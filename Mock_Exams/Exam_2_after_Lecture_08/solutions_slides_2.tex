@@ -1,0 +1,556 @@
+% ============================================================
+% HSBI Beamer — ISLP Lecture Series
+% Mock Exam 2 — Solutions (Lectures 5-8, ISLP Chapters 4-6)
+% Prof. Dr. Christoph Weisser — Summer Semester 2026
+% Build: pdflatex -jobname=Mock_Exam_2_Solutions_Slides solutions_slides_2.tex  (twice)
+% ============================================================
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}\usepackage[english]{babel}
+\usepackage{graphicx}\usepackage{booktabs}\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}\usepackage{hyperref}\usepackage{xcolor}
+\usepackage{verbatim}\usepackage{alltt}
+\usepackage{tikz}\usetikzlibrary{calc,arrows.meta,positioning,shapes}
+\usepackage{tcolorbox}\tcbuselibrary{skins}
+
+\usetheme{Madrid}\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamertemplate{headline}{%
+  \leavevmode\hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.2ex,dp=0.9ex]{section in head/foot}%
+      {\fontsize{4.6}{5.2}\selectfont%
+       \insertsectionnavigationhorizontal{\paperwidth}{}{\hskip0pt plus1filll}}%
+    \end{beamercolorbox}}%
+}
+\setbeamerfont{section in head/foot}{size=\tiny}
+\setbeamerfont{palette primary}{size=\tiny}
+\setbeamerfont{palette tertiary}{size=\tiny}
+\setbeamerfont{section in toc}{size=\footnotesize}
+
+\usepackage{listings}
+\definecolor{pyKw}{RGB}{0,0,180}\definecolor{pyStr}{RGB}{20,120,40}
+\definecolor{pyCom}{RGB}{120,120,120}\definecolor{accent}{RGB}{38,70,140}
+\lstdefinestyle{Pystyle}{language=Python,basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{pyKw}\bfseries,commentstyle=\color{pyCom}\itshape,
+  stringstyle=\color{pyStr},showstringspaces=false,upquote=true,
+  columns=fullflexible,breaklines=true,literate={~}{{$\sim$}}1}
+\lstset{style=Pystyle}
+
+\AtBeginSection[]{\begin{frame}{Outline}\footnotesize
+  \tableofcontents[currentsection,sectionstyle=show/shaded,subsectionstyle=show/show/hide]
+\end{frame}}
+
+\newcommand{\islpsource}[1]{%
+  \vfill\hfill{\tiny\itshape\color{gray}Source: #1 \textemdash{} ISLP, James et al.\ (2023).}\par
+}
+
+\newtcolorbox{takeaway}[1][Takeaway]{enhanced,colback=green!4,colframe=green!50!black,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+\newtcolorbox{numexample}[1][Worked example]{enhanced,colback=orange!4,colframe=orange!70!black,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+\newtcolorbox{readme}[1][How to read this]{enhanced,colback=blue!4,colframe=accent,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+
+\title{Mock Exam 2 --- Solutions}
+\subtitle{Lectures 5--8 (Chapters 4--6)}
+\author{Prof.\ Dr.\ Christoph Weisser}\institute{HSBI}
+\date{Summer Semester 2026}
+
+\newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{solutionbox}[1][Solution]{enhanced, fontupper=\footnotesize, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{longexercise}[1][Extended exercise (15 min)]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
+\addtobeamertemplate{frametitle}{}{\vspace{-2pt}}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{Overview --- problems and points}
+  \footnotesize
+  \begin{center}
+  \begin{tabular}{@{}clc@{}}
+    \toprule
+    \textbf{Problem} & \textbf{Topic} & \textbf{Points}\\
+    \midrule
+    P1 & Logistic regression by hand & 18\\
+    P2 & Discriminant analysis and naive Bayes --- concepts & 12\\
+    P3 & Confusion matrix and ROC curve & 15\\
+    P4 & Resampling methods (validation set $\cdot$ CV $\cdot$ bootstrap) & 18\\
+    P5 & Model selection with $C_p$ and BIC & 12\\
+    P6 & Ridge regression and the lasso & 15\\
+    \midrule
+     & \textbf{Total} \quad (90 minutes; points $\approx$ minutes) & \textbf{90}\\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{1mm}
+  \begin{takeaway}[How to use this deck]
+    Attempt each problem under exam conditions before looking at the teal boxes.
+    Allowed aids in the exam: a non-programmable calculator and one handwritten A4 sheet
+    of notes (both sides). Round final results to 3 decimals.
+  \end{takeaway}
+\end{frame}
+
+% ============================================================
+% Problem 1
+% ============================================================
+\begin{frame}{Problem 1 --- restatement}
+  \begin{exercise}[Problem 1 --- Logistic regression by hand (18 P)]
+    A bank models the default probability of a credit-card customer as a function of the
+    monthly balance $x$ (in EUR; observed range 0--400):
+    \[
+    \hat{p}(x)=\frac{e^{\hat{\beta}_0+\hat{\beta}_1x}}{1+e^{\hat{\beta}_0+\hat{\beta}_1x}},
+    \qquad \hat{\beta}_0=-4,\quad \hat{\beta}_1=0.02 .
+    \]
+    \begin{itemize}
+      \item[(a)] Predicted default probability at $x=100$ and $x=250$. \hfill (4 P)
+      \item[(b)] Odds and log-odds at both balances; interpret the odds at $x=250$. \hfill (4 P)
+      \item[(c)] Balance $x^{*}$ with $\hat{p}(x^{*})=0.5$. \hfill (3 P)
+      \item[(d)] Factor change of the odds per EUR and per 100 EUR; why is
+        ``probability $+0.02$ per EUR'' wrong? \hfill (4 P)
+      \item[(e)] Two reasons why linear regression on the 0/1 response is inappropriate. \hfill (3 P)
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution 1(a) --- predicted probabilities]
+    Linear predictor (log-odds): $\hat{\eta}(x)=-4+0.02\,x$, so
+    $\hat{\eta}(100)=-4+2=-2$ and $\hat{\eta}(250)=-4+5=1$. Hence
+    \[
+    \hat{p}(100)=\frac{e^{-2}}{1+e^{-2}}=\frac{0.1353}{1.1353}=\mathbf{0.119},
+    \qquad
+    \hat{p}(250)=\frac{e^{1}}{1+e^{1}}=\frac{2.7183}{3.7183}=\mathbf{0.731}.
+    \]
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 1(b) --- odds and log-odds]
+    Odds $=\hat{p}/(1-\hat{p})=e^{\hat{\eta}(x)}$ and log-odds $=\hat{\eta}(x)$:
+    \begin{center}
+    \begin{tabular}{lcc}
+      \toprule
+       & $x=100$ & $x=250$\\
+      \midrule
+      log-odds & $-2.000$ & $1.000$\\
+      odds & $e^{-2}=0.135$ & $e^{1}=2.718$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    Check with (a): $0.119/0.881=0.135$ and $0.731/0.269=2.718$. \checkmark\
+    At $x=250$ the odds are about $2.72$ to 1: default is roughly $2.7$ times as probable
+    as non-default.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution 1(c) --- balance with a 50:50 prediction]
+    $\hat{p}=0.5 \iff \text{odds}=1 \iff \text{log-odds}=0$:
+    \[
+    -4+0.02\,x^{*}=0 \quad\Longrightarrow\quad x^{*}=\frac{4}{0.02}=\mathbf{200\ \text{EUR}}.
+    \]
+    Below 200 EUR ``no default'' is predicted as more likely; above 200 EUR ``default''.
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 1(d) --- interpretation on the odds scale]
+    Per additional EUR the odds are \emph{multiplied} by $e^{\hat{\beta}_1}=e^{0.02}=1.020$
+    ($+2.0\,\%$); per additional 100 EUR by $e^{100\cdot 0.02}=e^{2}=7.389$.
+    The quoted statement is wrong because $\hat{\beta}_1$ acts on the \emph{log-odds}:
+    the probability change per EUR is
+    $\partial\hat{p}/\partial x=\hat{\beta}_1\,\hat{p}(x)\bigl(1-\hat{p}(x)\bigr)$,
+    which depends on $x$ --- the S-curve is steepest at $\hat{p}=0.5$ and almost flat in
+    the tails, so there is no constant probability effect.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (e)}
+  \begin{solutionbox}[Solution 1(e) --- why not linear regression]
+    \begin{itemize}
+      \item[(1)] The straight line $\hat{\beta}_0+\hat{\beta}_1x$ is unbounded: for small or
+        large balances it returns ``probabilities'' below 0 or above 1 --- not sensible
+        estimates of $\Pr(Y=1\mid x)$. The logistic function always stays in $[0,1]$.
+      \item[(2)] A 0/1 response violates the linear-model error assumptions: errors are
+        non-normal and heteroscedastic --- $\operatorname{Var}(Y\mid x)=p(x)(1-p(x))$
+        depends on $x$ --- so the usual inference is unreliable.
+      \item[] (With $>2$ classes a numeric coding would additionally impose an artificial
+        ordering and equal spacing between the classes.)
+    \end{itemize}
+  \end{solutionbox}
+  \begin{takeaway}[Remember]
+    Logistic regression is a \emph{linear model for the log-odds}:
+    $\log\bigl(p/(1-p)\bigr)=\beta_0+\beta_1x$. Coefficients are additive on the log-odds
+    scale and multiplicative on the odds scale --- never additive on the probability scale.
+  \end{takeaway}
+\end{frame}
+
+% ============================================================
+% Problem 2
+% ============================================================
+\begin{frame}{Problem 2 --- restatement}
+  \begin{exercise}[Problem 2 --- Discriminant analysis and naive Bayes (12 P)]
+    \begin{itemize}
+      \item[(a)] LDA vs.\ QDA: the distinguishing covariance assumption; number of
+        covariance matrices estimated with $K$ classes. \hfill (4 P)
+      \item[(b)] Bias--variance: when does LDA beat QDA on test data and vice versa?
+        Role of $n$ and of the true class covariances. \hfill (3 P)
+      \item[(c)] Key assumption of naive Bayes; why can it help when $p$ is large relative
+        to $n$? \hfill (3 P)
+      \item[(d)] Which classifiers give linear and which give quadratic or more general
+        boundaries? \hfill (2 P)
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution 2(a) --- covariance assumptions]
+    Both assume $X\mid Y=k\sim\mathcal{N}(\mu_k,\Sigma_k)$.
+    \textbf{LDA:} one covariance matrix \emph{shared} by all classes
+    ($\Sigma_1=\dots=\Sigma_K=\Sigma$) $\Rightarrow$ estimates \textbf{1} matrix
+    ($p(p+1)/2$ parameters). \textbf{QDA:} a \emph{class-specific} $\Sigma_k$
+    $\Rightarrow$ estimates \textbf{K} matrices ($K\,p(p+1)/2$ parameters).
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 2(b) --- who wins when]
+    QDA is far more flexible: \emph{low bias but high variance}; LDA is restrictive:
+    \emph{low variance but biased if the $\Sigma_k$ truly differ}.
+    \begin{itemize}
+      \item \textbf{LDA wins} when $n$ is small (or $p$ large) --- variance reduction is
+        crucial --- and when the class covariances are approximately equal (little bias
+        incurred).
+      \item \textbf{QDA wins} when $n$ is large --- its many parameters are estimated
+        reliably --- and when the class covariances clearly differ, so the shared-$\Sigma$
+        assumption of LDA would cause substantial bias.
+    \end{itemize}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution 2(c) --- naive Bayes]
+    Assumption: \emph{within each class the $p$ predictors are independent}:
+    $f_k(x)=f_{k1}(x_1)\cdots f_{kp}(x_p)$.
+    Only $p$ one-dimensional marginals per class are estimated instead of a full
+    $p$-dimensional joint density (no within-class association parameters). This slashes
+    the number of parameters and hence the \emph{variance}; for large $p$ relative to $n$
+    the variance saving usually outweighs the bias from ignoring dependence --- the
+    bias--variance trade-off again.
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 2(d) --- boundary shapes]
+    \textbf{LDA:} linear boundaries (quadratic terms cancel due to the shared $\Sigma$).
+    \textbf{QDA:} quadratic boundaries. \textbf{Naive Bayes:} generally non-linear but
+    \emph{additive} boundaries --- log-odds of the form $\sum_j g_j(x_j)$ without
+    interactions; only in special cases (e.g.\ Gaussian marginals with class-shared
+    variances) does it become linear.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% Problem 3
+% ============================================================
+\begin{frame}{Problem 3 --- restatement}
+  \begin{exercise}[Problem 3 --- Confusion matrix and ROC curve (15 P)]
+    Logistic-regression default classifier on $n=1{,}000$ customers with threshold
+    $\hat{p}>0.5$:
+    \begin{center}
+    \begin{tabular}{llcc}
+       & & \multicolumn{2}{c}{\textbf{True status}}\\
+       & & Default & No default\\
+      \midrule
+      \textbf{Predicted} & Default & 60 & 45\\
+       & No default & 40 & 855\\
+      \midrule
+       & Total & 100 & 900\\
+    \end{tabular}
+    \end{center}
+    \begin{itemize}
+      \item[(a)] TP/FP/FN/TN; accuracy and error rate; sensitivity; specificity;
+        precision; FPR; interpret sensitivity and precision. \hfill (7 P)
+      \item[(b)] Effect of lowering the threshold from 0.5 to 0.2 on sensitivity and
+        specificity; business reason for accepting it. \hfill (4 P)
+      \item[(c)] What does the ROC curve plot? Meaning of AUC $=0.5$ and AUC $=1$. \hfill (4 P)
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (a)}
+  \begin{solutionbox}[Solution 3(a) --- the five metrics]
+    Positive class ``default'': $\text{TP}=60$, $\text{FP}=45$, $\text{FN}=40$, $\text{TN}=855$.
+    \begin{center}
+    \begin{tabular}{llll}
+      \toprule
+      accuracy & $(60+855)/1000$ & $=0.915$ & error rate $=0.085$\\
+      sensitivity (recall/TPR) & $60/(60+40)=60/100$ & $=0.600$ & \\
+      specificity & $855/(855+45)=855/900$ & $=0.950$ & \\
+      precision & $60/(60+45)=60/105$ & $=0.571$ & \\
+      false positive rate & $45/(45+855)=45/900$ & $=0.050$ & $=1-\text{specificity}$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    \emph{Sensitivity:} $60\,\%$ of the true defaulters are detected --- $40\,\%$ are
+    missed. \emph{Precision:} of all customers flagged as defaulters only $57.1\,\%$
+    actually default; the remaining flags are false alarms.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (b) and (c)}
+  \begin{solutionbox}[Solution 3(b) --- lowering the threshold to 0.2]
+    More customers are flagged: true defaulters with $0.2<\hat{p}\le 0.5$ are now caught
+    $\Rightarrow$ \textbf{sensitivity increases} (FN $\downarrow$); more non-defaulters
+    are flagged too $\Rightarrow$ \textbf{specificity decreases} (FPR $\uparrow$).
+    \emph{Business reason:} asymmetric costs --- a missed default (credit loss) is far
+    more expensive than a false alarm (e.g.\ an unnecessary review); the expected cost can
+    fall even if the raw error rate rises.
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 3(c) --- ROC and AUC]
+    The ROC curve plots the \emph{true positive rate} (sensitivity) against the
+    \emph{false positive rate} ($1-$specificity) as the classification \emph{threshold}
+    varies from 1 down to 0. $\text{AUC}=0.5$: diagonal --- no better than random
+    guessing. $\text{AUC}=1$: perfect classifier --- some threshold attains sensitivity
+    $=1$ and specificity $=1$ simultaneously. (AUC $=$ probability that a random defaulter
+    is scored above a random non-defaulter.)
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% Problem 4
+% ============================================================
+\begin{frame}{Problem 4 --- restatement}
+  \begin{exercise}[Problem 4 --- Resampling methods (18 P)]
+    \begin{itemize}
+      \item[(a)] $n=200$: number of model \emph{fits} for the validation-set approach
+        (50/50 split) $\cdot$ 10-fold CV $\cdot$ LOOCV --- with justification. \hfill (4 P)
+      \item[(b)] LOOCV vs.\ 10-fold CV: bias and variance; which is preferred in
+        practice? \hfill (4 P)
+      \item[(c)] Show $\Pr(i\in\text{bootstrap sample})=1-(1-1/n)^n$; evaluate at $n=5$;
+        limit as $n\to\infty$. \hfill (5 P)
+      \item[(d)] $B=3$ bootstrap estimates $\hat{\alpha}^{*}=0.4$ / $0.5$ / $0.6$
+        (toy example; in practice $B\approx 1{,}000$): compute
+        $\widehat{\operatorname{SE}}_B(\hat{\alpha})$; what does it estimate; why is the
+        bootstrap useful? \hfill (5 P)
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution 4(a) --- number of fits at n = 200]
+    \begin{itemize}
+      \item \textbf{Validation set: 1 fit} --- train once on the 100 training
+        observations, evaluate on the 100 held-out ones.
+      \item \textbf{10-fold CV: 10 fits} --- each fold of 20 is held out once; refit on
+        the remaining 180 each time.
+      \item \textbf{LOOCV: 200 fits} --- each observation is held out once; refit on the
+        other 199 ($=n$-fold CV; for least squares a shortcut formula exists).
+    \end{itemize}
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 4(b) --- bias and variance of CV]
+    \emph{Bias:} LOOCV trains on $n-1$ observations $\Rightarrow$ nearly unbiased;
+    10-fold trains on $0.9\,n$ $\Rightarrow$ slightly overestimates the test error.
+    \emph{Variance:} LOOCV is \emph{higher}: its $n$ fits use almost identical training
+    sets, so the fold errors are strongly positively correlated --- averaging highly
+    correlated quantities reduces variance little; the 10 folds overlap less.
+    \emph{Practice:} $k=5$ or $10$ --- good bias--variance compromise and far cheaper.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution 4(c) --- bootstrap inclusion probability]
+    Each of the $n$ draws (with replacement) misses observation $i$ with probability
+    $1-1/n$; draws are independent:
+    $\Pr(i\notin\text{sample})=(1-1/n)^n \Rightarrow \Pr(i\in\text{sample})=1-(1-1/n)^n$.
+    \[
+    n=5:\ 1-(4/5)^5=1-0.32768=\mathbf{0.672};
+    \qquad
+    n\to\infty:\ 1-e^{-1}\approx 1-0.368=\mathbf{0.632}.
+    \]
+    A bootstrap sample contains roughly $2/3$ of the distinct original observations.
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 4(d) --- bootstrap standard error]
+    $\bar{\alpha}^{*}=(0.4+0.5+0.6)/3=0.5$;
+    \[
+    \widehat{\operatorname{SE}}_B(\hat{\alpha})
+    =\sqrt{\tfrac{1}{3-1}\bigl[(-0.1)^2+0^2+(0.1)^2\bigr]}
+    =\sqrt{0.02/2}=\sqrt{0.01}=\mathbf{0.100}.
+    \]
+    It estimates how much $\hat{\alpha}$ would vary over repeated samples from the
+    population. The bootstrap needs no analytic formula and no new data --- it resamples
+    the observed data and works for almost any statistic.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% Problem 5
+% ============================================================
+\begin{frame}{Problem 5 --- restatement}
+  \begin{exercise}[Problem 5 --- Model selection with Cp and BIC (12 P)]
+    Best subset selection with $n=100$ and $\hat{\sigma}^2=4$ (from the full model):
+    \begin{center}
+    \begin{tabular}{lcccc}
+      \toprule
+      $d$ & 1 & 2 & 3 & 4\\
+      \midrule
+      $\operatorname{RSS}_d$ & 500 & 444 & 428 & 424\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    \[
+    C_p=\tfrac{1}{n}\bigl(\operatorname{RSS}+2d\hat{\sigma}^2\bigr),\qquad
+    \operatorname{BIC}=\tfrac{1}{n}\bigl(\operatorname{RSS}+\log(n)\,d\,\hat{\sigma}^2\bigr),
+    \qquad \log(100)\approx 4.605 .
+    \]
+    \begin{itemize}
+      \item[(a)] $C_p$ for all four models. \hfill (4 P)
+      \item[(b)] BIC for all four models. \hfill (4 P)
+      \item[(c)] Which $d$ does each criterion select? Explain the disagreement. \hfill (2 P)
+      \item[(d)] Why can training RSS alone never select $d$? \hfill (2 P)
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution 5(a) --- Cp (penalty 8 per predictor)]
+    $C_p=(\operatorname{RSS}_d+2d\hat{\sigma}^2)/100=(\operatorname{RSS}_d+8d)/100$:
+    \begin{center}
+    \begin{tabular}{lcccc}
+      \toprule
+      $d$ & 1 & 2 & 3 & 4\\
+      \midrule
+      $\operatorname{RSS}_d+8d$ & 508 & 460 & 452 & 456\\
+      $C_p$ & 5.080 & 4.600 & \textbf{4.520} & 4.560\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 5(b) --- BIC (penalty 18.421 per predictor)]
+    $\operatorname{BIC}=(\operatorname{RSS}_d+4.605\cdot 4\cdot d)/100
+      =(\operatorname{RSS}_d+18.421\,d)/100$:
+    \begin{center}
+    \begin{tabular}{lcccc}
+      \toprule
+      $d$ & 1 & 2 & 3 & 4\\
+      \midrule
+      $\operatorname{RSS}_d+18.421\,d$ & 518.421 & 480.841 & 483.262 & 497.683\\
+      BIC & 5.184 & \textbf{4.808} & 4.833 & 4.977\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution 5(c) --- selected models and why they differ]
+    $C_p$ picks $\mathbf{d=3}$ (4.520); BIC picks $\mathbf{d=2}$ (4.808).
+    Both are RSS $+$ size penalty, but BIC charges $\log(n)\hat{\sigma}^2=18.421$ per
+    predictor vs.\ $2\hat{\sigma}^2=8$ for $C_p$; since $\log(100)=4.605>2$, BIC
+    penalises extra predictors more heavily and selects smaller models. Here the RSS drop
+    from $d=2$ to $d=3$ is $16$: larger than $8$ (so $C_p$ accepts the third predictor)
+    but smaller than $18.421$ (so BIC rejects it).
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 5(d) --- why RSS alone fails]
+    Adding a predictor can never increase the training RSS: RSS decreases
+    \emph{monotonically} in $d$ (training $R^2$ increases monotonically), so RSS-based
+    selection would always choose the largest model $d=4$ --- training error is an ever
+    more optimistic estimate of test error as flexibility grows. Hence: penalise model
+    size ($C_p$ / AIC / BIC / adjusted $R^2$) or estimate test error directly
+    (validation set / cross-validation).
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% Problem 6
+% ============================================================
+\begin{frame}{Problem 6 --- restatement}
+  \begin{exercise}[Problem 6 --- Ridge regression and the lasso (15 P)]
+    Linear model with standardised predictors $X_1,\dots,X_p$.
+    \begin{itemize}
+      \item[(a)] Objectives of ridge and lasso; which coefficient is not penalised? \hfill (4 P)
+      \item[(b)] Behaviour as $\lambda\to 0$ and $\lambda\to\infty$; which Chapter-3 method
+        is recovered as $\lambda\to 0$? \hfill (3 P)
+      \item[(c)] Why can the lasso set coefficients exactly to zero (geometry for $p=2$)? \hfill (3 P)
+      \item[(d)] Why standardise the predictors first? \hfill (2 P)
+      \item[(e)] Ridge fits at $\lambda=0.1$ and $\lambda=100$ (standardised coefficients)
+        and a 10-fold CV grid: which fit has lower bias / lower variance; which $\lambda$
+        should be chosen? \hfill (3 P)
+    \end{itemize}
+    \vspace{-1mm}
+    \begin{center}
+    \scriptsize
+    \begin{tabular}{lrr}
+      \toprule
+       & $\lambda=0.1$ & $\lambda=100$\\
+      \midrule
+      $\hat{\beta}_1$ & $0.92$ & $0.31$\\
+      $\hat{\beta}_2$ & $0.85$ & $0.29$\\
+      $\hat{\beta}_3$ & $-0.41$ & $-0.12$\\
+      $\hat{\beta}_4$ & $0.20$ & $0.06$\\
+      \bottomrule
+    \end{tabular}
+    \hspace{10mm}
+    \begin{tabular}{lcccc}
+      \toprule
+      $\lambda$ & 0.1 & 1 & 10 & 100\\
+      \midrule
+      CV error & 12.8 & 11.9 & 10.6 & 13.4\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution 6(a) --- the two objectives]
+    \[
+    \text{Ridge: }\min_{\beta}\ \operatorname{RSS}+\lambda\sum_{j=1}^{p}\beta_j^{2},
+    \qquad
+    \text{Lasso: }\min_{\beta}\ \operatorname{RSS}+\lambda\sum_{j=1}^{p}|\beta_j|,
+    \]
+    with $\operatorname{RSS}=\sum_{i}\bigl(y_i-\beta_0-\sum_j\beta_jx_{ij}\bigr)^2$ and
+    tuning parameter $\lambda\ge 0$. The intercept $\beta_0$ is \emph{not} penalised.
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 6(b) --- limiting behaviour]
+    $\lambda\to 0$: the penalty vanishes; both approach the \emph{ordinary least-squares}
+    fit of Chapter~3. $\lambda\to\infty$: the penalty dominates; all penalised
+    coefficients go to zero (null model with intercept only). Ridge shrinks
+    \emph{towards} zero (exactly zero only in the limit); the lasso sets more and more
+    coefficients \emph{exactly} to zero as $\lambda$ grows --- flexibility decreases
+    continuously along the $\lambda$ path.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution 6(c) --- why the lasso yields exact zeros]
+    Equivalent constrained form: minimise RSS subject to $|\beta_1|+|\beta_2|\le s$
+    (lasso: a \emph{diamond} with corners on the axes) or $\beta_1^2+\beta_2^2\le s$
+    (ridge: a \emph{disk} with no corners). The solution lies where the elliptical RSS
+    contours around the OLS estimate first touch the region. Ellipses typically hit the
+    diamond at a \emph{corner} --- where one coefficient is exactly zero (sparsity /
+    variable selection). The disk has no corners, so the contact point generically has all
+    coordinates non-zero: ridge shrinks but keeps every predictor.
+  \end{solutionbox}
+  \begin{solutionbox}[Solution 6(d) --- why standardise]
+    OLS is scale-equivariant --- rescaling $X_j$ just rescales $\hat{\beta}_j$. The
+    penalties depend on the coefficient \emph{magnitudes}: a predictor in small units has
+    a large coefficient and would be shrunk more strongly for purely cosmetic reasons.
+    Standardising to standard deviation one makes the penalty act comparably on all
+    predictors and the fit independent of the units.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (e)}
+  \begin{solutionbox}[Solution 6(e) --- bias-variance and the choice of lambda]
+    $\lambda=0.1$: almost no shrinkage --- close to the OLS fit --- more flexible
+    $\Rightarrow$ \textbf{lower bias and higher variance}. $\lambda=100$: strong shrinkage
+    (e.g.\ $0.92\to 0.31$; each coefficient about a third of its size) $\Rightarrow$
+    \textbf{higher bias and lower variance}. This is the Chapter-2 bias--variance
+    trade-off controlled by the single knob $\lambda$.
+    From the CV table the estimated test error is smallest at
+    $\lambda=\mathbf{10}$ ($10.6<11.9<12.8<13.4$) --- choose $\lambda=10$; neither of the
+    two fits in the coefficient table is optimal.
+  \end{solutionbox}
+  \begin{takeaway}[Big picture for the exam]
+    Regularisation trades a little bias for a large variance reduction; $\lambda$ is
+    always chosen by cross-validation --- never by looking at training RSS.
+  \end{takeaway}
+\end{frame}
+
+\end{document}

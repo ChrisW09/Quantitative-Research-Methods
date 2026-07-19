@@ -1,0 +1,471 @@
+% ============================================================
+% HSBI Beamer — ISLP Lecture Series
+% Mock Exam 1 — Solutions (Lectures 1-4, Chapters 1-3)
+% Compile: pdflatex -jobname=Mock_Exam_1_Solutions_Slides solutions_slides_1.tex
+% ============================================================
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}\usepackage[english]{babel}
+\usepackage{graphicx}\usepackage{booktabs}\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}\usepackage{hyperref}\usepackage{xcolor}
+\usepackage{verbatim}\usepackage{alltt}
+\usepackage{tikz}\usetikzlibrary{calc,arrows.meta,positioning,shapes}
+\usepackage{tcolorbox}\tcbuselibrary{skins}
+
+\usetheme{Madrid}\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamertemplate{headline}{%
+  \leavevmode\hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.2ex,dp=0.9ex]{section in head/foot}%
+      {\fontsize{4.6}{5.2}\selectfont%
+       \insertsectionnavigationhorizontal{\paperwidth}{}{\hskip0pt plus1filll}}%
+    \end{beamercolorbox}}%
+}
+\setbeamerfont{section in head/foot}{size=\tiny}
+\setbeamerfont{palette primary}{size=\tiny}
+\setbeamerfont{palette tertiary}{size=\tiny}
+\setbeamerfont{section in toc}{size=\footnotesize}
+
+\usepackage{listings}
+\definecolor{pyKw}{RGB}{0,0,180}\definecolor{pyStr}{RGB}{20,120,40}
+\definecolor{pyCom}{RGB}{120,120,120}\definecolor{accent}{RGB}{38,70,140}
+\lstdefinestyle{Pystyle}{language=Python,basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{pyKw}\bfseries,commentstyle=\color{pyCom}\itshape,
+  stringstyle=\color{pyStr},showstringspaces=false,upquote=true,
+  columns=fullflexible,breaklines=true,literate={~}{{$\sim$}}1}
+\lstset{style=Pystyle}
+
+\newtcolorbox{takeaway}[1][Takeaway]{enhanced,colback=green!4,colframe=green!50!black,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+\newtcolorbox{numexample}[1][Worked example]{enhanced,colback=orange!4,colframe=orange!70!black,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+\newtcolorbox{readme}[1][How to read this]{enhanced,colback=blue!4,colframe=accent,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+
+\title{Mock Exam 1 --- Solutions}
+\subtitle{Lectures 1--4 (Chapters 1--3)}
+\author{Prof.\ Dr.\ Christoph Weisser}\institute{HSBI}
+\date{Summer Semester 2026}\graphicspath{{images/}}
+
+\newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{solutionbox}[1][Solution]{enhanced, fontupper=\footnotesize, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
+\addtobeamertemplate{frametitle}{}{\vspace{-2pt}}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{Overview of the mock exam}
+  \footnotesize
+  \begin{center}
+  \begin{tabular}{@{}clc@{}}
+    \toprule
+    \textbf{Problem} & \textbf{Topic} & \textbf{Points}\\
+    \midrule
+    P1 & Fundamentals of statistical learning & 15\\
+    P2 & Bias--variance decomposition & 15\\
+    P3 & $K$-nearest neighbours classification & 12\\
+    P4 & Simple linear regression by hand & 24\\
+    P5 & Multiple regression --- interpreting Python output & 24\\
+    \midrule
+    $\Sigma$ & & \textbf{90}\\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{2pt}
+  \begin{takeaway}[Exam conditions]
+    90 minutes for 90 points ($\approx$ 1 point per minute). Allowed aids: non-programmable
+    calculator and one handwritten A4 sheet (both sides). Justify every answer; round final
+    results to 3 decimals.
+  \end{takeaway}
+\end{frame}
+
+% ============================================================
+% P1
+% ============================================================
+\begin{frame}{Problem 1 --- task}
+  \begin{exercise}[Problem 1 (15 P) --- Fundamentals of statistical learning]
+    \begin{itemize}
+      \item[(a)] \textbf{[4 P]} Prediction vs.\ inference --- explain the difference; one example each.
+      \item[(b)] \textbf{[4 P]} Parametric vs.\ non-parametric estimation of $f$; one advantage of each;
+        which flexibility--interpretability trade-off is behind the choice?
+      \item[(c)] \textbf{[3 P]} Classify: (i) churn prediction for 800 telecom customers;
+        (ii) which firm characteristics are associated with CEO salary (90 firms);
+        (iii) find groups among 5{,}000 shopping baskets.
+      \item[(d)] \textbf{[4 P]} Why is training MSE generally smaller than test MSE? What is overfitting?
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P1 --- (a) and (b)]
+    \textbf{(a) Prediction:} accurate $\hat Y=\hat f(X)$ for new $X$; $\hat f$ may be a black box.
+    \emph{Example:} is an incoming e-mail spam?\\
+    \textbf{Inference:} understand \emph{how} $Y$ depends on $X_1,\dots,X_p$ (which predictors,
+    direction, size); $\hat f$ must be interpretable.
+    \emph{Example:} which ad channels increase sales and by how much?
+    \medskip
+
+    \textbf{(b) Parametric:} (1) assume a form, e.g.\ $f(X)=\beta_0+\sum_j\beta_j X_j$;
+    (2) estimate the few parameters (least squares). \emph{Advantage:} needs less data;
+    simple and interpretable.\\
+    \textbf{Non-parametric:} no functional form; $\hat f$ follows the data (KNN, splines).
+    \emph{Advantage:} captures many possible shapes of $f$ --- no risk of a badly wrong form.\\
+    \emph{Trade-off:} flexibility reduces bias but costs data, risks overfitting and loses
+    interpretability; for inference we usually prefer restrictive models.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P1 --- (c) and (d)]
+    \textbf{(c)} (i) \emph{Classification}: qualitative response cancel yes/no (prediction).\\
+    (ii) \emph{Regression}: quantitative response CEO salary (inference).\\
+    (iii) \emph{Unsupervised}: no response variable; goal is clustering.
+    \medskip
+
+    \textbf{(d)} The method is fitted by minimising \emph{training} error, so $\hat f$ adapts to
+    the training observations \emph{including their noise} --- training MSE systematically
+    underestimates the error on fresh data. With growing flexibility the training MSE falls
+    monotonically while the test MSE is U-shaped.\\
+    \emph{Overfitting:} the fit follows patterns of the training noise that do not exist in the
+    population; a less flexible model would have \emph{lower test} MSE. Symptom: very small
+    training MSE together with a rising test MSE (widening gap).
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P2
+% ============================================================
+\begin{frame}{Problem 2 --- task}
+  \begin{exercise}[Problem 2 (15 P) --- Bias--variance decomposition]
+    At a fixed $x_0$ three methods were analysed; $\sigma^2=\operatorname{Var}(\varepsilon)=1.00$:
+    \begin{center}\scriptsize
+    \begin{tabular}{lccc}
+      \toprule
+      & A (linear) & B (moderate) & C (very flexible)\\
+      \midrule
+      $[\operatorname{Bias}]^2$ & 2.25 & 0.16 & 0.01\\
+      $\operatorname{Var}(\hat f(x_0))$ & 0.25 & 1.44 & 3.60\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    (a) \textbf{[4 P]} State the decomposition of the expected test MSE and explain the components.
+    (b) \textbf{[5 P]} Compute the expected test MSE for A--C; which method to choose?
+    (c) \textbf{[3 P]} Smallest expected test MSE any method could achieve here?
+    (d) \textbf{[3 P]} Behaviour of bias$^2$/variance/training/test MSE as flexibility grows; U-shape.
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P2 --- (a) and (b)]
+    \textbf{(a)}\ \ $E\big[(y_0-\hat f(x_0))^2\big]
+      =\underbrace{\operatorname{Var}(\hat f(x_0))}_{\text{sensitivity to training set}}
+      +\underbrace{[\operatorname{Bias}(\hat f(x_0))]^2}_{\text{systematic model error}}
+      +\underbrace{\operatorname{Var}(\varepsilon)}_{\text{irreducible noise}}$
+    \medskip
+
+    \textbf{(b)} Expected test MSE $=$ Bias$^2$ + Var + $\sigma^2$:
+    \begin{center}
+    \begin{tabular}{lcccc}
+      \toprule
+      & Bias$^2$ & Var & $\sigma^2$ & Test MSE\\
+      \midrule
+      A & 2.25 & 0.25 & 1.00 & 3.50\\
+      B & 0.16 & 1.44 & 1.00 & \textbf{2.60}\\
+      C & 0.01 & 3.60 & 1.00 & 4.61\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    Choose \textbf{B}: lowest expected test MSE. C pays more in variance ($+2.16$) than it
+    gains in bias ($-0.15$).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P2 --- (c) and (d)]
+    \textbf{(c)} $\sigma^2 = 1.00$. Since Bias$^2\ge 0$ and Var $\ge 0$,
+    $E[(y_0-\hat f(x_0))^2]\ \ge\ \operatorname{Var}(\varepsilon)=1.00$ for \emph{every} method.
+    Even the true $f$ cannot predict the noise draw $\varepsilon_0$: the \emph{irreducible error}
+    is the floor.
+    \medskip
+
+    \textbf{(d)} As flexibility increases:
+    \begin{itemize}
+      \item Bias$^2$ \emph{decreases} (typically monotonically); variance \emph{increases};
+      \item training MSE decreases \emph{monotonically} (the fit hugs the training data);
+      \item test MSE $=$ Bias$^2+$Var$+\sigma^2$ first falls (bias reduction dominates)
+        then rises (variance dominates) $\Rightarrow$ \textbf{U-shape}.
+    \end{itemize}
+    In the table: $3.50 \to 2.60 \to 4.61$ for A $\to$ B $\to$ C --- minimum at intermediate
+    flexibility.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P3
+% ============================================================
+\begin{frame}{Problem 3 --- task}
+  \begin{exercise}[Problem 3 (12 P) --- KNN classification]
+    Seven visitors with scores $X_1$ (pages) and $X_2$ (minutes) and outcome $Y$ (purchase);
+    new visitor at $x_0=(4{{,}}2)$ --- classify with Euclidean distance.
+    \begin{center}\scriptsize
+    \begin{tabular}{lccccccc}
+      \toprule
+      Obs. & 1 & 2 & 3 & 4 & 5 & 6 & 7\\
+      \midrule
+      $X_1$ & 4 & 2 & 6 & 4 & 1 & 7 & 5\\
+      $X_2$ & 3 & 2 & 2 & 5 & 1 & 4 & 6\\
+      $Y$ & Yes & No & No & No & Yes & Yes & No\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    (a) \textbf{[4 P]} All distances; classification with $K=1$.
+    (b) \textbf{[4 P]} Classification with $K=3$ and $\widehat{\Pr}(\text{Yes}\mid x_0)$.
+    (c) \textbf{[2 P]} Effect of $K$ on bias/variance; training error of 1-NN.
+    (d) \textbf{[2 P]} Bayes classifier: definition; why unattainable; relation to KNN.
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P3 --- (a) and (b)]
+    \textbf{(a)} $d^2=(X_1-4)^2+(X_2-2)^2$, sorted:
+    \begin{center}\scriptsize
+    \begin{tabular}{lccccccc}
+      \toprule
+      Obs. & 1 & 2 & 3 & 4 & 5 & 6 & 7\\
+      \midrule
+      $d^2$ & 1 & 4 & 4 & 9 & 10 & 13 & 17\\
+      $d$ & 1.000 & 2.000 & 2.000 & 3.000 & 3.162 & 3.606 & 4.123\\
+      $Y$ & Yes & No & No & No & Yes & Yes & No\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    $K=1$: nearest is Obs.~1 ($d=1.000$; Yes) $\Rightarrow$ \textbf{Yes}.
+    \medskip
+
+    \textbf{(b)} $K=3$: neighbours are Obs.~1 (Yes) and Obs.~2 and Obs.~3 (both No).
+    $\widehat{\Pr}(\text{Yes}\mid x_0)=1/3\approx 0.333$;
+    $\widehat{\Pr}(\text{No}\mid x_0)=2/3$ $\Rightarrow$ majority vote: \textbf{No}.
+    Note that $K=1$ and $K=3$ disagree --- the answer depends on the flexibility.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P3 --- (c) and (d)]
+    \textbf{(c)} Small $K$ (e.g.\ 1): highly flexible and jagged boundary $\Rightarrow$
+    \emph{low bias, high variance}. Large $K$: strong local averaging, smooth almost linear
+    boundary $\Rightarrow$ \emph{high bias, low variance}.
+    Training error of 1-NN: $0$ --- each training point is its own nearest neighbour
+    (says nothing about test error).
+    \medskip
+
+    \textbf{(d)} The \emph{Bayes classifier} assigns $x$ to the class $j$ maximising the
+    \emph{true} conditional probability $\Pr(Y=j\mid X=x)$; it minimises the expected test
+    error (\emph{Bayes error rate} $=$ lower bound for all classifiers).
+    Unattainable in practice: the conditional distribution of $Y$ given $X$ is unknown.
+    KNN \emph{estimates} these probabilities locally from the $K$ nearest neighbours and then
+    classifies to the largest estimate --- a data-driven approximation of the Bayes rule.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P4
+% ============================================================
+\begin{frame}{Problem 4 --- task}
+  \begin{exercise}[Problem 4 (24 P) --- Simple linear regression by hand]
+    Radio spots $x$ and weekly sales $y$ (in 1{,}000 EUR) for $n=5$ weeks;
+    $\sum x_i=15$; $\sum y_i=55$; $\sum x_i^2=55$; $\sum x_iy_i=195$.
+    \begin{center}\scriptsize
+    \begin{tabular}{lccccc}
+      \toprule
+      Week & 1 & 2 & 3 & 4 & 5\\
+      \midrule
+      $x_i$ & 1 & 2 & 3 & 4 & 5\\
+      $y_i$ & 6 & 7 & 11 & 13 & 18\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    (a) \textbf{[6 P]} $\hat\beta_1$ and $\hat\beta_0$; fitted line; interpretation.
+    (b) \textbf{[4 P]} Fitted values and residuals; check $\sum e_i=0$.
+    (c) \textbf{[3 P]} RSS and RSE; interpretation.
+    (d) \textbf{[6 P]} $\operatorname{SE}(\hat\beta_1)$; $t$-test of $H_0\colon\beta_1=0$
+        ($t_{0.975{{,}}3}=3.182$); 95\,\% CI.
+    (e) \textbf{[3 P]} TSS and $R^2$; interpretation. \quad
+    (f) \textbf{[2 P]} Prediction at $x=6$; one caveat.
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P4 --- (a) and (b)]
+    \textbf{(a)} $\bar x=3$; $\bar y=11$;\quad
+    $S_{xy}=195-5\cdot 3\cdot 11=30$;\quad $S_{xx}=55-5\cdot 3^2=10$
+    \[
+      \hat\beta_1=\frac{30}{10}=3.000\qquad
+      \hat\beta_0=11-3\cdot 3=2.000\qquad
+      \hat y = 2.000+3.000\,x
+    \]
+    \emph{Slope:} $+1$ spot $\Rightarrow$ expected sales $+3{,}000$ EUR per week.
+    \emph{Intercept:} expected sales without spots $=2{,}000$ EUR (mild extrapolation;
+    $x=0$ not observed).
+    \medskip
+
+    \textbf{(b)} $\hat y_i = 2+3x_i$; $e_i=y_i-\hat y_i$:
+    \begin{center}
+    \begin{tabular}{lccccc}
+      \toprule
+      $i$ & 1 & 2 & 3 & 4 & 5\\
+      \midrule
+      $\hat y_i$ & 5 & 8 & 11 & 14 & 17\\
+      $e_i$ & $1$ & $-1$ & $0$ & $-1$ & $1$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    $\sum e_i = 1-1+0-1+1 = 0$ \checkmark\ (always true for least squares with intercept).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P4 --- (c) and (d)]
+    \textbf{(c)} $\operatorname{RSS}=1+1+0+1+1=4.000$;\quad
+    $\operatorname{RSE}=\sqrt{4/(5-2)}=\sqrt{4/3}=1.155$ (thousand EUR):
+    typical deviation of observed sales from the true line ($\hat\sigma$).
+    \medskip
+
+    \textbf{(d)} $\operatorname{SE}(\hat\beta_1)=\dfrac{\operatorname{RSE}}{\sqrt{S_{xx}}}
+      =\dfrac{1.1547}{\sqrt{10}}=0.365$;\qquad
+    $t=\dfrac{3.000}{0.3651}=8.216$\ \ (df $=3$).
+    \begin{itemize}
+      \item $|t| = 8.216 > 3.182 = t_{0.975{,}3}$ $\Rightarrow$ reject $H_0\colon\beta_1=0$
+        at the 5\,\% level: significant positive association.
+      \item 95\,\% CI: $3.000 \pm 3.182\cdot 0.3651 = 3.000\pm 1.162 = [1.838;\ 4.162]$;
+        $0\notin$ CI --- consistent with the test.
+    \end{itemize}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (e) and (f)}
+  \begin{solutionbox}[Solution P4 --- (e) and (f)]
+    \textbf{(e)} $\operatorname{TSS}=\sum_i(y_i-11)^2=25+16+0+4+49=94.000$
+    \[
+      R^2=1-\frac{\operatorname{RSS}}{\operatorname{TSS}}=1-\frac{4}{94}=0.957
+    \]
+    $95.7\,\%$ of the variance of weekly sales is explained by the regression on radio spots
+    (simple regression: $r=\sqrt{R^2}\approx 0.979$).
+    \medskip
+
+    \textbf{(f)} $\hat y(6)=2+3\cdot 6=20.000$ thousand EUR $=20{,}000$ EUR.\\
+    \emph{Caveat:} $x=6$ lies outside the observed range $[1{;}5]$ $\Rightarrow$
+    \textbf{extrapolation} --- the linear form is unverified there (and $n=5$ is very small).
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P5
+% ============================================================
+\begin{frame}{Problem 5 --- task}
+  \begin{exercise}[Problem 5 (24 P) --- Multiple regression output]
+    $n=60$ employees; \texttt{salary} (1{,}000 EUR/year); \texttt{experience} (years);
+    \texttt{female} (dummy). OLS fit of
+    $\texttt{salary}=\beta_0+\beta_1\texttt{experience}+\beta_2\texttt{female}
+      +\beta_3(\texttt{experience}\!\times\!\texttt{female})+\varepsilon$:
+    \begin{center}\scriptsize
+    \begin{tabular}{lrrrr}
+      \toprule
+      & coef & std err & $t$ & $P>|t|$\\
+      \midrule
+      Intercept & 46.2000 & 1.100 & 42.000 & $<$0.0001\\
+      experience & 2.3500 & 0.250 & 9.400 & $<$0.0001\\
+      female & $-3.1000$ & 1.550 & $-2.000$ & 0.0504\\
+      experience:female & $-0.8500$ & 0.350 & $-2.429$ & 0.0184\\
+      \bottomrule
+    \end{tabular}\\[1mm]
+    $R^2=0.712$;\ adj.\ $R^2=0.697$;\ $F=46.15$ on 3 and 56 df; Prob($F$) $<0.0001$
+    \end{center}
+    (a) \textbf{[6 P]} Interpret all coefficients. (b) \textbf{[4 P]} Significance at 5\,\%; drop \texttt{female}?
+    (c) \textbf{[4 P]} Fitted equation per group. (d) \textbf{[4 P]} Predictions at 10 years; gap.
+    (e) \textbf{[3 P]} $R^2$ and $F$-test. (f) \textbf{[3 P]} U-shaped residual plot; VIF $=12$.
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (a)}
+  \begin{solutionbox}[Solution P5 --- (a) coefficient interpretation]
+    Salary in 1{,}000 EUR per year; baseline group: men (\texttt{female}$=0$).
+    \begin{itemize}
+      \item \textbf{Intercept 46.20:} expected salary of a \emph{man} with 0 years of
+        experience $=46{,}200$ EUR.
+      \item \textbf{experience 2.35:} for \emph{men} each additional year raises expected
+        salary by $2{,}350$ EUR (with an interaction the slope is group-specific).
+      \item \textbf{female $-3.10$:} at 0 years of experience women earn $3{,}100$ EUR
+        \emph{less} on average --- the difference of the two intercepts.
+      \item \textbf{experience:female $-0.85$:} the experience slope of women is $0.85$
+        smaller: women gain $2.35-0.85=1.50$ thousand EUR per year; the expected gender gap
+        \emph{widens} by $850$ EUR per year of experience.
+    \end{itemize}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (b) and (c)}
+  \begin{solutionbox}[Solution P5 --- (b) and (c)]
+    \textbf{(b)} Intercept and \texttt{experience}: $p<0.0001$ $\Rightarrow$ significant.
+    Interaction: consistency $t=-0.85/0.35=-2.429$ \checkmark; $p=0.0184<0.05$ $\Rightarrow$
+    significant. \texttt{female}: $p=0.0504>0.05$ $\Rightarrow$ \emph{not} significant at
+    exactly 5\,\% (borderline). Do \emph{not} remove it: \textbf{hierarchy principle} ---
+    a model containing an interaction should contain the corresponding main effects;
+    and $p=0.0504$ is weak evidence against an effect, not proof of none.
+    \medskip
+
+    \textbf{(c)} Group-wise fitted equations:
+    \begin{align*}
+      \text{Men:}\quad & \widehat{\texttt{salary}} = 46.20+2.35\,\texttt{experience}\\
+      \text{Women:}\quad & \widehat{\texttt{salary}} = (46.20-3.10)+(2.35-0.85)\,\texttt{experience}
+        = 43.10+1.50\,\texttt{experience}
+    \end{align*}
+    Different intercepts \emph{and} slopes --- exactly what the interaction permits.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (d) and (e)}
+  \begin{solutionbox}[Solution P5 --- (d) and (e)]
+    \textbf{(d)} At 10 years of experience:
+    \begin{align*}
+      \text{Man:}\quad & 46.20+2.35\cdot 10 = 69.70 \Rightarrow 69{,}700\text{ EUR}\\
+      \text{Woman:}\quad & 43.10+1.50\cdot 10 = 58.10 \Rightarrow 58{,}100\text{ EUR}
+    \end{align*}
+    Gap: $58.10-69.70=-11.60$ thousand EUR
+    $=\hat\beta_2+10\hat\beta_3=-3.10-8.50$ $\Rightarrow$ women earn $11{,}600$ EUR less.
+    \medskip
+
+    \textbf{(e)} $R^2=0.712$: the three terms explain $71.2\,\%$ of the salary variance.
+    $F$-test: $H_0\colon\beta_1=\beta_2=\beta_3=0$ (no predictor useful) vs.\ at least one
+    $\beta_j\neq 0$; $F=46.15$ (3 and 56 df) with $p<0.0001$ $\Rightarrow$ reject $H_0$:
+    the model is useful overall.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (f) diagnostics}
+  \begin{solutionbox}[Solution P5 --- (f) diagnostics]
+    \textbf{(i) U-shaped residual-vs-fitted plot:} systematic curvature the linear model
+    misses $\Rightarrow$ \textbf{non-linearity}. Remedies: add a polynomial term
+    (e.g.\ $\texttt{experience}^2$) or transform variables
+    (e.g.\ $\log(\texttt{salary})$ or $\sqrt{X}$).
+    \medskip
+
+    \textbf{(ii) VIF $=12$ for \texttt{age}:}
+    $\operatorname{VIF}_j = 1/(1-R^2_{X_j\mid X_{-j}})=12$ $\Rightarrow$
+    $R^2_{X_j\mid X_{-j}}\approx 0.917$: \texttt{age} is almost a linear combination of the
+    other predictors $\Rightarrow$ strong \textbf{multicollinearity}
+    (rules of thumb: VIF $>5$ or $>10$ is problematic).\\
+    \emph{Consequence:} $\operatorname{SE}(\hat\beta_{\texttt{age}})$ inflated by
+    $\sqrt{12}\approx 3.5$ $\Rightarrow$ unstable coefficient; low power of its $t$-test;
+    individual effects of collinear predictors cannot be separated --- although overall fit
+    and predictions may remain fine.
+  \end{solutionbox}
+\end{frame}
+
+\end{document}
