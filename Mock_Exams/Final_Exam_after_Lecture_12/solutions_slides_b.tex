@@ -1,0 +1,614 @@
+% ============================================================
+% HSBI Beamer — ISLP Lecture Series
+% Final Mock Exam — SET B — Solutions (Lectures 1-12, comprehensive)
+% Compile: pdflatex -jobname=Final_Mock_Exam_B_Solutions_Slides solutions_slides_b.tex
+% ============================================================
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}\usepackage[english]{babel}
+\usepackage{graphicx}\usepackage{booktabs}\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}\usepackage{hyperref}\usepackage{xcolor}
+\usepackage{verbatim}\usepackage{alltt}
+\usepackage{tikz}\usetikzlibrary{calc,arrows.meta,positioning,shapes}
+\usepackage{tcolorbox}\tcbuselibrary{skins}
+
+\usetheme{Madrid}\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamertemplate{headline}{%
+  \leavevmode\hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.2ex,dp=0.9ex]{section in head/foot}%
+      {\fontsize{4.6}{5.2}\selectfont%
+       \insertsectionnavigationhorizontal{\paperwidth}{}{\hskip0pt plus1filll}}%
+    \end{beamercolorbox}}%
+}
+\setbeamerfont{section in head/foot}{size=\tiny}
+\setbeamerfont{palette primary}{size=\tiny}
+\setbeamerfont{palette tertiary}{size=\tiny}
+\setbeamerfont{section in toc}{size=\footnotesize}
+
+\usepackage{listings}
+\definecolor{pyKw}{RGB}{0,0,180}\definecolor{pyStr}{RGB}{20,120,40}
+\definecolor{pyCom}{RGB}{120,120,120}\definecolor{accent}{RGB}{38,70,140}
+\lstdefinestyle{Pystyle}{language=Python,basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{pyKw}\bfseries,commentstyle=\color{pyCom}\itshape,
+  stringstyle=\color{pyStr},showstringspaces=false,upquote=true,
+  columns=fullflexible,breaklines=true,literate={~}{{$\sim$}}1}
+\lstset{style=Pystyle}
+
+\newtcolorbox{takeaway}[1][Takeaway]{enhanced,colback=green!4,colframe=green!50!black,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+\newtcolorbox{numexample}[1][Worked example]{enhanced,colback=orange!4,colframe=orange!70!black,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+\newtcolorbox{readme}[1][How to read this]{enhanced,colback=blue!4,colframe=accent,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,fonttitle=\bfseries,title=#1,
+  left=2mm,right=2mm,top=1mm,bottom=1mm}
+
+\title{Final Mock Exam --- Set B --- Solutions}
+\subtitle{Lectures 1--12 (comprehensive)}
+\author{Prof.\ Dr.\ Christoph Weisser}\institute{Quantitative Research Methods \textperiodcentered\ HSBI}
+\date{Summer Semester 2026}\graphicspath{{images/}}
+
+\newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{solutionbox}[1][Solution]{enhanced, fontupper=\footnotesize, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
+\addtobeamertemplate{frametitle}{}{\vspace{-2pt}}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{Overview of the final mock exam --- Set B}
+  \scriptsize
+  \begin{center}
+  \begin{tabular}{@{}cllc@{}}
+    \toprule
+    \textbf{Problem} & \textbf{Topic} & \textbf{Lecture slides} & \textbf{Points}\\
+    \midrule
+    P1 & Splines (beyond linearity)        & Chapter 7 --- Moving Beyond Linearity (Lecture 9)  & 16\\
+    P2 & Generalised additive models       & Chapter 7 --- Moving Beyond Linearity (Lecture 9)  & 8\\
+    P3 & Trees by hand                     & Chapter 8 --- Tree-Based Methods (Lecture 10)      & 20\\
+    P4 & Ensembles (bagging/RF/boosting)   & Chapter 8 --- Tree-Based Methods (Lecture 10)      & 16\\
+    P5 & Neural networks by hand           & Chapter 10 --- Deep Learning (Lecture 11)          & 20\\
+    P6 & Multiple testing                  & Chapter 13 --- Multiple Testing (Lecture 12)       & 20\\
+    P7 & Cumulative essentials             & Chapters 2--6 (Lectures 1--8)                      & 20\\
+    \midrule
+    $\Sigma$ & & & \textbf{120}\\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{2pt}
+  \begin{takeaway}[Exam conditions]
+    120 minutes for 120 points ($\approx$ 1 point per minute). Allowed aids: non-programmable
+    calculator and one handwritten A4 sheet (both sides). All required constants ($e$-powers
+    and logs) are given in the problems. Justify every answer.
+  \end{takeaway}
+\end{frame}
+
+% ============================================================
+% P1
+% ============================================================
+\begin{frame}{Problem 1 --- task}
+  \begin{exercise}[Problem 1 (16 P) --- Moving beyond linearity: splines]
+    {\scriptsize\itshape Lecture slides: Chapter 7 --- Moving Beyond Linearity (Lecture 9).}\par\smallskip
+    Throughout: regression splines on a single predictor $X$ with $K=5$ interior knots.
+    \begin{itemize}
+      \item[(a)] \textbf{[4 P]} Degrees of freedom of a cubic spline with $K$ interior knots ---
+        justify by counting parameters and constraints; evaluate for $K=5$.
+      \item[(b)] \textbf{[4 P]} Degrees of freedom of a \emph{natural} cubic spline with $K=5$
+        knots; which extra constraint acts where, and why is it useful?
+      \item[(c)] \textbf{[4 P]} Smoothing spline
+        $\sum_i (y_i-g(x_i))^2+\lambda\int g''(t)^2dt$: role of the two terms;
+        behaviour of $\hat g$ as $\lambda\to 0$ and $\lambda\to\infty$.
+      \item[(d)] \textbf{[4 P]} Truncated-power basis of a cubic spline with one knot $\xi$;
+        define $(x-\xi)^3_+$; why does adding it keep the fit smooth at $\xi$?
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P1 --- (a) and (b)]
+    \textbf{(a)} $K$ knots $\Rightarrow$ $K+1$ cubic pieces $\times\,4$ coefficients $=4K+4$
+    parameters; continuity of $g$ and $g'$ and $g''$ at each knot $\Rightarrow$ $3K$ constraints:
+    \[
+      \mathrm{df}=4(K+1)-3K=K+4
+      \qquad\Rightarrow\qquad K=5:\ \mathrm{df}=\mathbf{9}.
+    \]
+    (Equivalently: basis $1$, $x$, $x^2$, $x^3$ plus one truncated power per knot, $4+K$.)
+    \medskip
+
+    \textbf{(b)} Natural spline: \emph{linear beyond the boundary knots}
+    (regions $X<\xi_1$ and $X>\xi_K$); killing the quadratic and cubic terms there costs
+    $2$ parameters per boundary region, $4$ in total:
+    \[
+      \mathrm{df}=(K+4)-4=K
+      \qquad\Rightarrow\qquad K=5:\ \mathrm{df}=\mathbf{5}.
+    \]
+    \emph{Why useful:} splines are most erratic near the boundaries where data are sparse;
+    the linearity constraint stabilises the fit there (lower variance for a little extra bias).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P1 --- (c) and (d)]
+    \textbf{(c)} RSS term $=$ fidelity to the data; $\lambda\int g''(t)^2dt$ penalises curvature
+    (wiggliness); $\lambda$ trades the two off.
+    \begin{itemize}
+      \item $\lambda\to 0$: no penalty $\Rightarrow$ $\hat g$ \emph{interpolates} the training
+        points exactly --- extremely wiggly, zero training RSS, severe overfitting
+        (effective df $\to n$).
+      \item $\lambda\to\infty$: curvature infinitely expensive $\Rightarrow$ $g''\equiv 0$
+        $\Rightarrow$ $\hat g$ is the \emph{least-squares straight line} (effective df $\to 2$).
+    \end{itemize}
+    $\lambda$ (chosen by LOOCV) steers the effective df smoothly between $n$ and $2$.
+    \medskip
+
+    \textbf{(d)} $f(x)=\beta_0+\beta_1 x+\beta_2 x^2+\beta_3 x^3+\beta_4 (x-\xi)^3_+$ with
+    \[
+      (x-\xi)^3_+=\begin{cases}(x-\xi)^3 & x>\xi\\ 0 & x\le\xi\end{cases}
+    \]
+    $(x-\xi)^3_+$ has value and first and second derivative $0$ at $\xi$ $\Rightarrow$ only the
+    third derivative jumps: the fit stays continuous with continuous $g'$ and $g''$ --- a cubic spline.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P2
+% ============================================================
+\begin{frame}{Problem 2 --- task}
+  \begin{exercise}[Problem 2 (8 P) --- Generalised additive models]
+    {\scriptsize\itshape Lecture slides: Chapter 7 --- Moving Beyond Linearity (Lecture 9).}\par\smallskip
+    \begin{itemize}
+      \item[(a)] \textbf{[3 P]} General form of a GAM for quantitative $Y$; how does it generalise
+        multiple linear regression?
+      \item[(b)] \textbf{[3 P]} One interpretability advantage concerning the $f_j$;
+        the main structural limitation --- and its repair.
+      \item[(c)] \textbf{[2 P]} Backfitting in one or two sentences.
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution}
+  \begin{solutionbox}[Solution P2 --- GAMs]
+    \textbf{(a)}\ \ $Y=\beta_0+f_1(X_1)+f_2(X_2)+\dots+f_p(X_p)+\varepsilon$.\\
+    Linear regression is the special case $f_j(X_j)=\beta_j X_j$; a GAM replaces each linear
+    term by a smooth non-linear $f_j$ (spline, local regression) but keeps the
+    \emph{additive} structure.
+    \medskip
+
+    \textbf{(b)} \emph{Advantage:} additivity $\Rightarrow$ the effect of each $X_j$ is its own
+    function $f_j$, which can be plotted and interpreted individually while the other predictors
+    are held fixed --- one panel per predictor, as readable as a coefficient table.\\
+    \emph{Limitation:} no \emph{interactions} --- the effect of $X_j$ cannot depend on $X_k$.\\
+    \emph{Repair:} add interaction components manually, e.g.\ $X_j\times X_k$ or a
+    two-dimensional smooth $f_{jk}(X_j{,}X_k)$.
+    \medskip
+
+    \textbf{(c)} \emph{Backfitting:} cycle through $j=1{,}\dots{,}p$ and re-fit each $f_j$ to the
+    partial residuals $r_i=y_i-\beta_0-\sum_{k\ne j}f_k(x_{ik})$ with all other functions held
+    fixed; repeat until convergence.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P3
+% ============================================================
+\begin{frame}{Problem 3 --- task}
+  \begin{exercise}[Problem 3 (20 P) --- Trees by hand]
+    {\scriptsize\itshape Lecture slides: Chapter 8 --- Tree-Based Methods (Lecture 10).}\par\smallskip
+    Delivery vans $x$ and parcels/day $y$ (1{,}000s) for $n=6$ depots;
+    one split at $s$: $R_1=\{x<s\}$ and $R_2=\{x\ge s\}$ with region-mean predictions.
+    \begin{center}\scriptsize
+    \begin{tabular}{lcccccc}
+      \toprule
+      $i$ & 1 & 2 & 3 & 4 & 5 & 6\\
+      \midrule
+      $x_i$ & 10 & 12 & 14 & 16 & 18 & 20\\
+      $y_i$ & 6 & 4 & 5 & 11 & 13 & 12\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    (a) \textbf{[8 P]} Evaluate the cutpoints $s=15$ and $s=17$ by total RSS; which is chosen?
+    (b) \textbf{[2 P]} Prediction for a new depot with $x=13$.
+    (c) \textbf{[6 P]} Node with 12 obs: 6 ``Premium'' / 3 ``Standard'' / 3 ``Basic'':
+        proportions; Gini; entropy ($\ln 0.5=-0.6931$; $\ln 0.25=-1.3863$); predicted class.
+    (d) \textbf{[4 P]} Cost-complexity pruning: role of $\alpha$ in
+        $\sum_m\sum_{i\in R_m}(y_i-\hat y_{R_m})^2+\alpha|T|$.
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P3 --- (a) and (b)]
+    \textbf{(a)} Region means and RSS per cutpoint ($\bar y=51/6=8.5$, root RSS $=77.5$):
+    \begin{center}\scriptsize
+    \begin{tabular}{lccccc}
+      \toprule
+      $s$ & $R_1$ ($y$-values) & $\hat y_{R_1}$ & $R_2$ ($y$-values) & $\hat y_{R_2}$ & total RSS\\
+      \midrule
+      15 & $\{6{,}4{,}5\}$      & 5   & $\{11{,}13{,}12\}$ & 12   & $2+2=\mathbf{4}$\\
+      17 & $\{6{,}4{,}5{,}11\}$ & 6.5 & $\{13{,}12\}$      & 12.5 & $29+0.5=\mathbf{29.5}$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    Details: $s=15$: $(6-5)^2+(4-5)^2+(5-5)^2=2$; $(11-12)^2+(13-12)^2+(12-12)^2=2$.\\
+    $s=17$: $(6-6.5)^2+(4-6.5)^2+(5-6.5)^2+(11-6.5)^2=0.25+6.25+2.25+20.25=29$; $0.25+0.25=0.5$.\\
+    Greedy recursive binary splitting picks the smaller RSS: $\mathbf{s=15}$ ($4\ll 29.5$) ---
+    it separates the three low-throughput depots (mean 5) from the three high ones (mean 12).
+    \medskip
+
+    \textbf{(b)} $x=13<15$ $\Rightarrow$ region $R_1$ $\Rightarrow$
+    $\hat y=\hat y_{R_1}=\mathbf{5}$ (i.e.\ 5{,}000 parcels per day).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P3 --- (c) and (d)]
+    \textbf{(c)} $\hat p_{\text{Prem}}=6/12=0.5$; $\hat p_{\text{Std}}=\hat p_{\text{Basic}}=3/12=0.25$.
+    \[
+      G=0.5(1-0.5)+0.25(1-0.25)+0.25(1-0.25)=0.25+0.1875+0.1875=\mathbf{0.625}
+    \]
+    \[
+      D=-(0.5\ln 0.5+0.25\ln 0.25+0.25\ln 0.25)=0.5\cdot 0.6931+0.5\cdot 1.3863
+       =0.3466+0.6931=\mathbf{1.040}
+    \]
+    Predicted class: majority $=$ \textbf{Premium} (estimated probability $0.5$).
+    Both measures are $0$ for a pure node --- this node is quite impure (three classes present).
+    \medskip
+
+    \textbf{(d)} $\alpha$ $=$ price per terminal node $|T|$:
+    \begin{itemize}
+      \item $\alpha=0$: criterion $=$ training RSS $\Rightarrow$ full tree $T_0$ is optimal.
+      \item $\alpha\uparrow$: leaves must pay for themselves; branches with small RSS gain are
+        pruned $\Rightarrow$ nested sequence of ever smaller subtrees (weakest-link pruning).
+      \item Choice: \emph{cross-validation} over $\alpha$; refit the chosen subtree on all data
+        --- balances bias against variance.
+    \end{itemize}
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P4
+% ============================================================
+\begin{frame}{Problem 4 --- task}
+  \begin{exercise}[Problem 4 (16 P) --- Ensembles]
+    {\scriptsize\itshape Lecture slides: Chapter 8 --- Tree-Based Methods (Lecture 10).}\par\smallskip
+    \begin{itemize}
+      \item[(a)] \textbf{[6 P]} $B$ identically distributed trees with variance $\sigma^2$ and
+        pairwise correlation $\rho$:
+        $\operatorname{Var}\bigl(\frac1B\sum_b\hat f_b(x)\bigr)=\rho\sigma^2+\frac{1-\rho}{B}\sigma^2$.
+        (i) Why does this show variance reduction and what limits it?
+        (ii) Evaluate for $B=500$ and $\rho=0.7$ and $\sigma^2=4$; compare with one tree.
+        (iii) Limit as $B\to\infty$?
+      \item[(b)] \textbf{[4 P]} Random forests: modification at each split; recommended $m$
+        for classification with $p=36$; why does it improve on bagging (use the formula)?
+      \item[(c)] \textbf{[4 P]} Boosting: the three tuning parameters; the slow-learning idea.
+      \item[(d)] \textbf{[2 P]} What does the OOB error estimate and why is it free?
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P4 --- (a) and (b)]
+    \textbf{(a)} (i) Averaging drives the second term $\frac{1-\rho}{B}\sigma^2\to 0$
+    (the independent part of the trees' variability); the first term $\rho\sigma^2$ is
+    independent of $B$ --- correlation between bootstrap trees limits the reduction.\\
+    (ii) $\operatorname{Var}=0.7\cdot 4+\frac{1-0.7}{500}\cdot 4=2.8+0.0024=\mathbf{2.802}$
+    vs.\ $\sigma^2=4$ for a single tree ($\approx 30\%$ less).\\
+    (iii) $B\to\infty$: variance $\to\rho\sigma^2=\mathbf{2.8}$ (floor; more trees never
+    overfit, they only stabilise).
+    \medskip
+
+    \textbf{(b)} At \emph{each split} only a random subset of $m$ of the $p$ predictors may be
+    used; classification default $m\approx\sqrt p$ $\Rightarrow$ $p=36$: $m=\sqrt{36}=\mathbf{6}$.\\
+    With bagging a dominant predictor tops nearly every tree $\Rightarrow$ trees alike
+    $\Rightarrow$ $\rho$ high. Restricting candidates \emph{decorrelates} the trees
+    ($\rho\downarrow$), which lowers the floor $\rho\sigma^2$ --- the part of the variance
+    that averaging alone cannot remove.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P4 --- (c) and (d)]
+    \textbf{(c)} Boosting for regression trees:
+    \begin{itemize}
+      \item \textbf{$B$ --- number of trees:} added sequentially; too many $\Rightarrow$ slow
+        overfitting; choose by CV.
+      \item \textbf{$\lambda$ --- shrinkage} (e.g.\ $0.01$ or $0.001$): scales each new tree's
+        contribution; smaller $\lambda$ $\Rightarrow$ slower learning $\Rightarrow$ larger $B$ needed.
+      \item \textbf{$d$ --- splits per tree} (interaction depth): complexity and interaction
+        order of each tree; often stumps ($d=1$) suffice (additive model).
+    \end{itemize}
+    \emph{Slow learning:} each tree is fitted to the current \emph{residuals} and only the
+    fraction $\lambda$ is added --- the model improves gradually exactly where it still errs,
+    instead of fitting the data hard at once; this tends to generalise better.
+    \medskip
+
+    \textbf{(d)} Each bootstrap sample misses $\approx 1/3$ of the observations (out-of-bag);
+    predicting every observation only with trees that never saw it yields the \textbf{OOB error}
+    --- a valid \emph{test-error} estimate, free as a by-product of the bootstrap
+    (no validation set or CV loop needed).
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P5
+% ============================================================
+\begin{frame}{Problem 5 --- task}
+  \begin{exercise}[Problem 5 (20 P) --- Neural networks by hand]
+    {\scriptsize\itshape Lecture slides: Chapter 10 --- Deep Learning (Lecture 11).}\par\smallskip
+    Input $x=(2{,}1)$; hidden ReLU units $g(z)=\max\{0{,}z\}$; linear output:
+    \[
+      A_1=g(-2+3x_1-1x_2)\qquad A_2=g(1-2x_1+1x_2)\qquad f(x)=-1+2A_1+3A_2
+    \]
+    \begin{itemize}
+      \item[(a)] \textbf{[8 P]} Forward pass step by step: pre-activations; $A_1$ and $A_2$;
+        output $f(x)$. What did the ReLU do to unit 2 and why are non-linear activations essential?
+      \item[(b)] \textbf{[6 P]} Logits $z=(2.0{,}\ 1.0{,}\ -1.0)$; true class 1: all three softmax
+        probabilities and the cross-entropy loss
+        ($e^{2}=7.389$; $e^{1}=2.718$; $e^{-1}=0.368$; $\ln 10.475=2.349$).
+      \item[(c)] \textbf{[4 P]} Parameter count of a $p=6\to k=4\to K=3$ network with biases
+        (show both layers).
+      \item[(d)] \textbf{[2 P]} Conv layer: $32\times 32$ input; $F=5$; $P=0$; $S=1$:
+        output size via $(W-F+2P)/S+1$.
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (a) forward pass}
+  \begin{solutionbox}[Solution P5 --- (a) forward pass]
+    Pre-activations:
+    \[
+      z_1=-2+3\cdot 2-1\cdot 1=3
+      \qquad\qquad
+      z_2=1-2\cdot 2+1\cdot 1=-2
+    \]
+    ReLU activations:
+    \[
+      A_1=\max\{0{,}3\}=3\qquad\qquad A_2=\max\{0{,}-2\}=0
+    \]
+    Output:
+    \[
+      f(x)=-1+2\cdot 3+3\cdot 0=\mathbf{5}
+    \]
+    \medskip
+    The ReLU \emph{switched unit 2 off}: its negative pre-activation is clipped to $0$, so it
+    contributes nothing for this input (though it can for others).\\
+    \emph{Why essential:} with a linear $g$ the whole network collapses into one linear function
+    of $x$ regardless of depth --- the non-linearity is what lets hidden layers build flexible
+    functions (piecewise-linear surfaces with ReLU).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (b) softmax and cross-entropy}
+  \begin{solutionbox}[Solution P5 --- (b) softmax and cross-entropy]
+    Exponentials and their sum:
+    \[
+      e^{2.0}=7.389\qquad e^{1.0}=2.718\qquad e^{-1.0}=0.368
+      \qquad\Rightarrow\qquad 7.389+2.718+0.368=10.475
+    \]
+    Softmax probabilities:
+    \[
+      \hat p_1=\frac{7.389}{10.475}=\mathbf{0.705}\qquad
+      \hat p_2=\frac{2.718}{10.475}=\mathbf{0.259}\qquad
+      \hat p_3=\frac{0.368}{10.475}=\mathbf{0.035}
+    \]
+    (sum $=0.999\approx 1$ \checkmark). Cross-entropy for true class 1:
+    \[
+      -\ln\hat p_1=-\ln\frac{e^{2}}{10.475}=-(2-\ln 10.475)=2.349-2=\mathbf{0.349}
+    \]
+    Sanity checks: a perfect prediction ($\hat p_1=1$) gives loss $0$; predicting the uniform
+    $1/3$ would give $\ln 3\approx 1.099$ --- here the network is right and fairly confident.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P5 --- (c) parameters and (d) convolution]
+    \textbf{(c)} Fully connected $6\to 4\to 3$ with biases:
+    \begin{center}
+    \begin{tabular}{@{}lccc@{}}
+      \toprule
+      Layer & Weights & Biases & Parameters\\
+      \midrule
+      input $\to$ hidden & $6\cdot 4=24$ & $4$ & $28$\\
+      hidden $\to$ output & $4\cdot 3=12$ & $3$ & $15$\\
+      \midrule
+      total & & & $\mathbf{43}$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    \medskip
+
+    \textbf{(d)} Output width $=\dfrac{W-F+2P}{S}+1=\dfrac{32-5+2\cdot 0}{1}+1=27+1=28$
+    $\Rightarrow$ output feature map $\mathbf{28\times 28}$: with no padding ($P=0$) a $5\times 5$
+    filter at stride $1$ shrinks each spatial dimension by $F-1=4$.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P6
+% ============================================================
+\begin{frame}{Problem 6 --- task}
+  \begin{exercise}[Problem 6 (20 P) --- Multiple testing]
+    {\scriptsize\itshape Lecture slides: Chapter 13 --- Multiple Testing (Lecture 12).}\par\smallskip
+    \begin{itemize}
+      \item[(a)] \textbf{[4 P]} $m=10$ independent tests at $\alpha=0.05$; all nulls true:
+        define and compute the FWER ($(0.95)^{10}=0.5987$); interpret.
+      \item[(b)] \textbf{[7 P]} Six ordered $p$-values
+        $0.002$; $0.009$; $0.012$; $0.015$; $0.040$; $0.300$ --- FWER control at $\alpha=0.05$
+        with (i) Bonferroni and (ii) Holm; thresholds; rejected hypotheses; why is Holm never
+        weaker than Bonferroni?
+      \item[(c)] \textbf{[6 P]} Benjamini--Hochberg at $q=0.05$ on the same $p$-values:
+        thresholds $jq/m$; rejections; what exactly does FDR control guarantee?
+      \item[(d)] \textbf{[3 P]} Confirmatory Phase-III trial with $m=4$ pre-specified endpoints
+        (one hit could support approval): FWER or FDR? Justify.
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (a) FWER}
+  \begin{solutionbox}[Solution P6 --- (a) FWER for 10 independent tests]
+    $\text{FWER}=\Pr(V\ge 1)$ --- the probability of \emph{at least one} false rejection among
+    the $m$ tests ($V$ $=$ number of falsely rejected true nulls).
+    \medskip
+
+    With all 10 nulls true and independent tests at level $0.05$:
+    \[
+      \text{FWER}=1-\Pr(\text{no false rejection})
+      =1-(1-0.05)^{10}=1-(0.95)^{10}=1-0.5987=\mathbf{0.4013}
+    \]
+    \medskip
+
+    \emph{Interpretation:} although each test individually errs with probability $5\%$ only,
+    the chance of at least one spurious ``discovery'' among 10 unadjusted tests is about
+    $40\%$ --- multiple testing without adjustment makes false findings very likely.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (b) Bonferroni and Holm}
+  \begin{solutionbox}[Solution P6 --- (b) Bonferroni and Holm at level 0.05]
+    \textbf{Bonferroni:} reject iff $p_{(j)}\le\alpha/m=0.05/6=0.00833$:
+    only $0.002$ passes ($0.009>0.00833$) $\Rightarrow$
+    reject $H_{(1)}$: \textbf{1 rejection}. (Note $0.009<0.05$ yet Bonferroni does not reject it.)
+    \medskip
+
+    \textbf{Holm (step-down):} compare $p_{(j)}$ with $\alpha/(m-j+1)$; stop at first failure:
+    \begin{center}\scriptsize
+    \begin{tabular}{lcccccc}
+      \toprule
+      $j$ & 1 & 2 & 3 & 4 & 5 & 6\\
+      \midrule
+      $p_{(j)}$ & 0.002 & 0.009 & 0.012 & 0.015 & 0.040 & 0.300\\
+      $\alpha/(m-j+1)$ & 0.00833 & 0.0100 & 0.0125 & 0.0167 & 0.0250 & 0.0500\\
+      decision & \checkmark & \checkmark & \checkmark & \checkmark & \textbf{stop} & ---\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    $0.015\le 0.0167$ but $0.040>0.0250$ $\Rightarrow$ reject
+    $H_{(1)}$ to $H_{(4)}$: \textbf{4 rejections}.
+    \medskip
+
+    \emph{Holm $\supseteq$ Bonferroni:} Holm's hurdles $\alpha/(m-j+1)\ge\alpha/m$ for all $j$
+    (equality only at $j=1$) $\Rightarrow$ uniformly more powerful --- and it still controls the
+    FWER without independence assumptions.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P6 --- (c) Benjamini--Hochberg and (d) FWER vs FDR]
+    \textbf{(c)} Thresholds $jq/m=j\cdot 0.05/6$:
+    \begin{center}\scriptsize
+    \begin{tabular}{lcccccc}
+      \toprule
+      $j$ & 1 & 2 & 3 & 4 & 5 & 6\\
+      \midrule
+      $p_{(j)}$ & 0.002 & 0.009 & 0.012 & 0.015 & 0.040 & 0.300\\
+      $jq/m$ & 0.00833 & 0.0167 & 0.0250 & 0.0333 & 0.0417 & 0.0500\\
+      $p_{(j)}\le jq/m$? & yes & yes & yes & yes & \textbf{yes} & no\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    Largest such $j$: $L=5$ ($0.040\le 0.0417$; note $0.300>0.0500$) $\Rightarrow$ reject
+    \emph{all} of $H_{(1)}$ to $H_{(5)}$: \textbf{5 rejections}.
+    \emph{Guarantee:} $\text{FDR}=E[V/\max(R{,}1)]\le q$ --- \emph{on average} at most $5\%$
+    of rejected hypotheses are false discoveries (no bound on $\Pr(V\ge 1)$; that is FWER).
+    \medskip
+
+    \textbf{(d)} Control the \textbf{FWER}. A \emph{single} false positive is very costly
+    (could support approving an ineffective drug), so guard against \emph{any} Type I error, not
+    just their average proportion. With only $m=4$ endpoints an FWER procedure (Holm/Bonferroni
+    at $0.05/4=0.0125$) loses little power; FDR is too permissive for a confirmatory trial.
+  \end{solutionbox}
+\end{frame}
+
+% ============================================================
+% P7
+% ============================================================
+\begin{frame}{Problem 7 --- task}
+  \begin{exercise}[Problem 7 (20 P) --- Cumulative essentials]
+    {\scriptsize\itshape Lecture slides: Chapters 2--6 (Lectures 1--8).}\par\smallskip
+    \begin{itemize}
+      \item[(a)] \textbf{[4 P]} Screening confusion matrix ($TP{=}40$, $FN{=}10$, $FP{=}30$,
+        $TN{=}120$): error rate, sensitivity, specificity, precision; which number traces the ROC
+        curve and how do sensitivity/specificity move?
+      \item[(b)] \textbf{[4 P]} KNN: (i) predict at $x_0=5$ with $k=3$ from
+        $(1{,}3),(4{,}6),(6{,}8),(7{,}7),(10{,}12)$; (ii) how $k$ drives the bias--variance
+        trade-off; most flexible extreme; why is 1-NN training error $0$?
+      \item[(c)] \textbf{[4 P]} $k$-fold CV: what it does; one reason over LOOCV; one over a
+        single validation split.
+      \item[(d)] \textbf{[2 P]} $p=2{,}000$ predictors, only a handful matter: ridge or lasso?
+        Where does PCR sit?
+      \item[(e)] \textbf{[6 P]} Match \{linear regression; lasso; logistic regression; random
+        forest\} --- each once: (i) $\pounds$/schooling-year with CI; (ii) BP from 8{,}000 genes
+        ($n{=}150$) with a short gene list; (iii) spam yes/no with odds for auditors;
+        (iv) machine failure from interacting sensors, accuracy only.
+    \end{itemize}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Problem 7 --- solution (a) and (b)}
+  \begin{solutionbox}[Solution P7 --- (a) confusion matrix and (b) KNN]
+    \textbf{(a)} $50$ diseased, $150$ healthy, $n=200$:
+    \[
+      \text{err}=\tfrac{30+10}{200}=\mathbf{0.200}\quad
+      \text{sens}=\tfrac{40}{50}=\mathbf{0.800}\quad
+      \text{spec}=\tfrac{120}{150}=\mathbf{0.800}\quad
+      \text{prec}=\tfrac{40}{70}=\mathbf{0.571}
+    \]
+    Varying the \emph{classification threshold} traces the ROC curve: lowering it raises
+    sensitivity (fewer misses) but lowers specificity (more false alarms); raising it reverses.
+    \medskip
+
+    \textbf{(b)} (i) Distances from $x_0=5$: $4,1,1,2,5$; nearest three $x=4,6,7$ with
+    $y=6,8,7$ $\Rightarrow$ $\hat y(5)=\tfrac{6+8+7}{3}=\mathbf{7}$.\\
+    (ii) Small $k$ $=$ flexible: low bias, high variance; large $k$ $=$ smooth: high bias, low
+    variance. Most flexible extreme $=$ $\mathbf{k=1}$ (flexibility $\propto 1/k$). The training
+    error of 1-NN is $0$ because each point's nearest neighbour is \emph{itself}.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 7 --- solution (c) and (d)}
+  \begin{solutionbox}[Solution P7 --- (c) cross-validation and (d) lasso vs ridge/PCR]
+    \textbf{(c)} $k$-fold CV splits the data into $k$ equal folds; each fold serves once as
+    validation while the other $k-1$ train the model, and the $k$ errors are averaged.
+    \begin{itemize}
+      \item \emph{vs.\ LOOCV:} the $n$ leave-one-out fits are nearly identical $\Rightarrow$ their
+        errors are highly correlated $\Rightarrow$ the LOOCV average has \emph{higher variance}
+        (and costs $n$ fits).
+      \item \emph{vs.\ a single split:} one split is highly variable and biased upward (only part
+        of the data trains); $k$-fold trains on $(k-1)/k$ and averages $k$ estimates
+        $\Rightarrow$ less bias, more stability.
+    \end{itemize}
+    \medskip
+
+    \textbf{(d) Lasso:} the $\ell_1$ penalty sets coefficients \emph{exactly to zero}
+    $\Rightarrow$ variable selection; ideal for a sparse truth (a handful of signals among
+    2{,}000) and an interpretable model. Ridge keeps all 2{,}000; PCR is likewise \emph{not}
+    sparse (regresses on a few components, all variables load) --- neither delivers lasso's
+    short list.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 7 --- solution (e) matching}
+  \begin{solutionbox}[Solution P7 --- (e) method matching (each once)]
+    \begin{itemize}
+      \item[(i)] \textbf{Linear regression} --- quantitative response with $n\gg p$; goal is
+        \emph{inference}: an effect size with a confidence interval from OLS standard errors.
+      \item[(ii)] \textbf{Lasso} --- $p=8{,}000\gg n=150$: OLS infeasible; the $\ell_1$ penalty
+        regularises and returns a short list of relevant markers.
+      \item[(iii)] \textbf{Logistic regression} --- binary response; coefficients give odds
+        ratios $e^{\hat\beta_j}$: interpretable for auditors.
+      \item[(iv)] \textbf{Random forest} --- automatic non-linearities and interactions; strong
+        accuracy with many mixed predictors; interpretability not required.
+    \end{itemize}
+    \vspace{2pt}
+    \begin{takeaway}[One-line rule of thumb]
+      Inference on few predictors $\to$ linear/logistic regression; sparse high-dimensional
+      selection $\to$ lasso; pure predictive accuracy with complex structure $\to$ random forest.
+    \end{takeaway}
+  \end{solutionbox}
+\end{frame}
+
+\end{document}
