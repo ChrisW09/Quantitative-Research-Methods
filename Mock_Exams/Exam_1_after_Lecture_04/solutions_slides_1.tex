@@ -103,39 +103,83 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Problem 1 --- solution (a) and (b)}
-  \begin{solutionbox}[Solution P1 --- (a) and (b)]
-    \textbf{(a) Prediction:} accurate $\hat Y=\hat f(X)$ for new $X$; $\hat f$ may be a black box.
-    \emph{Example:} is an incoming e-mail spam?\\
-    \textbf{Inference:} understand \emph{how} $Y$ depends on $X_1,\dots,X_p$ (which predictors,
-    direction, size); $\hat f$ must be interpretable.
-    \emph{Example:} which ad channels increase sales and by how much?
+\begin{frame}{Problem 1 --- solution (a): prediction vs.\ inference}
+  \begin{solutionbox}[Solution P1(a) --- prediction vs.\ inference (4 P)]
+    We estimate $f$ in $Y=f(X)+\varepsilon$; the \emph{goal} decides what we need from $\hat f$.
     \medskip
 
-    \textbf{(b) Parametric:} (1) assume a form, e.g.\ $f(X)=\beta_0+\sum_j\beta_j X_j$;
-    (2) estimate the few parameters (least squares). \emph{Advantage:} needs less data;
-    simple and interpretable.\\
-    \textbf{Non-parametric:} no functional form; $\hat f$ follows the data (KNN, splines).
-    \emph{Advantage:} captures many possible shapes of $f$ --- no risk of a badly wrong form.\\
-    \emph{Trade-off:} flexibility reduces bias but costs data, risks overfitting and loses
-    interpretability; for inference we usually prefer restrictive models.
+    \textbf{Prediction.} We only want an \emph{accurate output} $\hat Y=\hat f(X)$ for new inputs
+    $X$. The form of $\hat f$ is secondary --- it may be treated as a \emph{black box}, because
+    the accuracy of $\hat Y$ is all that matters.\\[0.5mm]
+    \emph{Example:} Is an incoming e-mail spam or not? (Or: predict next month's product demand.)
+    \medskip
+
+    \textbf{Inference.} We want to understand \emph{how} $Y$ changes with $X_1,\dots,X_p$:
+    \emph{which} predictors matter, in \emph{which direction}, and \emph{how strongly}. Here
+    $\hat f$ must be \emph{interpretable}.\\[0.5mm]
+    \emph{Example:} Which advertising channels increase sales, and by how much per euro spent?
+  \end{solutionbox}
+  \begin{takeaway}[In one line]
+    Prediction targets the \emph{output} $\hat Y$; inference targets the \emph{mechanism} inside $\hat f$.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (b): parametric vs.\ non-parametric}
+  \begin{solutionbox}[Solution P1(b) --- two ways to estimate $f$ (4 P)]
+    \textbf{Parametric --- a two-step approach.}
+    \begin{itemize}
+      \item[(1)] \emph{Assume a functional form} for $f$, e.g.\ the linear model
+        $f(X)=\beta_0+\beta_1X_1+\dots+\beta_pX_p$.
+      \item[(2)] \emph{Estimate} the finite set of parameters (e.g.\ by least squares).
+    \end{itemize}
+    Estimating a whole function is thus reduced to estimating a few numbers.
+    \emph{Advantage:} needs relatively few observations; simple to fit and easy to interpret.
+    \medskip
+
+    \textbf{Non-parametric.} No explicit form is assumed; $\hat f$ is built to follow the data
+    directly (e.g.\ $K$-nearest neighbours, splines).
+    \emph{Advantage:} captures a far wider range of shapes of $f$ --- no risk of imposing a badly
+    wrong form.
+    \medskip
+
+    \textbf{Flexibility--interpretability trade-off.} More flexible methods can reduce bias, but
+    need many observations, risk overfitting and are harder to interpret; when \emph{inference}
+    is the goal we usually prefer the more restrictive, interpretable models.
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 1 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P1 --- (c) and (d)]
-    \textbf{(c)} (i) \emph{Classification}: qualitative response cancel yes/no (prediction).\\
-    (ii) \emph{Regression}: quantitative response CEO salary (inference).\\
-    (iii) \emph{Unsupervised}: no response variable; goal is clustering.
+\begin{frame}{Problem 1 --- solution (c): classifying the scenarios}
+  \begin{solutionbox}[Solution P1(c) --- regression / classification / unsupervised (3 P)]
+    \begin{itemize}
+      \item[(i)] \textbf{Classification} (supervised). The response ``cancels: yes/no'' is
+        \emph{qualitative}; the goal is prediction.
+      \item[(ii)] \textbf{Regression} (supervised). The response CEO salary is \emph{quantitative};
+        the goal is inference --- which factors are associated with salary, and how strongly.
+      \item[(iii)] \textbf{Unsupervised learning}. There is \emph{no response variable}; the goal
+        is to find clusters of similar customers.
+    \end{itemize}
+  \end{solutionbox}
+  \begin{takeaway}[Decision rule]
+    Is there a response? \emph{Qualitative} $\to$ classification; \emph{quantitative} $\to$
+    regression; \emph{none} $\to$ unsupervised.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (d): training vs.\ test MSE, overfitting}
+  \begin{solutionbox}[Solution P1(d) --- why training MSE $<$ test MSE (4 P)]
+    \textbf{Why the training MSE is smaller.} The method is fitted by making the \emph{training}
+    error small, so $\hat f$ adapts to the training observations --- \emph{including their random
+    noise}. The training MSE therefore \emph{systematically underestimates} the error on fresh
+    data, and for a given data set training MSE $\le$ test MSE in general.
     \medskip
 
-    \textbf{(d)} The method is fitted by minimising \emph{training} error, so $\hat f$ adapts to
-    the training observations \emph{including their noise} --- training MSE systematically
-    underestimates the error on fresh data. With growing flexibility the training MSE falls
-    monotonically while the test MSE is U-shaped.\\
-    \emph{Overfitting:} the fit follows patterns of the training noise that do not exist in the
-    population; a less flexible model would have \emph{lower test} MSE. Symptom: very small
-    training MSE together with a rising test MSE (widening gap).
+    \textbf{Behaviour vs.\ flexibility.} As flexibility grows, the training MSE decreases
+    \emph{monotonically}, while the test MSE first decreases and then increases (U-shape).
+    \medskip
+
+    \textbf{Overfitting.} The method follows patterns in the \emph{training noise} that do not
+    exist in the population; a \emph{less} flexible method would then achieve a \emph{smaller
+    test} MSE. Symptom: a widening gap --- very small training MSE together with a rising test MSE.
   \end{solutionbox}
 \end{frame}
 
@@ -163,48 +207,82 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Problem 2 --- solution (a) and (b)}
-  \begin{solutionbox}[Solution P2 --- (a) and (b)]
-    \textbf{(a)}\ \ $E\big[(y_0-\hat f(x_0))^2\big]
+\begin{frame}{Problem 2 --- solution (a): the decomposition}
+  \begin{solutionbox}[Solution P2(a) --- bias--variance decomposition (4 P)]
+    At a fixed test point $x_0$ the expected test MSE splits into three non-negative parts:
+    \[
+      E\big[(y_0-\hat f(x_0))^2\big]
       =\underbrace{\operatorname{Var}(\hat f(x_0))}_{\text{sensitivity to training set}}
       +\underbrace{[\operatorname{Bias}(\hat f(x_0))]^2}_{\text{systematic model error}}
-      +\underbrace{\operatorname{Var}(\varepsilon)}_{\text{irreducible noise}}$
-    \medskip
-
-    \textbf{(b)} Expected test MSE $=$ Bias$^2$ + Var + $\sigma^2$:
-    \begin{center}
-    \begin{tabular}{lcccc}
-      \toprule
-      & Bias$^2$ & Var & $\sigma^2$ & Test MSE\\
-      \midrule
-      A & 2.25 & 0.25 & 1.00 & 3.50\\
-      B & 0.16 & 1.44 & 1.00 & \textbf{2.60}\\
-      C & 0.01 & 3.60 & 1.00 & 4.61\\
-      \bottomrule
-    \end{tabular}
-    \end{center}
-    Choose \textbf{B}: lowest expected test MSE. C pays more in variance ($+2.16$) than it
-    gains in bias ($-0.15$).
+      +\underbrace{\operatorname{Var}(\varepsilon)}_{\text{irreducible noise}}.
+    \]
+    \begin{itemize}
+      \item \textbf{Variance} $\operatorname{Var}(\hat f(x_0))$: how much $\hat f(x_0)$ would
+        change if the method were re-fitted on a \emph{different} training set.
+      \item \textbf{Squared bias} $[\operatorname{Bias}(\hat f(x_0))]^2$: the systematic error
+        from approximating the true $f$ by a (possibly too simple) model.
+      \item \textbf{Irreducible error} $\operatorname{Var}(\varepsilon)=\sigma^2$: the noise
+        variance of $\varepsilon$, which \emph{no} method can remove.
+    \end{itemize}
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 2 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P2 --- (c) and (d)]
-    \textbf{(c)} $\sigma^2 = 1.00$. Since Bias$^2\ge 0$ and Var $\ge 0$,
-    $E[(y_0-\hat f(x_0))^2]\ \ge\ \operatorname{Var}(\varepsilon)=1.00$ for \emph{every} method.
-    Even the true $f$ cannot predict the noise draw $\varepsilon_0$: the \emph{irreducible error}
-    is the floor.
+\begin{frame}{Problem 2 --- solution (b): expected test MSE for A--C}
+  \begin{solutionbox}[Solution P2(b) --- compute the test MSE and choose (5 P)]
+    Expected test MSE $=$ Bias$^2+\operatorname{Var}+\sigma^2$, with $\sigma^2=1.00$. Adding the
+    three components row by row:
+    \begin{center}\footnotesize
+    \begin{tabular}{lcccc}
+      \toprule
+       & Bias$^2$ & Var & $\sigma^2$ & Test MSE\\
+      \midrule
+      A (linear)        & 2.25 & 0.25 & 1.00 & $2.25+0.25+1.00=3.50$\\
+      B (moderate)      & 0.16 & 1.44 & 1.00 & $0.16+1.44+1.00=\textbf{2.60}$\\
+      C (very flexible) & 0.01 & 3.60 & 1.00 & $0.01+3.60+1.00=4.61$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    \textbf{Choose Method B} --- it has the smallest expected test MSE. Its moderate flexibility
+    buys a large bias reduction ($2.25\to0.16$) at an acceptable variance cost, whereas the very
+    flexible Method C pays more in variance ($+2.16$) than it gains in bias ($-0.15$).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (c): the lower bound}
+  \begin{solutionbox}[Solution P2(c) --- smallest achievable test MSE (3 P)]
+    Squared bias and variance are both \emph{non-negative}, so for \emph{every} method
+    \[
+      E\big[(y_0-\hat f(x_0))^2\big]
+      =\underbrace{[\operatorname{Bias}(\hat f(x_0))]^2}_{\ge 0}
+      +\underbrace{\operatorname{Var}(\hat f(x_0))}_{\ge 0}
+      +\sigma^2 \;\ge\; \sigma^2 = 1.00.
+    \]
+    The floor $1.00$ is attained only in the ideal case of \emph{zero bias and zero variance}.
+    Even the true $f$ cannot predict the fresh noise draw $\varepsilon_0$ at $x_0$ --- this
+    $\operatorname{Var}(\varepsilon)=\sigma^2$ is the \textbf{irreducible error}.
+  \end{solutionbox}
+  \begin{takeaway}[Interpretation]
+    No modelling effort can push the expected test MSE below $\sigma^2=1.00$.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (d): behaviour and the U-shape}
+  \begin{solutionbox}[Solution P2(d) --- flexibility and the U-shape (3 P)]
+    As the flexibility of a method increases:
+    \begin{itemize}
+      \item \textbf{Squared bias} decreases (typically monotonically) --- a richer model
+        approximates the true $f$ better;
+      \item \textbf{Variance} increases --- the fit reacts more to the particular training set;
+      \item \textbf{Training MSE} decreases \emph{monotonically} --- a more flexible fit follows
+        the training data ever more closely.
+    \end{itemize}
+    The \textbf{expected test MSE} $=$ Bias$^2+\operatorname{Var}+\sigma^2$ therefore \emph{first
+    falls} (bias reduction dominates) and \emph{then rises} (variance increase dominates) ---
+    the characteristic \textbf{U-shape}.
     \medskip
 
-    \textbf{(d)} As flexibility increases:
-    \begin{itemize}
-      \item Bias$^2$ \emph{decreases} (typically monotonically); variance \emph{increases};
-      \item training MSE decreases \emph{monotonically} (the fit hugs the training data);
-      \item test MSE $=$ Bias$^2+$Var$+\sigma^2$ first falls (bias reduction dominates)
-        then rises (variance dominates) $\Rightarrow$ \textbf{U-shape}.
-    \end{itemize}
-    In the table: $3.50 \to 2.60 \to 4.61$ for A $\to$ B $\to$ C --- minimum at intermediate
-    flexibility.
+    In the table the test MSE runs $3.50 \to 2.60 \to 4.61$ for A $\to$ B $\to$ C: the minimum is
+    at the \emph{intermediate} flexibility (B).
   \end{solutionbox}
 \end{frame}
 
@@ -233,9 +311,14 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Problem 3 --- solution (a) and (b)}
-  \begin{solutionbox}[Solution P3 --- (a) and (b)]
-    \textbf{(a)} $d^2=(X_1-4)^2+(X_2-2)^2$, sorted:
+\begin{frame}{Problem 3 --- solution (a): distances and $K=1$}
+  \begin{solutionbox}[Solution P3(a) --- Euclidean distances and {$K=1$} (4 P)]
+    Distance from $x_0=(4,2)$: $\;d(x_0,x_i)=\sqrt{(X_{1i}-4)^2+(X_{2i}-2)^2}$. Two worked cases:
+    \[
+      \text{Obs.\ 1:}\ \sqrt{(4-4)^2+(3-2)^2}=\sqrt{1}=1.000,\qquad
+      \text{Obs.\ 5:}\ \sqrt{(1-4)^2+(1-2)^2}=\sqrt{10}=3.162.
+    \]
+    Ranking all seven by squared distance $d^2$ (order-preserving, avoids square roots):
     \begin{center}\scriptsize
     \begin{tabular}{lccccccc}
       \toprule
@@ -247,31 +330,63 @@
       \bottomrule
     \end{tabular}
     \end{center}
-    $K=1$: nearest is Obs.~1 ($d=1.000$; Yes) $\Rightarrow$ \textbf{Yes}.
-    \medskip
-
-    \textbf{(b)} $K=3$: neighbours are Obs.~1 (Yes) and Obs.~2 and Obs.~3 (both No).
-    $\widehat{\Pr}(\text{Yes}\mid x_0)=1/3\approx 0.333$;
-    $\widehat{\Pr}(\text{No}\mid x_0)=2/3$ $\Rightarrow$ majority vote: \textbf{No}.
-    Note that $K=1$ and $K=3$ disagree --- the answer depends on the flexibility.
+    \textbf{$K=1$:} the single nearest neighbour is Obs.~1 ($d=1.000$, label Yes)
+    $\Rightarrow$ classify the new visitor as \textbf{Yes}.
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 3 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P3 --- (c) and (d)]
-    \textbf{(c)} Small $K$ (e.g.\ 1): highly flexible and jagged boundary $\Rightarrow$
-    \emph{low bias, high variance}. Large $K$: strong local averaging, smooth almost linear
-    boundary $\Rightarrow$ \emph{high bias, low variance}.
-    Training error of 1-NN: $0$ --- each training point is its own nearest neighbour
-    (says nothing about test error).
+\begin{frame}{Problem 3 --- solution (b): $K=3$ and the probability}
+  \begin{solutionbox}[Solution P3(b) --- majority vote with {$K=3$} (4 P)]
+    KNN estimates each class probability by its frequency among the $K$ nearest neighbours:
+    \[
+      \widehat{\Pr}(Y=j\mid X=x_0)=\frac{1}{K}\sum_{i\in\mathcal N_0}\mathbf{1}(y_i=j),
+      \qquad \mathcal N_0=\{\text{$K$ nearest neighbours}\}.
+    \]
+    From the ranking in part~(a) the three nearest are Obs.~1 ($d=1.000$, Yes),
+    Obs.~2 ($d=2.000$, No) and Obs.~3 ($d=2.000$, No). Hence
+    \[
+      \widehat{\Pr}(\text{Yes}\mid x_0)=\tfrac{1}{3}\approx 0.333,\qquad
+      \widehat{\Pr}(\text{No}\mid x_0)=\tfrac{2}{3}\approx 0.667.
+    \]
+    Majority vote $\Rightarrow$ classify as \textbf{No}. Note that $K=1$ (Yes) and $K=3$ (No)
+    \emph{disagree} --- the decision depends on the flexibility of the classifier.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (c): the role of $K$}
+  \begin{solutionbox}[Solution P3(c) --- bias/variance and 1-NN training error (2 P)]
+    \textbf{Small $K$} (e.g.\ $K=1$): very flexible, jagged decision boundary
+    $\Rightarrow$ \emph{low bias, high variance}.\\[0.5mm]
+    \textbf{Large $K$}: averaging over many neighbours gives a smooth, almost linear boundary
+    $\Rightarrow$ \emph{high bias, low variance}.
     \medskip
 
-    \textbf{(d)} The \emph{Bayes classifier} assigns $x$ to the class $j$ maximising the
-    \emph{true} conditional probability $\Pr(Y=j\mid X=x)$; it minimises the expected test
-    error (\emph{Bayes error rate} $=$ lower bound for all classifiers).
-    Unattainable in practice: the conditional distribution of $Y$ given $X$ is unknown.
-    KNN \emph{estimates} these probabilities locally from the $K$ nearest neighbours and then
-    classifies to the largest estimate --- a data-driven approximation of the Bayes rule.
+    \textbf{Training error of 1-NN $=0$} (ignoring ties): each training point is its \emph{own}
+    nearest neighbour, so it is always classified correctly on the training set --- which says
+    \emph{nothing} about its test error.
+  \end{solutionbox}
+  \begin{takeaway}[$K$ is the flexibility knob]
+    Small $K$ $=$ flexible / high variance; large $K$ $=$ rigid / high bias --- the same
+    bias--variance trade-off as everywhere.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (d): the Bayes classifier}
+  \begin{solutionbox}[Solution P3(d) --- Bayes classifier and its link to KNN (2 P)]
+    \textbf{Definition.} The Bayes classifier assigns each $x$ to the class $j$ with the largest
+    \emph{true} conditional probability $\Pr(Y=j\mid X=x)$. It minimises the expected test error
+    rate; its error --- the \textbf{Bayes error rate} --- is the lower bound for \emph{all}
+    classifiers.
+    \medskip
+
+    \textbf{Why it cannot be used directly.} In practice the true conditional distribution of $Y$
+    given $X$ is \emph{unknown}, so $\Pr(Y=j\mid X=x)$ cannot be evaluated.
+    \medskip
+
+    \textbf{Relation to KNN.} KNN \emph{mimics} the Bayes rule: it \emph{estimates} the
+    conditional probabilities locally from the $K$ nearest training observations (the part~(b)
+    formula) and then classifies to the largest estimate --- a data-driven approximation of the
+    Bayes classifier.
   \end{solutionbox}
 \end{frame}
 
@@ -302,68 +417,139 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Problem 4 --- solution (a) and (b)}
-  \begin{solutionbox}[Solution P4 --- (a) and (b)]
-    \textbf{(a)} $\bar x=3$; $\bar y=11$;\quad
-    $S_{xy}=195-5\cdot 3\cdot 11=30$;\quad $S_{xx}=55-5\cdot 3^2=10$
-    \[
-      \hat\beta_1=\frac{30}{10}=3.000\qquad
-      \hat\beta_0=11-3\cdot 3=2.000\qquad
-      \hat y = 2.000+3.000\,x
-    \]
-    \emph{Slope:} $+1$ spot $\Rightarrow$ expected sales $+3{,}000$ EUR per week.
-    \emph{Intercept:} expected sales without spots $=2{,}000$ EUR (mild extrapolation;
-    $x=0$ not observed).
-    \medskip
+\begin{frame}{Problem 4 --- solution (a): least-squares estimates}
+  \begin{solutionbox}[Solution P4(a) --- slope $\hat\beta_1$ and intercept $\hat\beta_0$ (6 P)]
+    \textbf{Step 1 --- means:}\quad
+    $\bar x=\tfrac{\sum x_i}{n}=\tfrac{15}{5}=3$,\qquad
+    $\bar y=\tfrac{\sum y_i}{n}=\tfrac{55}{5}=11$.
 
-    \textbf{(b)} $\hat y_i = 2+3x_i$; $e_i=y_i-\hat y_i$:
-    \begin{center}
+    \textbf{Step 2 --- corrected cross-products:}
+    \begin{align*}
+      S_{xy}&=\sum x_iy_i-n\bar x\bar y=195-5\cdot 3\cdot 11=195-165=30,\\
+      S_{xx}&=\sum x_i^2-n\bar x^2=55-5\cdot 3^2=55-45=10.
+    \end{align*}
+
+    \textbf{Step 3 --- slope and intercept:}
+    \[
+      \hat\beta_1=\frac{S_{xy}}{S_{xx}}=\frac{30}{10}=3.000,\qquad
+      \hat\beta_0=\bar y-\hat\beta_1\bar x=11-3\cdot 3=2.000,
+    \]
+    giving the fitted line $\hat y=2.000+3.000\,x$.
+
+    \textbf{Interpretation.} Slope: each extra weekly spot adds an expected $3{,}000$ EUR in
+    sales. Intercept: expected sales of $2{,}000$ EUR at zero spots --- a mild extrapolation
+    ($x=0$ unobserved; $x$ ranges 1--5).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (b): fitted values and residuals}
+  \begin{solutionbox}[Solution P4(b) --- fitted values $\hat y_i$ and residuals $e_i$ (4 P)]
+    With $\hat y_i=2+3x_i$ and $e_i=y_i-\hat y_i$; e.g.\ $\hat y_1=2+3\cdot 1=5$ so $e_1=6-5=1$:
+    \begin{center}\footnotesize
     \begin{tabular}{lccccc}
       \toprule
       $i$ & 1 & 2 & 3 & 4 & 5\\
       \midrule
-      $\hat y_i$ & 5 & 8 & 11 & 14 & 17\\
-      $e_i$ & $1$ & $-1$ & $0$ & $-1$ & $1$\\
+      $x_i$ & 1 & 2 & 3 & 4 & 5\\
+      $y_i$ & 6 & 7 & 11 & 13 & 18\\
+      $\hat y_i=2+3x_i$ & 5 & 8 & 11 & 14 & 17\\
+      $e_i=y_i-\hat y_i$ & $1$ & $-1$ & $0$ & $-1$ & $1$\\
       \bottomrule
     \end{tabular}
     \end{center}
-    $\sum e_i = 1-1+0-1+1 = 0$ \checkmark\ (always true for least squares with intercept).
+    \textbf{Check:} $\sum_{i=1}^{5} e_i = 1-1+0-1+1 = 0$ \checkmark
+    \smallskip
+
+    This is no coincidence: for any least-squares fit \emph{with an intercept}, the residuals
+    always sum to zero (one of the normal-equation identities).
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 4 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P4 --- (c) and (d)]
-    \textbf{(c)} $\operatorname{RSS}=1+1+0+1+1=4.000$;\quad
-    $\operatorname{RSE}=\sqrt{4/(5-2)}=\sqrt{4/3}=1.155$ (thousand EUR):
-    typical deviation of observed sales from the true line ($\hat\sigma$).
-    \medskip
-
-    \textbf{(d)} $\operatorname{SE}(\hat\beta_1)=\dfrac{\operatorname{RSE}}{\sqrt{S_{xx}}}
-      =\dfrac{1.1547}{\sqrt{10}}=0.365$;\qquad
-    $t=\dfrac{3.000}{0.3651}=8.216$\ \ (df $=3$).
-    \begin{itemize}
-      \item $|t| = 8.216 > 3.182 = t_{0.975{,}3}$ $\Rightarrow$ reject $H_0\colon\beta_1=0$
-        at the 5\,\% level: significant positive association.
-      \item 95\,\% CI: $3.000 \pm 3.182\cdot 0.3651 = 3.000\pm 1.162 = [1.838;\ 4.162]$;
-        $0\notin$ CI --- consistent with the test.
-    \end{itemize}
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Problem 4 --- solution (e) and (f)}
-  \begin{solutionbox}[Solution P4 --- (e) and (f)]
-    \textbf{(e)} $\operatorname{TSS}=\sum_i(y_i-11)^2=25+16+0+4+49=94.000$
+\begin{frame}{Problem 4 --- solution (c): RSS and RSE}
+  \begin{solutionbox}[Solution P4(c) --- residual sum of squares and RSE (3 P)]
+    \textbf{Residual sum of squares} (sum of squared residuals from part~(b)):
     \[
-      R^2=1-\frac{\operatorname{RSS}}{\operatorname{TSS}}=1-\frac{4}{94}=0.957
+      \operatorname{RSS}=\sum_{i=1}^{5} e_i^2 = 1^2+(-1)^2+0^2+(-1)^2+1^2 = 1+1+0+1+1 = 4.000.
     \]
-    $95.7\,\%$ of the variance of weekly sales is explained by the regression on radio spots
-    (simple regression: $r=\sqrt{R^2}\approx 0.979$).
+    \textbf{Residual standard error} (with $n-2=3$ degrees of freedom):
+    \[
+      \operatorname{RSE}=\sqrt{\frac{\operatorname{RSS}}{\,n-2\,}}=\sqrt{\frac{4}{3}}
+      =\sqrt{1.333}=1.155 \ \text{(thousand EUR)}.
+    \]
+    \textbf{Interpretation.} Even if the true regression line were known, observed weekly sales
+    would still deviate from it by about $1.155$ thousand EUR ($\approx 1{,}155$ EUR) on average.
+    RSE is the estimate $\hat\sigma$ of $\sigma$, the standard deviation of the error $\varepsilon$.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (d.1): standard error and $t$-test}
+  \begin{solutionbox}[Solution P4(d) --- standard error and hypothesis test (part 1 of 2)]
+    \textbf{Hypotheses:} $H_0\colon\beta_1=0$ vs.\ $H_1\colon\beta_1\ne 0$, at level $\alpha=0.05$.
     \medskip
 
-    \textbf{(f)} $\hat y(6)=2+3\cdot 6=20.000$ thousand EUR $=20{,}000$ EUR.\\
-    \emph{Caveat:} $x=6$ lies outside the observed range $[1{;}5]$ $\Rightarrow$
-    \textbf{extrapolation} --- the linear form is unverified there (and $n=5$ is very small).
+    \textbf{Standard error of the slope:}
+    \[
+      \operatorname{SE}(\hat\beta_1)=\frac{\operatorname{RSE}}{\sqrt{S_{xx}}}
+      =\frac{1.1547}{\sqrt{10}}=\frac{1.1547}{3.1623}=0.365.
+    \]
+    \textbf{Test statistic} (df $=n-2=3$):
+    \[
+      t=\frac{\hat\beta_1-0}{\operatorname{SE}(\hat\beta_1)}=\frac{3.000}{0.3651}=8.216.
+    \]
+    \textbf{Decision:} since $|t|=8.216>3.182=t_{0.975,\,3}$, we \emph{reject} $H_0$ at the
+    $5\,\%$ level --- the slope is significantly different from zero.
   \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (d.2): confidence interval}
+  \begin{solutionbox}[Solution P4(d) --- 95\,\% confidence interval for $\beta_1$ (part 2 of 2)]
+    Using $\hat\beta_1=3.000$, $\operatorname{SE}(\hat\beta_1)=0.3651$ and $t_{0.975,\,3}=3.182$:
+    \begin{align*}
+      \hat\beta_1 \pm t_{0.975,\,3}\cdot\operatorname{SE}(\hat\beta_1)
+      &= 3.000 \pm 3.182\cdot 0.3651\\
+      &= 3.000 \pm 1.162\\
+      &= [\,1.838,\ 4.162\,].
+    \end{align*}
+    Zero is \emph{not} contained in the interval --- consistent with rejecting $H_0$ in
+    part~(d.1). \textbf{Conclusion:} there is a statistically significant \emph{positive} linear
+    association between the number of radio spots and weekly sales.
+  \end{solutionbox}
+  \begin{takeaway}[Test $\Leftrightarrow$ CI]
+    A two-sided $5\,\%$ test rejects $H_0\colon\beta_1=0$ exactly when $0$ falls outside the
+    $95\,\%$ confidence interval.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (e): TSS and $R^2$}
+  \begin{solutionbox}[Solution P4(e) --- total sum of squares and $R^2$ (3 P)]
+    \textbf{Total sum of squares} (deviations of $y_i$ from $\bar y=11$):
+    \[
+      \operatorname{TSS}=\sum_{i=1}^{5}(y_i-\bar y)^2
+      =(-5)^2+(-4)^2+0^2+2^2+7^2 = 25+16+0+4+49 = 94.000.
+    \]
+    \textbf{Coefficient of determination} (using $\operatorname{RSS}=4.000$):
+    \[
+      R^2=1-\frac{\operatorname{RSS}}{\operatorname{TSS}}=1-\frac{4}{94}=\frac{90}{94}=0.957.
+    \]
+    \textbf{Interpretation.} About $95.7\,\%$ of the variance of weekly sales is explained by the
+    linear regression on the number of radio spots. (In simple regression $R^2=r^2$, so the
+    correlation is $r=\sqrt{0.957}\approx 0.979$.)
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (f): prediction at $x=6$}
+  \begin{solutionbox}[Solution P4(f) --- prediction and its caveat (2 P)]
+    \textbf{Point prediction} from $\hat y=2+3x$ at $x=6$:
+    \[
+      \hat y(6)=2+3\cdot 6 = 2+18 = 20.000 \ \text{thousand EUR} = 20{,}000\ \text{EUR}.
+    \]
+    \textbf{Caveat.} $x=6$ lies \emph{outside} the observed range $x\in[1,5]$ --- this is an
+    \textbf{extrapolation}. The linear relationship has not been observed there and may not hold;
+    moreover the sample $n=5$ is very small, so the estimates are themselves uncertain.
+  \end{solutionbox}
+  \begin{takeaway}[Extrapolation warning]
+    A fitted line is only trustworthy \emph{within} the range of the observed predictor values.
+  \end{takeaway}
 \end{frame}
 
 % ============================================================
@@ -394,78 +580,145 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Problem 5 --- solution (a)}
-  \begin{solutionbox}[Solution P5 --- (a) coefficient interpretation]
-    Salary in 1{,}000 EUR per year; baseline group: men (\texttt{female}$=0$).
+\begin{frame}{Problem 5 --- solution (a.1): intercept and experience}
+  \begin{solutionbox}[Solution P5(a) --- baseline coefficients (part 1 of 2)]
+    Salary is measured in $1{,}000$ EUR per year; the \emph{baseline} group is men
+    (\texttt{female}$=0$).
+    \medskip
+
+    \textbf{Intercept $=46.20$.} Expected annual salary of a \emph{man} with $0$ years of
+    experience: $46{,}200$ EUR.
+    \medskip
+
+    \textbf{\texttt{experience} $=2.35$.} For \emph{men}, each additional year of experience
+    raises the expected salary by $2{,}350$ EUR. Because the model contains an interaction, this
+    slope refers to the baseline group (\texttt{female}$=0$) \emph{only} --- women have a
+    different slope (see part~a.2).
+  \end{solutionbox}
+  \begin{takeaway}[Reading a dummy--interaction model]
+    With \texttt{female} and \texttt{experience:female} present, \texttt{Intercept} and
+    \texttt{experience} describe the \emph{men} only.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (a.2): the dummy and the interaction}
+  \begin{solutionbox}[Solution P5(a) --- gender difference and its slope (part 2 of 2)]
+    \textbf{\texttt{female} $=-3.10$.} At $0$ years of experience, women are expected to earn
+    $3{,}100$ EUR \emph{less} than men --- the difference between the two group \emph{intercepts}.
+    \medskip
+
+    \textbf{\texttt{experience:female} $=-0.85$.} The experience slope for women is $0.85$
+    \emph{lower} than for men:
+    \[
+      \text{women's slope}=2.35-0.85=1.50\ \text{thousand EUR per year}.
+    \]
+    Equivalently, the expected salary gap between men and women \emph{widens} by $850$ EUR with
+    every additional year of experience.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (b): significance and the hierarchy principle}
+  \begin{solutionbox}[Solution P5(b) --- significance and the hierarchy principle (4 P)]
+    At $\alpha=0.05$ compare each $p$-value with $0.05$:
     \begin{itemize}
-      \item \textbf{Intercept 46.20:} expected salary of a \emph{man} with 0 years of
-        experience $=46{,}200$ EUR.
-      \item \textbf{experience 2.35:} for \emph{men} each additional year raises expected
-        salary by $2{,}350$ EUR (with an interaction the slope is group-specific).
-      \item \textbf{female $-3.10$:} at 0 years of experience women earn $3{,}100$ EUR
-        \emph{less} on average --- the difference of the two intercepts.
-      \item \textbf{experience:female $-0.85$:} the experience slope of women is $0.85$
-        smaller: women gain $2.35-0.85=1.50$ thousand EUR per year; the expected gender gap
-        \emph{widens} by $850$ EUR per year of experience.
+      \item \texttt{Intercept}, \texttt{experience}: $p<0.0001$ $\Rightarrow$ \emph{highly significant}.
+      \item \texttt{experience:female}: $p=0.0184<0.05$ $\Rightarrow$ \emph{significant}.
+        Consistency check: $t=\hat\beta_3/\operatorname{SE}(\hat\beta_3)=-0.85/0.35=-2.429$
+        \checkmark\ (matches the output).
+      \item \texttt{female}: $p=0.0504>0.05$ $\Rightarrow$ \emph{not} significant at exactly the
+        $5\,\%$ level (only marginally).
+    \end{itemize}
+    \textbf{Should \texttt{female} be removed? No.} By the \textbf{hierarchy principle}, if an
+    interaction (\texttt{experience}$\times$\texttt{female}) is kept, its main effects must be
+    kept too --- otherwise the interaction changes meaning. Besides, $p=0.0504$ is borderline
+    evidence, not evidence of \emph{no} effect.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (c): fitted equation per group}
+  \begin{solutionbox}[Solution P5(c) --- separate lines for men and women (4 P)]
+    Substitute \texttt{female}$=0$ and \texttt{female}$=1$ into
+    $\widehat{\texttt{salary}}=46.20+2.35\,\texttt{exp}-3.10\,\texttt{female}
+      -0.85\,(\texttt{exp}\times\texttt{female})$:
+    \begin{align*}
+      \text{Men } (\texttt{female}=0):\quad
+        & \widehat{\texttt{salary}} = 46.20 + 2.35\,\texttt{experience}\\
+      \text{Women } (\texttt{female}=1):\quad
+        & \widehat{\texttt{salary}} = (46.20-3.10) + (2.35-0.85)\,\texttt{experience}\\
+        & \phantom{\widehat{\texttt{salary}}} = 43.10 + 1.50\,\texttt{experience}
+    \end{align*}
+    The two groups get \emph{different intercepts and different slopes} --- exactly what including
+    the interaction term allows.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (d): predictions and the gap at 10 years}
+  \begin{solutionbox}[Solution P5(d) --- predicted salaries at 10 years (4 P)]
+    Insert \texttt{experience}$=10$ into the group equations from part~(c):
+    \begin{align*}
+      \text{Man:}\quad & 46.20 + 2.35\cdot 10 = 46.20+23.50 = 69.70 \Rightarrow 69{,}700\ \text{EUR}\\
+      \text{Woman:}\quad & 43.10 + 1.50\cdot 10 = 43.10+15.00 = 58.10 \Rightarrow 58{,}100\ \text{EUR}
+    \end{align*}
+    \textbf{Estimated gap} (woman $-$ man): $58.10-69.70=-11.60$ thousand EUR --- women earn
+    $11{,}600$ EUR less. In terms of the coefficients the gap at experience $=10$ is
+    \[
+      \hat\beta_2+10\,\hat\beta_3=-3.10-8.50=-11.60\ \text{thousand EUR}.
+    \]
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (e): $R^2$ and the $F$-test}
+  \begin{solutionbox}[Solution P5(e) --- overall fit and joint significance (3 P)]
+    \textbf{$R^2=0.712$.} The three model terms (\texttt{experience}, \texttt{female} and their
+    interaction) jointly explain $71.2\,\%$ of the variance of salaries in the sample.
+    \medskip
+
+    \textbf{$F$-test --- is the model useful at all?}
+    \[
+      H_0\colon \beta_1=\beta_2=\beta_3=0 \quad\text{vs.}\quad
+      H_1\colon \text{at least one } \beta_j\neq 0.
+    \]
+    The output gives $F=46.15$ on $3$ and $56$ degrees of freedom with $p<0.0001$
+    $\Rightarrow$ \emph{reject} $H_0$: at least one predictor is related to salary, so the model
+    is useful overall.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (f.1): non-linearity}
+  \begin{solutionbox}[Solution P5(f)(i) --- U-shaped residual plot (part 1 of 2)]
+    A residual-vs-fitted plot with a clear \textbf{U-shape} (positive residuals at small and
+    large fitted values, negative in between) signals \textbf{non-linearity}: the straight-line
+    model misses systematic \emph{curvature}, so the residuals are not patternless as they should be.
+    \medskip
+
+    \textbf{Remedies.}
+    \begin{itemize}
+      \item Add a non-linear term, e.g.\ $\texttt{experience}^2$ (polynomial regression);
+      \item Transform variables, e.g.\ model $\log(\texttt{salary})$ or use $\sqrt{X}$.
     \end{itemize}
   \end{solutionbox}
+  \begin{takeaway}[Diagnostic rule]
+    A good linear fit shows a \emph{structureless} residual cloud; any systematic shape points to
+    a violated assumption.
+  \end{takeaway}
 \end{frame}
 
-\begin{frame}{Problem 5 --- solution (b) and (c)}
-  \begin{solutionbox}[Solution P5 --- (b) and (c)]
-    \textbf{(b)} Intercept and \texttt{experience}: $p<0.0001$ $\Rightarrow$ significant.
-    Interaction: consistency $t=-0.85/0.35=-2.429$ \checkmark; $p=0.0184<0.05$ $\Rightarrow$
-    significant. \texttt{female}: $p=0.0504>0.05$ $\Rightarrow$ \emph{not} significant at
-    exactly 5\,\% (borderline). Do \emph{not} remove it: \textbf{hierarchy principle} ---
-    a model containing an interaction should contain the corresponding main effects;
-    and $p=0.0504$ is weak evidence against an effect, not proof of none.
+\begin{frame}{Problem 5 --- solution (f.2): multicollinearity (VIF)}
+  \begin{solutionbox}[Solution P5(f)(ii) --- what {$\operatorname{VIF}=12$} means (part 2 of 2)]
+    \textbf{Definition.} $\operatorname{VIF}_j=\dfrac{1}{1-R^2_{X_j\mid X_{-j}}}$, where
+    $R^2_{X_j\mid X_{-j}}$ comes from regressing $X_j$ on all \emph{other} predictors. Solving
+    $\operatorname{VIF}_{\texttt{age}}=12$:
+    \[
+      R^2_{\texttt{age}\mid \text{rest}}=1-\frac{1}{12}=0.917.
+    \]
+    So \texttt{age} is almost a linear combination of the other predictors --- strong
+    \textbf{multicollinearity} (common rules of thumb flag VIF $>5$ or $>10$).
     \medskip
 
-    \textbf{(c)} Group-wise fitted equations:
-    \begin{align*}
-      \text{Men:}\quad & \widehat{\texttt{salary}} = 46.20+2.35\,\texttt{experience}\\
-      \text{Women:}\quad & \widehat{\texttt{salary}} = (46.20-3.10)+(2.35-0.85)\,\texttt{experience}
-        = 43.10+1.50\,\texttt{experience}
-    \end{align*}
-    Different intercepts \emph{and} slopes --- exactly what the interaction permits.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Problem 5 --- solution (d) and (e)}
-  \begin{solutionbox}[Solution P5 --- (d) and (e)]
-    \textbf{(d)} At 10 years of experience:
-    \begin{align*}
-      \text{Man:}\quad & 46.20+2.35\cdot 10 = 69.70 \Rightarrow 69{,}700\text{ EUR}\\
-      \text{Woman:}\quad & 43.10+1.50\cdot 10 = 58.10 \Rightarrow 58{,}100\text{ EUR}
-    \end{align*}
-    Gap: $58.10-69.70=-11.60$ thousand EUR
-    $=\hat\beta_2+10\hat\beta_3=-3.10-8.50$ $\Rightarrow$ women earn $11{,}600$ EUR less.
-    \medskip
-
-    \textbf{(e)} $R^2=0.712$: the three terms explain $71.2\,\%$ of the salary variance.
-    $F$-test: $H_0\colon\beta_1=\beta_2=\beta_3=0$ (no predictor useful) vs.\ at least one
-    $\beta_j\neq 0$; $F=46.15$ (3 and 56 df) with $p<0.0001$ $\Rightarrow$ reject $H_0$:
-    the model is useful overall.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Problem 5 --- solution (f) diagnostics}
-  \begin{solutionbox}[Solution P5 --- (f) diagnostics]
-    \textbf{(i) U-shaped residual-vs-fitted plot:} systematic curvature the linear model
-    misses $\Rightarrow$ \textbf{non-linearity}. Remedies: add a polynomial term
-    (e.g.\ $\texttt{experience}^2$) or transform variables
-    (e.g.\ $\log(\texttt{salary})$ or $\sqrt{X}$).
-    \medskip
-
-    \textbf{(ii) VIF $=12$ for \texttt{age}:}
-    $\operatorname{VIF}_j = 1/(1-R^2_{X_j\mid X_{-j}})=12$ $\Rightarrow$
-    $R^2_{X_j\mid X_{-j}}\approx 0.917$: \texttt{age} is almost a linear combination of the
-    other predictors $\Rightarrow$ strong \textbf{multicollinearity}
-    (rules of thumb: VIF $>5$ or $>10$ is problematic).\\
-    \emph{Consequence:} $\operatorname{SE}(\hat\beta_{\texttt{age}})$ inflated by
-    $\sqrt{12}\approx 3.5$ $\Rightarrow$ unstable coefficient; low power of its $t$-test;
-    individual effects of collinear predictors cannot be separated --- although overall fit
-    and predictions may remain fine.
+    \textbf{Consequence.} $\operatorname{SE}(\hat\beta_{\texttt{age}})$ is inflated by a factor
+    $\sqrt{12}\approx 3.5$: the coefficient is estimated very imprecisely, its sign may flip
+    between samples, and its $t$-test loses power --- even though the model's overall fit and
+    predictions may be unaffected.
   \end{solutionbox}
 \end{frame}
 

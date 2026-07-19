@@ -105,51 +105,88 @@
         define $(x-\xi)^3_+$; why does adding it keep the fit smooth at $\xi$?
     \end{itemize}
   \end{exercise}
+  {\scriptsize\itshape Lecture slides: Chapter 7 --- Moving Beyond Linearity (Lecture 9).}
 \end{frame}
 
-\begin{frame}{Problem 1 --- solution (a) and (b)}
-  \begin{solutionbox}[Solution P1 --- (a) and (b)]
-    \textbf{(a)} $K$ knots $\Rightarrow$ $K+1$ cubic pieces $\times\,4$ coefficients $=4K+4$
-    parameters; continuity of $g$ and $g'$ and $g''$ at each knot $\Rightarrow$ $3K$ constraints:
+\begin{frame}{Problem 1 --- solution (a): cubic-spline df}
+  \begin{solutionbox}[Solution P1 --- (a) degrees of freedom of a cubic spline]
+    \textbf{Strategy: count parameters, then subtract constraints.}
+    \begin{itemize}
+      \item $K$ interior knots split the range of $X$ into $K+1$ intervals; each interval carries
+        its own cubic polynomial with $4$ coefficients:
+        \[
+          4(K+1)=4K+4\quad\text{free parameters (unconstrained pieces).}
+        \]
+      \item At \emph{each} knot the neighbouring pieces must agree in value, slope and curvature:
+        continuity of $g,\,g',\,g''$ $\Rightarrow$ $3$ constraints per knot, $3K$ in total.
+    \end{itemize}
     \[
-      \mathrm{df}=4(K+1)-3K=K+4
-      \qquad\Rightarrow\qquad K=4:\ \mathrm{df}=\mathbf{8}.
+      \mathrm{df}=\underbrace{4(K+1)}_{\text{parameters}}-\underbrace{3K}_{\text{constraints}}
+      =K+4
+      \qquad\Longrightarrow\qquad K=4:\ \mathrm{df}=4+4=\mathbf{8}.
     \]
-    (Equivalently: basis $1$, $x$, $x^2$, $x^3$ plus one truncated power per knot.)
-    \medskip
-
-    \textbf{(b)} Natural spline: \emph{linear beyond the boundary knots}
-    (regions $X<\xi_1$ and $X>\xi_K$); killing the quadratic and cubic terms there costs
-    $2$ parameters per boundary region:
-    \[
-      \mathrm{df}=(K+4)-4=K
-      \qquad\Rightarrow\qquad K=4:\ \mathrm{df}=\mathbf{4}.
-    \]
-    \emph{Why useful:} splines are most erratic near the boundaries where data are sparse;
-    the linearity constraint stabilises the fit there (lower variance for a little extra bias).
+    \textbf{Basis check.} The same space is spanned by $1,\,x,\,x^2,\,x^3$ plus one truncated-power
+    term per knot, i.e.\ $4+K$ basis functions --- an identical count.
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 1 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P1 --- (c) and (d)]
-    \textbf{(c)} RSS term $=$ fidelity to the data; $\lambda\int g''(t)^2dt$ penalises curvature
-    (wiggliness); $\lambda$ trades the two off.
-    \begin{itemize}
-      \item $\lambda\to 0$: no penalty $\Rightarrow$ $\hat g$ \emph{interpolates} the training
-        points exactly --- extremely wiggly, zero training RSS, severe overfitting
-        (effective df $\to n$).
-      \item $\lambda\to\infty$: curvature infinitely expensive $\Rightarrow$ $g''\equiv 0$
-        $\Rightarrow$ $\hat g$ is the \emph{least-squares straight line} (effective df $\to 2$).
-    \end{itemize}
-    $\lambda$ (chosen by LOOCV) steers the effective df smoothly between $n$ and $2$.
+\begin{frame}{Problem 1 --- solution (b): natural cubic spline}
+  \begin{solutionbox}[Solution P1 --- (b) the natural cubic spline]
+    A \emph{natural} cubic spline adds one requirement: it must be \emph{linear beyond the two
+    boundary knots}, i.e.\ in the outer regions $X<\xi_1$ and $X>\xi_K$.
     \medskip
 
-    \textbf{(d)} $f(x)=\beta_0+\beta_1 x+\beta_2 x^2+\beta_3 x^3+\beta_4 (x-\xi)^3_+$ with
+    \textbf{Cost of the constraint.} Linearity forces the quadratic and cubic terms to vanish in
+    each outer region $\Rightarrow$ $2$ fewer parameters per boundary region, $4$ in total:
     \[
-      (x-\xi)^3_+=\begin{cases}(x-\xi)^3 & x>\xi\\ 0 & x\le\xi\end{cases}
+      \mathrm{df}=(K+4)-4=K
+      \qquad\Longrightarrow\qquad K=4:\ \mathrm{df}=\mathbf{4}.
     \]
-    $(x-\xi)^3_+$ has value and first and second derivative $0$ at $\xi$ $\Rightarrow$ only the
-    third derivative jumps: the fit stays continuous with continuous $g'$ and $g''$ --- a cubic spline.
+    \textbf{Where it acts:} only in the two tails, outside the outermost knots.
+  \end{solutionbox}
+  \begin{takeaway}[Why it is useful]
+    \footnotesize Unconstrained splines and polynomials wiggle wildly near the boundaries, where
+    data are sparse; forcing linearity there cuts the prediction \emph{variance} at and beyond the
+    boundary for only a little extra bias.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (c): smoothing spline}
+  \begin{solutionbox}[Solution P1 --- (c) the two terms and the limits of $\lambda$]
+    \[
+      \min_{g}\ \underbrace{\sum_{i=1}^n\bigl(y_i-g(x_i)\bigr)^2}_{\text{fit to the data (RSS)}}
+      \;+\;\lambda\underbrace{\int g''(t)^2\,dt}_{\text{roughness / curvature}} .
+    \]
+    $g''$ measures curvature, so the integral penalises wiggliness; the tuning parameter
+    $\lambda\ge0$ trades the two terms off.
+    \begin{itemize}
+      \item $\lambda\to 0$: the penalty vanishes $\Rightarrow$ $\hat g$ \emph{interpolates} every
+        training point --- maximally wiggly, zero training RSS, severe overfitting
+        (effective df $\to n$).
+      \item $\lambda\to\infty$: any curvature is infinitely expensive $\Rightarrow g''\equiv0$
+        $\Rightarrow$ $\hat g$ is the \emph{least-squares straight line} (effective df $\to2$).
+    \end{itemize}
+    In between, $\lambda$ (chosen e.g.\ by LOOCV) moves the effective df smoothly from $n$ to $2$.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 1 --- solution (d): truncated-power basis}
+  \begin{solutionbox}[Solution P1 --- (d) truncated-power basis with one knot $\xi$]
+    A cubic spline with a single knot $\xi$ can be written with a five-function basis:
+    \[
+      f(x)=\beta_0+\beta_1x+\beta_2x^2+\beta_3x^3+\beta_4\,(x-\xi)^3_+,
+      \qquad
+      (x-\xi)^3_+=\begin{cases}(x-\xi)^3,& x>\xi\\[0.5mm] 0,& x\le\xi.\end{cases}
+    \]
+    \textbf{Why smoothness survives.} At the knot $x=\xi$ the added function and its first two
+    derivatives all vanish:
+    \[
+      (x-\xi)^3_+\big|_{\xi}=0,\qquad
+      \tfrac{d}{dx}(x-\xi)^3_+\big|_{\xi}=0,\qquad
+      \tfrac{d^2}{dx^2}(x-\xi)^3_+\big|_{\xi}=0,
+    \]
+    so adding it changes only the \emph{third} derivative at $\xi$. The fit therefore stays
+    continuous with continuous $g'$ and $g''$ --- exactly the defining smoothness of a cubic spline.
   \end{solutionbox}
 \end{frame}
 
@@ -166,28 +203,60 @@
       \item[(c)] \textbf{[2 P]} Backfitting in one or two sentences.
     \end{itemize}
   \end{exercise}
+  {\scriptsize\itshape Lecture slides: Chapter 7 --- Moving Beyond Linearity (Lecture 9).}
 \end{frame}
 
-\begin{frame}{Problem 2 --- solution}
-  \begin{solutionbox}[Solution P2 --- GAMs]
-    \textbf{(a)}\ \ $Y=\beta_0+f_1(X_1)+f_2(X_2)+\dots+f_p(X_p)+\varepsilon$.\\
-    Linear regression is the special case $f_j(X_j)=\beta_j X_j$; a GAM replaces each linear
-    term by a smooth non-linear $f_j$ (spline, local regression) but keeps the
-    \emph{additive} structure.
+\begin{frame}{Problem 2 --- solution (a): the GAM model form}
+  \begin{solutionbox}[Solution P2 --- (a) general form of a GAM]
+    \[
+      Y=\beta_0+f_1(X_1)+f_2(X_2)+\dots+f_p(X_p)+\varepsilon .
+    \]
+    Each predictor enters through its \emph{own} smooth function $f_j$ (a natural or smoothing
+    spline, or local regression), and the contributions are \emph{added}.
     \medskip
 
-    \textbf{(b)} \emph{Advantage:} additivity $\Rightarrow$ the effect of each $X_j$ is its own
-    function $f_j$, which can be plotted and interpreted individually while the other predictors
-    are held fixed --- one panel per predictor, as readable as a coefficient table.\\
-    \emph{Limitation:} no \emph{interactions} --- the effect of $X_j$ cannot depend on $X_k$.\\
-    \emph{Repair:} add interaction components manually, e.g.\ $X_j\times X_k$ or a
-    two-dimensional smooth $f_{jk}(X_j{,}X_k)$.
-    \medskip
-
-    \textbf{(c)} \emph{Backfitting:} cycle through $j=1{,}\dots{,}p$ and re-fit each $f_j$ to the
-    partial residuals $r_i=y_i-\beta_0-\sum_{k\ne j}f_k(x_{ik})$ with all other functions held
-    fixed; repeat until convergence.
+    \textbf{Extension of linear regression.} Multiple linear regression is the special case
+    $f_j(X_j)=\beta_jX_j$; a GAM keeps the additive structure but frees each term to bend into a
+    smooth non-linearity --- capturing curved effects a straight line would miss.
   \end{solutionbox}
+  \begin{takeaway}[One step further]
+    \footnotesize The same idea extends to classification: place the additive predictor inside a
+    link, e.g.\ $\log\!\frac{p(X)}{1-p(X)}=\beta_0+\sum_j f_j(X_j)$ for a logistic GAM.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (b): advantage and limitation}
+  \begin{solutionbox}[Solution P2 --- (b) interpretability vs.\ interactions]
+    \textbf{Advantage (interpretability).} Because the model is additive, the effect of each
+    $X_j$ on $Y$ is captured by its own function $f_j$, which can be \emph{plotted and read one
+    panel at a time} while the other predictors are held fixed --- non-linear effects stay as
+    readable as a coefficient table.
+    \medskip
+
+    \textbf{Limitation.} Additivity excludes \emph{interactions}: the effect of $X_j$ cannot
+    depend on the value of $X_k$.
+    \medskip
+
+    \textbf{Repair.} Add interaction components by hand --- a product term $X_j\times X_k$, or a
+    low-dimensional joint smooth $f_{jk}(X_j,X_k)$ as an extra component.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 2 --- solution (c): backfitting}
+  \begin{solutionbox}[Solution P2 --- (c) the backfitting algorithm]
+    Fit the $f_j$ one at a time, cycling through $j=1,\dots,p$. At each step update $f_j$ by
+    smoothing the \emph{partial residuals} --- what remains after removing all the \emph{other}
+    current terms:
+    \[
+      r_i=y_i-\beta_0-\sum_{k\ne j} f_k(x_{ik}),\qquad\text{then re-fit } f_j \text{ to } (x_{ij},r_i).
+    \]
+    Every other function is held fixed while $f_j$ is updated; repeat the whole cycle until the
+    $f_j$ stop changing (convergence).
+  \end{solutionbox}
+  \begin{takeaway}[Why it is convenient]
+    \footnotesize Backfitting only ever needs a \emph{one-dimensional} smoother, so any
+    scatterplot smoother (spline, loess) can be plugged in --- no giant multivariate fit required.
+  \end{takeaway}
 \end{frame}
 
 % ============================================================
@@ -215,55 +284,110 @@
     (d) \textbf{[4 P]} Cost-complexity pruning: role of $\alpha$ in
         $\sum_m\sum_{i\in R_m}(y_i-\hat y_{R_m})^2+\alpha|T|$.
   \end{exercise}
+  {\scriptsize\itshape Lecture slides: Chapter 8 --- Tree-Based Methods (Lecture 10).}
 \end{frame}
 
-\begin{frame}{Problem 3 --- solution (a) and (b)}
-  \begin{solutionbox}[Solution P3 --- (a) and (b)]
-    \textbf{(a)} Region means and RSS per cutpoint:
+\begin{frame}{Problem 3 --- solution (a.1): root node and cutpoint $s=2.5$}
+  \begin{solutionbox}[Solution P3 --- (a) part 1: root node and cutpoint 2.5]
+    \textbf{Root node (no split), for reference.}
+    $\bar y=\tfrac{2+4+3+3+8+10}{6}=\tfrac{30}{6}=5$, and
+    \[
+      \mathrm{RSS}_{\text{root}}=(2{-}5)^2+(4{-}5)^2+(3{-}5)^2+(3{-}5)^2+(8{-}5)^2+(10{-}5)^2
+      =9{+}1{+}4{+}4{+}9{+}25=52 .
+    \]
+    \textbf{Cutpoint $s=2.5$:} $R_1=\{1,2\}$, $y\in\{2,4\}$, $\hat y_{R_1}=3$;\quad
+    $R_2=\{3,4,5,6\}$, $y\in\{3,3,8,10\}$, $\hat y_{R_2}=\tfrac{24}{4}=6$.
+    \[
+      \mathrm{RSS}_{R_1}=(2{-}3)^2+(4{-}3)^2=2,
+    \]
+    \[
+      \mathrm{RSS}_{R_2}=(3{-}6)^2+(3{-}6)^2+(8{-}6)^2+(10{-}6)^2=9{+}9{+}4{+}16=38,
+    \]
+    \[
+      \Longrightarrow\quad \mathrm{RSS}(2.5)=2+38=\mathbf{40}.
+    \]
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (a.2): cutpoint $s=4.5$ and the choice}
+  \begin{solutionbox}[Solution P3 --- (a) part 2: cutpoint 4.5 and the choice]
+    \textbf{Cutpoint $s=4.5$:} $R_1=\{1,2,3,4\}$, $y\in\{2,4,3,3\}$, $\hat y_{R_1}=\tfrac{12}{4}=3$;\quad
+    $R_2=\{5,6\}$, $y\in\{8,10\}$, $\hat y_{R_2}=9$.
+    \[
+      \mathrm{RSS}_{R_1}=1+1+0+0=2,\qquad
+      \mathrm{RSS}_{R_2}=(8{-}9)^2+(10{-}9)^2=2
+      \ \Rightarrow\ \mathrm{RSS}(4.5)=2+2=\mathbf{4}.
+    \]
     \begin{center}\scriptsize
     \begin{tabular}{lccccc}
       \toprule
-      $s$ & $R_1$ ($y$-values) & $\hat y_{R_1}$ & $R_2$ ($y$-values) & $\hat y_{R_2}$ & total RSS\\
+      $s$ & $R_1$ ($y$) & $\hat y_{R_1}$ & $R_2$ ($y$) & $\hat y_{R_2}$ & total RSS\\
       \midrule
-      2.5 & $\{2{,}4\}$ & 3 & $\{3{,}3{,}8{,}10\}$ & 6 & $2+38=\mathbf{40}$\\
-      4.5 & $\{2{,}4{,}3{,}3\}$ & 3 & $\{8{,}10\}$ & 9 & $2+2=\mathbf{4}$\\
+      $2.5$ & $\{2,4\}$ & $3$ & $\{3,3,8,10\}$ & $6$ & $2+38=40$\\
+      $4.5$ & $\{2,4,3,3\}$ & $3$ & $\{8,10\}$ & $9$ & $2+2=\mathbf{4}$\\
       \bottomrule
     \end{tabular}
     \end{center}
-    Details: $s=2.5$: $(2-3)^2+(4-3)^2=2$; $(3-6)^2+(3-6)^2+(8-6)^2+(10-6)^2=9+9+4+16=38$.\\
-    $s=4.5$: $1+1+0+0=2$; $(8-9)^2+(10-9)^2=2$.\\
-    Greedy recursive binary splitting picks the smaller RSS: $\mathbf{s=4.5}$ ($4\ll 40$;
-    root RSS was 52) --- it isolates the two high-sales products.
-    \medskip
-
-    \textbf{(b)} $x=5\ge 4.5$ $\Rightarrow$ region $R_2$ $\Rightarrow$
-    $\hat y=\hat y_{R_2}=\mathbf{9}$ (i.e.\ 9{,}000 units per week).
+    \textbf{Decision.} Recursive binary splitting is greedy and picks the smaller RSS: $4<40$, so
+    it chooses $\mathbf{s=4.5}$ --- isolating the four low-sales products (mean $3$) from the two
+    high-sales products (mean $9$) and cutting the root RSS from $52$ down to $4$.
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 3 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P3 --- (c) and (d)]
-    \textbf{(c)} $\hat p_{\text{Yes}}=6/8=0.75$; $\hat p_{\text{No}}=2/8=0.25$.
+\begin{frame}{Problem 3 --- solution (b): prediction for a new product}
+  \begin{solutionbox}[Solution P3 --- (b) prediction for a new product]
+    Drop the new observation down the tree using the chosen split $s=4.5$:
     \[
-      G=0.75\cdot 0.25+0.25\cdot 0.75=\mathbf{0.375}
+      x=5\ \ge\ 4.5 \quad\Longrightarrow\quad \text{region } R_2
+      \quad\Longrightarrow\quad \hat y=\hat y_{R_2}=\mathbf{9}
     \]
-    \[
-      D=-(0.75\ln 0.75+0.25\ln 0.25)=0.75\cdot 0.2877+0.25\cdot 1.3863
-       =0.2158+0.3466=\mathbf{0.562}
-    \]
-    Predicted class: majority $=$ \textbf{Yes} (estimated probability $0.75$).
-    Both measures are near $0$ for pure nodes --- this node is moderately impure.
-    \medskip
+    i.e.\ the tree predicts $\mathbf{9{,}000}$ units per week.
+  \end{solutionbox}
+  \begin{takeaway}[How a tree predicts]
+    \footnotesize A regression tree is \emph{piecewise constant}: every $x\in[4.5,6]$ receives the
+    same prediction $\hat y_{R_2}=9$ (the region mean). Predictions change only by jumping at the
+    split points.
+  \end{takeaway}
+\end{frame}
 
-    \textbf{(d)} $\alpha$ $=$ price per terminal node $|T|$:
+\begin{frame}{Problem 3 --- solution (c): Gini and entropy of a node}
+  \begin{solutionbox}[Solution P3 --- (c) impurity of a 6-Yes / 2-No node]
+    Class proportions: $\hat p_{\text{Yes}}=\tfrac{6}{8}=0.75$,\quad $\hat p_{\text{No}}=\tfrac{2}{8}=0.25$.
+    \[
+      G=\sum_k \hat p_k(1-\hat p_k)=0.75\cdot0.25+0.25\cdot0.75=0.1875+0.1875=\mathbf{0.375}.
+    \]
+    \[
+      D=-\sum_k \hat p_k\ln\hat p_k=-\bigl(0.75\ln0.75+0.25\ln0.25\bigr)
+    \]
+    \[
+      =-\bigl(0.75\cdot(-0.2877)+0.25\cdot(-1.3863)\bigr)=0.2158+0.3466=\mathbf{0.562}.
+    \]
+    \textbf{Predicted class:} the majority, \textbf{Yes} (estimated probability $0.75$).
+  \end{solutionbox}
+  \begin{takeaway}[Reading the numbers]
+    \footnotesize Both $G$ and $D$ equal $0$ for a pure node and are largest at a $50\!:\!50$ split;
+    here they sit in the middle, so this node is \emph{moderately impure}.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 3 --- solution (d): cost-complexity pruning}
+  \begin{solutionbox}[Solution P3 --- (d) cost-complexity pruning]
+    In $\ \sum_{m}\sum_{i\in R_m}(y_i-\hat y_{R_m})^2+\alpha|T|\ $ the parameter $\alpha\ge0$ is the
+    \emph{price charged per terminal node} $|T|$: it trades the subtree's fit against its size.
     \begin{itemize}
-      \item $\alpha=0$: criterion $=$ training RSS $\Rightarrow$ full tree $T_0$ is optimal.
-      \item $\alpha\uparrow$: leaves must pay for themselves; branches with small RSS gain are
-        pruned $\Rightarrow$ nested sequence of ever smaller subtrees (weakest-link pruning).
-      \item Choice: \emph{cross-validation} over $\alpha$; refit the chosen subtree on all data
-        --- balances bias against variance.
+      \item $\alpha=0$: the criterion is just the training RSS $\Rightarrow$ the full tree $T_0$
+        wins (nothing penalises size).
+      \item $\alpha$ increasing: each leaf must ``pay for itself''; a branch whose RSS reduction is
+        smaller than $\alpha$ is pruned. Growing $\alpha$ yields a \emph{nested sequence} of
+        ever-smaller subtrees (weakest-link pruning).
+      \item Choosing $\alpha$: by \emph{cross-validation} --- take the $\alpha$ with the smallest
+        CV error, then refit that subtree on all the data.
     \end{itemize}
   \end{solutionbox}
+  \begin{takeaway}[Bias--variance]
+    \footnotesize $\alpha$ is a complexity dial: small $\alpha$ = large low-bias/high-variance
+    tree; large $\alpha$ = small high-bias/low-variance tree. CV locates the sweet spot.
+  \end{takeaway}
 \end{frame}
 
 % ============================================================
@@ -288,51 +412,121 @@
       \item[(d)] \textbf{[2 P]} What does the OOB error estimate and why is it free?
     \end{itemize}
   \end{exercise}
+  {\scriptsize\itshape Lecture slides: Chapter 8 --- Tree-Based Methods (Lecture 10).}
 \end{frame}
 
-\begin{frame}{Problem 4 --- solution (a) and (b)}
-  \begin{solutionbox}[Solution P4 --- (a) and (b)]
-    \textbf{(a)} (i) Averaging drives the second term $\frac{1-\rho}{B}\sigma^2\to 0$
-    (the independent part of the trees' variability); the first term $\rho\sigma^2$ is
-    independent of $B$ --- correlation between bootstrap trees limits the reduction.\\
-    (ii) $\operatorname{Var}=0.6\cdot 4+\frac{0.4}{100}\cdot 4=2.4+0.016=\mathbf{2.416}$
-    vs.\ $\sigma^2=4$ for a single tree ($\approx 40\%$ less).\\
-    (iii) $B\to\infty$: variance $\to\rho\sigma^2=\mathbf{2.4}$ (floor; more trees never
-    overfit, they only stabilise).
-    \medskip
-
-    \textbf{(b)} At \emph{each split} only a random subset of $m$ of the $p$ predictors may be
-    used; classification default $m\approx\sqrt p$ $\Rightarrow$ $p=25$: $m=\sqrt{25}=\mathbf{5}$.\\
-    With bagging a dominant predictor tops nearly every tree $\Rightarrow$ trees alike
-    $\Rightarrow$ $\rho$ high. Restricting candidates \emph{decorrelates} the trees
-    ($\rho\downarrow$), which lowers the floor $\rho\sigma^2$ --- the part of the variance
-    that averaging alone cannot remove.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Problem 4 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P4 --- (c) and (d)]
-    \textbf{(c)} Boosting for regression trees --- the three constructor arguments:
+\begin{frame}{Problem 4 --- solution (a.1): why bagging reduces variance}
+  \begin{solutionbox}[Solution P4 --- (a)(i) reading the variance formula]
+    \[
+      \operatorname{Var}\!\Bigl(\tfrac1B\textstyle\sum_{b=1}^B \hat f_b(x)\Bigr)
+      =\underbrace{\rho\,\sigma^2}_{\text{correlated part}}
+      +\underbrace{\frac{1-\rho}{B}\,\sigma^2}_{\text{independent part}} .
+    \]
     \begin{itemize}
-      \item \texttt{n\_estimators}~$=B$ --- \textbf{number of trees:} added sequentially; too
-        many $\Rightarrow$ slow overfitting; choose by CV (here $5000$).
-      \item \texttt{learning\_rate}~$=\lambda$ --- \textbf{shrinkage} (e.g.\ $0.01$ or $0.001$):
-        scales each new tree's contribution; smaller $\lambda$ $\Rightarrow$ slower learning
-        $\Rightarrow$ larger $B$ needed (here $0.01$).
-      \item \texttt{max\_depth}~$=d$ --- \textbf{splits per tree} (interaction depth):
-        complexity and interaction order of each tree; often stumps ($d=1$) suffice (here $1$).
+      \item The second term $\frac{1-\rho}{B}\sigma^2\to0$ as $B$ grows: averaging cancels the
+        \emph{independent} part of the trees' variability --- this is the variance reduction of
+        bagging.
+      \item The first term $\rho\sigma^2$ does \emph{not} depend on $B$. Bootstrap trees are grown
+        on overlapping samples of the same data and share the same strong predictors, so they are
+        positively correlated; that correlated part cannot be averaged away and \emph{limits} the
+        reduction.
     \end{itemize}
-    \emph{Slow learning:} each tree is fitted to the current \emph{residuals} and only the
-    fraction $\lambda$ is added --- the model improves gradually exactly where it still errs,
-    instead of fitting the data hard at once; the small \texttt{learning\_rate} with many trees
-    and shallow stumps encodes exactly this.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (a.2): evaluate and take $B\to\infty$}
+  \begin{solutionbox}[Solution P4 --- (a)(ii)--(iii) the numbers and the limit]
+    \textbf{(ii) $B=100$, $\rho=0.6$, $\sigma^2=4$:}
+    \[
+      \operatorname{Var}=0.6\cdot4+\frac{1-0.6}{100}\cdot4
+      =2.4+\frac{0.4\cdot4}{100}=2.4+0.016=\mathbf{2.416},
+    \]
+    versus $\sigma^2=4$ for a single tree --- a reduction of about $\mathbf{40\%}$.
     \medskip
 
-    \textbf{(d)} Each bootstrap sample misses $\approx 1/3$ of the observations (out-of-bag);
-    predicting every observation only with trees that never saw it yields the \textbf{OOB error}
-    --- a valid \emph{test-error} estimate, free as a by-product of the bootstrap
-    (no validation set or CV loop needed).
+    \textbf{(iii) $B\to\infty$:} the independent term dies and the variance approaches the floor
+    \[
+      \operatorname{Var}\ \longrightarrow\ \rho\sigma^2=0.6\cdot4=\mathbf{2.4}.
+    \]
   \end{solutionbox}
+  \begin{takeaway}[More trees never overfit]
+    \footnotesize Raising $B$ can only push the variance from $2.416$ down toward $2.4$; extra
+    trees merely stabilise the average. To go \emph{below} $2.4$ you must lower $\rho$ --- exactly
+    what random forests do.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (b): random forests}
+  \begin{solutionbox}[Solution P4 --- (b) decorrelating the trees]
+    \textbf{Modification.} At \emph{each split}, only a fresh \emph{random subset} of $m$ of the
+    $p$ predictors is allowed as splitting candidates.
+    \medskip
+
+    \textbf{Recommended $m$ (classification):} $m\approx\sqrt p$, so for $p=25$:
+    $m=\sqrt{25}=\mathbf{5}$.
+    \medskip
+
+    \textbf{Why it beats bagging.} With bagging a dominant predictor tops the first split of
+    almost every tree $\Rightarrow$ the trees look alike $\Rightarrow$ $\rho$ is high. Withholding
+    it from $\approx\tfrac{p-m}{p}$ of the split searches \emph{decorrelates} the trees, lowering
+    $\rho$ --- and by (a) a smaller $\rho$ lowers the irreducible floor $\rho\sigma^2$ that
+    averaging alone can never touch.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (c.1): the three boosting parameters}
+  \begin{solutionbox}[Solution P4 --- (c) what each constructor argument controls]
+    \begin{center}\ttfamily\scriptsize
+    GradientBoostingRegressor(n\_estimators=5000,\\
+    \ \ learning\_rate=0.01, max\_depth=1)
+    \end{center}
+    \begin{itemize}
+      \item \texttt{n\_estimators}$=B$ --- \textbf{number of trees} added sequentially; unlike
+        bagging, boosting \emph{can} overfit if $B$ is too large, so choose $B$ by CV (here
+        $5000$).
+      \item \texttt{learning\_rate}$=\lambda$ --- \textbf{shrinkage}: scales each new tree's
+        contribution, i.e.\ the speed of learning; smaller $\lambda$ needs larger $B$ (here
+        $0.01$).
+      \item \texttt{max\_depth}$=d$ --- \textbf{splits per tree} (interaction depth): the
+        complexity and interaction order of each tree; often $d=1$ stumps suffice (here $1$).
+    \end{itemize}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (c.2): the ``slow learning'' idea}
+  \begin{solutionbox}[Solution P4 --- (c) why boosting learns slowly]
+    Boosting builds the model \emph{sequentially}: each new tree is fitted to the current
+    \emph{residuals} (what the model still gets wrong), and only the small fraction $\lambda$ of
+    that tree is added,
+    \[
+      \hat f(x)\ \leftarrow\ \hat f(x)+\lambda\,\hat f^{\text{new}}(x).
+    \]
+    So the fit improves gradually and concentrates effort exactly where errors remain, instead of
+    fitting the data hard in one step --- which tends to generalise better.
+    \medskip
+
+    \textbf{The chosen values encode this:} a \emph{small} \texttt{learning\_rate}$=0.01$ with
+    \emph{many} trees (\texttt{n\_estimators}$=5000$) and shallow \texttt{max\_depth}$=1$ stumps.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 4 --- solution (d): out-of-bag error}
+  \begin{solutionbox}[Solution P4 --- (d) what OOB estimates and why it is free]
+    Each bootstrap sample is drawn with replacement, so on average about $\tfrac13$ of the
+    observations are left out --- they are \emph{out-of-bag} (OOB) for that tree.
+    \medskip
+
+    Predict each observation using \emph{only} the trees that never saw it, then aggregate: the
+    resulting error is the \textbf{OOB error}, a valid estimate of the model's \emph{test error}.
+    \medskip
+
+    \textbf{Why free:} it reuses the bootstrap as a by-product --- no separate validation set and
+    no extra cross-validation loop are required.
+  \end{solutionbox}
+  \begin{takeaway}[Handy consequence]
+    \footnotesize For large $B$ the OOB error is essentially the same as LOOCV, but obtained in a
+    single training run.
+  \end{takeaway}
 \end{frame}
 
 % ============================================================
@@ -356,76 +550,94 @@
         output size via $(W-F+2P)/S+1$.
     \end{itemize}
   \end{exercise}
+  {\scriptsize\itshape Lecture slides: Chapter 10 --- Deep Learning (Lecture 11).}
 \end{frame}
 
-\begin{frame}{Problem 5 --- solution (a) forward pass}
-  \begin{solutionbox}[Solution P5 --- (a) forward pass]
-    Pre-activations:
+\begin{frame}{Problem 5 --- solution (a): forward pass}
+  \begin{solutionbox}[Solution P5 --- (a) the forward pass]
+    \textbf{Pre-activations} (weighted sum $+$ bias):
     \[
-      z_1=-1+1\cdot 1+2\cdot 2=4
-      \qquad\qquad
-      z_2=-3-2\cdot 1+1\cdot 2=-3
+      z_1=-1+1\cdot1+2\cdot2=-1+1+4=4,\qquad
+      z_2=-3-2\cdot1+1\cdot2=-3-2+2=-3 .
     \]
-    ReLU activations:
+    \textbf{ReLU activations} $g(z)=\max\{0,z\}$:
     \[
-      A_1=\max\{0{,}4\}=4\qquad\qquad A_2=\max\{0{,}-3\}=0
+      A_1=\max\{0,4\}=4,\qquad A_2=\max\{0,-3\}=0 .
     \]
-    Output:
+    \textbf{Output} (linear unit):
     \[
-      f(x)=1+2\cdot 4+4\cdot 0=\mathbf{9}
+      f(x)=1+2A_1+4A_2=1+2\cdot4+4\cdot0=\mathbf{9}.
     \]
-    \medskip
-    The ReLU \emph{switched unit 2 off}: its negative pre-activation is clipped to $0$, so it
-    contributes nothing for this input (though it can for others).\\
-    \emph{Why essential:} with a linear $g$ the whole network collapses into one linear function
-    of $x$ regardless of depth --- the non-linearity is what lets hidden layers build flexible
-    functions (piecewise-linear surfaces with ReLU).
   \end{solutionbox}
+  \begin{takeaway}[What the ReLU did / why it matters]
+    \footnotesize Unit 2 is \emph{switched off} ($z_2<0\Rightarrow A_2=0$) and adds nothing here
+    (it could for other inputs). Without a non-linear $g$ the network collapses into one linear
+    function of $x$ --- the non-linearity is what buys flexibility.
+  \end{takeaway}
 \end{frame}
 
-\begin{frame}{Problem 5 --- solution (b) softmax and cross-entropy}
+\begin{frame}{Problem 5 --- solution (b): softmax and cross-entropy}
   \begin{solutionbox}[Solution P5 --- (b) softmax and cross-entropy]
-    Exponentials and their sum:
+    \abovedisplayskip=4pt\belowdisplayskip=4pt\abovedisplayshortskip=2pt\belowdisplayshortskip=2pt
+    \textbf{Exponentiate the logits and sum:}
     \[
-      e^{1.0}=2.718\qquad e^{0.0}=1.000\qquad e^{-1.0}=0.368
-      \qquad\Rightarrow\qquad 2.718+1.000+0.368=4.086
+      e^{1.0}=2.718,\quad e^{0.0}=1.000,\quad e^{-1.0}=0.368
+      \ \Rightarrow\ \textstyle\sum=2.718+1.000+0.368=4.086 .
     \]
-    Softmax probabilities:
+    \textbf{Softmax probabilities:}
     \[
-      \hat p_1=\frac{2.718}{4.086}=\mathbf{0.665}\qquad
-      \hat p_2=\frac{1.000}{4.086}=\mathbf{0.245}\qquad
-      \hat p_3=\frac{0.368}{4.086}=\mathbf{0.090}
+      \hat p_1=\tfrac{2.718}{4.086}=\mathbf{0.665},\quad
+      \hat p_2=\tfrac{1.000}{4.086}=\mathbf{0.245},\quad
+      \hat p_3=\tfrac{0.368}{4.086}=\mathbf{0.090}
+      \quad(\text{sum}=1.000\ \checkmark).
     \]
-    (sum $=1.000$ \checkmark). Cross-entropy for true class 1:
+    \textbf{Cross-entropy for the true class 1:}
     \[
-      -\ln\hat p_1=-\ln\frac{e^{1}}{4.086}=-(1-\ln 4.086)=1.408-1=\mathbf{0.408}
+      -\ln\hat p_1=-\ln\frac{e^{1}}{4.086}=-(1-\ln4.086)=1.408-1=\mathbf{0.408}.
     \]
-    Sanity checks: a perfect prediction ($\hat p_1=1$) gives loss $0$; predicting the uniform
-    $1/3$ would give $\ln 3\approx 1.099$ --- here the network is right and fairly confident.
   \end{solutionbox}
+  \begin{takeaway}[Sanity check]
+    \footnotesize A perfect $\hat p_1=1$ gives loss $0$; the uniform guess $\tfrac13$ gives
+    $\ln3\approx1.099$. Our $0.408$ sits well below --- the net is right and fairly confident.
+  \end{takeaway}
 \end{frame}
 
-\begin{frame}{Problem 5 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P5 --- (c) parameters and (d) convolution]
-    \textbf{(c)} Fully connected $4\to 3\to 2$ with biases:
+\begin{frame}{Problem 5 --- solution (c): parameter count}
+  \begin{solutionbox}[Solution P5 --- (c) parameters of a $4\to3\to2$ network]
+    Every hidden and output unit has a bias, so each layer contributes
+    (inputs $\times$ units) weights plus (units) biases:
     \begin{center}
     \begin{tabular}{@{}lccc@{}}
       \toprule
-      Layer & Weights & Biases & Parameters\\
+      Layer & Weights & Biases & Subtotal\\
       \midrule
-      input $\to$ hidden & $4\cdot 3=12$ & $3$ & $15$\\
-      hidden $\to$ output & $3\cdot 2=6$ & $2$ & $8$\\
+      input $\to$ hidden & $4\cdot3=12$ & $3$ & $15$\\
+      hidden $\to$ output & $3\cdot2=6$ & $2$ & $8$\\
       \midrule
-      total & & & $\mathbf{23}$\\
+      \textbf{Total} & & & $\mathbf{23}$\\
       \bottomrule
     \end{tabular}
     \end{center}
-    \medskip
-
-    \textbf{(d)} Output width $=\dfrac{W-F+2P}{S}+1=\dfrac{32-5+2\cdot 2}{1}+1=31+1=32$
-    $\Rightarrow$ output feature map $\mathbf{32\times 32}$: with $F=5$ and $P=2$ and $S=1$
-    this is the ``same'' convolution --- spatial size preserved (one map per filter).
   \end{solutionbox}
+  \begin{takeaway}[General rule]
+    \footnotesize A dense layer from $a$ to $b$ units has $a\cdot b+b=b(a{+}1)$ parameters. Summing
+    the two layers: $3(4{+}1)+2(3{+}1)=15+8=23$.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 5 --- solution (d): convolution output size}
+  \begin{solutionbox}[Solution P5 --- (d) output of a convolutional layer]
+    With input width $W=32$, filter size $F=5$, padding $P=2$ and stride $S=1$:
+    \[
+      \frac{W-F+2P}{S}+1=\frac{32-5+2\cdot2}{1}+1=\frac{31}{1}+1=32 .
+    \]
+    The height is computed identically, so the output feature map is $\mathbf{32\times32}$
+    (one such map per filter).
+  \end{solutionbox}
+  \begin{takeaway}[``Same'' convolution]
+    \footnotesize Here $P=(F-1)/2$ with $S=1$, which preserves the spatial size --- a ``same''
+    convolution. A larger stride $S>1$ or less padding would shrink the feature map.
+  \end{takeaway}
 \end{frame}
 
 % ============================================================
@@ -447,36 +659,54 @@
         FWER or FDR? Justify.
     \end{itemize}
   \end{exercise}
+  {\scriptsize\itshape Lecture slides: Chapter 13 --- Multiple Testing (Lecture 12).}
 \end{frame}
 
-\begin{frame}{Problem 6 --- solution (a) FWER}
-  \begin{solutionbox}[Solution P6 --- (a) FWER for 20 independent tests]
-    $\text{FWER}=\Pr(V\ge 1)$ --- the probability of \emph{at least one} false rejection among
-    the $m$ tests ($V$ $=$ number of falsely rejected true nulls).
+\begin{frame}{Problem 6 --- solution (a): FWER of 20 unadjusted tests}
+  \begin{solutionbox}[Solution P6 --- (a) family-wise error rate]
+    \textbf{Definition.} $\text{FWER}=\Pr(V\ge1)$, the probability of \emph{at least one} false
+    rejection, where $V$ counts the true nulls that are wrongly rejected.
     \medskip
 
-    With all 20 nulls true and independent tests at level $0.05$:
+    \textbf{Compute} (all $20$ nulls true, tests independent, each at level $0.05$):
     \[
-      \text{FWER}=1-\Pr(\text{no false rejection})
-      =1-(1-0.05)^{20}=1-(0.95)^{20}=1-0.3585=\mathbf{0.6415}
+      \text{FWER}=1-\Pr(\text{no false rejection})=1-(1-0.05)^{20}=1-(0.95)^{20}
+      =1-0.3585=\mathbf{0.6415}.
     \]
+  \end{solutionbox}
+  \begin{takeaway}[Interpretation]
+    \footnotesize Each test errs only $5\%$ of the time, yet there is a $\approx64\%$ chance of at
+    least one spurious ``discovery'' among the $20$. With $m=100$ it is
+    $1-0.95^{100}\approx0.994$ --- unadjusted multiple testing all but guarantees false findings.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (b.1): Bonferroni}
+  \begin{solutionbox}[Solution P6 --- (b) the Bonferroni correction]
+    \textbf{Rule.} Reject $H_{(j)}$ iff $p_{(j)}\le\dfrac{\alpha}{m}=\dfrac{0.05}{6}=0.00833$
+    --- the \emph{same} threshold for every $j$.
     \medskip
 
-    \emph{Interpretation:} although each test individually errs with probability $5\%$ only,
-    the chance of at least one spurious ``discovery'' among 20 unadjusted tests is about
-    $64\%$ --- multiple testing without adjustment almost guarantees false findings
-    (with $m=100$: $1-0.95^{100}\approx 0.994$).
+    \begin{center}\scriptsize
+    \begin{tabular}{lcccccc}
+      \toprule
+      $j$ & 1 & 2 & 3 & 4 & 5 & 6\\
+      \midrule
+      $p_{(j)}$ & 0.001 & 0.004 & 0.011 & 0.030 & 0.045 & 0.230\\
+      $\le 0.00833$? & \checkmark & \checkmark & $\times$ & $\times$ & $\times$ & $\times$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    \medskip
+    Only $0.001$ and $0.004$ clear the bar ($0.011>0.00833$) $\Rightarrow$ reject $H_{(1)}$ and
+    $H_{(2)}$: \textbf{2 rejections}.
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 6 --- solution (b) Bonferroni and Holm}
-  \begin{solutionbox}[Solution P6 --- (b) Bonferroni and Holm at level 0.05]
-    \textbf{Bonferroni:} reject iff $p_{(j)}\le\alpha/m=0.05/6=0.00833$:
-    only $0.001$ and $0.004$ pass ($0.011>0.00833$) $\Rightarrow$
-    reject $H_{(1)}$ and $H_{(2)}$: \textbf{2 rejections}.
-    \medskip
-
-    \textbf{Holm (step-down):} compare $p_{(j)}$ with $\alpha/(m-j+1)$; stop at first failure:
+\begin{frame}{Problem 6 --- solution (b.2): Holm step-down}
+  \begin{solutionbox}[Solution P6 --- (b) the Holm step-down procedure]
+    \textbf{Rule.} Step down $j=1,2,\dots$, comparing $p_{(j)}$ with $\dfrac{\alpha}{m-j+1}$;
+    reject while $p_{(j)}$ stays below its threshold and \emph{stop at the first failure}.
     \begin{center}\scriptsize
     \begin{tabular}{lcccccc}
       \toprule
@@ -488,19 +718,20 @@
       \bottomrule
     \end{tabular}
     \end{center}
-    $0.011\le 0.0125$ but $0.030>0.0167$ $\Rightarrow$ reject
-    $H_{(1)}$ and $H_{(2)}$ and $H_{(3)}$: \textbf{3 rejections}.
-    \medskip
-
-    \emph{Holm $\supseteq$ Bonferroni:} Holm's hurdles $\alpha/(m-j+1)\ge\alpha/m$ for all $j$
-    (equality only at $j=1$) $\Rightarrow$ uniformly more powerful --- and it still controls the
-    FWER without independence assumptions.
+    $0.011\le0.0125$ but $0.030>0.0167$ $\Rightarrow$ reject $H_{(1)},H_{(2)},H_{(3)}$:
+    \textbf{3 rejections}.
   \end{solutionbox}
+  \begin{takeaway}[Holm $\supseteq$ Bonferroni]
+    \footnotesize Holm's hurdles satisfy $\alpha/(m-j+1)\ge\alpha/m$ for every $j$ (equal only at
+    $j=1$), so Holm rejects \emph{at least} whatever Bonferroni does --- uniformly more powerful,
+    and still valid without any independence assumption.
+  \end{takeaway}
 \end{frame}
 
-\begin{frame}{Problem 6 --- solution (c) and (d)}
-  \begin{solutionbox}[Solution P6 --- (c) Benjamini--Hochberg and (d) FDR vs FWER]
-    \textbf{(c)} Thresholds $jq/m=j\cdot 0.05/6$:
+\begin{frame}{Problem 6 --- solution (c.1): Benjamini--Hochberg}
+  \begin{solutionbox}[Solution P6 --- (c) the Benjamini--Hochberg procedure]
+    \textbf{Rule.} Compare $p_{(j)}$ with $\dfrac{jq}{m}=\dfrac{j\cdot0.05}{6}$; let $L$ be the
+    \emph{largest} $j$ that passes, then reject $H_{(1)},\dots,H_{(L)}$.
     \begin{center}\scriptsize
     \begin{tabular}{lcccccc}
       \toprule
@@ -512,17 +743,44 @@
       \bottomrule
     \end{tabular}
     \end{center}
-    Largest such $j$: $L=4$ ($0.030\le 0.0333$; note $0.045>0.0417$) $\Rightarrow$ reject
-    \emph{all} of $H_{(1)}$ to $H_{(4)}$: \textbf{4 rejections}.
-    \emph{Guarantee:} $\text{FDR}=E[V/\max(R{,}1)]\le q$ --- \emph{on average} at most $5\%$
-    of rejected hypotheses are false discoveries (no bound on $\Pr(V\ge 1)$; that is FWER).
+    Largest passing index: $L=4$ ($0.030\le0.0333$, while $0.045>0.0417$). BH rejects \emph{all}
+    of $H_{(1)},\dots,H_{(4)}$: \textbf{4 rejections} --- note $H_{(4)}$ is rejected even though on
+    its own $0.030$ is not tiny.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (c.2): what FDR control guarantees}
+  \begin{solutionbox}[Solution P6 --- (c) the FDR guarantee]
+    \[
+      \text{FDR}=\mathbb{E}\!\left[\frac{V}{\max(R,1)}\right]\le q=0.05,
+    \]
+    where $R$ is the number of rejections and $V$ the number of \emph{false} ones. In words:
+    \emph{on average} at most $5\%$ of the hypotheses BH rejects are false discoveries.
     \medskip
 
-    \textbf{(d)} Control the \textbf{FDR}. Bonferroni at $0.05/20{,}000=2.5\cdot 10^{-6}$
-    would leave almost no power --- guarding against a \emph{single} false positive is
-    needlessly strict when every hit is re-tested anyway. FDR control tolerates a small known
-    fraction of false leads in exchange for a much richer list of candidates ---
-    exactly right for exploratory screening with follow-up validation.
+    It does \emph{not} promise that at most $5\%$ of \emph{these particular} $4$ rejections are
+    false, nor does it bound $\Pr(V\ge1)$ --- that stronger guarantee would be FWER control.
+  \end{solutionbox}
+  \begin{takeaway}[Same data --- three procedures]
+    \footnotesize Bonferroni $\to2$, Holm $\to3$, BH $\to4$ rejections. Controlling the milder FDR
+    instead of the FWER buys more power (more discoveries) at the cost of a few expected false
+    positives.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 6 --- solution (d): FWER or FDR for a genomics screen?}
+  \begin{solutionbox}[Solution P6 --- (d) exploratory screen of 20000 genes]
+    \textbf{Recommendation: control the FDR.}
+    \begin{itemize}
+      \item FWER control (e.g.\ Bonferroni at $\dfrac{0.05}{20{,}000}=2.5\times10^{-6}$) guards
+        against even a \emph{single} false positive $\Rightarrow$ almost no power; nearly every
+        true signal would be missed.
+      \item The study is \emph{exploratory} and every hit is re-tested in an independent follow-up,
+        so a few false leads are cheap --- what matters is that the candidate \emph{list} is mostly
+        reliable.
+      \item FDR control at $q=0.05$--$0.2$ delivers exactly that: a rich list of candidates of
+        which, on average, only a known small fraction is false.
+    \end{itemize}
   \end{solutionbox}
 \end{frame}
 
@@ -549,49 +807,92 @@
         (iv) machine failures from hundreds of interacting sensors; accuracy only.
     \end{itemize}
   \end{exercise}
+  {\scriptsize\itshape Lecture slides: Chapters 2--6 (Lectures 1--8).}
 \end{frame}
 
-\begin{frame}{Problem 7 --- solution (a) to (c)}
-  \begin{solutionbox}[Solution P7 --- (a) to (c)]
-    \textbf{(a) False.} Test error $=$ bias$^2$ $+$ variance $+$ irreducible error: flexibility
-    lowers bias but raises variance; past the sweet spot the test error \emph{rises} (U-shape).
-    E.g.\ near-linear truth or small $n$: linear regression beats a flexible overfitter.
-    (Only \emph{training} error always falls with flexibility.)
+\begin{frame}{Problem 7 --- solution (a): flexibility and test error}
+  \begin{solutionbox}[Solution P7 --- (a) ``more flexible $\Rightarrow$ lower test error''?]
+    \textbf{False.} The expected test error decomposes as
+    \[
+      \mathbb{E}\bigl(y_0-\hat f(x_0)\bigr)^2
+      =\underbrace{\operatorname{Var}(\hat f(x_0))}_{\uparrow\text{ with flexibility}}
+      +\underbrace{[\operatorname{Bias}(\hat f(x_0))]^2}_{\downarrow\text{ with flexibility}}
+      +\underbrace{\operatorname{Var}(\varepsilon)}_{\text{irreducible}} .
+    \]
+    Flexibility lowers bias but raises variance; past the sweet spot the variance increase wins and
+    the test error \emph{rises} --- the characteristic U-shape. E.g.\ when the true $f$ is nearly
+    linear or $n$ is small, a flexible method overfits and a simple linear fit has \emph{lower}
+    test error.
+  \end{solutionbox}
+  \begin{takeaway}[The one thing that is monotone]
+    \footnotesize Only the \emph{training} error falls monotonically with flexibility; test error
+    is U-shaped --- which is exactly why we \emph{estimate} it (CV) rather than trust training fit.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 7 --- solution (b): odds vs.\ probability}
+  \begin{solutionbox}[Solution P7 --- (b) interpreting the logistic coefficient $0.7$]
+    From \texttt{sm.Logit}, $\hat\beta_1=0.7$ for \texttt{missed\_payments} (highly significant,
+    $z=4.667$). One more missed payment adds $0.7$ to the \emph{log-odds}, i.e.\ \emph{multiplies
+    the odds} of default by
+    \[
+      e^{\hat\beta_1}=e^{0.7}=\mathbf{2.014}
+    \]
+    --- the odds roughly \emph{double}, by the same factor at every value of $x$.
     \medskip
 
-    \textbf{(b)} From the \texttt{sm.Logit} output, \texttt{coef}~$=0.7$ for
-    \texttt{missed\_payments}: one more missed payment adds $0.7$ to the log-odds, i.e.\
-    \emph{multiplies} the odds of default by $e^{0.7}=\mathbf{2.014}$ (roughly doubles them) ---
-    the same factor at every $x$. The \emph{probability} change depends on the position on the
-    S-curve: large near $p\approx 0.5$, tiny near $0$ or $1$ $\Rightarrow$ no single number.
-    \medskip
-
-    \textbf{(c)} \emph{vs.\ LOOCV:} the $n$ leave-one-out fits are nearly identical
-    $\Rightarrow$ their errors are highly correlated $\Rightarrow$ the LOOCV average has
-    \emph{higher variance} (and costs $n$ fits). \emph{vs.\ validation split:} a single split is
-    highly variable and overestimates test error since only part of the data trains the model
-    (\emph{bias}); $k$-fold trains on $(k-1)/k$ of the data and averages $k$ estimates
-    $\Rightarrow$ less bias and more stability.
+    \textbf{Why no single number for the probability.} The effect on $p(x)$ depends on where the
+    applicant sits on the S-shaped logistic curve: a $0.7$ log-odds shift moves $p$ a lot near
+    $p\approx0.5$ but hardly at all when $p$ is close to $0$ or $1$.
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Problem 7 --- solution (d) and (e)}
-  \begin{solutionbox}[Solution P7 --- (d) and (e)]
-    \textbf{(d) Lasso:} the $\ell_1$ penalty sets coefficients \emph{exactly to zero}
-    $\Rightarrow$ variable selection; ideal for a sparse truth (a handful of signals among
-    2{,}000) and yields a small interpretable model. Ridge keeps all 2{,}000 predictors.
+\begin{frame}{Problem 7 --- solution (c): why 5- or 10-fold CV}
+  \begin{solutionbox}[Solution P7 --- (c) $k$-fold CV vs.\ LOOCV and vs.\ one split]
+    \textbf{vs.\ LOOCV.} The $n$ leave-one-out fits are trained on almost identical data sets, so
+    their errors are highly positively correlated; averaging strongly correlated quantities reduces
+    variance little, so the LOOCV estimate has \emph{higher variance} (and costs $n$ fits rather
+    than $k$).
     \medskip
 
-    \textbf{(e)} Matching (each method once):
+    \textbf{vs.\ a single validation split.} One split is highly variable and \emph{overestimates}
+    the test error, because only part of the data trains the model (bias). $k$-fold CV trains on
+    $\tfrac{k-1}{k}$ of the data and averages $k$ estimates $\Rightarrow$ less bias and more
+    stability.
+  \end{solutionbox}
+  \begin{takeaway}[Sweet spot]
+    \footnotesize $k=5$ or $10$ is the usual compromise: much cheaper and lower-variance than
+    LOOCV, yet far less biased and less noisy than a single hold-out split.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 7 --- solution (d): ridge or lasso?}
+  \begin{solutionbox}[Solution P7 --- (d) ridge versus lasso]
+    \textbf{Lasso.} The $\ell_1$ penalty can set coefficients \emph{exactly to zero}, so it
+    performs \emph{variable selection} --- ideal when only a handful of the $2{,}000$ predictors
+    truly matter, and it returns a small, interpretable model.
+    \medskip
+
+    \textbf{Why not ridge.} The $\ell_2$ penalty only shrinks coefficients; it keeps all
+    $2{,}000$ predictors in the model and tends to lose when most true coefficients are zero.
+  \end{solutionbox}
+  \begin{takeaway}[Rule of thumb]
+    \footnotesize Sparse truth $\to$ lasso (selection); many small effects that all contribute
+    $\to$ ridge (shrinkage). The elastic net blends the two.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Problem 7 --- solution (e): match method to scenario}
+  \begin{solutionbox}[Solution P7 --- (e) each method used exactly once]
     \begin{itemize}
-      \item[(i)] \textbf{Linear regression} --- quantitative response; goal is \emph{inference}:
-        effect size with confidence interval from OLS standard errors.
-      \item[(ii)] \textbf{Lasso} --- $p=5{,}000\gg n=100$: OLS infeasible; $\ell_1$ selects a
-        short list of genes.
-      \item[(iii)] \textbf{Logistic regression} --- binary response; coefficients give odds
-        ratios $e^{\hat\beta_j}$: interpretable for the regulator.
-      \item[(iv)] \textbf{Random forest} --- automatic non-linearities and interactions; strong
-        accuracy with many mixed predictors; interpretability not needed.
+      \item[(i)] \textbf{Linear regression} --- quantitative response, goal is \emph{inference}:
+        the effect of one extra m$^2$ with a confidence interval, straight from OLS standard errors.
+      \item[(ii)] \textbf{Lasso} --- $p=5{,}000\gg n=100$ makes OLS infeasible; the $\ell_1$
+        penalty regularises and returns a \emph{short list} of relevant genes.
+      \item[(iii)] \textbf{Logistic regression} --- binary response (default yes/no) with
+        interpretable coefficients $e^{\hat\beta_j}=$ odds ratios, suitable for the regulator.
+      \item[(iv)] \textbf{Random forest} --- captures non-linearities and interactions among
+        hundreds of mixed sensors automatically; high accuracy, interpretability not required.
     \end{itemize}
   \end{solutionbox}
 \end{frame}
