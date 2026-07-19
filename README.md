@@ -6,11 +6,11 @@
 </p>
 
 <p align="center">
-  <img alt="Based on ISLP (Springer 2023)" src="https://img.shields.io/badge/Based%20on-ISLP%20(Springer%202023)-8a2be2.svg">
-  <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-3776ab.svg?logo=python&logoColor=white">
-  <img alt="Jupyter notebooks" src="https://img.shields.io/badge/Jupyter-notebooks-f37726.svg?logo=jupyter&logoColor=white">
-  <img alt="Slides: LaTeX Beamer" src="https://img.shields.io/badge/Slides-LaTeX%20Beamer-008080.svg?logo=latex&logoColor=white">
-  <a href="#-open-any-notebook-in-colab"><img alt="Open in Colab" src="https://img.shields.io/badge/Open%20in-Colab-f9ab00.svg?logo=googlecolab&logoColor=white"></a>
+  <img alt="Based on ISLP (Springer 2023)" src="docs/badges/based-on-islp.svg">
+  <img alt="Python 3.9+" src="docs/badges/python.svg">
+  <img alt="Jupyter notebooks" src="docs/badges/jupyter.svg">
+  <img alt="Slides: LaTeX Beamer" src="docs/badges/slides.svg">
+  <a href="#-open-any-notebook-in-colab"><img alt="Open in Colab" src="docs/badges/colab.svg"></a>
 </p>
 
 <p align="center">
