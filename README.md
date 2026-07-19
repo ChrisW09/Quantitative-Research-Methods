@@ -64,7 +64,7 @@ Applied Sciences and Arts).
 - **Slides built for the room.** Every deck moves motivation → intuition →
   formal definition → worked example, with colour-coded callout boxes and
   **~70 short + ~35 extended exercises**, each followed by a full solution.
-- **Numbers you can trust.** ~50 purpose-built visuals are computed from the
+- **Numbers you can trust.** ~40 purpose-built visuals are computed from the
   real course datasets (not sketched), and every mock-exam answer was verified
   programmatically.
 - **Labs that run anywhere.** Thirteen Jupyter notebooks run locally *and* on
@@ -160,8 +160,8 @@ Ten decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 - **~70 short exercises** (~5 min) in purple boxes, each with a full
   step-by-step solution (teal), plus **~35 extended, multi-part exercises**
   (~15 min) in violet boxes with detailed multi-slide solutions.
-- **~50 purpose-built visuals** — matplotlib plots computed from the real
-  course datasets, plus native TikZ concept diagrams.
+- **~40 purpose-built visuals** — ≈22 matplotlib plots computed from the real
+  course datasets plus ≈18 native TikZ concept diagrams.
 - **Commented Python** on every code listing, and a cyan "Companion notebook"
   box marking exactly when to switch to the Jupyter lab.
 - **Closing summary** — chapter-in-one-slide, key formulas, vocabulary,

@@ -1,83 +1,54 @@
-# ISLP Lecture Series — Slides with In-Deck Exercises
+# Lecture Slides — Quantitative Research Methods
 
-Enhanced Beamer decks for *An Introduction to Statistical Learning, with
-Applications in Python* (James, Witten, Hastie, Tibshirani & Taylor, 2023),
-prepared for HSBI by Prof. Dr. Christoph Weisser.
+Ten Beamer decks for the **Quantitative Research Methods** course, based on
+*An Introduction to Statistical Learning, with Applications in Python* (James,
+Witten, Hastie, Tibshirani & Taylor, 2023), prepared for HSBI by Prof. Dr.
+Christoph Weisser.
 
-This folder builds on `slides_refined_advanced/` and adds the one feature it
-lacked: **formal exercises with detailed, step-by-step solutions**, placed
-roughly every 20 minutes of lecture time. Everything else (HSBI house style,
-motivation → intuition → definition → worked example flow, roadmaps,
-mini-checks) is preserved.
+Each chapter folder (`chapter_NN/`) is self-contained: `chapter_NN.tex`, its
+`images/`, and the compiled `chapter_NN.pdf`.
 
-## What was added
+## Teaching design
 
-- **70 short exercises** (~5 min, roughly one every 20 min), each a prompt
-  slide immediately followed by a full worked-solution slide. Purple prompt box,
-  teal solution box; long solutions run across a clean `(1/2)` / `(2/2)` pair.
-- **35 extended exercises** (~15 min, roughly one every 45 min) in a distinct
-  **violet** "Extended exercise" box — integrative, multi-part problems with
-  detailed multi-slide solutions. These are the ~45-minute checkpoints; the
-  short exercises are the ~20-minute ones.
+Every deck follows the same flow — motivation → intuition → formal definition →
+worked example — in the HSBI house style, with:
+
+- **70 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
+  slide immediately followed by a teal worked-solution slide; long solutions run
+  across a clean `(1/2)` / `(2/2)` pair.
+- **35 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
+  "Extended exercise" box — integrative, multi-part problems with detailed
+  multi-slide solutions.
 - Every exercise is tagged **[Concept]/[Math]/[Python]** (short) or
-  **[Math]/[Python]/[Integrative]** (extended) so you can pick the right mix.
+  **[Math]/[Python]/[Integrative]** (extended), so you can pick the right mix.
   Python solutions carry runnable snippets against the bundled datasets, and all
   numeric answers were reproduced against the real data.
-- All 10 decks compile cleanly with `pdflatex` (exit 0), with no blank or
-  cut-off slides.
-
-## Visuals pass (new teaching graphics)
-
-Each deck gained purpose-built visuals — **~22 Python data plots** generated
-from the bundled datasets (matplotlib) and **~18 native TikZ concept diagrams**
-— for example: the taxonomy of statistical learning and the bias–variance
-trade-off (ch1–2), least-squares residuals and Advertising fits (ch3), the
-logistic S-curve, ROC and a confusion-matrix schematic (ch4), k-fold /
-bootstrap diagrams and the CV-vs-degree curve (ch5), ridge & lasso coefficient
-paths plus the ℓ1-vs-ℓ2 constraint geometry (ch6), spline/GAM fits on Wage
-(ch7), a decision tree with its feature-space partition and ensemble error
-curves (ch8), a neural-network architecture, activation functions and a
-convolution diagram (ch10), and the FWER-growth curve, Benjamini–Hochberg
-staircase and p-value histogram (ch13). Every new figure is capped in height so
-image plus caption never overflows the slide.
-
-## Summary pass (concepts & formulas)
-
-Every deck ends with a **5–10 slide summary block**, and each now includes a
-dedicated **"Key formulas at a glance"** slide collecting the chapter's
-essential equations (e.g. the bias–variance decomposition, ridge/lasso
-objectives, Gini/entropy, the forward pass and gradient-descent update, the
-Benjamini–Hochberg rule), alongside the existing "Chapter in one slide",
-vocabulary, decision-rules, pitfalls and "things to remember" slides.
-
-## Layout pass (empty-slide fix)
-
-An earlier version wrapped every solution in an auto-breaking frame. Because a
-callout box cannot be split, beamer pushed each box onto a second page and left
-the first nearly blank — and the same mechanism split every section `Outline`
-and the title `Contents` into a full page plus a near-empty one. This edition
-fixes that throughout: box text is set at `\footnotesize`, the spurious page
-breaks are removed, table-of-contents slides fit on one page, and any solution
-too long for a single slide is split into a clean `(1/2)` / `(2/2)` pair. The
-result removed **~107 empty/near-empty pages** (794 → 687) with no loss of
-content. Every exercise and solution slide was verified by rendering the page
-and checking it is neither blank nor cut off at the bottom.
+- **~40 purpose-built visuals** (≈22 matplotlib plots generated from the bundled
+  datasets + ≈18 native TikZ concept diagrams) — for example the bias–variance
+  trade-off, the logistic S-curve, ROC and a confusion-matrix schematic,
+  k-fold / bootstrap diagrams, ridge & lasso coefficient paths with the ℓ1-vs-ℓ2
+  constraint geometry, spline/GAM fits, a decision tree with its feature-space
+  partition, a neural-network architecture and a convolution diagram, and the
+  Benjamini–Hochberg staircase.
+- A **5–10 slide summary block** closing every deck, including a dedicated
+  **"Key formulas at a glance"** slide plus "chapter in one slide", vocabulary,
+  decision rules and common pitfalls.
 
 ## Exercises per chapter
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages |
-|---|---|---|---|---|
-| 1  | Introduction | 3 | 1 | 65 |
-| 2  | Statistical Learning | 8 | 4 | 98 |
-| 3  | Linear Regression | 12 | 6 | 143 |
-| 4  | Classification | 10 | 6 | 108 |
-| 5  | Resampling Methods | 6 | 3 | 78 |
-| 6  | Linear Model Selection & Regularization | 7 | 3 | 82 |
-| 7  | Moving Beyond Linearity | 6 | 3 | 77 |
-| 8  | Tree-Based Methods | 7 | 3 | 75 |
-| 10 | Deep Learning | 6 | 3 | 71 |
-| 13 | Multiple Testing | 5 | 3 | 62 |
-| **Total** | | **70** | **35** | **859** |
+|---|---|:--:|:--:|:--:|
+| 1  | Introduction | 3 | 1 | 73 |
+| 2  | Statistical Learning | 8 | 4 | 112 |
+| 3  | Linear Regression | 12 | 6 | 152 |
+| 4  | Classification | 10 | 6 | 125 |
+| 5  | Resampling Methods | 6 | 3 | 83 |
+| 6  | Linear Model Selection & Regularization | 7 | 3 | 89 |
+| 7  | Moving Beyond Linearity | 6 | 3 | 89 |
+| 8  | Tree-Based Methods | 7 | 3 | 87 |
+| 10 | Deep Learning | 6 | 3 | 78 |
+| 13 | Multiple Testing | 5 | 3 | 67 |
+| **Total** | | **70** | **35** | **955** |
 
 ## Suggested 12-lecture plan (180 min each)
 
@@ -106,18 +77,23 @@ questions"; **Ch 4** after multiple logistic regression (before LDA).
 
 ## Rebuilding a deck
 
+Requires a TeX Live distribution (with `beamer`, `tcolorbox`, `tikz`,
+`listings`, `booktabs`):
+
 ```bash
 cd chapter_NN
 pdflatex chapter_NN.tex
 pdflatex chapter_NN.tex   # second pass for the navigation bar
 ```
 
-Each chapter folder is self-contained (`chapter_NN.tex`, its `images/`, and the
-compiled `chapter_NN.pdf`). Python exercise snippets read data from
-`../../ALL CSV FILES - 2nd Edition/` or via the `ISLP` package.
+Python exercise snippets read data from `../../ALL CSV FILES - 2nd Edition/` or
+via the `ISLP` package.
 
 ## Citation
 
+These slides are based on, and follow the structure of, the source textbook —
+please cite it if you reuse them:
+
 > James, G., Witten, D., Hastie, T., Tibshirani, R., & Taylor, J. (2023).
 > *An Introduction to Statistical Learning, with Applications in Python.*
-> Springer. <https://www.statlearning.com>
+> Springer Texts in Statistics. Springer. <https://www.statlearning.com>
