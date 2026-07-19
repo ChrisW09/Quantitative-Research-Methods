@@ -88,10 +88,10 @@ Achieved points & \hspace{8mm} & \hspace{8mm} & \hspace{8mm} & \hspace{8mm} & \h
 
 \begin{enumerate}[label=(\alph*),leftmargin=7mm,itemsep=2.5mm]
   \item \pp{4} A \emph{cubic spline} is a piecewise cubic polynomial that is continuous and has
-    continuous first and second derivatives at each knot. Derive the number of degrees of freedom
-    (free parameters, counting the intercept) of a cubic spline with $K$ interior knots by
-    counting the coefficients of the polynomial pieces and subtracting the constraints imposed
-    at the knots. Evaluate your formula for $K=3$ interior knots.
+    continuous first and second derivatives at each knot. How many degrees of freedom
+    (free parameters, counting the intercept) does a cubic spline with $K$ interior knots use?
+    Justify your answer by counting the parameters of the polynomial pieces and subtracting the
+    constraints at the knots, and evaluate for $K=3$.
   \item \pp{4} How many degrees of freedom does a \emph{natural} cubic spline with the same
     $K=3$ knots use? State the additional constraint a natural spline imposes, say in which
     region of the predictor space it takes effect, and explain why it is useful in practice.
@@ -227,8 +227,8 @@ each region.
     regions, the region means and the resulting total residual sum of squares
     $\operatorname{RSS}(s)=\sum_{m=1}^{2}\sum_{i\in R_m}(y_i-\hat{y}_{R_m})^2$.
     Which cutpoint does recursive binary splitting choose, and why?
-  \item \pp{2} Using the chosen split, predict the number of parcels for a new depot that will
-    operate $x=5$ vans.
+  \item \pp{2} Using the chosen split at $s=3.5$ from (a), predict the number of parcels for a
+    new depot that will operate $x=5$ vans.
   \item \pp{6} A \emph{classification} tree for a different task has a terminal node containing
     $9$ training observations from three product categories: $5$ ``Electronics'', $3$
     ``Clothing'' and $1$ ``Books''. Compute the class proportions, the Gini index
@@ -326,11 +326,22 @@ optimising training fit.
     approach as $B\to\infty$?
   \item \pp{4} How do \emph{random forests} modify bagging at each split, and what is the
     recommended subset size $m$ for \emph{regression} as a function of $p$ (evaluate for
-    $p=30$)? Explain, with reference to the formula in (a), why this modification improves on
-    bagging.
-  \item \pp{4} Name the three tuning parameters of \emph{boosting} for regression trees and
-    state in one sentence each what they control. What is the ``slow learning'' idea behind
-    boosting?
+    $p=30$)? Using the bagged-variance formula
+    $\operatorname{Var}=\rho\sigma^{2}+\tfrac{1-\rho}{B}\sigma^{2}$ from (a), explain why this
+    modification improves on bagging.
+  \item \pp{4} A colleague fits a boosted regression-tree model in scikit-learn with the call
+    below; its three arguments are exactly the three tuning parameters of \emph{boosting}:
+    \begin{center}\small
+    \begin{tabular}{@{}l@{}}
+    \texttt{from sklearn.ensemble import GradientBoostingRegressor}\\
+    \texttt{boost = GradientBoostingRegressor(}\\
+    \texttt{~~~~n\_estimators=5000, learning\_rate=0.01, max\_depth=1)}\\
+    \texttt{boost.fit(X\_train, y\_train)}\\
+    \end{tabular}
+    \end{center}
+    For each of \texttt{n\_estimators}, \texttt{learning\_rate} and \texttt{max\_depth}, state in
+    one sentence what it controls, and explain the ``slow learning'' idea behind boosting: why is
+    a small \texttt{learning\_rate} paired with a large \texttt{n\_estimators}?
   \item \pp{2} What does the \emph{out-of-bag} (OOB) error of a bagged model estimate, and why
     is it available essentially for free?
 \end{enumerate}
@@ -365,21 +376,24 @@ irreducible floor $\rho\sigma^2$ of the ensemble variance, which mere averaging 
 
 \medskip
 \textbf{(c) Boosting.}
+The three arguments of \texttt{GradientBoostingRegressor} are exactly the three tuning
+parameters of boosting:
 \begin{itemize}[nosep,leftmargin=5mm]
-  \item \emph{Number of trees $B$:} how many small trees are added sequentially; unlike
-    bagging, boosting \emph{can} overfit if $B$ is too large, so $B$ is chosen by
-    cross-validation.
-  \item \emph{Shrinkage $\lambda$} (learning rate, e.g.\ $0.01$ or $0.001$): scales the
-    contribution of each new tree and thus the speed of learning; smaller $\lambda$ usually
-    needs larger $B$.
-  \item \emph{Number of splits $d$ per tree} (interaction depth): the complexity of each tree
-    and the interaction order of the model; often even $d=1$ (stumps, additive model) works
-    well.
+  \item \texttt{n\_estimators} (\emph{number of trees $B$}): how many small trees are added
+    sequentially; unlike bagging, boosting \emph{can} overfit if $B$ is too large, so it is
+    chosen by cross-validation --- here $B=5000$.
+  \item \texttt{learning\_rate} (\emph{shrinkage $\lambda$}, e.g.\ $0.01$ or $0.001$): scales
+    the contribution of each new tree and thus the speed of learning; a smaller $\lambda$
+    usually needs a larger $B$ --- here $\lambda=0.01$.
+  \item \texttt{max\_depth} (\emph{splits per tree / interaction depth $d$}): the complexity of
+    each tree and the interaction order of the model; often even $d=1$ (stumps $\Rightarrow$
+    additive model, as here) works well.
 \end{itemize}
 \emph{Slow learning:} each tree is fitted to the current \emph{residuals}, and only a small
-fraction $\lambda$ of it is added to the model; the model thus improves slowly and exactly in
-the regions where it still performs poorly, instead of fitting the data hard in one step ---
-which tends to generalise better.
+fraction $\lambda$ of it is added to the model; the small \texttt{learning\_rate=0.01} combined
+with the large \texttt{n\_estimators=5000} makes the model improve slowly and exactly in the
+regions where it still performs poorly, instead of fitting the data hard in one step --- which
+tends to generalise better.
 
 \medskip
 \textbf{(d) OOB error.}
@@ -501,9 +515,9 @@ $64\times 64$ input (the floor discards the fractional part before adding $1$).
     exactly which hypotheses are rejected, and explain why Holm can never reject fewer
     hypotheses than Bonferroni.
   \item \pp{6} Apply the \emph{Benjamini--Hochberg} (BH) procedure with FDR level $q=0.05$ to
-    the same six $p$-values: give the thresholds $jq/m$, determine which hypotheses are
-    rejected, and state precisely what ``FDR control at $q=0.05$'' guarantees for the
-    resulting set of rejections.
+    the same six ordered $p$-values ($0.001$, $0.008$, $0.011$, $0.030$, $0.041$, $0.260$;
+    $m=6$): give the thresholds $jq/m$, determine which hypotheses are rejected, and state
+    precisely what ``FDR control at $q=0.05$'' guarantees for the resulting set of rejections.
   \item \pp{3} A pharmaceutical company runs a \emph{confirmatory} phase-III trial that tests
     $m=5$ pre-specified endpoints; a single false-positive endpoint could lead to the approval
     of an ineffective drug. Should they control the FWER or the FDR? Justify your
@@ -602,19 +616,29 @@ not when each individual claim must stand on its own.
     $E\bigl[(y_0-\hat f(x_0))^2\bigr]
       =\operatorname{Var}(\hat f(x_0))+\bigl[\operatorname{Bias}(\hat f(x_0))\bigr]^2
        +\operatorname{Var}(\varepsilon)$.
-    Two candidate methods give, at $x_0$:
+    A simulation stores these three components for two candidate estimators in a \texttt{pandas}
+    \texttt{DataFrame} and prints it:
+    \begin{center}\small
+    \begin{tabular}{@{}l@{}}
+    \texttt{comp = pd.DataFrame(\{"var": [3.5, 0.5], "bias": [-1.0, -2.5],}\\
+    \texttt{~~~~~~~~~~~~~~~~~~~~"noise\_var": [2.0, 2.0]\},}\\
+    \texttt{~~~~~~~~~~~~~~~~~~~~index=["flexible\_spline", "linear\_model"])}\\
+    \texttt{print(comp)}\\
+    \end{tabular}
+    \end{center}
     \begin{center}
     \begin{tabular}{lccc}
     \toprule
-    Method & $\operatorname{Var}(\hat f)$ & $\operatorname{Bias}(\hat f)$ & $\operatorname{Var}(\varepsilon)$\\
+     & \texttt{var} & \texttt{bias} & \texttt{noise\_var}\\
     \midrule
-    (1) flexible spline & 3.5 & $-1.0$ & 2.0\\
-    (2) linear model & 0.5 & $-2.5$ & 2.0\\
+    \texttt{flexible\_spline} & 3.5 & $-1.0$ & 2.0\\
+    \texttt{linear\_model} & 0.5 & $-2.5$ & 2.0\\
     \bottomrule
     \end{tabular}
     \end{center}
-    Compute the expected test MSE of each method, say which you would deploy at $x_0$, and state
-    the lowest test MSE \emph{any} method could achieve here.
+    Reading the three components off this output, compute the expected test MSE of each estimator,
+    say which you would deploy at $x_0$, and state the lowest test MSE \emph{any} method could
+    achieve here.
   \item \pp{3} Write down the \emph{elastic net} penalty and explain what it inherits from the
     lasso and what it inherits from ridge regression. In which situation does the elastic net
     clearly outperform the lasso?
@@ -653,18 +677,19 @@ on average about $\mathbf{63.2\%}$ of the original observations appear in a boot
 
 \medskip
 \textbf{(b) Bias--variance decomposition.}
+Reading the two rows of the \texttt{DataFrame} and applying
+$\text{MSE}=\operatorname{Var}+\operatorname{Bias}^2+\operatorname{Var}(\varepsilon)$:
 \[
-  \text{MSE}_1=\operatorname{Var}+\operatorname{Bias}^2+\operatorname{Var}(\varepsilon)
-   =3.5+(-1.0)^2+2.0=3.5+1.0+2.0=\mathbf{6.5},
+  \text{MSE}_{\texttt{flexible\_spline}}=3.5+(-1.0)^2+2.0=3.5+1.0+2.0=\mathbf{6.5},
 \]
 \[
-  \text{MSE}_2=0.5+(-2.5)^2+2.0=0.5+6.25+2.0=\mathbf{8.75}.
+  \text{MSE}_{\texttt{linear\_model}}=0.5+(-2.5)^2+2.0=0.5+6.25+2.0=\mathbf{8.75}.
 \]
-Deploy the \textbf{flexible spline} (method 1): its higher estimation variance ($3.5$ vs.\
-$0.5$) is more than offset by its much smaller squared bias ($1.0$ vs.\ $6.25$), giving the
-lower expected test error ($6.5<8.75$). The lowest test MSE any method can achieve at $x_0$ is
-the \emph{irreducible error} $\operatorname{Var}(\varepsilon)=\mathbf{2.0}$; no estimator can go
-below it.
+Deploy the \textbf{flexible\_spline} (row 1): its higher estimation variance ($3.5$ vs.\ $0.5$)
+is more than offset by its much smaller squared bias ($1.0$ vs.\ $6.25$), giving the lower
+expected test error ($6.5<8.75$). The lowest test MSE any method can achieve at $x_0$ is the
+\emph{irreducible error} $\operatorname{Var}(\varepsilon)=\texttt{noise\_var}=\mathbf{2.0}$; no
+estimator can go below it.
 
 \medskip
 \textbf{(c) Elastic net.}

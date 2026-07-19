@@ -229,8 +229,8 @@ $\hat{y}_{R_m}$ in each region.
     regions, the region means and the resulting total residual sum of squares
     $\operatorname{RSS}(s)=\sum_{m=1}^{2}\sum_{i\in R_m}(y_i-\hat{y}_{R_m})^2$.
     Which cutpoint does recursive binary splitting choose, and why?
-  \item \pp{2} Using the chosen split, predict the monthly revenue for a new branch that runs
-    $x=5$ promotional events.
+  \item \pp{2} Using the split at $s=3.5$ from part~(a) (so $R_2=\{x\ge 3.5\}$), predict the
+    monthly revenue for a new branch that runs $x=5$ promotional events.
   \item \pp{6} A \emph{classification} tree for a churn task has a terminal node containing
     10 training customers: 7 of class ``Stay'' and 3 of class ``Leave''. Compute the class
     proportions, the Gini index $G=\sum_{k}\hat{p}_{k}(1-\hat{p}_{k})$ and the entropy
@@ -328,11 +328,23 @@ optimising training fit.
     approach as $B\to\infty$?
   \item \pp{4} How do \emph{random forests} modify bagging at each split, and what is the
     recommended subset size $m$ for \emph{regression} as a function of $p$ (evaluate for
-    $p=15$)? Explain, with reference to the formula in (a), why this modification improves on
-    bagging.
-  \item \pp{4} Name the three tuning parameters of \emph{boosting} for regression trees and
-    state in one sentence each what they control. What is the ``slow learning'' idea behind
-    boosting?
+    $p=15$)? Explain, with reference to the variance formula
+    $\operatorname{Var}=\rho\sigma^2+\frac{1-\rho}{B}\sigma^2$ from part~(a), why this
+    modification improves on bagging.
+  \item \pp{4} The following \texttt{scikit-learn} code fits a boosted regression-tree model:
+    \begin{center}\small\ttfamily
+    \begin{tabular}{@{}l@{}}
+    from sklearn.ensemble import GradientBoostingRegressor\\
+    gbr = GradientBoostingRegressor(\\
+    \hspace*{2em}n\_estimators=500, learning\_rate=0.01, max\_depth=2)\\
+    gbr.fit(X\_train, y\_train)\\
+    \end{tabular}
+    \end{center}
+    The three keyword arguments \texttt{n\_estimators}, \texttt{learning\_rate} and
+    \texttt{max\_depth} are exactly the three tuning parameters of boosting. State in one
+    sentence each what each of them controls, and explain the ``slow learning'' idea behind
+    boosting --- in particular why one chooses a small \texttt{learning\_rate} such as
+    \texttt{0.01}.
   \item \pp{2} What does the \emph{out-of-bag} (OOB) error of a bagged model estimate, and why
     is it available essentially for free?
 \end{enumerate}
@@ -370,21 +382,24 @@ variance, which mere averaging cannot touch.
 
 \medskip
 \textbf{(c) Boosting.}
+The three keyword arguments \emph{are} the three tuning parameters:
 \begin{itemize}[nosep,leftmargin=5mm]
-  \item \emph{Number of trees $B$:} how many small trees are added sequentially; unlike
+  \item \texttt{n\_estimators}${}=B$, the \emph{number of trees} added sequentially; unlike
     bagging, boosting \emph{can} overfit if $B$ is too large, so $B$ is chosen by
     cross-validation.
-  \item \emph{Shrinkage $\lambda$} (learning rate, e.g.\ $0.01$ or $0.001$): scales the
+  \item \texttt{learning\_rate}${}=\lambda$, the \emph{shrinkage} (here $0.01$): it scales the
     contribution of each new tree and thus the speed of learning; smaller $\lambda$ usually
     needs larger $B$.
-  \item \emph{Number of splits $d$ per tree} (interaction depth): the complexity of each tree
-    and the interaction order of the model; often even $d=1$ (stumps, additive model) works
-    well.
+  \item \texttt{max\_depth}${}=d$, the \emph{number of splits / interaction depth} per tree
+    (here $2$): the complexity of each tree and the interaction order of the model; often even
+    $d=1$ (stumps, additive model) works well.
 \end{itemize}
 \emph{Slow learning:} each tree is fitted to the current \emph{residuals}, and only a small
 fraction $\lambda$ of it is added to the model; the model thus improves slowly and exactly in
 the regions where it still performs poorly, instead of fitting the data hard in one step ---
-which tends to generalise better.
+which tends to generalise better. Choosing a small \texttt{learning\_rate} such as
+\texttt{0.01} is precisely how this slow learning is implemented (at the cost of needing more
+trees, i.e.\ a larger \texttt{n\_estimators}).
 
 \medskip
 \textbf{(d) OOB error.}
@@ -502,9 +517,10 @@ exactly the ``same'' convolution that preserves the spatial size.
     exactly which hypotheses are rejected, and explain why Holm can never reject fewer
     hypotheses than Bonferroni.
   \item \pp{6} Apply the \emph{Benjamini--Hochberg} (BH) procedure with FDR level $q=0.10$ to
-    the same six $p$-values: give the thresholds $jq/m$, determine which hypotheses are
-    rejected, and state precisely what ``FDR control at $q=0.10$'' guarantees for the
-    resulting set of rejections.
+    the same six ordered $p$-values from part~(b)
+    ($p_{(1)},\dots,p_{(6)}=0.002,\,0.007,\,0.009,\,0.020,\,0.040,\,0.320$): give the
+    thresholds $jq/m$, determine which hypotheses are rejected, and state precisely what
+    ``FDR control at $q=0.10$'' guarantees for the resulting set of rejections.
   \item \pp{3} A pharmaceutical company runs a confirmatory phase-III trial with $m=4$
     pre-specified primary endpoints; a positive result on any endpoint would support regulatory
     approval of the drug. Should they control the FWER or the FDR? Justify your recommendation.
@@ -593,11 +609,23 @@ appropriate for a large exploratory screen, not for a small confirmatory endpoin
   \item \pp{4} True or false --- justify briefly: ``By choosing a sufficiently flexible model
     and collecting enough training data, the expected test MSE at a point can be driven all the
     way down to zero.''
-  \item \pp{4} A logistic regression for passing a certification exam,
-    $\log\bigl(\frac{p(x)}{1-p(x)}\bigr)=\beta_0+\beta_1 x$ with $x=$ hours of study, yields
-    $\hat{\beta}_1=0.8$. Interpret the effect of \emph{one additional hour of study} on the
-    \emph{odds} of passing \emph{(use $e^{0.8}=2.226$)}. Why can the effect on the
-    \emph{probability} of passing not be stated as a single number?
+  \item \pp{4} A logistic regression predicts whether a candidate passes a certification exam
+    (\texttt{passed}$=1$) from the number of \texttt{hours} of study,
+    $\log\bigl(\frac{p}{1-p}\bigr)=\beta_0+\beta_1\,\texttt{hours}$. The model was fitted in
+    Python (\texttt{statsmodels} \texttt{Logit}), with the following output:
+    \begin{center}
+    \begin{tabular}{lrrrr}
+    \toprule
+     & coef & std err & $z$ & $P>|z|$\\
+    \midrule
+    const & $-3.2000$ & 0.700 & $-4.571$ & 0.000\\
+    hours &  0.8000 & 0.160 & 5.000 & 0.000\\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+    Using the estimated coefficient on \texttt{hours}, interpret the effect of \emph{one
+    additional hour of study} on the \emph{odds} of passing \emph{(use $e^{0.8}=2.226$)}. Why
+    can the effect on the \emph{probability} of passing not be stated as a single number?
   \item \pp{4} Give one reason to prefer $k$-fold cross-validation with $k=5$ or $10$ over
     \emph{LOOCV}, and one reason to prefer it over a \emph{single validation split}.
   \item \pp{2} You have $p=1{,}200$ SNP predictors but expect only about a dozen to be truly
@@ -632,12 +660,13 @@ irreducible part.
 
 \medskip
 \textbf{(b) Odds ratio.}
-One additional hour of study increases the log-odds of passing by $\hat{\beta}_1=0.8$, i.e.\ it
+The fitted coefficient on \texttt{hours} is $\hat{\beta}_1=0.8000$ (from the \texttt{Logit}
+output). One additional hour of study increases the log-odds of passing by $0.8$, i.e.\ it
 \emph{multiplies the odds} of passing by $e^{0.8}=2.226$ --- the odds go up by about $123\%$
-(more than double), regardless of the starting value of $x$.
-The effect on the \emph{probability} depends on where the student sits on the S-shaped logistic
-curve: the same change in log-odds moves $p(x)$ a lot near $p\approx 0.5$ but very little when
-$p$ is already close to $0$ or $1$ --- hence no single number describes it.
+(more than double), regardless of the current number of hours.
+The effect on the \emph{probability} depends on where the candidate sits on the S-shaped
+logistic curve: the same change in log-odds moves $p$ a lot near $p\approx 0.5$ but very little
+when $p$ is already close to $0$ or $1$ --- hence no single number describes it.
 
 \medskip
 \textbf{(c) $k$-fold CV with $k=5$ or $10$.}

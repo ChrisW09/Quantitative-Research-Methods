@@ -85,20 +85,36 @@ Achieved points & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \h
 
 A bank models the probability that a credit-card customer \emph{defaults} ($Y=1$) as a
 function of the monthly card balance $x$ (in EUR; balances in this portfolio range from
-0 to 400 EUR). A logistic regression fitted by maximum likelihood gave
+0 to 400 EUR) with a logistic regression
 \[
 \hat{p}(x)=\Pr(Y=1\mid X=x)
-  =\frac{e^{\hat{\beta}_0+\hat{\beta}_1 x}}{1+e^{\hat{\beta}_0+\hat{\beta}_1 x}},
-\qquad
-\hat{\beta}_0=-4,\quad \hat{\beta}_1=0.02 .
+  =\frac{e^{\hat{\beta}_0+\hat{\beta}_1 x}}{1+e^{\hat{\beta}_0+\hat{\beta}_1 x}} .
 \]
+Fitting it by maximum likelihood in Python with \texttt{statsmodels}
+(\texttt{sm.Logit(y, X).fit()}) gives the coefficients:
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+ & coef & std err & $z$ & $P>|z|$\\
+\midrule
+\texttt{const}   & $-4.0000$ & 0.400 & $-10.000$ & $<0.0001$\\
+\texttt{balance} & $\phantom{-}0.0200$ & 0.002 & $\phantom{-}10.000$ & $<0.0001$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent where \texttt{const} is the intercept $\hat{\beta}_0$ and \texttt{balance} is the
+coefficient $\hat{\beta}_1$ on the card balance.
 
 \begin{enumerate}[label=(\alph*),leftmargin=7mm,itemsep=2.5mm]
-  \item \pp{4} Compute the predicted default probability $\hat{p}(x)$ for a customer with
-    balance $x=100$ EUR and for a customer with balance $x=250$ EUR.
-  \item \pp{4} For the same two customers, compute the \emph{odds} of default
-    $\hat{p}(x)/(1-\hat{p}(x))$ and the \emph{log-odds} (logit). Interpret the odds of the
-    customer with $x=250$ in one sentence.
+  \item \pp{4} Read the estimated coefficients $\hat{\beta}_0$ and $\hat{\beta}_1$ from the
+    \texttt{statsmodels} output above, and use them to compute the predicted default
+    probability $\hat{p}(x)$ for a customer with balance $x=100$ EUR and for a customer with
+    balance $x=250$ EUR.
+  \item \pp{4} For the same two customers ($x=100$ EUR and $x=250$ EUR), compute the
+    \emph{odds} of default $\hat{p}(x)/(1-\hat{p}(x))$ and the \emph{log-odds} (logit).
+    Interpret the odds of the customer with $x=250$ in one sentence.
   \item \pp{3} Determine the balance $x^{*}$ at which the predicted default probability
     equals exactly $0.5$. Show your derivation.
   \item \pp{4} Interpret the estimated slope on the odds scale: by which \emph{factor} do the
@@ -111,7 +127,9 @@ function of the monthly card balance $x$ (in EUR; balances in this portfolio ran
 
 \ifdefined\withsolutions
 \begin{solutionbox}
-\textbf{(a) Predicted probabilities.} The linear predictor (log-odds) is
+\textbf{(a) Predicted probabilities.} Reading the coefficients from the \texttt{statsmodels}
+output: $\hat{\beta}_0=-4$ (row \texttt{const}) and $\hat{\beta}_1=0.02$ (row \texttt{balance}).
+The linear predictor (log-odds) is
 $\hat{\eta}(x)=\hat{\beta}_0+\hat{\beta}_1x=-4+0.02x$.
 \[
 x=100:\ \hat{\eta}=-4+2=-2,\qquad
@@ -244,26 +262,30 @@ class-shared variances) does it reduce to a linear rule.
 
 A logistic regression classifier predicts credit-card default on an evaluation set of
 $n=1{,}000$ customers, using the default threshold: predict ``default'' if
-$\hat{p}(\text{default}\mid x)>0.5$. The result is the following confusion matrix:
+$\hat{p}(\text{default}\mid x)>0.5$. The labels are coded $1=$ ``default'' and
+$0=$ ``no default''. Evaluated in Python with \texttt{scikit-learn}, the call
+\texttt{confusion\_matrix(y\_true, y\_pred)} returns:
 
 \begin{center}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{llcc|c}
- & & \multicolumn{2}{c|}{\textbf{True status}} & \\
- & & Default & No default & Total\\
-\cmidrule{2-5}
-\textbf{Predicted} & Default    & 60 & 45  & 105\\
-                   & No default & 40 & 855 & 895\\
-\cmidrule{2-5}
- & Total & 100 & 900 & 1{,}000\\
+\begin{tabular}{@{}l@{}}
+\toprule
+\ttfamily array([[855,\ \ 45],\\
+\ttfamily \ \ \ \ \ \ \ [\ 40,\ \ 60]])\\
+\bottomrule
 \end{tabular}
 \end{center}
 
+\noindent Recall that \texttt{scikit-learn} places the \emph{true} classes in the rows and
+the \emph{predicted} classes in the columns, with the class labels in increasing order (so
+row and column~1 refer to label $0=$ ``no default'', and row and column~2 to label
+$1=$ ``default'').
+
 \begin{enumerate}[label=(\alph*),leftmargin=7mm,itemsep=2.5mm]
-  \item \pp{7} Identify TP, FP, FN and TN, and compute (i) the overall accuracy and the
-    overall error rate, (ii) the sensitivity (recall, true positive rate), (iii) the
-    specificity, (iv) the precision, and (v) the false positive rate. Interpret sensitivity
-    and precision in one sentence each in the context of this application.
+  \item \pp{7} Read TP, FP, FN and TN from the \texttt{scikit-learn} \texttt{confusion\_matrix}
+    array above (taking ``default'' as the positive class), and compute (i) the overall
+    accuracy and the overall error rate, (ii) the sensitivity (recall, true positive rate),
+    (iii) the specificity, (iv) the precision, and (v) the false positive rate. Interpret
+    sensitivity and precision in one sentence each in the context of this application.
   \item \pp{4} The bank now lowers the classification threshold from $0.5$ to $0.2$
     (predict ``default'' if $\hat{p}>0.2$). Explain --- without further computation --- how
     sensitivity and specificity will change, and give a business reason why the bank might
@@ -275,8 +297,10 @@ $\hat{p}(\text{default}\mid x)>0.5$. The result is the following confusion matri
 
 \ifdefined\withsolutions
 \begin{solutionbox}
-\textbf{(a) Metrics.} With ``default'' as the positive class:
-$\text{TP}=60$, $\text{FP}=45$, $\text{FN}=40$, $\text{TN}=855$.
+\textbf{(a) Metrics.} In the \texttt{scikit-learn} array the rows are the true classes and
+the columns the predicted classes, ordered $0$ (``no default'') then $1$ (``default''); with
+``default'' as the positive class this gives $\text{TN}=855$ (top-left), $\text{FP}=45$
+(top-right), $\text{FN}=40$ (bottom-left) and $\text{TP}=60$ (bottom-right).
 \begin{align*}
 \text{(i) accuracy} &= \frac{\text{TP}+\text{TN}}{n}=\frac{60+855}{1000}=\frac{915}{1000}=0.915,
 \qquad \text{error rate}=1-0.915=0.085,\\[0.5mm]
@@ -433,8 +457,10 @@ C_p=\frac{1}{n}\bigl(\operatorname{RSS}+2\,d\,\hat{\sigma}^2\bigr),
 \begin{enumerate}[label=(\alph*),leftmargin=7mm,itemsep=2.5mm]
   \item \pp{4} Compute $C_p$ for all four models (3 decimals).
   \item \pp{4} Compute BIC for all four models (3 decimals).
-  \item \pp{2} Which model size does each criterion select? Explain the reason for the
-    disagreement by comparing the two penalty terms.
+  \item \pp{2} Using the criterion values from (a) and (b) ---
+    $C_p=5.080,\,4.600,\,4.520,\,4.560$ and $\operatorname{BIC}=5.184,\,4.808,\,4.833,\,4.977$
+    for $d=1,2,3,4$ --- state which model size each criterion selects, and explain the reason
+    for the disagreement by comparing the two penalty terms.
   \item \pp{2} Why can the training RSS (or equivalently the training $R^2$) alone never be
     used to select $d$? What does RSS necessarily do as $d$ grows?
 \end{enumerate}

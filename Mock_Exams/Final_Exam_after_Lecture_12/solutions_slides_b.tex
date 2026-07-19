@@ -212,7 +212,7 @@
     \end{tabular}
     \end{center}
     (a) \textbf{[8 P]} Evaluate the cutpoints $s=15$ and $s=17$ by total RSS; which is chosen?
-    (b) \textbf{[2 P]} Prediction for a new depot with $x=13$.
+    (b) \textbf{[2 P]} With the chosen split $s=15$ ($R_1$ mean 5, $R_2$ mean 12): prediction for a new depot with $x=13$.
     (c) \textbf{[6 P]} Node with 12 obs: 6 ``Premium'' / 3 ``Standard'' / 3 ``Basic'':
         proportions; Gini; entropy ($\ln 0.5=-0.6931$; $\ln 0.25=-1.3863$); predicted class.
     (d) \textbf{[4 P]} Cost-complexity pruning: role of $\alpha$ in
@@ -283,8 +283,11 @@
         (ii) Evaluate for $B=500$ and $\rho=0.7$ and $\sigma^2=4$; compare with one tree.
         (iii) Limit as $B\to\infty$?
       \item[(b)] \textbf{[4 P]} Random forests: modification at each split; recommended $m$
-        for classification with $p=36$; why does it improve on bagging (use the formula)?
-      \item[(c)] \textbf{[4 P]} Boosting: the three tuning parameters; the slow-learning idea.
+        for classification with $p=36$; why does it improve on bagging (use the variance formula
+        $\rho\sigma^2+\frac{1-\rho}{B}\sigma^2$ from (a))?
+      \item[(c)] \textbf{[4 P]} A boosting model in \texttt{scikit-learn}:\\
+        {\scriptsize\texttt{GradientBoostingRegressor(n\_estimators=500, learning\_rate=0.01, max\_depth=1)}}\\
+        state what each of the three arguments controls and the slow-learning idea.
       \item[(d)] \textbf{[2 P]} What does the OOB error estimate and why is it free?
     \end{itemize}
   \end{exercise}
@@ -312,19 +315,19 @@
 
 \begin{frame}{Problem 4 --- solution (c) and (d)}
   \begin{solutionbox}[Solution P4 --- (c) and (d)]
-    \textbf{(c)} Boosting for regression trees:
+    \textbf{(c)} Boosting tuning parameters (from the call):
     \begin{itemize}
-      \item \textbf{$B$ --- number of trees:} added sequentially; too many $\Rightarrow$ slow
-        overfitting; choose by CV.
-      \item \textbf{$\lambda$ --- shrinkage} (e.g.\ $0.01$ or $0.001$): scales each new tree's
-        contribution; smaller $\lambda$ $\Rightarrow$ slower learning $\Rightarrow$ larger $B$ needed.
-      \item \textbf{$d$ --- splits per tree} (interaction depth): complexity and interaction
-        order of each tree; often stumps ($d=1$) suffice (additive model).
+      \item \texttt{n\_estimators}$=B=500$: number of trees added sequentially; too many
+        $\Rightarrow$ overfitting; choose by CV.
+      \item \texttt{learning\_rate}$=\lambda=0.01$ (shrinkage): scales each new tree's
+        contribution; smaller $\lambda$ $\Rightarrow$ larger $B$ needed.
+      \item \texttt{max\_depth}$=d=1$ (interaction depth): splits per tree / interaction order;
+        $d=1$ $=$ stumps (additive model).
     \end{itemize}
     \emph{Slow learning:} each tree is fitted to the current \emph{residuals} and only the
     fraction $\lambda$ is added --- the model improves gradually exactly where it still errs,
     instead of fitting the data hard at once; this tends to generalise better.
-    \medskip
+    \smallskip
 
     \textbf{(d)} Each bootstrap sample misses $\approx 1/3$ of the observations (out-of-bag);
     predicting every observation only with trees that never saw it yields the \textbf{OOB error}
@@ -440,7 +443,8 @@
         $0.002$; $0.009$; $0.012$; $0.015$; $0.040$; $0.300$ --- FWER control at $\alpha=0.05$
         with (i) Bonferroni and (ii) Holm; thresholds; rejected hypotheses; why is Holm never
         weaker than Bonferroni?
-      \item[(c)] \textbf{[6 P]} Benjamini--Hochberg at $q=0.05$ on the same $p$-values:
+      \item[(c)] \textbf{[6 P]} Benjamini--Hochberg at $q=0.05$ on the same six $p$-values
+        ($0.002$; $0.009$; $0.012$; $0.015$; $0.040$; $0.300$; $m=6$):
         thresholds $jq/m$; rejections; what exactly does FDR control guarantee?
       \item[(d)] \textbf{[3 P]} Confirmatory Phase-III trial with $m=4$ pre-specified endpoints
         (one hit could support approval): FWER or FDR? Justify.
@@ -530,9 +534,10 @@
   \begin{exercise}[Problem 7 (20 P) --- Cumulative essentials]
     {\scriptsize\itshape Lecture slides: Chapters 2--6 (Lectures 1--8).}\par\smallskip
     \begin{itemize}
-      \item[(a)] \textbf{[4 P]} Screening confusion matrix ($TP{=}40$, $FN{=}10$, $FP{=}30$,
-        $TN{=}120$): error rate, sensitivity, specificity, precision; which number traces the ROC
-        curve and how do sensitivity/specificity move?
+      \item[(a)] \textbf{[4 P]} \texttt{scikit-learn}'s \texttt{confusion\_matrix} (labels
+        $[0,1]$; rows true, cols predicted) returns \texttt{[[120, 30], [10, 40]]}: compute
+        error rate, sensitivity, specificity, precision (positive class \texttt{1}); which
+        number traces the ROC curve and how do sensitivity/specificity move?
       \item[(b)] \textbf{[4 P]} KNN: (i) predict at $x_0=5$ with $k=3$ from
         $(1{,}3),(4{,}6),(6{,}8),(7{,}7),(10{,}12)$; (ii) how $k$ drives the bias--variance
         trade-off; most flexible extreme; why is 1-NN training error $0$?
@@ -550,7 +555,8 @@
 
 \begin{frame}{Problem 7 --- solution (a) and (b)}
   \begin{solutionbox}[Solution P7 --- (a) confusion matrix and (b) KNN]
-    \textbf{(a)} $50$ diseased, $150$ healthy, $n=200$:
+    \textbf{(a)} Read the array (order $[0,1]$, rows true / cols predicted); diagonal $=$ correct,
+    so $TN{=}120$, $FP{=}30$, $FN{=}10$, $TP{=}40$ ($50$ diseased, $150$ healthy, $n=200$):
     \[
       \text{err}=\tfrac{30+10}{200}=\mathbf{0.200}\quad
       \text{sens}=\tfrac{40}{50}=\mathbf{0.800}\quad

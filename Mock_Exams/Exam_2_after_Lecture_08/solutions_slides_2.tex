@@ -102,18 +102,27 @@
 % ============================================================
 \begin{frame}{Problem 1 --- restatement}
   \begin{exercise}[Problem 1 --- Logistic regression by hand (18 P)]
-    A bank models the default probability of a credit-card customer as a function of the
-    monthly balance $x$ (in EUR; observed range 0--400):
-    \[
-    \hat{p}(x)=\frac{e^{\hat{\beta}_0+\hat{\beta}_1x}}{1+e^{\hat{\beta}_0+\hat{\beta}_1x}},
-    \qquad \hat{\beta}_0=-4,\quad \hat{\beta}_1=0.02 .
-    \]
+    A bank models a credit-card customer's default probability from the monthly balance $x$
+    (EUR, range 0--400) by logistic regression, fitted in Python with \texttt{statsmodels}
+    (\texttt{sm.Logit(y, X).fit()}):
+    \begin{center}\scriptsize
+    \begin{tabular}{lrrrr}
+      \toprule
+       & coef & std err & $z$ & $P>|z|$\\
+      \midrule
+      \texttt{const}   & $-4.0000$ & 0.400 & $-10.000$ & $<0.0001$\\
+      \texttt{balance} & $\phantom{-}0.0200$ & 0.002 & $\phantom{-}10.000$ & $<0.0001$\\
+      \bottomrule
+    \end{tabular}
+    \end{center}
     \begin{itemize}
-      \item[(a)] Predicted default probability at $x=100$ and $x=250$. \hfill (4 P)
-      \item[(b)] Odds and log-odds at both balances; interpret the odds at $x=250$. \hfill (4 P)
+      \item[(a)] Read $\hat{\beta}_0,\hat{\beta}_1$ from the output; predicted default
+        probability at $x=100$ and $x=250$. \hfill (4 P)
+      \item[(b)] Odds and log-odds at both balances ($x=100$, $x=250$); interpret the odds
+        at $x=250$. \hfill (4 P)
       \item[(c)] Balance $x^{*}$ with $\hat{p}(x^{*})=0.5$. \hfill (3 P)
-      \item[(d)] Factor change of the odds per EUR and per 100 EUR; why is
-        ``probability $+0.02$ per EUR'' wrong? \hfill (4 P)
+      \item[(d)] Odds factor per EUR and per 100 EUR; why is ``probability $+0.02$ per EUR''
+        wrong? \hfill (4 P)
       \item[(e)] Two reasons why linear regression on the 0/1 response is inappropriate. \hfill (3 P)
     \end{itemize}
   \end{exercise}
@@ -121,13 +130,11 @@
 
 \begin{frame}{Problem 1 --- solution (a) and (b)}
   \begin{solutionbox}[Solution 1(a) --- predicted probabilities]
-    Linear predictor (log-odds): $\hat{\eta}(x)=-4+0.02\,x$, so
-    $\hat{\eta}(100)=-4+2=-2$ and $\hat{\eta}(250)=-4+5=1$. Hence
-    \[
-    \hat{p}(100)=\frac{e^{-2}}{1+e^{-2}}=\frac{0.1353}{1.1353}=\mathbf{0.119},
-    \qquad
-    \hat{p}(250)=\frac{e^{1}}{1+e^{1}}=\frac{2.7183}{3.7183}=\mathbf{0.731}.
-    \]
+    Read $\hat{\beta}_0=-4$ (\texttt{const}) and $\hat{\beta}_1=0.02$ (\texttt{balance})
+    from the output; then $\hat{\eta}(x)=-4+0.02\,x$ gives $\hat{\eta}(100)=-2$ and
+    $\hat{\eta}(250)=1$, hence
+    $\hat{p}(100)=e^{-2}/(1+e^{-2})=\mathbf{0.119}$ and
+    $\hat{p}(250)=e^{1}/(1+e^{1})=\mathbf{0.731}$.
   \end{solutionbox}
   \begin{solutionbox}[Solution 1(b) --- odds and log-odds]
     Odds $=\hat{p}/(1-\hat{p})=e^{\hat{\eta}(x)}$ and log-odds $=\hat{\eta}(x)$:
@@ -141,9 +148,8 @@
       \bottomrule
     \end{tabular}
     \end{center}
-    Check with (a): $0.119/0.881=0.135$ and $0.731/0.269=2.718$. \checkmark\
-    At $x=250$ the odds are about $2.72$ to 1: default is roughly $2.7$ times as probable
-    as non-default.
+    Check: $0.731/0.269=2.718$. \checkmark\ At $x=250$ the odds are $\approx 2.72{:}1$ ---
+    default is about $2.7\times$ as probable as non-default.
   \end{solutionbox}
 \end{frame}
 
@@ -251,21 +257,20 @@
 \begin{frame}{Problem 3 --- restatement}
   \begin{exercise}[Problem 3 --- Confusion matrix and ROC curve (15 P)]
     Logistic-regression default classifier on $n=1{,}000$ customers with threshold
-    $\hat{p}>0.5$:
-    \begin{center}
-    \begin{tabular}{llcc}
-       & & \multicolumn{2}{c}{\textbf{True status}}\\
-       & & Default & No default\\
-      \midrule
-      \textbf{Predicted} & Default & 60 & 45\\
-       & No default & 40 & 855\\
-      \midrule
-       & Total & 100 & 900\\
+    $\hat{p}>0.5$; labels $1=$ default, $0=$ no default, evaluated with \texttt{scikit-learn}
+    (rows $=$ true, columns $=$ predicted, labels in increasing order):
+    \begin{center}\footnotesize
+    \begin{tabular}{@{}l@{}}
+      \toprule
+      \ttfamily confusion\_matrix(y\_true, y\_pred)\\
+      \ttfamily array([[855,\ \ 45],\\
+      \ttfamily \ \ \ \ \ \ \ [\ 40,\ \ 60]])\\
+      \bottomrule
     \end{tabular}
     \end{center}
     \begin{itemize}
-      \item[(a)] TP/FP/FN/TN; accuracy and error rate; sensitivity; specificity;
-        precision; FPR; interpret sensitivity and precision. \hfill (7 P)
+      \item[(a)] Read TP/FP/FN/TN from the array; accuracy and error rate; sensitivity;
+        specificity; precision; FPR; interpret sensitivity and precision. \hfill (7 P)
       \item[(b)] Effect of lowering the threshold from 0.5 to 0.2 on sensitivity and
         specificity; business reason for accepting it. \hfill (4 P)
       \item[(c)] What does the ROC curve plot? Meaning of AUC $=0.5$ and AUC $=1$. \hfill (4 P)
@@ -275,7 +280,9 @@
 
 \begin{frame}{Problem 3 --- solution (a)}
   \begin{solutionbox}[Solution 3(a) --- the five metrics]
-    Positive class ``default'': $\text{TP}=60$, $\text{FP}=45$, $\text{FN}=40$, $\text{TN}=855$.
+    Rows $=$ true, columns $=$ predicted, labels $0$ then $1$; with ``default'' ($=1$) as the
+    positive class: $\text{TP}=60$ (bottom-right), $\text{FP}=45$ (top-right),
+    $\text{FN}=40$ (bottom-left), $\text{TN}=855$ (top-left).
     \begin{center}
     \begin{tabular}{llll}
       \toprule
@@ -401,7 +408,9 @@
     \begin{itemize}
       \item[(a)] $C_p$ for all four models. \hfill (4 P)
       \item[(b)] BIC for all four models. \hfill (4 P)
-      \item[(c)] Which $d$ does each criterion select? Explain the disagreement. \hfill (2 P)
+      \item[(c)] Using $C_p=(5.080,4.600,4.520,4.560)$ and
+        BIC$=(5.184,4.808,4.833,4.977)$: which $d$ does each criterion select? Explain the
+        disagreement. \hfill (2 P)
       \item[(d)] Why can training RSS alone never select $d$? \hfill (2 P)
     \end{itemize}
   \end{exercise}

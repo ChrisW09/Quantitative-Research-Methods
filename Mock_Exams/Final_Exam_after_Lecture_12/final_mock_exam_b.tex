@@ -91,10 +91,10 @@ $K=5$ interior knots.
 
 \begin{enumerate}[label=(\alph*),leftmargin=7mm,itemsep=2.5mm]
   \item \pp{4} A \emph{cubic spline} is a piecewise cubic polynomial that is continuous and has
-    continuous first and second derivatives at every knot. Derive how many degrees of freedom
-    (free parameters, counting the intercept) such a spline uses for a general number $K$ of
-    interior knots, by counting the parameters of the polynomial pieces and subtracting the
-    constraints imposed at the knots. Then evaluate the count for $K=5$.
+    continuous first and second derivatives at every knot. How many degrees of freedom
+    (free parameters, counting the intercept) does a cubic spline with $K$ interior knots use?
+    Justify your answer by counting the parameters of the polynomial pieces and subtracting the
+    constraints at the knots, and evaluate for $K=5$.
   \item \pp{4} How many degrees of freedom does a \emph{natural} cubic spline with the same
     $K=5$ knots use? State the additional constraint a natural spline imposes, in which region
     of the predictor space it acts, and why practitioners find this constraint useful.
@@ -233,8 +233,9 @@ each region.
     regions, their means, and the total residual sum of squares
     $\operatorname{RSS}(s)=\sum_{m=1}^{2}\sum_{i\in R_m}(y_i-\hat{y}_{R_m})^2$.
     Which cutpoint does recursive binary splitting prefer, and why?
-  \item \pp{2} Using the preferred split, predict the number of parcels for a new depot with
-    $x=13$ vans.
+  \item \pp{2} Suppose recursive binary splitting selects the split at $s=15$, giving regions
+    $R_1=\{x<15\}$ with mean $\hat{y}_{R_1}=5$ and $R_2=\{x\ge 15\}$ with mean
+    $\hat{y}_{R_2}=12$. Predict the number of parcels for a new depot with $x=13$ vans.
   \item \pp{6} A \emph{classification} tree for a different task has a terminal node containing
     $12$ training observations from three classes: $6$ ``Premium'', $3$ ``Standard'' and $3$
     ``Basic''. Compute the class proportions, the Gini index
@@ -333,9 +334,17 @@ than merely minimising training error.
     approach as $B\to\infty$?
   \item \pp{4} How do \emph{random forests} modify bagging at each split, and what is the
     recommended subset size $m$ for \emph{classification} as a function of $p$ (evaluate for
-    $p=36$)? Using the formula in (a), explain why this modification improves on bagging.
-  \item \pp{4} Name the three tuning parameters of \emph{boosting} for regression trees and say
-    in one sentence each what they control. What is the ``slow learning'' idea behind boosting?
+    $p=36$)? Using the variance formula
+    $\operatorname{Var}=\rho\sigma^2+\tfrac{1-\rho}{B}\sigma^2$ from part~(a), explain why this
+    modification improves on bagging.
+  \item \pp{4} A data scientist fits a boosting model for regression trees in
+    \texttt{scikit-learn}:
+    \begin{center}
+    \texttt{GradientBoostingRegressor(n\_estimators=500, learning\_rate=0.01, max\_depth=1)}
+    \end{center}
+    These three arguments are exactly the tuning parameters of boosting. State in one sentence
+    each what \texttt{n\_estimators}, \texttt{learning\_rate} and \texttt{max\_depth} control,
+    and explain the ``slow learning'' idea behind the small \texttt{learning\_rate}.
   \item \pp{2} What does the \emph{out-of-bag} (OOB) error of a bagged model estimate, and why
     is it essentially free to obtain?
 \end{enumerate}
@@ -370,20 +379,19 @@ lowers the irreducible floor $\rho\sigma^2$ of the ensemble variance, which plai
 never reach.
 
 \medskip
-\textbf{(c) Boosting.}
+\textbf{(c) Boosting tuning parameters (read from the call).}
 \begin{itemize}[nosep,leftmargin=5mm]
-  \item \emph{Number of trees $B$:} how many small trees are added in sequence; unlike bagging,
-    boosting \emph{can} overfit if $B$ is too large, so $B$ is tuned by cross-validation.
-  \item \emph{Shrinkage $\lambda$} (learning rate, e.g.\ $0.01$ or $0.001$): scales the
-    contribution of each new tree and hence the speed of learning; a smaller $\lambda$ usually
-    requires a larger $B$.
-  \item \emph{Number of splits $d$ per tree} (interaction depth): the complexity of each tree
-    and the interaction order captured; often even $d=1$ (stumps, an additive model) suffices.
+  \item \texttt{n\_estimators}$=B=500$: the number of small trees added in sequence; unlike
+    bagging, boosting \emph{can} overfit if $B$ is too large, so $B$ is tuned by cross-validation.
+  \item \texttt{learning\_rate}$=\lambda=0.01$ (shrinkage): scales the contribution of each new
+    tree and hence the speed of learning; a smaller $\lambda$ usually requires a larger $B$.
+  \item \texttt{max\_depth}$=d=1$ (interaction depth): the number of splits per tree and the
+    interaction order captured; $d=1$ means \emph{stumps} (an additive model).
 \end{itemize}
-\emph{Slow learning:} each new tree is fit to the current \emph{residuals}, and only a small
-fraction $\lambda$ of it is added to the model, so the fit improves gradually and precisely
-where it is still weak, rather than fitting the data hard in a single step --- which tends to
-generalise better.
+\emph{Slow learning:} each new tree is fit to the current \emph{residuals}, and only the small
+fraction \texttt{learning\_rate}$=\lambda$ of it is added to the model, so the fit improves
+gradually and precisely where it is still weak, rather than fitting the data hard in a single
+step --- which tends to generalise better.
 
 \medskip
 \textbf{(d) OOB error.}
@@ -501,7 +509,8 @@ stride $1$ shrinks each spatial dimension by $F-1=4$.
     hypotheses each method rejects, and explain why Holm can never reject fewer hypotheses than
     Bonferroni.
   \item \pp{6} Apply the \emph{Benjamini--Hochberg} (BH) procedure at FDR level $q=0.05$ to the
-    same six $p$-values: give the thresholds $jq/m$, determine which hypotheses are rejected, and
+    same six ordered $p$-values ($m=6$; $p_{(1)},\dots,p_{(6)}=0.002,\ 0.009,\ 0.012,\ 0.015,\
+    0.040,\ 0.300$): give the thresholds $jq/m$, determine which hypotheses are rejected, and
     state precisely what ``FDR control at $q=0.05$'' guarantees for the resulting set of
     rejections.
   \item \pp{3} A pharmaceutical company runs a \emph{confirmatory} Phase-III trial with $m=4$
@@ -589,21 +598,24 @@ permissive for a confirmatory, decision-driving trial.
 {\small\itshape Lecture slides: Chapters 2--6 (Lectures 1--8).}\par\vspace{1mm}
 
 \begin{enumerate}[label=(\alph*),leftmargin=7mm,itemsep=2.5mm]
-  \item \pp{4} A medical screening classifier is evaluated on $200$ patients, giving the
-    confusion matrix
+  \item \pp{4} A medical screening classifier is evaluated on $200$ patients (label
+    \texttt{1}$=$diseased, \texttt{0}$=$healthy). In \texttt{scikit-learn},
+    \texttt{confusion\_matrix(y\_true, y\_pred)} returns the array below (rows $=$ true class,
+    columns $=$ predicted class; label order $[0,1]$):
     \begin{center}
     \begin{tabular}{lcc}
     \toprule
-     & Predicted diseased & Predicted healthy\\
+     & predicted \texttt{0} & predicted \texttt{1}\\
     \midrule
-    Actually diseased & $40$ & $10$\\
-    Actually healthy  & $30$ & $120$\\
+    true \texttt{0} (healthy)  & $120$ & $30$\\
+    true \texttt{1} (diseased) & $10$  & $40$\\
     \bottomrule
     \end{tabular}
     \end{center}
-    Compute the overall error rate, the sensitivity, the specificity and the precision (positive
-    predictive value). Which single number would trace out the ROC curve if it were varied, and
-    in which direction would sensitivity and specificity move?
+    Read off the counts and compute the overall error rate, the sensitivity, the specificity and
+    the precision (positive predictive value) for the positive class \texttt{1}. Which single
+    number would trace out the ROC curve if it were varied, and in which direction would
+    sensitivity and specificity move?
   \item \pp{4} Consider $K$-nearest-neighbours. (i) Using the training set
     $(x,y)$: $(1,3)$, $(4,6)$, $(6,8)$, $(7,7)$, $(10,12)$, predict the response at $x_0=5$ with $k=3$
     (KNN regression, unweighted average). (ii) Explain how $k$ governs the bias--variance
@@ -633,9 +645,10 @@ permissive for a confirmatory, decision-driving trial.
 
 \ifdefined\withsolutions
 \begin{solutionbox}
-\textbf{(a) Confusion-matrix metrics.}
-Here $TP=40$, $FN=10$, $FP=30$, $TN=120$, total $200$; $50$ patients are truly diseased and
-$150$ truly healthy.
+\textbf{(a) Reading the \texttt{confusion\_matrix} output.}
+The array is ordered $[0,1]$ with rows $=$ true and columns $=$ predicted, so the diagonal holds
+the correct predictions: from the table $TN=120$ and $FP=30$ (true \texttt{0}), $FN=10$ and
+$TP=40$ (true \texttt{1}); total $200$, with $50$ diseased and $150$ healthy.
 \[
   \text{error rate}=\frac{FP+FN}{200}=\frac{30+10}{200}=\mathbf{0.200},\qquad
   \text{sensitivity}=\frac{TP}{TP+FN}=\frac{40}{50}=\mathbf{0.800},

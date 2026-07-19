@@ -228,8 +228,9 @@ $\hat{y}_{R_m}$ in each region.
     regions, the region means and the resulting total residual sum of squares
     $\operatorname{RSS}(s)=\sum_{m=1}^{2}\sum_{i\in R_m}(y_i-\hat{y}_{R_m})^2$.
     Which cutpoint does recursive binary splitting choose, and why?
-  \item \pp{2} Using the chosen split, predict the weekly sales for a new product with
-    advertising budget $x=5$.
+  \item \pp{2} Using the split chosen in part~(a), namely $s=4.5$ (so $R_1=\{i:x_i<4.5\}$ with
+    mean $\hat{y}_{R_1}=3$ and $R_2=\{i:x_i\ge 4.5\}$ with mean $\hat{y}_{R_2}=9$), predict the
+    weekly sales for a new product with advertising budget $x=5$.
   \item \pp{6} A \emph{classification} tree for a different task has a terminal node containing
     8 training observations: 6 of class ``Yes'' and 2 of class ``No''. Compute the class
     proportions, the Gini index $G=\sum_{k}\hat{p}_{k}(1-\hat{p}_{k})$ and the entropy
@@ -321,10 +322,19 @@ optimising training fit.
     approach as $B\to\infty$?
   \item \pp{4} How do \emph{random forests} modify bagging at each split, and what is the
     recommended subset size $m$ for classification as a function of $p$ (evaluate for $p=25$)?
-    Explain, with reference to the formula in (a), why this modification improves on bagging.
-  \item \pp{4} Name the three tuning parameters of \emph{boosting} for regression trees and
-    state in one sentence each what they control. What is the ``slow learning'' idea behind
-    boosting?
+    Explain --- with reference to the ensemble-variance formula
+    $\operatorname{Var}=\rho\,\sigma^{2}+\frac{1-\rho}{B}\,\sigma^{2}$ from part~(a) ---
+    why this modification improves on bagging.
+  \item \pp{4} A data scientist tunes a \emph{boosting} model for regression trees with the
+    following \texttt{scikit-learn} call:
+    \begin{center}
+    \texttt{GradientBoostingRegressor(n\_estimators=5000,}\\
+    \texttt{\ \ \ \ learning\_rate=0.01, max\_depth=1)}
+    \end{center}
+    These three constructor arguments are exactly the three tuning parameters of boosting for
+    regression trees. State in one sentence each what \texttt{n\_estimators},
+    \texttt{learning\_rate} and \texttt{max\_depth} control. What is the ``slow learning'' idea
+    behind boosting, and how is it reflected in the values chosen here?
   \item \pp{2} What does the \emph{out-of-bag} (OOB) error of a bagged model estimate, and why
     is it available essentially for free?
 \end{enumerate}
@@ -358,22 +368,24 @@ searches \emph{decorrelates} the trees, i.e.\ lowers $\rho$ --- and by (a) this 
 irreducible floor $\rho\sigma^2$ of the ensemble variance, which mere averaging cannot touch.
 
 \medskip
-\textbf{(c) Boosting.}
+\textbf{(c) Boosting --- the three tuning parameters (constructor arguments).}
 \begin{itemize}[nosep,leftmargin=5mm]
-  \item \emph{Number of trees $B$:} how many small trees are added sequentially; unlike
-    bagging, boosting \emph{can} overfit if $B$ is too large, so $B$ is chosen by
-    cross-validation.
-  \item \emph{Shrinkage $\lambda$} (learning rate, e.g.\ $0.01$ or $0.001$): scales the
-    contribution of each new tree and thus the speed of learning; smaller $\lambda$ usually
-    needs larger $B$.
-  \item \emph{Number of splits $d$ per tree} (interaction depth): the complexity of each tree
-    and the interaction order of the model; often even $d=1$ (stumps, additive model) works
-    well.
+  \item \texttt{n\_estimators}~$=B$, the \emph{number of trees}: how many small trees are added
+    sequentially; unlike bagging, boosting \emph{can} overfit if $B$ is too large, so it is
+    chosen by cross-validation (here $B=5000$).
+  \item \texttt{learning\_rate}~$=\lambda$, the \emph{shrinkage} (e.g.\ $0.01$ or $0.001$):
+    scales the contribution of each new tree and thus the speed of learning; smaller $\lambda$
+    usually needs larger $B$ (here $\lambda=0.01$).
+  \item \texttt{max\_depth}~$=d$, the \emph{number of splits per tree} (interaction depth): the
+    complexity of each tree and the interaction order of the model; often even $d=1$ (stumps,
+    additive model) works well (here \texttt{max\_depth}$=1$).
 \end{itemize}
 \emph{Slow learning:} each tree is fitted to the current \emph{residuals}, and only a small
 fraction $\lambda$ of it is added to the model; the model thus improves slowly and exactly in
 the regions where it still performs poorly, instead of fitting the data hard in one step ---
-which tends to generalise better.
+which tends to generalise better. The chosen values encode exactly this: a \emph{small}
+\texttt{learning\_rate=0.01} with \emph{many} trees (\texttt{n\_estimators=5000}) and shallow
+\texttt{max\_depth=1} stumps.
 
 \medskip
 \textbf{(d) OOB error.}
@@ -491,7 +503,9 @@ exactly the ``same'' convolution that preserves the spatial size.
     exactly which hypotheses are rejected, and explain why Holm can never reject fewer
     hypotheses than Bonferroni.
   \item \pp{6} Apply the \emph{Benjamini--Hochberg} (BH) procedure with FDR level $q=0.05$ to
-    the same six $p$-values: give the thresholds $jq/m$, determine which hypotheses are
+    the same six ordered $p$-values from part~(b), namely
+    $p_{(1)},\dots,p_{(6)}=0.001,\ 0.004,\ 0.011,\ 0.030,\ 0.045,\ 0.230$:
+    give the thresholds $jq/m$, determine which hypotheses are
     rejected, and state precisely what ``FDR control at $q=0.05$'' guarantees for the
     resulting set of rejections.
   \item \pp{3} A genomics group screens $20{,}000$ genes in an \emph{exploratory} study; the
@@ -580,11 +594,24 @@ which on average at most a known fraction is false.
 \begin{enumerate}[label=(\alph*),leftmargin=7mm,itemsep=2.5mm]
   \item \pp{4} True or false --- justify briefly: ``A more flexible statistical learning method
     always yields a lower \emph{test} error than a less flexible one.''
-  \item \pp{4} A logistic regression for loan default,
-    $\log\bigl(\frac{p(x)}{1-p(x)}\bigr)=\beta_0+\beta_1 x$ with $x=$ number of missed
-    payments, yields $\hat{\beta}_1=0.7$. Interpret the effect of \emph{one additional missed
-    payment} on the \emph{odds} of default \emph{(use $e^{0.7}=2.014$)}. Why can the effect on
-    the \emph{probability} of default not be stated as a single number?
+  \item \pp{4} A bank fits a logistic regression for loan default in \texttt{statsmodels},
+    $\log\bigl(\frac{p(x)}{1-p(x)}\bigr)=\beta_0+\beta_1\,\texttt{missed\_payments}$, where
+    \texttt{missed\_payments} is the number of missed payments $x$. The call
+    \texttt{sm.Logit(default, X).fit()} produces:
+    \begin{center}
+    \begin{tabular}{lrrrr}
+    \toprule
+     & coef & std err & $z$ & $P>|z|$\\
+    \midrule
+    \texttt{const}            & $-3.5000$ & 0.420 & $-8.333$ & 0.000\\
+    \texttt{missed\_payments} &   0.7000  & 0.150 &   4.667  & 0.000\\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+    Using the estimated coefficient of \texttt{missed\_payments}, interpret the effect of
+    \emph{one additional missed payment} on the \emph{odds} of default
+    \emph{(use $e^{0.7}=2.014$)}. Why can the effect on the \emph{probability} of default not be
+    stated as a single number?
   \item \pp{4} Give one reason to prefer $k$-fold cross-validation with $k=5$ or $10$ over
     \emph{LOOCV}, and one reason to prefer it over a \emph{single validation split}.
   \item \pp{2} You have $p=2{,}000$ predictors but expect only a handful to be truly related to
@@ -617,9 +644,10 @@ error always decreases with flexibility.)
 
 \medskip
 \textbf{(b) Odds ratio.}
-One additional missed payment increases the log-odds by $\hat{\beta}_1=0.7$, i.e.\ it
-\emph{multiplies the odds} of default by $e^{0.7}=2.014$ --- the odds roughly double,
-regardless of the starting value of $x$.
+The \texttt{coef} column gives $\hat{\beta}_1=0.7$ for \texttt{missed\_payments} (highly
+significant, $z=4.667$). One additional missed payment increases the log-odds by
+$\hat{\beta}_1=0.7$, i.e.\ it \emph{multiplies the odds} of default by $e^{0.7}=2.014$ --- the
+odds roughly double, regardless of the starting value of $x$.
 The effect on the \emph{probability} depends on where the observation sits on the S-shaped
 logistic curve: the same change in log-odds shifts $p(x)$ a lot near $p\approx 0.5$ but very
 little when $p$ is close to $0$ or $1$ --- hence no single number describes it.
