@@ -1,57 +1,124 @@
-# Quantitative Research Methods — Lecture Materials
+<h1 align="center">Quantitative Research Methods</h1>
 
-Complete teaching materials for **Quantitative Research Methods**, a 12-lecture
-university course prepared by **Prof. Dr. Christoph Weisser** (HSBI — Bielefeld
-University of Applied Sciences and Arts).
+<p align="center">
+  A complete, ready-to-teach university course in statistical learning —<br>
+  ten polished slide decks, thirteen Jupyter labs, three mock exams, and the course datasets.
+</p>
 
-> **These materials are based on the textbook**
-> *An Introduction to Statistical Learning, with Applications in Python*
-> (James, Witten, Hastie, Tibshirani & Taylor, Springer 2023 — "ISLP"). The
-> course structure, topics, notation and labs follow the book; please cite it if
-> you reuse these materials (see [Citation](#citation)).
+<p align="center">
+  <img alt="Based on ISLP (Springer 2023)" src="https://img.shields.io/badge/Based%20on-ISLP%20(Springer%202023)-8a2be2.svg">
+  <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-3776ab.svg?logo=python&logoColor=white">
+  <img alt="Jupyter notebooks" src="https://img.shields.io/badge/Jupyter-notebooks-f37726.svg?logo=jupyter&logoColor=white">
+  <img alt="Slides: LaTeX Beamer" src="https://img.shields.io/badge/Slides-LaTeX%20Beamer-008080.svg?logo=latex&logoColor=white">
+  <a href="#-open-any-notebook-in-colab"><img alt="Open in Colab" src="https://img.shields.io/badge/Open%20in-Colab-f9ab00.svg?logo=googlecolab&logoColor=white"></a>
+</p>
 
-The package contains ten polished Beamer slide decks with built-in exercises
-and solutions, thirteen Jupyter lab notebooks that run locally **and on
-Google Colab**, three mock exams with full solutions and in-class review
-decks, and the course datasets.
+<p align="center">
+  <b>10 Beamer decks · 13 Jupyter labs · 3 mock exams · ~105 exercises with worked solutions · runs locally &amp; on Colab</b>
+</p>
 
----
+<p align="center">
+  <a href="#-why-these-materials">⚡ Why</a> &nbsp;·&nbsp;
+  <a href="#-quick-start">🚀 Quick start</a> &nbsp;·&nbsp;
+  <a href="#-the-course-at-a-glance">📚 Course</a> &nbsp;·&nbsp;
+  <a href="#-lecture-slides">🎞️ Slides</a> &nbsp;·&nbsp;
+  <a href="#-lab-notebooks">📓 Labs</a> &nbsp;·&nbsp;
+  <a href="#-mock-exams">📝 Exams</a> &nbsp;·&nbsp;
+  <a href="#-open-any-notebook-in-colab">▶️ Colab</a> &nbsp;·&nbsp;
+  <a href="#-about">👤 About</a>
+</p>
 
-## Repository structure
+> **These materials are based on the textbook** *An Introduction to Statistical
+> Learning, with Applications in Python* (James, Witten, Hastie, Tibshirani &
+> Taylor, Springer 2023 — "ISLP"). The course structure, topics, notation and
+> labs follow the book; please cite it if you reuse these materials
+> (see [Citation & licence](#-citation--licence)).
 
-```
-.
-├── Lecture_Slides/                   Ten Beamer decks — the core deliverable
-│   ├── chapter_01 … chapter_13/      chapter_NN.tex, chapter_NN.pdf, images/
-│   └── README.md                     Deck guide: 12-lecture plan, exercise index
-│
-├── Lab_Notebooks/                    13 Jupyter notebooks (chapter_NN_lab.ipynb)
-│                                     Run locally or on Google Colab (see below)
-│
-├── Mock_Exams/
-│   ├── Exam_1_after_Lecture_04/      Ch 1–3   (90 min / 90 pts)
-│   ├── Exam_2_after_Lecture_08/      Ch 4–6   (90 min / 90 pts)
-│   └── Final_Exam_after_Lecture_12/  Comprehensive (120 min / 120 pts)
-│                                     Each: exam PDF, solutions PDF, and a
-│                                     Beamer solutions deck for in-class review
-│
-├── ALL CSV FILES - 2nd Edition/      Course datasets (from statlearning.com)
-│
-├── Source_Material/                  Textbook PDF + original figure banks
-│                                     (NOT for public redistribution — see
-│                                     "Publishing to GitHub" below)
-│
-├── requirements.txt                  Python environment for the notebooks
-├── .gitignore
-└── README.md                         This file
-```
+Prepared by **Prof. Dr. Christoph Weisser** (HSBI — Bielefeld University of
+Applied Sciences and Arts).
 
 ---
 
-## The course at a glance (12 × 180 min)
+## Contents
+
+- [Why these materials](#-why-these-materials)
+- [Quick start](#-quick-start)
+- [The course at a glance](#-the-course-at-a-glance)
+- [Repository layout](#-repository-layout)
+- [Lecture slides](#-lecture-slides)
+- [Lab notebooks](#-lab-notebooks)
+- [Mock exams](#-mock-exams)
+- [Python environment](#-python-environment)
+- [Datasets](#-datasets)
+- [Open any notebook in Colab](#-open-any-notebook-in-colab)
+- [About](#-about)
+- [Citation & licence](#-citation--licence)
+
+---
+
+## ⚡ Why these materials
+
+- **A whole course, not a pile of files.** Ten Beamer decks, thirteen labs and
+  three mock exams that share one notation, one dataset set, and one 12-week
+  rhythm — ready to teach as-is or adapt.
+- **Slides built for the room.** Every deck moves motivation → intuition →
+  formal definition → worked example, with colour-coded callout boxes and
+  **~70 short + ~35 extended exercises**, each followed by a full solution.
+- **Numbers you can trust.** ~50 purpose-built visuals are computed from the
+  real course datasets (not sketched), and every mock-exam answer was verified
+  programmatically.
+- **Labs that run anywhere.** Thirteen Jupyter notebooks run locally *and* on
+  Google Colab — data loads from the `ISLP` package with an automatic fallback
+  to the bundled CSVs, so a fresh Colab runtime just works.
+- **Exam-ready.** Three practice exams matched to the course calendar, each in
+  three formats (questions, worked solutions, and an in-class review deck) built
+  from a single LaTeX source so paper and solutions can never diverge.
+- **Reproducible by design.** LaTeX sources for every deck and exam, a pinned
+  Python environment, and datasets that resolve automatically.
+
+---
+
+## 🚀 Quick start
+
+You don't need to install anything to read the slides or the mock exams — the
+compiled PDFs live right in the repo. To *run* a lab you have two options:
+
+### ▶︎ Google Colab — zero setup *(recommended)*
+
+Open any notebook in your browser; nothing to install. Every notebook's first
+cell detects Colab, quietly installs the few missing packages (`ISLP`, plus
+`pygam`/`xgboost`/`lifelines` where a chapter needs them; `torch` is
+preinstalled on Colab), and resolves the data automatically — **12 of the 13
+datasets load straight from the `ISLP` package**, and the one that isn't in
+ISLP (`Advertising`) streams from the book's official site.
+
+Jump to [**Open any notebook in Colab**](#-open-any-notebook-in-colab) for a
+one-click link to all thirteen labs.
+
+> 🔒 **This repository is private.** The Colab links open once you're signed in
+> to a Google account that has access to the repo (e.g. the owner). If you make
+> the repo public, the links work for everyone.
+
+### ⌥ Local Jupyter
+
+```bash
+python -m venv .venv
+source .venv/bin/activate         # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+jupyter lab Lab_Notebooks/chapter_03_lab.ipynb
+```
+
+Tested with **Python 3.9+**. Data loads via the `ISLP` package when installed,
+with an automatic fallback to the bundled `ALL CSV FILES - 2nd Edition/` folder.
+
+---
+
+## 📚 The course at a glance
+
+A 12-lecture semester (12 × 180 min):
 
 | Lecture | Chapter | Topic |
-|--:|--|--|
+|:--:|:--:|--|
 | 1 | 1 + 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference |
 | 2 | 2 (part 2) | Model accuracy; bias–variance trade-off; Bayes classifier; KNN |
 | 3–4 | 3 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
@@ -63,31 +130,58 @@ decks, and the course datasets.
 | 11 | 10 | Deep learning: MLPs, CNNs, training, regularization (PyTorch) |
 | 12 | 13 | Multiple testing: FWER, Bonferroni/Holm, FDR, Benjamini–Hochberg |
 
+> Chapters **9 (SVM), 11 (Survival) and 12 (Unsupervised)** aren't part of the
+> 12-lecture plan but ship as **self-study lab notebooks** for completeness.
+
 ---
 
-## The slide decks
+## 🗂️ Repository layout
 
-Each deck (`Lecture_Slides/chapter_NN/`) follows a consistent teaching design:
+| Path | Contents |
+|---|---|
+| [`Lecture_Slides/`](./Lecture_Slides/) | Ten Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable. See its [deck guide](./Lecture_Slides/README.md). |
+| [`Lab_Notebooks/`](./Lab_Notebooks/) | Thirteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
+| [`Mock_Exams/`](./Mock_Exams/) | Three exams — each with a questions PDF, a solutions PDF, and a Beamer review deck |
+| [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
+| [`requirements.txt`](./requirements.txt) | Pinned Python environment for the notebooks |
+| `Source_Material/` | Copyrighted textbook PDF & figure banks — **excluded from git** (see [`.gitignore`](./.gitignore)) |
 
-- **Front matter:** course-at-a-glance overview, chapter table of contents, and
-  a "Notation in this chapter" symbol table.
-- **Teaching flow:** motivation → intuition → formal definition → worked
-  example, with color-coded callout boxes (green takeaway, blue how-to-read,
+---
+
+## 🎞️ Lecture slides
+
+Ten decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
+
+- **Front matter** — course-at-a-glance, chapter contents, and a "Notation in
+  this chapter" symbol table.
+- **Teaching flow** — motivation → intuition → formal definition → worked
+  example, with colour-coded callout boxes (green takeaway, blue how-to-read,
   orange worked example, red pitfall).
-- **70 short exercises** (~5 min, roughly every 20 minutes of lecture) in
-  purple boxes, each followed by a full step-by-step solution (teal).
-- **35 extended exercises** (~15 min, roughly every 45 minutes) in violet
-  boxes — integrative multi-part problems with detailed multi-slide solutions.
-- **~50 purpose-built visuals:** matplotlib plots computed from the real
-  course datasets plus native TikZ concept diagrams — all numbers on these
-  slides were generated, not sketched.
-- **Commented Python:** every code listing carries line-by-line comments.
-- **Lab signposts:** a cyan "Companion notebook" box marks exactly when to
-  switch to the Jupyter notebook for a live demo.
-- **Closing summary block:** chapter-in-one-slide, key formulas at a glance,
-  vocabulary, decision rules, and common pitfalls.
+- **~70 short exercises** (~5 min) in purple boxes, each with a full
+  step-by-step solution (teal), plus **~35 extended, multi-part exercises**
+  (~15 min) in violet boxes with detailed multi-slide solutions.
+- **~50 purpose-built visuals** — matplotlib plots computed from the real
+  course datasets, plus native TikZ concept diagrams.
+- **Commented Python** on every code listing, and a cyan "Companion notebook"
+  box marking exactly when to switch to the Jupyter lab.
+- **Closing summary** — chapter-in-one-slide, key formulas, vocabulary,
+  decision rules, and common pitfalls.
 
-### Rebuilding a deck
+| Ch. | Deck | Open |
+|:--:|--|:--:|
+| 1 | Introduction | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
+| 2 | Statistical Learning | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
+| 3 | Linear Regression | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
+| 4 | Classification | [PDF](./Lecture_Slides/chapter_04/chapter_04.pdf) |
+| 5 | Resampling Methods | [PDF](./Lecture_Slides/chapter_05/chapter_05.pdf) |
+| 6 | Linear Model Selection & Regularization | [PDF](./Lecture_Slides/chapter_06/chapter_06.pdf) |
+| 7 | Moving Beyond Linearity | [PDF](./Lecture_Slides/chapter_07/chapter_07.pdf) |
+| 8 | Tree-Based Methods | [PDF](./Lecture_Slides/chapter_08/chapter_08.pdf) |
+| 10 | Deep Learning | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
+| 13 | Multiple Testing | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
+
+<details>
+<summary><b>Rebuilding a deck</b></summary>
 
 Requires a TeX Live distribution (with `beamer`, `tcolorbox`, `tikz`,
 `listings`, `booktabs`):
@@ -97,102 +191,61 @@ cd Lecture_Slides/chapter_NN
 pdflatex chapter_NN.tex
 pdflatex chapter_NN.tex   # second pass for the navigation bar
 ```
+</details>
 
 ---
 
-## The lab notebooks
+## 📓 Lab notebooks
 
-Thirteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each
-chapter's Python Lab section — including chapters 9, 11 and 12, which are not
-part of the 12-lecture plan but are included for self-study.
+Thirteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
+Python Lab — including chapters 9, 11 and 12, which are included for self-study.
+Each notebook runs **locally or on Google Colab**; data loads via the `ISLP`
+package with an automatic fallback to the bundled CSVs, so nothing needs
+downloading by hand.
 
-### Run locally
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-jupyter lab Lab_Notebooks/chapter_03_lab.ipynb
-```
-
-Data loads via the `ISLP` package when installed, with automatic fallback to
-the bundled `ALL CSV FILES - 2nd Edition/` folder.
-
-### Run on Google Colab
-
-Every notebook is Colab-ready. Its first cell detects Colab, quietly installs
-any missing packages (`ISLP`, plus `pygam`/`xgboost`/`lifelines` where needed;
-`torch` is preinstalled on Colab), and resolves the data automatically:
-**12 of the 13 datasets load straight from the `ISLP` package**, and the one
-that isn't in ISLP (`Advertising`) streams from the book's official site — so
-the notebooks run on a fresh Colab runtime **even before this repo is public**.
-
-**Open in Colab (one link per notebook):**
-
-| Lecture chapter | Colab link | | Self-study | Colab link |
-|--|--|--|--|--|
-| 1 · Introduction | `…/chapter_01_lab.ipynb` | | 9 · SVM | `…/chapter_09_lab.ipynb` |
-| 2 · Statistical Learning | `…/chapter_02_lab.ipynb` | | 11 · Survival | `…/chapter_11_lab.ipynb` |
-| 3 · Linear Regression | `…/chapter_03_lab.ipynb` | | 12 · Unsupervised | `…/chapter_12_lab.ipynb` |
-| 4 · Classification | `…/chapter_04_lab.ipynb` | | | |
-| 5 · Resampling | `…/chapter_05_lab.ipynb` | | | |
-| 6 · Model Selection | `…/chapter_06_lab.ipynb` | | | |
-| 7 · Beyond Linearity | `…/chapter_07_lab.ipynb` | | | |
-| 8 · Trees | `…/chapter_08_lab.ipynb` | | | |
-| 10 · Deep Learning | `…/chapter_10_lab.ipynb` | | | |
-| 13 · Multiple Testing | `…/chapter_13_lab.ipynb` | | | |
-
-Each notebook also carries an **"Open in Colab" badge** in its first cell. The
-full link format is:
-
-```
-https://colab.research.google.com/github/OWNER/REPO/blob/main/Lab_Notebooks/chapter_NN_lab.ipynb
-```
-
-**One-time setup after you create the GitHub repo** (the links use an `OWNER/REPO`
-placeholder until then): from the repo root, replace the placeholder everywhere —
-
-```bash
-# macOS/BSD sed; use `sed -i` (no '') on Linux. Replace with your real path.
-grep -rl 'OWNER/REPO' README.md Lab_Notebooks | \
-  xargs sed -i '' 's#OWNER/REPO#your-github-user/your-repo#g'
-```
-
-That fixes the badge links, the README table, and the `GITHUB_RAW` data fallback
-in every notebook in one step. The Colab badges then become clickable and open
-each notebook directly from GitHub.
+One-click Colab links for all thirteen are in
+[**Open any notebook in Colab**](#-open-any-notebook-in-colab) below.
 
 ---
 
-## Mock exams
+## 📝 Mock exams
 
-Three practice exams matched to the course rhythm, each in three formats
-built from a single LaTeX source (paper and solutions can never diverge):
+Three practice exams matched to the course rhythm, each built from a single
+LaTeX source so the paper and its solutions can never diverge. All numeric
+answers were verified programmatically. Each exam ships in three formats:
+**questions**, **worked solutions**, and a **Beamer deck** for reviewing the
+exam in class.
 
-| Exam | After | Covers | Format |
-|--|--|--|--|
-| Mock Exam 1 | Lecture 4 | Ch 1–3 | 90 min / 90 pts |
-| Mock Exam 2 | Lecture 8 | Ch 4–6 (+ light cumulative) | 90 min / 90 pts |
-| Final Mock Exam | Lecture 12 | All chapters, weighted to Ch 7/8/10/13 | 120 min / 120 pts |
+| Exam | After | Covers | Format | Files |
+|--|:--:|--|:--:|--|
+| Mock Exam 1 | Lecture 4 | Ch 1–3 | 90 min · 90 pts | [Questions](./Mock_Exams/Exam_1_after_Lecture_04/Mock_Exam_1.pdf) · [Solutions](./Mock_Exams/Exam_1_after_Lecture_04/Mock_Exam_1_Solutions.pdf) · [Review deck](./Mock_Exams/Exam_1_after_Lecture_04/Mock_Exam_1_Solutions_Slides.pdf) |
+| Mock Exam 2 | Lecture 8 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts | [Questions](./Mock_Exams/Exam_2_after_Lecture_08/Mock_Exam_2.pdf) · [Solutions](./Mock_Exams/Exam_2_after_Lecture_08/Mock_Exam_2_Solutions.pdf) · [Review deck](./Mock_Exams/Exam_2_after_Lecture_08/Mock_Exam_2_Solutions_Slides.pdf) |
+| Final Mock Exam | Lecture 12 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts | [Questions](./Mock_Exams/Final_Exam_after_Lecture_12/Final_Mock_Exam.pdf) · [Solutions](./Mock_Exams/Final_Exam_after_Lecture_12/Final_Mock_Exam_Solutions.pdf) · [Review deck](./Mock_Exams/Final_Exam_after_Lecture_12/Final_Mock_Exam_Solutions_Slides.pdf) |
 
-Per exam: `Mock_Exam_N.pdf` (questions only), `Mock_Exam_N_Solutions.pdf`
-(worked solutions), and `Mock_Exam_N_Solutions_Slides.pdf` (Beamer deck for
-reviewing the exam in class). All numeric answers were verified
-programmatically. To rebuild:
+<details>
+<summary><b>Rebuilding an exam</b></summary>
 
 ```bash
 cd Mock_Exams/Exam_1_after_Lecture_04
 pdflatex -jobname=Mock_Exam_1 mock_exam_1.tex
 pdflatex -jobname=Mock_Exam_1_Solutions "\def\withsolutions{1}\input{mock_exam_1.tex}"
 ```
+</details>
 
 ---
 
-## Python environment
+## 🐍 Python environment
 
-`requirements.txt` pins the packages used by the notebooks and the in-slide
-code examples: numpy, pandas, matplotlib, scipy, statsmodels, scikit-learn,
-ISLP, pygam (ch 7), xgboost (ch 8, optional), torch (ch 10), lifelines
-(ch 11), jupyter.
+[`requirements.txt`](./requirements.txt) pins the packages used by the
+notebooks and the in-slide code examples:
+
+| Purpose | Packages |
+|---|---|
+| Core scientific stack | `numpy` · `pandas` · `matplotlib` · `scipy` |
+| Statistics & ML | `statsmodels` · `scikit-learn` |
+| Book companion (datasets + helpers) | `ISLP` |
+| Chapter-specific | `pygam` (Ch 7) · `xgboost` (Ch 8, optional) · `torch` (Ch 10) · `lifelines` (Ch 11) |
+| Notebook environment | `jupyter` |
 
 ```bash
 pip install -r requirements.txt
@@ -200,21 +253,71 @@ pip install -r requirements.txt
 
 ---
 
-## Publishing to GitHub — read before pushing
+## 📊 Datasets
 
-- **`Source_Material/` must not be pushed to a public repository.** It
-  contains the full textbook PDF and per-chapter PDFs, which are copyrighted
-  Springer material. The provided `.gitignore` excludes it by default.
-- The **datasets** are distributed by the authors at
-  <https://www.statlearning.com> for use with the book; the slide decks
-  attribute every book figure to its source.
-- After pushing, set `GITHUB_RAW` in the notebooks (see above) and consider
-  adding per-notebook "Open in Colab" badges:
-  `https://colab.research.google.com/github/OWNER/REPO/blob/main/Lab_Notebooks/chapter_NN_lab.ipynb`.
+The course datasets live in [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/)
+and are distributed by the textbook authors at
+[statlearning.com](https://www.statlearning.com) for use with the book. In the
+notebooks, **12 of the 13 datasets load straight from the `ISLP` package**; the
+one that isn't in ISLP (`Advertising`) streams from the book's official site,
+and the bundled CSVs act as an offline fallback. The slide decks attribute
+every book figure to its source.
 
 ---
 
-## Citation
+## ▶️ Open any notebook in Colab
+
+Click a badge to open a lab in [Google Colab](https://colab.research.google.com/).
+See the [privacy note](#-google-colab--zero-setup-recommended) above — while the
+repo is private, these open for accounts with access.
+
+### Lecture chapters
+
+| Ch. | Lab | Open |
+|:--:|--|:--:|
+| 1 · Introduction | `chapter_01_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_01_lab.ipynb) |
+| 2 · Statistical Learning | `chapter_02_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_02_lab.ipynb) |
+| 3 · Linear Regression | `chapter_03_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_03_lab.ipynb) |
+| 4 · Classification | `chapter_04_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_04_lab.ipynb) |
+| 5 · Resampling Methods | `chapter_05_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_05_lab.ipynb) |
+| 6 · Model Selection & Regularization | `chapter_06_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_06_lab.ipynb) |
+| 7 · Moving Beyond Linearity | `chapter_07_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_07_lab.ipynb) |
+| 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_08_lab.ipynb) |
+| 10 · Deep Learning | `chapter_10_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_10_lab.ipynb) |
+| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_13_lab.ipynb) |
+
+### Self-study chapters
+
+| Ch. | Lab | Open |
+|:--:|--|:--:|
+| 9 · Support Vector Machines | `chapter_09_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_09_lab.ipynb) |
+| 11 · Survival Analysis | `chapter_11_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_11_lab.ipynb) |
+| 12 · Unsupervised Learning | `chapter_12_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/quantitative-research-methods/blob/main/Lab_Notebooks/chapter_12_lab.ipynb) |
+
+---
+
+## 👤 About
+
+I am **Prof. Dr. Christoph Weisser**, Professor of Mathematics, specializing in
+Business Data Science at Hochschule Bielefeld (HSBI), and former Technical Lead
+Analytics & Artificial Intelligence at BASF. My work focuses on Artificial
+Intelligence, Generative AI, Business Data Science, and agentic AI systems that
+bridge research with real-world industrial applications.
+
+Before joining academia, I led international AI initiatives at BASF from
+strategy through production deployment. Today, I combine research, teaching,
+open-source software development, and selected industry collaborations to
+advance the practical application of AI.
+
+I completed the PhD Program in Applied Statistics & Empirical Methods (summa cum
+laude) at Georg-August-Universität Göttingen and studied at the University of
+Oxford and the University of St Andrews as a scholar of the Studienstiftung des
+deutschen Volkes. I regularly publish research in leading journals and
+international conferences and contribute to open-source AI software.
+
+---
+
+## 📄 Citation & licence
 
 The **Quantitative Research Methods** course materials are based on, and follow
 the structure of, the textbook *An Introduction to Statistical Learning, with
@@ -239,5 +342,12 @@ BibTeX:
 }
 ```
 
-Slides, exercises, exams and notebooks for the Quantitative Research Methods
-course prepared by Prof. Dr. Christoph Weisser (HSBI), Summer Semester 2026.
+**Attribution.** The slides, exercises, mock exams and notebooks in this
+repository were prepared by Prof. Dr. Christoph Weisser (HSBI), Summer Semester
+2026. The ISLP textbook, its text and its figures are © the authors / Springer;
+the datasets are distributed by the authors at
+[statlearning.com](https://www.statlearning.com) for use with the book. The
+copyrighted textbook PDF and figure banks are **not** included in this
+repository (see [`.gitignore`](./.gitignore)).
+
+<p align="center"><sub>Happy teaching 🎓</sub></p>
