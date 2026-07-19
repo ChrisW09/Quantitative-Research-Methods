@@ -1,10 +1,14 @@
-# An Introduction to Statistical Learning with Python — Lecture Materials
+# Quantitative Research Methods — Lecture Materials
 
-Complete teaching materials for a 12-lecture university course based on
-*An Introduction to Statistical Learning, with Applications in Python*
-(James, Witten, Hastie, Tibshirani & Taylor, Springer 2023 — "ISLP"),
-prepared by **Prof. Dr. Christoph Weisser** (HSBI — Bielefeld University of
-Applied Sciences and Arts).
+Complete teaching materials for **Quantitative Research Methods**, a 12-lecture
+university course prepared by **Prof. Dr. Christoph Weisser** (HSBI — Bielefeld
+University of Applied Sciences and Arts).
+
+> **These materials are based on the textbook**
+> *An Introduction to Statistical Learning, with Applications in Python*
+> (James, Witten, Hastie, Tibshirani & Taylor, Springer 2023 — "ISLP"). The
+> course structure, topics, notation and labs follow the book; please cite it if
+> you reuse these materials (see [Citation](#citation)).
 
 The package contains ten polished Beamer slide decks with built-in exercises
 and solutions, thirteen Jupyter lab notebooks that run locally **and on
@@ -212,11 +216,28 @@ pip install -r requirements.txt
 
 ## Citation
 
-If you reuse these materials, please cite the source textbook:
+The **Quantitative Research Methods** course materials are based on, and follow
+the structure of, the textbook *An Introduction to Statistical Learning, with
+Applications in Python*. If you reuse them, please cite the source textbook:
 
 > James, G., Witten, D., Hastie, T., Tibshirani, R., & Taylor, J. (2023).
 > *An Introduction to Statistical Learning, with Applications in Python.*
-> Springer. <https://www.statlearning.com>
+> Springer Texts in Statistics. Springer. <https://www.statlearning.com>
 
-Slides, exercises, exams and notebooks prepared by Prof. Dr. Christoph
-Weisser (HSBI), Summer Semester 2026.
+BibTeX:
+
+```bibtex
+@book{islp2023,
+  title     = {An Introduction to Statistical Learning: with Applications in Python},
+  author    = {James, Gareth and Witten, Daniela and Hastie, Trevor and Tibshirani, Robert and Taylor, Jonathan},
+  year      = {2023},
+  publisher = {Springer},
+  series    = {Springer Texts in Statistics},
+  isbn      = {978-3-031-38746-3},
+  doi       = {10.1007/978-3-031-38747-0},
+  url       = {https://www.statlearning.com}
+}
+```
+
+Slides, exercises, exams and notebooks for the Quantitative Research Methods
+course prepared by Prof. Dr. Christoph Weisser (HSBI), Summer Semester 2026.
