@@ -268,7 +268,7 @@ every book figure to its source.
 ## ▶️ Open any notebook in Colab
 
 Click a badge to open a lab in [Google Colab](https://colab.research.google.com/).
-See the [privacy note](#-google-colab--zero-setup-recommended) above — while the
+See the [privacy note](#-quick-start) above — while the
 repo is private, these open for accounts with access.
 
 ### Lecture chapters
