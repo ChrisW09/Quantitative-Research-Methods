@@ -236,7 +236,7 @@
     At each node:
     \begin{enumerate}
       \item For every predictor $X_j$ and every cutpoint $s$, compute
-            the RSS that would result from splitting on $X_j < s$.
+            the RSS (residual sum of squares) that would result from splitting on $X_j < s$.
       \item Pick the $(j, s)$ that minimises the resulting RSS.
       \item Recurse on each child.
     \end{enumerate}
@@ -929,7 +929,7 @@ Winners: $\alpha{=}0\!\to\!4$ leaves, $\alpha{=}5\!\to\!3$ leaves, $\alpha{=}20\
     \begin{itemize}
       \item $B$ --- number of trees. Too large $\Rightarrow$
             overfitting.
-      \item $\nu$ --- learning rate (typically $0.001$ to $0.1$).
+      \item $\nu$ --- learning rate (typically $0.01$ or $0.001$).
       \item $d$ --- tree depth (often $d = 1$ or $2$ suffices).
     \end{itemize}
   \end{readme}
@@ -1234,7 +1234,7 @@ print(imp.round(3).head())  # top predictors
   \footnotesize
   \begin{description}
     \item[Regression tree] minimise $\sum_{m}\sum_{i\in R_m}\big(y_i-\hat y_{R_m}\big)^2$; predict region mean.
-    \item[Gini] $G=\sum_{k=1}^{K}\hat p_{mk}(1-\hat p_{mk})$; \quad \textbf{entropy} $D=-\sum_k \hat p_{mk}\log \hat p_{mk}$.
+    \item[Gini] $G=\sum_{k}\hat p_{mk}(1-\hat p_{mk})$; \quad \textbf{entropy} $D=-\sum_k \hat p_{mk}\log \hat p_{mk}$.
     \item[Pruning] minimise $\sum_{m=1}^{|T|}\mathrm{RSS}_m+\alpha|T|$ \ (cost complexity, $\alpha\ge0$).
     \item[Bagging] $\hat f_{\mathrm{bag}}(x)=\dfrac1B\sum_{b=1}^{B}\hat f^{*b}(x)$; OOB error $\approx$ test error.
     \item[Random forest] as bagging but try $m\approx\sqrt{p}$ (class.) or $p/3$ (regr.) predictors per split.
@@ -1285,7 +1285,7 @@ print(imp.round(3).head())  # top predictors
             RF always wins.
       \item Forget that trees fit step-functions --- they cannot
             extrapolate.
-      \item Skip CV: even RF can overfit if trees grow without limit.
+      \item Skip CV: even RF can overfit if individual trees are grown to unlimited depth.
     \end{enumerate}
   \end{alertblock}
 \end{frame}

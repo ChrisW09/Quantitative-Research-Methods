@@ -112,7 +112,7 @@
     FWER & family-wise error rate $\Pr(V\ge 1)$ \\
     FDR & false discovery rate $E\big[V/\max(R,1)\big]$ \\
     $q$ & target FDR level of Benjamini--Hochberg \\
-    Power & $E[S]/m_1$, with $m_1$ the number of false nulls \\
+    Power & $E[S]/m_1$, with $m_0$ and $m_1$ the number of true and false nulls ($m_0+m_1=m$) \\
     \bottomrule
   \end{tabular}
   \end{center}
@@ -132,7 +132,7 @@
           consequences.
     \item \textbf{Apply} Bonferroni and Holm corrections to control
           family-wise error rate (FWER).
-    \item \textbf{Apply} the Benjamini-Hochberg procedure to control
+    \item \textbf{Apply} the Benjamini--Hochberg procedure to control
           false discovery rate (FDR).
     \item \textbf{Use} resampling-based $p$-values when the null
           distribution is hard to derive.
@@ -147,7 +147,7 @@
     \begin{enumerate}
       \item The multiple-testing problem.
       \item FWER controls: Bonferroni, Holm.
-      \item FDR control: Benjamini-Hochberg.
+      \item FDR control: Benjamini--Hochberg.
       \item Resampling-based $p$-values.
       \item Practical issues: $p$-hacking, post-selection inference.
     \end{enumerate}
@@ -189,7 +189,7 @@
       \item $p$-value: probability under $H_0$ of a test statistic at
             least as extreme as observed.
       \item ``Reject $H_0$ if $p < \alpha$'' controls the per-test
-            type-I error rate at $\alpha$.
+            Type I error rate at $\alpha$.
     \end{itemize}
   \end{readme}
   \begin{takeaway}
@@ -467,7 +467,7 @@
 \section{FDR}
 % ============================================================
 
-\begin{frame}{The Benjamini-Hochberg (BH) procedure}
+\begin{frame}{The Benjamini--Hochberg (BH) procedure}
   \begin{block}{Algorithm (control FDR at level $q$)}
     \begin{enumerate}
       \item Order the $p$-values: $p_{(1)} \le \cdots \le p_{(m)}$.
@@ -498,7 +498,7 @@
   \islpsource{Figure 13.6}
 \end{frame}
 
-\begin{frame}{Benjamini-Hochberg as a staircase}
+\begin{frame}{Benjamini--Hochberg as a staircase}
   \begin{center}
     \includegraphics[width=0.92\textwidth,height=0.58\textheight,keepaspectratio]{ch13_bh.png}
   \end{center}
@@ -579,7 +579,7 @@
     \item[(i)] \textbf{FWER} (Bonferroni/Holm): a single false
           approval is unacceptable; the cost of any Type I error is
           very high.
-    \item[(ii)] \textbf{FDR} (Benjamini-Hochberg): an exploratory
+    \item[(ii)] \textbf{FDR} (Benjamini--Hochberg): an exploratory
           candidate list is the goal; a modest fraction of false leads
           is acceptable and will be filtered by follow-up experiments.
           FWER here would be far too conservative and kill power.
@@ -587,14 +587,14 @@
 \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Exercise 13.5 --- Benjamini-Hochberg procedure [Math]}
+\begin{frame}{Exercise 13.5 --- Benjamini--Hochberg procedure [Math]}
 \begin{exercise}
   Using the same six $p$-values,
   \[
     p = (0.001,\; 0.008,\; 0.012,\; 0.030,\; 0.040,\; 0.600),
     \quad m = 6 ,
   \]
-  apply the Benjamini-Hochberg (BH) procedure at FDR level
+  apply the Benjamini--Hochberg (BH) procedure at FDR level
   $q = 0.05$.
   \begin{enumerate}
     \item For each rank $L$ compute the BH threshold $L q / m$.
@@ -924,7 +924,7 @@ m, m1, mu = 1000, 100, 3.0         # 100 true effects, mean shift mu
 q, alpha  = 0.10, 0.05             # FDR target q, FWER target alpha
 truth = np.arange(m) < m1          # first m1 tests are non-null
 
-def bh_reject(p, q):               # Benjamini-Hochberg step-up
+def bh_reject(p, q):               # Benjamini--Hochberg step-up
     order = np.argsort(p); ps = p[order]      # sort p-values ascending
     thr = (np.arange(1, m + 1) / m) * q       # BH line: (j/m) * q
     hit = np.where(ps <= thr)[0]              # ranks below the line
@@ -949,8 +949,8 @@ def simulate(method, reps=2000):                   # average FDR / power over re
     return fdr / reps, pw / reps                   # averages over the repeats
 
 for meth in ["bh", "bonferroni"]:                  # compare both procedures
-    f, p = simulate(meth)                          # run the experiment
-    print("%-11s FDR=%.3f power=%.3f" % (meth, f, p))  # summary line
+    f, pw = simulate(meth)                         # run the experiment
+    print("%-11s FDR=%.3f power=%.3f" % (meth, f, pw))  # summary line
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}
@@ -985,7 +985,7 @@ for meth in ["bh", "bonferroni"]:                  # compare both procedures
   \begin{itemize}
     \item Set up the multiple-testing problem.
     \item Family-wise error rate (FWER): Bonferroni and Holm.
-    \item False discovery rate (FDR): Benjamini-Hochberg.
+    \item False discovery rate (FDR): Benjamini--Hochberg.
     \item Resampling-based $p$-values and Storey's $q$-values.
     \item Pitfalls of post-selection inference and $p$-hacking.
   \end{itemize}

@@ -112,7 +112,7 @@
     $K$ & Number of knots; cubic-spline df $=K+4$, natural-spline df $=K$ \\
     $\lambda$ & Smoothing parameter of the penalised (smoothing-spline) fit \\
     $\int g''(t)^2\,dt$ & Roughness penalty: total curvature of the fit $g$ \\
-    $\mathrm{df}_\lambda$ & Effective degrees of freedom, $\operatorname{trace}(S_\lambda)$ \\
+    $\mathrm{df}_\lambda$ & Effective degrees of freedom, $\operatorname{trace}(S_\lambda)$, where $\hat g = S_\lambda y$ \\
     $s$ & Span: fraction of nearest neighbours used by LOESS \\
     $f_j(X_j)$ & Smooth component function of predictor $X_j$ in a GAM \\
     \bottomrule
@@ -238,7 +238,7 @@
   \begin{center}
     \includegraphics[width=0.92\textwidth,height=0.50\textheight,keepaspectratio]{7_1.pdf}
   \end{center}
-  \begin{takeaway}Left: the degree-4 fit; right: its pointwise band. The curve captures the rise-then-plateau, but bends and widens at the sparse upper edge.\end{takeaway}
+  \begin{takeaway}Left: the degree-4 fit with its pointwise band; right: the fitted $\Pr(\text{wage}>250\mid\text{age})$. The curve captures the rise-then-plateau, but bends and widens at the sparse upper edge.\end{takeaway}
   \islpsource{Figure 7.1}
 \end{frame}
 
@@ -321,7 +321,7 @@ We fit a piecewise-constant (step-function) regression of \texttt{wage} on \text
 
 \begin{frame}{Solution --- Exercise 7.2 (1/2)}
 \begin{solutionbox}
-\textbf{(a) Two dummies for three bins.} Define $C_1(x)=\mathbf{1}[35\le x<50]$ and $C_2(x)=\mathbf{1}[x\ge 50]$. The first bin $(-\infty,35)$ is the \emph{reference category}, absorbed into the intercept. \emph{Why omit one bin?} With an intercept, the column of ones equals the sum of all three bin dummies, so including all three would make the design matrix perfectly collinear --- the ``dummy-variable trap''. In general: $K$ bins $\Rightarrow$ $K-1$ dummies plus an intercept.
+\textbf{(a) Two dummies for three bins.} Define $C_1(x)=\mathbf{1}[35\le x<50]$ and $C_2(x)=\mathbf{1}[x\ge 50]$. The first bin $(-\infty,35)$ is the \emph{reference category}, absorbed into the intercept. \emph{Why omit one bin?} With an intercept, the column of ones equals the sum of all three bin dummies, so including all three would make the design matrix perfectly collinear --- the ``dummy-variable trap''. In general: $m$ bins $\Rightarrow$ $m-1$ dummies plus an intercept.
 
 \medskip
 \textbf{(b) Fitted model.}
@@ -530,12 +530,12 @@ We fit a piecewise-constant (step-function) regression of \texttt{wage} on \text
   \end{readme}
 \end{frame}
 
-\begin{frame}{Polynomial vs.\ spline on Wage}
+\begin{frame}{Cubic vs.\ natural spline on Wage}
   \begin{center}
-    \includegraphics[width=0.85\textwidth,height=0.50\textheight,keepaspectratio]{7_5.pdf}
+    \includegraphics[width=0.85\textwidth,height=0.50\textheight,keepaspectratio]{7_4.pdf}
   \end{center}
-  \begin{takeaway}Same data, two fits: the polynomial oscillates at the edges while the natural spline stays controlled --- boundary behaviour is the deciding difference.\end{takeaway}
-  \islpsource{Figure 7.5}
+  \begin{takeaway}Same data, two fits: the cubic spline's error bands blow up at the edges while the natural spline's stay controlled --- boundary behaviour is the deciding difference.\end{takeaway}
+  \islpsource{Figure 7.4}
 \end{frame}
 
 \begin{frame}{Wage vs.\ age: four models side by side}
@@ -719,7 +719,7 @@ so $\hat g,\hat g',\hat g''$ are continuous. But $t'''=6\cdot\mathbf{1}\{x>40\}$
     \begin{itemize}
       \item The minimiser is a natural cubic spline with knots at every
             $x_i$.
-      \item $\lambda = 0$: interpolation. $\lambda = \infty$: linear fit.
+      \item $\lambda = 0$: interpolation. $\lambda \to \infty$: linear fit.
       \item ``Effective degrees of freedom'' parameterise the
             smoothness.
     \end{itemize}
@@ -1023,6 +1023,7 @@ plt.show()
   \begin{lstlisting}
 from pygam import LinearGAM, s, f
 
+Wage["education"] = Wage["education"].astype("category").cat.codes  # encode factor
 X = Wage[["year", "age", "education"]]  # three predictors
 y = Wage["wage"]                        # response
 gam = LinearGAM(s(0) + s(1) + f(2)).fit(X, y)  # smooth year, age; factor edu

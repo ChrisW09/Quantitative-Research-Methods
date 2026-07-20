@@ -151,7 +151,7 @@
     \item \textbf{Use} the bootstrap to obtain standard errors and
           confidence intervals when no closed-form formula exists.
     \item \textbf{Avoid} the common resampling pitfalls (information
-          leakage, time-series CV, group-respecting splits).
+          leakage, naive time-series folds, group-ignoring splits).
   \end{itemize}
 \end{frame}
 
@@ -706,7 +706,8 @@
     Any two LOOCV training sets share $n-2$ of their $n-1$ observations,
     so the $n$ fitted models are almost identical and their errors are
     highly positively correlated. The variance of an average of
-    positively correlated terms,
+    positively correlated terms (each with variance $\sigma^2$ and average
+    pairwise correlation $\rho$),
     $\mathrm{Var}(\bar e) = \tfrac{1}{n}\sigma^2 +
     \tfrac{n-1}{n}\rho\,\sigma^2$, does not shrink toward zero when
     $\rho$ is large --- hence high variance. In $k$-fold with small $k$
@@ -858,7 +859,7 @@
     4.20\pm0.14$.
 
     \textbf{(4) Comparison.} Both estimates target the same test MSE and
-    agree closely ($3.88$ vs $4.20$).
+    agree closely ($3.88$ vs.\ $4.20$).
     \begin{itemize}
       \item \emph{Bias}: LOOCV trains on $199$ points (almost unbiased);
             5-fold trains on $160$, so it is slightly pessimistic ---
@@ -900,7 +901,7 @@
             $\mathbf{Z}^{*1}, \ldots, \mathbf{Z}^{*B}$, each by
             sampling $n$ rows \emph{with replacement} from the data.
       \item Compute the statistic $\hat\alpha^{*b}$ on each.
-      \item Estimate the standard error by:
+      \item Estimate the standard error by (with $\bar\alpha^*=\tfrac1B\sum_b\hat\alpha^{*b}$ the mean of the replicates):
             \[
               \widehat{\mathrm{SE}}(\hat\alpha) =
               \sqrt{\frac{1}{B-1}\sum_{b=1}^B

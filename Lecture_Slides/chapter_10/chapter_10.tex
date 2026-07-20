@@ -108,7 +108,7 @@
     $A_k$ & activation of hidden unit $k$: $A_k=g\big(w_{k0}+\sum_j w_{kj}X_j\big)$ \\
     $w_{kj}$, $w_{k0}$ & weight from input $j$ into hidden unit $k$; its bias \\
     $\beta_k$, $\beta_0$ & output weight of hidden unit $k$; output bias \\
-    softmax & output activation $e^{z_m}/\sum_\ell e^{z_\ell}$ for multiclass labels \\
+    softmax & output activation $e^{z_m}/\sum_{m'} e^{z_{m'}}$ for multiclass labels \\
     $W$, $F$, $P$, $S$ & conv arithmetic: input width, filter size, padding, stride \\
     $\theta$ & all weights and biases of the network collectively \\
     $\eta$ & learning rate of (stochastic) gradient descent \\
@@ -682,7 +682,7 @@
   \end{tikzpicture}
   \end{center}
   \begin{takeaway}
-    Each output cell is a dot product of the shared-weight filter with a local input patch. Weight sharing plus locality make CNNs data-efficient for images.
+    Each output cell is a dot product of the shared-weight filter with a local input patch. Weight sharing plus locality make convolutional neural networks (CNNs) data-efficient for images.
   \end{takeaway}
 \end{frame}
 
@@ -740,7 +740,7 @@
     \item \textbf{Batch normalisation}: re-centre and scale each layer's inputs per
           mini-batch --- stabilises and speeds up training.
     \item \textbf{Dropout}: randomly switch off units so the net cannot rely on any
-          single one (detailed in the next section).
+          single one (detailed in the Fitting section).
     \item \textbf{Data augmentation}: random crops, flips, colour jitter --- free
           extra ``images'' that teach invariance.
     \item \textbf{Skip / residual connections} (ResNet): let gradients bypass layers,
@@ -762,7 +762,7 @@
   convolutional layer with $16$ filters, each $5 \times 5$, stride
   $1$, no padding (``valid''). Recall the spatial-size formula
   \[
-    O = \frac{W - F + 2P}{S} + 1 .
+    O = \left\lfloor\frac{W - F + 2P}{S}\right\rfloor + 1 .
   \]
   \begin{enumerate}
     \item Compute the output volume (height, width, depth) of the
@@ -1030,7 +1030,7 @@
   \begin{readme}
     \begin{itemize}
       \item Implicit regularisation by SGD.
-      \item Dropout, weight decay (L2), early stopping.
+      \item Dropout, weight decay ($\ell_2$), early stopping.
       \item Data augmentation.
       \item Architecture choice is itself a strong inductive bias.
     \end{itemize}
@@ -1067,7 +1067,7 @@
   \end{tikzpicture}
   \end{center}
   \begin{takeaway}
-    On each mini-batch, every hidden unit is kept with probability $1-p$ and otherwise
+    On each mini-batch, every hidden unit is kept with probability $1-\rho$ and otherwise
     \emph{zeroed}, so the net cannot lean on any single unit and learns redundant,
     robust features. At test time all units are used (weights rescaled).
   \end{takeaway}
