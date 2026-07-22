@@ -73,7 +73,22 @@ row in that page's table too, for the Colab badge.
 
 ## Publishing
 
-The build output in `docs/_build/html/` is a self-contained static site — it can
-be served from GitHub Pages, Read the Docs, or any static host. The
-`html_extra_path` mechanism means the deck and exam PDFs are part of that output,
-so a published site is enough to teach from.
+The site is live at **<https://chrisw09.github.io/Quantitative-Research-Methods/>**.
+
+Deployment is automatic: [`.github/workflows/docs.yml`](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/.github/workflows/docs.yml)
+builds the site and publishes it to GitHub Pages on every push to `main` that
+touches `docs/`, `Lab_Notebooks/`, or a deck or exam PDF. It can also be run by
+hand from the repository's **Actions** tab (*Documentation* → *Run workflow*).
+
+Two things worth knowing about that workflow:
+
+- It builds with `sphinx-build -W --keep-going`, so **any warning fails the
+  build** rather than silently publishing a broken page. If a deployment fails,
+  read the log before re-running — the warning is real.
+- It publishes the artifact directly, without Jekyll, so the `_static/`
+  directory survives (a `.nojekyll` file is added as well).
+
+The output in `docs/_build/html/` is a self-contained static site, so it can
+equally be served from Read the Docs or any static host. The `html_extra_path`
+mechanism means the deck and exam PDFs are part of that output — a published
+site is enough to teach from.

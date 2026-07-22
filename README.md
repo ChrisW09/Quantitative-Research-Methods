@@ -11,10 +11,15 @@
   <img alt="Jupyter notebooks" src="docs/badges/jupyter.svg">
   <img alt="Slides: LaTeX Beamer" src="docs/badges/slides.svg">
   <a href="#-open-any-notebook-in-colab"><img alt="Open in Colab" src="docs/badges/colab.svg"></a>
+  <a href="https://chrisw09.github.io/Quantitative-Research-Methods/"><img alt="Documentation" src="https://img.shields.io/badge/docs-online-2ea44f"></a>
 </p>
 
 <p align="center">
   <b>11 Beamer decks · 14 Jupyter labs · 3 mock exams · ~119 exercises with worked solutions · runs locally &amp; on Colab</b>
+</p>
+
+<p align="center">
+  <b>📖 Read it online: <a href="https://chrisw09.github.io/Quantitative-Research-Methods/">chrisw09.github.io/Quantitative-Research-Methods</a></b>
 </p>
 
 <p align="center">
@@ -96,9 +101,8 @@ ISLP (`Advertising`) streams from the book's official site.
 Jump to [**Open any notebook in Colab**](#-open-any-notebook-in-colab) for a
 one-click link to all fourteen labs.
 
-> 🔒 **This repository is private.** The Colab links open once you're signed in
-> to a Google account that has access to the repo (e.g. the owner). If you make
-> the repo public, the links work for everyone.
+> 💡 The Colab links open straight from GitHub — no account on this repository
+> is needed, only a Google account to run the notebook.
 
 ### ⌥ Local Jupyter
 
@@ -286,8 +290,7 @@ every book figure to its source.
 ## ▶️ Open any notebook in Colab
 
 Click a badge to open a lab in [Google Colab](https://colab.research.google.com/).
-See the [privacy note](#-quick-start) above — while the
-repo is private, these open for accounts with access.
+Nothing needs installing; a Google account is enough to run them.
 
 ### Lecture chapters
 
@@ -317,9 +320,14 @@ repo is private, these open for accounts with access.
 
 ## 📖 Documentation
 
+**📖 <https://chrisw09.github.io/Quantitative-Research-Methods/>**
+
 Everything above — the lecture plan, the decks, all fourteen labs rendered in
-full, the exams and the datasets — is also published as a browsable Sphinx site
-in [`docs/`](./docs/):
+full, the exams and the datasets — is published as a browsable site, rebuilt
+automatically by [GitHub Actions](./.github/workflows/docs.yml) on every push to
+`main` that touches the materials.
+
+To build it locally from [`docs/`](./docs/):
 
 ```bash
 pip install -r docs/requirements.txt
@@ -328,9 +336,9 @@ open docs/_build/html/index.html          # Linux: xdg-open
 ```
 
 The build stages the notebooks and the deck/exam PDFs into the site
-automatically, so the generated `docs/_build/html/` folder is self-contained and
-can be served from GitHub Pages or any static host. Details in
-`docs/building-docs.md`.
+automatically, so the generated `docs/_build/html/` folder is self-contained.
+Details, including how the deployment works, are in
+[`docs/building-docs.md`](./docs/building-docs.md).
 
 ---
 

@@ -16,12 +16,9 @@ ISLP (`Advertising`) streams from the book's official site.
 One-click links for all fourteen labs are on the [Lab notebooks](labs.md)
 page.
 
-```{admonition} Private repository
-:class: warning
-
-While the repository is private, the Colab links open only for Google accounts
-that have access to it. Making the repository public makes the links work for
-everyone.
+```{tip}
+The Colab links open straight from the public GitHub repository — you only need
+a Google account to *run* a notebook, not any access to this repository.
 ```
 
 ## ⌥ Local Jupyter

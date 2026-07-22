@@ -34,11 +34,9 @@ documentation build never executes them).
 | 11 · Survival Analysis | `chapter_11_lab.ipynb` | [Rendered](labs/chapter_11_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_11_lab.ipynb) |
 | 12 · Unsupervised Learning | `chapter_12_lab.ipynb` | [Rendered](labs/chapter_12_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_12_lab.ipynb) |
 
-```{admonition} Private repository
-:class: warning
-
-While the repository is private, the Colab badges open only for Google accounts
-that have access to it.
+```{tip}
+The Colab badges open straight from the public GitHub repository; a Google
+account is all you need to run a notebook.
 ```
 
 ## How the notebooks find their data
