@@ -15,18 +15,20 @@ confidence intervals, hypothesis testing, simple linear regression, matrix
 algebra, derivatives and gradient descent, and the `numpy`/`pandas` toolkit —
 each section ending with where that topic reappears in the course. It opens
 with a ten-question self-check so students can judge whether they need it. Its
-figures are regenerated from the bundled data by
-[`chapter_00/make_figures.py`](./chapter_00/make_figures.py).
+eighteen figures are regenerated from the bundled data by
+[`chapter_00/make_figures.py`](./chapter_00/make_figures.py), and it has a
+companion notebook, `Lab_Notebooks/chapter_00_lab.ipynb`, which rebuilds every
+one of them in code.
 
 ## Teaching design
 
 Every deck follows the same flow — motivation → intuition → formal definition →
 worked example — in the HSBI house style, with:
 
-- **78 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
+- **80 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
   slide immediately followed by a teal worked-solution slide; long solutions run
   across a clean `(1/2)` / `(2/2)` pair.
-- **38 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
+- **39 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
   "Extended exercise" box — integrative, multi-part problems with detailed
   multi-slide solutions.
 - Every exercise is tagged **[Concept]/[Math]/[Python]** (short) or
@@ -48,7 +50,7 @@ worked example — in the HSBI house style, with:
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse refresher *(optional)* | 8 | 3 | 99 |
+| 0  | Precourse refresher *(optional)* | 10 | 4 | 121 |
 | 1  | Introduction | 3 | 1 | 73 |
 | 2  | Statistical Learning | 8 | 4 | 112 |
 | 3  | Linear Regression | 12 | 6 | 152 |
@@ -59,7 +61,7 @@ worked example — in the HSBI house style, with:
 | 8  | Tree-Based Methods | 7 | 3 | 87 |
 | 10 | Deep Learning | 6 | 3 | 78 |
 | 13 | Multiple Testing | 5 | 3 | 67 |
-| **Total** | | **78** | **38** | **1054** |
+| **Total** | | **80** | **39** | **1076** |
 
 ## Suggested 12-lecture plan (180 min each)
 

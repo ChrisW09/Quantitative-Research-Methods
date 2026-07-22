@@ -2,7 +2,7 @@
 
 <p align="center">
   A complete, ready-to-teach university course in statistical learning —<br>
-  eleven polished slide decks, thirteen Jupyter labs, three mock exams, and the course datasets.
+  eleven polished slide decks, fourteen Jupyter labs, three mock exams, and the course datasets.
 </p>
 
 <p align="center">
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <b>11 Beamer decks · 13 Jupyter labs · 3 mock exams · ~116 exercises with worked solutions · runs locally &amp; on Colab</b>
+  <b>11 Beamer decks · 14 Jupyter labs · 3 mock exams · ~119 exercises with worked solutions · runs locally &amp; on Colab</b>
 </p>
 
 <p align="center">
@@ -60,15 +60,15 @@ Applied Sciences and Arts).
 ## ⚡ Why these materials
 
 - **A whole course, not a pile of files.** Eleven Beamer decks — ten chapters
-  plus an optional precourse refresher — thirteen labs and three mock exams that
+  plus an optional precourse refresher — fourteen labs and three mock exams that
   share one notation, one dataset set, and one 12-week rhythm.
 - **Slides built for the room.** Every deck moves motivation → intuition →
   formal definition → worked example, with colour-coded callout boxes and
-  **~78 short + ~38 extended exercises**, each followed by a full solution.
+  **~80 short + ~39 extended exercises**, each followed by a full solution.
 - **Numbers you can trust.** ~40 purpose-built visuals are computed from the
   real course datasets (not sketched), and every mock-exam answer was verified
   programmatically.
-- **Labs that run anywhere.** Thirteen Jupyter notebooks run locally *and* on
+- **Labs that run anywhere.** Fourteen Jupyter notebooks run locally *and* on
   Google Colab — data loads from the `ISLP` package with an automatic fallback
   to the bundled CSVs, so a fresh Colab runtime just works.
 - **Exam-ready.** Three practice exams matched to the course calendar, each in
@@ -94,7 +94,7 @@ datasets load straight from the `ISLP` package**, and the one that isn't in
 ISLP (`Advertising`) streams from the book's official site.
 
 Jump to [**Open any notebook in Colab**](#-open-any-notebook-in-colab) for a
-one-click link to all thirteen labs.
+one-click link to all fourteen labs.
 
 > 🔒 **This repository is private.** The Colab links open once you're signed in
 > to a Google account that has access to the repo (e.g. the owner). If you make
@@ -142,7 +142,7 @@ A 12-lecture semester (12 × 180 min):
 | Path | Contents |
 |---|---|
 | [`Lecture_Slides/`](./Lecture_Slides/) | Eleven Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable, including the `chapter_00` precourse refresher. See its [deck guide](./Lecture_Slides/README.md). |
-| [`Lab_Notebooks/`](./Lab_Notebooks/) | Thirteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
+| [`Lab_Notebooks/`](./Lab_Notebooks/) | Fourteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
 | [`Mock_Exams/`](./Mock_Exams/) | Three exams — each with a questions PDF, a solutions PDF, and a Beamer review deck |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
 | [`docs/`](./docs/) | Sphinx documentation for the whole course — see [Documentation](#-documentation) |
@@ -160,8 +160,8 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 - **Teaching flow** — motivation → intuition → formal definition → worked
   example, with colour-coded callout boxes (green takeaway, blue how-to-read,
   orange worked example, red pitfall).
-- **~78 short exercises** (~5 min) in purple boxes, each with a full
-  step-by-step solution (teal), plus **~38 extended, multi-part exercises**
+- **~80 short exercises** (~5 min) in purple boxes, each with a full
+  step-by-step solution (teal), plus **~39 extended, multi-part exercises**
   (~15 min) in violet boxes with detailed multi-slide solutions.
 - **~40 purpose-built visuals** — ≈22 matplotlib plots computed from the real
   course datasets plus ≈18 native TikZ concept diagrams.
@@ -184,14 +184,18 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 | 10 | Deep Learning | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
 | 13 | Multiple Testing | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
 
-> **New: a precourse refresher (Chapter 0).** An optional 99-slide session that
+> **New: a precourse refresher (Chapter 0).** An optional 121-slide session that
 > revisits the undergraduate material this course assumes — descriptive
 > statistics, probability and Bayes, the standard distributions, sampling and
 > confidence intervals, hypothesis testing, simple linear regression, matrix
 > algebra, derivatives and gradient descent, and the `numpy`/`pandas` toolkit.
 > It opens with a ten-question self-check so students can decide whether they
 > need it, and closes with a table mapping every topic to the chapter that uses
-> it.
+> it. Eighteen figures — Anscombe's quartet, Simpson's paradox, the CLT, CI
+> coverage, power, gradient descent — are computed from the course data by
+> [`make_figures.py`](./Lecture_Slides/chapter_00/make_figures.py), and the
+> whole session has a companion notebook,
+> [`chapter_00_lab.ipynb`](./Lab_Notebooks/chapter_00_lab.ipynb).
 
 <details>
 <summary><b>Rebuilding a deck</b></summary>
@@ -210,13 +214,14 @@ pdflatex chapter_NN.tex   # second pass for the navigation bar
 
 ## 📓 Lab notebooks
 
-Thirteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
-Python Lab — including chapters 9, 11 and 12, which are included for self-study.
+Fourteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
+Python Lab — including the precourse refresher and chapters 9, 11 and 12, which
+are included for self-study.
 Each notebook runs **locally or on Google Colab**; data loads via the `ISLP`
 package with an automatic fallback to the bundled CSVs, so nothing needs
 downloading by hand.
 
-One-click Colab links for all thirteen are in
+One-click Colab links for all fourteen are in
 [**Open any notebook in Colab**](#-open-any-notebook-in-colab) below.
 
 ---
@@ -288,6 +293,7 @@ repo is private, these open for accounts with access.
 
 | Ch. | Lab | Open |
 |:--:|--|:--:|
+| 0 · Precourse Refresher | `chapter_00_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00_lab.ipynb) |
 | 1 · Introduction | `chapter_01_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_01_lab.ipynb) |
 | 2 · Statistical Learning | `chapter_02_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_02_lab.ipynb) |
 | 3 · Linear Regression | `chapter_03_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_03_lab.ipynb) |
@@ -311,7 +317,7 @@ repo is private, these open for accounts with access.
 
 ## 📖 Documentation
 
-Everything above — the lecture plan, the decks, all thirteen labs rendered in
+Everything above — the lecture plan, the decks, all fourteen labs rendered in
 full, the exams and the datasets — is also published as a browsable Sphinx site
 in [`docs/`](./docs/):
 

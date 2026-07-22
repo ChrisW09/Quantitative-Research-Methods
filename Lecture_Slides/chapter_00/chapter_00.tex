@@ -173,8 +173,9 @@
     \item \textbf{Recognise} the normal, $t$, $\chi^2$, $F$, Bernoulli, binomial
           and Poisson distributions and say where each is used.
     \item \textbf{Explain} sampling variability, standard errors, confidence
-          intervals and $p$-values --- and their standard misreadings.
-    \item \textbf{Fit and interpret} a simple linear regression by hand.
+          intervals, $p$-values and power --- and their standard misreadings.
+    \item \textbf{Fit and interpret} a simple linear regression by hand, and
+          \textbf{read} a printed regression table column by column.
     \item \textbf{Manipulate} vectors and matrices, and read the matrix form of
           the regression estimator.
     \item \textbf{Differentiate} a loss function and take a gradient-descent step.
@@ -183,8 +184,8 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Do you actually need this session? A 10-question self-check}
-  \footnotesize
+\begin{frame}{Do you actually need this session? A 12-question self-check}
+  \scriptsize
   Answer honestly. Each question maps to one section of this deck.
   \begin{enumerate}
     \item Why is the median often reported for income, but the mean for test scores?
@@ -200,10 +201,14 @@
           is $n \times p$?
     \item What does the derivative of a loss function tell an optimisation
           algorithm to do?
+    \item A study finds ``no significant effect''. What third number do you
+          need before believing it?
+    \item Adding one far-out point changes a fitted slope a lot. What is that
+          point called?
   \end{enumerate}
   \begin{takeaway}[Scoring]
-    Comfortable with 8+? Skim this deck. Fewer than 5? Work through it with the
-    exercises --- it will pay for itself by Lecture 3.
+    Comfortable with 9+? Skim this deck. Fewer than 6? Work through it with
+    the exercises --- it will pay for itself by Lecture 3.
   \end{takeaway}
 \end{frame}
 
@@ -211,13 +216,15 @@
   \begin{block}{Primary textbook (from Lecture 1 onwards)}
     James, G., Witten, D., Hastie, T., Tibshirani, R., \& Taylor, J.\ (2023).
     \emph{An Introduction to Statistical Learning, with Applications in
-    Python.} Springer. Chapter 2 and the Chapter 3 appendix cover much of
-    this refresher in condensed form.
+    Python.} Springer. Chapter 2 and Section 3.1 cover parts of this
+    refresher in condensed form.
   \end{block}
   \begin{block}{If you want a fuller undergraduate treatment}
     Any introductory statistics text will do; the topics to look up are listed
-    on the final ``where to read more'' slide. All figures in this deck were
-    computed from the course data sets.
+    on the final ``where to read more'' slide. Every figure in this deck was
+    computed from the course data sets or from a clearly labelled simulation;
+    the code that produces them sits in \texttt{make\_figures.py} beside this
+    file.
   \end{block}
 \end{frame}
 
@@ -238,7 +245,11 @@
       \item The Python toolkit of the labs.
     \end{enumerate}
   \end{takeaway}
-  Roughly one exercise every 20 minutes; solutions follow immediately.
+  \footnotesize
+  Every idea is shown as a \emph{picture} computed from the course data before
+  it is written as a formula; every section says where it reappears in
+  Chapters 1--13; and there is an exercise with a full solution roughly every
+  20 minutes.
 \end{frame}
 
 \begin{frame}{The shape of a data set: $n$ observations, $p$ variables}
@@ -459,14 +470,17 @@
 
 \begin{frame}{Quantiles, the five-number summary, and the boxplot}
   \begin{center}
-    \includegraphics[width=0.86\textwidth,height=0.56\textheight,keepaspectratio]{ch00_boxplot_anatomy.png}
+    \includegraphics[width=0.84\textwidth,height=0.50\textheight,keepaspectratio]{ch00_boxplot_anatomy.png}
   \end{center}
-  \footnotesize
-  The $q$-quantile is the value below which a fraction $q$ of the data lies.
-  $Q_1 = 25\%$, median $=50\%$, $Q_3 = 75\%$; $\mathrm{IQR} = Q_3 - Q_1$ holds
-  the middle half. The usual outlier rule flags points outside
+  \scriptsize
+  The $q$-quantile is the value below which a fraction $q$ of the data lies:
+  $Q_1 = 25\%$, median $= 50\%$, $Q_3 = 75\%$, and $\mathrm{IQR} = Q_3 - Q_1$
+  holds the middle half. The usual rule flags points outside
   $[\,Q_1 - 1.5\,\mathrm{IQR},\ Q_3 + 1.5\,\mathrm{IQR}\,]$ --- a convention,
   not a law, and never a licence to delete data.
+  \begin{labnote}[Companion notebook]
+    Rebuild this plot yourself with \texttt{df["wage"].describe()}.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{Shape: skewness read off a picture}
@@ -477,6 +491,40 @@
   \texttt{Wage} is right-skewed: a long upper tail pulls the mean
   ($111.7$) above the median ($104.9$). Rule of thumb: mean $>$ median
   suggests right skew, mean $<$ median left skew.
+\end{frame}
+
+\begin{frame}{Four shapes you will actually meet}
+  \begin{center}
+    \includegraphics[width=0.99\textwidth,height=0.48\textheight,keepaspectratio]{ch00_shape_gallery.png}
+  \end{center}
+  \scriptsize
+  \textbf{Symmetric} --- mean and median agree; report either.
+  \textbf{Skewed} --- they separate; the median is the honest summary.
+  \textbf{A spike at one value} --- 22\% of \texttt{Credit} customers carry a
+  zero balance; no single number describes this well, so say so.
+  \textbf{Bimodal} --- two peaks usually mean two \emph{populations} mixed
+  together; find the variable that separates them.
+  \begin{takeaway}[Shape is a modelling decision]
+    A histogram is not decoration: it tells you whether a mean is meaningful,
+    whether a transformation is needed, and whether a group variable is
+    missing from your model.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{When a transformation helps}
+  \begin{center}
+    \includegraphics[width=0.78\textwidth,height=0.44\textheight,keepaspectratio]{ch00_log_transform.png}
+  \end{center}
+  \footnotesize
+  Taking logs pulls in the long right tail: skewness falls from $+1.0$ to
+  $+0.3$, and mean and median almost coincide.
+  \begin{takeaway}[Why this matters later]
+    Logs turn multiplicative effects into additive ones, so a coefficient
+    becomes a \emph{percentage} change. \texttt{Wage} ships with a
+    \texttt{logwage} column for exactly this reason. Logs need strictly
+    positive data --- and predictions must be transformed back before anyone
+    reads them.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Standardisation: the $z$-score}
@@ -499,6 +547,21 @@
       \item \textbf{Ch.\ 10} --- neural networks train far better on
             standardised inputs.
     \end{itemize}
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Standardisation in action: who is my nearest neighbour?}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth,height=0.48\textheight,keepaspectratio]{ch00_standardisation.png}
+  \end{center}
+  \footnotesize
+  \texttt{Credit}: income is in thousands, the limit in single dollars, so on
+  raw units the limit decides every distance by itself. After standardising,
+  both count equally --- and a different customer is nearest.
+  \begin{takeaway}[The rule]
+    Any method built on distances or on penalised coefficients --- KNN, PCA,
+    clustering, ridge, lasso, neural networks --- must see standardised
+    inputs, or the answer depends on your choice of units.
   \end{takeaway}
 \end{frame}
 
@@ -625,6 +688,21 @@
   $y = x^2 + \varepsilon$ --- and $r = 0.08$. \textbf{Always plot the data.}
 \end{frame}
 
+\begin{frame}{Anscombe's quartet: four data sets, one set of statistics}
+  \begin{center}
+    \includegraphics[width=0.99\textwidth,height=0.50\textheight,keepaspectratio]{ch00_anscombe.png}
+  \end{center}
+  \footnotesize
+  All four have the same $\bar x$, the same $\bar y$, the same standard
+  deviations, the same $r = 0.82$ and the \emph{same} fitted line --- yet only
+  the first deserves one. Constructed by F.~J.\ Anscombe (1973) to make
+  exactly this point.
+  \begin{takeaway}[The habit this should build]
+    Summary statistics compress, and compression loses information. Plot
+    first, summarise second, model third.
+  \end{takeaway}
+\end{frame}
+
 \begin{frame}{Correlation is not causation --- the two classic traps}
   \begin{readme}[Confounding]
     Ice-cream sales and drowning deaths correlate strongly. Neither causes
@@ -641,6 +719,22 @@
     Before believing any two-variable claim, ask: \emph{what third variable
     could produce this pattern?} This question is the entire reason
     multiple regression exists.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Simpson's paradox, drawn}
+  \begin{center}
+    \includegraphics[width=0.86\textwidth,height=0.48\textheight,keepaspectratio]{ch00_simpson.png}
+  \end{center}
+  \footnotesize
+  Simulated data for three age groups: older people here both exercise more
+  \emph{and} have higher cholesterol. Ignoring the group, exercise looks
+  harmful ($+0.66$); within every group it helps.
+  \begin{takeaway}[The lesson]
+    The overall slope and the within-group slope answer different questions.
+    Adding the group variable to the model --- what multiple regression does
+    --- recovers the within-group answer. Which one you \emph{want} depends on
+    the decision you are making.
   \end{takeaway}
 \end{frame}
 
@@ -806,6 +900,36 @@
   \end{takeaway}
 \end{frame}
 
+\begin{frame}{The same calculation, without any algebra}
+  \vspace{-3pt}
+  \begin{center}
+    \begin{tikzpicture}[scale=0.92,every node/.style={font=\scriptsize},
+      b/.style={draw=accent,fill=accent!7,rounded corners=2pt,inner sep=3pt,align=center},
+      g/.style={draw=gray!60,fill=gray!5,rounded corners=2pt,inner sep=3pt,align=center},
+      o/.style={draw=orange!70!black,fill=orange!12,rounded corners=2pt,inner sep=3pt,align=center},
+      ->,>={Stealth[length=4pt]}]
+      \node[b] (all) at (0,2.4) {\textbf{1000 people}};
+      \node[b] (ill) at (-3,1.1) {10 ill};
+      \node[b] (well) at (3,1.1) {990 healthy};
+      \node[o] (tp) at (-4.7,-0.4) {\textbf{9} test\\positive};
+      \node[g] (fn) at (-1.9,-0.4) {1 tests\\negative};
+      \node[o] (fp) at (1.5,-0.4) {\textbf{50} test\\positive};
+      \node[g] (tn) at (4.7,-0.4) {940 test\\negative};
+      \draw (all) -- (ill); \draw (all) -- (well);
+      \draw (ill) -- (tp); \draw (ill) -- (fn);
+      \draw (well) -- (fp); \draw (well) -- (tn);
+      \node[align=center,font=\small] at (0,-1.6)
+        {$9 + 50 = 59$ positive tests, of which $9$ are truly ill:
+         $\;9/59 \approx \mathbf{15\%}$};
+    \end{tikzpicture}
+  \end{center}
+  \begin{takeaway}[Natural frequencies beat percentages]
+    The same calculation becomes obvious once it is counts of people rather
+    than conditional probabilities --- a trick worth using whenever a
+    probability statement feels slippery.
+  \end{takeaway}
+\end{frame}
+
 \begin{frame}{Random variables, expectation and variance}
   \begin{block}{Definitions (discrete case)}
     \[
@@ -893,6 +1017,59 @@
   \end{solutionbox}
 \end{frame}
 
+\begin{frame}{Exercise 0.5 --- Expectation and variance rules [Math]}
+  \begin{exercise}
+    A machine fills bottles. The fill volume $X$ has
+    $\mathrm{E}[X] = 500$\,ml and $\mathrm{Var}(X) = 16$\,ml$^2$.
+    \begin{enumerate}
+      \item A calibration error adds exactly $3$\,ml to every bottle. Give the
+            new mean and the new variance of $Y = X + 3$.
+      \item The volume is re-expressed in litres, $W = X/1000$. Give
+            $\mathrm{E}[W]$, $\mathrm{Var}(W)$ and $\mathrm{SD}(W)$.
+      \item A crate holds $4$ bottles filled \emph{independently}. Give the
+            mean and variance of the total $T = X_1 + X_2 + X_3 + X_4$, and of
+            the average $\bar X = T/4$.
+      \item Standardise: what are the mean and SD of $Z = (X - 500)/4$?
+      \item Suppose instead the four bottles come from one shared reservoir,
+            so their volumes are positively correlated. Which of your answers
+            in (3) breaks, and in which direction?
+    \end{enumerate}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 0.5}
+  \begin{solutionbox}
+    \textbf{(1)} $\mathrm{E}[Y] = 503$\,ml; $\mathrm{Var}(Y) = 16$ ---
+    unchanged. Shifting every value moves the centre but not the spread
+    ($b$ drops out of $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$).
+
+    \textbf{(2)} $\mathrm{E}[W] = 0.5$\,l;
+    $\mathrm{Var}(W) = (1/1000)^2 \cdot 16 = 1.6\times10^{-5}$\,l$^2$;
+    $\mathrm{SD}(W) = 4/1000 = 0.004$\,l. Note the SD rescales linearly while
+    the variance rescales by the \emph{square} --- which is exactly why we
+    report the SD.
+
+    \textbf{(3)} $\mathrm{E}[T] = 4(500) = 2000$\,ml and, \emph{by
+    independence}, $\mathrm{Var}(T) = 4(16) = 64$ (SD $= 8$).
+    For the average, $\mathrm{E}[\bar X] = 500$ and
+    $\mathrm{Var}(\bar X) = \mathrm{Var}(T)/16 = 4$, so
+    $\mathrm{SD}(\bar X) = 2 = 4/\sqrt{4}$ --- the $\sigma/\sqrt n$ rule,
+    derived rather than asserted.
+
+    \textbf{(4)} $\mathrm{E}[Z] = 0$ and $\mathrm{SD}(Z) = 1$: standardising
+    is just the $a = 1/4$, $b = -125$ case of the same two rules.
+
+    \textbf{(5)} Only the \emph{variances} in (3) break --- the means are
+    unaffected, because expectation is linear whatever the dependence. With
+    positive correlation, $\mathrm{Var}(T) = \sum_i\mathrm{Var}(X_i) +
+    2\sum_{i<j}\mathrm{Cov}(X_i,X_j) > 64$: the true spread is \emph{larger}
+    than the independence formula suggests, so treating dependent
+    observations as independent makes us overconfident. That is the same
+    mistake as using random cross-validation folds on a time series
+    (Chapter 5).
+  \end{solutionbox}
+\end{frame}
+
 
 % ============================================================
 \section{Distributions you will meet}
@@ -941,6 +1118,17 @@
   \end{readme}
 \end{frame}
 
+\begin{frame}{The 68--95--99.7 rule, drawn}
+  \begin{center}
+    \includegraphics[width=0.76\textwidth,height=0.50\textheight,keepaspectratio]{ch00_normal_rule.png}
+  \end{center}
+  \footnotesize
+  Two consequences you will use every week: an observation more than two SDs
+  from the mean is unusual (about 1 in 20), and ``estimate
+  $\pm\,1.96\,\mathrm{SE}$'' is a 95\% interval. That same $1.96$ appears in
+  every confidence interval and every two-sided 5\% test in this course.
+\end{frame}
+
 \begin{frame}{Three distributions that come from the normal}
   \begin{center}
     \includegraphics[width=0.98\textwidth,height=0.52\textheight,keepaspectratio]{ch00_reference_dists.png}
@@ -972,6 +1160,26 @@
     spread of $\bar X$ shrinks like $1/\sqrt{n}$ --- quadrupling the sample
     halves the uncertainty.
   \end{takeaway}
+\end{frame}
+
+\begin{frame}{Two different promises: LLN and CLT}
+  \begin{center}
+    \includegraphics[width=0.90\textwidth,height=0.44\textheight,keepaspectratio]{ch00_lln.png}
+  \end{center}
+  \footnotesize
+  \begin{center}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    \textbf{Law of large numbers} & \textbf{Central limit theorem} \\
+    \midrule
+    $\bar X \to \mu$ as $n$ grows & $\bar X$ becomes normally distributed \\
+    says \emph{where} the mean lands & says \emph{how far off} it typically is \\
+    justifies estimating at all & justifies confidence intervals and tests \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  The right panel is the economics of data collection: going from $n=25$ to
+  $n=100$ halves the uncertainty; halving it again costs $n=400$.
 \end{frame}
 
 
@@ -1114,6 +1322,34 @@
   \end{takeaway}
 \end{frame}
 
+\begin{frame}{A $p$-value is an area}
+  \begin{center}
+    \includegraphics[width=0.74\textwidth,height=0.48\textheight,keepaspectratio]{ch00_pvalue.png}
+  \end{center}
+  \footnotesize
+  Draw the distribution the statistic \emph{would} have if $H_0$ were true,
+  mark what you actually observed, and shade everything at least that
+  extreme. The shaded area is the $p$-value: $0.048$ here, for $t = 2.0$ on
+  $99$ degrees of freedom. Both tails count because the alternative is
+  two-sided --- a deviation in either direction would have surprised us.
+\end{frame}
+
+\begin{frame}{Power: the error nobody reports}
+  \begin{center}
+    \includegraphics[width=0.84\textwidth,height=0.44\textheight,keepaspectratio]{ch00_power.png}
+  \end{center}
+  \footnotesize
+  Moving the critical value to the right shrinks the orange area ($\alpha$)
+  but grows the green one ($\beta$). Only \emph{more data} --- or a larger
+  true effect, or less noise --- shrinks both, by pushing the curves apart.
+  \begin{takeaway}[Why underpowered studies mislead]
+    With low power most true effects are missed, and the few that do reach
+    significance are the ones that got lucky --- so their estimated effects
+    are \emph{too large}. This is a large part of why published findings fail
+    to replicate.
+  \end{takeaway}
+\end{frame}
+
 \begin{frame}{Worked example: a one-sample $t$-test}
   \footnotesize
   \begin{numexample}[Has average handling time changed?]
@@ -1137,7 +1373,7 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Exercise 0.5 --- Reading an inference [Concept]}
+\begin{frame}{Exercise 0.6 --- Reading an inference [Concept]}
   \begin{exercise}
     A colleague reports: ``We estimated the effect of a training programme on
     productivity. The estimate is $+2.4$ units with standard error $1.5$,
@@ -1157,7 +1393,7 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 0.5}
+\begin{frame}{Solution --- Exercise 0.10}
   \begin{solutionbox}
     \textbf{(1)} $2.4 \pm 1.96(1.5) = 2.4 \pm 2.94 = [-0.54,\ 5.34]$.
 
@@ -1320,6 +1556,50 @@
   \end{alertblock}
 \end{frame}
 
+\begin{frame}{One point can move the whole line}
+  \begin{center}
+    \includegraphics[width=0.90\textwidth,height=0.46\textheight,keepaspectratio]{ch00_outlier_influence.png}
+  \end{center}
+  \footnotesize
+  Twenty simulated points plus one extra (circled). \textbf{Left:} an unusual
+  $y$ at a typical $x$ lifts the line a little. \textbf{Right:} the same
+  vertical error placed far out in $x$ swings the slope --- that point has
+  high \emph{leverage}, because the line must pivot to reach it.
+  \begin{takeaway}[Two different words]
+    An \textbf{outlier} has a large residual; a \textbf{high-leverage} point
+    has an unusual $x$. A point that is both is the dangerous case, and
+    Chapter 3 gives you leverage statistics to find them.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}[fragile]{Reading a regression output --- the table you will see all term}
+  \scriptsize
+\begin{lstlisting}
+                 coef    std err        t     P>|t|     [0.025    0.975]
+Intercept      7.0326      0.458   15.360     0.000      6.130     7.935
+TV             0.0475      0.003   17.668     0.000      0.042     0.053
+
+R-squared: 0.612    F-statistic: 312.1    Prob (F-statistic): 1.47e-42    n = 200
+\end{lstlisting}
+  \begin{readme}[Column by column]
+    \textbf{coef} --- the estimate $b_j$: sales rise by $0.0475$ thousand
+    units per extra \$1000 of TV budget.
+    \textbf{std err} --- its standard error: how much $b_j$ would wobble
+    across repeated samples.
+    \textbf{t} $= \mathrm{coef}/\mathrm{std\ err} = 0.0475/0.00269 = 17.7$:
+    the estimate is $17.7$ standard errors from zero.
+    \textbf{P>|t|} --- the two-sided $p$-value for $H_0:\beta_j = 0$.
+    \textbf{[0.025 0.975]} --- the 95\% confidence interval, $\approx
+    \mathrm{coef} \pm 1.96\,\mathrm{std\ err}$.
+  \end{readme}
+  \begin{takeaway}[What to look at first]
+    The coefficient and its interval --- \emph{is the effect big enough to
+    matter, and how sure are we?} The $p$-value only answers ``could it be
+    zero''. Chapter 3 adds the $F$-statistic, diagnostics and multiple
+    predictors to this same table.
+  \end{takeaway}
+\end{frame}
+
 \begin{frame}{Extended Exercise 0.2 --- Regression by hand, end to end [Math]}
   \begin{longexercise}
     Four branches report weekly advertising spend $x$ (\euro 000s) and sales
@@ -1409,6 +1689,64 @@
   \end{solutionbox}
 \end{frame}
 
+\begin{frame}[fragile]{Exercise 0.7 --- Interrogating a regression table [Python]}
+  \begin{exercise}
+    \scriptsize
+    A colleague regresses a city's monthly ice-cream sales (thousands of
+    euros) on the average temperature ($^\circ$C) and reports:
+\begin{lstlisting}
+                coef   std err       t   P>|t|    [0.025   0.975]
+Intercept     4.2000     1.4000    3.00   0.005    1.3552   7.0448
+temp          0.9000     0.1500    6.00   0.000    0.5952   1.2048
+R-squared: 0.51    n = 36
+\end{lstlisting}
+    \begin{enumerate}
+      \item Interpret the slope in words, with units.
+      \item Verify the $t$-value and check the confidence interval against the
+            ``$\pm 1.96\,\mathrm{SE}$'' rule of thumb.
+      \item Interpret the intercept. Is it meaningful here?
+      \item What does $R^2 = 0.51$ say, and what does it \emph{not} say?
+      \item Your colleague concludes: ``raising the temperature by
+            $1^\circ$C would raise sales by \euro 900''. What is wrong with
+            the wording, and what would make the claim defensible?
+    \end{enumerate}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 0.7}
+  \begin{solutionbox}
+    \scriptsize
+    \textbf{(1)} A $1^\circ$C higher average monthly temperature is
+    \emph{associated with} \euro 900 more sales per month
+    ($0.9$ thousand euros), on average across these 36 months.
+
+    \textbf{(2)} $t = 0.9/0.15 = 6.0$ \checkmark. The rule of thumb gives
+    $0.9 \pm 1.96(0.15) = [0.606,\ 1.194]$, slightly narrower than the printed
+    $[0.595,\ 1.205]$: with only $n = 36$ the software uses the $t_{34}$
+    quantile $2.032$, not $1.96$.
+
+    \textbf{(3)} The intercept is predicted sales at $0^\circ$C:
+    \euro 4{,}200. Whether that is meaningful depends on whether $0^\circ$C
+    is inside the observed temperature range. If the city never drops below
+    $5^\circ$C, it is an extrapolation and should be read as ``the number
+    that positions the line'', nothing more.
+
+    \textbf{(4)} $51\%$ of the month-to-month variation in sales is accounted
+    for by temperature; $49\%$ is not. It does \emph{not} say the model is
+    correct, that the relationship is linear, that temperature causes sales,
+    or that predictions will be accurate for a new month.
+
+    \textbf{(5)} Two problems. \emph{Causal wording:} this is observational
+    data, and month is a lurking variable --- school holidays, tourism and
+    marketing all move with temperature (a confounder, and a hint of the
+    Simpson's-paradox risk). \emph{Units:} the coefficient is per
+    $1^\circ$C \emph{on the monthly average}, not per warm afternoon.
+    A defensible version: ``months that are $1^\circ$C warmer sell about
+    \euro 900 more, on average''. To claim causation you would need an
+    experiment or a design that holds the confounders fixed.
+  \end{solutionbox}
+\end{frame}
+
 
 % ============================================================
 \section{Linear algebra you will need}
@@ -1489,7 +1827,7 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{Exercise 0.6 --- Matrix mechanics [Math]}
+\begin{frame}{Exercise 0.8 --- Matrix mechanics [Math]}
   \begin{exercise}
     Let
     \[
@@ -1633,9 +1971,26 @@
   \end{takeaway}
 \end{frame}
 
+\begin{frame}{Gradient descent, drawn}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth,height=0.46\textheight,keepaspectratio]{ch00_gradient_descent.png}
+  \end{center}
+  \footnotesize
+  The contours are the loss $L(\beta_0,\beta_1)$ for the three-point data set
+  of Extended Exercise 0.3; the star is the least-squares solution.
+  \textbf{Left:} a safe learning rate walks downhill and creeps along the
+  valley floor. \textbf{Right:} too large a rate steps past the valley, lands
+  higher up the far side, and every step after that is worse.
+  \begin{takeaway}[Why the valley is so narrow]
+    Long thin contours mean the loss is far more curved in one direction than
+    another, which forces a small step size. Standardising the predictors
+    makes the contours rounder --- the same fix, again.
+  \end{takeaway}
+\end{frame}
+
 \begin{frame}{Extended Exercise 0.3 --- Normal equations and one descent step [Integrative]}
   \begin{longexercise}
-    Use the data of Exercise 0.6:
+    Use the data of Exercise 0.8:
     $(x,y) = (1,2), (2,3), (3,5)$, model $y = \beta_0 + \beta_1 x$, and
     loss $L(\boldsymbol\beta) = \sum_i (y_i - \beta_0 - \beta_1 x_i)^2$.
     \begin{enumerate}
@@ -1672,7 +2027,7 @@
     Setting both to zero gives $\sum_i e_i = 0$ and $\sum_i x_i e_i = 0$, i.e.
     $3\beta_0 + 6\beta_1 = 10$ and $6\beta_0 + 14\beta_1 = 23$ --- exactly
     $\mathbf{X}^\top\mathbf{X}\boldsymbol\beta = \mathbf{X}^\top\mathbf{y}$
-    with the matrices of Exercise 0.6, so
+    with the matrices of Exercise 0.8, so
     $\boldsymbol\beta = (1/3,\ 3/2)^\top$ as before. \emph{The normal
     equations are ``derivative $=0$'' in matrix form.}
 
@@ -1710,7 +2065,7 @@
       \boldsymbol\beta^{(1)} = (0,0)^\top - 1\cdot(-20,-46)^\top = (20,\ 46)^\top .
     \]
     Fitted values are $66, 112, 158$ against $y = (2,3,5)$: the loss explodes
-    to about $4.1\times10^{4}$, far worse than the starting $38$, and the next
+    to about $3.9\times10^{4}$, far worse than the starting $38$, and the next
     step is larger still --- \textbf{divergence}. The step size must respect
     the curvature of the loss, so in practice one standardises the predictors
     and tunes $\alpha$: the workflow of Chapter 10.
@@ -1802,7 +2157,53 @@ model.predict(X_test)       # .fit / .predict everywhere
   \end{takeaway}
 \end{frame}
 
-\begin{frame}[fragile]{Exercise 0.7 --- Reading Python output [Python]}
+\begin{frame}[fragile]{Missing values and other everyday nuisances}
+\begin{lstlisting}
+df.isna().sum()                    # how many missing, per column
+df["horsepower"].unique()[:5]      # '?' hides in Auto.csv as a string!
+auto = pd.read_csv("Auto.csv", na_values="?").dropna()
+df["education"] = df["education"].astype("category")   # not a number
+pd.get_dummies(df["education"], drop_first=True)       # -> 0/1 columns
+\end{lstlisting}
+  \begin{alertblock}{Three traps that bite every semester}
+    \begin{enumerate}
+      \item \textbf{Missing values disguised as data.} \texttt{Auto.csv}
+            stores unknown horsepower as \texttt{'?'}, so the column loads as
+            text and \texttt{.mean()} fails --- or worse, silently misleads.
+      \item \textbf{Dropping rows changes the sample.} \texttt{dropna()} is
+            fine when values are missing at random and rare; otherwise it
+            quietly biases everything that follows. Report how many rows you
+            lost.
+      \item \textbf{Categories stored as numbers.} A region coded $1,2,3$ will
+            be treated as quantitative unless you say otherwise.
+    \end{enumerate}
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{A whole first analysis in ten lines}
+\begin{lstlisting}
+import pandas as pd, matplotlib.pyplot as plt, statsmodels.formula.api as smf
+
+adv = pd.read_csv("Advertising.csv", index_col=0)   # 1. load
+adv.describe()                                      # 2. summarise
+adv.plot.scatter(x="TV", y="sales")                 # 3. LOOK at it
+fit = smf.ols("sales ~ TV", data=adv).fit()         # 4. fit
+print(fit.params, fit.bse, fit.rsquared)            # 5. estimate, SE, R^2
+print(fit.conf_int())                               # 6. uncertainty
+plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
+\end{lstlisting}
+  \vspace{-4pt}
+  \begin{takeaway}[The shape of every analysis in this course]
+    Load $\to$ summarise $\to$ \textbf{plot} $\to$ fit $\to$ report estimates
+    \emph{with} uncertainty $\to$ check the residuals. Chapters 2--13 change
+    step 4 and enrich step 7; the skeleton never changes.
+  \end{takeaway}
+  \begin{labnote}[Companion notebook]
+    Run all of this in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}.
+  \end{labnote}
+\end{frame}
+
+\begin{frame}[fragile]{Exercise 0.9 --- Reading Python output [Python]}
   \begin{exercise}
     \scriptsize
     A student runs the following on the \texttt{Wage} data and gets the
@@ -1814,7 +2215,7 @@ model.predict(X_test)       # .fit / .predict everywhere
 # count 3000 | mean 111.70 | std 41.73 | min 20.09
 # 25% 85.38 | 50% 104.92 | 75% 128.68 | max 318.34
 >>> df["age"].corr(df["wage"])
-0.1957
+0.1956
 \end{lstlisting}
     \begin{enumerate}
       \item What are $n$ and $p$?
@@ -1829,10 +2230,13 @@ model.predict(X_test)       # .fit / .predict everywhere
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 0.7}
+\begin{frame}{Solution --- Exercise 0.9}
   \begin{solutionbox}
-    \textbf{(1)} $n = 3000$ observations, $p = 11$ columns. (If one column is
-    the response \texttt{wage}, then $10$ are available as predictors.)
+    \textbf{(1)} $n = 3000$ observations, $p = 11$ columns --- so with
+    \texttt{wage} as the response, $10$ columns remain. But one of them is
+    \texttt{logwage}, a transform \emph{of the response itself}: using it as a
+    predictor would leak the answer into the model and produce a perfect,
+    worthless fit. Always check what the columns actually \emph{are}.
 
     \textbf{(2)} $\mathrm{IQR} = 128.68 - 85.38 = 43.30$. The upper fence is
     $128.68 + 1.5(43.30) = 128.68 + 64.95 = 193.63$. Since
@@ -1859,7 +2263,7 @@ model.predict(X_test)       # .fit / .predict everywhere
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Exercise 0.8 --- Choosing the right tool [Concept]}
+\begin{frame}{Exercise 0.10 --- Choosing the right tool [Concept]}
   \begin{exercise}
     For each task, name (a) the summary or method you would use, and (b) the
     plot you would draw first.
@@ -1903,6 +2307,85 @@ model.predict(X_test)       # .fit / .predict everywhere
   \end{solutionbox}
 \end{frame}
 
+\begin{frame}{Extended Exercise 0.4 --- Reviewing an analysis end to end [Integrative]}
+  \begin{longexercise}
+    A consultancy reports on a loyalty programme. ``We looked at $n = 900$
+    customers. Members spend on average \euro 128 per month, non-members
+    \euro 96. The difference of \euro 32 has $p < 0.001$, so the programme
+    works. A regression of spend on membership gives $R^2 = 0.04$, and the
+    correlation between spend and \emph{months since joining} is
+    $r = 0.05$, so loyalty length does not matter. We recommend enrolling
+    every customer.''
+    \begin{enumerate}
+      \item Spending is strongly right-skewed. What does that do to the two
+            reported averages, and what would you report instead?
+      \item The standard error of the difference is \euro 6. Give a 95\%
+            confidence interval and restate the finding properly.
+      \item Reconcile ``$p < 0.001$'' with ``$R^2 = 0.04$''. Is there a
+            contradiction?
+      \item Criticise the conclusion drawn from $r = 0.05$.
+      \item Give the single biggest threat to the causal claim, and describe
+            a study design that would settle it.
+      \item Which two plots would you have asked for before reading any of
+            these numbers?
+    \end{enumerate}
+  \end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 0.4 (1/2)}
+  \begin{solutionbox}
+    \scriptsize
+    \textbf{(1) Skew.} Both means are pulled up by a small number of very
+    large spenders, and the two groups may be skewed to different degrees, so
+    the \emph{difference in means} can be driven by a handful of customers.
+    Report medians and IQRs alongside the means, plus the group sizes --- and
+    show the distributions, not just their centres. (A log transform, or a
+    comparison of medians, is often the better analysis here.)
+
+    \textbf{(2) Uncertainty.} $32 \pm 1.96(6) = 32 \pm 11.8 =
+    [\,\text{\euro}20.2,\ \text{\euro}43.8\,]$. Proper statement: ``members
+    spend about \euro 32 more per month than non-members, and the data are
+    consistent with anywhere between \euro 20 and \euro 44''. That range, not
+    the $p$-value, is what a business decision needs.
+
+    \textbf{(3) No contradiction.} They answer different questions.
+    $p < 0.001$ says the difference is very unlikely to be zero --- easy to
+    achieve with $n = 900$. $R^2 = 0.04$ says membership accounts for only
+    $4\%$ of the variation in spending --- individual customers differ far
+    more among themselves than the groups differ from each other. A real but
+    small effect, precisely estimated: significance is not importance.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 0.4 (2/2)}
+  \begin{solutionbox}
+    \scriptsize
+    \textbf{(4) The $r = 0.05$ claim.} $r$ measures only \emph{linear}
+    association, so a strong non-linear pattern (a jump in the first months,
+    then a plateau) would show up as $r \approx 0$. It is also not resistant
+    to outliers, and ``does not matter'' confuses a small estimate with a
+    precisely estimated zero --- no standard error was given. Plot spend
+    against tenure before concluding anything.
+
+    \textbf{(5) The causal threat: self-selection.} Customers \emph{chose} to
+    join, and the ones who join are plausibly those who already shop most.
+    The comparison then measures who joins, not what joining does. A
+    randomised trial --- offer the programme to a random subset and compare
+    all those offered with all those not --- would settle it. Failing that,
+    compare each member's spending before and after joining against matched
+    non-members over the same period. The recommendation ``enrol everyone''
+    also assumes the effect would hold for people who never chose to join,
+    which is exactly the population the data say nothing about.
+
+    \textbf{(6) The two plots.} (i) Overlaid histograms or side-by-side
+    boxplots of spending by membership --- showing shape, spread and outliers,
+    not just two means; (ii) a scatterplot of spend against months since
+    joining, which would immediately expose whether $r = 0.05$ hides a curve.
+    Both are two lines of \texttt{pandas}, and both would have been drawn
+    before any test in a competent analysis.
+  \end{solutionbox}
+\end{frame}
+
 
 % ============================================================
 \section{Summary}
@@ -1916,14 +2399,15 @@ model.predict(X_test)       # .fit / .predict everywhere
     \item \textbf{One variable}: centre (mean / median), spread (SD / IQR),
           shape (skew, outliers). Never a centre without a spread.
     \item \textbf{Two variables}: covariance $\to$ correlation $r$ (linear,
-          unit-free, non-causal). Always plot before trusting $r$.
+          unit-free, non-causal). Anscombe and Simpson are why you plot first
+          and ask what is missing from the model.
     \item \textbf{Probability}: conditioning and Bayes' theorem; base rates
           dominate rare-event problems.
     \item \textbf{Distributions}: Bernoulli/binomial/Poisson for counts;
           normal, and $t$, $\chi^2$, $F$ derived from it.
     \item \textbf{Inference}: SD describes data, SE describes an estimate and
           shrinks like $1/\sqrt n$; CIs and $p$-values are statements about
-          \emph{procedures}.
+          \emph{procedures}; power is the error nobody reports.
     \item \textbf{Regression}: minimise RSS; $b_1 = S_{xy}/S_{xx}$;
           $R^2 = 1 - \mathrm{RSS}/\mathrm{TSS}$; residual plots diagnose.
     \item \textbf{Algebra and calculus}: dimensions must match;
@@ -1974,7 +2458,7 @@ model.predict(X_test)       # .fit / .predict everywhere
 \end{frame}
 
 \begin{frame}{Vocabulary check}
-  \scriptsize
+  \tiny
   \begin{center}
   \begin{tabular}{@{}ll@{}}
     \toprule
@@ -1994,7 +2478,9 @@ model.predict(X_test)       # .fit / .predict everywhere
     Type I / Type II error & false positive / false negative \\
     Power & probability of detecting a real effect \\
     Residual & observed minus fitted, $y_i - \hat y_i$ \\
+    Leverage & how unusual an observation's $x$ is \\
     $R^2$ & fraction of variation in $y$ accounted for \\
+    Log transform & tames right skew; turns effects into percentages \\
     Gradient & vector of partial derivatives; points uphill \\
     Convex & bowl-shaped; every local minimum is global \\
     \bottomrule
@@ -2003,7 +2489,7 @@ model.predict(X_test)       # .fit / .predict everywhere
 \end{frame}
 
 \begin{frame}{Where each topic reappears in the course}
-  \scriptsize
+  \tiny
   \begin{center}
   \begin{tabular}{@{}ll@{}}
     \toprule
@@ -2013,11 +2499,15 @@ model.predict(X_test)       # .fit / .predict everywhere
     Mean, variance, expectation rules & Ch.\ 2 (bias--variance decomposition) \\
     Standardisation ($z$-scores) & Ch.\ 2 (KNN), Ch.\ 6 (ridge/lasso), Ch.\ 10 \\
     Correlation, confounding & Ch.\ 3 (multiple regression, collinearity) \\
+    Anscombe, Simpson's paradox & Ch.\ 3 (why we plot and adjust) \\
+    Log transforms, skew & Ch.\ 3, 7 (transformed responses, splines) \\
     Conditional probability, Bayes & Ch.\ 4 (Bayes classifier, LDA, naive Bayes) \\
     Bernoulli / binomial / Poisson & Ch.\ 4 (logistic, Poisson regression) \\
     Normal, $t$, $\chi^2$, $F$ & Ch.\ 3 ($t$- and $F$-tests on coefficients) \\
     Standard errors, CIs & Ch.\ 3 (coefficient inference), Ch.\ 5 (bootstrap) \\
     Type I/II errors, $p$-values & Ch.\ 4 (confusion matrix), Ch.\ 13 (FWER, FDR) \\
+    Power, sample size & Ch.\ 5 (how much data is enough), Ch.\ 13 \\
+    Outliers and leverage & Ch.\ 3 (diagnostics), Ch.\ 8 (trees are robust) \\
     Simple linear regression, $R^2$ & Ch.\ 3 (all of it), Ch.\ 6 (model selection) \\
     Residual plots & Ch.\ 3 (diagnostics), Ch.\ 7 (non-linearity) \\
     Matrix algebra, inverses & Ch.\ 3 (normal equations), Ch.\ 6 (singularity) \\
@@ -2063,13 +2553,18 @@ model.predict(X_test)       # .fit / .predict everywhere
           $(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$?
     \item Why must predictors be standardised before ridge regression?
     \item Why does a large learning rate make gradient descent diverge?
+    \item Two studies report the same estimate; one has twice the standard
+          error. Which is more likely to be ``significant'', and why is that
+          not the same as being more \emph{true}?
+    \item Sketch Anscombe's fourth data set from memory and say why its
+          correlation is untrustworthy.
   \end{enumerate}
 \end{frame}
 
 \begin{frame}{Five things to remember}
   \begin{enumerate}
-    \item \textbf{Plot before you compute.} Every summary statistic hides
-          something; a picture usually shows it.
+    \item \textbf{Plot before you compute.} Anscombe's quartet: four data
+          sets, identical statistics, four different stories.
     \item \textbf{Centre needs spread; estimate needs uncertainty.} A number
           without a standard error is not a result.
     \item \textbf{Conditioning is the core idea.} Classification is
@@ -2101,8 +2596,10 @@ model.predict(X_test)       # .fit / .predict everywhere
   \end{block}
   \begin{labnote}[Practice beats reading]
     Redo Exercises 0.2, 0.3 and Extended Exercise 0.2 \emph{by hand}, then
-    reproduce them in Python with \texttt{numpy} and \texttt{pandas}. That
-    single hour is the best preparation for Lecture 1.
+    reproduce them in Python in the companion notebook
+    \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}, which rebuilds every
+    figure of this deck from the course data. That single hour is the best
+    preparation for Lecture 1.
   \end{labnote}
 \end{frame}
 

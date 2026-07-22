@@ -52,8 +52,11 @@ def save(fig, name):
     print("wrote", name)
 
 
-wage = pd.read_csv(DATA / "Wage.csv", index_col=0)
+# Wage.csv has no index column; Advertising.csv, Boston.csv and Credit.csv do.
+wage = pd.read_csv(DATA / "Wage.csv")
 adv = pd.read_csv(DATA / "Advertising.csv", index_col=0)
+boston = pd.read_csv(DATA / "Boston.csv", index_col=0)
+credit = pd.read_csv(DATA / "Credit.csv")
 
 
 # 1 -- Centre and spread on a skewed variable ---------------------------------
@@ -303,6 +306,361 @@ def fig_slr():
     save(fig, "ch00_slr.png")
 
 
+# ---------------------------------------------------------------------------
+# Added figures: shape, association, inference and optimisation
+# ---------------------------------------------------------------------------
+
+
+# 8 -- A gallery of shapes, all from the course data ---------------------------
+def fig_shape_gallery():
+    panels = [
+        (boston["rm"], "Boston: rooms per dwelling", "roughly symmetric"),
+        (wage["wage"], "Wage: wages", "right-skewed"),
+        (credit["Balance"], "Credit: card balance", "a spike at zero"),
+        (boston["tax"], "Boston: property-tax rate", "bimodal"),
+    ]
+    fig, axes = plt.subplots(1, 4, figsize=(9.4, 2.7))
+    for ax, (x, title, shape) in zip(axes, panels):
+        ax.hist(x, bins=30, color=ACCENT, alpha=0.75, edgecolor="white", linewidth=0.3)
+        ax.axvline(x.mean(), color=ORANGE, lw=1.8)
+        ax.axvline(x.median(), color="black", lw=1.8, ls="--")
+        ax.set_title(f"{title}\n{shape}", fontsize=8.5)
+        ax.set_yticks([])
+        ax.tick_params(labelsize=7.5)
+    axes[0].set_ylabel("frequency")
+    fig.suptitle(
+        "Solid orange = mean, dashed black = median. The gap between them is the skew.",
+        fontsize=8.5,
+    )
+    save(fig, "ch00_shape_gallery.png")
+
+
+# 9 -- A log transform tames a skewed variable --------------------------------
+def fig_log_transform():
+    x = wage["wage"].to_numpy()
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.6, 2.8))
+    for ax, v, title in (
+        (ax1, x, "wage"),
+        (ax2, np.log(x), "log(wage)"),
+    ):
+        ax.hist(v, bins=40, color=ACCENT, alpha=0.75, edgecolor="white", linewidth=0.3)
+        ax.axvline(v.mean(), color=ORANGE, lw=1.8, label="mean")
+        ax.axvline(np.median(v), color="black", lw=1.8, ls="--", label="median")
+        sk = stats.skew(v)
+        ax.set_title(f"{title}   (skewness {sk:+.2f})", fontsize=9.5)
+        ax.set_xlabel(title)
+    ax1.set_ylabel("frequency")
+    ax1.legend(frameon=False, fontsize=8)
+    save(fig, "ch00_log_transform.png")
+
+
+# 10 -- Anscombe's quartet ----------------------------------------------------
+def fig_anscombe():
+    x1 = np.array([10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5], float)
+    x4 = np.array([8, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8], float)
+    sets = [
+        (x1, [8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68],
+         "I: a linear fit is fine"),
+        (x1, [9.14, 8.14, 8.74, 8.77, 9.26, 8.10, 6.13, 3.10, 9.13, 7.26, 4.74],
+         "II: the truth is a curve"),
+        (x1, [7.46, 6.77, 12.74, 7.11, 7.81, 8.84, 6.08, 5.39, 8.15, 6.42, 5.73],
+         "III: one outlier tilts the line"),
+        (x4, [6.58, 5.76, 7.71, 8.84, 8.47, 7.04, 5.25, 12.50, 5.56, 7.91, 6.89],
+         "IV: one point decides everything"),
+    ]
+    fig, axes = plt.subplots(1, 4, figsize=(9.4, 2.6), sharex=True, sharey=True)
+    for ax, (x, y, title) in zip(axes, sets):
+        y = np.asarray(y, float)
+        b1, b0 = np.polyfit(x, y, 1)
+        r = np.corrcoef(x, y)[0, 1]
+        ax.scatter(x, y, s=16, color=ACCENT, alpha=0.85, edgecolors="none")
+        xs = np.linspace(3, 20, 20)
+        ax.plot(xs, b0 + b1 * xs, color=ORANGE, lw=1.5)
+        ax.set_title(f"{title}\n$\\bar x$={x.mean():.1f}, $\\bar y$={y.mean():.2f}, "
+                     f"$r$={r:.2f}", fontsize=8)
+        ax.set_xlim(2, 20)
+        ax.tick_params(labelsize=7.5)
+    fig.suptitle(
+        "Anscombe's quartet: identical means, SDs, correlation and regression line",
+        fontsize=9,
+    )
+    save(fig, "ch00_anscombe.png")
+
+
+# 11 -- Simpson's paradox -----------------------------------------------------
+def fig_simpson():
+    rng = np.random.default_rng(7)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8.0, 3.1), sharey=True)
+    colours = [ACCENT, ORANGE, "#2E7D5B"]
+    xs_all, ys_all = [], []
+    for k, (base_x, base_y, c) in enumerate(
+        zip((2.0, 4.5, 7.0), (4.0, 6.0, 8.0), colours)
+    ):
+        x = base_x + rng.normal(0, 0.6, 40)
+        y = base_y - 0.5 * (x - base_x) + rng.normal(0, 0.35, 40)
+        xs_all.append(x)
+        ys_all.append(y)
+        for ax in (ax1, ax2):
+            ax.scatter(x, y, s=12, color=c if ax is ax2 else GREY, alpha=0.75,
+                       edgecolors="none")
+        b1, b0 = np.polyfit(x, y, 1)
+        xx = np.linspace(x.min(), x.max(), 20)
+        ax2.plot(xx, b0 + b1 * xx, color=c, lw=1.8)
+
+    X = np.concatenate(xs_all)
+    Y = np.concatenate(ys_all)
+    b1, b0 = np.polyfit(X, Y, 1)
+    xx = np.linspace(X.min(), X.max(), 20)
+    ax1.plot(xx, b0 + b1 * xx, color="black", lw=2)
+    ax1.set_title(f"Ignoring the group: slope $= {b1:+.2f}$", fontsize=9.5)
+    ax2.set_title("Within each group: slope $< 0$", fontsize=9.5)
+    for ax in (ax1, ax2):
+        ax.set_xlabel("hours of exercise per week")
+    ax1.set_ylabel("cholesterol")
+    fig.suptitle("Simpson's paradox: the aggregate reverses every subgroup", fontsize=9.5)
+    save(fig, "ch00_simpson.png")
+
+
+# 12 -- The 68-95-99.7 rule ---------------------------------------------------
+def fig_normal_rule():
+    z = np.linspace(-4, 4, 600)
+    d = stats.norm.pdf(z)
+    fig, ax = plt.subplots(figsize=(6.6, 2.9))
+    ax.plot(z, d, color=ACCENT, lw=1.8)
+    bands = [(1, 0.30, "68%"), (2, 0.18, "95%"), (3, 0.10, "99.7%")]
+    for k, alpha, label in bands:
+        m = (z >= -k) & (z <= k)
+        ax.fill_between(z[m], d[m], color=ACCENT, alpha=alpha)
+        ax.annotate(
+            f"$\\pm{k}\\sigma$: {label}",
+            xy=(k, stats.norm.pdf(k)),
+            xytext=(k + 0.25, 0.36 - 0.09 * k),
+            fontsize=8.5,
+            arrowprops={"arrowstyle": "->", "color": GREY, "lw": 0.8},
+        )
+    ax.set_xticks(range(-4, 5))
+    ax.set_xticklabels([f"${v:+d}\\sigma$".replace("+0σ", "\\mu") if v else "$\\mu$"
+                        for v in range(-4, 5)], fontsize=8)
+    ax.set_yticks([])
+    ax.set_title("The 68\u201395\u201399.7 rule (and why $1.96$ is worth memorising)")
+    save(fig, "ch00_normal_rule.png")
+
+
+# 13 -- What a p-value is, as an area -----------------------------------------
+def fig_pvalue():
+    df = 99
+    tobs = 2.0
+    t = np.linspace(-4, 4, 600)
+    d = stats.t.pdf(t, df)
+    p = 2 * stats.t.sf(tobs, df)
+    fig, ax = plt.subplots(figsize=(6.6, 2.9))
+    ax.plot(t, d, color=ACCENT, lw=1.8)
+    for side in (1, -1):
+        m = (t * side) >= tobs
+        ax.fill_between(t[m], d[m], color=ORANGE, alpha=0.75)
+    ax.axvline(tobs, color=ORANGE, lw=1.4, ls="--")
+    ax.axvline(-tobs, color=ORANGE, lw=1.4, ls="--")
+    ax.annotate(
+        f"observed $t = {tobs}$",
+        xy=(tobs, stats.t.pdf(tobs, df)),
+        xytext=(2.5, 0.28),
+        fontsize=8.5,
+        arrowprops={"arrowstyle": "->", "color": GREY, "lw": 0.8},
+    )
+    ax.annotate(
+        f"the two shaded tails\nare the $p$-value: {p:.3f}",
+        xy=(2.6, 0.012),
+        xytext=(1.2, 0.14),
+        fontsize=8.5,
+        color=ORANGE,
+        arrowprops={"arrowstyle": "->", "color": ORANGE, "lw": 0.8},
+    )
+    ax.set_yticks([])
+    ax.set_xlabel("value of the test statistic if $H_0$ were true  ($t_{99}$)")
+    ax.set_title("A $p$-value is an area under the null distribution")
+    save(fig, "ch00_pvalue.png")
+
+
+# 14 -- Type I, Type II and power ---------------------------------------------
+def fig_power():
+    z = np.linspace(-4, 7, 800)
+    shift = 2.8
+    crit = 1.96
+    h0 = stats.norm.pdf(z)
+    h1 = stats.norm.pdf(z, shift)
+    power = 1 - stats.norm.cdf(crit, shift)
+
+    fig, ax = plt.subplots(figsize=(7.4, 3.0))
+    ax.plot(z, h0, color=ACCENT, lw=1.8, label="if $H_0$ true")
+    ax.plot(z, h1, color="#2E7D5B", lw=1.8, label="if $H_1$ true")
+    m = z >= crit
+    ax.fill_between(z[m], h0[m], color=ORANGE, alpha=0.85,
+                    label=r"Type I error ($\alpha/2$)")
+    m2 = z <= crit
+    ax.fill_between(z[m2], h1[m2], color="#2E7D5B", alpha=0.28,
+                    label=r"Type II error ($\beta$)")
+    ax.axvline(crit, color="black", lw=1.2, ls="--")
+    ax.annotate("reject $H_0$ to the right\nof the critical value",
+                xy=(crit, 0.30), xytext=(3.4, 0.34), fontsize=8.5,
+                arrowprops={"arrowstyle": "->", "color": GREY, "lw": 0.8})
+    ax.set_yticks([])
+    ax.set_xlabel("test statistic")
+    ax.set_title(f"Power $= 1-\\beta = {power:.2f}$ for this effect size and $n$")
+    ax.legend(frameon=False, fontsize=8, loc="upper left")
+    save(fig, "ch00_power.png")
+
+
+# 15 -- Law of large numbers, and the 1/sqrt(n) law ---------------------------
+def fig_lln():
+    pop = wage["wage"].to_numpy()
+    mu = pop.mean()
+    rng = np.random.default_rng(11)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8.6, 3.0))
+    ns = np.arange(1, 501)
+    for k in range(6):
+        draws = rng.choice(pop, size=500, replace=True)
+        ax1.plot(ns, np.cumsum(draws) / ns, lw=0.9, alpha=0.8)
+    ax1.axhline(mu, color="black", lw=1.6, ls="--", label=f"$\\mu$ = {mu:.0f}")
+    ax1.set_xlabel("observations so far, $n$")
+    ax1.set_ylabel("running mean")
+    ax1.set_title("Law of large numbers: six samples", fontsize=9.5)
+    ax1.legend(frameon=False, fontsize=8)
+
+    sizes = np.array([2, 5, 10, 25, 50, 100, 200, 400])
+    emp = [rng.choice(pop, size=(2000, n), replace=True).mean(axis=1).std(ddof=1)
+           for n in sizes]
+    ax2.plot(sizes, emp, "o", color=ACCENT, ms=5, label="simulated SD of $\\bar x$")
+    grid = np.linspace(2, 400, 200)
+    ax2.plot(grid, pop.std(ddof=1) / np.sqrt(grid), color=ORANGE, lw=1.8,
+             label=r"$\sigma/\sqrt{n}$")
+    ax2.set_xlabel("sample size $n$")
+    ax2.set_ylabel("spread of the sample mean")
+    ax2.set_title("Precision improves only like $1/\\sqrt{n}$", fontsize=9.5)
+    ax2.legend(frameon=False, fontsize=8)
+    save(fig, "ch00_lln.png")
+
+
+# 16 -- One point can move a least-squares line -------------------------------
+def fig_outlier_influence():
+    rng = np.random.default_rng(3)
+    x = np.linspace(1, 10, 20)
+    y = 2 + 0.8 * x + rng.normal(0, 0.7, 20)
+
+    cases = [
+        (5.5, 14.0, "an outlier in $y$, at a typical $x$"),
+        (22.0, 5.0, "a high-leverage point, far out in $x$"),
+    ]
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.1))
+    for ax, (xo, yo, title) in zip(axes, cases):
+        xa = np.append(x, xo)
+        ya = np.append(y, yo)
+        b1, b0 = np.polyfit(x, y, 1)
+        c1, c0 = np.polyfit(xa, ya, 1)
+        xs = np.linspace(0, max(11, xo + 1), 50)
+        ax.scatter(x, y, s=16, color=ACCENT, alpha=0.8, edgecolors="none")
+        ax.scatter([xo], [yo], s=55, facecolors="none", edgecolors=ORANGE, lw=1.8)
+        ax.plot(xs, b0 + b1 * xs, color=GREY, lw=1.6, ls="--",
+                label=f"without: slope {b1:.2f}")
+        ax.plot(xs, c0 + c1 * xs, color=ORANGE, lw=1.9,
+                label=f"with: slope {c1:.2f}")
+        ax.set_title(title, fontsize=9.5)
+        ax.set_xlabel("x")
+        ax.legend(frameon=False, fontsize=8, loc="upper left")
+    axes[0].set_ylabel("y")
+    save(fig, "ch00_outlier_influence.png")
+
+
+# 17 -- Why distances need standardised variables -----------------------------
+def fig_standardisation():
+    d = credit[["Income", "Limit"]].to_numpy()[:120]
+    q = np.array([50.0, 5000.0])          # the query customer
+
+    def nearest(mat, point):
+        return int(np.argmin(((mat - point) ** 2).sum(axis=1)))
+
+    raw_nb = nearest(d, q)
+    mu, sd = d.mean(axis=0), d.std(axis=0, ddof=1)
+    z = (d - mu) / sd
+    zq = (q - mu) / sd
+    std_nb = nearest(z, zq)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8.8, 3.3))
+    GREEN = "#2E7D5B"
+
+    # Both candidate neighbours are marked in both panels, so the switch is visible.
+    for ax, pts, query, xlab, ylab, title in (
+        (ax1, d, q, "Income (thousands of \\$)", "Limit (\\$)",
+         "Raw units: 'Limit' dwarfs 'Income', so it decides"),
+        (ax2, z, zq, "Income ($z$-score)", "Limit ($z$-score)",
+         "Standardised: both variables now count equally"),
+    ):
+        ax.scatter(pts[:, 0], pts[:, 1], s=14, color=ACCENT, alpha=0.5,
+                   edgecolors="none")
+        ax.scatter(*query, marker="*", s=170, color="black", zorder=6,
+                   label="the customer we ask about")
+        ax.plot([query[0], pts[raw_nb, 0]], [query[1], pts[raw_nb, 1]],
+                color=ORANGE, lw=1.6, zorder=4)
+        ax.plot([query[0], pts[std_nb, 0]], [query[1], pts[std_nb, 1]],
+                color=GREEN, lw=1.6, ls="--", zorder=4)
+        ax.scatter(*pts[raw_nb], s=90, facecolors="none", edgecolors=ORANGE, lw=2,
+                   zorder=5, label="nearest in raw units")
+        ax.scatter(*pts[std_nb], s=90, facecolors="none", edgecolors=GREEN, lw=2,
+                   zorder=5, label="nearest after standardising")
+        ax.set_title(title, fontsize=9)
+        ax.set_xlabel(xlab)
+        ax.set_ylabel(ylab)
+    ax1.legend(frameon=False, fontsize=7.5, loc="upper left")
+    save(fig, "ch00_standardisation.png")
+    print(f"    (nearest neighbour: row {raw_nb} raw vs row {std_nb} standardised)")
+
+
+# 18 -- Gradient descent on a real loss surface -------------------------------
+def fig_gradient_descent():
+    X = np.array([[1.0, 1.0], [1.0, 2.0], [1.0, 3.0]])
+    y = np.array([2.0, 3.0, 5.0])
+    beta_hat = np.linalg.solve(X.T @ X, X.T @ y)
+
+    def loss(b0, b1):
+        return sum((yi - b0 - b1 * xi) ** 2 for xi, yi in zip(X[:, 1], y))
+
+    def path(alpha, steps):
+        b = np.zeros(2)
+        out = [b.copy()]
+        for _ in range(steps):
+            b = b + 2 * alpha * X.T @ (y - X @ b)
+            out.append(b.copy())
+        return np.array(out)
+
+    fig, axes = plt.subplots(1, 2, figsize=(8.8, 3.3))
+    settings = [
+        (0.01, 60, "$\\alpha = 0.01$: converges \u2014 but slowly",
+         (-1.5, 2.5), (-0.6, 3.0)),
+        (0.07, 6, "$\\alpha = 0.07$: overshoots, and every step is worse",
+         (-4.0, 5.5), (-8.0, 9.0)),
+    ]
+    for ax, (alpha, steps, title, xlim, ylim) in zip(axes, settings):
+        g0, g1 = np.meshgrid(np.linspace(*xlim, 220), np.linspace(*ylim, 220))
+        Z = loss(g0, g1)
+        ax.contour(g0, g1, Z, levels=np.geomspace(0.3, Z.max(), 16), colors=[GREY],
+                   linewidths=0.6, alpha=0.7)
+        pth = path(alpha, steps)
+        ax.plot(pth[:, 0], pth[:, 1], "-o", color=ORANGE, ms=3, lw=1.2)
+        ax.plot(*beta_hat, "*", color="black", ms=14, zorder=5)
+        ax.annotate("start", xy=(0, 0), xytext=(0.12, 0.06), fontsize=8,
+                    xycoords="data", textcoords="axes fraction",
+                    arrowprops={"arrowstyle": "->", "color": GREY, "lw": 0.8})
+        ax.set_title(title, fontsize=9.5)
+        ax.set_xlabel(r"$\beta_0$")
+        ax.set_xlim(*xlim)
+        ax.set_ylim(*ylim)
+    axes[0].set_ylabel(r"$\beta_1$")
+    axes[0].annotate("least-squares\nsolution", xy=tuple(beta_hat), xytext=(-1.25, 2.4),
+                     fontsize=8,
+                     arrowprops={"arrowstyle": "->", "color": GREY, "lw": 0.8})
+    save(fig, "ch00_gradient_descent.png")
+
+
 if __name__ == "__main__":
     fig_center_spread()
     fig_boxplot_anatomy()
@@ -311,3 +669,14 @@ if __name__ == "__main__":
     fig_reference_dists()
     fig_ci_coverage()
     fig_slr()
+    fig_shape_gallery()
+    fig_log_transform()
+    fig_anscombe()
+    fig_simpson()
+    fig_normal_rule()
+    fig_pvalue()
+    fig_power()
+    fig_lln()
+    fig_outlier_influence()
+    fig_standardisation()
+    fig_gradient_descent()

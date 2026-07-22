@@ -8,7 +8,7 @@ self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 
 | Ch. | Deck | Short ex. | Extended ex. | Pages | PDF |
 |:--:|---|:--:|:--:|:--:|:--:|
-| 0 | Precourse Refresher *(optional)* | 8 | 3 | 99 | <a href="slides/chapter_00.pdf">Open</a> |
+| 0 | Precourse Refresher *(optional)* | 10 | 4 | 121 | <a href="slides/chapter_00.pdf">Open</a> |
 | 1 | Introduction | 3 | 1 | 73 | <a href="slides/chapter_01.pdf">Open</a> |
 | 2 | Statistical Learning | 8 | 4 | 112 | <a href="slides/chapter_02.pdf">Open</a> |
 | 3 | Linear Regression | 12 | 6 | 152 | <a href="slides/chapter_03.pdf">Open</a> |
@@ -19,7 +19,7 @@ self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 | 8 | Tree-Based Methods | 7 | 3 | 87 | <a href="slides/chapter_08.pdf">Open</a> |
 | 10 | Deep Learning | 6 | 3 | 78 | <a href="slides/chapter_10.pdf">Open</a> |
 | 13 | Multiple Testing | 5 | 3 | 67 | <a href="slides/chapter_13.pdf">Open</a> |
-| **Total** | | **78** | **38** | **1054** | |
+| **Total** | | **80** | **39** | **1076** | |
 
 ## Chapter 0: the precourse refresher
 
@@ -41,10 +41,14 @@ backgrounds. It covers:
 - the `numpy` / `pandas` / `matplotlib` / `statsmodels` / `scikit-learn`
   toolkit of the labs.
 
-It opens with a ten-question self-check so students can decide whether they
+It opens with a twelve-question self-check so students can decide whether they
 need it, and closes with a table mapping every topic to the chapter that uses
-it. Its figures are regenerated from the bundled data by
-`Lecture_Slides/chapter_00/make_figures.py`.
+it. Eighteen figures — the boxplot anatomy, a gallery of shapes, Anscombe's
+quartet, Simpson's paradox, the CLT, confidence-interval coverage, $p$-values
+as areas, power, leverage, and gradient descent on a real loss surface — are
+computed from the course data by
+`Lecture_Slides/chapter_00/make_figures.py`, and every one of them is rebuilt
+in code in the [companion notebook](labs.md).
 
 ## What's in a deck
 
