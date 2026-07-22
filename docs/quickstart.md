@@ -1,8 +1,8 @@
 # Quick start
 
-You don't need to install anything to **read** the slides or the mock exams —
-the compiled PDFs are linked from [Lecture slides](slides.md) and
-[Mock exams](exams.md). To *run* a lab you have two options.
+You don't need to install anything to **read** the slides — the compiled PDFs
+are linked from [Lecture slides](slides.md). To *run* a lab you have two
+options.
 
 ## ▶︎ Google Colab — zero setup (recommended)
 
@@ -36,9 +36,9 @@ with an automatic fallback to the bundled `ALL CSV FILES - 2nd Edition/` folder
 
 ## Rebuilding the LaTeX materials
 
-Both the decks and the exams are compiled from LaTeX sources kept in the
-repository, so anything can be edited and rebuilt. This needs a TeX Live
-distribution with `beamer`, `tcolorbox`, `tikz`, `listings` and `booktabs`.
+The decks are compiled from LaTeX sources kept in the repository, so anything
+can be edited and rebuilt. This needs a TeX Live distribution with `beamer`,
+`tcolorbox`, `tikz`, `listings` and `booktabs`.
 
 ::::{tab-set}
 
@@ -49,18 +49,6 @@ cd Lecture_Slides/chapter_03
 pdflatex chapter_03.tex
 pdflatex chapter_03.tex   # second pass for the navigation bar
 ```
-:::
-
-:::{tab-item} A mock exam
-
-```bash
-cd Mock_Exams/Exam_1_after_Lecture_04
-pdflatex -jobname=Mock_Exam_1 mock_exam_1.tex
-pdflatex -jobname=Mock_Exam_1_Solutions "\def\withsolutions{1}\input{mock_exam_1.tex}"
-```
-
-The questions paper and the solutions come from **one** source file, so they
-can never diverge.
 :::
 
 :::{tab-item} This documentation

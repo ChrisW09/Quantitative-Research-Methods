@@ -41,7 +41,8 @@ complete [lab notebooks](labs.md) for students who want them.
 ## Assessment rhythm
 
 Three mock exams are matched to the calendar so students can self-test at the
-natural checkpoints — see [Mock exams](exams.md).
+natural checkpoints — see [Mock exams](exams.md). They are not distributed with
+this repository.
 
 | Exam | Written after | Covers | Length |
 |---|:--:|---|:--:|

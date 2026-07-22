@@ -44,7 +44,10 @@ its source directory. `docs/conf.py` therefore stages them before each build:
 |---|---|---|
 | `Lab_Notebooks/*.ipynb` | `docs/labs/` | MyST-NB renders them as pages |
 | `Lecture_Slides/chapter_NN/chapter_NN.pdf` | `docs/_extra/slides/` | copied verbatim into the HTML output via `html_extra_path`, so `slides/chapter_NN.pdf` links resolve |
-| `Mock_Exams/**/*.pdf` | `docs/_extra/exams/` | same, for `exams/*.pdf` links |
+
+The mock exams are **not** staged: they are assessment material, kept out of the
+repository and off this site. `docs/exams.md` describes them without linking any
+file.
 
 Both staging directories are **generated and git-ignored** — never edit anything
 in them, and never add a hand-written page under `docs/labs/`: it is wiped and
@@ -77,7 +80,7 @@ The site is live at **<https://chrisw09.github.io/Quantitative-Research-Methods/
 
 Deployment is automatic: [`.github/workflows/docs.yml`](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/.github/workflows/docs.yml)
 builds the site and publishes it to GitHub Pages on every push to `main` that
-touches `docs/`, `Lab_Notebooks/`, or a deck or exam PDF. It can also be run by
+touches `docs/`, `Lab_Notebooks/`, or a deck PDF. It can also be run by
 hand from the repository's **Actions** tab (*Documentation* → *Run workflow*).
 
 Two things worth knowing about that workflow:

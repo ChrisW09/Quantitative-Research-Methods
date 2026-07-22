@@ -86,8 +86,8 @@ Applied Sciences and Arts).
 
 ## 🚀 Quick start
 
-You don't need to install anything to read the slides or the mock exams — the
-compiled PDFs live right in the repo. To *run* a lab you have two options:
+You don't need to install anything to read the slides — the compiled PDFs live
+right in the repo. To *run* a lab you have two options:
 
 ### ▶︎ Google Colab — zero setup *(recommended)*
 
@@ -147,10 +147,10 @@ A 12-lecture semester (12 × 180 min):
 |---|---|
 | [`Lecture_Slides/`](./Lecture_Slides/) | Eleven Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable, including the `chapter_00` precourse refresher. See its [deck guide](./Lecture_Slides/README.md). |
 | [`Lab_Notebooks/`](./Lab_Notebooks/) | Fourteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
-| [`Mock_Exams/`](./Mock_Exams/) | Three exams — each with a questions PDF, a solutions PDF, and a Beamer review deck |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
 | [`docs/`](./docs/) | Sphinx documentation for the whole course — see [Documentation](#-documentation) |
 | [`requirements.txt`](./requirements.txt) | Pinned Python environment for the notebooks |
+| `Mock_Exams/` | Three exams (questions, solutions, review decks) — **excluded from git**: assessment material |
 | `Source_Material/` | Copyrighted textbook PDF & figure banks — **excluded from git** (see [`.gitignore`](./.gitignore)) |
 
 ---
@@ -238,21 +238,19 @@ answers were verified programmatically. Each exam ships in three formats:
 **questions**, **worked solutions**, and a **Beamer deck** for reviewing the
 exam in class.
 
-| Exam | After | Covers | Format | Files |
-|--|:--:|--|:--:|--|
-| Mock Exam 1 | Lecture 4 | Ch 1–3 | 90 min · 90 pts | [Questions](./Mock_Exams/Exam_1_after_Lecture_04/Mock_Exam_1.pdf) · [Solutions](./Mock_Exams/Exam_1_after_Lecture_04/Mock_Exam_1_Solutions.pdf) · [Review deck](./Mock_Exams/Exam_1_after_Lecture_04/Mock_Exam_1_Solutions_Slides.pdf) |
-| Mock Exam 2 | Lecture 8 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts | [Questions](./Mock_Exams/Exam_2_after_Lecture_08/Mock_Exam_2.pdf) · [Solutions](./Mock_Exams/Exam_2_after_Lecture_08/Mock_Exam_2_Solutions.pdf) · [Review deck](./Mock_Exams/Exam_2_after_Lecture_08/Mock_Exam_2_Solutions_Slides.pdf) |
-| Final Mock Exam | Lecture 12 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts | [Questions](./Mock_Exams/Final_Exam_after_Lecture_12/Final_Mock_Exam.pdf) · [Solutions](./Mock_Exams/Final_Exam_after_Lecture_12/Final_Mock_Exam_Solutions.pdf) · [Review deck](./Mock_Exams/Final_Exam_after_Lecture_12/Final_Mock_Exam_Solutions_Slides.pdf) |
+> 🔒 **Not distributed here.** The exams, their solutions and their LaTeX
+> sources are assessment material and are deliberately kept out of this
+> repository (see [`.gitignore`](./.gitignore)). Instructors can request them
+> from the author.
 
-<details>
-<summary><b>Rebuilding an exam</b></summary>
+| Exam | After | Covers | Format |
+|--|:--:|--|:--:|
+| Mock Exam 1 | Lecture 4 | Ch 1–3 | 90 min · 90 pts |
+| Mock Exam 2 | Lecture 8 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
+| Final Mock Exam | Lecture 12 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
 
-```bash
-cd Mock_Exams/Exam_1_after_Lecture_04
-pdflatex -jobname=Mock_Exam_1 mock_exam_1.tex
-pdflatex -jobname=Mock_Exam_1_Solutions "\def\withsolutions{1}\input{mock_exam_1.tex}"
-```
-</details>
+The final exam also exists in three parallel versions (A / B / C) — same
+structure and difficulty, different numbers.
 
 ---
 

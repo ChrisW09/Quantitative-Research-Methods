@@ -53,7 +53,7 @@ Fourteen notebooks, rendered here in full and runnable locally or on Colab.
 :link: exams
 :link-type: doc
 
-Three exams — questions, worked solutions and an in-class review deck each.
+Three exams, each in three formats — documented here, distributed on request.
 :::
 
 :::{grid-item-card} 📊 Datasets
@@ -100,7 +100,7 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 | Lecture decks | 10 chapters + a precourse refresher · ~1076 slides |
 | Exercises | ~80 short (~5 min) + ~39 extended (~15 min), all with solutions |
 | Lab notebooks | 14 (precourse + 10 lecture chapters + 3 self-study) |
-| Mock exams | 3, each in 3 formats (questions · solutions · review deck) |
+| Mock exams | 3, each in 3 formats (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Semester shape | 12 lectures × 180 min (+ optional precourse session) |
 

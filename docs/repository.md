@@ -11,10 +11,7 @@
 │       └── make_figures.py    #   (chapter_00 only) regenerates its figures
 ├── Lab_Notebooks/             # fourteen Jupyter labs, local- and Colab-ready
 │   └── chapter_NN_lab.ipynb
-├── Mock_Exams/                # three exams, each in three formats
-│   ├── Exam_1_after_Lecture_04/
-│   ├── Exam_2_after_Lecture_08/
-│   └── Final_Exam_after_Lecture_12/
+├── Mock_Exams/                # three exams — git-ignored (assessment material)
 ├── ALL CSV FILES - 2nd Edition/   # course datasets (statlearning.com)
 ├── docs/                      # this documentation (Sphinx)
 ├── Source_Material/           # copyrighted book PDFs & figure banks — git-ignored
@@ -27,11 +24,13 @@
 
 | | |
 |---|---|
-| **Committed** | LaTeX sources, compiled deck and exam PDFs, notebooks with outputs, datasets, this documentation |
-| **Git-ignored** | `Source_Material/` (copyrighted textbook PDF and figure banks), LaTeX build artefacts (`*.aux`, `*.log`, `*.nav`, …), `.venv/`, `.ipynb_checkpoints/`, `Lab_Notebooks/data/`, `docs/_build/`, and the documentation's staged copies (`docs/labs/`, `docs/_extra/`) |
+| **Committed** | Deck LaTeX sources and compiled PDFs, notebooks with outputs, datasets, this documentation |
+| **Git-ignored** | `Mock_Exams/` (assessment material — exams, solutions and their sources), `Source_Material/` (copyrighted textbook PDF and figure banks), LaTeX build artefacts (`*.aux`, `*.log`, `*.nav`, …), `.venv/`, `.ipynb_checkpoints/`, `Lab_Notebooks/data/`, `docs/_build/`, and the documentation's staged copies (`docs/labs/`, `docs/_extra/`) |
 
-Compiled PDFs *are* committed on purpose: a colleague should be able to clone
-the repository and teach from it without a TeX installation.
+Compiled deck PDFs *are* committed on purpose: a colleague should be able to
+clone the repository and teach from it without a TeX installation. The exams
+are the exception — publishing worked solutions to a public repository would
+make them useless as assessment.
 
 ## Naming conventions
 

@@ -1,14 +1,18 @@
 """Sphinx configuration for the Quantitative Research Methods course docs.
 
 The course materials live outside ``docs/`` (notebooks in ``Lab_Notebooks/``,
-compiled decks in ``Lecture_Slides/``, exams in ``Mock_Exams/``).  Sphinx can
+compiled decks in ``Lecture_Slides/``).  Sphinx can
 only read sources from inside the source directory, so before the build starts
 we stage what the site needs:
 
 * ``Lab_Notebooks/*.ipynb``   -> ``docs/labs/``     (rendered by myst-nb)
-* deck and exam PDFs         -> ``docs/_extra/``   (copied verbatim into the
+* lecture-deck PDFs          -> ``docs/_extra/``   (copied verbatim into the
                                                     HTML output via
                                                     ``html_extra_path``)
+
+The mock exams are deliberately **not** staged: they are assessment material,
+kept out of the public repository (see ``.gitignore``) and therefore off the
+published site.
 
 Both staging directories are generated and git-ignored; nothing is edited in
 place and no source file is ever written back to.
@@ -31,33 +35,6 @@ EXTRA = HERE / "_extra"
 
 # Chapters that have a compiled lecture deck ("00" is the precourse refresher).
 SLIDE_CHAPTERS = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "10", "13"]
-
-# Exam PDFs: (folder under Mock_Exams/, list of PDF stems).
-EXAM_FILES = [
-    (
-        "Exam_1_after_Lecture_04",
-        ["Mock_Exam_1", "Mock_Exam_1_Solutions", "Mock_Exam_1_Solutions_Slides"],
-    ),
-    (
-        "Exam_2_after_Lecture_08",
-        ["Mock_Exam_2", "Mock_Exam_2_Solutions", "Mock_Exam_2_Solutions_Slides"],
-    ),
-    (
-        "Final_Exam_after_Lecture_12",
-        [
-            "Final_Mock_Exam",
-            "Final_Mock_Exam_Solutions",
-            "Final_Mock_Exam_Solutions_Slides",
-            "Final_Mock_Exam_A",
-            "Final_Mock_Exam_A_Solutions",
-            "Final_Mock_Exam_B",
-            "Final_Mock_Exam_B_Solutions",
-            "Final_Mock_Exam_C",
-            "Final_Mock_Exam_C_Solutions",
-        ],
-    ),
-]
-
 
 def _copy(src: Path, dst: Path) -> bool:
     """Copy ``src`` to ``dst`` (creating parents). Returns False if missing."""
@@ -86,14 +63,6 @@ def stage_materials(app=None, config=None) -> None:
         name = f"chapter_{ch}.pdf"
         if not _copy(ROOT / "Lecture_Slides" / f"chapter_{ch}" / name, EXTRA / "slides" / name):
             missing.append(f"Lecture_Slides/chapter_{ch}/{name}")
-
-    # Exams -> docs/_extra/exams/
-    for folder, stems in EXAM_FILES:
-        for stem in stems:
-            if not _copy(
-                ROOT / "Mock_Exams" / folder / f"{stem}.pdf", EXTRA / "exams" / f"{stem}.pdf"
-            ):
-                missing.append(f"Mock_Exams/{folder}/{stem}.pdf")
 
     EXTRA.mkdir(parents=True, exist_ok=True)  # keep html_extra_path valid
 
