@@ -51,6 +51,7 @@ Applied Sciences and Arts).
 - [Python environment](#-python-environment)
 - [Datasets](#-datasets)
 - [Open any notebook in Colab](#-open-any-notebook-in-colab)
+- [Documentation](#-documentation)
 - [About](#-about)
 - [Citation & licence](#-citation--licence)
 
@@ -143,6 +144,7 @@ A 12-lecture semester (12 × 180 min):
 | [`Lab_Notebooks/`](./Lab_Notebooks/) | Thirteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
 | [`Mock_Exams/`](./Mock_Exams/) | Three exams — each with a questions PDF, a solutions PDF, and a Beamer review deck |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
+| [`docs/`](./docs/) | Sphinx documentation for the whole course — see [Documentation](#-documentation) |
 | [`requirements.txt`](./requirements.txt) | Pinned Python environment for the notebooks |
 | `Source_Material/` | Copyrighted textbook PDF & figure banks — **excluded from git** (see [`.gitignore`](./.gitignore)) |
 
@@ -293,6 +295,25 @@ repo is private, these open for accounts with access.
 | 9 · Support Vector Machines | `chapter_09_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_09_lab.ipynb) |
 | 11 · Survival Analysis | `chapter_11_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_11_lab.ipynb) |
 | 12 · Unsupervised Learning | `chapter_12_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_12_lab.ipynb) |
+
+---
+
+## 📖 Documentation
+
+Everything above — the lecture plan, the decks, all thirteen labs rendered in
+full, the exams and the datasets — is also published as a browsable Sphinx site
+in [`docs/`](./docs/):
+
+```bash
+pip install -r docs/requirements.txt
+sphinx-build -b html docs docs/_build/html
+open docs/_build/html/index.html          # Linux: xdg-open
+```
+
+The build stages the notebooks and the deck/exam PDFs into the site
+automatically, so the generated `docs/_build/html/` folder is self-contained and
+can be served from GitHub Pages or any static host. Details in
+`docs/building-docs.md`.
 
 ---
 
