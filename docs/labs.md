@@ -1,7 +1,7 @@
 # Lab notebooks
 
-Fourteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
-Python lab — including the precourse refresher and chapters 9, 11 and 12, which
+Fifteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
+Python lab — including both precourse sessions and chapters 9, 11 and 12, which
 are included for self-study.
 Each notebook runs **locally or on Google Colab**; data loads via the `ISLP`
 package with an automatic fallback to the bundled CSVs, so nothing needs
@@ -14,7 +14,8 @@ documentation build never executes them).
 
 | Ch. | Lab | Read here | Open in Colab |
 |:--:|---|:--:|:--:|
-| 0 · Precourse Refresher | `chapter_00_lab.ipynb` | [Rendered](labs/chapter_00_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00_lab.ipynb) |
+| 0 · Precourse (a) — Statistics | `chapter_00_lab.ipynb` | [Rendered](labs/chapter_00_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00_lab.ipynb) |
+| 0b · Precourse (b) — Toolkit | `chapter_00b_lab.ipynb` | [Rendered](labs/chapter_00b_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00b_lab.ipynb) |
 | 1 · Introduction | `chapter_01_lab.ipynb` | [Rendered](labs/chapter_01_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_01_lab.ipynb) |
 | 2 · Statistical Learning | `chapter_02_lab.ipynb` | [Rendered](labs/chapter_02_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_02_lab.ipynb) |
 | 3 · Linear Regression | `chapter_03_lab.ipynb` | [Rendered](labs/chapter_03_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_03_lab.ipynb) |

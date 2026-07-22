@@ -2,7 +2,7 @@
 
 <p align="center">
   A complete, ready-to-teach university course in statistical learning —<br>
-  eleven polished slide decks, fourteen Jupyter labs, three mock exams, and the course datasets.
+  twelve polished slide decks, fifteen Jupyter labs, three mock exams, and the course datasets.
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>11 Beamer decks · 14 Jupyter labs · 3 mock exams · ~119 exercises with worked solutions · runs locally &amp; on Colab</b>
+  <b>12 Beamer decks · 15 Jupyter labs · 3 mock exams · ~127 exercises with worked solutions · runs locally &amp; on Colab</b>
 </p>
 
 <p align="center">
@@ -65,15 +65,15 @@ Applied Sciences and Arts).
 ## ⚡ Why these materials
 
 - **A whole course, not a pile of files.** Eleven Beamer decks — ten chapters
-  plus an optional precourse refresher — fourteen labs and three mock exams that
+  plus a two-part optional precourse — fifteen labs and three mock exams that
   share one notation, one dataset set, and one 12-week rhythm.
 - **Slides built for the room.** Every deck moves motivation → intuition →
   formal definition → worked example, with colour-coded callout boxes and
-  **~80 short + ~39 extended exercises**, each followed by a full solution.
+  **~86 short + ~41 extended exercises**, each followed by a full solution.
 - **Numbers you can trust.** ~40 purpose-built visuals are computed from the
   real course datasets (not sketched), and every mock-exam answer was verified
   programmatically.
-- **Labs that run anywhere.** Fourteen Jupyter notebooks run locally *and* on
+- **Labs that run anywhere.** Fifteen Jupyter notebooks run locally *and* on
   Google Colab — data loads from the `ISLP` package with an automatic fallback
   to the bundled CSVs, so a fresh Colab runtime just works.
 - **Exam-ready.** Three practice exams matched to the course calendar, each in
@@ -99,7 +99,7 @@ datasets load straight from the `ISLP` package**, and the one that isn't in
 ISLP (`Advertising`) streams from the book's official site.
 
 Jump to [**Open any notebook in Colab**](#-open-any-notebook-in-colab) for a
-one-click link to all fourteen labs.
+one-click link to all fifteen labs.
 
 > 💡 The Colab links open straight from GitHub — no account on this repository
 > is needed, only a Google account to run the notebook.
@@ -124,7 +124,8 @@ A 12-lecture semester (12 × 180 min):
 
 | Lecture | Chapter | Topic |
 |:--:|:--:|--|
-| 0 *(optional)* | — | **Precourse refresher**: descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python |
+| 0 *(optional)* | — | **Precourse (a)**: descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python |
+| 0b *(optional)* | — | **Precourse (b)**: reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost, the Python patterns of the labs |
 | 1 | 1 + 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference |
 | 2 | 2 (part 2) | Model accuracy; bias–variance trade-off; Bayes classifier; KNN |
 | 3–4 | 3 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
@@ -146,7 +147,7 @@ A 12-lecture semester (12 × 180 min):
 | Path | Contents |
 |---|---|
 | [`Lecture_Slides/`](./Lecture_Slides/) | Eleven Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable, including the `chapter_00` precourse refresher. See its [deck guide](./Lecture_Slides/README.md). |
-| [`Lab_Notebooks/`](./Lab_Notebooks/) | Fourteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
+| [`Lab_Notebooks/`](./Lab_Notebooks/) | Fifteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
 | [`docs/`](./docs/) | Sphinx documentation for the whole course — see [Documentation](#-documentation) |
 | [`requirements.txt`](./requirements.txt) | Pinned Python environment for the notebooks |
@@ -164,8 +165,8 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 - **Teaching flow** — motivation → intuition → formal definition → worked
   example, with colour-coded callout boxes (green takeaway, blue how-to-read,
   orange worked example, red pitfall).
-- **~80 short exercises** (~5 min) in purple boxes, each with a full
-  step-by-step solution (teal), plus **~39 extended, multi-part exercises**
+- **~86 short exercises** (~5 min) in purple boxes, each with a full
+  step-by-step solution (teal), plus **~41 extended, multi-part exercises**
   (~15 min) in violet boxes with detailed multi-slide solutions.
 - **~40 purpose-built visuals** — ≈22 matplotlib plots computed from the real
   course datasets plus ≈18 native TikZ concept diagrams.
@@ -176,7 +177,8 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 
 | Ch. | Deck | Open |
 |:--:|--|:--:|
-| 0 | Precourse Refresher *(optional)* | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
+| 0 | Precourse (a) — Statistics Refresher *(optional)* | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(optional)* | [PDF](./Lecture_Slides/chapter_00b/chapter_00b.pdf) |
 | 1 | Introduction | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
 | 2 | Statistical Learning | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
 | 3 | Linear Regression | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
@@ -200,6 +202,15 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 > [`make_figures.py`](./Lecture_Slides/chapter_00/make_figures.py), and the
 > whole session has a companion notebook,
 > [`chapter_00_lab.ipynb`](./Lab_Notebooks/chapter_00_lab.ipynb).
+>
+> **Part (b), the toolkit (Chapter 0b).** A second optional session covering
+> what the later chapters use but never explain — chosen by counting actual
+> usage across the ten lecture decks: reading notation (Σ, Π, argmin,
+> indicators, sets — 180 uses), logs and exponentials (176), odds and the logit
+> (108), likelihood and maximum likelihood (37), counting and the 2ᵖ cost (13),
+> and the Python patterns every lab relies on (functions, loops, seeds,
+> `fit`/`predict`, train/test discipline). Also with a companion notebook,
+> [`chapter_00b_lab.ipynb`](./Lab_Notebooks/chapter_00b_lab.ipynb).
 
 <details>
 <summary><b>Rebuilding a deck</b></summary>
@@ -218,14 +229,14 @@ pdflatex chapter_NN.tex   # second pass for the navigation bar
 
 ## 📓 Lab notebooks
 
-Fourteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
-Python Lab — including the precourse refresher and chapters 9, 11 and 12, which
+Fifteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
+Python Lab — including both precourse sessions and chapters 9, 11 and 12, which
 are included for self-study.
 Each notebook runs **locally or on Google Colab**; data loads via the `ISLP`
 package with an automatic fallback to the bundled CSVs, so nothing needs
 downloading by hand.
 
-One-click Colab links for all fourteen are in
+One-click Colab links for all fifteen are in
 [**Open any notebook in Colab**](#-open-any-notebook-in-colab) below.
 
 ---
@@ -294,7 +305,8 @@ Nothing needs installing; a Google account is enough to run them.
 
 | Ch. | Lab | Open |
 |:--:|--|:--:|
-| 0 · Precourse Refresher | `chapter_00_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00_lab.ipynb) |
+| 0 · Precourse (a) — Statistics | `chapter_00_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00_lab.ipynb) |
+| 0b · Precourse (b) — Toolkit | `chapter_00b_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00b_lab.ipynb) |
 | 1 · Introduction | `chapter_01_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_01_lab.ipynb) |
 | 2 · Statistical Learning | `chapter_02_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_02_lab.ipynb) |
 | 3 · Linear Regression | `chapter_03_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_03_lab.ipynb) |
@@ -320,7 +332,7 @@ Nothing needs installing; a Google account is enough to run them.
 
 **📖 <https://chrisw09.github.io/Quantitative-Research-Methods/>**
 
-Everything above — the lecture plan, the decks, all fourteen labs rendered in
+Everything above — the lecture plan, the decks, all fifteen labs rendered in
 full, the exams and the datasets — is published as a browsable site, rebuilt
 automatically by [GitHub Actions](./.github/workflows/docs.yml) on every push to
 `main` that touches the materials.

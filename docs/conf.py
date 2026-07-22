@@ -33,8 +33,8 @@ LABS_DST = HERE / "labs"
 
 EXTRA = HERE / "_extra"
 
-# Chapters that have a compiled lecture deck ("00" is the precourse refresher).
-SLIDE_CHAPTERS = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "10", "13"]
+# Chapters with a compiled deck ("00"/"00b" are the two precourse sessions).
+SLIDE_CHAPTERS = ["00", "00b", "01", "02", "03", "04", "05", "06", "07", "08", "10", "13"]
 
 def _copy(src: Path, dst: Path) -> bool:
     """Copy ``src`` to ``dst`` (creating parents). Returns False if missing."""

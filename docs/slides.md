@@ -1,6 +1,6 @@
 # Lecture slides
 
-Eleven Beamer decks live in `Lecture_Slides/chapter_NN/`, each folder
+Twelve Beamer decks live in `Lecture_Slides/chapter_NN/`, each folder
 self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 `chapter_NN.pdf`. The PDFs below are served with this documentation.
 
@@ -8,7 +8,8 @@ self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 
 | Ch. | Deck | Short ex. | Extended ex. | Pages | PDF |
 |:--:|---|:--:|:--:|:--:|:--:|
-| 0 | Precourse Refresher *(optional)* | 10 | 4 | 121 | <a href="slides/chapter_00.pdf">Open</a> |
+| 0 | Precourse (a) — Statistics Refresher *(optional)* | 10 | 4 | 121 | <a href="slides/chapter_00.pdf">Open</a> |
+| 0b | Precourse (b) — Toolkit *(optional)* | 6 | 2 | 57 | <a href="slides/chapter_00b.pdf">Open</a> |
 | 1 | Introduction | 3 | 1 | 73 | <a href="slides/chapter_01.pdf">Open</a> |
 | 2 | Statistical Learning | 8 | 4 | 112 | <a href="slides/chapter_02.pdf">Open</a> |
 | 3 | Linear Regression | 12 | 6 | 152 | <a href="slides/chapter_03.pdf">Open</a> |
@@ -19,7 +20,7 @@ self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 | 8 | Tree-Based Methods | 7 | 3 | 87 | <a href="slides/chapter_08.pdf">Open</a> |
 | 10 | Deep Learning | 6 | 3 | 78 | <a href="slides/chapter_10.pdf">Open</a> |
 | 13 | Multiple Testing | 5 | 3 | 67 | <a href="slides/chapter_13.pdf">Open</a> |
-| **Total** | | **80** | **39** | **1076** | |
+| **Total** | | **86** | **41** | **1133** | |
 
 ## Chapter 0: the precourse refresher
 
@@ -49,6 +50,26 @@ as areas, power, leverage, and gradient descent on a real loss surface — are
 computed from the course data by
 `Lecture_Slides/chapter_00/make_figures.py`, and every one of them is rebuilt
 in code in the [companion notebook](labs.md).
+
+## Chapter 0b: the precourse toolkit
+
+A second optional session, covering what the ten lecture decks *use* but never
+*explain*. Its scope was not guessed — it comes from counting usage across the
+decks:
+
+| Topic | Where it bites | Uses |
+|---|---|--:|
+| `log` and `exp` | Ch. 4 (113), Ch. 10 (31), Ch. 6 (16) | 176 |
+| odds and the logit | Ch. 4 (92), Ch. 10 (12) | 108 |
+| likelihood and $\prod$ | Ch. 4 (35), Ch. 2–3 | 37 |
+| $\sum$, $\arg\max$, indicators, sets | every chapter from Ch. 2 | 180 |
+| counting and the $2^p$ cost | Ch. 6 (subset selection) | 13 |
+
+It adds a sixth strand the labs depend on and the decks never teach: the Python
+patterns themselves — writing a function, looping over candidate settings,
+seeding randomness, the `fit`/`predict` contract, and the discipline of scoring
+on data the model has not seen. Eight figures, six short and two extended
+exercises, and a companion notebook.
 
 ## What's in a deck
 

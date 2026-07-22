@@ -1,6 +1,6 @@
 # Lecture Slides — Quantitative Research Methods
 
-Eleven Beamer decks for the **Quantitative Research Methods** course, based on
+Twelve Beamer decks for the **Quantitative Research Methods** course, based on
 *An Introduction to Statistical Learning, with Applications in Python* (James,
 Witten, Hastie, Tibshirani & Taylor, 2023), prepared for HSBI by Prof. Dr.
 Christoph Weisser.
@@ -20,15 +20,23 @@ eighteen figures are regenerated from the bundled data by
 companion notebook, `Lab_Notebooks/chapter_00_lab.ipynb`, which rebuilds every
 one of them in code.
 
+`chapter_00b/` is the **second precourse session**, covering what the later
+chapters use but never explain. Its scope was chosen by counting usage across
+the ten lecture decks: reading notation (Σ, Π, argmin, indicators, sets — 180
+uses), logs and exponentials (176), odds and the logit (108), likelihood and
+maximum likelihood (37), counting and the 2ᵖ cost (13), plus the Python
+patterns every lab relies on. Companion notebook:
+`Lab_Notebooks/chapter_00b_lab.ipynb`.
+
 ## Teaching design
 
 Every deck follows the same flow — motivation → intuition → formal definition →
 worked example — in the HSBI house style, with:
 
-- **80 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
+- **86 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
   slide immediately followed by a teal worked-solution slide; long solutions run
   across a clean `(1/2)` / `(2/2)` pair.
-- **39 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
+- **41 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
   "Extended exercise" box — integrative, multi-part problems with detailed
   multi-slide solutions.
 - Every exercise is tagged **[Concept]/[Math]/[Python]** (short) or
@@ -50,7 +58,8 @@ worked example — in the HSBI house style, with:
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse refresher *(optional)* | 10 | 4 | 121 |
+| 0  | Precourse (a) — statistics refresher *(optional)* | 10 | 4 | 121 |
+| 0b | Precourse (b) — toolkit *(optional)* | 6 | 2 | 57 |
 | 1  | Introduction | 3 | 1 | 73 |
 | 2  | Statistical Learning | 8 | 4 | 112 |
 | 3  | Linear Regression | 12 | 6 | 152 |
@@ -61,7 +70,7 @@ worked example — in the HSBI house style, with:
 | 8  | Tree-Based Methods | 7 | 3 | 87 |
 | 10 | Deep Learning | 6 | 3 | 78 |
 | 13 | Multiple Testing | 5 | 3 | 67 |
-| **Total** | | **80** | **39** | **1076** |
+| **Total** | | **86** | **41** | **1133** |
 
 ## Suggested 12-lecture plan (180 min each)
 
@@ -71,7 +80,8 @@ section boundary so you can stop and resume cleanly.
 
 | Lecture | Chapter(s) | Content | Exercises |
 |---|---|---|---|
-| 0 *(optional)*  | Ch 0 | Precourse refresher: descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python | 0.1–0.8 |
+| 0 *(optional)*  | Ch 0 | Precourse (a): descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python | 0.1–0.10 |
+| 0b *(optional)* | Ch 0b | Precourse (b): notation, logs and odds, likelihood, counting, the Python of the labs | 0b.1–0b.6 |
 | 1  | Ch 1 + Ch 2 (part 1) | Introduction; what is statistical learning; prediction vs inference; parametric vs non-parametric | 1.1–1.3, 2.1–2.2 |
 | 2  | Ch 2 (part 2) | Assessing accuracy; bias–variance trade-off; classification & KNN; lab | 2.3–2.8 |
 | 3  | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, t, F) | 3.1–3.6 |

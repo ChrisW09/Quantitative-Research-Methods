@@ -13,7 +13,7 @@ preinstalled on Colab), and resolves the data automatically — **12 of the 13
 datasets load straight from the `ISLP` package**, and the one that isn't in
 ISLP (`Advertising`) streams from the book's official site.
 
-One-click links for all fourteen labs are on the [Lab notebooks](labs.md)
+One-click links for all fifteen labs are on the [Lab notebooks](labs.md)
 page.
 
 ```{tip}

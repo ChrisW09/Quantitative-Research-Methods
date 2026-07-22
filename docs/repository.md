@@ -2,14 +2,14 @@
 
 ```text
 .
-├── Lecture_Slides/            # eleven Beamer decks — the core deliverable
+├── Lecture_Slides/            # twelve Beamer decks — the core deliverable
 │   ├── README.md              #   deck guide: design, exercise counts, 12-lecture plan
 │   └── chapter_NN/
 │       ├── chapter_NN.tex     #   source
 │       ├── chapter_NN.pdf     #   compiled deck (committed)
 │       ├── images/            #   matplotlib figures used by the deck
-│       └── make_figures.py    #   (chapter_00 only) regenerates its figures
-├── Lab_Notebooks/             # fourteen Jupyter labs, local- and Colab-ready
+│       └── make_figures.py    #   (chapter_00, chapter_00b) regenerates figures
+├── Lab_Notebooks/             # fifteen Jupyter labs, local- and Colab-ready
 │   └── chapter_NN_lab.ipynb
 ├── Mock_Exams/                # three exams — git-ignored (assessment material)
 ├── ALL CSV FILES - 2nd Edition/   # course datasets (statlearning.com)

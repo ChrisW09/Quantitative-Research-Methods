@@ -1,13 +1,15 @@
 # The course at a glance
 
 A 12-lecture semester (12 × 180 min) covering ten ISLP chapters, optionally
-preceded by a precourse refresher of the undergraduate prerequisites.
+preceded by a two-part precourse: (a) a refresher of the undergraduate
+statistics, and (b) the notation, algebra and Python the chapters assume.
 
 ## Semester plan
 
 | Lecture | Chapter(s) | Content | Exercises |
 |:--:|:--:|---|---|
-| 0 *(optional)* | Ch 0 | **Precourse refresher**: descriptive statistics; probability and Bayes; distributions; standard errors and confidence intervals; hypothesis testing and power; simple linear regression; matrix algebra; gradients; the Python toolkit (with its own [lab notebook](labs.md)) | 0.1–0.10 |
+| 0 *(optional)* | Ch 0 | **Precourse (a)**: descriptive statistics; probability and Bayes; distributions; standard errors and confidence intervals; hypothesis testing and power; simple linear regression; matrix algebra; gradients; the Python toolkit (with its own [lab notebook](labs.md)) | 0.1–0.10 |
+| 0b *(optional)* | Ch 0b | **Precourse (b)**: reading mathematical notation; logs and exponentials; odds, the logit and the sigmoid; likelihood and maximum likelihood; counting and computational cost; the Python patterns the labs use (with its own [lab notebook](labs.md)) | 0b.1–0b.6 |
 | 1 | Ch 1 + Ch 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference; parametric vs. non-parametric | 1.1–1.3, 2.1–2.2 |
 | 2 | Ch 2 (part 2) | Assessing accuracy; bias–variance trade-off; classification & KNN; lab | 2.3–2.8 |
 | 3 | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, *t*, *F*) | 3.1–3.6 |

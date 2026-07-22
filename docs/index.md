@@ -1,7 +1,7 @@
 # Quantitative Research Methods
 
 A complete, ready-to-teach university course in statistical learning —
-**eleven polished Beamer decks, fourteen Jupyter labs, three mock exams** and
+**twelve polished Beamer decks, fifteen Jupyter labs, three mock exams** and
 the course datasets.
 
 ```{admonition} Based on ISLP
@@ -39,14 +39,14 @@ The 12-lecture plan, chapter map and suggested stopping points.
 :link: slides
 :link-type: doc
 
-Eleven decks, ~1076 pages, 80 short + 39 extended exercises with solutions.
+Twelve decks, ~1133 pages, 86 short + 41 extended exercises with solutions.
 :::
 
 :::{grid-item-card} 📓 Lab notebooks
 :link: labs
 :link-type: doc
 
-Fourteen notebooks, rendered here in full and runnable locally or on Colab.
+Fifteen notebooks, rendered here in full and runnable locally or on Colab.
 :::
 
 :::{grid-item-card} 📝 Mock exams
@@ -70,7 +70,7 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 ## What makes these materials different
 
 **A whole course, not a pile of files.**
-: Eleven decks, fourteen labs and three exams that share one notation, one
+: Twelve decks, fifteen labs and three exams that share one notation, one
   dataset set and one 12-week rhythm — ready to teach as-is or adapt.
 
 **Slides built for the room.**
@@ -83,7 +83,7 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
   sketched), and every mock-exam answer was verified programmatically.
 
 **Labs that run anywhere.**
-: Fourteen notebooks run locally *and* on Google Colab; data loads from the
+: Fifteen notebooks run locally *and* on Google Colab; data loads from the
   `ISLP` package with an automatic fallback to the bundled CSVs, so a fresh
   Colab runtime just works.
 
@@ -97,9 +97,9 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 
 | | |
 |---|---|
-| Lecture decks | 10 chapters + a precourse refresher · ~1076 slides |
-| Exercises | ~80 short (~5 min) + ~39 extended (~15 min), all with solutions |
-| Lab notebooks | 14 (precourse + 10 lecture chapters + 3 self-study) |
+| Lecture decks | 10 chapters + two precourse sessions · ~1133 slides |
+| Exercises | ~86 short (~5 min) + ~41 extended (~15 min), all with solutions |
+| Lab notebooks | 15 (2 precourse + 10 lecture chapters + 3 self-study) |
 | Mock exams | 3, each in 3 formats (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Semester shape | 12 lectures × 180 min (+ optional precourse session) |
