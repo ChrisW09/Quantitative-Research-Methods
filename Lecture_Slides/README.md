@@ -1,6 +1,6 @@
 # Lecture Slides — Quantitative Research Methods
 
-Ten Beamer decks for the **Quantitative Research Methods** course, based on
+Eleven Beamer decks for the **Quantitative Research Methods** course, based on
 *An Introduction to Statistical Learning, with Applications in Python* (James,
 Witten, Hastie, Tibshirani & Taylor, 2023), prepared for HSBI by Prof. Dr.
 Christoph Weisser.
@@ -8,15 +8,25 @@ Christoph Weisser.
 Each chapter folder (`chapter_NN/`) is self-contained: `chapter_NN.tex`, its
 `images/`, and the compiled `chapter_NN.pdf`.
 
+`chapter_00/` is an **optional precourse refresher** of the undergraduate
+material the course assumes. It is not an ISLP chapter: it revisits descriptive
+statistics, probability and Bayes, the standard distributions, sampling and
+confidence intervals, hypothesis testing, simple linear regression, matrix
+algebra, derivatives and gradient descent, and the `numpy`/`pandas` toolkit —
+each section ending with where that topic reappears in the course. It opens
+with a ten-question self-check so students can judge whether they need it. Its
+figures are regenerated from the bundled data by
+[`chapter_00/make_figures.py`](./chapter_00/make_figures.py).
+
 ## Teaching design
 
 Every deck follows the same flow — motivation → intuition → formal definition →
 worked example — in the HSBI house style, with:
 
-- **70 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
+- **78 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
   slide immediately followed by a teal worked-solution slide; long solutions run
   across a clean `(1/2)` / `(2/2)` pair.
-- **35 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
+- **38 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
   "Extended exercise" box — integrative, multi-part problems with detailed
   multi-slide solutions.
 - Every exercise is tagged **[Concept]/[Math]/[Python]** (short) or
@@ -38,6 +48,7 @@ worked example — in the HSBI house style, with:
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages |
 |---|---|:--:|:--:|:--:|
+| 0  | Precourse refresher *(optional)* | 8 | 3 | 99 |
 | 1  | Introduction | 3 | 1 | 73 |
 | 2  | Statistical Learning | 8 | 4 | 112 |
 | 3  | Linear Regression | 12 | 6 | 152 |
@@ -48,16 +59,17 @@ worked example — in the HSBI house style, with:
 | 8  | Tree-Based Methods | 7 | 3 | 87 |
 | 10 | Deep Learning | 6 | 3 | 78 |
 | 13 | Multiple Testing | 5 | 3 | 67 |
-| **Total** | | **70** | **35** | **955** |
+| **Total** | | **78** | **38** | **1054** |
 
 ## Suggested 12-lecture plan (180 min each)
 
-Ten chapters mapped onto twelve 180-minute sessions. The three heaviest
+Ten chapters mapped onto twelve 180-minute sessions, optionally preceded by the precourse refresher. The three heaviest
 chapters (2, 3, 4) each span two lectures; the split point is a natural
 section boundary so you can stop and resume cleanly.
 
 | Lecture | Chapter(s) | Content | Exercises |
 |---|---|---|---|
+| 0 *(optional)*  | Ch 0 | Precourse refresher: descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python | 0.1–0.8 |
 | 1  | Ch 1 + Ch 2 (part 1) | Introduction; what is statistical learning; prediction vs inference; parametric vs non-parametric | 1.1–1.3, 2.1–2.2 |
 | 2  | Ch 2 (part 2) | Assessing accuracy; bias–variance trade-off; classification & KNN; lab | 2.3–2.8 |
 | 3  | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, t, F) | 3.1–3.6 |

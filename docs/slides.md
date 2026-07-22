@@ -1,6 +1,6 @@
 # Lecture slides
 
-Ten Beamer decks live in `Lecture_Slides/chapter_NN/`, each folder
+Eleven Beamer decks live in `Lecture_Slides/chapter_NN/`, each folder
 self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 `chapter_NN.pdf`. The PDFs below are served with this documentation.
 
@@ -8,6 +8,7 @@ self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 
 | Ch. | Deck | Short ex. | Extended ex. | Pages | PDF |
 |:--:|---|:--:|:--:|:--:|:--:|
+| 0 | Precourse Refresher *(optional)* | 8 | 3 | 99 | <a href="slides/chapter_00.pdf">Open</a> |
 | 1 | Introduction | 3 | 1 | 73 | <a href="slides/chapter_01.pdf">Open</a> |
 | 2 | Statistical Learning | 8 | 4 | 112 | <a href="slides/chapter_02.pdf">Open</a> |
 | 3 | Linear Regression | 12 | 6 | 152 | <a href="slides/chapter_03.pdf">Open</a> |
@@ -18,7 +19,32 @@ self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 | 8 | Tree-Based Methods | 7 | 3 | 87 | <a href="slides/chapter_08.pdf">Open</a> |
 | 10 | Deep Learning | 6 | 3 | 78 | <a href="slides/chapter_10.pdf">Open</a> |
 | 13 | Multiple Testing | 5 | 3 | 67 | <a href="slides/chapter_13.pdf">Open</a> |
-| **Total** | | **70** | **35** | **955** | |
+| **Total** | | **78** | **38** | **1054** | |
+
+## Chapter 0: the precourse refresher
+
+An optional session, added for students who need the undergraduate material
+back before Lecture 1 — and for anyone teaching a cohort with mixed
+backgrounds. It covers:
+
+- data and variable types; centre, spread and shape; boxplots and $z$-scores;
+- covariance, correlation and what correlation cannot see; confounding;
+- probability rules, conditional probability and Bayes' theorem (with the
+  base-rate trap that motivates Chapter 4's ROC curves);
+- the Bernoulli, binomial, Poisson, normal, $t$, $\chi^2$ and $F$
+  distributions, and the central limit theorem;
+- standard errors, confidence intervals, hypothesis tests and the standard
+  misreadings of both;
+- simple linear regression end to end: least squares, residuals, $R^2$;
+- the linear algebra (matrix products, inverses, norms, eigenvectors) and
+  calculus (gradients, convexity, gradient descent) later chapters rely on;
+- the `numpy` / `pandas` / `matplotlib` / `statsmodels` / `scikit-learn`
+  toolkit of the labs.
+
+It opens with a ten-question self-check so students can decide whether they
+need it, and closes with a table mapping every topic to the chapter that uses
+it. Its figures are regenerated from the bundled data by
+`Lecture_Slides/chapter_00/make_figures.py`.
 
 ## What's in a deck
 

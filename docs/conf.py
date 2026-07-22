@@ -29,8 +29,8 @@ LABS_DST = HERE / "labs"
 
 EXTRA = HERE / "_extra"
 
-# Chapters that have a compiled lecture deck.
-SLIDE_CHAPTERS = ["01", "02", "03", "04", "05", "06", "07", "08", "10", "13"]
+# Chapters that have a compiled lecture deck ("00" is the precourse refresher).
+SLIDE_CHAPTERS = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "10", "13"]
 
 # Exam PDFs: (folder under Mock_Exams/, list of PDF stems).
 EXAM_FILES = [

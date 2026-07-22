@@ -1,8 +1,8 @@
 # Quantitative Research Methods
 
-A complete, ready-to-teach university course in statistical learning — **ten
-polished Beamer decks, thirteen Jupyter labs, three mock exams** and the course
-datasets.
+A complete, ready-to-teach university course in statistical learning —
+**eleven polished Beamer decks, thirteen Jupyter labs, three mock exams** and
+the course datasets.
 
 ```{admonition} Based on ISLP
 :class: note
@@ -39,7 +39,7 @@ The 12-lecture plan, chapter map and suggested stopping points.
 :link: slides
 :link-type: doc
 
-Ten decks, ~955 pages, 70 short + 35 extended exercises with solutions.
+Eleven decks, ~1054 pages, 78 short + 38 extended exercises with solutions.
 :::
 
 :::{grid-item-card} 📓 Lab notebooks
@@ -70,8 +70,8 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 ## What makes these materials different
 
 **A whole course, not a pile of files.**
-: Ten decks, thirteen labs and three exams that share one notation, one dataset
-  set and one 12-week rhythm — ready to teach as-is or adapt.
+: Eleven decks, thirteen labs and three exams that share one notation, one
+  dataset set and one 12-week rhythm — ready to teach as-is or adapt.
 
 **Slides built for the room.**
 : Every deck moves motivation → intuition → formal definition → worked example,
@@ -97,12 +97,12 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 
 | | |
 |---|---|
-| Lecture decks | 10 chapters · ~955 slides |
-| Exercises | ~70 short (~5 min) + ~35 extended (~15 min), all with solutions |
+| Lecture decks | 10 chapters + a precourse refresher · ~1054 slides |
+| Exercises | ~78 short (~5 min) + ~38 extended (~15 min), all with solutions |
 | Lab notebooks | 13 (10 lecture chapters + 3 self-study) |
 | Mock exams | 3, each in 3 formats (questions · solutions · review deck) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
-| Semester shape | 12 lectures × 180 min |
+| Semester shape | 12 lectures × 180 min (+ optional precourse session) |
 
 ```{toctree}
 :hidden:

@@ -1,11 +1,13 @@
 # The course at a glance
 
-A 12-lecture semester (12 × 180 min) covering ten ISLP chapters.
+A 12-lecture semester (12 × 180 min) covering ten ISLP chapters, optionally
+preceded by a precourse refresher of the undergraduate prerequisites.
 
 ## Semester plan
 
 | Lecture | Chapter(s) | Content | Exercises |
 |:--:|:--:|---|---|
+| 0 *(optional)* | Ch 0 | **Precourse refresher**: descriptive statistics; probability and Bayes; distributions; standard errors and confidence intervals; hypothesis testing; simple linear regression; matrix algebra; gradients; the Python toolkit | 0.1–0.8 |
 | 1 | Ch 1 + Ch 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference; parametric vs. non-parametric | 1.1–1.3, 2.1–2.2 |
 | 2 | Ch 2 (part 2) | Assessing accuracy; bias–variance trade-off; classification & KNN; lab | 2.3–2.8 |
 | 3 | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, *t*, *F*) | 3.1–3.6 |

@@ -2,7 +2,7 @@
 
 <p align="center">
   A complete, ready-to-teach university course in statistical learning —<br>
-  ten polished slide decks, thirteen Jupyter labs, three mock exams, and the course datasets.
+  eleven polished slide decks, thirteen Jupyter labs, three mock exams, and the course datasets.
 </p>
 
 <p align="center">
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <b>10 Beamer decks · 13 Jupyter labs · 3 mock exams · ~105 exercises with worked solutions · runs locally &amp; on Colab</b>
+  <b>11 Beamer decks · 13 Jupyter labs · 3 mock exams · ~116 exercises with worked solutions · runs locally &amp; on Colab</b>
 </p>
 
 <p align="center">
@@ -59,12 +59,12 @@ Applied Sciences and Arts).
 
 ## ⚡ Why these materials
 
-- **A whole course, not a pile of files.** Ten Beamer decks, thirteen labs and
-  three mock exams that share one notation, one dataset set, and one 12-week
-  rhythm — ready to teach as-is or adapt.
+- **A whole course, not a pile of files.** Eleven Beamer decks — ten chapters
+  plus an optional precourse refresher — thirteen labs and three mock exams that
+  share one notation, one dataset set, and one 12-week rhythm.
 - **Slides built for the room.** Every deck moves motivation → intuition →
   formal definition → worked example, with colour-coded callout boxes and
-  **~70 short + ~35 extended exercises**, each followed by a full solution.
+  **~78 short + ~38 extended exercises**, each followed by a full solution.
 - **Numbers you can trust.** ~40 purpose-built visuals are computed from the
   real course datasets (not sketched), and every mock-exam answer was verified
   programmatically.
@@ -120,6 +120,7 @@ A 12-lecture semester (12 × 180 min):
 
 | Lecture | Chapter | Topic |
 |:--:|:--:|--|
+| 0 *(optional)* | — | **Precourse refresher**: descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python |
 | 1 | 1 + 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference |
 | 2 | 2 (part 2) | Model accuracy; bias–variance trade-off; Bayes classifier; KNN |
 | 3–4 | 3 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
@@ -140,7 +141,7 @@ A 12-lecture semester (12 × 180 min):
 
 | Path | Contents |
 |---|---|
-| [`Lecture_Slides/`](./Lecture_Slides/) | Ten Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable. See its [deck guide](./Lecture_Slides/README.md). |
+| [`Lecture_Slides/`](./Lecture_Slides/) | Eleven Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable, including the `chapter_00` precourse refresher. See its [deck guide](./Lecture_Slides/README.md). |
 | [`Lab_Notebooks/`](./Lab_Notebooks/) | Thirteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
 | [`Mock_Exams/`](./Mock_Exams/) | Three exams — each with a questions PDF, a solutions PDF, and a Beamer review deck |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
@@ -152,15 +153,15 @@ A 12-lecture semester (12 × 180 min):
 
 ## 🎞️ Lecture slides
 
-Ten decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
+Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 
 - **Front matter** — course-at-a-glance, chapter contents, and a "Notation in
   this chapter" symbol table.
 - **Teaching flow** — motivation → intuition → formal definition → worked
   example, with colour-coded callout boxes (green takeaway, blue how-to-read,
   orange worked example, red pitfall).
-- **~70 short exercises** (~5 min) in purple boxes, each with a full
-  step-by-step solution (teal), plus **~35 extended, multi-part exercises**
+- **~78 short exercises** (~5 min) in purple boxes, each with a full
+  step-by-step solution (teal), plus **~38 extended, multi-part exercises**
   (~15 min) in violet boxes with detailed multi-slide solutions.
 - **~40 purpose-built visuals** — ≈22 matplotlib plots computed from the real
   course datasets plus ≈18 native TikZ concept diagrams.
@@ -171,6 +172,7 @@ Ten decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 
 | Ch. | Deck | Open |
 |:--:|--|:--:|
+| 0 | Precourse Refresher *(optional)* | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
 | 1 | Introduction | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
 | 2 | Statistical Learning | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
 | 3 | Linear Regression | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
@@ -181,6 +183,15 @@ Ten decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 | 8 | Tree-Based Methods | [PDF](./Lecture_Slides/chapter_08/chapter_08.pdf) |
 | 10 | Deep Learning | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
 | 13 | Multiple Testing | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
+
+> **New: a precourse refresher (Chapter 0).** An optional 99-slide session that
+> revisits the undergraduate material this course assumes — descriptive
+> statistics, probability and Bayes, the standard distributions, sampling and
+> confidence intervals, hypothesis testing, simple linear regression, matrix
+> algebra, derivatives and gradient descent, and the `numpy`/`pandas` toolkit.
+> It opens with a ten-question self-check so students can decide whether they
+> need it, and closes with a table mapping every topic to the chapter that uses
+> it.
 
 <details>
 <summary><b>Rebuilding a deck</b></summary>
