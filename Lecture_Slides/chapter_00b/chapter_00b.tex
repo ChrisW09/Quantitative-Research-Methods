@@ -110,10 +110,10 @@
 \begin{frame}{Contents}
   \begin{columns}[t]
     \begin{column}{0.5\textwidth}
-      \tableofcontents[hideallsubsections,sections={1-3}]
+      \tableofcontents[hideallsubsections,sections={1-4}]
     \end{column}
     \begin{column}{0.5\textwidth}
-      \tableofcontents[hideallsubsections,sections={4-6}]
+      \tableofcontents[hideallsubsections,sections={5-7}]
     \end{column}
   \end{columns}
 \end{frame}
@@ -162,7 +162,7 @@
     $L(\theta)$, $\ell(\theta)$ & likelihood and log-likelihood of the parameter $\theta$ \\
     $\hat\theta_{\mathrm{MLE}}$ & the value of $\theta$ that maximises the likelihood \\
     $\binom{p}{k}$ & the number of ways of choosing $k$ items from $p$ \\
-    $\mathcal{O}(\cdot)$ & how the cost grows with the size of the problem \\
+    $2^{p}$ & the number of subsets of $p$ predictors: how the cost grows \\
     \bottomrule
   \end{tabular}
   \end{center}
@@ -224,8 +224,7 @@
   \end{block}
   \begin{numexample}[With numbers]
     For $a = (2, 5, 3)$: $\sum_i a_i = 10$ and $\prod_i a_i = 30$.
-    In Python: \texttt{a.sum()} and \texttt{a.prod()} --- or
-    \texttt{np.log(a).sum()} for the log of the product.
+    In Python: \texttt{a.sum()} and \texttt{a.prod()}.
   \end{numexample}
   \begin{block}{Rules worth knowing}
     \[
@@ -380,9 +379,9 @@
   \end{takeaway}
   \begin{numexample}[Numerical underflow --- the practical reason]
     A likelihood multiplies $n$ probabilities. With $n = 1000$ and each
-    around $0.5$, the product is $\approx 10^{-301}$: the computer rounds it
-    to zero and every model becomes equally good. Its log is
-    $\approx -693$, a perfectly ordinary number.
+    around $0.5$, the product is $\approx 10^{-301}$, close to the smallest
+    number a computer can store; at $n = 2000$ it underflows to zero and every
+    model looks equally good. Its log $\approx -693$ is perfectly ordinary.
   \end{numexample}
 \end{frame}
 
@@ -472,10 +471,11 @@
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{takeaway}[Note the symmetry]
-    Probabilities $0.25$ and $0.75$ give log-odds $-1.10$ and $+1.10$: the
-    logit scale is symmetric about zero, while probabilities are squeezed
-    against $0$ and $1$. That symmetry is why models work on the logit scale.
+  \begin{takeaway}[Why the log-odds scale]
+    Probabilities are squeezed against $0$ and $1$; log-odds run from $-\infty$
+    to $+\infty$, symmetrically about zero. Models work on the log-odds scale
+    because it has \emph{room}: whatever number a linear predictor produces is
+    a legal log-odds.
   \end{takeaway}
 \end{frame}
 
@@ -571,7 +571,7 @@
     $P(y_i \mid \theta)$ is a probability \emph{of the data given a parameter}.
     As a function of $\theta$ with the data \emph{fixed}, we call it a
     likelihood --- and it is \textbf{not} a probability distribution over
-    $\theta$. That is the single most common misunderstanding here.
+    $\theta$. That is the commonest misunderstanding here.
   \end{readme}
 \end{frame}
 
@@ -591,11 +591,13 @@
 
 \begin{frame}{Least squares is maximum likelihood in disguise}
   \begin{center}
-    \includegraphics[width=0.88\textwidth,height=0.42\textheight,keepaspectratio]{ch00b_likelihood_normal.png}
+    \includegraphics[width=0.88\textwidth,height=0.36\textheight,keepaspectratio]{ch00b_likelihood_normal.png}
   \end{center}
   \footnotesize
-  With normal errors, $\log P(y_i \mid \mu) = -\frac{(y_i-\mu)^2}{2\sigma^2} +
-  \text{const}$, so
+  With normal errors $P(y_i \mid \mu) = \frac{1}{\sigma\sqrt{2\pi}}
+  \exp\bigl(-\tfrac{(y_i-\mu)^2}{2\sigma^2}\bigr)$, and the log strips the
+  exponential down to its exponent:
+  $\log P(y_i \mid \mu) = -\frac{(y_i-\mu)^2}{2\sigma^2} + \text{const}$, so
   \[
     \ell(\mu) = -\frac{1}{2\sigma^2}\sum_i (y_i - \mu)^2 + \text{const}
     \quad\Longrightarrow\quad
@@ -718,9 +720,10 @@
     someone asks ``how sure are you?'' --- that question is answered by a
     standard error or an interval, not by the likelihood's height.
 
-    \textbf{(3) Correct, and harmless.} Each extra observation multiplies in
-    another probability $\le 1$, so $L$ shrinks (and $\ell$ becomes more
-    negative). Only \emph{comparisons at the same data set} are meaningful ---
+    \textbf{(3) Correct for discrete data.} Each extra observation multiplies
+    in another probability $\le 1$, so $L$ shrinks; for a continuous response
+    the factors are densities and can exceed $1$. Only \emph{comparisons at
+    the same data set} are meaningful ---
     which is why you can never compare log-likelihoods across samples of
     different size.
 
@@ -767,13 +770,13 @@
 
 \begin{frame}{The cost of ``just try everything''}
   \begin{center}
-    \includegraphics[width=0.82\textwidth,height=0.50\textheight,keepaspectratio]{ch00b_subset_growth.png}
+    \includegraphics[width=0.95\textwidth,height=0.58\textheight,keepaspectratio]{ch00b_subset_growth.png}
   \end{center}
   \footnotesize
   Forward stepwise selection fits about $p^2/2$ models instead of $2^p$: for
-  $p = 40$, roughly $800$ instead of $10^{12}$. That is the difference between
-  a second and longer than the age of the universe --- with no guarantee of
-  finding the same answer, which is the trade-off Chapter 6 discusses.
+  $p = 40$, roughly $800$ instead of $10^{12}$. At $0.01$ s per fit that is
+  eight seconds against about $350$ years --- with no guarantee of finding the
+  same answer, which is the trade-off Chapter 6 discusses.
 \end{frame}
 
 \begin{frame}{Exercise 0b.5 --- Counting [Math]}
@@ -821,7 +824,7 @@
 \section{The Python you will actually write}
 % ============================================================
 
-\begin{frame}[fragile]{Functions and loops --- used in all fourteen labs}
+\begin{frame}[fragile]{Functions and loops --- used in all fifteen labs}
 \begin{lstlisting}
 def rmse(y, y_hat):                     # define once, reuse everywhere
     """Root mean squared error."""
@@ -874,12 +877,13 @@ X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3,
                                           random_state=42)
 \end{lstlisting}
   \begin{center}
-    \includegraphics[width=0.80\textwidth,height=0.28\textheight,keepaspectratio]{ch00b_split.png}
+    \includegraphics[width=0.90\textwidth,height=0.31\textheight,keepaspectratio]{ch00b_split.png}
   \end{center}
-  \footnotesize
-  Every notebook in this course seeds its randomness, so your numbers match
-  the slides exactly. Change the seed and the third decimal moves --- that is
-  not a bug, it is sampling variability, and Chapter 5 is about measuring it.
+  \scriptsize
+  A ``random'' generator is a deterministic recipe and the seed is where it
+  starts, so the same seed replays the same draws --- which is why your numbers
+  match the slides. Change the seed and the third decimal moves: not a bug, but
+  sampling variability, which Chapter 5 is about measuring.
 \end{frame}
 
 \begin{frame}[fragile]{The scikit-learn contract: fit, predict, score}
@@ -891,12 +895,11 @@ model = LinearRegression()               # 1. choose a model
 model.fit(X_train, y_train)              # 2. learn from TRAINING data only
 pred  = model.predict(X_test)            # 3. predict on unseen data
 mean_squared_error(y_test, pred)         # 4. score honestly
-
 model.coef_, model.intercept_            # fitted values carry a trailing _
 \end{lstlisting}
   \begin{takeaway}[Learn it once and you know every model in the course]
-    Trees, forests, boosting, SVMs, neural nets and clustering use the same
-    three methods: swapping \texttt{LinearRegression()} for
+    Trees, forests, boosting, SVMs and neural nets use the same three methods:
+    swapping \texttt{LinearRegression()} for
     \texttt{RandomForestRegressor()} changes one line.
   \end{takeaway}
   \begin{alertblock}{The cardinal sin}
@@ -987,7 +990,7 @@ for degree in range(1, 6):
 
 \begin{frame}{Solution --- Extended Exercise 0b.2}
   \begin{solutionbox}
-    \tiny
+    \scriptsize
     \textbf{(1) The six steps.} Load; \emph{look} at it (scatter, and check
     for missing values --- \texttt{Auto} stores them as \texttt{'?'}); split
     with a seed; fit each candidate on the training set; score each on the
@@ -1007,8 +1010,8 @@ for degree in range(1, 6):
 
     \textbf{(4) The winner is unstable, so do not trust it.} A single split is
     a high-variance estimate, and the seed sweep proves it: three different
-    ``best'' degrees appear. Never pick a seed until the answer looks good.
-    Use $k$-fold cross-validation (Chapter 5), which averages over splits.
+    ``best'' degrees appear. Use $k$-fold cross-validation (Chapter 5), which
+    averages over splits.
     Doing that here ($5$-fold, repeated $10\times$) gives RMSEs of
     $4.91,\ 4.36,\ 4.37,\ 4.38,\ 4.34$ with a repeat-to-repeat spread of about
     $\pm0.04$: degree $1$ is clearly worse, and \emph{degrees 2 to 5 are

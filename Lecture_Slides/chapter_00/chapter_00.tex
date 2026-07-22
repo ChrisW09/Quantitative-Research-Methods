@@ -33,7 +33,7 @@
 \lstdefinestyle{Pystyle}{language=Python,basicstyle=\ttfamily\footnotesize,
   keywordstyle=\color{pyKw}\bfseries,commentstyle=\color{pyCom}\itshape,
   stringstyle=\color{pyStr},showstringspaces=false,upquote=true,
-  columns=fullflexible,breaklines=true,literate={~}{{$\sim$}}1}
+  columns=fullflexible,keepspaces=true,breaklines=true,literate={~}{{$\sim$}}1}
 \lstset{style=Pystyle}
 
 \AtBeginSection[]{\begin{frame}{Outline}\scriptsize
@@ -186,7 +186,10 @@
 
 \begin{frame}{Do you actually need this session? A 12-question self-check}
   \scriptsize
-  Answer honestly. Each question maps to one section of this deck.
+  Answer honestly. Each question maps to one section, so a wrong answer tells
+  you where to read: 1--2 one variable; 3 two variables; 4 probability;
+  5--6 sampling; 7 and 11 testing and power; 8 and 12 regression;
+  9 linear algebra; 10 calculus.
   \begin{enumerate}
     \item Why is the median often reported for income, but the mean for test scores?
     \item What does it mean that a variable has SD $=0$?
@@ -422,9 +425,9 @@
     \[
       \bar x = \frac{1}{n}\sum_{i=1}^{n} x_i,
       \qquad
-      \text{median} = \text{the middle value of the sorted data},
+      \text{median} = \text{middle value of the sorted data},
       \qquad
-      \text{mode} = \text{the most frequent value.}
+      \text{mode} = \text{most frequent value.}
     \]
   \end{block}
   \footnotesize
@@ -470,16 +473,20 @@
 
 \begin{frame}{Quantiles, the five-number summary, and the boxplot}
   \begin{center}
-    \includegraphics[width=0.84\textwidth,height=0.50\textheight,keepaspectratio]{ch00_boxplot_anatomy.png}
+    \includegraphics[width=0.84\textwidth,height=0.42\textheight,keepaspectratio]{ch00_boxplot_anatomy.png}
   \end{center}
   \scriptsize
   The $q$-quantile is the value below which a fraction $q$ of the data lies:
   $Q_1 = 25\%$, median $= 50\%$, $Q_3 = 75\%$, and $\mathrm{IQR} = Q_3 - Q_1$
   holds the middle half. The usual rule flags points outside
   $[\,Q_1 - 1.5\,\mathrm{IQR},\ Q_3 + 1.5\,\mathrm{IQR}\,]$ --- a convention,
-  not a law, and never a licence to delete data.
+  not a law, and never a licence to delete data. Careful on small samples: by
+  hand we take the median of each half, so $Q_1$ and $Q_3$ are data values,
+  while \texttt{numpy} and \texttt{pandas} interpolate between neighbours and
+  can differ by half a unit.
   \begin{labnote}[Companion notebook]
-    Rebuild this plot yourself with \texttt{df["wage"].describe()}.
+    Rebuild this plot yourself in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}
+    with \texttt{df["wage"].describe()}.
   \end{labnote}
 \end{frame}
 
@@ -500,7 +507,7 @@
   \scriptsize
   \textbf{Symmetric} --- mean and median agree; report either.
   \textbf{Skewed} --- they separate; the median is the honest summary.
-  \textbf{A spike at one value} --- 22\% of \texttt{Credit} customers carry a
+  \textbf{A spike at one value} --- 22.5\% of \texttt{Credit} customers carry a
   zero balance; no single number describes this well, so say so.
   \textbf{Bimodal} --- two peaks usually mean two \emph{populations} mixed
   together; find the variable that separates them.
@@ -516,8 +523,8 @@
     \includegraphics[width=0.78\textwidth,height=0.44\textheight,keepaspectratio]{ch00_log_transform.png}
   \end{center}
   \footnotesize
-  Taking logs pulls in the long right tail: skewness falls from $+1.0$ to
-  $+0.3$, and mean and median almost coincide.
+  Taking logs pulls in the long right tail: skewness falls from $+1.68$ to
+  $-0.12$, and mean and median almost coincide.
   \begin{takeaway}[Why this matters later]
     Logs turn multiplicative effects into additive ones, so a coefficient
     becomes a \emph{percentage} change. \texttt{Wage} ships with a
@@ -608,9 +615,9 @@
     $\bar x = 58/7 \approx 8.29$. The 4th of seven sorted values is the
     median $= 6$. The mode is $6$.
 
-    \textbf{(2) Spread.} Deviations from $8.29$:
-    $-5.29,-3.29,-2.29,-2.29,-0.29,0.71,12.71$; squares
-    $27.9,10.8,5.2,5.2,0.1,0.5,161.6$, summing to $211.4$. Hence
+    \textbf{(2) Spread.} Deviations from $8.29$ are $-5.29$, $-3.29$, $-2.29$,
+    $-2.29$, $-0.29$, $0.71$, $12.71$; their squares $27.9$, $10.8$, $5.2$,
+    $5.2$, $0.1$, $0.5$, $161.6$ sum to $211.4$. Hence
     $s^2 = 211.4/6 \approx 35.2$ and $s \approx 5.94$ minutes.
 
     \textbf{(3) Quartiles.} Lower half $\{3,5,6\} \Rightarrow Q_1 = 5$; upper
@@ -711,9 +718,9 @@
     as a predictor can make a spurious effect disappear.
   \end{readme}
   \begin{readme}[Simpson's paradox]
-    An association can \emph{reverse} once you condition on a group. A
+    An association can \emph{reverse} once you condition on a group: a
     treatment can look worse overall yet be better in every subgroup, if the
-    sicker patients were more likely to receive it. Aggregation can lie.
+    sicker patients were more likely to receive it.
   \end{readme}
   \begin{takeaway}[The habit to build]
     Before believing any two-variable claim, ask: \emph{what third variable
@@ -724,17 +731,16 @@
 
 \begin{frame}{Simpson's paradox, drawn}
   \begin{center}
-    \includegraphics[width=0.86\textwidth,height=0.48\textheight,keepaspectratio]{ch00_simpson.png}
+    \includegraphics[width=0.86\textwidth,height=0.44\textheight,keepaspectratio]{ch00_simpson.png}
   \end{center}
   \footnotesize
-  Simulated data for three age groups: older people here both exercise more
-  \emph{and} have higher cholesterol. Ignoring the group, exercise looks
+  Simulated data for three age groups: older people both exercise more
+  \emph{and} have higher cholesterol. Ignore the group and exercise looks
   harmful ($+0.66$); within every group it helps.
   \begin{takeaway}[The lesson]
-    The overall slope and the within-group slope answer different questions.
-    Adding the group variable to the model --- what multiple regression does
-    --- recovers the within-group answer. Which one you \emph{want} depends on
-    the decision you are making.
+    The overall and the within-group slope answer different questions. Adding
+    the group variable --- what multiple regression does --- recovers the
+    within-group answer; which one you \emph{want} depends on the decision.
   \end{takeaway}
 \end{frame}
 
@@ -870,8 +876,8 @@
     \textbf{base rate} $P(A)$.
   \end{readme}
   \begin{takeaway}[Where it reappears]
-    Chapter 4 is Bayes' theorem applied four times over: the Bayes
-    classifier, LDA, QDA and naive Bayes all compute
+    Chapter 4 is Bayes' theorem applied three times over: LDA, QDA and naive
+    Bayes all recover
     $P(Y=k \mid X=x)$ from $P(X = x\mid Y=k)$ and the prior $\pi_k = P(Y=k)$.
   \end{takeaway}
 \end{frame}
@@ -1010,10 +1016,9 @@
     times larger, so even a small error rate on it swamps the true positives.
 
     \textbf{(4)} Require $0.00475/(0.00475 + f\cdot 0.995) \ge 0.5$, i.e.
-    $f \le 0.0048$ --- a false-positive rate below \textbf{0.48\%}, four times
-    stricter than today's $2\%$, and reachable only by flagging far less
-    aggressively, which costs detection. That trade-off, drawn as a curve, is
-    the ROC curve of Chapter 4.
+    $f \le 0.0048$ --- below \textbf{0.48\%}, four times stricter than today's
+    $2\%$ and reachable only by flagging less aggressively, which costs
+    detection: the ROC trade-off of Chapter 4.
   \end{solutionbox}
 \end{frame}
 
@@ -1224,7 +1229,8 @@
   \vspace{-2pt}
   \footnotesize
   Each horizontal bar is one 95\% CI from one sample. Two of the 25 miss the
-  true $\mu$ --- which is exactly what ``95\%'' promises.
+  true $\mu$. With 95\% coverage we expect about one miss in 25, so two is an
+  ordinary draw --- the promise is about the long run, not any one batch.
 \end{frame}
 
 \begin{frame}{What a confidence interval does and does not say}
@@ -1246,7 +1252,9 @@
   \end{alertblock}
   \begin{takeaway}[Width tells you as much as position]
     Wide interval around a large estimate: ``possibly big --- we cannot tell''.
-    Narrow interval around a small one: ``genuinely small''.
+    Narrow interval around a small one: ``genuinely small''. You will read
+    these intervals straight off regression output in Chapter 3 and rebuild
+    them without any formula from bootstrap replicates in Chapter 5.
   \end{takeaway}
 \end{frame}
 
@@ -1256,6 +1264,13 @@
 % ============================================================
 
 \begin{frame}{The logic of a test in five steps}
+  \footnotesize
+  \begin{readme}[The idea in one sentence]
+    A test never proves an effect exists. It asks: \emph{if there were no
+    effect at all, how surprising would data like ours be?} If the answer is
+    ``very surprising'', we abandon the no-effect story. Everything below is
+    bookkeeping for that one question.
+  \end{readme}
   \begin{enumerate}
     \item State $H_0$ (the sceptical default: ``no effect'', $\beta_j = 0$)
           and $H_1$.
@@ -1288,6 +1303,8 @@
   \end{tabular}
   \end{center}
   \begin{itemize}
+    \item In this table $\beta$ is the \emph{Type II error rate} --- the one
+          place in this course where $\beta$ is not a regression coefficient.
     \item Lowering $\alpha$ buys fewer false positives at the cost of more
           false negatives. There is no setting that avoids both.
     \item \textbf{Power} rises with the true effect size, with $n$, and with
@@ -1339,7 +1356,8 @@
     \includegraphics[width=0.84\textwidth,height=0.44\textheight,keepaspectratio]{ch00_power.png}
   \end{center}
   \footnotesize
-  Moving the critical value to the right shrinks the orange area ($\alpha$)
+  Moving the critical value to the right shrinks the orange area (the upper
+  tail here, $\alpha/2$)
   but grows the green one ($\beta$). Only \emph{more data} --- or a larger
   true effect, or less noise --- shrinks both, by pushing the curves apart.
   \begin{takeaway}[Why underpowered studies mislead]
@@ -1393,7 +1411,7 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 0.10}
+\begin{frame}{Solution --- Exercise 0.6}
   \begin{solutionbox}
     \textbf{(1)} $2.4 \pm 1.96(1.5) = 2.4 \pm 2.94 = [-0.54,\ 5.34]$.
 
@@ -1562,9 +1580,10 @@
   \end{center}
   \footnotesize
   Twenty simulated points plus one extra (circled). \textbf{Left:} an unusual
-  $y$ at a typical $x$ lifts the line a little. \textbf{Right:} the same
-  vertical error placed far out in $x$ swings the slope --- that point has
-  high \emph{leverage}, because the line must pivot to reach it.
+  $y$ sitting at the average $x$ lifts the line but leaves the slope
+  unchanged. \textbf{Right:} a point far out in $x$ swings the slope from
+  $0.82$ to $0.25$ --- that point has high \emph{leverage}, because the line
+  must pivot to reach it.
   \begin{takeaway}[Two different words]
     An \textbf{outlier} has a large residual; a \textbf{high-leverage} point
     has an unusual $x$. A point that is both is the dangerous case, and
@@ -1587,7 +1606,8 @@ R-squared: 0.612    F-statistic: 312.1    Prob (F-statistic): 1.47e-42    n = 20
     \textbf{std err} --- its standard error: how much $b_j$ would wobble
     across repeated samples.
     \textbf{t} $= \mathrm{coef}/\mathrm{std\ err} = 0.0475/0.00269 = 17.7$:
-    the estimate is $17.7$ standard errors from zero.
+    the estimate is $17.7$ standard errors from zero. (Divide by the printed
+    $0.003$ and you get $15.8$ --- the column is rounded.)
     \textbf{P>|t|} --- the two-sided $p$-value for $H_0:\beta_j = 0$.
     \textbf{[0.025 0.975]} --- the 95\% confidence interval, $\approx
     \mathrm{coef} \pm 1.96\,\mathrm{std\ err}$.
@@ -1653,10 +1673,10 @@ R-squared: 0.612    F-statistic: 312.1    Prob (F-statistic): 1.47e-42    n = 20
       \bottomrule
     \end{tabular}
     \end{center}
-    The residuals sum to $0$. This is forced by the first normal equation:
-    setting $\partial \mathrm{RSS}/\partial b_0 = 0$ gives
-    $\sum_i e_i = 0$ exactly. It is a property of the \emph{fitting method},
-    not evidence that the model is right.
+    The residuals sum to $0$, and they must: since $b_0 = \bar y - b_1\bar x$,
+    $\sum_i e_i = n(\bar y - b_0 - b_1 \bar x) = 0$ for \emph{any} data set
+    --- the line is pinned through $(\bar x, \bar y)$. A property of the
+    \emph{fitting method}, not evidence that the model is right.
   \end{solutionbox}
 \end{frame}
 
@@ -1854,7 +1874,7 @@ R-squared: 0.51    n = 36
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 0.6}
+\begin{frame}{Solution --- Exercise 0.8}
   \begin{solutionbox}
     \textbf{(1)} $\mathbf{X}$ is $3\times2$, so $\mathbf{X}^\top$ is
     $2\times3$, $\mathbf{X}^\top\mathbf{X}$ is $2\times2$ and
@@ -2046,6 +2066,7 @@ R-squared: 0.51    n = 36
 
 \begin{frame}{Solution --- Extended Exercise 0.3 (2/2)}
   \begin{solutionbox}
+    \scriptsize
     \textbf{(4) Did it help?}
     \[
       L(0,0) = 2^2+3^2+5^2 = 38 .
@@ -2100,7 +2121,7 @@ A.T @ A                                # matrix product: 2x2
 \begin{lstlisting}
 import pandas as pd
 
-df = pd.read_csv("Wage.csv", index_col=0)
+df = pd.read_csv("Wage.csv")           # no index column in this file
 df.shape          # (3000, 11) -- that's (n, p)
 df.head()         # first rows
 df.describe()     # count, mean, std, min, quartiles, max
@@ -2195,8 +2216,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
   \vspace{-4pt}
   \begin{takeaway}[The shape of every analysis in this course]
     Load $\to$ summarise $\to$ \textbf{plot} $\to$ fit $\to$ report estimates
-    \emph{with} uncertainty $\to$ check the residuals. Chapters 2--13 change
-    step 4 and enrich step 7; the skeleton never changes.
+    \emph{with} uncertainty $\to$ check the residuals.
   \end{takeaway}
   \begin{labnote}[Companion notebook]
     Run all of this in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}.
@@ -2241,8 +2261,8 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     \textbf{(2)} $\mathrm{IQR} = 128.68 - 85.38 = 43.30$. The upper fence is
     $128.68 + 1.5(43.30) = 128.68 + 64.95 = 193.63$. Since
     $220 > 193.63$, \textbf{yes}, it would be flagged --- but with $n=3000$,
-    a few hundred such points are entirely expected in a right-skewed
-    variable. ``Flagged'' means ``look at it'', not ``drop it''.
+    about $100$ such points ($109$ here) are entirely expected in a
+    right-skewed variable. ``Flagged'' means ``look at it'', not ``drop it''.
 
     \textbf{(3)} Mean $111.70 >$ median $104.92$, so the distribution is
     \textbf{right-skewed} (a long upper tail of high earners, consistent with
@@ -2257,9 +2277,10 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     great deal.
 
     \textbf{(5)} $\mathrm{SE}(\bar x) = s/\sqrt n = 41.73/\sqrt{3000}
-    = 41.73/54.77 \approx 0.76$. So the mean wage is pinned down to well
-    under a dollar, although individual wages vary by $\pm 40$ --- the
-    standard-deviation / standard-error distinction in one line.
+    = 41.73/54.77 \approx 0.76$. \texttt{wage} is in thousands of dollars, so
+    the mean is pinned down to about $\pm\$760$, while individual wages vary
+    by roughly $\pm\$40{,}000$ --- the standard-deviation / standard-error
+    distinction in one line.
   \end{solutionbox}
 \end{frame}
 
@@ -2278,7 +2299,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 0.8}
+\begin{frame}{Solution --- Exercise 0.10}
   \begin{solutionbox}
     \scriptsize
     \begin{enumerate}
@@ -2458,7 +2479,8 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
 \end{frame}
 
 \begin{frame}{Vocabulary check}
-  \tiny
+  \scriptsize
+  \renewcommand{\arraystretch}{0.95}
   \begin{center}
   \begin{tabular}{@{}ll@{}}
     \toprule

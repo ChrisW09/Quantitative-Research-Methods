@@ -149,6 +149,8 @@ A 12-lecture semester (12 × 180 min):
 | [`Lecture_Slides/`](./Lecture_Slides/) | Eleven Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable, including the `chapter_00` precourse refresher. See its [deck guide](./Lecture_Slides/README.md). |
 | [`Lab_Notebooks/`](./Lab_Notebooks/) | Fifteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
+| [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, per-session runsheets, slide index, printable handouts |
+| [`Makefile`](./Makefile) | One-command rebuild of figures, decks, handouts and the index |
 | [`docs/`](./docs/) | Sphinx documentation for the whole course — see [Documentation](#-documentation) |
 | [`requirements.txt`](./requirements.txt) | Pinned Python environment for the notebooks |
 | `Mock_Exams/` | Three exams (questions, solutions, review decks) — **excluded from git**: assessment material |
@@ -262,6 +264,31 @@ exam in class.
 
 The final exam also exists in three parallel versions (A / B / C) — same
 structure and difficulty, different numbers.
+
+---
+
+## 👩‍🏫 Teaching it
+
+[`Teaching_Guide/`](./Teaching_Guide/) holds what you need to walk into a room:
+a [semester plan](./Teaching_Guide/semester_plan.md), a
+[before-class checklist](./Teaching_Guide/before_class.md), a generated
+[slide index](./Teaching_Guide/slide_index.md) (every section and exercise with
+its page number), and per-session runsheets with timings, a cut-list for when
+you are behind, the exercises worth running live, and the misconceptions to
+pre-empt.
+
+Everything rebuilds with one command:
+
+```bash
+make            # figures, any deck whose source changed, and the slide index
+make check      # page counts, and any slide that overruns its frame
+make handouts   # printable 2-up PDFs of every deck
+make help       # the rest
+```
+
+> The runsheets and the handouts are git-ignored: runsheets name which exercises
+> map onto which exam problems, so they stay off the public repository alongside
+> the exams themselves.
 
 ---
 
