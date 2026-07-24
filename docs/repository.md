@@ -11,10 +11,17 @@
 │       └── make_figures.py    #   (chapter_00, chapter_00b) regenerates figures
 ├── Lab_Notebooks/             # fifteen Jupyter labs, local- and Colab-ready
 │   └── chapter_NN_lab.ipynb
+├── Teaching_Guide/            # instructor kit: plan, index, checklist, handouts
+│   ├── semester_plan.md       #   the twelve weeks on one page
+│   ├── slide_index.md         #   generated: sections, exercises, page numbers
+│   ├── before_class.md        #   the ten-minute pre-lecture checklist
+│   ├── runsheets/             #   per-session scripts — git-ignored (assessment)
+│   └── handouts/              #   printable 2-up decks — build output
 ├── Mock_Exams/                # three exams — git-ignored (assessment material)
 ├── ALL CSV FILES - 2nd Edition/   # course datasets (statlearning.com)
 ├── docs/                      # this documentation (Sphinx)
 ├── Source_Material/           # copyrighted book PDFs & figure banks — git-ignored
+├── Makefile                   # one-command rebuild: figures, decks, index, handouts
 ├── requirements.txt           # pinned Python environment for the notebooks
 ├── CITATION.cff              # how to cite these materials
 └── README.md
@@ -48,4 +55,5 @@ make them useless as assessment.
 - [`Lecture_Slides/README.md`](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Lecture_Slides/README.md)
   — the deck guide, with per-chapter exercise counts, the contents of each
   deck's appendix, and the full lecture plan.
+- [Teaching it](teaching.md) — the instructor kit and the `make` targets.
 - [Building the docs](building-docs.md) — how this site is assembled.

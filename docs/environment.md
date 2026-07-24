@@ -60,3 +60,9 @@ Rebuilding the [slides](slides.md) or [exams](exams.md) requires a TeX Live
 distribution including `beamer`, `tcolorbox`, `tikz`, `listings` and `booktabs`.
 Nothing else in the repository depends on LaTeX — the compiled PDFs are
 committed.
+
+## Where to go next
+
+- [Quick start](quickstart.md) — Colab in one click, or a local venv in four lines.
+- [Lab notebooks](labs.md) — what the environment is for.
+- [Building the docs](building-docs.md) — the separate, documentation-only requirements.

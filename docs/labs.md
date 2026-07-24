@@ -10,6 +10,11 @@ downloading by hand.
 Every notebook is rendered in full below (with its stored outputs — the
 documentation build never executes them).
 
+:::{container} qrm-chips
+**15** notebooks · **12** lecture chapters · **3** self-study chapters ·
+runs **locally** and on **Colab**
+:::
+
 ## Lecture chapters
 
 | Ch. | Lab | Read here | Open in Colab |
@@ -63,3 +68,9 @@ works offline.
 
 labs/chapter_*_lab
 ```
+
+## Where to go next
+
+- [Lecture slides](slides.md) — the deck each notebook accompanies.
+- [Datasets](datasets.md) — what is bundled, and which chapter uses it.
+- [Python environment](environment.md) — the pinned packages, and the four chapter-specific ones.

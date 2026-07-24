@@ -98,3 +98,9 @@ The datasets are © the textbook authors and are distributed by them at
 [statlearning.com](https://www.statlearning.com) for use with the book. They are
 bundled here only so the course runs offline — see
 [Citation & licence](citation.md).
+
+## Where to go next
+
+- [Lab notebooks](labs.md) — where each dataset is loaded and used.
+- [Python environment](environment.md) — how `ISLP` resolves the data.
+- [Lecture slides](slides.md) — the figures computed from these files.

@@ -53,4 +53,11 @@ pdflatex -jobname=Mock_Exam_1_Solutions "\def\withsolutions{1}\input{mock_exam_1
 
 The review decks are separate Beamer sources in the same folder
 (`solutions_slides_*.tex`) and compile with a plain `pdflatex` run (twice, for
-the navigation bar).
+the navigation bar). From the repository root, `make exams` rebuilds all three
+papers and their solutions on a machine that has the folder.
+
+## Where to go next
+
+- [The course at a glance](course.md) — where each exam sits in the calendar.
+- [Teaching it](teaching.md) — which exercises rehearse which exam problem.
+- [Lecture slides](slides.md) — the material each paper draws on.
