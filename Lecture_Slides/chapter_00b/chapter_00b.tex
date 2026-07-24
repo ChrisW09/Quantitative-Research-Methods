@@ -335,6 +335,11 @@
     $\bigl(\sum_i (y_i - \hat y_i)\bigr)^2 = (1 - 1 + 0)^2 = 0$. Squaring
     first keeps the errors from cancelling --- which is the whole reason
     least squares squares.
+
+    \medskip
+    \textit{Common mistake:} writing $\min$ when $\arg\min$ is meant.
+    Every estimator ahead is an $\arg\min$: $\hat\beta$ is the
+    \emph{coefficient value} that minimises RSS, never the RSS value itself.
   \end{solutionbox}
 \end{frame}
 
@@ -441,6 +446,11 @@
     single zero destroys the column. Common fixes: model $\log(y + 1)$; use a
     square root instead; or --- best --- use a model built for the data type,
     such as the Poisson regression of Chapter 4 for counts.
+
+    \medskip
+    \textit{Common mistake:} inventing a rule for sums. $\log(a+b)$
+    simplifies to nothing --- the log rules turn \emph{products} into sums;
+    there is no rule for the log of a sum.
   \end{solutionbox}
 \end{frame}
 
@@ -547,6 +557,11 @@
 
     \textbf{(5)} $p = \sigma(-1.4) = 1/(1 + e^{1.4}) = 1/(1+4.055) =
     \mathbf{0.198}$, about $20\%$.
+
+    \medskip
+    \textit{Common mistake:} reading odds as probabilities. Odds of $0.818$
+    do not mean ``$82\%$'' --- convert back with
+    $p = \mathrm{odds}/(1+\mathrm{odds}) = 0.45$.
   \end{solutionbox}
 \end{frame}
 
@@ -615,6 +630,7 @@
 
 \begin{frame}{Solution --- Exercise 0b.4}
   \begin{solutionbox}
+    \scriptsize
     \textbf{(1) Wrong.} A likelihood is a probability of the \emph{data},
     computed \emph{given} a parameter value --- not a probability of the
     parameter. Likelihoods need not sum or integrate to $1$ over $\pi$, so
@@ -641,6 +657,12 @@
     a more flexible model can always be made to fit it better --- overfitting.
     That is precisely why Chapter 6 penalises the log-likelihood (AIC, BIC) and
     Chapter 5 measures performance on held-out data instead.
+
+    \medskip
+    \textit{Common mistake:} the root of (1), (2) and (4) is one flipped
+    conditioning: $L$ is the probability of \emph{this data} given $\pi$,
+    never of $\pi$ given the data. Keep that direction straight and the
+    statements sort themselves.
   \end{solutionbox}
 \end{frame}
 
@@ -816,10 +838,10 @@ for degree in range(1, 6):
 \begin{frame}{Solution --- Extended Exercise 0b.2}
   \begin{solutionbox}
     \scriptsize
-    \textbf{(1) The six steps.} Load; \emph{look} at it (scatter, and check
-    for missing values --- \texttt{Auto} stores them as \texttt{'?'}); split
-    with a seed; fit each candidate on the training set; score each on the
-    test set; report the chosen model \emph{with} its test error.
+    \textbf{(1) The six steps.} Load; \emph{look} (scatter, and check for
+    missing values --- \texttt{Auto} stores them as \texttt{'?'}); split with
+    a seed; fit each candidate on train; score each on test; report the
+    chosen model \emph{with} its test error.
 
     \textbf{(2) Looking, and splitting.} Plot before modelling --- the
     curvature is obvious and tells you a polynomial is worth trying. And the
@@ -833,11 +855,10 @@ for degree in range(1, 6):
     meaningful separates it from degree $2$ --- so choose \textbf{degree 2},
     the simplest model that is not beaten.
 
-    \textbf{(4) The winner is unstable, so do not trust it.} A single split is
-    a high-variance estimate, and the seed sweep proves it: three different
-    ``best'' degrees appear. Use $k$-fold cross-validation (Chapter 5), which
-    averages over splits.
-    Doing that here ($5$-fold, repeated $10\times$) gives RMSEs of
+    \textbf{(4) The winner is unstable, so do not trust it.} A single split
+    is a high-variance estimate, and the seed sweep proves it: three different
+    ``best'' degrees appear. The fix is $k$-fold cross-validation (Chapter 5):
+    here ($5$-fold, repeated $10\times$) it gives RMSEs of
     $4.91,\ 4.36,\ 4.37,\ 4.38,\ 4.34$ with a repeat-to-repeat spread of about
     $\pm0.04$: degree $1$ is clearly worse, and \emph{degrees 2 to 5 are
     statistically indistinguishable}. The defensible sentence is ``a quadratic
@@ -847,6 +868,10 @@ for degree in range(1, 6):
     includes the test set, so information from the test set has entered the
     training pipeline and the test error is no longer an honest estimate of
     performance on new data (fit the scaler on the training set alone).
+
+    \textit{Common mistake:} rerunning with new seeds until the ranking
+    looks right --- the sweep is a diagnostic, not a menu; a fixed seed buys
+    reproducibility, not correctness.
   \end{solutionbox}
 \end{frame}
 
@@ -1118,6 +1143,7 @@ for degree in range(1, 6):
 
 \begin{frame}{Solution --- Extended Exercise 0b.1 (2/2)}
   \begin{solutionbox}
+    \scriptsize
     \textbf{(4) The numbers.} $\hat\pi = 333/10\,000 = \mathbf{0.0333}$, the
     $3.3\%$ default rate quoted in Chapter 4.
 
@@ -1139,6 +1165,11 @@ for degree in range(1, 6):
     numerically --- by walking uphill, exactly the gradient method of
     Part (a). Note also that $-\ell$ is the ``binary cross-entropy'' loss of
     Chapter 10: the same quantity under a different name.
+
+    \medskip
+    \textit{Common mistake:} treating $\hat\pi = k/n$ as exact. With $k=0$
+    the MLE announces ``defaults are impossible'' --- an estimate inherits the
+    sample's noise and needs a standard error, not blind faith.
   \end{solutionbox}
 \end{frame}
 
@@ -1215,6 +1246,12 @@ for degree in range(1, 6):
     sample well by luck, so its $R^2$ is optimistic and it may not generalise.
     That is \textbf{multiple testing} (Chapter 13), and it is also why model
     choice must be judged on held-out data (Chapter 5).
+
+    \medskip
+    \textit{Common mistake:} assuming the $22$ stepwise fits search the same
+    space as the $64$. Stepwise follows one \emph{path} through the subsets,
+    so it can miss the best model --- the speed is bought with a restricted
+    search.
   \end{solutionbox}
 \end{frame}
 
