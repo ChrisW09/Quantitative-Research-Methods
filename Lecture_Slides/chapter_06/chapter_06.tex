@@ -724,9 +724,14 @@
     \textbf{(3) No exact zeros.}
     Ridge shrinks coefficients toward zero but essentially never sets
     them \emph{exactly} to zero (the $\ell_2$ penalty is smooth at the
-    origin). So ridge keeps all $p$ predictors in the model; it improves
-    prediction and stability but does \emph{not} perform variable
-    selection --- for that, use the lasso.
+    origin). So ridge keeps all $p$ predictors; it improves prediction and
+    stability but does \emph{not} select variables --- for that, use the lasso.
+
+    \medskip
+    \textit{Common mistake:} treating standardisation as cosmetic. For
+    plain OLS it is (predictions unchanged); with a penalty it \emph{changes
+    the model} --- ridge on raw and on standardised predictors gives
+    genuinely different fits.
   \end{solutionbox}
 \end{frame}
 
@@ -1149,6 +1154,12 @@ print("ridge alpha:", round(ridge.alpha_, 3),
     automatic variable selection, whereas ridge stabilises the fit while
     retaining every predictor. Choose based on whether sparsity or
     keeping all predictors is preferred.
+
+    \medskip
+    \textit{Common mistake:} comparing the printed \texttt{alpha} with a
+    textbook $\lambda$ --- \texttt{scikit-learn} scales the lasso penalty by
+    $1/(2n)$, so the numbers differ across formulations even when the
+    fitted models agree.
   \end{solutionbox}
 \end{frame}
 

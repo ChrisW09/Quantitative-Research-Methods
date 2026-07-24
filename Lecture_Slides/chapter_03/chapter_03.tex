@@ -1131,6 +1131,11 @@
     i.e.\ $[4.21,\,11.79]$ (\$4210--\$11{,}790). It is wide because $n$ is
     small, $x_0=7$ extrapolates beyond the data, and it targets a
     \emph{single} car rather than the average.
+
+    \medskip
+    \textit{Common mistake:} dropping the ``$1+$'' under the root. That
+    gives the \emph{confidence} interval for the average 7-year-old car ---
+    $8 \pm 2.58$ --- far too narrow for one specific car.
   \end{solutionbox}
 \end{frame}
 
@@ -1458,6 +1463,11 @@ print(res.summary())                 # coef table: SE, t, p, R2, F
     overall test whose Type~I error stays at $\alpha$ regardless of $p$,
     which is why we consult it \emph{first} before looking at individual
     coefficients.
+
+    \medskip
+    \textit{Common mistake:} reading the significant $F$ as ``all three
+    predictors matter''. It says only that \emph{at least one} does; the
+    individual $t$-tests (and Chapter~6) decide which.
   \end{solutionbox}
 \end{frame}
 
@@ -1607,6 +1617,7 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
 
 \begin{frame}{Solution --- Exercise 3.7}
   \begin{solutionbox}
+    \scriptsize
     \textbf{(1) Two levels.}
     \[
       \text{non-student }(\texttt{student}=0):\ \hat y = 480.4,\qquad
@@ -1632,6 +1643,12 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
     intercept represents; the remaining $k-1$ coefficients are
     contrasts against that baseline. Overall differences among levels
     are still tested jointly with an $F$-test.
+
+    \medskip
+    \textit{Common mistake:} comparing South and West directly by their
+    coefficients as if each were a mean --- both are contrasts against
+    \emph{East}. South vs.\ West is $-12.5-(-18.7)=+6.2$: South's average
+    balance is \$6.20 \emph{above} West's.
   \end{solutionbox}
 \end{frame}
 
@@ -2323,15 +2340,15 @@ print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
     detect either effect --- even though \emph{jointly} they predict
     balance well.
 
-    \textbf{(3) Fixes.}
-    \begin{itemize}
-      \item Drop one of the redundant predictors (keep \texttt{limit}
-            \emph{or} \texttt{rating}), since they carry nearly the same
-            information.
-      \item Combine them into a single index (e.g.\ an average or a
-            principal component), or use a penalised method such as
-            ridge regression that tolerates collinearity.
-    \end{itemize}
+    \textbf{(3) Fixes.} Drop one of the redundant predictors (keep
+    \texttt{limit} \emph{or} \texttt{rating}); or combine them into a single
+    index (an average or a principal component); or use a penalised method
+    such as ridge regression, which tolerates collinearity.
+
+    \medskip
+    \textit{Common mistake:} concluding the model \emph{predicts} poorly.
+    Collinearity corrupts the attribution to \emph{individual} coefficients;
+    the joint fit and its predictions are typically fine.
   \end{solutionbox}
 \end{frame}
 
