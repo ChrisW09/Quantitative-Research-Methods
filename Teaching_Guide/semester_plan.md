@@ -4,24 +4,30 @@ Twelve sessions of 180 minutes, plus two optional precourse sessions. Slide
 counts are live figures from the compiled decks; the per-session detail is in
 [`runsheets/`](./runsheets/).
 
+Slide counts are written **main flow + appendix**. Every deck now ends with an
+appendix holding the optional, more advanced material (formal derivations, the
+heaviest worked exercises, side topics); the timed plans in the runsheets cover
+the main flow only, so the appendix pages are extra material to assign, not to
+teach.
+
 ## The twelve weeks
 
 | Week | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
-| — | Precourse (a) | `chapter_00` | 121 | 10 + 4 | Optional. Statistics refresher |
-| — | Precourse (b) | `chapter_00b` | 57 | 6 + 2 | Optional. Notation, logs & odds, likelihood, Python |
-| 1 | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 73 + ~55 | 3 + 1, part of 8 + 4 | Stop after KNN / bias–variance |
+| — | Precourse (a) | `chapter_00` | 104 + 16 | 10 + 4 | Optional. Statistics refresher |
+| — | Precourse (b) | `chapter_00b` | 48 + 9 | 6 + 2 | Optional. Notation, logs & odds, likelihood, Python |
+| 1 | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 68 + ~55 | 3 + 1, part of 8 + 4 | Stop after KNN / bias–variance |
 | 2 | Statistical Learning II | `chapter_02` | rest | rest | Accuracy, Bayes classifier, lab |
-| 3 | Linear Regression I | `chapter_03` | ~76 | 6 of 12 | Stop after "Goodness of fit / the four questions" |
+| 3 | Linear Regression I | `chapter_03` | ~74 | 6 of 12 | Stop after "Goodness of fit / the four questions" |
 | 4 | Linear Regression II | `chapter_03` | rest | rest | **Mock Exam 1 after this week** |
 | 5 | Classification I | `chapter_04` | ~63 | 4 of 10 | Stop after multiple logistic regression |
 | 6 | Classification II | `chapter_04` | rest | rest | LDA/QDA, naive Bayes, ROC, lab |
-| 7 | Resampling | `chapter_05` | 83 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap |
-| 8 | Model Selection & Regularisation | `chapter_06` | 89 | 7 + 3 | **Mock Exam 2 after this week** |
-| 9 | Beyond Linearity | `chapter_07` | 89 | 6 + 3 | Polynomials, splines, GAMs |
-| 10 | Tree-Based Methods | `chapter_08` | 87 | 7 + 3 | Trees, bagging, forests, boosting |
-| 11 | Deep Learning | `chapter_10` | 78 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
-| 12 | Multiple Testing | `chapter_13` | 67 | 5 + 3 | **Final mock exam after this week** |
+| 7 | Resampling | `chapter_05` | 77 + 7 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap |
+| 8 | Model Selection & Regularisation | `chapter_06` | 79 + 11 | 7 + 3 | **Mock Exam 2 after this week** |
+| 9 | Beyond Linearity | `chapter_07` | 83 + 7 | 6 + 3 | Polynomials, splines, GAMs |
+| 10 | Tree-Based Methods | `chapter_08` | 81 + 7 | 7 + 3 | Trees, bagging, forests, boosting |
+| 11 | Deep Learning | `chapter_10` | 71 + 8 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
+| 12 | Multiple Testing | `chapter_13` | 61 + 6 | 5 + 3 | **Final mock exam after this week** |
 
 Chapters **9 (SVM)**, **11 (Survival)** and **12 (Unsupervised)** are not
 taught; they ship as self-study notebooks for students who want them.

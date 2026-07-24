@@ -176,6 +176,11 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
   box marking exactly when to switch to the Jupyter lab.
 - **Closing summary** — chapter-in-one-slide, key formulas, vocabulary,
   decision rules, and common pitfalls.
+- **An appendix in every deck** — the optional, more advanced material (formal
+  derivations, the heaviest worked exercises, side topics) sits behind the
+  summary, with an opening slide saying what is in it and why each item is
+  optional. The main thread never depends on it, so ~1030 slides carry the
+  course and ~110 more are there when you want them.
 
 | Ch. | Deck | Open |
 |:--:|--|:--:|
@@ -192,7 +197,7 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 | 10 | Deep Learning | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
 | 13 | Multiple Testing | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
 
-> **New: a precourse refresher (Chapter 0).** An optional 121-slide session that
+> **New: a precourse refresher (Chapter 0).** An optional 120-slide session that
 > revisits the undergraduate material this course assumes — descriptive
 > statistics, probability and Bayes, the standard distributions, sampling and
 > confidence intervals, hypothesis testing, simple linear regression, matrix

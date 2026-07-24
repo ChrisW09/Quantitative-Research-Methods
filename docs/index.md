@@ -39,7 +39,7 @@ The 12-lecture plan, chapter map and suggested stopping points.
 :link: slides
 :link-type: doc
 
-Twelve decks, ~1133 pages, 86 short + 41 extended exercises with solutions.
+Twelve decks, ~1029 pages plus ~111 pages of optional appendices, 86 short + 41 extended exercises with solutions.
 :::
 
 :::{grid-item-card} 📓 Lab notebooks
@@ -97,7 +97,7 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 
 | | |
 |---|---|
-| Lecture decks | 10 chapters + two precourse sessions · ~1133 slides |
+| Lecture decks | 10 chapters + two precourse sessions · ~1029 slides + ~111 in optional appendices |
 | Exercises | ~86 short (~5 min) + ~41 extended (~15 min), all with solutions |
 | Lab notebooks | 15 (2 precourse + 10 lecture chapters + 3 self-study) |
 | Mock exams | 3, each in 3 formats (not distributed publicly) |

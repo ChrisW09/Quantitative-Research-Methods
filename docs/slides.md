@@ -4,23 +4,28 @@ Twelve Beamer decks live in `Lecture_Slides/chapter_NN/`, each folder
 self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 `chapter_NN.pdf`. The PDFs below are served with this documentation.
 
+Every deck ends with an **appendix** holding the optional, more advanced
+material — formal derivations, the heavier worked exercises, and side topics.
+Nothing in the main thread depends on it, so a session can ignore it entirely;
+the page counts below give the main flow and the appendix separately.
+
 ## The decks
 
-| Ch. | Deck | Short ex. | Extended ex. | Pages | PDF |
+| Ch. | Deck | Short ex. | Extended ex. | Pages (main + appendix) | PDF |
 |:--:|---|:--:|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics Refresher *(optional)* | 10 | 4 | 121 | <a href="slides/chapter_00.pdf">Open</a> |
-| 0b | Precourse (b) — Toolkit *(optional)* | 6 | 2 | 57 | <a href="slides/chapter_00b.pdf">Open</a> |
-| 1 | Introduction | 3 | 1 | 73 | <a href="slides/chapter_01.pdf">Open</a> |
-| 2 | Statistical Learning | 8 | 4 | 112 | <a href="slides/chapter_02.pdf">Open</a> |
-| 3 | Linear Regression | 12 | 6 | 152 | <a href="slides/chapter_03.pdf">Open</a> |
-| 4 | Classification | 10 | 6 | 125 | <a href="slides/chapter_04.pdf">Open</a> |
-| 5 | Resampling Methods | 6 | 3 | 83 | <a href="slides/chapter_05.pdf">Open</a> |
-| 6 | Linear Model Selection & Regularization | 7 | 3 | 89 | <a href="slides/chapter_06.pdf">Open</a> |
-| 7 | Moving Beyond Linearity | 6 | 3 | 89 | <a href="slides/chapter_07.pdf">Open</a> |
-| 8 | Tree-Based Methods | 7 | 3 | 87 | <a href="slides/chapter_08.pdf">Open</a> |
-| 10 | Deep Learning | 6 | 3 | 78 | <a href="slides/chapter_10.pdf">Open</a> |
-| 13 | Multiple Testing | 5 | 3 | 67 | <a href="slides/chapter_13.pdf">Open</a> |
-| **Total** | | **86** | **41** | **1133** | |
+| 0 | Precourse (a) — Statistics Refresher *(optional)* | 10 | 4 | 104 + 16 | <a href="slides/chapter_00.pdf">Open</a> |
+| 0b | Precourse (b) — Toolkit *(optional)* | 6 | 2 | 48 + 9 | <a href="slides/chapter_00b.pdf">Open</a> |
+| 1 | Introduction | 3 | 1 | 68 + 6 | <a href="slides/chapter_01.pdf">Open</a> |
+| 2 | Statistical Learning | 8 | 4 | 105 + 8 | <a href="slides/chapter_02.pdf">Open</a> |
+| 3 | Linear Regression | 12 | 6 | 142 + 11 | <a href="slides/chapter_03.pdf">Open</a> |
+| 4 | Classification | 10 | 6 | 110 + 15 | <a href="slides/chapter_04.pdf">Open</a> |
+| 5 | Resampling Methods | 6 | 3 | 77 + 7 | <a href="slides/chapter_05.pdf">Open</a> |
+| 6 | Linear Model Selection & Regularization | 7 | 3 | 79 + 11 | <a href="slides/chapter_06.pdf">Open</a> |
+| 7 | Moving Beyond Linearity | 6 | 3 | 83 + 7 | <a href="slides/chapter_07.pdf">Open</a> |
+| 8 | Tree-Based Methods | 7 | 3 | 81 + 7 | <a href="slides/chapter_08.pdf">Open</a> |
+| 10 | Deep Learning | 6 | 3 | 71 + 8 | <a href="slides/chapter_10.pdf">Open</a> |
+| 13 | Multiple Testing | 5 | 3 | 61 + 6 | <a href="slides/chapter_13.pdf">Open</a> |
+| **Total** | | **86** | **41** | **1029 + 111** | |
 
 ## Chapter 0: the precourse refresher
 

@@ -53,24 +53,29 @@ worked example — in the HSBI house style, with:
 - A **5–10 slide summary block** closing every deck, including a dedicated
   **"Key formulas at a glance"** slide plus "chapter in one slide", vocabulary,
   decision rules and common pitfalls.
+- An **appendix** at the back of every deck holding the optional, more advanced
+  material: formal derivations, the heaviest worked exercises and side topics. It
+  opens with a slide saying what is in it and why each item is optional, and the
+  "Contents" slide points at it. The main thread never depends on the appendix, so
+  a session can run front to back and stop where the appendix begins.
 
 ## Exercises per chapter
 
-| Chapter | Topic | Short ex. | Extended ex. | Pages |
+| Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher *(optional)* | 10 | 4 | 121 |
-| 0b | Precourse (b) — toolkit *(optional)* | 6 | 2 | 57 |
-| 1  | Introduction | 3 | 1 | 73 |
-| 2  | Statistical Learning | 8 | 4 | 112 |
-| 3  | Linear Regression | 12 | 6 | 152 |
-| 4  | Classification | 10 | 6 | 125 |
-| 5  | Resampling Methods | 6 | 3 | 83 |
-| 6  | Linear Model Selection & Regularization | 7 | 3 | 89 |
-| 7  | Moving Beyond Linearity | 6 | 3 | 89 |
-| 8  | Tree-Based Methods | 7 | 3 | 87 |
-| 10 | Deep Learning | 6 | 3 | 78 |
-| 13 | Multiple Testing | 5 | 3 | 67 |
-| **Total** | | **86** | **41** | **1133** |
+| 0  | Precourse (a) — statistics refresher *(optional)* | 10 | 4 | 104 + 16 |
+| 0b | Precourse (b) — toolkit *(optional)* | 6 | 2 | 48 + 9 |
+| 1  | Introduction | 3 | 1 | 68 + 6 |
+| 2  | Statistical Learning | 8 | 4 | 105 + 8 |
+| 3  | Linear Regression | 12 | 6 | 142 + 11 |
+| 4  | Classification | 10 | 6 | 110 + 15 |
+| 5  | Resampling Methods | 6 | 3 | 77 + 7 |
+| 6  | Linear Model Selection & Regularization | 7 | 3 | 79 + 11 |
+| 7  | Moving Beyond Linearity | 6 | 3 | 83 + 7 |
+| 8  | Tree-Based Methods | 7 | 3 | 81 + 7 |
+| 10 | Deep Learning | 6 | 3 | 71 + 8 |
+| 13 | Multiple Testing | 5 | 3 | 61 + 6 |
+| **Total** | | **86** | **41** | **1029 + 111** |
 
 ## Suggested 12-lecture plan (180 min each)
 

@@ -97,12 +97,18 @@ def deck_block(folder: str, name: str, sessions: float) -> list[str]:
     secs = sections_from_toc(toc)
     teaching_minutes = int(sessions * (SESSION_MINUTES - OVERHEAD_MINUTES))
 
+    # The appendix holds optional material, so it is outside the time budget.
+    appendix_start = next((p for ti, p in secs if ti.lower().startswith("appendix")), None)
+    taught = appendix_start - 1 if appendix_start else total
+
     lines = [
         f"### {name}",
         "",
-        f"`{folder}.pdf` — **{total} slides**, planned for "
-        f"**{sessions:g} × 180 min** (≈ {teaching_minutes} min of actual teaching, "
-        f"≈ {teaching_minutes / total:.1f} min per slide).",
+        f"`{folder}.pdf` — **{taught} slides** in the main flow"
+        + (f" plus **{total - taught}** in the appendix" if appendix_start else "")
+        + f", planned for **{sessions:g} × 180 min** "
+        f"(≈ {teaching_minutes} min of actual teaching, "
+        f"≈ {teaching_minutes / taught:.1f} min per slide).",
         "",
         "| Section | Pages | Slides | Time budget |",
         "|---|:--:|:--:|:--:|",
@@ -111,16 +117,17 @@ def deck_block(folder: str, name: str, sessions: float) -> list[str]:
     bounds = [(t, p) for t, p in secs] + [("", total + 1)]
     front = secs[0][1] - 1 if secs else total
     if front > 0:
-        share = front / total
+        share = front / taught
         lines.append(
             f"| *front matter* | 1–{front} | {front} | {teaching_minutes * share:.0f} min |"
         )
     for (title, start), (_, nxt) in zip(bounds, bounds[1:]):
         span = nxt - start
-        share = span / total
-        lines.append(
-            f"| {title} | {start}–{nxt - 1} | {span} | {teaching_minutes * share:.0f} min |"
-        )
+        if appendix_start and start >= appendix_start:
+            budget = "optional"
+        else:
+            budget = f"{teaching_minutes * span / taught:.0f} min"
+        lines.append(f"| {title} | {start}–{nxt - 1} | {span} | {budget} |")
     lines.append("")
 
     # Exercises, with their solutions folded in.
