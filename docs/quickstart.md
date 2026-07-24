@@ -67,6 +67,6 @@ See [Building the docs](building-docs.md) for live-reload and PDF output.
 ## Where to go next
 
 - [The course at a glance](course.md) — the 12-lecture plan.
-- [Lecture slides](slides.md) — deck-by-deck contents and exercise counts.
+- [Lecture slides](slides.md) — deck-by-deck contents, exercise counts, and what sits in each deck's optional appendix.
 - [Lab notebooks](labs.md) — every lab, rendered in full.
 - [Python environment](environment.md) — what's pinned and why.

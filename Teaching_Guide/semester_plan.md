@@ -45,7 +45,9 @@ can stop and resume without a dangling thread:
 
 ## If you are behind
 
-Falling behind is normal — the decks carry more than a session holds. In order
+Falling behind is normal — the decks carry more than a session holds. The first
+cut has already been made for you: each deck's appendix (formal derivations, the
+heaviest exercises, side topics) is outside the timed plan. After that, in order
 of what to sacrifice:
 
 1. **Extended exercises.** Set them as homework; the solutions are in the deck,

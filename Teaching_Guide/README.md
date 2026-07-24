@@ -7,7 +7,7 @@ a 120-slide deck first.
 |---|---|
 | [`semester_plan.md`](./semester_plan.md) | The 12 weeks on one page: what to teach when, what the assessment rhythm is, what to do if you fall behind |
 | [`runsheets/`](./runsheets/) | One page per session: timing blocks, what to cut first, which exercises to run live, the misconceptions to pre-empt |
-| [`slide_index.md`](./slide_index.md) | Every deck's sections with page ranges, every exercise with its page, generated from the compiled PDFs |
+| [`slide_index.md`](./slide_index.md) | Every deck's sections with page ranges, every exercise with its page, generated from the compiled PDFs; each deck's appendix is listed but marked *optional* rather than given a time budget |
 | [`before_class.md`](./before_class.md) | The ten-minute checklist for the morning of a lecture |
 | [`handouts/`](./handouts/) | Printable two-up versions of every deck (`make handouts`) |
 | `make_index.py`, `check_decks.py` | The generators behind the index and the health check |
@@ -37,6 +37,20 @@ Lecture_Slides/chapter_NN/chapter_NN.tex   the deck you project
 Lab_Notebooks/chapter_NN_lab.ipynb          what students run
 Mock_Exams/                                 assessment (kept out of git)
 ```
+
+## A note on the appendices
+
+Every deck ends with an appendix holding its optional, more advanced material —
+formal derivations, the heaviest worked exercises, side topics. It is deliberately
+outside the timed plan: the runsheets stop where the appendix begins, and
+`slide_index.md` marks it *optional*. Three ways to use it:
+
+- **Assign it.** Every exercise in an appendix has its full solution behind it,
+  so students can work it alone.
+- **Reach for it in the room** when a cohort wants the derivation — each runsheet
+  has an "In the appendix (optional)" section naming what is there and which
+  board moments moved with it.
+- **Ignore it.** No slide in the main flow depends on an appendix slide.
 
 ## A note on the two precourse sessions
 

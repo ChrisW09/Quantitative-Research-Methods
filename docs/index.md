@@ -75,8 +75,9 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 
 **Slides built for the room.**
 : Every deck moves motivation → intuition → formal definition → worked example,
-  with colour-coded callout boxes and ~70 short + ~35 extended exercises, each
-  followed by a full solution.
+  with colour-coded callout boxes and ~86 short + ~41 extended exercises, each
+  followed by a full solution. The hardest, optional material sits in a per-deck
+  appendix, so the main thread fits the twelve sessions.
 
 **Numbers you can trust.**
 : ~40 purpose-built visuals are computed from the real course datasets (not

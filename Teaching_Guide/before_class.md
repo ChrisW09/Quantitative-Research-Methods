@@ -12,6 +12,9 @@ somebody.
       now, not at minute 140.
 - [ ] Decide which exercises run live. The decks carry more than fits; the
       runsheet names the two or three worth the room's time.
+- [ ] Note where the deck's **appendix** starts (the runsheet says, and
+      `slide_index.md` marks it). It is outside the timed plan — stop there, and
+      only go past it if you are ahead or the room asks for the derivation.
 
 ## The morning of
 

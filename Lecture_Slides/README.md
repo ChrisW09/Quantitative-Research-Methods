@@ -11,10 +11,11 @@ Each chapter folder (`chapter_NN/`) is self-contained: `chapter_NN.tex`, its
 `chapter_00/` is an **optional precourse refresher** of the undergraduate
 material the course assumes. It is not an ISLP chapter: it revisits descriptive
 statistics, probability and Bayes, the standard distributions, sampling and
-confidence intervals, hypothesis testing, simple linear regression, matrix
-algebra, derivatives and gradient descent, and the `numpy`/`pandas` toolkit —
-each section ending with where that topic reappears in the course. It opens
-with a ten-question self-check so students can judge whether they need it. Its
+confidence intervals, hypothesis testing, simple linear regression and the
+`numpy`/`pandas` toolkit — each section ending with where that topic reappears
+in the course. The matrix algebra and the derivatives/gradient-descent strands
+sit in its appendix, to be taken only by the cohorts that need them. It opens
+with a twelve-question self-check so students can judge whether they need it. Its
 eighteen figures are regenerated from the bundled data by
 [`chapter_00/make_figures.py`](./chapter_00/make_figures.py), and it has a
 companion notebook, `Lab_Notebooks/chapter_00_lab.ipynb`, which rebuilds every
@@ -25,7 +26,8 @@ chapters use but never explain. Its scope was chosen by counting usage across
 the ten lecture decks: reading notation (Σ, Π, argmin, indicators, sets — 180
 uses), logs and exponentials (176), odds and the logit (108), likelihood and
 maximum likelihood (37), counting and the 2ᵖ cost (13), plus the Python
-patterns every lab relies on. Companion notebook:
+patterns every lab relies on. The maximum-likelihood derivation and the counting
+strand are in its appendix. Companion notebook:
 `Lab_Notebooks/chapter_00b_lab.ipynb`.
 
 ## Teaching design
@@ -59,6 +61,28 @@ worked example — in the HSBI house style, with:
   "Contents" slide points at it. The main thread never depends on the appendix, so
   a session can run front to back and stop where the appendix begins.
 
+## What is in the appendices
+
+The appendix of each deck is outside the timed teaching plan: the runsheets in
+`Teaching_Guide/runsheets/` stop where it begins, and `slide_index.md` marks it
+*optional*. Every exercise in an appendix still carries its full solution, so it
+works as homework.
+
+| Chapter | In its appendix | Pages |
+|---|---|:--:|
+| 0  | χ²/t/F and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 16 |
+| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 9 |
+| 1  | the design matrix entry by entry · the two dataset lookup tables | 6 |
+| 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 8 |
+| 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 11 |
+| 4  | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression | 15 |
+| 5  | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 7 |
+| 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
+| 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
+| 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
+| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
+| 13 | the four outcomes drawn · resampling-based inference · post-selection inference | 6 |
+
 ## Exercises per chapter
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
@@ -85,7 +109,7 @@ section boundary so you can stop and resume cleanly.
 
 | Lecture | Chapter(s) | Content | Exercises |
 |---|---|---|---|
-| 0 *(optional)*  | Ch 0 | Precourse (a): descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python | 0.1–0.10 |
+| 0 *(optional)*  | Ch 0 | Precourse (a): descriptive statistics, probability, distributions, inference, simple regression, Python (matrix algebra and calculus in the appendix) | 0.1–0.10 |
 | 0b *(optional)* | Ch 0b | Precourse (b): notation, logs and odds, likelihood, counting, the Python of the labs | 0b.1–0b.6 |
 | 1  | Ch 1 + Ch 2 (part 1) | Introduction; what is statistical learning; prediction vs inference; parametric vs non-parametric | 1.1–1.3, 2.1–2.2 |
 | 2  | Ch 2 (part 2) | Assessing accuracy; bias–variance trade-off; classification & KNN; lab | 2.3–2.8 |
@@ -103,6 +127,9 @@ section boundary so you can stop and resume cleanly.
 For the split lectures, the recommended stopping points are: **Ch 2** after the
 KNN / bias–variance material; **Ch 3** after "Goodness of fit / the four
 questions"; **Ch 4** after multiple logistic regression (before LDA).
+
+The plan above covers the main flow of each deck. Appendix pages sit outside it
+— assign them, or reach for them when a room wants the derivation.
 
 ## Rebuilding a deck
 

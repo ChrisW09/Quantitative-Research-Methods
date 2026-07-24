@@ -46,5 +46,6 @@ make them useless as assessment.
 ## Related reading
 
 - [`Lecture_Slides/README.md`](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Lecture_Slides/README.md)
-  — the deck guide, with per-chapter exercise counts and the full lecture plan.
+  — the deck guide, with per-chapter exercise counts, the contents of each
+  deck's appendix, and the full lecture plan.
 - [Building the docs](building-docs.md) — how this site is assembled.

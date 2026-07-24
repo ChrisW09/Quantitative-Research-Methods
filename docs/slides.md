@@ -42,10 +42,11 @@ backgrounds. It covers:
 - standard errors, confidence intervals, hypothesis tests and the standard
   misreadings of both;
 - simple linear regression end to end: least squares, residuals, $R^2$;
-- the linear algebra (matrix products, inverses, norms, eigenvectors) and
-  calculus (gradients, convexity, gradient descent) later chapters rely on;
 - the `numpy` / `pandas` / `matplotlib` / `statsmodels` / `scikit-learn`
-  toolkit of the labs.
+  toolkit of the labs;
+- and, in the deck's appendix, the linear algebra (matrix products, inverses,
+  norms, eigenvectors) and calculus (gradients, convexity, gradient descent)
+  that later chapters rely on — take them if the cohort needs them.
 
 It opens with a twelve-question self-check so students can decide whether they
 need it, and closes with a table mapping every topic to the chapter that uses
@@ -74,7 +75,8 @@ It adds a sixth strand the labs depend on and the decks never teach: the Python
 patterns themselves — writing a function, looping over candidate settings,
 seeding randomness, the `fit`/`predict` contract, and the discipline of scoring
 on data the model has not seen. Eight figures, six short and two extended
-exercises, and a companion notebook.
+exercises, and a companion notebook. The maximum-likelihood derivation and the
+counting/cost strand live in its appendix.
 
 ## What's in a deck
 
@@ -93,6 +95,32 @@ exercises, and a companion notebook.
 - **Verified numbers** — Python solutions carry runnable snippets against the
   bundled datasets, and all numeric answers were reproduced against the real
   data.
+- **An appendix** behind the closing summary, holding the optional and more
+  advanced material. It opens with a signpost slide listing what is in it and
+  *why* each item is optional, and the deck's Contents slide points at it.
+
+## What each appendix holds
+
+The main flow never depends on the appendix, and the per-session runsheets in
+`Teaching_Guide/` budget no teaching time for it — it is material to assign, to
+reach for when a room wants the full story, or to come back to from a later
+chapter.
+
+| Ch. | In its appendix | Pages |
+|:--:|---|:--:|
+| 0 | $\chi^2$/$t$/$F$ and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 16 |
+| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the $2^p$ cost (with Exercise 0b.5) | 9 |
+| 1 | the design matrix entry by entry · the two dataset lookup tables | 6 |
+| 2 | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 8 |
+| 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 11 |
+| 4 | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression | 15 |
+| 5 | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 7 |
+| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
+| 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
+| 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
+| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
+| 13 | the four outcomes drawn · resampling-based inference · post-selection inference | 6 |
+
 
 ## Rebuilding a deck
 

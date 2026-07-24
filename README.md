@@ -64,12 +64,15 @@ Applied Sciences and Arts).
 
 ## ⚡ Why these materials
 
-- **A whole course, not a pile of files.** Eleven Beamer decks — ten chapters
+- **A whole course, not a pile of files.** Twelve Beamer decks — ten chapters
   plus a two-part optional precourse — fifteen labs and three mock exams that
   share one notation, one dataset set, and one 12-week rhythm.
 - **Slides built for the room.** Every deck moves motivation → intuition →
   formal definition → worked example, with colour-coded callout boxes and
-  **~86 short + ~41 extended exercises**, each followed by a full solution.
+  **~86 short + ~41 extended exercises**, each followed by a full solution. The
+  hardest, optional material — formal derivations, side topics, the heaviest
+  exercises — is parked in a **per-deck appendix**, so the main thread is
+  ~1030 slides that fit the twelve sessions, with ~110 more behind them.
 - **Numbers you can trust.** ~40 purpose-built visuals are computed from the
   real course datasets (not sketched), and every mock-exam answer was verified
   programmatically.
@@ -124,7 +127,7 @@ A 12-lecture semester (12 × 180 min):
 
 | Lecture | Chapter | Topic |
 |:--:|:--:|--|
-| 0 *(optional)* | — | **Precourse (a)**: descriptive statistics, probability, distributions, inference, simple regression, matrix algebra, calculus, Python |
+| 0 *(optional)* | — | **Precourse (a)**: descriptive statistics, probability, distributions, inference, simple regression, Python — matrix algebra and calculus in the appendix |
 | 0b *(optional)* | — | **Precourse (b)**: reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost, the Python patterns of the labs |
 | 1 | 1 + 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference |
 | 2 | 2 (part 2) | Model accuracy; bias–variance trade-off; Bayes classifier; KNN |
@@ -146,7 +149,7 @@ A 12-lecture semester (12 × 180 min):
 
 | Path | Contents |
 |---|---|
-| [`Lecture_Slides/`](./Lecture_Slides/) | Eleven Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable, including the `chapter_00` precourse refresher. See its [deck guide](./Lecture_Slides/README.md). |
+| [`Lecture_Slides/`](./Lecture_Slides/) | Twelve Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable, including the `chapter_00` precourse refresher. See its [deck guide](./Lecture_Slides/README.md). |
 | [`Lab_Notebooks/`](./Lab_Notebooks/) | Fifteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
 | [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, per-session runsheets, slide index, printable handouts |
@@ -160,7 +163,7 @@ A 12-lecture semester (12 × 180 min):
 
 ## 🎞️ Lecture slides
 
-Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
+Twelve decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
 
 - **Front matter** — course-at-a-glance, chapter contents, and a "Notation in
   this chapter" symbol table.
@@ -176,33 +179,62 @@ Eleven decks (`Lecture_Slides/chapter_NN/`) share a consistent teaching design:
   box marking exactly when to switch to the Jupyter lab.
 - **Closing summary** — chapter-in-one-slide, key formulas, vocabulary,
   decision rules, and common pitfalls.
-- **An appendix in every deck** — the optional, more advanced material (formal
-  derivations, the heaviest worked exercises, side topics) sits behind the
-  summary, with an opening slide saying what is in it and why each item is
-  optional. The main thread never depends on it, so ~1030 slides carry the
-  course and ~110 more are there when you want them.
+- **An appendix in every deck** — the optional, more advanced material sits
+  behind the summary: formal derivations, the heaviest worked exercises, and
+  side topics. It opens with a slide saying what is in it and *why* each item is
+  optional, and the deck's Contents slide points at it. The main thread never
+  depends on the appendix, so a session runs front to back and stops where the
+  appendix begins: **1029 slides carry the course, 111 more are there when you
+  want them.**
 
-| Ch. | Deck | Open |
-|:--:|--|:--:|
-| 0 | Precourse (a) — Statistics Refresher *(optional)* | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
-| 0b | Precourse (b) — Toolkit *(optional)* | [PDF](./Lecture_Slides/chapter_00b/chapter_00b.pdf) |
-| 1 | Introduction | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
-| 2 | Statistical Learning | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
-| 3 | Linear Regression | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
-| 4 | Classification | [PDF](./Lecture_Slides/chapter_04/chapter_04.pdf) |
-| 5 | Resampling Methods | [PDF](./Lecture_Slides/chapter_05/chapter_05.pdf) |
-| 6 | Linear Model Selection & Regularization | [PDF](./Lecture_Slides/chapter_06/chapter_06.pdf) |
-| 7 | Moving Beyond Linearity | [PDF](./Lecture_Slides/chapter_07/chapter_07.pdf) |
-| 8 | Tree-Based Methods | [PDF](./Lecture_Slides/chapter_08/chapter_08.pdf) |
-| 10 | Deep Learning | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
-| 13 | Multiple Testing | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
+| Ch. | Deck | Short ex. | Extended ex. | Main flow | Appendix | Open |
+|:--:|--|:--:|:--:|:--:|:--:|:--:|
+| 0 | Precourse (a) — Statistics Refresher *(optional)* | 10 | 4 | 104 | +16 | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(optional)* | 6 | 2 | 48 | +9 | [PDF](./Lecture_Slides/chapter_00b/chapter_00b.pdf) |
+| 1 | Introduction | 3 | 1 | 68 | +6 | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
+| 2 | Statistical Learning | 8 | 4 | 105 | +8 | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
+| 3 | Linear Regression | 12 | 6 | 142 | +11 | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
+| 4 | Classification | 10 | 6 | 110 | +15 | [PDF](./Lecture_Slides/chapter_04/chapter_04.pdf) |
+| 5 | Resampling Methods | 6 | 3 | 77 | +7 | [PDF](./Lecture_Slides/chapter_05/chapter_05.pdf) |
+| 6 | Linear Model Selection & Regularization | 7 | 3 | 79 | +11 | [PDF](./Lecture_Slides/chapter_06/chapter_06.pdf) |
+| 7 | Moving Beyond Linearity | 6 | 3 | 83 | +7 | [PDF](./Lecture_Slides/chapter_07/chapter_07.pdf) |
+| 8 | Tree-Based Methods | 7 | 3 | 81 | +7 | [PDF](./Lecture_Slides/chapter_08/chapter_08.pdf) |
+| 10 | Deep Learning | 6 | 3 | 71 | +8 | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
+| 13 | Multiple Testing | 5 | 3 | 61 | +6 | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
+| **Total** | | **86** | **41** | **1029** | **+111** | |
 
-> **New: a precourse refresher (Chapter 0).** An optional 120-slide session that
-> revisits the undergraduate material this course assumes — descriptive
-> statistics, probability and Bayes, the standard distributions, sampling and
-> confidence intervals, hypothesis testing, simple linear regression, matrix
-> algebra, derivatives and gradient descent, and the `numpy`/`pandas` toolkit.
-> It opens with a ten-question self-check so students can decide whether they
+<details>
+<summary><b>What each appendix holds</b></summary>
+
+Every deck ends with a signpost slide and then the optional material below.
+Nothing in the main flow depends on it, and the per-session runsheets in
+[`Teaching_Guide/`](./Teaching_Guide/) budget no time for it.
+
+| Ch. | In its appendix | Pages |
+|:--:|---|:--:|
+| 0 | χ²/t/F and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 16 |
+| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 9 |
+| 1 | the design matrix entry by entry · the two dataset lookup tables | 6 |
+| 2 | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 8 |
+| 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 11 |
+| 4 | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression | 15 |
+| 5 | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 7 |
+| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
+| 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
+| 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
+| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
+| 13 | the four outcomes drawn · resampling-based inference · post-selection inference | 6 |
+
+</details>
+
+> **New: a precourse refresher (Chapter 0).** An optional session — 104 slides
+> plus a 16-slide appendix — that revisits the undergraduate material this
+> course assumes: descriptive statistics, probability and Bayes, the standard
+> distributions, sampling and confidence intervals, hypothesis testing, simple
+> linear regression, and the `numpy`/`pandas` toolkit; the matrix algebra and
+> the calculus/gradient-descent strands sit in its appendix, for the cohorts
+> that need them.
+> It opens with a twelve-question self-check so students can decide whether they
 > need it, and closes with a table mapping every topic to the chapter that uses
 > it. Eighteen figures — Anscombe's quartet, Simpson's paradox, the CLT, CI
 > coverage, power, gradient descent — are computed from the course data by
@@ -278,9 +310,10 @@ structure and difficulty, different numbers.
 a [semester plan](./Teaching_Guide/semester_plan.md), a
 [before-class checklist](./Teaching_Guide/before_class.md), a generated
 [slide index](./Teaching_Guide/slide_index.md) (every section and exercise with
-its page number), and per-session runsheets with timings, a cut-list for when
-you are behind, the exercises worth running live, and the misconceptions to
-pre-empt.
+its page number, each appendix marked *optional*), and per-session runsheets
+with timings, a cut-list for when you are behind, the exercises worth running
+live, and the misconceptions to pre-empt. The runsheet timings cover the main
+flow only — appendix pages are material to assign, not to teach.
 
 Everything rebuilds with one command:
 

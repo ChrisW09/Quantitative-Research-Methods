@@ -77,3 +77,8 @@ Every deck follows the same rhythm, so students always know where they are:
    the right mix for your room.
 4. **Closing summary** — chapter-in-one-slide, key formulas at a glance,
    vocabulary, decision rules and common pitfalls.
+5. **Appendix** — the optional, more advanced material: formal derivations, the
+   heaviest worked exercises and side topics, introduced by a slide that says
+   what is in it and why each item is optional. The main flow never depends on
+   it, so a session runs front to back and stops where the appendix begins; the
+   instructor runsheets budget no time for it.
