@@ -148,6 +148,8 @@
 
 \begin{frame}{Contents}\footnotesize
   \tableofcontents[hideallsubsections]
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -510,32 +512,6 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Why squared, and not absolute?}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Pros of squaring}
-      \begin{itemize}
-        \item Differentiable everywhere $\Rightarrow$ closed form.
-        \item Larger mistakes punished more $\Rightarrow$ no huge
-              residuals at the optimum.
-        \item Aligns with the Gaussian-error likelihood (Gauss 1809).
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Cons of squaring}
-      \begin{itemize}
-        \item Not robust to outliers --- one extreme $y_i$ can move
-              the line a lot.
-        \item Robust alternatives (median regression, Huber loss)
-              exist and are useful when outliers dominate.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \begin{takeaway}
-    For a first course we always start with squared loss. Switching
-    to robust losses is a one-line change in modern software.
-  \end{takeaway}
-\end{frame}
 
 \begin{frame}{Deriving the slope: step 1 of 2}
   Set the partial derivative of RSS with respect to $\beta_1$ to zero:
@@ -1158,104 +1134,9 @@
   \end{solutionbox}
 \end{frame}
 
-% ---------------- Extended Exercise 3.L2 [Math] ----------------
-\begin{frame}{Extended Exercise 3.L2 --- Deriving least squares [Math]}
-  \begin{longexercise}
-    Do not merely \emph{use} the OLS formulas --- \emph{derive} them.
-    \begin{enumerate}
-      \item Write $\mathrm{RSS}(\beta_0,\beta_1)=\sum_{i=1}^{n}(y_i-\beta_0-\beta_1 x_i)^2$
-            and set both partial derivatives to zero to obtain the
-            \emph{normal equations}.
-      \item Solve them for $\hat\beta_0$ and $\hat\beta_1$.
-      \item Show the fitted line always passes through $(\bar x,\bar y)$.
-      \item State precisely what it means that $\hat\beta_1$ is
-            \emph{unbiased}.
-      \item Plug in the summaries $n=20$, $\bar x=5$, $\bar y=15$,
-            $S_{xx}=40$, $S_{xy}=100$ to get the estimates.
-    \end{enumerate}
-  \end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 3.L2 (1/3)}
-  \begin{solutionbox}
-    \emph{Method.} $\mathrm{RSS}(\beta_0,\beta_1)$ is a smooth convex
-    function of the two coefficients (a bowl), so its unique minimiser
-    is the point where \emph{both} partial derivatives vanish --- two
-    linear equations in two unknowns.
 
-    \textbf{(1) Normal equations.} Differentiate the sum of squares and
-    set each derivative to zero:
-    \[
-      \frac{\partial \mathrm{RSS}}{\partial \beta_0}
-        =-2\sum (y_i-\beta_0-\beta_1 x_i)=0
-        \;\Rightarrow\; \sum y_i=n\beta_0+\beta_1\sum x_i,
-    \]
-    \[
-      \frac{\partial \mathrm{RSS}}{\partial \beta_1}
-        =-2\sum x_i(y_i-\beta_0-\beta_1 x_i)=0
-        \;\Rightarrow\; \sum x_i y_i=\beta_0\sum x_i+\beta_1\sum x_i^2.
-    \]
-    The factors $-2$ cancel. Read as statements about residuals: the
-    first says the residuals sum to zero, the second says they are
-    orthogonal to the predictor.
-  \end{solutionbox}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 3.L2 (2/3)}
-  \begin{solutionbox}
-    \textbf{(2) Solve the system.} Divide the first normal equation by
-    $n$:
-    \[
-      \bar y=\beta_0+\beta_1\bar x
-      \;\Rightarrow\; \hat\beta_0=\bar y-\hat\beta_1\bar x.
-    \]
-    Substitute this into the second equation (note
-    $\sum x_i=n\bar x$) and collect the $\hat\beta_1$ terms:
-    \[
-      \sum x_i y_i=(\bar y-\hat\beta_1\bar x)\,n\bar x+\hat\beta_1\sum x_i^2
-      \;\Rightarrow\;
-      \sum x_i y_i-n\bar x\bar y
-        =\hat\beta_1\Bigl(\sum x_i^2-n\bar x^2\Bigr).
-    \]
-    The centring identities
-    $\sum x_i y_i-n\bar x\bar y=\sum(x_i-\bar x)(y_i-\bar y)=S_{xy}$ and
-    $\sum x_i^2-n\bar x^2=\sum(x_i-\bar x)^2=S_{xx}$ then give
-    \[
-      \boxed{\ \hat\beta_1=\dfrac{\sum(x_i-\bar x)(y_i-\bar y)}{\sum(x_i-\bar x)^2}
-      =\dfrac{S_{xy}}{S_{xx}}\ },\qquad
-      \boxed{\ \hat\beta_0=\bar y-\hat\beta_1\bar x\ }.
-    \]
-    \textit{Common mistake:} trying to solve the second equation on its
-    own --- the uncentred sums collapse to $S_{xy}/S_{xx}$ only
-    \emph{after} substituting $\hat\beta_0=\bar y-\hat\beta_1\bar x$.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 3.L2 (3/3)}
-  \begin{solutionbox}
-    \textbf{(3) Passes through $(\bar x,\bar y)$.} At $x=\bar x$,
-    \[
-      \hat y=\hat\beta_0+\hat\beta_1\bar x
-      =(\bar y-\hat\beta_1\bar x)+\hat\beta_1\bar x=\bar y.
-    \]
-    This is just the first normal equation restated --- the residuals
-    always sum to zero.
-
-    \textbf{(4) Unbiasedness.} Treating the $x_i$ as fixed and assuming
-    $\mathbb{E}[\varepsilon_i]=0$, one shows $\mathbb{E}[\hat\beta_1]=\beta_1$
-    and $\mathbb{E}[\hat\beta_0]=\beta_0$. Meaning: \emph{averaged over
-    many repeated samples} the estimates are centred on the true values
-    --- no systematic over- or under-estimation. (Any single estimate
-    still has sampling error, quantified by its SE.)
-
-    \textbf{(5) Plug in.}
-    \[
-      \hat\beta_1=\frac{S_{xy}}{S_{xx}}=\frac{100}{40}=2.5,\qquad
-      \hat\beta_0=\bar y-\hat\beta_1\bar x=15-2.5(5)=2.5,
-    \]
-    so $\hat y=2.5+2.5\,x$.
-  \end{solutionbox}
-\end{frame}
 
 % ============================================================
 \section{Multiple Linear Regression}
@@ -1300,32 +1181,6 @@
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{Matrix form: a compact view}
-  Stack predictors into a design matrix $\mathbf{X}$ that includes a
-  column of ones (for the intercept):
-  \[
-    \mathbf{y} \;=\; \mathbf{X}\,\boldsymbol\beta \;+\; \boldsymbol\varepsilon,
-    \qquad
-    \mathbf{X} \in \mathbb{R}^{n \times (p+1)}.
-  \]
-  Least squares gives the closed form
-  \[
-    \boxed{\;
-      \hat{\boldsymbol\beta}
-        \;=\; (\mathbf{X}^\top \mathbf{X})^{-1}\mathbf{X}^\top \mathbf{y}.
-    \;}
-  \]
-  \begin{readme}
-    \begin{itemize}
-      \item $\mathbf{X}^\top\mathbf{X}$ must be invertible: requires
-            $n > p + 1$ \emph{and} no perfect collinearity.
-      \item The hat matrix $\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top$
-            satisfies $\hat{\mathbf{y}} = \mathbf{H}\mathbf{y}$.
-      \item Diagonal entries $h_{ii}$ are leverages --- we will use
-            them in diagnostics.
-    \end{itemize}
-  \end{readme}
-\end{frame}
 
 % ============================================================
 \begin{frame}[fragile]{Exercise 3.4 --- Multiple OLS on Advertising [Python]}
@@ -2594,78 +2449,8 @@ print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
 \end{frame}
 
 
-% ---------------- Extended Exercise 3.L6 [Python] ----------------
-\begin{frame}[fragile]{Extended Exercise 3.L6 --- Linear vs polynomial vs KNN [Python]}
-  \begin{longexercise}
-    On \texttt{Auto.csv}, model $\texttt{mpg}\sim\texttt{horsepower}$
-    (drop the rows where \texttt{horsepower} is the string \texttt{"?"}).
-    \begin{enumerate}
-      \item Make a $70/30$ split (\texttt{random\_state=1}) and fit three
-            models: linear, degree-2 polynomial, and KNN regression
-            (standardise $x$ first).
-      \item Estimate the \emph{test} MSE of each.
-      \item Which fits best, and why? Answer in terms of the
-            \emph{bias--variance trade-off}, and say what happens to KNN as
-            $K\to 1$.
-    \end{enumerate}
-  \end{longexercise}
-\end{frame}
 
-\begin{frame}[fragile]{Solution --- Extended Exercise 3.L6 (1/3)}
-  \begin{solutionbox}
-    \textbf{Load, clean and split.}
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.metrics import mean_squared_error as mse   # test-error metric
 
-a = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Auto.csv")  # load Auto data
-a = a[a.horsepower != "?"]; a.horsepower = a.horsepower.astype(float)  # clean
-X, y = a[["horsepower"]].values, a["mpg"].values  # one predictor, target mpg
-Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=.3, random_state=1)  # 70/30
-\end{lstlisting}
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}[fragile]{Solution --- Extended Exercise 3.L6 (2/3)}
-  \begin{solutionbox}
-    \textbf{Fit the three models and score the test MSE.}
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-lin = LinearRegression().fit(Xtr, ytr)                    # straight-line fit
-pol = make_pipeline(PolynomialFeatures(2), LinearRegression()).fit(Xtr, ytr)  # adds hp^2
-knn = make_pipeline(StandardScaler(), KNeighborsRegressor(10)).fit(Xtr, ytr)  # scale, K=10
-for name, m in [("linear", lin), ("poly-2", pol), ("KNN10", knn)]:
-    print(name, round(mse(yte, m.predict(Xte)), 1))       # test-set MSE
-# linear 26.2 | poly-2 19.8 | KNN(K=10) 21.3
-\end{lstlisting}
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 3.L6 (3/3)}
-  \begin{solutionbox}
-    \textbf{Test MSE.} Linear $\approx 26.2$, degree-2 polynomial
-    $\approx 19.8$, KNN $(K{=}10)\approx 21.3$: both flexible models
-    clearly beat the straight line.
-
-    \textbf{Why (bias--variance).} The true \texttt{mpg}--\texttt{horsepower}
-    relationship is convex and decreasing, so a straight line
-    \emph{underfits} --- high \emph{bias}, largest test MSE. The degree-2
-    polynomial captures the curvature with just one extra parameter (low
-    bias, still low variance) and wins here; a moderate-$K$ KNN is a close
-    non-parametric competitor.
-
-    \textbf{As $K\to 1$.} Each prediction is a single neighbour: the model
-    interpolates the training points (training MSE $\to 0$) but is very
-    wiggly --- high \emph{variance}, so test MSE \emph{rises} (here
-    $\approx 34$ at $K{=}1$). The best $K$ balances bias (large $K$)
-    against variance (small $K$). \emph{Takeaway:} prefer the parsimonious
-    degree-2 fit; if using KNN, tune $K$ by cross-validation.
-  \end{solutionbox}
-\end{frame}
 
 % ============================================================
 \section{Python Lab}
@@ -2915,6 +2700,254 @@ print(dict(zip(X.columns, vifs)))  # VIF near 1 fine; > 5 problematic
     \item Confusion matrices, ROC curves, AUC.
     \item Generalised linear models in one frame.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{Squared versus absolute loss} --- the trade-offs of the squared criterion and the robust alternatives. Interesting, but this course always uses squared loss.
+      \item \textbf{Deriving least squares (Extended Exercise 3.L2)} --- the full calculus derivation of $\hat\beta_0$ and $\hat\beta_1$. The main deck derives the two normal equations already; this is the same argument done slowly, as homework.
+      \item \textbf{Matrix form of multiple regression} --- $\hat{\boldsymbol\beta}=(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$. You never compute it by hand; it reappears in Chapter 6 for ridge.
+      \item \textbf{Linear vs.\ polynomial vs.\ KNN (Extended Exercise 3.L6)} --- a full simulation study in Python. Excellent practice, and a natural bridge to Chapter 5 --- but it needs a machine, not a lecture slot.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Why squared, and not absolute?}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Pros of squaring}
+      \begin{itemize}
+        \item Differentiable everywhere $\Rightarrow$ closed form.
+        \item Larger mistakes punished more $\Rightarrow$ no huge
+              residuals at the optimum.
+        \item Aligns with the Gaussian-error likelihood (Gauss 1809).
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Cons of squaring}
+      \begin{itemize}
+        \item Not robust to outliers --- one extreme $y_i$ can move
+              the line a lot.
+        \item Robust alternatives (median regression, Huber loss)
+              exist and are useful when outliers dominate.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \begin{takeaway}
+    For a first course we always start with squared loss. Switching
+    to robust losses is a one-line change in modern software.
+  \end{takeaway}
+\end{frame}
+
+% ---------------- Extended Exercise 3.L2 [Math] ----------------
+\begin{frame}{Extended Exercise 3.L2 --- Deriving least squares [Math]}
+  \begin{longexercise}
+    Do not merely \emph{use} the OLS formulas --- \emph{derive} them.
+    \begin{enumerate}
+      \item Write $\mathrm{RSS}(\beta_0,\beta_1)=\sum_{i=1}^{n}(y_i-\beta_0-\beta_1 x_i)^2$
+            and set both partial derivatives to zero to obtain the
+            \emph{normal equations}.
+      \item Solve them for $\hat\beta_0$ and $\hat\beta_1$.
+      \item Show the fitted line always passes through $(\bar x,\bar y)$.
+      \item State precisely what it means that $\hat\beta_1$ is
+            \emph{unbiased}.
+      \item Plug in the summaries $n=20$, $\bar x=5$, $\bar y=15$,
+            $S_{xx}=40$, $S_{xy}=100$ to get the estimates.
+    \end{enumerate}
+  \end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 3.L2 (1/3)}
+  \begin{solutionbox}
+    \emph{Method.} $\mathrm{RSS}(\beta_0,\beta_1)$ is a smooth convex
+    function of the two coefficients (a bowl), so its unique minimiser
+    is the point where \emph{both} partial derivatives vanish --- two
+    linear equations in two unknowns.
+
+    \textbf{(1) Normal equations.} Differentiate the sum of squares and
+    set each derivative to zero:
+    \[
+      \frac{\partial \mathrm{RSS}}{\partial \beta_0}
+        =-2\sum (y_i-\beta_0-\beta_1 x_i)=0
+        \;\Rightarrow\; \sum y_i=n\beta_0+\beta_1\sum x_i,
+    \]
+    \[
+      \frac{\partial \mathrm{RSS}}{\partial \beta_1}
+        =-2\sum x_i(y_i-\beta_0-\beta_1 x_i)=0
+        \;\Rightarrow\; \sum x_i y_i=\beta_0\sum x_i+\beta_1\sum x_i^2.
+    \]
+    The factors $-2$ cancel. Read as statements about residuals: the
+    first says the residuals sum to zero, the second says they are
+    orthogonal to the predictor.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 3.L2 (2/3)}
+  \begin{solutionbox}
+    \textbf{(2) Solve the system.} Divide the first normal equation by
+    $n$:
+    \[
+      \bar y=\beta_0+\beta_1\bar x
+      \;\Rightarrow\; \hat\beta_0=\bar y-\hat\beta_1\bar x.
+    \]
+    Substitute this into the second equation (note
+    $\sum x_i=n\bar x$) and collect the $\hat\beta_1$ terms:
+    \[
+      \sum x_i y_i=(\bar y-\hat\beta_1\bar x)\,n\bar x+\hat\beta_1\sum x_i^2
+      \;\Rightarrow\;
+      \sum x_i y_i-n\bar x\bar y
+        =\hat\beta_1\Bigl(\sum x_i^2-n\bar x^2\Bigr).
+    \]
+    The centring identities
+    $\sum x_i y_i-n\bar x\bar y=\sum(x_i-\bar x)(y_i-\bar y)=S_{xy}$ and
+    $\sum x_i^2-n\bar x^2=\sum(x_i-\bar x)^2=S_{xx}$ then give
+    \[
+      \boxed{\ \hat\beta_1=\dfrac{\sum(x_i-\bar x)(y_i-\bar y)}{\sum(x_i-\bar x)^2}
+      =\dfrac{S_{xy}}{S_{xx}}\ },\qquad
+      \boxed{\ \hat\beta_0=\bar y-\hat\beta_1\bar x\ }.
+    \]
+    \textit{Common mistake:} trying to solve the second equation on its
+    own --- the uncentred sums collapse to $S_{xy}/S_{xx}$ only
+    \emph{after} substituting $\hat\beta_0=\bar y-\hat\beta_1\bar x$.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 3.L2 (3/3)}
+  \begin{solutionbox}
+    \textbf{(3) Passes through $(\bar x,\bar y)$.} At $x=\bar x$,
+    \[
+      \hat y=\hat\beta_0+\hat\beta_1\bar x
+      =(\bar y-\hat\beta_1\bar x)+\hat\beta_1\bar x=\bar y.
+    \]
+    This is just the first normal equation restated --- the residuals
+    always sum to zero.
+
+    \textbf{(4) Unbiasedness.} Treating the $x_i$ as fixed and assuming
+    $\mathbb{E}[\varepsilon_i]=0$, one shows $\mathbb{E}[\hat\beta_1]=\beta_1$
+    and $\mathbb{E}[\hat\beta_0]=\beta_0$. Meaning: \emph{averaged over
+    many repeated samples} the estimates are centred on the true values
+    --- no systematic over- or under-estimation. (Any single estimate
+    still has sampling error, quantified by its SE.)
+
+    \textbf{(5) Plug in.}
+    \[
+      \hat\beta_1=\frac{S_{xy}}{S_{xx}}=\frac{100}{40}=2.5,\qquad
+      \hat\beta_0=\bar y-\hat\beta_1\bar x=15-2.5(5)=2.5,
+    \]
+    so $\hat y=2.5+2.5\,x$.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Matrix form: a compact view}
+  Stack predictors into a design matrix $\mathbf{X}$ that includes a
+  column of ones (for the intercept):
+  \[
+    \mathbf{y} \;=\; \mathbf{X}\,\boldsymbol\beta \;+\; \boldsymbol\varepsilon,
+    \qquad
+    \mathbf{X} \in \mathbb{R}^{n \times (p+1)}.
+  \]
+  Least squares gives the closed form
+  \[
+    \boxed{\;
+      \hat{\boldsymbol\beta}
+        \;=\; (\mathbf{X}^\top \mathbf{X})^{-1}\mathbf{X}^\top \mathbf{y}.
+    \;}
+  \]
+  \begin{readme}
+    \begin{itemize}
+      \item $\mathbf{X}^\top\mathbf{X}$ must be invertible: requires
+            $n > p + 1$ \emph{and} no perfect collinearity.
+      \item The hat matrix $\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top$
+            satisfies $\hat{\mathbf{y}} = \mathbf{H}\mathbf{y}$.
+      \item Diagonal entries $h_{ii}$ are leverages --- we will use
+            them in diagnostics.
+    \end{itemize}
+  \end{readme}
+\end{frame}
+
+% ---------------- Extended Exercise 3.L6 [Python] ----------------
+\begin{frame}[fragile]{Extended Exercise 3.L6 --- Linear vs polynomial vs KNN [Python]}
+  \begin{longexercise}
+    On \texttt{Auto.csv}, model $\texttt{mpg}\sim\texttt{horsepower}$
+    (drop the rows where \texttt{horsepower} is the string \texttt{"?"}).
+    \begin{enumerate}
+      \item Make a $70/30$ split (\texttt{random\_state=1}) and fit three
+            models: linear, degree-2 polynomial, and KNN regression
+            (standardise $x$ first).
+      \item Estimate the \emph{test} MSE of each.
+      \item Which fits best, and why? Answer in terms of the
+            \emph{bias--variance trade-off}, and say what happens to KNN as
+            $K\to 1$.
+    \end{enumerate}
+  \end{longexercise}
+\end{frame}
+
+\begin{frame}[fragile]{Solution --- Extended Exercise 3.L6 (1/3)}
+  \begin{solutionbox}
+    \textbf{Load, clean and split.}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_squared_error as mse   # test-error metric
+
+a = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Auto.csv")  # load Auto data
+a = a[a.horsepower != "?"]; a.horsepower = a.horsepower.astype(float)  # clean
+X, y = a[["horsepower"]].values, a["mpg"].values  # one predictor, target mpg
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=.3, random_state=1)  # 70/30
+\end{lstlisting}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}[fragile]{Solution --- Extended Exercise 3.L6 (2/3)}
+  \begin{solutionbox}
+    \textbf{Fit the three models and score the test MSE.}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+lin = LinearRegression().fit(Xtr, ytr)                    # straight-line fit
+pol = make_pipeline(PolynomialFeatures(2), LinearRegression()).fit(Xtr, ytr)  # adds hp^2
+knn = make_pipeline(StandardScaler(), KNeighborsRegressor(10)).fit(Xtr, ytr)  # scale, K=10
+for name, m in [("linear", lin), ("poly-2", pol), ("KNN10", knn)]:
+    print(name, round(mse(yte, m.predict(Xte)), 1))       # test-set MSE
+# linear 26.2 | poly-2 19.8 | KNN(K=10) 21.3
+\end{lstlisting}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 3.L6 (3/3)}
+  \begin{solutionbox}
+    \textbf{Test MSE.} Linear $\approx 26.2$, degree-2 polynomial
+    $\approx 19.8$, KNN $(K{=}10)\approx 21.3$: both flexible models
+    clearly beat the straight line.
+
+    \textbf{Why (bias--variance).} The true \texttt{mpg}--\texttt{horsepower}
+    relationship is convex and decreasing, so a straight line
+    \emph{underfits} --- high \emph{bias}, largest test MSE. The degree-2
+    polynomial captures the curvature with just one extra parameter (low
+    bias, still low variance) and wins here; a moderate-$K$ KNN is a close
+    non-parametric competitor.
+
+    \textbf{As $K\to 1$.} Each prediction is a single neighbour: the model
+    interpolates the training points (training MSE $\to 0$) but is very
+    wiggly --- high \emph{variance}, so test MSE \emph{rises} (here
+    $\approx 34$ at $K{=}1$). The best $K$ balances bias (large $K$)
+    against variance (small $K$). \emph{Takeaway:} prefer the parsimonious
+    degree-2 fit; if using KNN, tune $K$ by cross-validation.
+  \end{solutionbox}
 \end{frame}
 
 \end{document}

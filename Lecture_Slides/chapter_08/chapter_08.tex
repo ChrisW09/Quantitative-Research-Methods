@@ -95,6 +95,8 @@
 
 \begin{frame}{Contents}\small
   \tableofcontents[hideallsubsections]
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -290,37 +292,6 @@
   \islpsource{Figure 8.2}
 \end{frame}
 
-\begin{frame}{The same tree as a partition of predictor space}
-  \begin{center}
-  \begin{tikzpicture}[scale=0.68,>=Stealth,font=\small]
-    % region fills
-    \fill[accent!10] (0,0) rectangle (1.5,5);
-    \fill[orange!14] (1.5,0) rectangle (8,2.47);
-    \fill[green!14]  (1.5,2.47) rectangle (8,5);
-    % partition lines
-    \draw[very thick] (1.5,0) -- (1.5,5);
-    \draw[very thick] (1.5,2.47) -- (8,2.47);
-    % axes + frame
-    \draw[->,thick] (0,0) -- (8.7,0) node[right]{Years};
-    \draw[->,thick] (0,0) -- (0,5.5) node[above]{Hits};
-    \draw (0,0) rectangle (8,5);
-    % ticks
-    \draw (1.5,0)--(1.5,-0.12) node[below,font=\footnotesize]{$4.5$};
-    \node[below,font=\footnotesize] at (8,-0.12) {$24$};
-    \draw (0,2.47)--(-0.12,2.47) node[left,font=\footnotesize]{$117.5$};
-    \node[left,font=\footnotesize] at (0,5) {$238$};
-    \node[below left,font=\footnotesize] at (0,0) {$0$};
-    % region labels
-    \node[font=\bfseries] at (0.75,3.0) {$R_1$};
-    \node[font=\bfseries] at (4.75,1.35) {$R_2$};
-    \node[font=\bfseries] at (4.75,3.75) {$R_3$};
-    \node[font=\scriptsize] at (0.75,2.4) {5.11};
-    \node[font=\scriptsize] at (4.75,0.95) {6.00};
-    \node[font=\scriptsize] at (4.75,3.35) {6.74};
-  \end{tikzpicture}
-  \end{center}
-  \begin{takeaway}$R_1$ holds inexperienced players; among experienced players, more hits ($R_3$) predicts higher salary than fewer ($R_2$).\end{takeaway}
-\end{frame}
 
 \begin{frame}{Why prune?}
   Recursive splitting with no stopping rule gives one leaf per training
@@ -608,70 +579,9 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
 \end{solutionbox}
 \end{frame}
 
-% ====================== EXTENDED EXERCISE: Trees (classification) ======================
-\begin{frame}{Extended Exercise 8.2 --- Impurity measures and pruning [Math]}
-\begin{longexercise}
-A binary-classification node holds $200$ cases: $100$ ``Yes'' and $100$ ``No''. Two candidate splits give:
-\begin{itemize}
-  \item \textbf{Split A:} $A_1=(80\text{ Yes},20\text{ No})$ and $A_2=(20\text{ Yes},80\text{ No})$.
-  \item \textbf{Split B:} $B_1=(100\text{ Yes},40\text{ No})$ and $B_2=(0\text{ Yes},60\text{ No})$.
-\end{itemize}
-\begin{enumerate}
-  \item For each split compute the weighted Gini index, cross-entropy and classification error.
-  \item Which split wins under each criterion? Explain the disagreement.
-  \item A pruned-tree sequence has subtrees with (leaves $|T|$, training errors $R$) $=(4,0),(3,4),(2,10),(1,40)$. For $\alpha\in\{0,5,20,50\}$ find the subtree minimising $R+\alpha|T|$.
-\end{enumerate}
-\end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 8.2 (1/3)}
-\begin{solutionbox}
-For a node with ``Yes''-fraction $\hat p$:
-\[ G=2\hat p(1-\hat p),\quad D=-\hat p\ln\hat p-(1-\hat p)\ln(1-\hat p),\quad E=1-\max(\hat p,1-\hat p), \]
-and children are combined by their share of the $200$ cases.
 
-\medskip
-\textbf{Split A} ($A_1,A_2$ each $100$ cases, $\hat p=0.8$ and $0.2$ --- symmetric):
-\[ G=2(0.8)(0.2)=0.32,\quad D=-0.8\ln0.8-0.2\ln0.2=0.500,\quad E=0.20. \]
-Both children give identical values and equal weights $\tfrac{100}{200}=0.5$, so $G_A=0.32$, $D_A=0.500$, $E_A=0.20$.
 
-\medskip
-\emph{Note:} we use the natural log for $D$; switching to $\log_2$ rescales every entropy by the same factor and never changes which split wins.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 8.2 (2/3)}
-\begin{solutionbox}
-\textbf{Split B.} $B_1$: $\hat p=100/140=0.714$, weight $0.7$; $B_2$ pure ($\hat p=0$), weight $0.3$.
-\begin{align*}
-G_B&=0.7\,[2(0.714)(0.286)]+0.3\,(0)=0.7(0.408)=\mathbf{0.286},\\
-D_B&=0.7\,[-0.714\ln0.714-0.286\ln0.286]+0=0.7(0.598)=\mathbf{0.419},\\
-E_B&=0.7\,(1-0.714)+0.3\,(0)=0.7(0.286)=\mathbf{0.20}.
-\end{align*}
-
-\medskip
-\textbf{(2) Who wins?} Classification error ties ($E_A=E_B=0.20$) and cannot separate the splits. Gini ($0.286<0.32$) and entropy ($0.419<0.500$) both prefer \textbf{Split B}, because it carves out a \emph{pure} node $B_2$. Purity is rewarded by Gini/entropy even when majority-vote error is unchanged --- which is why we \emph{grow} trees with Gini or entropy, not error.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 8.2 (3/3)}
-\begin{solutionbox}
-\textbf{(3) Cost-complexity pruning.} Minimise $R_\alpha(T)=R(T)+\alpha|T|$ over the nested subtrees:
-\[
-\begin{array}{c|cccc}
- & (4,0) & (3,4) & (2,10) & (1,40)\\\hline
-\alpha{=}0 & \mathbf{0} & 4 & 10 & 40\\
-\alpha{=}5 & 20 & \mathbf{19} & 20 & 45\\
-\alpha{=}20 & 80 & 64 & \mathbf{50} & 60\\
-\alpha{=}50 & 200 & 154 & 110 & \mathbf{90}
-\end{array}
-\]
-Winners: $\alpha{=}0\!\to\!4$ leaves, $\alpha{=}5\!\to\!3$ leaves, $\alpha{=}20\!\to\!2$ leaves, $\alpha{=}50\!\to\!$ the root. As $\alpha$ grows the optimal subtree shrinks (breakpoints at $\alpha=4,6,30$) --- the nested ``weakest-link'' sequence that cross-validation then searches over.
-
-\medskip
-\emph{Sample entry:} for $\alpha=5$ and the $3$-leaf tree, $R_\alpha=R+\alpha|T|=4+5\cdot3=19$ --- the smallest value in its row, so $3$ leaves win at that price.
-\end{solutionbox}
-\end{frame}
 
 
 
@@ -960,18 +870,6 @@ Winners: $\alpha{=}0\!\to\!4$ leaves, $\alpha{=}5\!\to\!3$ leaves, $\alpha{=}20\
   \end{readme}
 \end{frame}
 
-\begin{frame}{BART: Bayesian Additive Regression Trees}
-  \begin{block}{Idea}
-    A sum of $K$ small trees (each a ``weak learner''), updated one
-    tree at a time using a Bayesian posterior-style move.
-  \end{block}
-  \begin{takeaway}
-    Combines flavours of bagging (averaging) and boosting (sequential
-    update). Out-of-the-box hyperparameters often work; the Bayesian
-    framework gives credible intervals for free. Implementations:
-    \texttt{ISLP.bart}, \texttt{PyMC}.
-  \end{takeaway}
-\end{frame}
 
 % ====================== EXERCISE: Boosting ======================
 \begin{frame}{Exercise 8.6 --- Boosting tuning parameters [Concept]}
@@ -1325,6 +1223,137 @@ print(imp.round(3).head())  # top predictors
     \item Convolutional networks (CNNs) for images.
     \item Training: backpropagation, SGD, regularisation.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{The partition picture, drawn a second time} --- a schematic duplicate of the Hitters partition already shown in the main deck.
+      \item \textbf{Impurity measures and pruning (Extended Exercise 8.2)} --- Gini, entropy and cost-complexity pruning worked through in full. Exercises 8.2 and 8.3 cover both in the main deck.
+      \item \textbf{BART} --- Bayesian additive regression trees --- a fourth ensemble, listed for completeness. Random forests and boosting are the two you will be asked about.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{The same tree as a partition of predictor space}
+  \begin{center}
+  \begin{tikzpicture}[scale=0.68,>=Stealth,font=\small]
+    % region fills
+    \fill[accent!10] (0,0) rectangle (1.5,5);
+    \fill[orange!14] (1.5,0) rectangle (8,2.47);
+    \fill[green!14]  (1.5,2.47) rectangle (8,5);
+    % partition lines
+    \draw[very thick] (1.5,0) -- (1.5,5);
+    \draw[very thick] (1.5,2.47) -- (8,2.47);
+    % axes + frame
+    \draw[->,thick] (0,0) -- (8.7,0) node[right]{Years};
+    \draw[->,thick] (0,0) -- (0,5.5) node[above]{Hits};
+    \draw (0,0) rectangle (8,5);
+    % ticks
+    \draw (1.5,0)--(1.5,-0.12) node[below,font=\footnotesize]{$4.5$};
+    \node[below,font=\footnotesize] at (8,-0.12) {$24$};
+    \draw (0,2.47)--(-0.12,2.47) node[left,font=\footnotesize]{$117.5$};
+    \node[left,font=\footnotesize] at (0,5) {$238$};
+    \node[below left,font=\footnotesize] at (0,0) {$0$};
+    % region labels
+    \node[font=\bfseries] at (0.75,3.0) {$R_1$};
+    \node[font=\bfseries] at (4.75,1.35) {$R_2$};
+    \node[font=\bfseries] at (4.75,3.75) {$R_3$};
+    \node[font=\scriptsize] at (0.75,2.4) {5.11};
+    \node[font=\scriptsize] at (4.75,0.95) {6.00};
+    \node[font=\scriptsize] at (4.75,3.35) {6.74};
+  \end{tikzpicture}
+  \end{center}
+  \begin{takeaway}$R_1$ holds inexperienced players; among experienced players, more hits ($R_3$) predicts higher salary than fewer ($R_2$).\end{takeaway}
+\end{frame}
+
+% ====================== EXTENDED EXERCISE: Trees (classification) ======================
+\begin{frame}{Extended Exercise 8.2 --- Impurity measures and pruning [Math]}
+\begin{longexercise}
+A binary-classification node holds $200$ cases: $100$ ``Yes'' and $100$ ``No''. Two candidate splits give:
+\begin{itemize}
+  \item \textbf{Split A:} $A_1=(80\text{ Yes},20\text{ No})$ and $A_2=(20\text{ Yes},80\text{ No})$.
+  \item \textbf{Split B:} $B_1=(100\text{ Yes},40\text{ No})$ and $B_2=(0\text{ Yes},60\text{ No})$.
+\end{itemize}
+\begin{enumerate}
+  \item For each split compute the weighted Gini index, cross-entropy and classification error.
+  \item Which split wins under each criterion? Explain the disagreement.
+  \item A pruned-tree sequence has subtrees with (leaves $|T|$, training errors $R$) $=(4,0),(3,4),(2,10),(1,40)$. For $\alpha\in\{0,5,20,50\}$ find the subtree minimising $R+\alpha|T|$.
+\end{enumerate}
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 8.2 (1/3)}
+\begin{solutionbox}
+For a node with ``Yes''-fraction $\hat p$:
+\[ G=2\hat p(1-\hat p),\quad D=-\hat p\ln\hat p-(1-\hat p)\ln(1-\hat p),\quad E=1-\max(\hat p,1-\hat p), \]
+and children are combined by their share of the $200$ cases.
+
+\medskip
+\textbf{Split A} ($A_1,A_2$ each $100$ cases, $\hat p=0.8$ and $0.2$ --- symmetric):
+\[ G=2(0.8)(0.2)=0.32,\quad D=-0.8\ln0.8-0.2\ln0.2=0.500,\quad E=0.20. \]
+Both children give identical values and equal weights $\tfrac{100}{200}=0.5$, so $G_A=0.32$, $D_A=0.500$, $E_A=0.20$.
+
+\medskip
+\emph{Note:} we use the natural log for $D$; switching to $\log_2$ rescales every entropy by the same factor and never changes which split wins.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 8.2 (2/3)}
+\begin{solutionbox}
+\textbf{Split B.} $B_1$: $\hat p=100/140=0.714$, weight $0.7$; $B_2$ pure ($\hat p=0$), weight $0.3$.
+\begin{align*}
+G_B&=0.7\,[2(0.714)(0.286)]+0.3\,(0)=0.7(0.408)=\mathbf{0.286},\\
+D_B&=0.7\,[-0.714\ln0.714-0.286\ln0.286]+0=0.7(0.598)=\mathbf{0.419},\\
+E_B&=0.7\,(1-0.714)+0.3\,(0)=0.7(0.286)=\mathbf{0.20}.
+\end{align*}
+
+\medskip
+\textbf{(2) Who wins?} Classification error ties ($E_A=E_B=0.20$) and cannot separate the splits. Gini ($0.286<0.32$) and entropy ($0.419<0.500$) both prefer \textbf{Split B}, because it carves out a \emph{pure} node $B_2$. Purity is rewarded by Gini/entropy even when majority-vote error is unchanged --- which is why we \emph{grow} trees with Gini or entropy, not error.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 8.2 (3/3)}
+\begin{solutionbox}
+\textbf{(3) Cost-complexity pruning.} Minimise $R_\alpha(T)=R(T)+\alpha|T|$ over the nested subtrees:
+\[
+\begin{array}{c|cccc}
+ & (4,0) & (3,4) & (2,10) & (1,40)\\\hline
+\alpha{=}0 & \mathbf{0} & 4 & 10 & 40\\
+\alpha{=}5 & 20 & \mathbf{19} & 20 & 45\\
+\alpha{=}20 & 80 & 64 & \mathbf{50} & 60\\
+\alpha{=}50 & 200 & 154 & 110 & \mathbf{90}
+\end{array}
+\]
+Winners: $\alpha{=}0\!\to\!4$ leaves, $\alpha{=}5\!\to\!3$ leaves, $\alpha{=}20\!\to\!2$ leaves, $\alpha{=}50\!\to\!$ the root. As $\alpha$ grows the optimal subtree shrinks (breakpoints at $\alpha=4,6,30$) --- the nested ``weakest-link'' sequence that cross-validation then searches over.
+
+\medskip
+\emph{Sample entry:} for $\alpha=5$ and the $3$-leaf tree, $R_\alpha=R+\alpha|T|=4+5\cdot3=19$ --- the smallest value in its row, so $3$ leaves win at that price.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{BART: Bayesian Additive Regression Trees}
+  \begin{block}{Idea}
+    A sum of $K$ small trees (each a ``weak learner''), updated one
+    tree at a time using a Bayesian posterior-style move.
+  \end{block}
+  \begin{takeaway}
+    Combines flavours of bagging (averaging) and boosting (sequential
+    update). Out-of-the-box hyperparameters often work; the Bayesian
+    framework gives credible intervals for free. Implementations:
+    \texttt{ISLP.bart}, \texttt{PyMC}.
+  \end{takeaway}
 \end{frame}
 
 \end{document}

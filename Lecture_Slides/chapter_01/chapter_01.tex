@@ -103,6 +103,8 @@
       \tableofcontents[hideallsubsections,sections={5-8}]
     \end{column}
   \end{columns}
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -644,91 +646,8 @@ you hand over is $\hat Y$ itself or the shape of $f$.}
   \end{readme}
 \end{frame}
 
-\begin{frame}{The design matrix}
-  Stack the predictor vectors as rows:
-  \[
-    \boxed{\;
-      \mathbf{X} =
-      \begin{pmatrix}
-        x_{11} & x_{12} & \cdots & x_{1p} \\
-        x_{21} & x_{22} & \cdots & x_{2p} \\
-        \vdots & \vdots & \ddots & \vdots \\
-        x_{n1} & x_{n2} & \cdots & x_{np}
-      \end{pmatrix} \in \mathbb{R}^{n\times p}.
-    \;}
-  \]
-  \begin{readme}
-    \begin{itemize}
-      \item Row $i$: vector $x_i = (x_{i1}, \ldots, x_{ip})^\top$ ---
-            one observation, all predictors.
-      \item Column $j$: vector $\mathbf{x}_j$ --- all observations, one
-            predictor.
-      \item $x_{ij}$: value of the $j$-th predictor for the $i$-th
-            observation.
-    \end{itemize}
-  \end{readme}
-\end{frame}
 
-\begin{frame}{Anatomy of the data: the matrix $\mathbf{X}$ and the vector $\mathbf{y}$}
-  \begin{center}
-  \begin{tikzpicture}[
-    cell/.style={draw=accent!40,minimum width=1.0cm,minimum height=0.56cm,font=\footnotesize,inner sep=0pt},
-    col/.style={font=\scriptsize\bfseries,text=accent},
-    yc/.style={draw=green!55!black,minimum width=1.0cm,minimum height=0.56cm,font=\footnotesize,inner sep=0pt,fill=green!6}]
-    \node[col] at (0,0.62){$X_1$}; \node[col] at (1.0,0.62){$X_2$};
-    \node[col,text=orange!60!black] at (2.0,0.62){$X_j$}; \node[col] at (3.0,0.62){$\cdots$};
-    \node[col] at (4.0,0.62){$X_p$};
-    \foreach \ry in {0,1,2,3,4}{
-      \pgfmathsetmacro\yy{-\ry*0.56}
-      \foreach \cx in {0,1,2,3,4}{
-        \pgfmathsetmacro\xx{\cx*1.0}
-        \ifnum\ry=2
-          \ifnum\cx=2 \node[cell,fill=green!20] at (\xx,\yy){$x_{ij}$};
-          \else \node[cell,fill=accent!14] at (\xx,\yy){}; \fi
-        \else\ifnum\ry=3
-          \ifnum\cx=2 \node[cell,fill=orange!16,text=gray] at (\xx,\yy){$\vdots$};
-          \else \node[cell,text=gray] at (\xx,\yy){$\vdots$}; \fi
-        \else
-          \ifnum\cx=2 \node[cell,fill=orange!16] at (\xx,\yy){};
-          \else \node[cell] at (\xx,\yy){}; \fi
-        \fi\fi
-      }
-      \ifnum\ry=0 \node[left,font=\scriptsize,text=gray] at (-0.62,\yy){obs 1};\fi
-      \ifnum\ry=1 \node[left,font=\scriptsize,text=gray] at (-0.62,\yy){obs 2};\fi
-      \ifnum\ry=2 \node[left,font=\scriptsize,text=accent] at (-0.62,\yy){obs $i$};\fi
-      \ifnum\ry=4 \node[left,font=\scriptsize,text=gray] at (-0.62,\yy){obs $n$};\fi
-    }
-    \node[font=\large\bfseries,text=accent] at (-1.75,-1.12){$\mathbf{X}$};
-    \node[font=\scriptsize,text=gray] at (2.0,-3.0){$n\times p$ design matrix};
-    \begin{scope}[shift={(5.7,0)}]
-      \node[col,text=green!45!black] at (0,0.62){$Y$};
-      \node[yc] at (0,0){$y_1$}; \node[yc] at (0,-0.56){$y_2$};
-      \node[yc,fill=accent!14] at (0,-1.12){$y_i$};
-      \node[yc,text=gray] at (0,-1.68){$\vdots$}; \node[yc] at (0,-2.24){$y_n$};
-      \node[font=\large\bfseries,text=green!45!black] at (0.95,-1.12){$\mathbf{y}$};
-      \node[font=\scriptsize,text=gray] at (0,-3.0){$n\times 1$ response};
-    \end{scope}
-    \draw[-{Latex[length=1.6mm]},accent,thick] (4.55,-1.12)--(5.2,-1.12);
-  \end{tikzpicture}
-  \end{center}
-  \begin{takeaway}A \textbf{row} is one observation $x_i$ (all predictors); a \textbf{column} is one predictor across all observations; $x_{ij}$ sits at row $i$, column $j$. Supervised learning pairs each row of $\mathbf X$ with its response $y_i$.\end{takeaway}
-\end{frame}
 
-\begin{frame}{The response and estimates}
-  \begin{block}{Response vector}
-    \[ \mathbf{y} = (y_1, y_2, \ldots, y_n)^\top \in \mathbb{R}^n. \]
-  \end{block}
-  \begin{readme}[The hat convention]
-    Estimated quantities wear a hat: $\hat{\beta}, \hat{f}, \hat{y}$.
-    The hat reminds us that these are computed from a sample and
-    therefore have sampling variability.
-  \end{readme}
-  \begin{numexample}[Common usage]
-    Predicted (fitted) values: $\hat{y}_i$.\\
-    Residuals: $e_i = y_i - \hat{y}_i$.\\
-    Train vs.\ test: subscripts $\mathrm{tr}$ and $\mathrm{te}$.
-  \end{numexample}
-\end{frame}
 
 
 \begin{frame}{Exercise 1.2 --- Regression, Classification, or Unsupervised? [Concept]}
@@ -910,41 +829,7 @@ yhat = model.predict(X)         # predicted wage for each row
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Datasets at a glance (1/2)}
-  \footnotesize
-  \begin{tabular}{lrrll}
-    \toprule
-    \textbf{Name} & $n$ & $p$ & \textbf{Response} & \textbf{Used in} \\
-    \midrule
-    Wage         & 3000 &  10 & wage (num.)        & Ch.~1, 7 \\
-    Smarket      & 1250 &   8 & Direction (binary) & Ch.~1, 4 \\
-    NCI60        &   64 & 6830 & --- (unsup.)       & Ch.~1, 12 \\
-    Auto         &  392 &   8 & mpg (num.)         & Ch.~3 \\
-    Boston       &  506 &  12 & medv (num.)        & Ch.~3, 8 \\
-    Carseats     &  400 &  10 & Sales (num.)       & Ch.~3, 8 \\
-    Credit       &  400 &  10 & Balance (num.)     & Ch.~3, 6 \\
-    Default      & 10000 &  3 & default (binary)   & Ch.~4 \\
-    Heart        &  303 &  13 & AHD (binary)       & Ch.~4, 8 \\
-    \bottomrule
-  \end{tabular}
-\end{frame}
 
-\begin{frame}{Datasets at a glance (2/2)}
-  \footnotesize
-  \begin{tabular}{lrrll}
-    \toprule
-    \textbf{Name} & $n$ & $p$ & \textbf{Response} & \textbf{Used in} \\
-    \midrule
-    Caravan      & 5822 &  85 & Purchase (binary)  & Ch.~4 \\
-    OJ           & 1070 &  17 & Purchase (binary)  & Ch.~8, 9 \\
-    Hitters      &  322 &  19 & Salary (num.)      & Ch.~6, 8 \\
-    College      &  777 &  17 & Apps (num.)        & Ch.~6 \\
-    BrainCancer  &   88 &   8 & survival           & Ch.~11 \\
-    USArrests    &   50 &   4 & --- (unsup.)       & Ch.~12 \\
-    Bikeshare    & 8645 &  14 & bikers (num.)      & Ch.~4 \\
-    \bottomrule
-  \end{tabular}
-\end{frame}
 
 
 \begin{frame}{Exercise 1.3 --- Notation: $n$, $p$, and $\mathbf{X}$ [Math]}
@@ -1227,6 +1112,148 @@ A regional bank has records on \textbf{20{,}000} past personal-loan customers. F
     \item Decompose prediction error into bias and variance.
     \item Meet our first concrete classifier: $K$-nearest neighbours.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{The design matrix in full} --- the anatomy of $\mathbf{X}$ and $\mathbf{y}$ drawn out entry by entry, and the notation for estimates. The one-slide version in the main deck (``Notation: $n$, $p$, and the design matrix'') is all the chapter needs.
+      \item \textbf{The dataset catalogue} --- the two reference tables of every ISLP data set. Look them up when a lab asks for a data set you have not met.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{The design matrix}
+  Stack the predictor vectors as rows:
+  \[
+    \boxed{\;
+      \mathbf{X} =
+      \begin{pmatrix}
+        x_{11} & x_{12} & \cdots & x_{1p} \\
+        x_{21} & x_{22} & \cdots & x_{2p} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        x_{n1} & x_{n2} & \cdots & x_{np}
+      \end{pmatrix} \in \mathbb{R}^{n\times p}.
+    \;}
+  \]
+  \begin{readme}
+    \begin{itemize}
+      \item Row $i$: vector $x_i = (x_{i1}, \ldots, x_{ip})^\top$ ---
+            one observation, all predictors.
+      \item Column $j$: vector $\mathbf{x}_j$ --- all observations, one
+            predictor.
+      \item $x_{ij}$: value of the $j$-th predictor for the $i$-th
+            observation.
+    \end{itemize}
+  \end{readme}
+\end{frame}
+
+\begin{frame}{Anatomy of the data: the matrix $\mathbf{X}$ and the vector $\mathbf{y}$}
+  \begin{center}
+  \begin{tikzpicture}[
+    cell/.style={draw=accent!40,minimum width=1.0cm,minimum height=0.56cm,font=\footnotesize,inner sep=0pt},
+    col/.style={font=\scriptsize\bfseries,text=accent},
+    yc/.style={draw=green!55!black,minimum width=1.0cm,minimum height=0.56cm,font=\footnotesize,inner sep=0pt,fill=green!6}]
+    \node[col] at (0,0.62){$X_1$}; \node[col] at (1.0,0.62){$X_2$};
+    \node[col,text=orange!60!black] at (2.0,0.62){$X_j$}; \node[col] at (3.0,0.62){$\cdots$};
+    \node[col] at (4.0,0.62){$X_p$};
+    \foreach \ry in {0,1,2,3,4}{
+      \pgfmathsetmacro\yy{-\ry*0.56}
+      \foreach \cx in {0,1,2,3,4}{
+        \pgfmathsetmacro\xx{\cx*1.0}
+        \ifnum\ry=2
+          \ifnum\cx=2 \node[cell,fill=green!20] at (\xx,\yy){$x_{ij}$};
+          \else \node[cell,fill=accent!14] at (\xx,\yy){}; \fi
+        \else\ifnum\ry=3
+          \ifnum\cx=2 \node[cell,fill=orange!16,text=gray] at (\xx,\yy){$\vdots$};
+          \else \node[cell,text=gray] at (\xx,\yy){$\vdots$}; \fi
+        \else
+          \ifnum\cx=2 \node[cell,fill=orange!16] at (\xx,\yy){};
+          \else \node[cell] at (\xx,\yy){}; \fi
+        \fi\fi
+      }
+      \ifnum\ry=0 \node[left,font=\scriptsize,text=gray] at (-0.62,\yy){obs 1};\fi
+      \ifnum\ry=1 \node[left,font=\scriptsize,text=gray] at (-0.62,\yy){obs 2};\fi
+      \ifnum\ry=2 \node[left,font=\scriptsize,text=accent] at (-0.62,\yy){obs $i$};\fi
+      \ifnum\ry=4 \node[left,font=\scriptsize,text=gray] at (-0.62,\yy){obs $n$};\fi
+    }
+    \node[font=\large\bfseries,text=accent] at (-1.75,-1.12){$\mathbf{X}$};
+    \node[font=\scriptsize,text=gray] at (2.0,-3.0){$n\times p$ design matrix};
+    \begin{scope}[shift={(5.7,0)}]
+      \node[col,text=green!45!black] at (0,0.62){$Y$};
+      \node[yc] at (0,0){$y_1$}; \node[yc] at (0,-0.56){$y_2$};
+      \node[yc,fill=accent!14] at (0,-1.12){$y_i$};
+      \node[yc,text=gray] at (0,-1.68){$\vdots$}; \node[yc] at (0,-2.24){$y_n$};
+      \node[font=\large\bfseries,text=green!45!black] at (0.95,-1.12){$\mathbf{y}$};
+      \node[font=\scriptsize,text=gray] at (0,-3.0){$n\times 1$ response};
+    \end{scope}
+    \draw[-{Latex[length=1.6mm]},accent,thick] (4.55,-1.12)--(5.2,-1.12);
+  \end{tikzpicture}
+  \end{center}
+  \begin{takeaway}A \textbf{row} is one observation $x_i$ (all predictors); a \textbf{column} is one predictor across all observations; $x_{ij}$ sits at row $i$, column $j$. Supervised learning pairs each row of $\mathbf X$ with its response $y_i$.\end{takeaway}
+\end{frame}
+
+\begin{frame}{The response and estimates}
+  \begin{block}{Response vector}
+    \[ \mathbf{y} = (y_1, y_2, \ldots, y_n)^\top \in \mathbb{R}^n. \]
+  \end{block}
+  \begin{readme}[The hat convention]
+    Estimated quantities wear a hat: $\hat{\beta}, \hat{f}, \hat{y}$.
+    The hat reminds us that these are computed from a sample and
+    therefore have sampling variability.
+  \end{readme}
+  \begin{numexample}[Common usage]
+    Predicted (fitted) values: $\hat{y}_i$.\\
+    Residuals: $e_i = y_i - \hat{y}_i$.\\
+    Train vs.\ test: subscripts $\mathrm{tr}$ and $\mathrm{te}$.
+  \end{numexample}
+\end{frame}
+
+\begin{frame}{Datasets at a glance (1/2)}
+  \footnotesize
+  \begin{tabular}{lrrll}
+    \toprule
+    \textbf{Name} & $n$ & $p$ & \textbf{Response} & \textbf{Used in} \\
+    \midrule
+    Wage         & 3000 &  10 & wage (num.)        & Ch.~1, 7 \\
+    Smarket      & 1250 &   8 & Direction (binary) & Ch.~1, 4 \\
+    NCI60        &   64 & 6830 & --- (unsup.)       & Ch.~1, 12 \\
+    Auto         &  392 &   8 & mpg (num.)         & Ch.~3 \\
+    Boston       &  506 &  12 & medv (num.)        & Ch.~3, 8 \\
+    Carseats     &  400 &  10 & Sales (num.)       & Ch.~3, 8 \\
+    Credit       &  400 &  10 & Balance (num.)     & Ch.~3, 6 \\
+    Default      & 10000 &  3 & default (binary)   & Ch.~4 \\
+    Heart        &  303 &  13 & AHD (binary)       & Ch.~4, 8 \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Datasets at a glance (2/2)}
+  \footnotesize
+  \begin{tabular}{lrrll}
+    \toprule
+    \textbf{Name} & $n$ & $p$ & \textbf{Response} & \textbf{Used in} \\
+    \midrule
+    Caravan      & 5822 &  85 & Purchase (binary)  & Ch.~4 \\
+    OJ           & 1070 &  17 & Purchase (binary)  & Ch.~8, 9 \\
+    Hitters      &  322 &  19 & Salary (num.)      & Ch.~6, 8 \\
+    College      &  777 &  17 & Apps (num.)        & Ch.~6 \\
+    BrainCancer  &   88 &   8 & survival           & Ch.~11 \\
+    USArrests    &   50 &   4 & --- (unsup.)       & Ch.~12 \\
+    Bikeshare    & 8645 &  14 & bikers (num.)      & Ch.~4 \\
+    \bottomrule
+  \end{tabular}
 \end{frame}
 
 \end{document}

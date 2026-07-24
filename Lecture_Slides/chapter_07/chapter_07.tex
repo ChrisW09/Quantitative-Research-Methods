@@ -95,6 +95,8 @@
 
 \begin{frame}{Contents}\small
   \tableofcontents[hideallsubsections]
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -456,44 +458,7 @@ We fit a piecewise-constant (step-function) regression of \texttt{wage} on \text
   \begin{takeaway}Each region is a free cubic, yet at every knot the pieces share value, slope and curvature --- so the joins are invisible.\end{takeaway}
 \end{frame}
 
-\begin{frame}{The building block: one truncated-power term per knot}
-  \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-    \begin{center}
-    \begin{tikzpicture}[scale=0.95,>=Stealth,font=\small]
-      \definecolor{cP}{RGB}{38,70,140}
-      \draw[->,thick] (-0.2,0)--(4.8,0) node[right]{$x$};
-      \draw[->,thick] (0,-0.2)--(0,3.5) node[above,font=\footnotesize]{$(x-\xi)^3_+$};
-      \draw[cP,very thick] (0,0)--(2,0);
-      \draw[cP,very thick,domain=2:4.2,smooth,samples=40] plot(\x,{0.25*(\x-2)*(\x-2)*(\x-2)});
-      \draw[gray,dashed] (2,-0.1)--(2,3.0);
-      \node[below,font=\footnotesize] at (2,-0.12) {$\xi$};
-      \fill[cP] (2,0) circle(2pt);
-      \node[cP,font=\scriptsize] at (1.0,0.3) {$\equiv 0$};
-      \node[cP,font=\scriptsize] at (3.5,2.3) {cubic rise};
-    \end{tikzpicture}
-    \end{center}
-    \end{column}
-    \begin{column}{0.45\textwidth}
-      \begin{readme}[Reading $(x-\xi)^3_+$]
-        The ``$+$'' is the \emph{positive part}: the term is $0$ for
-        $x\le\xi$ and equals $(x-\xi)^3$ afterwards. Its value, slope
-        and curvature are all $0$ at $\xi$, so switching it on adds a
-        bend \emph{only to the right} of the knot without breaking
-        $C^2$-smoothness.
-      \end{readme}
-    \end{column}
-  \end{columns}
-  \begin{takeaway}Full basis for $K$ knots: $\;1,\,x,\,x^2,\,x^3,\,(x-\xi_1)^3_+,\dots,(x-\xi_K)^3_+\;$ --- that is $K+4$ functions, exactly the $K+4$ degrees of freedom of a cubic spline.\end{takeaway}
-\end{frame}
 
-\begin{frame}{Adding constraints turns loose pieces into a spline}
-  \begin{center}
-    \includegraphics[width=0.92\textwidth,height=0.50\textheight,keepaspectratio]{7_3.pdf}
-  \end{center}
-  \begin{takeaway}Top-left: unconstrained pieces jump. Adding continuity of value, then slope, then curvature (bottom-left) removes the kinks --- the cubic spline is smoothest.\end{takeaway}
-  \islpsource{Figure 7.3}
-\end{frame}
 
 \begin{frame}{The natural-spline boundary fix}
   \begin{alertblock}{Boundary problem}
@@ -622,67 +587,9 @@ i.e.\ $2$ extra constraints at each of the $2$ boundaries: $4$ additional constr
 \end{solutionbox}
 \end{frame}
 
-% ====================== EXTENDED EXERCISE: Splines ======================
-\begin{frame}{Extended Exercise 7.1 --- Regression splines by hand [Math]}
-\begin{longexercise}
-Build a cubic regression spline for \texttt{wage} on \texttt{age} with $K=3$ interior knots $\xi_1=25<\xi_2=40<\xi_3=60$.
-\begin{enumerate}
-  \item Write the truncated-power basis and state the total degrees of freedom.
-  \item The fitted function is
-  \[ \hat g(x)=40+0.5\,x+0.0004\,(x-25)^3_+ -0.0002\,(x-40)^3_+ +0.0003\,(x-60)^3_+ . \]
-  Evaluate $\hat g(50)$.
-  \item Show that $\hat g,\hat g',\hat g''$ are continuous at $\xi_2=40$ but $\hat g'''$ jumps.
-  \item How many degrees of freedom does a \emph{natural} cubic spline with the same three knots use? Explain the difference.
-\end{enumerate}
-\end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 7.1 (1/3)}
-\begin{solutionbox}
-\textbf{(a) Truncated-power basis.} With $K=3$ knots the cubic-spline basis is
-\[ 1,\ x,\ x^2,\ x^3,\ (x-\xi_1)^3_+,\ (x-\xi_2)^3_+,\ (x-\xi_3)^3_+, \]
-so a fitted spline is $\hat g(x)=\beta_0+\beta_1x+\beta_2x^2+\beta_3x^3+\sum_{k=1}^{3}\beta_{3+k}(x-\xi_k)^3_+$.
 
-\medskip
-\textbf{Degrees of freedom.} Four base terms plus one per knot: $4+K=7$. Equivalently, a free cubic in each of the $K+1=4$ regions has $4\cdot4=16$ parameters, minus $3$ continuity constraints ($g,g',g''$) at each of the $3$ knots: $16-9=7$.
 
-\medskip
-\emph{Why this basis works:} each $(x-\xi_k)^3_+$ has value, slope and curvature $0$ at its knot, so it bends the fit only to the \emph{right} of $\xi_k$ without breaking smoothness --- plain OLS on these $7$ columns automatically yields a $C^2$ piecewise cubic.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 7.1 (2/3)}
-\begin{solutionbox}
-\textbf{(b) Evaluate $\hat g(50)$.} Here the quadratic and cubic \emph{base} coefficients happen to be zero, so only the linear base term and the \emph{active} truncated terms contribute. At $x=50$ the knots $25$ and $40$ are exceeded but $60$ is not:
-\[ (50-25)^3=25^3=15625,\quad (50-40)^3=10^3=1000,\quad (50-60)^3_+=0. \]
-Therefore
-\begin{align*}
-\hat g(50)&=40+0.5(50)+0.0004(15625)-0.0002(1000)+0.0003(0)\\
-&=40+25+6.25-0.20+0 = \mathbf{71.05}.
-\end{align*}
-Only the basis functions ``switched on'' at $x=50$ enter the sum --- this locality is the point of the truncated basis.
-
-\medskip
-\textit{Common mistake:} evaluating the third term as $(50-60)^3=(-10)^3=-1000$ instead of $0$. The ``$+$'' truncation zeroes the term for $x\le 60$; forgetting it would give the wrong value $71.05-0.30=70.75$.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 7.1 (3/3)}
-\begin{solutionbox}
-\textbf{(c) Continuity at $\xi_2=40$.} Only the term $t(x)=(x-40)^3_+$ changes behaviour there. With $t'=3(x-40)^2_+$ and $t''=6(x-40)_+$, its one-sided limits at $x=40$ are
-\[
-\begin{array}{c|ccc}
- & t & t' & t'' \\\hline
-x\to40^- & 0 & 0 & 0\\
-x\to40^+ & 0 & 0 & 0
-\end{array}
-\]
-so $\hat g,\hat g',\hat g''$ are continuous. But $t'''=6\cdot\mathbf{1}\{x>40\}$ jumps from $0$ to $6$, hence $\hat g'''$ is discontinuous --- the signature of a cubic spline (continuous curvature, kinked third derivative).
-
-\medskip
-\textbf{(d) Natural cubic spline.} It is forced \emph{linear} beyond the two boundary knots, imposing $2$ extra constraints at each end ($g''=g'''=0$), i.e.\ $4$ fewer df: $7-4=\mathbf{3}$. A natural spline spends its budget in the interior and is far more stable at the edges.
-\end{solutionbox}
-\end{frame}
 
 
 
@@ -1292,6 +1199,127 @@ plt.legend(); plt.xlabel('age'); plt.ylabel('wage'); plt.show()
     \item Bagging, random forests, boosting, BART.
     \item The dominant family of methods for tabular data.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{How the spline basis is built} --- the truncated-power term $(x-\xi)_+^3$ and the constraint counting that turns loose cubic pieces into one smooth curve. The main deck keeps the picture (``Why the continuity constraints?'') and the degrees-of-freedom rule, which is what you are asked to apply.
+      \item \textbf{Regression splines by hand (Extended Exercise 7.1)} --- evaluating a spline basis and its fit with pencil and paper. Exercise 7.3 covers the same counting argument in five minutes.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{The building block: one truncated-power term per knot}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+    \begin{center}
+    \begin{tikzpicture}[scale=0.95,>=Stealth,font=\small]
+      \definecolor{cP}{RGB}{38,70,140}
+      \draw[->,thick] (-0.2,0)--(4.8,0) node[right]{$x$};
+      \draw[->,thick] (0,-0.2)--(0,3.5) node[above,font=\footnotesize]{$(x-\xi)^3_+$};
+      \draw[cP,very thick] (0,0)--(2,0);
+      \draw[cP,very thick,domain=2:4.2,smooth,samples=40] plot(\x,{0.25*(\x-2)*(\x-2)*(\x-2)});
+      \draw[gray,dashed] (2,-0.1)--(2,3.0);
+      \node[below,font=\footnotesize] at (2,-0.12) {$\xi$};
+      \fill[cP] (2,0) circle(2pt);
+      \node[cP,font=\scriptsize] at (1.0,0.3) {$\equiv 0$};
+      \node[cP,font=\scriptsize] at (3.5,2.3) {cubic rise};
+    \end{tikzpicture}
+    \end{center}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{readme}[Reading $(x-\xi)^3_+$]
+        The ``$+$'' is the \emph{positive part}: the term is $0$ for
+        $x\le\xi$ and equals $(x-\xi)^3$ afterwards. Its value, slope
+        and curvature are all $0$ at $\xi$, so switching it on adds a
+        bend \emph{only to the right} of the knot without breaking
+        $C^2$-smoothness.
+      \end{readme}
+    \end{column}
+  \end{columns}
+  \begin{takeaway}Full basis for $K$ knots: $\;1,\,x,\,x^2,\,x^3,\,(x-\xi_1)^3_+,\dots,(x-\xi_K)^3_+\;$ --- that is $K+4$ functions, exactly the $K+4$ degrees of freedom of a cubic spline.\end{takeaway}
+\end{frame}
+
+\begin{frame}{Adding constraints turns loose pieces into a spline}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth,height=0.50\textheight,keepaspectratio]{7_3.pdf}
+  \end{center}
+  \begin{takeaway}Top-left: unconstrained pieces jump. Adding continuity of value, then slope, then curvature (bottom-left) removes the kinks --- the cubic spline is smoothest.\end{takeaway}
+  \islpsource{Figure 7.3}
+\end{frame}
+
+% ====================== EXTENDED EXERCISE: Splines ======================
+\begin{frame}{Extended Exercise 7.1 --- Regression splines by hand [Math]}
+\begin{longexercise}
+Build a cubic regression spline for \texttt{wage} on \texttt{age} with $K=3$ interior knots $\xi_1=25<\xi_2=40<\xi_3=60$.
+\begin{enumerate}
+  \item Write the truncated-power basis and state the total degrees of freedom.
+  \item The fitted function is
+  \[ \hat g(x)=40+0.5\,x+0.0004\,(x-25)^3_+ -0.0002\,(x-40)^3_+ +0.0003\,(x-60)^3_+ . \]
+  Evaluate $\hat g(50)$.
+  \item Show that $\hat g,\hat g',\hat g''$ are continuous at $\xi_2=40$ but $\hat g'''$ jumps.
+  \item How many degrees of freedom does a \emph{natural} cubic spline with the same three knots use? Explain the difference.
+\end{enumerate}
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 7.1 (1/3)}
+\begin{solutionbox}
+\textbf{(a) Truncated-power basis.} With $K=3$ knots the cubic-spline basis is
+\[ 1,\ x,\ x^2,\ x^3,\ (x-\xi_1)^3_+,\ (x-\xi_2)^3_+,\ (x-\xi_3)^3_+, \]
+so a fitted spline is $\hat g(x)=\beta_0+\beta_1x+\beta_2x^2+\beta_3x^3+\sum_{k=1}^{3}\beta_{3+k}(x-\xi_k)^3_+$.
+
+\medskip
+\textbf{Degrees of freedom.} Four base terms plus one per knot: $4+K=7$. Equivalently, a free cubic in each of the $K+1=4$ regions has $4\cdot4=16$ parameters, minus $3$ continuity constraints ($g,g',g''$) at each of the $3$ knots: $16-9=7$.
+
+\medskip
+\emph{Why this basis works:} each $(x-\xi_k)^3_+$ has value, slope and curvature $0$ at its knot, so it bends the fit only to the \emph{right} of $\xi_k$ without breaking smoothness --- plain OLS on these $7$ columns automatically yields a $C^2$ piecewise cubic.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 7.1 (2/3)}
+\begin{solutionbox}
+\textbf{(b) Evaluate $\hat g(50)$.} Here the quadratic and cubic \emph{base} coefficients happen to be zero, so only the linear base term and the \emph{active} truncated terms contribute. At $x=50$ the knots $25$ and $40$ are exceeded but $60$ is not:
+\[ (50-25)^3=25^3=15625,\quad (50-40)^3=10^3=1000,\quad (50-60)^3_+=0. \]
+Therefore
+\begin{align*}
+\hat g(50)&=40+0.5(50)+0.0004(15625)-0.0002(1000)+0.0003(0)\\
+&=40+25+6.25-0.20+0 = \mathbf{71.05}.
+\end{align*}
+Only the basis functions ``switched on'' at $x=50$ enter the sum --- this locality is the point of the truncated basis.
+
+\medskip
+\textit{Common mistake:} evaluating the third term as $(50-60)^3=(-10)^3=-1000$ instead of $0$. The ``$+$'' truncation zeroes the term for $x\le 60$; forgetting it would give the wrong value $71.05-0.30=70.75$.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 7.1 (3/3)}
+\begin{solutionbox}
+\textbf{(c) Continuity at $\xi_2=40$.} Only the term $t(x)=(x-40)^3_+$ changes behaviour there. With $t'=3(x-40)^2_+$ and $t''=6(x-40)_+$, its one-sided limits at $x=40$ are
+\[
+\begin{array}{c|ccc}
+ & t & t' & t'' \\\hline
+x\to40^- & 0 & 0 & 0\\
+x\to40^+ & 0 & 0 & 0
+\end{array}
+\]
+so $\hat g,\hat g',\hat g''$ are continuous. But $t'''=6\cdot\mathbf{1}\{x>40\}$ jumps from $0$ to $6$, hence $\hat g'''$ is discontinuous --- the signature of a cubic spline (continuous curvature, kinked third derivative).
+
+\medskip
+\textbf{(d) Natural cubic spline.} It is forced \emph{linear} beyond the two boundary knots, imposing $2$ extra constraints at each end ($g''=g'''=0$), i.e.\ $4$ fewer df: $7-4=\mathbf{3}$. A natural spline spends its budget in the interior and is far more stable at the edges.
+\end{solutionbox}
 \end{frame}
 
 \end{document}

@@ -93,7 +93,10 @@
 \end{frame}
 
 
-\begin{frame}{Contents}\small\tableofcontents[hideallsubsections]\end{frame}
+\begin{frame}{Contents}\small\tableofcontents[hideallsubsections]
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
+\end{frame}
 
 \begin{frame}{Notation in this chapter}
   \footnotesize
@@ -220,29 +223,6 @@
   \end{readme}
 \end{frame}
 
-\begin{frame}{The four outcomes of a test decision}
-  \begin{center}
-  \begin{tikzpicture}[x=1cm,y=1cm,font=\small,
-      cell/.style={minimum width=3cm,minimum height=1.6cm,draw=black!40,align=center},
-      hd/.style={font=\footnotesize\bfseries}]
-    \node[hd] at (1.6,1.15) {Not rejected};
-    \node[hd] at (5.0,1.15) {Rejected};
-    \node[hd,rotate=90] at (-1.55,0)     {$H_0$ true};
-    \node[hd,rotate=90] at (-1.55,-1.75) {$H_0$ false};
-    \node[cell,fill=green!14]  (U) at (1.6,0)     {$U$\\[1pt]\scriptsize true negatives};
-    \node[cell,fill=red!16]    (V) at (5.0,0)     {$V$\\[1pt]\scriptsize Type I (false pos.)};
-    \node[cell,fill=orange!14] (T) at (1.6,-1.75) {$T$\\[1pt]\scriptsize Type II (false neg.)};
-    \node[cell,fill=accent!16] (S) at (5.0,-1.75) {$S$\\[1pt]\scriptsize true positives};
-    \node[hd] at (7.4,0)     {$m_0$};
-    \node[hd] at (7.4,-1.75) {$m_1$};
-    \node[hd] at (1.6,-3.0)  {$m-R$};
-    \node[hd] at (5.0,-3.0)  {$R=V+S$};
-  \end{tikzpicture}
-  \end{center}
-  \begin{takeaway}
-    \textbf{Type I errors} are the red cell $V$. The FWER $=\Pr(V\ge 1)$ guards against \emph{any} false positive; the FDR $=E[V/R]$ controls their \emph{expected fraction} among the $R$ rejections.
-  \end{takeaway}
-\end{frame}
 
 
 % ------------------------------------------------------------
@@ -717,53 +697,6 @@
 \end{frame}
 
 % ============================================================
-\section{Resampling}
-% ============================================================
-
-\begin{frame}{Resampling-based $p$-values}
-  When the test statistic's null distribution is hard to derive:
-  \begin{readme}
-    \begin{itemize}
-      \item \textbf{Permutation}: shuffle the response many times to
-            get a null distribution.
-      \item \textbf{Bootstrap (under $H_0$)}: resample under a
-            constraint that enforces the null.
-      \item Empirical $p$-values are then thresholded by Bonferroni /
-            Holm / BH as before.
-    \end{itemize}
-  \end{readme}
-  \begin{takeaway}
-    Empirical $p$-value $=\dfrac{1+\#\{\text{resampled statistics}\ge\text{observed}\}}{1+B}$
-    over $B$ resamples --- no parametric null needed. The ``$+1$'' keeps it strictly
-    positive.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Resampling-based FDR}
-  \begin{takeaway}[Storey's $q$-value]
-    Estimate the proportion of true nulls $\hat\pi_0$ from the
-    $p$-value distribution. Calibrate FDR more accurately than BH.
-    Especially relevant when many nulls are false.
-  \end{takeaway}
-  \begin{readme}[How $\hat\pi_0$ is read off]
-    True nulls give $p$-values that are $\sim U(0,1)$, so the histogram is \emph{flat}
-    away from $0$; the height of that flat part estimates $\hat\pi_0$. BH implicitly
-    assumes $\hat\pi_0=1$; plugging in the smaller true value makes FDR control less
-    conservative and recovers more discoveries.
-  \end{readme}
-\end{frame}
-
-\begin{frame}{The distribution of $p$-values under many tests}
-  \begin{center}
-    \includegraphics[width=0.92\textwidth,height=0.58\textheight,keepaspectratio]{ch13_pval_hist.png}
-  \end{center}
-  \begin{takeaway}
-    True nulls give $p$-values that are $\sim U(0,1)$ (the flat bulk), while true effects pile up near $0$. Storey's method reads $\hat\pi_0$ off the height of that flat part to calibrate the FDR.
-  \end{takeaway}
-\end{frame}
-
-
-% ============================================================
 \section{Practice}
 % ============================================================
 
@@ -782,22 +715,6 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Post-selection inference}
-  After variable selection (lasso, stepwise) standard $p$-values are
-  invalid.
-  \begin{takeaway}
-    The bias: the \emph{same data} both \emph{chose} the hypothesis and \emph{tested}
-    it, so the reported $p$-values are optimistically small. Valid inference must
-    account for the selection step.
-  \end{takeaway}
-  \begin{readme}[Modern methods]
-    \begin{itemize}
-      \item Sample splitting / data-carving.
-      \item Selective inference (Lee, Sun, Sun, Taylor).
-      \item Knockoffs (Barber, Cand\`es).
-    \end{itemize}
-  \end{readme}
-\end{frame}
 
 % ------------------------------------------------------------
 % EXTENDED (INTEGRATIVE) EXERCISE 13.2 --- FWER vs FDR design decision
@@ -1079,6 +996,110 @@ for meth in ["bh", "bonferroni"]:                  # compare both procedures
   \end{takeaway}
   Thank you for taking this course. Good luck applying statistical
   learning to your own data!
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{The four outcomes, drawn} --- a diagram of the same $2\times2$ table the main deck already gives as a table.
+      \item \textbf{Resampling-based inference} --- permutation $p$-values, the resampling estimate of the FDR, and what the histogram of many $p$-values looks like. Use it when the null distribution is not available in closed form.
+      \item \textbf{Post-selection inference} --- why a $p$-value computed after looking at the data is not a $p$-value. Important in research practice, beyond the exam.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{The four outcomes of a test decision}
+  \begin{center}
+  \begin{tikzpicture}[x=1cm,y=1cm,font=\small,
+      cell/.style={minimum width=3cm,minimum height=1.6cm,draw=black!40,align=center},
+      hd/.style={font=\footnotesize\bfseries}]
+    \node[hd] at (1.6,1.15) {Not rejected};
+    \node[hd] at (5.0,1.15) {Rejected};
+    \node[hd,rotate=90] at (-1.55,0)     {$H_0$ true};
+    \node[hd,rotate=90] at (-1.55,-1.75) {$H_0$ false};
+    \node[cell,fill=green!14]  (U) at (1.6,0)     {$U$\\[1pt]\scriptsize true negatives};
+    \node[cell,fill=red!16]    (V) at (5.0,0)     {$V$\\[1pt]\scriptsize Type I (false pos.)};
+    \node[cell,fill=orange!14] (T) at (1.6,-1.75) {$T$\\[1pt]\scriptsize Type II (false neg.)};
+    \node[cell,fill=accent!16] (S) at (5.0,-1.75) {$S$\\[1pt]\scriptsize true positives};
+    \node[hd] at (7.4,0)     {$m_0$};
+    \node[hd] at (7.4,-1.75) {$m_1$};
+    \node[hd] at (1.6,-3.0)  {$m-R$};
+    \node[hd] at (5.0,-3.0)  {$R=V+S$};
+  \end{tikzpicture}
+  \end{center}
+  \begin{takeaway}
+    \textbf{Type I errors} are the red cell $V$. The FWER $=\Pr(V\ge 1)$ guards against \emph{any} false positive; the FDR $=E[V/R]$ controls their \emph{expected fraction} among the $R$ rejections.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Resampling-based $p$-values}
+  When the test statistic's null distribution is hard to derive:
+  \begin{readme}
+    \begin{itemize}
+      \item \textbf{Permutation}: shuffle the response many times to
+            get a null distribution.
+      \item \textbf{Bootstrap (under $H_0$)}: resample under a
+            constraint that enforces the null.
+      \item Empirical $p$-values are then thresholded by Bonferroni /
+            Holm / BH as before.
+    \end{itemize}
+  \end{readme}
+  \begin{takeaway}
+    Empirical $p$-value $=\dfrac{1+\#\{\text{resampled statistics}\ge\text{observed}\}}{1+B}$
+    over $B$ resamples --- no parametric null needed. The ``$+1$'' keeps it strictly
+    positive.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Resampling-based FDR}
+  \begin{takeaway}[Storey's $q$-value]
+    Estimate the proportion of true nulls $\hat\pi_0$ from the
+    $p$-value distribution. Calibrate FDR more accurately than BH.
+    Especially relevant when many nulls are false.
+  \end{takeaway}
+  \begin{readme}[How $\hat\pi_0$ is read off]
+    True nulls give $p$-values that are $\sim U(0,1)$, so the histogram is \emph{flat}
+    away from $0$; the height of that flat part estimates $\hat\pi_0$. BH implicitly
+    assumes $\hat\pi_0=1$; plugging in the smaller true value makes FDR control less
+    conservative and recovers more discoveries.
+  \end{readme}
+\end{frame}
+
+\begin{frame}{The distribution of $p$-values under many tests}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth,height=0.58\textheight,keepaspectratio]{ch13_pval_hist.png}
+  \end{center}
+  \begin{takeaway}
+    True nulls give $p$-values that are $\sim U(0,1)$ (the flat bulk), while true effects pile up near $0$. Storey's method reads $\hat\pi_0$ off the height of that flat part to calibrate the FDR.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Post-selection inference}
+  After variable selection (lasso, stepwise) standard $p$-values are
+  invalid.
+  \begin{takeaway}
+    The bias: the \emph{same data} both \emph{chose} the hypothesis and \emph{tested}
+    it, so the reported $p$-values are optimistically small. Valid inference must
+    account for the selection step.
+  \end{takeaway}
+  \begin{readme}[Modern methods]
+    \begin{itemize}
+      \item Sample splitting / data-carving.
+      \item Selective inference (Lee, Sun, Sun, Taylor).
+      \item Knockoffs (Barber, Cand\`es).
+    \end{itemize}
+  \end{readme}
 \end{frame}
 
 \end{document}

@@ -116,6 +116,8 @@
       \tableofcontents[hideallsubsections,sections={5-7}]
     \end{column}
   \end{columns}
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Why this second session exists}
@@ -589,105 +591,9 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Least squares is maximum likelihood in disguise}
-  \begin{center}
-    \includegraphics[width=0.88\textwidth,height=0.36\textheight,keepaspectratio]{ch00b_likelihood_normal.png}
-  \end{center}
-  \footnotesize
-  With normal errors $P(y_i \mid \mu) = \frac{1}{\sigma\sqrt{2\pi}}
-  \exp\bigl(-\tfrac{(y_i-\mu)^2}{2\sigma^2}\bigr)$, and the log strips the
-  exponential down to its exponent:
-  $\log P(y_i \mid \mu) = -\frac{(y_i-\mu)^2}{2\sigma^2} + \text{const}$, so
-  \[
-    \ell(\mu) = -\frac{1}{2\sigma^2}\sum_i (y_i - \mu)^2 + \text{const}
-    \quad\Longrightarrow\quad
-    \arg\max_\mu \ell(\mu) = \arg\min_\mu \sum_i (y_i-\mu)^2 .
-  \]
-  \begin{takeaway}[One principle under two names]
-    Maximising the likelihood \emph{is} minimising squared error whenever the
-    errors are normal. Chapter 4 keeps the principle and drops the normal
-    assumption --- that is all logistic regression does.
-  \end{takeaway}
-\end{frame}
 
-\begin{frame}{Extended Exercise 0b.1 --- Deriving an estimator [Math]}
-  \begin{longexercise}
-    In a sample of $n$ customers, $k$ default. Model each customer as an
-    independent Bernoulli trial with unknown default probability $\pi$.
-    \begin{enumerate}
-      \item Write the likelihood $L(\pi)$ as a product, then simplify it to a
-            single expression in $\pi$, $k$ and $n$.
-      \item Take logs to get $\ell(\pi)$.
-      \item Differentiate $\ell$ with respect to $\pi$, set the derivative to
-            zero, and solve. What is $\hat\pi_{\mathrm{MLE}}$?
-      \item Evaluate it for the \texttt{Default} data: $n = 10\,000$ with
-            $333$ defaults.
-      \item Explain why maximising $\ell$ gives the same answer as maximising
-            $L$, and why we bother with the log at all.
-      \item Chapter 4 replaces the single $\pi$ by
-            $\pi(x_i) = \sigma(\beta_0 + \beta_1 x_i)$. Write the resulting
-            log-likelihood, and say why it can no longer be solved by hand.
-    \end{enumerate}
-  \end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 0b.1 (1/2)}
-  \begin{solutionbox}
-    \textbf{(1) The likelihood.} Each defaulting customer contributes $\pi$ and
-    each non-defaulting one $1-\pi$; independence lets us multiply:
-    \[
-      L(\pi) = \prod_{i=1}^{n} \pi^{y_i}(1-\pi)^{1-y_i}
-             = \pi^{k}(1-\pi)^{\,n-k},
-      \qquad k = \sum_i y_i .
-    \]
-    The exponent trick is worth noticing: $\pi^{y_i}(1-\pi)^{1-y_i}$ equals
-    $\pi$ when $y_i = 1$ and $1-\pi$ when $y_i = 0$.
 
-    \textbf{(2) The log-likelihood.}
-    \[
-      \ell(\pi) = k\log \pi + (n-k)\log(1-\pi).
-    \]
-    The product has become a sum --- the only reason this is doable by hand.
-
-    \textbf{(3) Maximise.}
-    \[
-      \frac{d\ell}{d\pi} = \frac{k}{\pi} - \frac{n-k}{1-\pi} = 0
-      \;\Longrightarrow\;
-      k(1-\pi) = (n-k)\pi
-      \;\Longrightarrow\;
-      \hat\pi_{\mathrm{MLE}} = \frac{k}{n}.
-    \]
-    The sample proportion --- exactly what anyone would have guessed. That is
-    the point: maximum likelihood \emph{derives} the obvious estimator, and
-    keeps working when the answer is no longer obvious.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 0b.1 (2/2)}
-  \begin{solutionbox}
-    \textbf{(4) The numbers.} $\hat\pi = 333/10\,000 = \mathbf{0.0333}$, the
-    $3.3\%$ default rate quoted in Chapter 4.
-
-    \textbf{(5) Why the log is safe --- and necessary.} $\log$ is strictly
-    increasing, so it preserves the location of the maximum: if
-    $L(a) > L(b)$ then $\ell(a) > \ell(b)$. We use it because it converts the
-    product into a sum (so the derivative is a sum of simple terms) and because
-    the product itself underflows to zero on a computer for even moderate $n$.
-
-    \textbf{(6) The regression version.} With
-    $\pi_i = \sigma(\beta_0 + \beta_1 x_i)$,
-    \[
-      \ell(\beta_0,\beta_1) = \sum_{i=1}^{n}
-        \Bigl[\,y_i \log \pi_i + (1-y_i)\log(1-\pi_i)\Bigr].
-    \]
-    Setting the derivatives to zero now gives equations in which
-    $\beta$ appears \emph{inside} $\sigma$, so they cannot be rearranged into
-    a closed form as the normal equations were. Software maximises $\ell$
-    numerically --- by walking uphill, exactly the gradient method of
-    Part (a). Note also that $-\ell$ is the ``binary cross-entropy'' loss of
-    Chapter 10: the same quantity under a different name.
-  \end{solutionbox}
-\end{frame}
 
 \begin{frame}{Exercise 0b.4 --- What a likelihood is and is not [Concept]}
   \begin{exercise}
@@ -735,87 +641,6 @@
     a more flexible model can always be made to fit it better --- overfitting.
     That is precisely why Chapter 6 penalises the log-likelihood (AIC, BIC) and
     Chapter 5 measures performance on held-out data instead.
-  \end{solutionbox}
-\end{frame}
-
-
-% ============================================================
-\section{Counting and computational cost}
-% ============================================================
-
-\begin{frame}{How many models are there?}
-  \footnotesize
-  \begin{block}{Counting rules}
-    \[
-      k! = k(k-1)\cdots 1,
-      \qquad
-      \binom{p}{k} = \frac{p!}{k!\,(p-k)!},
-      \qquad
-      \sum_{k=0}^{p}\binom{p}{k} = 2^{p}.
-    \]
-    $\binom{p}{k}$ counts the subsets of size $k$; summing over all $k$ counts
-    \emph{every} subset --- each variable is either in or out, hence $2^p$.
-  \end{block}
-  \begin{numexample}[With numbers]
-    With $p = 4$ predictors there are $\binom{4}{2} = 6$ two-variable models
-    and $2^4 = 16$ models in total (including the empty one). With
-    $p = 10$: $1\,024$. With $p = 40$: over $10^{12}$.
-  \end{numexample}
-  \begin{takeaway}[Where you meet this]
-    Chapter 6 asks which subset of predictors to keep. The count above is why
-    ``try them all'' stops being possible around $p = 30$, and why stepwise
-    selection and regularisation exist at all.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{The cost of ``just try everything''}
-  \begin{center}
-    \includegraphics[width=0.95\textwidth,height=0.58\textheight,keepaspectratio]{ch00b_subset_growth.png}
-  \end{center}
-  \footnotesize
-  Forward stepwise selection fits about $p^2/2$ models instead of $2^p$: for
-  $p = 40$, roughly $800$ instead of $10^{12}$. At $0.01$ s per fit that is
-  eight seconds against about $350$ years --- with no guarantee of finding the
-  same answer, which is the trade-off Chapter 6 discusses.
-\end{frame}
-
-\begin{frame}{Exercise 0b.5 --- Counting [Math]}
-  \begin{exercise}
-    A data set has $p = 6$ candidate predictors.
-    \begin{enumerate}
-      \item How many models contain exactly two predictors?
-      \item How many models are there in total?
-      \item Best-subset selection fits all of them; forward stepwise fits
-            $1 + p(p+1)/2$. Compute both counts.
-      \item Each fit takes $0.01$ seconds. How long does each strategy take
-            for $p = 6$, and for $p = 30$?
-      \item Testing every model against the data and keeping the best
-            $R^2$ has a statistical cost as well as a computational one. What
-            is it? (One sentence; Chapter 13 gives it a name.)
-    \end{enumerate}
-  \end{exercise}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 0b.5}
-  \begin{solutionbox}
-    \textbf{(1)} $\binom{6}{2} = \frac{6 \cdot 5}{2} = \mathbf{15}$.
-
-    \textbf{(2)} $2^6 = \mathbf{64}$ (the empty model included).
-
-    \textbf{(3)} Best subset: $64$ fits. Forward stepwise:
-    $1 + 6(7)/2 = \mathbf{22}$ fits. For $p = 30$ the same formulas give
-    $2^{30} \approx 1.07\times10^{9}$ against $466$.
-
-    \textbf{(4)} At $0.01$ s per fit and $p = 6$: $0.64$ s versus $0.22$ s ---
-    no practical difference. At $p = 30$: $1.07\times10^{7}$ seconds
-    $\approx \mathbf{124\ \text{days}}$ versus $4.7$ seconds. This is why
-    Chapter 6 does not simply recommend best-subset selection.
-
-    \textbf{(5)} Picking the winner from a huge number of models is
-    \emph{selection on noise}: with enough candidates, some model fits the
-    sample well by luck, so its $R^2$ is optimistic and it may not generalise.
-    That is \textbf{multiple testing} (Chapter 13), and it is also why model
-    choice must be judged on held-out data (Chapter 5).
   \end{solutionbox}
 \end{frame}
 
@@ -1195,6 +1020,202 @@ for degree in range(1, 6):
     \texttt{scipy}, the $2^p$ count, and a complete
     split/fit/score experiment on \texttt{Auto}.
   \end{labnote}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{Least squares as maximum likelihood} --- the derivation that connects Chapter 3 to Chapter 4, plus Extended Exercise 0b.1 (deriving an estimator from scratch). The two methods are usable without it.
+      \item \textbf{Counting and computational cost} --- how the $2^p$ models of Chapter 6 explode, and why ``just try everything'' fails (with Exercise 0b.5). Chapter 6 re-states the conclusion where it is needed.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Least squares is maximum likelihood in disguise}
+  \begin{center}
+    \includegraphics[width=0.88\textwidth,height=0.36\textheight,keepaspectratio]{ch00b_likelihood_normal.png}
+  \end{center}
+  \footnotesize
+  With normal errors $P(y_i \mid \mu) = \frac{1}{\sigma\sqrt{2\pi}}
+  \exp\bigl(-\tfrac{(y_i-\mu)^2}{2\sigma^2}\bigr)$, and the log strips the
+  exponential down to its exponent:
+  $\log P(y_i \mid \mu) = -\frac{(y_i-\mu)^2}{2\sigma^2} + \text{const}$, so
+  \[
+    \ell(\mu) = -\frac{1}{2\sigma^2}\sum_i (y_i - \mu)^2 + \text{const}
+    \quad\Longrightarrow\quad
+    \arg\max_\mu \ell(\mu) = \arg\min_\mu \sum_i (y_i-\mu)^2 .
+  \]
+  \begin{takeaway}[One principle under two names]
+    Maximising the likelihood \emph{is} minimising squared error whenever the
+    errors are normal. Chapter 4 keeps the principle and drops the normal
+    assumption --- that is all logistic regression does.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Extended Exercise 0b.1 --- Deriving an estimator [Math]}
+  \begin{longexercise}
+    In a sample of $n$ customers, $k$ default. Model each customer as an
+    independent Bernoulli trial with unknown default probability $\pi$.
+    \begin{enumerate}
+      \item Write the likelihood $L(\pi)$ as a product, then simplify it to a
+            single expression in $\pi$, $k$ and $n$.
+      \item Take logs to get $\ell(\pi)$.
+      \item Differentiate $\ell$ with respect to $\pi$, set the derivative to
+            zero, and solve. What is $\hat\pi_{\mathrm{MLE}}$?
+      \item Evaluate it for the \texttt{Default} data: $n = 10\,000$ with
+            $333$ defaults.
+      \item Explain why maximising $\ell$ gives the same answer as maximising
+            $L$, and why we bother with the log at all.
+      \item Chapter 4 replaces the single $\pi$ by
+            $\pi(x_i) = \sigma(\beta_0 + \beta_1 x_i)$. Write the resulting
+            log-likelihood, and say why it can no longer be solved by hand.
+    \end{enumerate}
+  \end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 0b.1 (1/2)}
+  \begin{solutionbox}
+    \textbf{(1) The likelihood.} Each defaulting customer contributes $\pi$ and
+    each non-defaulting one $1-\pi$; independence lets us multiply:
+    \[
+      L(\pi) = \prod_{i=1}^{n} \pi^{y_i}(1-\pi)^{1-y_i}
+             = \pi^{k}(1-\pi)^{\,n-k},
+      \qquad k = \sum_i y_i .
+    \]
+    The exponent trick is worth noticing: $\pi^{y_i}(1-\pi)^{1-y_i}$ equals
+    $\pi$ when $y_i = 1$ and $1-\pi$ when $y_i = 0$.
+
+    \textbf{(2) The log-likelihood.}
+    \[
+      \ell(\pi) = k\log \pi + (n-k)\log(1-\pi).
+    \]
+    The product has become a sum --- the only reason this is doable by hand.
+
+    \textbf{(3) Maximise.}
+    \[
+      \frac{d\ell}{d\pi} = \frac{k}{\pi} - \frac{n-k}{1-\pi} = 0
+      \;\Longrightarrow\;
+      k(1-\pi) = (n-k)\pi
+      \;\Longrightarrow\;
+      \hat\pi_{\mathrm{MLE}} = \frac{k}{n}.
+    \]
+    The sample proportion --- exactly what anyone would have guessed. That is
+    the point: maximum likelihood \emph{derives} the obvious estimator, and
+    keeps working when the answer is no longer obvious.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 0b.1 (2/2)}
+  \begin{solutionbox}
+    \textbf{(4) The numbers.} $\hat\pi = 333/10\,000 = \mathbf{0.0333}$, the
+    $3.3\%$ default rate quoted in Chapter 4.
+
+    \textbf{(5) Why the log is safe --- and necessary.} $\log$ is strictly
+    increasing, so it preserves the location of the maximum: if
+    $L(a) > L(b)$ then $\ell(a) > \ell(b)$. We use it because it converts the
+    product into a sum (so the derivative is a sum of simple terms) and because
+    the product itself underflows to zero on a computer for even moderate $n$.
+
+    \textbf{(6) The regression version.} With
+    $\pi_i = \sigma(\beta_0 + \beta_1 x_i)$,
+    \[
+      \ell(\beta_0,\beta_1) = \sum_{i=1}^{n}
+        \Bigl[\,y_i \log \pi_i + (1-y_i)\log(1-\pi_i)\Bigr].
+    \]
+    Setting the derivatives to zero now gives equations in which
+    $\beta$ appears \emph{inside} $\sigma$, so they cannot be rearranged into
+    a closed form as the normal equations were. Software maximises $\ell$
+    numerically --- by walking uphill, exactly the gradient method of
+    Part (a). Note also that $-\ell$ is the ``binary cross-entropy'' loss of
+    Chapter 10: the same quantity under a different name.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{How many models are there?}
+  \footnotesize
+  \begin{block}{Counting rules}
+    \[
+      k! = k(k-1)\cdots 1,
+      \qquad
+      \binom{p}{k} = \frac{p!}{k!\,(p-k)!},
+      \qquad
+      \sum_{k=0}^{p}\binom{p}{k} = 2^{p}.
+    \]
+    $\binom{p}{k}$ counts the subsets of size $k$; summing over all $k$ counts
+    \emph{every} subset --- each variable is either in or out, hence $2^p$.
+  \end{block}
+  \begin{numexample}[With numbers]
+    With $p = 4$ predictors there are $\binom{4}{2} = 6$ two-variable models
+    and $2^4 = 16$ models in total (including the empty one). With
+    $p = 10$: $1\,024$. With $p = 40$: over $10^{12}$.
+  \end{numexample}
+  \begin{takeaway}[Where you meet this]
+    Chapter 6 asks which subset of predictors to keep. The count above is why
+    ``try them all'' stops being possible around $p = 30$, and why stepwise
+    selection and regularisation exist at all.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{The cost of ``just try everything''}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth,height=0.58\textheight,keepaspectratio]{ch00b_subset_growth.png}
+  \end{center}
+  \footnotesize
+  Forward stepwise selection fits about $p^2/2$ models instead of $2^p$: for
+  $p = 40$, roughly $800$ instead of $10^{12}$. At $0.01$ s per fit that is
+  eight seconds against about $350$ years --- with no guarantee of finding the
+  same answer, which is the trade-off Chapter 6 discusses.
+\end{frame}
+
+\begin{frame}{Exercise 0b.5 --- Counting [Math]}
+  \begin{exercise}
+    A data set has $p = 6$ candidate predictors.
+    \begin{enumerate}
+      \item How many models contain exactly two predictors?
+      \item How many models are there in total?
+      \item Best-subset selection fits all of them; forward stepwise fits
+            $1 + p(p+1)/2$. Compute both counts.
+      \item Each fit takes $0.01$ seconds. How long does each strategy take
+            for $p = 6$, and for $p = 30$?
+      \item Testing every model against the data and keeping the best
+            $R^2$ has a statistical cost as well as a computational one. What
+            is it? (One sentence; Chapter 13 gives it a name.)
+    \end{enumerate}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 0b.5}
+  \begin{solutionbox}
+    \textbf{(1)} $\binom{6}{2} = \frac{6 \cdot 5}{2} = \mathbf{15}$.
+
+    \textbf{(2)} $2^6 = \mathbf{64}$ (the empty model included).
+
+    \textbf{(3)} Best subset: $64$ fits. Forward stepwise:
+    $1 + 6(7)/2 = \mathbf{22}$ fits. For $p = 30$ the same formulas give
+    $2^{30} \approx 1.07\times10^{9}$ against $466$.
+
+    \textbf{(4)} At $0.01$ s per fit and $p = 6$: $0.64$ s versus $0.22$ s ---
+    no practical difference. At $p = 30$: $1.07\times10^{7}$ seconds
+    $\approx \mathbf{124\ \text{days}}$ versus $4.7$ seconds. This is why
+    Chapter 6 does not simply recommend best-subset selection.
+
+    \textbf{(5)} Picking the winner from a huge number of models is
+    \emph{selection on noise}: with enough candidates, some model fits the
+    sample well by luck, so its $R^2$ is optimistic and it may not generalise.
+    That is \textbf{multiple testing} (Chapter 13), and it is also why model
+    choice must be judged on held-out data (Chapter 5).
+  \end{solutionbox}
 \end{frame}
 
 \end{document}

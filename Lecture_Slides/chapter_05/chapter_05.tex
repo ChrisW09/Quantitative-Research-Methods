@@ -102,6 +102,8 @@
 
 \begin{frame}{Contents}\small
   \tableofcontents[hideallsubsections]
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -419,6 +421,11 @@
   \end{takeaway}
 \end{frame}
 
+
+
+
+
+
 \begin{frame}{The OLS LOOCV shortcut}
   For OLS regression specifically:
   \begin{block}{LOOCV formula for OLS}
@@ -436,78 +443,6 @@
     fits.
   \end{readme}
 \end{frame}
-
-\begin{frame}{Exercise 5.2 --- LOOCV Fits and the Leverage Shortcut [Math]}
-  \begin{exercise}
-    Consider a data set with $n = 500$ observations.
-    \begin{enumerate}
-      \item How many separate model fits does \emph{naive} LOOCV
-            require? How many for $10$-fold CV?
-      \item State the OLS leverage shortcut for $\mathrm{CV}_{(n)}$ and
-            explain how many full model fits it needs.
-      \item For a simple linear regression with $n = 4$ points, one
-            observation has residual $y_i - \hat y_i = 2.0$ and leverage
-            $h_i = 0.5$. Compute this point's contribution
-            $\bigl(\tfrac{y_i-\hat y_i}{1-h_i}\bigr)^2$ to the LOOCV sum
-            and compare it with the naive squared residual $e_i^2$.
-    \end{enumerate}
-  \end{exercise}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 5.2 (1/2)}
-  \begin{solutionbox}
-    \textbf{(1) Number of fits.}
-    Naive LOOCV leaves out one observation at a time and refits, so it
-    requires $n = 500$ fits. $10$-fold CV refits once per fold, so it
-    requires $10$ fits.
-
-    \textbf{(2) The OLS shortcut.}
-    For ordinary least squares,
-    \[
-      \mathrm{CV}_{(n)} = \frac{1}{n}\sum_{i=1}^n
-        \left(\frac{y_i - \hat y_i}{1 - h_i}\right)^2 ,
-    \]
-    where $\hat y_i$ and the leverages $h_i$ (diagonal of the hat matrix
-    $\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top$)
-    come from a \emph{single} fit on the full data. So it needs only
-    \textbf{one} fit instead of $n$ --- a dramatic saving.
-
-    \emph{Why this works:} OLS is a linear smoother, so deleting
-    observation $i$ changes its own fitted value in a way captured
-    entirely by $h_i$; the $n$ leave-one-out residuals can therefore be
-    recovered \emph{exactly} --- not approximately --- from one fit. No
-    such identity exists for general nonlinear models.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 5.2 (2/2)}
-  \begin{solutionbox}
-    \textbf{(3) Numerical contribution.}
-    \[
-      \left(\frac{y_i - \hat y_i}{1 - h_i}\right)^2
-      = \left(\frac{2.0}{1 - 0.5}\right)^2
-      = \left(\frac{2.0}{0.5}\right)^2
-      = 4.0^2 = 16.0 .
-    \]
-    The naive squared residual is $e_i^2 = 2.0^2 = 4.0$. The shortcut
-    inflates this high-leverage point's contribution by the factor
-    $1/(1-h_i)^2 = 1/0.25 = 4$, correctly reflecting that a
-    high-leverage point strongly pulls the fitted line toward itself, so
-    its genuine leave-one-out error is much larger than the in-sample
-    residual suggests.
-
-    \emph{Interpretation.} The in-sample residual understates this
-    point's out-of-sample error by a factor of $4$: remove the point and
-    the fitted line springs back, so the prediction misses it far more
-    badly than the training residual admits.
-
-    \emph{Common mistake:} forgetting that $y_i - \hat y_i$ and $h_i$
-    both come from the \emph{full-data} fit (no refitting is involved),
-    or dividing by $1-h_i$ without squaring --- the correction factor on
-    the \emph{squared} error is $1/(1-h_i)^2 = 4$, not $1/(1-h_i) = 2$.
-  \end{solutionbox}
-\end{frame}
-
 
 % ============================================================
 \section{$k$-Fold CV}
@@ -796,87 +731,8 @@
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Extended Exercise 5.1 --- LOOCV Shortcut vs.\ 5-Fold CV [Math]}
-  \begin{longexercise}
-    A simple linear regression (one predictor, so $p+1=2$ parameters) is
-    fit by OLS to $n = 200$ observations, giving a training residual sum
-    of squares $\mathrm{RSS} = \sum_i e_i^2 = 760$.
-    \begin{enumerate}
-      \item \textbf{Leverage shortcut, per point.} Three representative
-            observations have (residual $e_i$, leverage $h_i$):
-            $A=(1.0,\,0.02)$, $B=(3.0,\,0.30)$, $C=(-2.0,\,0.05)$.
-            Compute each LOOCV contribution $\bigl(e_i/(1-h_i)\bigr)^2$
-            and compare with the naive $e_i^2$.
-      \item \textbf{Leverage shortcut, whole sample.} The average OLS
-            leverage is $\bar h=(p+1)/n$. Using the approximation that
-            all $h_i\approx\bar h$, estimate
-            $\mathrm{CV}_{(n)}\approx \mathrm{MSE}_{\text{train}}/(1-\bar h)^2$.
-      \item \textbf{5-fold CV.} A 5-fold run gives per-fold MSEs
-            $4.0,\,4.4,\,3.8,\,4.6,\,4.2$. Compute $\mathrm{CV}_{(5)}$ and
-            its standard error across folds.
-      \item \textbf{Compare} the two estimates and their bias--variance
-            properties. Which is cheaper \emph{here}, and why does that
-            not usually hold?
-    \end{enumerate}
-  \end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 5.1 (1/2)}
-  \begin{solutionbox}
-    \textbf{(1) Per-point leverage correction.}
-    \[
-      A:\ \Bigl(\tfrac{1.0}{0.98}\Bigr)^2\!=\!1.04,\quad
-      B:\ \Bigl(\tfrac{3.0}{0.70}\Bigr)^2\!=\!18.37,\quad
-      C:\ \Bigl(\tfrac{-2.0}{0.95}\Bigr)^2\!=\!4.43,
-    \]
-    versus the naive $e_i^2 = 1.0,\ 9.0,\ 4.0$. The correction factor
-    $1/(1-h_i)^2$ equals $1.04,\ 2.04,\ 1.11$: the high-leverage point
-    $B$ is inflated most, because it pulls the fit strongly toward
-    itself, so its true leave-one-out error far exceeds the in-sample
-    residual.
 
-    \textbf{(2) Whole-sample shortcut.}
-    $\bar h=(p+1)/n=2/200=0.01$ and
-    $\mathrm{MSE}_{\text{train}}=\mathrm{RSS}/n=760/200=3.80$, hence
-    \[
-      \mathrm{CV}_{(n)}\approx\frac{3.80}{(1-0.01)^2}
-      =\frac{3.80}{0.9801}\approx 3.88 .
-    \]
-    A single OLS fit plus the hat-matrix diagonal replaces $n=200$ fits.
-    Note that $3.88$ sits just \emph{above}
-    $\mathrm{MSE}_{\text{train}} = 3.80$: the $1/(1-\bar h)^2$ factor
-    always inflates the training error, undoing its optimism.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 5.1 (2/2)}
-  \begin{solutionbox}
-    \textbf{(3) 5-fold estimate.}
-    $\mathrm{CV}_{(5)}=\tfrac15(4.0+4.4+3.8+4.6+4.2)=\tfrac{21.0}{5}=4.20$.
-    Deviations from $4.20$ are $-0.2,0.2,-0.4,0.4,0.0$; their squares sum
-    to $0.40$, so $s=\sqrt{0.40/4}=\sqrt{0.1}\approx0.316$ and the
-    standard error is $s/\sqrt5\approx0.14$: $\mathrm{CV}_{(5)}\approx
-    4.20\pm0.14$.
-
-    \textbf{(4) Comparison.} Both estimates target the same test MSE and
-    agree closely ($3.88$ vs.\ $4.20$).
-    \begin{itemize}
-      \item \emph{Bias}: LOOCV trains on $199$ points (almost unbiased);
-            5-fold trains on $160$, so it is slightly pessimistic ---
-            consistent with $4.20>3.88$.
-      \item \emph{Variance}: LOOCV averages $n$ highly correlated fits
-            (higher variance); 5-fold averages $5$ weakly correlated
-            fits (lower variance).
-      \item \emph{Cost}: here LOOCV is \emph{cheaper} --- the leverage
-            shortcut is one fit versus five. This reversal is special to
-            OLS/ridge; for a general model LOOCV costs $n$ fits.
-    \end{itemize}
-    \emph{Common mistake:} reading $3.88 < 4.20$ as ``LOOCV is more
-    accurate''. Both target the same test MSE; the gap mostly reflects
-    5-fold's pessimistic bias (training on $160$ rather than $199$
-    points), not a defect of either estimate.
-  \end{solutionbox}
-\end{frame}
 
 % ============================================================
 \section{The Bootstrap}
@@ -1522,6 +1378,179 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
     \item Dimension reduction: PCR and PLS.
     \item How to use cross-validation to pick tuning parameters.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{Drilling the leverage shortcut (Exercise 5.2 and Extended Exercise 5.1)} --- both work the identity that gives LOOCV for a linear model from a \emph{single} least-squares fit. The identity itself stays in the main deck (``The OLS LOOCV shortcut''); what moves here is the arithmetic practice, which is heavy going in a lecture and ideal as homework. Remember that the shortcut is special: it holds for least squares only.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+
+\begin{frame}{Exercise 5.2 --- LOOCV Fits and the Leverage Shortcut [Math]}
+  \begin{exercise}
+    Consider a data set with $n = 500$ observations.
+    \begin{enumerate}
+      \item How many separate model fits does \emph{naive} LOOCV
+            require? How many for $10$-fold CV?
+      \item State the OLS leverage shortcut for $\mathrm{CV}_{(n)}$ and
+            explain how many full model fits it needs.
+      \item For a simple linear regression with $n = 4$ points, one
+            observation has residual $y_i - \hat y_i = 2.0$ and leverage
+            $h_i = 0.5$. Compute this point's contribution
+            $\bigl(\tfrac{y_i-\hat y_i}{1-h_i}\bigr)^2$ to the LOOCV sum
+            and compare it with the naive squared residual $e_i^2$.
+    \end{enumerate}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 5.2 (1/2)}
+  \begin{solutionbox}
+    \textbf{(1) Number of fits.}
+    Naive LOOCV leaves out one observation at a time and refits, so it
+    requires $n = 500$ fits. $10$-fold CV refits once per fold, so it
+    requires $10$ fits.
+
+    \textbf{(2) The OLS shortcut.}
+    For ordinary least squares,
+    \[
+      \mathrm{CV}_{(n)} = \frac{1}{n}\sum_{i=1}^n
+        \left(\frac{y_i - \hat y_i}{1 - h_i}\right)^2 ,
+    \]
+    where $\hat y_i$ and the leverages $h_i$ (diagonal of the hat matrix
+    $\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top$)
+    come from a \emph{single} fit on the full data. So it needs only
+    \textbf{one} fit instead of $n$ --- a dramatic saving.
+
+    \emph{Why this works:} OLS is a linear smoother, so deleting
+    observation $i$ changes its own fitted value in a way captured
+    entirely by $h_i$; the $n$ leave-one-out residuals can therefore be
+    recovered \emph{exactly} --- not approximately --- from one fit. No
+    such identity exists for general nonlinear models.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 5.2 (2/2)}
+  \begin{solutionbox}
+    \textbf{(3) Numerical contribution.}
+    \[
+      \left(\frac{y_i - \hat y_i}{1 - h_i}\right)^2
+      = \left(\frac{2.0}{1 - 0.5}\right)^2
+      = \left(\frac{2.0}{0.5}\right)^2
+      = 4.0^2 = 16.0 .
+    \]
+    The naive squared residual is $e_i^2 = 2.0^2 = 4.0$. The shortcut
+    inflates this high-leverage point's contribution by the factor
+    $1/(1-h_i)^2 = 1/0.25 = 4$, correctly reflecting that a
+    high-leverage point strongly pulls the fitted line toward itself, so
+    its genuine leave-one-out error is much larger than the in-sample
+    residual suggests.
+
+    \emph{Interpretation.} The in-sample residual understates this
+    point's out-of-sample error by a factor of $4$: remove the point and
+    the fitted line springs back, so the prediction misses it far more
+    badly than the training residual admits.
+
+    \emph{Common mistake:} forgetting that $y_i - \hat y_i$ and $h_i$
+    both come from the \emph{full-data} fit (no refitting is involved),
+    or dividing by $1-h_i$ without squaring --- the correction factor on
+    the \emph{squared} error is $1/(1-h_i)^2 = 4$, not $1/(1-h_i) = 2$.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Extended Exercise 5.1 --- LOOCV Shortcut vs.\ 5-Fold CV [Math]}
+  \begin{longexercise}
+    A simple linear regression (one predictor, so $p+1=2$ parameters) is
+    fit by OLS to $n = 200$ observations, giving a training residual sum
+    of squares $\mathrm{RSS} = \sum_i e_i^2 = 760$.
+    \begin{enumerate}
+      \item \textbf{Leverage shortcut, per point.} Three representative
+            observations have (residual $e_i$, leverage $h_i$):
+            $A=(1.0,\,0.02)$, $B=(3.0,\,0.30)$, $C=(-2.0,\,0.05)$.
+            Compute each LOOCV contribution $\bigl(e_i/(1-h_i)\bigr)^2$
+            and compare with the naive $e_i^2$.
+      \item \textbf{Leverage shortcut, whole sample.} The average OLS
+            leverage is $\bar h=(p+1)/n$. Using the approximation that
+            all $h_i\approx\bar h$, estimate
+            $\mathrm{CV}_{(n)}\approx \mathrm{MSE}_{\text{train}}/(1-\bar h)^2$.
+      \item \textbf{5-fold CV.} A 5-fold run gives per-fold MSEs
+            $4.0,\,4.4,\,3.8,\,4.6,\,4.2$. Compute $\mathrm{CV}_{(5)}$ and
+            its standard error across folds.
+      \item \textbf{Compare} the two estimates and their bias--variance
+            properties. Which is cheaper \emph{here}, and why does that
+            not usually hold?
+    \end{enumerate}
+  \end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 5.1 (1/2)}
+  \begin{solutionbox}
+    \textbf{(1) Per-point leverage correction.}
+    \[
+      A:\ \Bigl(\tfrac{1.0}{0.98}\Bigr)^2\!=\!1.04,\quad
+      B:\ \Bigl(\tfrac{3.0}{0.70}\Bigr)^2\!=\!18.37,\quad
+      C:\ \Bigl(\tfrac{-2.0}{0.95}\Bigr)^2\!=\!4.43,
+    \]
+    versus the naive $e_i^2 = 1.0,\ 9.0,\ 4.0$. The correction factor
+    $1/(1-h_i)^2$ equals $1.04,\ 2.04,\ 1.11$: the high-leverage point
+    $B$ is inflated most, because it pulls the fit strongly toward
+    itself, so its true leave-one-out error far exceeds the in-sample
+    residual.
+
+    \textbf{(2) Whole-sample shortcut.}
+    $\bar h=(p+1)/n=2/200=0.01$ and
+    $\mathrm{MSE}_{\text{train}}=\mathrm{RSS}/n=760/200=3.80$, hence
+    \[
+      \mathrm{CV}_{(n)}\approx\frac{3.80}{(1-0.01)^2}
+      =\frac{3.80}{0.9801}\approx 3.88 .
+    \]
+    A single OLS fit plus the hat-matrix diagonal replaces $n=200$ fits.
+    Note that $3.88$ sits just \emph{above}
+    $\mathrm{MSE}_{\text{train}} = 3.80$: the $1/(1-\bar h)^2$ factor
+    always inflates the training error, undoing its optimism.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 5.1 (2/2)}
+  \begin{solutionbox}
+    \textbf{(3) 5-fold estimate.}
+    $\mathrm{CV}_{(5)}=\tfrac15(4.0+4.4+3.8+4.6+4.2)=\tfrac{21.0}{5}=4.20$.
+    Deviations from $4.20$ are $-0.2,0.2,-0.4,0.4,0.0$; their squares sum
+    to $0.40$, so $s=\sqrt{0.40/4}=\sqrt{0.1}\approx0.316$ and the
+    standard error is $s/\sqrt5\approx0.14$: $\mathrm{CV}_{(5)}\approx
+    4.20\pm0.14$.
+
+    \textbf{(4) Comparison.} Both estimates target the same test MSE and
+    agree closely ($3.88$ vs.\ $4.20$).
+    \begin{itemize}
+      \item \emph{Bias}: LOOCV trains on $199$ points (almost unbiased);
+            5-fold trains on $160$, so it is slightly pessimistic ---
+            consistent with $4.20>3.88$.
+      \item \emph{Variance}: LOOCV averages $n$ highly correlated fits
+            (higher variance); 5-fold averages $5$ weakly correlated
+            fits (lower variance).
+      \item \emph{Cost}: here LOOCV is \emph{cheaper} --- the leverage
+            shortcut is one fit versus five. This reversal is special to
+            OLS/ridge; for a general model LOOCV costs $n$ fits.
+    \end{itemize}
+    \emph{Common mistake:} reading $3.88 < 4.20$ as ``LOOCV is more
+    accurate''. Both target the same test MSE; the gap mostly reflects
+    5-fold's pessimistic bias (training on $160$ rather than $199$
+    points), not a defect of either estimate.
+  \end{solutionbox}
 \end{frame}
 
 \end{document}

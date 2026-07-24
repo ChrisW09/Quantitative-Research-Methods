@@ -115,6 +115,8 @@
       \tableofcontents[hideallsubsections,sections={7-12}]
     \end{column}
   \end{columns}
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this refresher}
@@ -1134,25 +1136,6 @@
   every confidence interval and every two-sided 5\% test in this course.
 \end{frame}
 
-\begin{frame}{Three distributions that come from the normal}
-  \begin{center}
-    \includegraphics[width=0.98\textwidth,height=0.52\textheight,keepaspectratio]{ch00_reference_dists.png}
-  \end{center}
-  \footnotesize
-  \begin{tabular}{@{}lll@{}}
-    \toprule
-    \textbf{Distribution} & \textbf{Arises as} & \textbf{Used for} \\
-    \midrule
-    $t_\nu$ & normal mean with $\sigma$ \emph{estimated} & $t$-tests, CIs on coefficients (Ch.\ 3) \\
-    $\chi^2_\nu$ & sum of $\nu$ squared standard normals & variance, likelihood-ratio tests \\
-    $F_{d_1,d_2}$ & ratio of two scaled $\chi^2$ & the $F$-test for several coefficients (Ch.\ 3) \\
-    \bottomrule
-  \end{tabular}
-  \vspace{2pt}
-  As the degrees of freedom grow, $t_\nu \to N(0,1)$: with $\nu > 30$ the
-  difference is negligible, which is why large-sample rules of thumb use
-  $1.96$.
-\end{frame}
 
 \begin{frame}{The central limit theorem}
   \begin{center}
@@ -1167,25 +1150,6 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Two different promises: LLN and CLT}
-  \begin{center}
-    \includegraphics[width=0.90\textwidth,height=0.44\textheight,keepaspectratio]{ch00_lln.png}
-  \end{center}
-  \footnotesize
-  \begin{center}
-  \begin{tabular}{@{}ll@{}}
-    \toprule
-    \textbf{Law of large numbers} & \textbf{Central limit theorem} \\
-    \midrule
-    $\bar X \to \mu$ as $n$ grows & $\bar X$ becomes normally distributed \\
-    says \emph{where} the mean lands & says \emph{how far off} it typically is \\
-    justifies estimating at all & justifies confidence intervals and tests \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  The right panel is the economics of data collection: going from $n=25$ to
-  $n=100$ halves the uncertainty; halving it again costs $n=400$.
-\end{frame}
 
 
 % ============================================================
@@ -1550,29 +1514,6 @@
   missing something. Both plots return in Chapter 3.
 \end{frame}
 
-\begin{frame}{Decomposing the variation}
-  \footnotesize
-  \begin{block}{The three sums of squares}
-    \[
-      \underbrace{\sum_i (y_i - \bar y)^2}_{\mathrm{TSS}}
-      = \underbrace{\sum_i (\hat y_i - \bar y)^2}_{\text{explained}}
-      + \underbrace{\sum_i (y_i - \hat y_i)^2}_{\mathrm{RSS}},
-      \qquad
-      R^2 = 1 - \frac{\mathrm{RSS}}{\mathrm{TSS}} .
-    \]
-  \end{block}
-  \begin{readme}[How to read $R^2$]
-    The fraction of the variation in $y$ that the model accounts for.
-    $R^2 = 0.61$ means ``61\% of the variability in sales is accounted for by
-    TV spend''. In simple regression $R^2 = r^2$ exactly.
-  \end{readme}
-  \begin{alertblock}{Do not over-read it}
-    A high $R^2$ does not make a model correct, useful or causal, and a low
-    one does not make it worthless. Adding any predictor never decreases
-    $R^2$ --- which is why Chapter 6 needs adjusted $R^2$, $C_p$, AIC, BIC and
-    cross-validation.
-  \end{alertblock}
-\end{frame}
 
 \begin{frame}{One point can move the whole line}
   \begin{center}
@@ -1764,332 +1705,6 @@ R-squared: 0.51    n = 36
     A defensible version: ``months that are $1^\circ$C warmer sell about
     \euro 900 more, on average''. To claim causation you would need an
     experiment or a design that holds the confounders fixed.
-  \end{solutionbox}
-\end{frame}
-
-
-% ============================================================
-\section{Linear algebra you will need}
-% ============================================================
-
-\begin{frame}{Vectors and matrices: the minimum}
-  \footnotesize
-  \begin{block}{Objects}
-    A \textbf{vector} $\mathbf{a} \in \mathbb{R}^p$ is a column of $p$
-    numbers; an $m \times n$ \textbf{matrix} has $m$ rows and $n$ columns;
-    $\mathbf{A}^\top$ swaps them.
-  \end{block}
-  \begin{block}{Multiplication --- the only rule you must remember}
-    $(m \times n)\cdot(n \times k) = (m \times k)$: the \emph{inner}
-    dimensions must match and they disappear. Entry $(i,j)$ of the product is
-    the dot product of row $i$ of the first and column $j$ of the second.
-  \end{block}
-  \begin{block}{Special cases}
-    Dot product $\mathbf{a}^\top\mathbf{b} = \sum_j a_j b_j$ (a scalar);
-    identity $\mathbf{I}$ with $\mathbf{A}\mathbf{I} = \mathbf{A}$;
-    inverse $\mathbf{A}^{-1}$ with $\mathbf{A}^{-1}\mathbf{A} = \mathbf{I}$
-    (exists only if $\mathbf{A}$ is square and non-singular).
-  \end{block}
-  \begin{takeaway}[Dimension checking is free error-detection]
-    If $\mathbf{X}$ is $n \times p$, then $\mathbf{X}^\top\mathbf{X}$ is
-    $p \times p$ and $\mathbf{X}^\top\mathbf{y}$ is $p \times 1$. Any formula
-    whose dimensions do not line up is wrong --- no algebra needed.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Why this course speaks matrix}
-  \begin{block}{Regression in one line}
-    With a column of ones in $\mathbf{X}$, the least-squares estimator is
-    \[
-      \hat{\boldsymbol\beta}
-      = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y},
-      \qquad
-      \hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol\beta}.
-    \]
-  \end{block}
-  \begin{readme}[Read it as a recipe]
-    $\mathbf{X}^\top\mathbf{y}$ collects how each predictor covaries with the
-    response; $\mathbf{X}^\top\mathbf{X}$ records how they covary with
-    \emph{each other}; inverting it divides out that shared information ---
-    which is what ``holding the others constant'' means algebraically.
-  \end{readme}
-  \begin{alertblock}{When the inverse fails}
-    If two predictors are perfectly correlated, or $p > n$, then
-    $\mathbf{X}^\top\mathbf{X}$ is singular and $\hat{\boldsymbol\beta}$ does
-    not exist. Ridge regression inverts
-    $\mathbf{X}^\top\mathbf{X} + \lambda\mathbf{I}$ instead (Ch.\ 6).
-  \end{alertblock}
-\end{frame}
-
-\begin{frame}{Norms, distances and eigenvectors --- where they show up}
-  \footnotesize
-  \begin{block}{Norms}
-    \[
-      \|\boldsymbol\beta\|_2^2 = \sum_j \beta_j^2 \quad(\ell_2),
-      \qquad
-      \|\boldsymbol\beta\|_1 = \sum_j |\beta_j| \quad(\ell_1).
-    \]
-    \emph{Where:} ridge penalises $\|\boldsymbol\beta\|_2^2$ and shrinks
-    coefficients smoothly; lasso penalises $\|\boldsymbol\beta\|_1$ and sets
-    some to exactly zero (Ch.\ 6). The difference between a round and a
-    pointed constraint region is the whole story.
-  \end{block}
-  \begin{block}{Euclidean distance}
-    $d(\mathbf{a},\mathbf{b}) = \sqrt{\sum_j (a_j-b_j)^2}$.
-    \emph{Where:} KNN (Ch.\ 2, 4) and clustering (Ch.\ 12) are built on it ---
-    and it is why unstandardised variables wreck both.
-  \end{block}
-  \begin{block}{Eigenvectors and eigenvalues}
-    $\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$: directions the matrix only
-    stretches. \emph{Where:} principal components (Ch.\ 6, 12) are the
-    eigenvectors of the covariance matrix --- the directions of greatest
-    variance in the data.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Exercise 0.8 --- Matrix mechanics [Math]}
-  \begin{exercise}
-    Let
-    \[
-      \mathbf{X} = \begin{pmatrix} 1 & 1 \\ 1 & 2 \\ 1 & 3 \end{pmatrix},
-      \qquad
-      \mathbf{y} = \begin{pmatrix} 2 \\ 3 \\ 5 \end{pmatrix}.
-    \]
-    \begin{enumerate}
-      \item State the dimensions of $\mathbf{X}^\top$,
-            $\mathbf{X}^\top\mathbf{X}$ and $\mathbf{X}^\top\mathbf{y}$
-            \emph{before} computing anything.
-      \item Compute $\mathbf{X}^\top\mathbf{X}$ and
-            $\mathbf{X}^\top\mathbf{y}$.
-      \item Invert $\mathbf{X}^\top\mathbf{X}$, using
-            $\begin{pmatrix} a & b \\ c & d\end{pmatrix}^{-1}
-             = \frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a\end{pmatrix}$.
-      \item Compute
-            $\hat{\boldsymbol\beta}
-             = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$,
-            and check the slope against $b_1 = S_{xy}/S_{xx}$.
-      \item What would go wrong if a third column equal to twice the second
-            were added to $\mathbf{X}$?
-    \end{enumerate}
-  \end{exercise}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 0.8}
-  \begin{solutionbox}
-    \textbf{(1)} $\mathbf{X}$ is $3\times2$, so $\mathbf{X}^\top$ is
-    $2\times3$, $\mathbf{X}^\top\mathbf{X}$ is $2\times2$ and
-    $\mathbf{X}^\top\mathbf{y}$ is $2\times1$; hence
-    $\hat{\boldsymbol\beta}$ is $2\times1$ --- an intercept and a slope.
-
-    \textbf{(2)}
-    \[
-      \mathbf{X}^\top\mathbf{X}
-      = \begin{pmatrix} 3 & 6 \\ 6 & 14 \end{pmatrix},
-      \qquad
-      \mathbf{X}^\top\mathbf{y}
-      = \begin{pmatrix} 2+3+5 \\ 2+6+15 \end{pmatrix}
-      = \begin{pmatrix} 10 \\ 23 \end{pmatrix}.
-    \]
-    \textbf{(3)} $\det = 3(14) - 6(6) = 42 - 36 = 6$, so
-    $(\mathbf{X}^\top\mathbf{X})^{-1}
-      = \frac{1}{6}\begin{pmatrix} 14 & -6 \\ -6 & 3\end{pmatrix}$.
-
-    \textbf{(4)}
-    \[
-      \hat{\boldsymbol\beta} = \frac{1}{6}
-      \begin{pmatrix} 14 & -6 \\ -6 & 3\end{pmatrix}
-      \begin{pmatrix} 10 \\ 23 \end{pmatrix}
-      = \frac{1}{6}\begin{pmatrix} 140-138 \\ -60+69 \end{pmatrix}
-      = \frac{1}{6}\begin{pmatrix} 2 \\ 9 \end{pmatrix}
-      = \begin{pmatrix} 0.333 \\ 1.5 \end{pmatrix}.
-    \]
-    Check: $\bar x = 2$, $\bar y = 10/3$, $S_{xx} = 2$, $S_{xy} = 3$, so
-    $b_1 = 1.5$ \checkmark and $b_0 = 10/3 - 3 = 1/3$ \checkmark.
-
-    \textbf{(5)} Perfect collinearity: $\mathbf{X}^\top\mathbf{X}$ becomes
-    singular ($\det = 0$), the inverse does not exist, and infinitely many
-    coefficient vectors give an identical fit. Software reports a ``singular
-    matrix'' or silently drops a column.
-  \end{solutionbox}
-\end{frame}
-
-
-% ============================================================
-\section{Calculus and optimisation}
-% ============================================================
-
-\begin{frame}{Derivatives: the three facts that matter}
-  \footnotesize
-  \begin{block}{Rules}
-    \[
-      \frac{d}{dx}x^k = kx^{k-1},
-      \qquad
-      \frac{d}{dx}e^x = e^x,
-      \qquad
-      \frac{d}{dx}\log x = \frac1x,
-      \qquad
-      \frac{d}{dx}f(g(x)) = f'(g(x))\,g'(x).
-    \]
-  \end{block}
-  \begin{block}{What a derivative means here}
-    The slope of the function: how much the output changes per unit change
-    in the input. At a minimum, the slope is zero --- which is how every
-    estimator in this course is derived.
-  \end{block}
-  \begin{block}{Partial derivatives and the gradient}
-    With several inputs, differentiate with respect to one at a time,
-    holding the others fixed. Stacking them gives the gradient
-    \[
-      \nabla f(\boldsymbol\beta)
-      = \Bigl(\tfrac{\partial f}{\partial \beta_1}, \dots,
-              \tfrac{\partial f}{\partial \beta_p}\Bigr)^{\!\top},
-    \]
-    which points in the direction of \emph{steepest increase}.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Minimising a loss: the pattern behind every method}
-  \begin{numexample}[Deriving the sample mean]
-    Minimise $L(c) = \sum_i (x_i - c)^2$ over $c$:
-    \[
-      \frac{dL}{dc} = -2\sum_i (x_i - c) = 0
-      \;\Longrightarrow\;
-      \sum_i x_i = nc
-      \;\Longrightarrow\;
-      c = \bar x .
-    \]
-    So the sample mean is not a convention --- it is \emph{the} minimiser of
-    squared error. (Minimising $\sum_i |x_i - c|$ instead gives the median.)
-  \end{numexample}
-  \begin{takeaway}[The recurring recipe]
-    \textbf{1.} Write a loss measuring misfit. \textbf{2.} Differentiate.
-    \textbf{3.} Set to zero and solve --- or, when no closed form exists,
-    walk downhill. Least squares, logistic regression, splines, boosting and
-    neural networks are all this recipe with different losses.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Gradient descent: when there is no closed form}
-  \begin{block}{The update}
-    \[
-      \boldsymbol\beta^{(t+1)}
-      = \boldsymbol\beta^{(t)} - \alpha\,\nabla L\bigl(\boldsymbol\beta^{(t)}\bigr),
-      \qquad \alpha > 0 \text{ the learning rate}.
-    \]
-  \end{block}
-  \begin{readme}[The picture]
-    Stand on a hillside in fog. The gradient points uphill, so step the
-    opposite way, and repeat. $\alpha$ too small $\Rightarrow$ crawling;
-    $\alpha$ too large $\Rightarrow$ overshooting and divergence. Choosing
-    it well is a recurring practical theme of Chapter 10.
-  \end{readme}
-  \begin{takeaway}[Convexity decides whether this is safe]
-    For a convex loss (least squares, logistic regression) every local
-    minimum is global, so descent finds the answer. Neural networks are
-    \emph{not} convex --- which is why initialisation, learning-rate
-    schedules and early stopping matter so much in Chapter 10.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Gradient descent, drawn}
-  \begin{center}
-    \includegraphics[width=0.92\textwidth,height=0.46\textheight,keepaspectratio]{ch00_gradient_descent.png}
-  \end{center}
-  \footnotesize
-  The contours are the loss $L(\beta_0,\beta_1)$ for the three-point data set
-  of Extended Exercise 0.3; the star is the least-squares solution.
-  \textbf{Left:} a safe learning rate walks downhill and creeps along the
-  valley floor. \textbf{Right:} too large a rate steps past the valley, lands
-  higher up the far side, and every step after that is worse.
-  \begin{takeaway}[Why the valley is so narrow]
-    Long thin contours mean the loss is far more curved in one direction than
-    another, which forces a small step size. Standardising the predictors
-    makes the contours rounder --- the same fix, again.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Extended Exercise 0.3 --- Normal equations and one descent step [Integrative]}
-  \begin{longexercise}
-    Use the data of Exercise 0.8:
-    $(x,y) = (1,2), (2,3), (3,5)$, model $y = \beta_0 + \beta_1 x$, and
-    loss $L(\boldsymbol\beta) = \sum_i (y_i - \beta_0 - \beta_1 x_i)^2$.
-    \begin{enumerate}
-      \item Write $L$ out explicitly for the three observations.
-      \item Derive $\partial L/\partial\beta_0$ and
-            $\partial L/\partial\beta_1$, and show that setting both to zero
-            gives the normal equations
-            $\mathbf{X}^\top\mathbf{X}\boldsymbol\beta = \mathbf{X}^\top\mathbf{y}$.
-      \item Starting from $\boldsymbol\beta^{(0)} = (0,0)^\top$, compute the
-            gradient and take one gradient-descent step with $\alpha = 0.01$.
-      \item Compute $L$ at $\boldsymbol\beta^{(0)}$, at
-            $\boldsymbol\beta^{(1)}$, and at the exact solution
-            $(1/3,\ 3/2)^\top$. Did the step help?
-      \item What happens with $\alpha = 1$? Compute
-            $\boldsymbol\beta^{(1)}$ and comment.
-    \end{enumerate}
-  \end{longexercise}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 0.3 (1/2)}
-  \begin{solutionbox}
-    \scriptsize
-    \textbf{(1) The loss.}
-    \[
-      L(\beta_0,\beta_1) = (2-\beta_0-\beta_1)^2 + (3-\beta_0-2\beta_1)^2
-                         + (5-\beta_0-3\beta_1)^2 .
-    \]
-    \textbf{(2) Partial derivatives.} With $e_i = y_i-\beta_0-\beta_1x_i$,
-    \[
-      \frac{\partial L}{\partial \beta_0} = -2\sum_i e_i,
-      \qquad
-      \frac{\partial L}{\partial \beta_1} = -2\sum_i x_i e_i .
-    \]
-    Setting both to zero gives $\sum_i e_i = 0$ and $\sum_i x_i e_i = 0$, i.e.
-    $3\beta_0 + 6\beta_1 = 10$ and $6\beta_0 + 14\beta_1 = 23$ --- exactly
-    $\mathbf{X}^\top\mathbf{X}\boldsymbol\beta = \mathbf{X}^\top\mathbf{y}$
-    with the matrices of Exercise 0.8, so
-    $\boldsymbol\beta = (1/3,\ 3/2)^\top$ as before. \emph{The normal
-    equations are ``derivative $=0$'' in matrix form.}
-
-    \textbf{(3) One step.} At $(0,0)^\top$ the residuals are $e = (2,3,5)$:
-    \[
-      \nabla L = -2\bigl(\textstyle\sum_i e_i,\ \sum_i x_i e_i\bigr)^\top
-               = -2(10,\ 23)^\top = (-20,\ -46)^\top ,
-    \]
-    \[
-      \boldsymbol\beta^{(1)} = (0,0)^\top - 0.01(-20,-46)^\top
-                             = (0.20,\ 0.46)^\top .
-    \]
-    The step moves \emph{towards} $(0.33, 1.50)$, as it should.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 0.3 (2/2)}
-  \begin{solutionbox}
-    \scriptsize
-    \textbf{(4) Did it help?}
-    \[
-      L(0,0) = 2^2+3^2+5^2 = 38 .
-    \]
-    At $\boldsymbol\beta^{(1)} = (0.20, 0.46)$ the fitted values are
-    $0.66, 1.12, 1.58$, so the residuals are $1.34, 1.88, 3.42$ and
-    \[
-      L(\boldsymbol\beta^{(1)}) = 1.796 + 3.534 + 11.696 = 17.03 .
-    \]
-    At the exact solution the residuals are $1/6, -1/3, 1/6$, so
-    $L = 1/6 \approx 0.167$. One step cut the loss from $38$ to $17$ --- a big
-    improvement, still far from the optimum: descent needs many iterations,
-    which is why a closed form is preferred whenever one exists.
-
-    \textbf{(5) Too large a learning rate.} With $\alpha = 1$,
-    \[
-      \boldsymbol\beta^{(1)} = (0,0)^\top - 1\cdot(-20,-46)^\top = (20,\ 46)^\top .
-    \]
-    Fitted values are $66, 112, 158$ against $y = (2,3,5)$: the loss explodes
-    to about $3.9\times10^{4}$, far worse than the starting $38$, and the next
-    step is larger still --- \textbf{divergence}. The step size must respect
-    the curvature of the loss, so in practice one standardises the predictors
-    and tunes $\alpha$: the workflow of Chapter 10.
   \end{solutionbox}
 \end{frame}
 
@@ -2640,6 +2255,408 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     ``residual'', ``conditional probability'' and ``gradient'' are used
     without further explanation.
   \end{takeaway}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{$\chi^2$, $t$, $F$, and LLN vs.\ CLT} --- the distributions derived from the normal, and the two asymptotic promises. You only need to recognise the names when they appear in Chapters 3--6.
+      \item \textbf{The ANOVA decomposition} --- $\mathrm{TSS}=\mathrm{ESS}+\mathrm{RSS}$ written out. Useful, but $R^2$ is the version you will actually quote.
+      \item \textbf{Linear algebra} --- vectors, matrices, matrix multiplication, norms and eigenvectors (with Exercise 0.8). Needed to \emph{read} the compact formulas, never to compute anything by hand in this course.
+      \item \textbf{Calculus and optimisation} --- derivatives, minimising a loss, gradient descent (with Extended Exercise 0.3). Software does this for you; come back here when Chapter 10 trains a network.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Three distributions that come from the normal}
+  \begin{center}
+    \includegraphics[width=0.98\textwidth,height=0.52\textheight,keepaspectratio]{ch00_reference_dists.png}
+  \end{center}
+  \footnotesize
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    \textbf{Distribution} & \textbf{Arises as} & \textbf{Used for} \\
+    \midrule
+    $t_\nu$ & normal mean with $\sigma$ \emph{estimated} & $t$-tests, CIs on coefficients (Ch.\ 3) \\
+    $\chi^2_\nu$ & sum of $\nu$ squared standard normals & variance, likelihood-ratio tests \\
+    $F_{d_1,d_2}$ & ratio of two scaled $\chi^2$ & the $F$-test for several coefficients (Ch.\ 3) \\
+    \bottomrule
+  \end{tabular}
+  \vspace{2pt}
+  As the degrees of freedom grow, $t_\nu \to N(0,1)$: with $\nu > 30$ the
+  difference is negligible, which is why large-sample rules of thumb use
+  $1.96$.
+\end{frame}
+
+\begin{frame}{Two different promises: LLN and CLT}
+  \begin{center}
+    \includegraphics[width=0.90\textwidth,height=0.44\textheight,keepaspectratio]{ch00_lln.png}
+  \end{center}
+  \footnotesize
+  \begin{center}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    \textbf{Law of large numbers} & \textbf{Central limit theorem} \\
+    \midrule
+    $\bar X \to \mu$ as $n$ grows & $\bar X$ becomes normally distributed \\
+    says \emph{where} the mean lands & says \emph{how far off} it typically is \\
+    justifies estimating at all & justifies confidence intervals and tests \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  The right panel is the economics of data collection: going from $n=25$ to
+  $n=100$ halves the uncertainty; halving it again costs $n=400$.
+\end{frame}
+
+\begin{frame}{Decomposing the variation}
+  \footnotesize
+  \begin{block}{The three sums of squares}
+    \[
+      \underbrace{\sum_i (y_i - \bar y)^2}_{\mathrm{TSS}}
+      = \underbrace{\sum_i (\hat y_i - \bar y)^2}_{\text{explained}}
+      + \underbrace{\sum_i (y_i - \hat y_i)^2}_{\mathrm{RSS}},
+      \qquad
+      R^2 = 1 - \frac{\mathrm{RSS}}{\mathrm{TSS}} .
+    \]
+  \end{block}
+  \begin{readme}[How to read $R^2$]
+    The fraction of the variation in $y$ that the model accounts for.
+    $R^2 = 0.61$ means ``61\% of the variability in sales is accounted for by
+    TV spend''. In simple regression $R^2 = r^2$ exactly.
+  \end{readme}
+  \begin{alertblock}{Do not over-read it}
+    A high $R^2$ does not make a model correct, useful or causal, and a low
+    one does not make it worthless. Adding any predictor never decreases
+    $R^2$ --- which is why Chapter 6 needs adjusted $R^2$, $C_p$, AIC, BIC and
+    cross-validation.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Vectors and matrices: the minimum}
+  \footnotesize
+  \begin{block}{Objects}
+    A \textbf{vector} $\mathbf{a} \in \mathbb{R}^p$ is a column of $p$
+    numbers; an $m \times n$ \textbf{matrix} has $m$ rows and $n$ columns;
+    $\mathbf{A}^\top$ swaps them.
+  \end{block}
+  \begin{block}{Multiplication --- the only rule you must remember}
+    $(m \times n)\cdot(n \times k) = (m \times k)$: the \emph{inner}
+    dimensions must match and they disappear. Entry $(i,j)$ of the product is
+    the dot product of row $i$ of the first and column $j$ of the second.
+  \end{block}
+  \begin{block}{Special cases}
+    Dot product $\mathbf{a}^\top\mathbf{b} = \sum_j a_j b_j$ (a scalar);
+    identity $\mathbf{I}$ with $\mathbf{A}\mathbf{I} = \mathbf{A}$;
+    inverse $\mathbf{A}^{-1}$ with $\mathbf{A}^{-1}\mathbf{A} = \mathbf{I}$
+    (exists only if $\mathbf{A}$ is square and non-singular).
+  \end{block}
+  \begin{takeaway}[Dimension checking is free error-detection]
+    If $\mathbf{X}$ is $n \times p$, then $\mathbf{X}^\top\mathbf{X}$ is
+    $p \times p$ and $\mathbf{X}^\top\mathbf{y}$ is $p \times 1$. Any formula
+    whose dimensions do not line up is wrong --- no algebra needed.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Why this course speaks matrix}
+  \begin{block}{Regression in one line}
+    With a column of ones in $\mathbf{X}$, the least-squares estimator is
+    \[
+      \hat{\boldsymbol\beta}
+      = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y},
+      \qquad
+      \hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol\beta}.
+    \]
+  \end{block}
+  \begin{readme}[Read it as a recipe]
+    $\mathbf{X}^\top\mathbf{y}$ collects how each predictor covaries with the
+    response; $\mathbf{X}^\top\mathbf{X}$ records how they covary with
+    \emph{each other}; inverting it divides out that shared information ---
+    which is what ``holding the others constant'' means algebraically.
+  \end{readme}
+  \begin{alertblock}{When the inverse fails}
+    If two predictors are perfectly correlated, or $p > n$, then
+    $\mathbf{X}^\top\mathbf{X}$ is singular and $\hat{\boldsymbol\beta}$ does
+    not exist. Ridge regression inverts
+    $\mathbf{X}^\top\mathbf{X} + \lambda\mathbf{I}$ instead (Ch.\ 6).
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Norms, distances and eigenvectors --- where they show up}
+  \footnotesize
+  \begin{block}{Norms}
+    \[
+      \|\boldsymbol\beta\|_2^2 = \sum_j \beta_j^2 \quad(\ell_2),
+      \qquad
+      \|\boldsymbol\beta\|_1 = \sum_j |\beta_j| \quad(\ell_1).
+    \]
+    \emph{Where:} ridge penalises $\|\boldsymbol\beta\|_2^2$ and shrinks
+    coefficients smoothly; lasso penalises $\|\boldsymbol\beta\|_1$ and sets
+    some to exactly zero (Ch.\ 6). The difference between a round and a
+    pointed constraint region is the whole story.
+  \end{block}
+  \begin{block}{Euclidean distance}
+    $d(\mathbf{a},\mathbf{b}) = \sqrt{\sum_j (a_j-b_j)^2}$.
+    \emph{Where:} KNN (Ch.\ 2, 4) and clustering (Ch.\ 12) are built on it ---
+    and it is why unstandardised variables wreck both.
+  \end{block}
+  \begin{block}{Eigenvectors and eigenvalues}
+    $\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$: directions the matrix only
+    stretches. \emph{Where:} principal components (Ch.\ 6, 12) are the
+    eigenvectors of the covariance matrix --- the directions of greatest
+    variance in the data.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Exercise 0.8 --- Matrix mechanics [Math]}
+  \begin{exercise}
+    Let
+    \[
+      \mathbf{X} = \begin{pmatrix} 1 & 1 \\ 1 & 2 \\ 1 & 3 \end{pmatrix},
+      \qquad
+      \mathbf{y} = \begin{pmatrix} 2 \\ 3 \\ 5 \end{pmatrix}.
+    \]
+    \begin{enumerate}
+      \item State the dimensions of $\mathbf{X}^\top$,
+            $\mathbf{X}^\top\mathbf{X}$ and $\mathbf{X}^\top\mathbf{y}$
+            \emph{before} computing anything.
+      \item Compute $\mathbf{X}^\top\mathbf{X}$ and
+            $\mathbf{X}^\top\mathbf{y}$.
+      \item Invert $\mathbf{X}^\top\mathbf{X}$, using
+            $\begin{pmatrix} a & b \\ c & d\end{pmatrix}^{-1}
+             = \frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a\end{pmatrix}$.
+      \item Compute
+            $\hat{\boldsymbol\beta}
+             = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$,
+            and check the slope against $b_1 = S_{xy}/S_{xx}$.
+      \item What would go wrong if a third column equal to twice the second
+            were added to $\mathbf{X}$?
+    \end{enumerate}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 0.8}
+  \begin{solutionbox}
+    \textbf{(1)} $\mathbf{X}$ is $3\times2$, so $\mathbf{X}^\top$ is
+    $2\times3$, $\mathbf{X}^\top\mathbf{X}$ is $2\times2$ and
+    $\mathbf{X}^\top\mathbf{y}$ is $2\times1$; hence
+    $\hat{\boldsymbol\beta}$ is $2\times1$ --- an intercept and a slope.
+
+    \textbf{(2)}
+    \[
+      \mathbf{X}^\top\mathbf{X}
+      = \begin{pmatrix} 3 & 6 \\ 6 & 14 \end{pmatrix},
+      \qquad
+      \mathbf{X}^\top\mathbf{y}
+      = \begin{pmatrix} 2+3+5 \\ 2+6+15 \end{pmatrix}
+      = \begin{pmatrix} 10 \\ 23 \end{pmatrix}.
+    \]
+    \textbf{(3)} $\det = 3(14) - 6(6) = 42 - 36 = 6$, so
+    $(\mathbf{X}^\top\mathbf{X})^{-1}
+      = \frac{1}{6}\begin{pmatrix} 14 & -6 \\ -6 & 3\end{pmatrix}$.
+
+    \textbf{(4)}
+    \[
+      \hat{\boldsymbol\beta} = \frac{1}{6}
+      \begin{pmatrix} 14 & -6 \\ -6 & 3\end{pmatrix}
+      \begin{pmatrix} 10 \\ 23 \end{pmatrix}
+      = \frac{1}{6}\begin{pmatrix} 140-138 \\ -60+69 \end{pmatrix}
+      = \frac{1}{6}\begin{pmatrix} 2 \\ 9 \end{pmatrix}
+      = \begin{pmatrix} 0.333 \\ 1.5 \end{pmatrix}.
+    \]
+    Check: $\bar x = 2$, $\bar y = 10/3$, $S_{xx} = 2$, $S_{xy} = 3$, so
+    $b_1 = 1.5$ \checkmark and $b_0 = 10/3 - 3 = 1/3$ \checkmark.
+
+    \textbf{(5)} Perfect collinearity: $\mathbf{X}^\top\mathbf{X}$ becomes
+    singular ($\det = 0$), the inverse does not exist, and infinitely many
+    coefficient vectors give an identical fit. Software reports a ``singular
+    matrix'' or silently drops a column.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Derivatives: the three facts that matter}
+  \footnotesize
+  \begin{block}{Rules}
+    \[
+      \frac{d}{dx}x^k = kx^{k-1},
+      \qquad
+      \frac{d}{dx}e^x = e^x,
+      \qquad
+      \frac{d}{dx}\log x = \frac1x,
+      \qquad
+      \frac{d}{dx}f(g(x)) = f'(g(x))\,g'(x).
+    \]
+  \end{block}
+  \begin{block}{What a derivative means here}
+    The slope of the function: how much the output changes per unit change
+    in the input. At a minimum, the slope is zero --- which is how every
+    estimator in this course is derived.
+  \end{block}
+  \begin{block}{Partial derivatives and the gradient}
+    With several inputs, differentiate with respect to one at a time,
+    holding the others fixed. Stacking them gives the gradient
+    \[
+      \nabla f(\boldsymbol\beta)
+      = \Bigl(\tfrac{\partial f}{\partial \beta_1}, \dots,
+              \tfrac{\partial f}{\partial \beta_p}\Bigr)^{\!\top},
+    \]
+    which points in the direction of \emph{steepest increase}.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Minimising a loss: the pattern behind every method}
+  \begin{numexample}[Deriving the sample mean]
+    Minimise $L(c) = \sum_i (x_i - c)^2$ over $c$:
+    \[
+      \frac{dL}{dc} = -2\sum_i (x_i - c) = 0
+      \;\Longrightarrow\;
+      \sum_i x_i = nc
+      \;\Longrightarrow\;
+      c = \bar x .
+    \]
+    So the sample mean is not a convention --- it is \emph{the} minimiser of
+    squared error. (Minimising $\sum_i |x_i - c|$ instead gives the median.)
+  \end{numexample}
+  \begin{takeaway}[The recurring recipe]
+    \textbf{1.} Write a loss measuring misfit. \textbf{2.} Differentiate.
+    \textbf{3.} Set to zero and solve --- or, when no closed form exists,
+    walk downhill. Least squares, logistic regression, splines, boosting and
+    neural networks are all this recipe with different losses.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Gradient descent: when there is no closed form}
+  \begin{block}{The update}
+    \[
+      \boldsymbol\beta^{(t+1)}
+      = \boldsymbol\beta^{(t)} - \alpha\,\nabla L\bigl(\boldsymbol\beta^{(t)}\bigr),
+      \qquad \alpha > 0 \text{ the learning rate}.
+    \]
+  \end{block}
+  \begin{readme}[The picture]
+    Stand on a hillside in fog. The gradient points uphill, so step the
+    opposite way, and repeat. $\alpha$ too small $\Rightarrow$ crawling;
+    $\alpha$ too large $\Rightarrow$ overshooting and divergence. Choosing
+    it well is a recurring practical theme of Chapter 10.
+  \end{readme}
+  \begin{takeaway}[Convexity decides whether this is safe]
+    For a convex loss (least squares, logistic regression) every local
+    minimum is global, so descent finds the answer. Neural networks are
+    \emph{not} convex --- which is why initialisation, learning-rate
+    schedules and early stopping matter so much in Chapter 10.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Gradient descent, drawn}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth,height=0.46\textheight,keepaspectratio]{ch00_gradient_descent.png}
+  \end{center}
+  \footnotesize
+  The contours are the loss $L(\beta_0,\beta_1)$ for the three-point data set
+  of Extended Exercise 0.3; the star is the least-squares solution.
+  \textbf{Left:} a safe learning rate walks downhill and creeps along the
+  valley floor. \textbf{Right:} too large a rate steps past the valley, lands
+  higher up the far side, and every step after that is worse.
+  \begin{takeaway}[Why the valley is so narrow]
+    Long thin contours mean the loss is far more curved in one direction than
+    another, which forces a small step size. Standardising the predictors
+    makes the contours rounder --- the same fix, again.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Extended Exercise 0.3 --- Normal equations and one descent step [Integrative]}
+  \begin{longexercise}
+    Use the data of Exercise 0.8:
+    $(x,y) = (1,2), (2,3), (3,5)$, model $y = \beta_0 + \beta_1 x$, and
+    loss $L(\boldsymbol\beta) = \sum_i (y_i - \beta_0 - \beta_1 x_i)^2$.
+    \begin{enumerate}
+      \item Write $L$ out explicitly for the three observations.
+      \item Derive $\partial L/\partial\beta_0$ and
+            $\partial L/\partial\beta_1$, and show that setting both to zero
+            gives the normal equations
+            $\mathbf{X}^\top\mathbf{X}\boldsymbol\beta = \mathbf{X}^\top\mathbf{y}$.
+      \item Starting from $\boldsymbol\beta^{(0)} = (0,0)^\top$, compute the
+            gradient and take one gradient-descent step with $\alpha = 0.01$.
+      \item Compute $L$ at $\boldsymbol\beta^{(0)}$, at
+            $\boldsymbol\beta^{(1)}$, and at the exact solution
+            $(1/3,\ 3/2)^\top$. Did the step help?
+      \item What happens with $\alpha = 1$? Compute
+            $\boldsymbol\beta^{(1)}$ and comment.
+    \end{enumerate}
+  \end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 0.3 (1/2)}
+  \begin{solutionbox}
+    \scriptsize
+    \textbf{(1) The loss.}
+    \[
+      L(\beta_0,\beta_1) = (2-\beta_0-\beta_1)^2 + (3-\beta_0-2\beta_1)^2
+                         + (5-\beta_0-3\beta_1)^2 .
+    \]
+    \textbf{(2) Partial derivatives.} With $e_i = y_i-\beta_0-\beta_1x_i$,
+    \[
+      \frac{\partial L}{\partial \beta_0} = -2\sum_i e_i,
+      \qquad
+      \frac{\partial L}{\partial \beta_1} = -2\sum_i x_i e_i .
+    \]
+    Setting both to zero gives $\sum_i e_i = 0$ and $\sum_i x_i e_i = 0$, i.e.
+    $3\beta_0 + 6\beta_1 = 10$ and $6\beta_0 + 14\beta_1 = 23$ --- exactly
+    $\mathbf{X}^\top\mathbf{X}\boldsymbol\beta = \mathbf{X}^\top\mathbf{y}$
+    with the matrices of Exercise 0.8, so
+    $\boldsymbol\beta = (1/3,\ 3/2)^\top$ as before. \emph{The normal
+    equations are ``derivative $=0$'' in matrix form.}
+
+    \textbf{(3) One step.} At $(0,0)^\top$ the residuals are $e = (2,3,5)$:
+    \[
+      \nabla L = -2\bigl(\textstyle\sum_i e_i,\ \sum_i x_i e_i\bigr)^\top
+               = -2(10,\ 23)^\top = (-20,\ -46)^\top ,
+    \]
+    \[
+      \boldsymbol\beta^{(1)} = (0,0)^\top - 0.01(-20,-46)^\top
+                             = (0.20,\ 0.46)^\top .
+    \]
+    The step moves \emph{towards} $(0.33, 1.50)$, as it should.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 0.3 (2/2)}
+  \begin{solutionbox}
+    \scriptsize
+    \textbf{(4) Did it help?}
+    \[
+      L(0,0) = 2^2+3^2+5^2 = 38 .
+    \]
+    At $\boldsymbol\beta^{(1)} = (0.20, 0.46)$ the fitted values are
+    $0.66, 1.12, 1.58$, so the residuals are $1.34, 1.88, 3.42$ and
+    \[
+      L(\boldsymbol\beta^{(1)}) = 1.796 + 3.534 + 11.696 = 17.03 .
+    \]
+    At the exact solution the residuals are $1/6, -1/3, 1/6$, so
+    $L = 1/6 \approx 0.167$. One step cut the loss from $38$ to $17$ --- a big
+    improvement, still far from the optimum: descent needs many iterations,
+    which is why a closed form is preferred whenever one exists.
+
+    \textbf{(5) Too large a learning rate.} With $\alpha = 1$,
+    \[
+      \boldsymbol\beta^{(1)} = (0,0)^\top - 1\cdot(-20,-46)^\top = (20,\ 46)^\top .
+    \]
+    Fitted values are $66, 112, 158$ against $y = (2,3,5)$: the loss explodes
+    to about $3.9\times10^{4}$, far worse than the starting $38$, and the next
+    step is larger still --- \textbf{divergence}. The step size must respect
+    the curvature of the loss, so in practice one standardises the predictors
+    and tunes $\alpha$: the workflow of Chapter 10.
+  \end{solutionbox}
 \end{frame}
 
 \end{document}

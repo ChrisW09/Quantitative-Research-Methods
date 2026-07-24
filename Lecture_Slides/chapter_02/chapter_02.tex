@@ -110,6 +110,8 @@
       \tableofcontents[hideallsubsections,sections={7-11}]
     \end{column}
   \end{columns}
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -1109,96 +1111,8 @@ does.}
 \end{frame}
 
 
-% ------------------------------------------------------------
-% Extended exercise E2.1 --- end of Bias-Variance section
-% ------------------------------------------------------------
-\begin{frame}{Extended Exercise 2.1 --- Bias-variance from first principles [Math]}
-\begin{longexercise}
-Let $y_0=f(x_0)+\varepsilon$ with $E[\varepsilon]=0$, $\mathrm{Var}(\varepsilon)=\sigma^2$, and $\varepsilon$ independent of the training data used to build $\hat f$. Expectations are over \emph{both} the random training set and the new noise $\varepsilon$.
-\begin{enumerate}\setlength\itemsep{1pt}
-  \item Show $E\big[(y_0-\hat f(x_0))^2\big]=E\big[(f(x_0)-\hat f(x_0))^2\big]+\sigma^2$. Where is independence of $\varepsilon$ used?
-  \item By adding and subtracting $E[\hat f(x_0)]$, show $E\big[(f(x_0)-\hat f(x_0))^2\big]=\mathrm{Bias}(\hat f(x_0))^2+\mathrm{Var}(\hat f(x_0))$.
-  \item Conclude $E[(y_0-\hat f)^2]=\mathrm{Var}(\hat f)+\mathrm{Bias}^2+\sigma^2$, and say which terms are reducible.
-  \item Apply it at $x_0$ for three models (with $\sigma^2=1.0$): compute each total test MSE, pick the best, and state the lowest MSE attainable here.
-\end{enumerate}
-\vspace{-1mm}
-\begin{center}\footnotesize
-\begin{tabular}{lccc}
-\toprule
-Model & $\mathrm{Bias}$ & $\mathrm{Var}(\hat f)$ & $\sigma^2$ \\
-\midrule
-A (low flexibility)    & $2.0$ & $0.5$ & $1.0$ \\
-B (medium flexibility) & $1.0$ & $1.2$ & $1.0$ \\
-C (high flexibility)   & $0.3$ & $3.5$ & $1.0$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 2.1 (1/3)}
-\begin{solutionbox}
-Write $\hat f=\hat f(x_0)$ and the constant $f=f(x_0)$.
 
-\textbf{1. Split off the noise.} Since $y_0=f+\varepsilon$,
-\[
-E[(y_0-\hat f)^2]=E\big[((f-\hat f)+\varepsilon)^2\big]
- =E[(f-\hat f)^2]+2\,E[(f-\hat f)\varepsilon]+E[\varepsilon^2].
-\]
-Because $\varepsilon$ is \emph{independent} of the training data (hence of $\hat f$) and $E[\varepsilon]=0$, the cross term factorises to $2\,E[f-\hat f]\,E[\varepsilon]=0$; and $E[\varepsilon^2]=\mathrm{Var}(\varepsilon)=\sigma^2$. Hence
-\[
-E[(y_0-\hat f)^2]=E[(f-\hat f)^2]+\sigma^2 .
-\]
-
-\textbf{2. Bias--variance split.} Add and subtract $E[\hat f]$:
-\[
-E[(f-\hat f)^2]=E\big[\big((f-E[\hat f])+(E[\hat f]-\hat f)\big)^2\big].
-\]
-The cross term is $2\,(f-E[\hat f])\,E\big[E[\hat f]-\hat f\big]=0$, leaving
-\[
-(E[\hat f]-f)^2+E\big[(\hat f-E[\hat f])^2\big]=\mathrm{Bias}(\hat f)^2+\mathrm{Var}(\hat f).
-\]
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 2.1 (2/3)}
-\begin{solutionbox}
-\textbf{3. Decomposition.} Combining the two steps,
-\[
-\boxed{\,E[(y_0-\hat f(x_0))^2]=\mathrm{Var}(\hat f(x_0))+\mathrm{Bias}(\hat f(x_0))^2+\sigma^2 .\,}
-\]
-$\mathrm{Var}(\hat f)$ and $\mathrm{Bias}^2$ are \emph{reducible} (they depend on the estimator); $\sigma^2$ is \emph{irreducible}.
-
-Interpretation: a method can only fight over the first two terms ---
-choosing the flexibility shifts error between variance and squared
-bias, while the noise floor $\sigma^2$ stays fixed no matter what we
-fit. This is exactly the reducible/irreducible split of the lecture,
-now derived rather than asserted.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 2.1 (3/3)}
-\begin{solutionbox}
-\textbf{4. Apply.} Test MSE $=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$:
-\vspace{-1mm}
-\begin{center}\footnotesize
-\begin{tabular}{lcccc}
-\toprule
-Model & $\mathrm{Bias}^2$ & $\mathrm{Var}$ & $\sigma^2$ & Test MSE \\
-\midrule
-A & $4.00$ & $0.5$ & $1.0$ & $\mathbf{5.50}$ \\
-B & $1.00$ & $1.2$ & $1.0$ & $\mathbf{3.20}$ \\
-C & $0.09$ & $3.5$ & $1.0$ & $\mathbf{4.59}$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-\vspace{-1mm}
-\textbf{Best: model B} (test MSE $3.20$). Low$\to$medium: falling bias$^2$ ($4.00\to1.00$) outweighs rising variance; medium$\to$high: exploding variance ($1.2\to3.5$) dominates --- the classic U-shape. No model can beat the floor $\sigma^2=1.0$, reached only if bias \emph{and} variance were both zero.
-
-\smallskip
-{\itshape Common mistake: judging by a single column --- C has the lowest bias and A the lowest variance, yet B wins, because only the sum $\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$ is the test MSE.}
-\end{solutionbox}
-\end{frame}
 
 
 % ============================================================
@@ -1552,51 +1466,8 @@ Small $K$ $=$ flexible $=$ low bias, high variance; large $K$ $=$ rigid $=$ high
 \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Extended Exercise 2.3 --- Bayes boundary for two Gaussians [Math]}
-\begin{longexercise}
-A 1-D two-class problem with \emph{common}-variance Gaussian class densities:
-\[
-X\mid Y{=}0\sim\mathcal N(\mu_0,\sigma^2),\qquad X\mid Y{=}1\sim\mathcal N(\mu_1,\sigma^2),
-\]
-priors $\pi_0=\Pr(Y{=}0)$ and $\pi_1=1-\pi_0$. Use $\mu_0=0$, $\mu_1=2$, $\sigma=1$, $\pi_0=0.6$, $\pi_1=0.4$.
-\begin{enumerate}\setlength\itemsep{1pt}
-  \item Write the Bayes classifier via the posteriors $\propto\pi_k f_k(x)$.
-  \item Taking logs, derive the boundary and show $x^\star=\dfrac{\mu_0+\mu_1}{2}+\dfrac{\sigma^2}{\mu_1-\mu_0}\ln\dfrac{\pi_0}{\pi_1}$; evaluate it.
-  \item Compute the Bayes error $\pi_0\Pr(X{>}x^\star\mid Y{=}0)+\pi_1\Pr(X{<}x^\star\mid Y{=}1)$, using $\Phi(1.20)=0.885$ and $\Phi(0.80)=0.788$.
-  \item Interpret: which way does raising $\pi_0$ move $x^\star$, and what does the Bayes error represent?
-\end{enumerate}
-\end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 2.3 (1/2)}
-\begin{solutionbox}
-\textbf{1. Bayes rule.} The posterior is $\Pr(Y{=}k\mid x)\propto\pi_k f_k(x)$ with $f_k(x)=\frac{1}{\sqrt{2\pi}\,\sigma}\exp\!\big(-\frac{(x-\mu_k)^2}{2\sigma^2}\big)$. Predict class~1 iff $\pi_1 f_1(x)>\pi_0 f_0(x)$.
 
-\textbf{2. Boundary.} Take logs of $\pi_1 f_1(x)=\pi_0 f_0(x)$; the constant $\frac{1}{\sqrt{2\pi}\,\sigma}$ cancels:
-\[
-\ln\pi_1-\frac{(x-\mu_1)^2}{2\sigma^2}=\ln\pi_0-\frac{(x-\mu_0)^2}{2\sigma^2}.
-\]
-Multiply by $2\sigma^2$ and expand; the $x^2$ terms cancel (equal variances $\Rightarrow$ a \emph{linear} boundary), giving
-\[
-2(\mu_1-\mu_0)x-(\mu_1^2-\mu_0^2)=2\sigma^2\ln\frac{\pi_0}{\pi_1}
-\;\Rightarrow\;
-x^\star=\frac{\mu_0+\mu_1}{2}+\frac{\sigma^2}{\mu_1-\mu_0}\ln\frac{\pi_0}{\pi_1}.
-\]
-Plug in: $x^\star=1+\tfrac12\ln(1.5)=1+\tfrac12(0.405)=\mathbf{1.203}$.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 2.3 (2/2)}
-\begin{solutionbox}
-\textbf{3. Bayes error.} With $\sigma=1$: class~0 is misread when $X>x^\star$, probability $\Pr(Z>1.203)=1-\Phi(1.20)\approx0.115$; class~1 is misread when $X<x^\star$, probability $\Pr(Z<1.203-2)=\Phi(-0.797)=1-\Phi(0.80)\approx0.212$. Weight by the priors:
-\[
-\text{Bayes error}=0.6(0.115)+0.4(0.212)=0.069+0.085=\mathbf{0.154}.
-\]
-Even the optimal rule misreads about $15\%$ of cases --- the price of the overlap between the two bells.
-
-\textbf{4. Interpretation.} The boundary sits at the midpoint $1$ only when $\pi_0=\pi_1$. Raising $\pi_0$ makes $\ln(\pi_0/\pi_1)>0$, sliding $x^\star$ \emph{toward the rarer class} ($\mu_1$): we cede more of the line to the commoner class~0. The Bayes error is the \emph{irreducible} classification error --- the analogue of $\mathrm{Var}(\varepsilon)$ in regression --- attainable only with the \emph{true} $\pi_k,f_k$; any estimated classifier does at least as badly.
-\end{solutionbox}
-\end{frame}
 
 
 % ============================================================
@@ -1892,6 +1763,163 @@ $K=3$: nearest are $x=3,4,2$ with $y=3.3,3.9,1.8$, so $\hat y(x_0)=\tfrac{3.3+3.
     \item The benchmark against which every fancier method gets
           compared.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{Bias--variance from first principles} --- Extended Exercise 2.1 derives the decomposition instead of quoting it. The main deck states the result and Exercise 2.4 uses it with numbers --- that is what the exam asks for.
+      \item \textbf{The Bayes boundary for two Gaussians} --- Extended Exercise 2.3 computes the optimal boundary analytically. It is the algebra behind LDA, so it fits better \emph{after} Chapter 4.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+% ------------------------------------------------------------
+% Extended exercise E2.1 --- end of Bias-Variance section
+% ------------------------------------------------------------
+\begin{frame}{Extended Exercise 2.1 --- Bias-variance from first principles [Math]}
+\begin{longexercise}
+Let $y_0=f(x_0)+\varepsilon$ with $E[\varepsilon]=0$, $\mathrm{Var}(\varepsilon)=\sigma^2$, and $\varepsilon$ independent of the training data used to build $\hat f$. Expectations are over \emph{both} the random training set and the new noise $\varepsilon$.
+\begin{enumerate}\setlength\itemsep{1pt}
+  \item Show $E\big[(y_0-\hat f(x_0))^2\big]=E\big[(f(x_0)-\hat f(x_0))^2\big]+\sigma^2$. Where is independence of $\varepsilon$ used?
+  \item By adding and subtracting $E[\hat f(x_0)]$, show $E\big[(f(x_0)-\hat f(x_0))^2\big]=\mathrm{Bias}(\hat f(x_0))^2+\mathrm{Var}(\hat f(x_0))$.
+  \item Conclude $E[(y_0-\hat f)^2]=\mathrm{Var}(\hat f)+\mathrm{Bias}^2+\sigma^2$, and say which terms are reducible.
+  \item Apply it at $x_0$ for three models (with $\sigma^2=1.0$): compute each total test MSE, pick the best, and state the lowest MSE attainable here.
+\end{enumerate}
+\vspace{-1mm}
+\begin{center}\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Model & $\mathrm{Bias}$ & $\mathrm{Var}(\hat f)$ & $\sigma^2$ \\
+\midrule
+A (low flexibility)    & $2.0$ & $0.5$ & $1.0$ \\
+B (medium flexibility) & $1.0$ & $1.2$ & $1.0$ \\
+C (high flexibility)   & $0.3$ & $3.5$ & $1.0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 2.1 (1/3)}
+\begin{solutionbox}
+Write $\hat f=\hat f(x_0)$ and the constant $f=f(x_0)$.
+
+\textbf{1. Split off the noise.} Since $y_0=f+\varepsilon$,
+\[
+E[(y_0-\hat f)^2]=E\big[((f-\hat f)+\varepsilon)^2\big]
+ =E[(f-\hat f)^2]+2\,E[(f-\hat f)\varepsilon]+E[\varepsilon^2].
+\]
+Because $\varepsilon$ is \emph{independent} of the training data (hence of $\hat f$) and $E[\varepsilon]=0$, the cross term factorises to $2\,E[f-\hat f]\,E[\varepsilon]=0$; and $E[\varepsilon^2]=\mathrm{Var}(\varepsilon)=\sigma^2$. Hence
+\[
+E[(y_0-\hat f)^2]=E[(f-\hat f)^2]+\sigma^2 .
+\]
+
+\textbf{2. Bias--variance split.} Add and subtract $E[\hat f]$:
+\[
+E[(f-\hat f)^2]=E\big[\big((f-E[\hat f])+(E[\hat f]-\hat f)\big)^2\big].
+\]
+The cross term is $2\,(f-E[\hat f])\,E\big[E[\hat f]-\hat f\big]=0$, leaving
+\[
+(E[\hat f]-f)^2+E\big[(\hat f-E[\hat f])^2\big]=\mathrm{Bias}(\hat f)^2+\mathrm{Var}(\hat f).
+\]
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 2.1 (2/3)}
+\begin{solutionbox}
+\textbf{3. Decomposition.} Combining the two steps,
+\[
+\boxed{\,E[(y_0-\hat f(x_0))^2]=\mathrm{Var}(\hat f(x_0))+\mathrm{Bias}(\hat f(x_0))^2+\sigma^2 .\,}
+\]
+$\mathrm{Var}(\hat f)$ and $\mathrm{Bias}^2$ are \emph{reducible} (they depend on the estimator); $\sigma^2$ is \emph{irreducible}.
+
+Interpretation: a method can only fight over the first two terms ---
+choosing the flexibility shifts error between variance and squared
+bias, while the noise floor $\sigma^2$ stays fixed no matter what we
+fit. This is exactly the reducible/irreducible split of the lecture,
+now derived rather than asserted.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 2.1 (3/3)}
+\begin{solutionbox}
+\textbf{4. Apply.} Test MSE $=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$:
+\vspace{-1mm}
+\begin{center}\footnotesize
+\begin{tabular}{lcccc}
+\toprule
+Model & $\mathrm{Bias}^2$ & $\mathrm{Var}$ & $\sigma^2$ & Test MSE \\
+\midrule
+A & $4.00$ & $0.5$ & $1.0$ & $\mathbf{5.50}$ \\
+B & $1.00$ & $1.2$ & $1.0$ & $\mathbf{3.20}$ \\
+C & $0.09$ & $3.5$ & $1.0$ & $\mathbf{4.59}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{-1mm}
+\textbf{Best: model B} (test MSE $3.20$). Low$\to$medium: falling bias$^2$ ($4.00\to1.00$) outweighs rising variance; medium$\to$high: exploding variance ($1.2\to3.5$) dominates --- the classic U-shape. No model can beat the floor $\sigma^2=1.0$, reached only if bias \emph{and} variance were both zero.
+
+\smallskip
+{\itshape Common mistake: judging by a single column --- C has the lowest bias and A the lowest variance, yet B wins, because only the sum $\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$ is the test MSE.}
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Extended Exercise 2.3 --- Bayes boundary for two Gaussians [Math]}
+\begin{longexercise}
+A 1-D two-class problem with \emph{common}-variance Gaussian class densities:
+\[
+X\mid Y{=}0\sim\mathcal N(\mu_0,\sigma^2),\qquad X\mid Y{=}1\sim\mathcal N(\mu_1,\sigma^2),
+\]
+priors $\pi_0=\Pr(Y{=}0)$ and $\pi_1=1-\pi_0$. Use $\mu_0=0$, $\mu_1=2$, $\sigma=1$, $\pi_0=0.6$, $\pi_1=0.4$.
+\begin{enumerate}\setlength\itemsep{1pt}
+  \item Write the Bayes classifier via the posteriors $\propto\pi_k f_k(x)$.
+  \item Taking logs, derive the boundary and show $x^\star=\dfrac{\mu_0+\mu_1}{2}+\dfrac{\sigma^2}{\mu_1-\mu_0}\ln\dfrac{\pi_0}{\pi_1}$; evaluate it.
+  \item Compute the Bayes error $\pi_0\Pr(X{>}x^\star\mid Y{=}0)+\pi_1\Pr(X{<}x^\star\mid Y{=}1)$, using $\Phi(1.20)=0.885$ and $\Phi(0.80)=0.788$.
+  \item Interpret: which way does raising $\pi_0$ move $x^\star$, and what does the Bayes error represent?
+\end{enumerate}
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 2.3 (1/2)}
+\begin{solutionbox}
+\textbf{1. Bayes rule.} The posterior is $\Pr(Y{=}k\mid x)\propto\pi_k f_k(x)$ with $f_k(x)=\frac{1}{\sqrt{2\pi}\,\sigma}\exp\!\big(-\frac{(x-\mu_k)^2}{2\sigma^2}\big)$. Predict class~1 iff $\pi_1 f_1(x)>\pi_0 f_0(x)$.
+
+\textbf{2. Boundary.} Take logs of $\pi_1 f_1(x)=\pi_0 f_0(x)$; the constant $\frac{1}{\sqrt{2\pi}\,\sigma}$ cancels:
+\[
+\ln\pi_1-\frac{(x-\mu_1)^2}{2\sigma^2}=\ln\pi_0-\frac{(x-\mu_0)^2}{2\sigma^2}.
+\]
+Multiply by $2\sigma^2$ and expand; the $x^2$ terms cancel (equal variances $\Rightarrow$ a \emph{linear} boundary), giving
+\[
+2(\mu_1-\mu_0)x-(\mu_1^2-\mu_0^2)=2\sigma^2\ln\frac{\pi_0}{\pi_1}
+\;\Rightarrow\;
+x^\star=\frac{\mu_0+\mu_1}{2}+\frac{\sigma^2}{\mu_1-\mu_0}\ln\frac{\pi_0}{\pi_1}.
+\]
+Plug in: $x^\star=1+\tfrac12\ln(1.5)=1+\tfrac12(0.405)=\mathbf{1.203}$.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 2.3 (2/2)}
+\begin{solutionbox}
+\textbf{3. Bayes error.} With $\sigma=1$: class~0 is misread when $X>x^\star$, probability $\Pr(Z>1.203)=1-\Phi(1.20)\approx0.115$; class~1 is misread when $X<x^\star$, probability $\Pr(Z<1.203-2)=\Phi(-0.797)=1-\Phi(0.80)\approx0.212$. Weight by the priors:
+\[
+\text{Bayes error}=0.6(0.115)+0.4(0.212)=0.069+0.085=\mathbf{0.154}.
+\]
+Even the optimal rule misreads about $15\%$ of cases --- the price of the overlap between the two bells.
+
+\textbf{4. Interpretation.} The boundary sits at the midpoint $1$ only when $\pi_0=\pi_1$. Raising $\pi_0$ makes $\ln(\pi_0/\pi_1)>0$, sliding $x^\star$ \emph{toward the rarer class} ($\mu_1$): we cede more of the line to the commoner class~0. The Bayes error is the \emph{irreducible} classification error --- the analogue of $\mathrm{Var}(\varepsilon)$ in regression --- attainable only with the \emph{true} $\pi_k,f_k$; any estimated classifier does at least as badly.
+\end{solutionbox}
 \end{frame}
 
 \end{document}

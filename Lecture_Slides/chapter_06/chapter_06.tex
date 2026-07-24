@@ -100,6 +100,8 @@
 
 \begin{frame}{Contents}\small
   \tableofcontents[hideallsubsections]
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -370,66 +372,8 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Exercise 6.1 --- Counting Models in Subset Selection [Math]}
-  \begin{exercise}
-    A regression problem has $p = 10$ candidate predictors.
-    \begin{enumerate}
-      \item How many models does \emph{best subset} selection consider
-            in total (including the null model)? Give the general
-            formula and the number.
-      \item How many models does \emph{forward stepwise} selection fit
-            in total? Give the general formula and the number.
-      \item By roughly what factor does best subset exceed forward
-            stepwise here, and why does the gap explode as $p$ grows?
-    \end{enumerate}
-  \end{exercise}
-\end{frame}
 
-\begin{frame}{Solution --- Exercise 6.1 (1/2)}
-  \begin{solutionbox}
-    \textbf{(1) Best subset.}
-    For each size $k$ there are $\binom{p}{k}$ models, and summing over
-    all sizes gives
-    \[
-      \sum_{k=0}^{p}\binom{p}{k} = 2^{p} .
-    \]
-    For $p = 10$: $\;2^{10} = 1024$ models.
 
-    \textbf{(2) Forward stepwise.}
-    Start from the null model, then at step $k$ (for
-    $k = 0,\dots,p-1$) fit the $p - k$ models that add one predictor to
-    the current model:
-    \[
-      1 + \sum_{k=0}^{p-1}(p-k) = 1 + \frac{p(p+1)}{2} .
-    \]
-    For $p = 10$: $\;1 + \tfrac{10\cdot 11}{2} = 1 + 55 = 56$ models.
-    (Backward stepwise fits the same count, $O(p^2)$.)
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 6.1 (2/2)}
-  \begin{solutionbox}
-    \textbf{(3) The gap.}
-    Here $1024 / 56 \approx 18\times$. Best subset grows
-    \emph{exponentially} ($2^p$) while forward stepwise grows only
-    \emph{quadratically} ($O(p^2)$). For $p = 20$, best subset already
-    considers $2^{20} \approx 10^6$ models versus
-    $1 + \tfrac{20 \cdot 21}{2} = 211$ for forward stepwise --- which is
-    why best subset is infeasible beyond $p \approx 30$ and stepwise
-    heuristics are used instead.
-
-    \emph{Interpretation.} The saving is bought with greed: forward
-    stepwise commits to one predictor per step and walks a single path
-    through the model lattice, so it can miss the best subset of a given
-    size --- its winner must still be validated by CV or a penalised
-    criterion.
-
-    \emph{Common mistake:} dropping the null model from either count ---
-    both include it ($2^{10} = 1024$ subsets \emph{including}
-    $\varnothing$; $1 + 55 = 56$ stepwise fits, the leading $1$ being
-    $M_0$).
-  \end{solutionbox}
-\end{frame}
 
 \begin{frame}{Exercise 6.2 --- Why RSS and $R^2$ Cannot Pick the Size [Concept]}
   \begin{exercise}
@@ -552,6 +496,10 @@
   \end{center}
   \begin{takeaway}Each criterion trades goodness-of-fit against complexity; BIC's heavier penalty picks the smallest model, $C_p$ and adjusted $R^2$ a slightly larger one.\end{takeaway}
 \end{frame}
+
+
+
+
 
 \begin{frame}{Extended Exercise 6.1 --- $C_p$, BIC and Adjusted $R^2$ Across Sizes [Math]}
   \begin{longexercise}
@@ -990,107 +938,9 @@
   \begin{takeaway}Unlike ridge, the lasso drives coefficients to \emph{exactly} zero as $\lambda$ grows --- it performs automatic variable selection.\end{takeaway}
 \end{frame}
 
-\begin{frame}{Why the lasso is sparse: the constraint geometry}
-  \begin{columns}[c]
-    \begin{column}{0.5\textwidth}\centering
-      {\small\textbf{Lasso ($\ell_1$ diamond)}}\\[3pt]
-      \begin{tikzpicture}[scale=0.8]
-        \draw[->] (-1.9,0)--(2.9,0) node[right,font=\scriptsize]{$\beta_1$};
-        \draw[->] (0,-1.9)--(0,2.9) node[above,font=\scriptsize]{$\beta_2$};
-        \fill[blue!12,draw=blue!60!black,line width=0.8pt] (1.3,0)--(0,1.3)--(-1.3,0)--(0,-1.3)--cycle;
-        \foreach \r in {0.55,1.5,2.55}{\draw[red!70!black,rotate around={22:(2.3,1.75)}] (2.3,1.75) ellipse [x radius=\r, y radius=0.64*\r];}
-        \fill (2.3,1.75) circle (1.6pt) node[right,font=\scriptsize]{$\hat\beta$};
-        \fill[green!55!black] (0,1.3) circle (2.2pt);
-        \node[font=\scriptsize,align=center] at (-0.75,1.75) {corner:\\$\hat\beta_1=0$};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.5\textwidth}\centering
-      {\small\textbf{Ridge ($\ell_2$ circle)}}\\[3pt]
-      \begin{tikzpicture}[scale=0.8]
-        \draw[->] (-1.9,0)--(2.9,0) node[right,font=\scriptsize]{$\beta_1$};
-        \draw[->] (0,-1.9)--(0,2.9) node[above,font=\scriptsize]{$\beta_2$};
-        \fill[blue!12,draw=blue!60!black,line width=0.8pt] (0,0) circle (1.3);
-        \foreach \r in {0.55,1.35,2.15}{\draw[red!70!black,rotate around={22:(2.3,1.75)}] (2.3,1.75) ellipse [x radius=\r, y radius=0.64*\r];}
-        \fill (2.3,1.75) circle (1.6pt) node[right,font=\scriptsize]{$\hat\beta$};
-        \fill[green!55!black] (1.0,0.83) circle (2.2pt);
-        \node[font=\scriptsize,align=center] at (1.95,0.35) {both\\$\ne 0$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
-  \begin{takeaway}RSS contours first touch the $\ell_1$ diamond at a \emph{corner} ($\hat\beta_j=0$); the smooth $\ell_2$ circle almost never does.\end{takeaway}
-\end{frame}
 
-\begin{frame}{Extended Exercise 6.2 --- Orthonormal Design: Ridge vs.\ Lasso [Math]}
-  \begin{longexercise}
-    Assume an \emph{orthonormal} design, $\mathbf{X}^\top\mathbf{X}=I$,
-    so the OLS estimates are $\hat\beta_j^{\mathrm{OLS}}
-    =(\mathbf{X}^\top\mathbf{y})_j$ and the objective separates
-    coordinate-by-coordinate.
-    \begin{enumerate}
-      \item \textbf{Ridge.} Minimise
-            $\lVert\mathbf{y}-\mathbf{X}\beta\rVert^2+\lambda
-            \lVert\beta\rVert_2^2$ and show
-            $\hat\beta_j^{\mathrm R}=\hat\beta_j^{\mathrm{OLS}}/(1+\lambda)$.
-      \item \textbf{Lasso.} Minimise
-            $\lVert\mathbf{y}-\mathbf{X}\beta\rVert^2+\lambda
-            \lVert\beta\rVert_1$ and derive the soft-threshold solution
-            $\hat\beta_j^{\mathrm L}
-            =\mathrm{sign}(\hat\beta_j^{\mathrm{OLS}})
-            \bigl(|\hat\beta_j^{\mathrm{OLS}}|-\lambda/2\bigr)_+$.
-      \item \textbf{Apply} both with $\lambda=1$ to
-            $\hat\beta^{\mathrm{OLS}}=(3.0,\,-1.5,\,0.4,\,-0.2)$ and
-            comment on shrinkage vs.\ selection.
-    \end{enumerate}
-  \end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 6.2 (1/2)}
-  \begin{solutionbox}
-    Because $\mathbf{X}^\top\mathbf{X}=I$,
-    $\lVert\mathbf{y}-\mathbf{X}\beta\rVert^2=\text{const}
-    +\sum_j\bigl(\beta_j-\hat\beta_j^{\mathrm{OLS}}\bigr)^2$, so every
-    penalty separates across $j$.
 
-    \textbf{(1) Ridge.} Minimise
-    $(\beta_j-\hat\beta_j^{\mathrm{OLS}})^2+\lambda\beta_j^2$. Setting the
-    derivative to zero,
-    $2(\beta_j-\hat\beta_j^{\mathrm{OLS}})+2\lambda\beta_j=0
-    \Rightarrow(1+\lambda)\beta_j=\hat\beta_j^{\mathrm{OLS}}$, hence
-    $\boxed{\hat\beta_j^{\mathrm R}=\hat\beta_j^{\mathrm{OLS}}/(1+\lambda)}$
-    --- a constant \emph{shrinkage factor}, never exactly zero.
-
-    \textbf{(2) Lasso.} Minimise
-    $(\beta_j-\hat\beta_j^{\mathrm{OLS}})^2+\lambda|\beta_j|$. For
-    $\beta_j>0$, $2(\beta_j-\hat\beta_j^{\mathrm{OLS}})+\lambda=0$ gives
-    $\beta_j=\hat\beta_j^{\mathrm{OLS}}-\lambda/2$ (valid while
-    positive); symmetrically for $\beta_j<0$. Combining and clamping at
-    $0$,
-    $\boxed{\hat\beta_j^{\mathrm L}
-    =\mathrm{sign}(\hat\beta_j^{\mathrm{OLS}})
-    (|\hat\beta_j^{\mathrm{OLS}}|-\lambda/2)_+}$.
-  \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 6.2 (2/2)}
-  \begin{solutionbox}
-    \textbf{(3) Apply with $\lambda=1$} (ridge factor $1/(1+\lambda)=0.5$,
-    lasso threshold $\lambda/2=0.5$):
-    \[
-      \begin{array}{c|cccc}
-        \hat\beta^{\mathrm{OLS}} & 3.0 & -1.5 & 0.4 & -0.2\\\hline
-        \hat\beta^{\mathrm R}=\hat\beta^{\mathrm{OLS}}/2 & 1.5 & -0.75 & 0.20 & -0.10\\[1pt]
-        \hat\beta^{\mathrm L}=\mathrm{soft}(\cdot,0.5) & 2.5 & -1.0 & 0 & 0
-      \end{array}
-    \]
-    \textbf{Comment.} Ridge multiplies \emph{every} coefficient by the
-    same factor $0.5$: all four survive, merely shrunk. The lasso
-    subtracts $0.5$ from each magnitude and clamps at zero, so the two
-    small coefficients ($0.4,-0.2$, below the threshold $0.5$) are set
-    \emph{exactly to zero} while the large ones are shrunk by the same
-    absolute amount. This is precisely why the $\ell_1$ penalty performs
-    \emph{variable selection} and the $\ell_2$ penalty only shrinks.
-  \end{solutionbox}
-\end{frame}
 
 % ============================================================
 \section{PCR / PLS}
@@ -1133,63 +983,8 @@
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{Partial least squares (PLS)}
-  PLS components are designed to maximise covariance with $Y$.
-  \begin{block}{Construction}
-    \begin{itemize}
-      \item First component: weights $\phi_{j1} \propto \mathrm{cov}(X_j, Y)$.
-      \item Subsequent components: same idea after orthogonalising
-            against earlier components.
-    \end{itemize}
-  \end{block}
-  \begin{takeaway}
-    PLS often performs comparably to ridge regression and can
-    outperform PCR on noisy data. Cross-validate $M$ for both methods
-    on the same grid.
-  \end{takeaway}
-\end{frame}
 
-\begin{frame}{Exercise 6.6 --- Dimension Reduction: PCR vs.\ PLS [Concept]}
-  \begin{exercise}
-    \begin{enumerate}
-      \item In one sentence each, describe the key idea of dimension
-            reduction and how PCR and PLS choose their directions
-            $Z_1,\dots,Z_M$.
-      \item State the essential difference between PCR and PLS (which one
-            uses $Y$?).
-      \item Give a concrete situation in which PCR can perform poorly,
-            and explain how PLS addresses it.
-    \end{enumerate}
-  \end{exercise}
-\end{frame}
 
-\begin{frame}{Solution --- Exercise 6.6}
-  \begin{solutionbox}
-    \textbf{(1) The idea.}
-    Dimension reduction replaces the $p$ correlated predictors with
-    $M < p$ linear combinations $Z_m = \sum_j \phi_{jm}X_j$ and fits an
-    ordinary regression on those few components, cutting variance and
-    handling collinearity. PCR takes the $\phi_{jm}$ from the
-    \emph{principal components} of $\mathbf{X}$ (the directions of
-    maximal predictor variance); PLS chooses the $\phi_{jm}$ to maximise
-    the \emph{covariance between $Z_m$ and $Y$}.
-
-    \textbf{(2) The essential difference.}
-    PCR is \emph{unsupervised} --- it ignores $Y$ when building
-    components. PLS is \emph{supervised} --- it uses $Y$, so its
-    directions are tilted toward what predicts the response.
-
-    \textbf{(3) When PCR struggles.}
-    If the direction that best predicts $Y$ happens to be a
-    \emph{low-variance} direction of $\mathbf{X}$, PCR's leading
-    components (chosen purely for high $X$-variance) will miss it, and
-    you may need many components before the predictive direction enters
-    --- wasting degrees of freedom. PLS avoids this by explicitly
-    seeking directions correlated with $Y$, so it can capture the
-    predictive signal with fewer components. In practice PLS often
-    performs comparably to ridge regression.
-  \end{solutionbox}
-\end{frame}
 
 
 % ============================================================
@@ -1560,6 +1355,253 @@ print("lasso drops:", dropped)
     \item Local regression.
     \item Generalised additive models.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic. Read it when
+  you want the full story, or when a later chapter sends you back here.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{The constraint geometry, drawn a second time} --- a duplicate of the diamond-vs-circle picture that is already in the main deck.
+      \item \textbf{Counting the models (Exercise 6.1)} --- how many subsets best subset and forward stepwise actually fit, $2^p$ against $1+p(p+1)/2$. The lattice picture in the main deck makes the same point in one slide.
+      \item \textbf{Ridge and lasso under an orthonormal design (Extended Exercise 6.2)} --- the closed forms that explain \emph{why} the lasso thresholds coefficients to zero and ridge only shrinks them. The cleanest proof in the chapter --- and the hardest algebra.
+      \item \textbf{Partial least squares} --- PLS as the supervised cousin of PCR, with Exercise 6.6. PCR is the version that appears in the lab and the exam.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Why the lasso is sparse: the constraint geometry}
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}\centering
+      {\small\textbf{Lasso ($\ell_1$ diamond)}}\\[3pt]
+      \begin{tikzpicture}[scale=0.8]
+        \draw[->] (-1.9,0)--(2.9,0) node[right,font=\scriptsize]{$\beta_1$};
+        \draw[->] (0,-1.9)--(0,2.9) node[above,font=\scriptsize]{$\beta_2$};
+        \fill[blue!12,draw=blue!60!black,line width=0.8pt] (1.3,0)--(0,1.3)--(-1.3,0)--(0,-1.3)--cycle;
+        \foreach \r in {0.55,1.5,2.55}{\draw[red!70!black,rotate around={22:(2.3,1.75)}] (2.3,1.75) ellipse [x radius=\r, y radius=0.64*\r];}
+        \fill (2.3,1.75) circle (1.6pt) node[right,font=\scriptsize]{$\hat\beta$};
+        \fill[green!55!black] (0,1.3) circle (2.2pt);
+        \node[font=\scriptsize,align=center] at (-0.75,1.75) {corner:\\$\hat\beta_1=0$};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.5\textwidth}\centering
+      {\small\textbf{Ridge ($\ell_2$ circle)}}\\[3pt]
+      \begin{tikzpicture}[scale=0.8]
+        \draw[->] (-1.9,0)--(2.9,0) node[right,font=\scriptsize]{$\beta_1$};
+        \draw[->] (0,-1.9)--(0,2.9) node[above,font=\scriptsize]{$\beta_2$};
+        \fill[blue!12,draw=blue!60!black,line width=0.8pt] (0,0) circle (1.3);
+        \foreach \r in {0.55,1.35,2.15}{\draw[red!70!black,rotate around={22:(2.3,1.75)}] (2.3,1.75) ellipse [x radius=\r, y radius=0.64*\r];}
+        \fill (2.3,1.75) circle (1.6pt) node[right,font=\scriptsize]{$\hat\beta$};
+        \fill[green!55!black] (1.0,0.83) circle (2.2pt);
+        \node[font=\scriptsize,align=center] at (1.95,0.35) {both\\$\ne 0$};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \begin{takeaway}RSS contours first touch the $\ell_1$ diamond at a \emph{corner} ($\hat\beta_j=0$); the smooth $\ell_2$ circle almost never does.\end{takeaway}
+\end{frame}
+
+\begin{frame}{Exercise 6.1 --- Counting Models in Subset Selection [Math]}
+  \begin{exercise}
+    A regression problem has $p = 10$ candidate predictors.
+    \begin{enumerate}
+      \item How many models does \emph{best subset} selection consider
+            in total (including the null model)? Give the general
+            formula and the number.
+      \item How many models does \emph{forward stepwise} selection fit
+            in total? Give the general formula and the number.
+      \item By roughly what factor does best subset exceed forward
+            stepwise here, and why does the gap explode as $p$ grows?
+    \end{enumerate}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 6.1 (1/2)}
+  \begin{solutionbox}
+    \textbf{(1) Best subset.}
+    For each size $k$ there are $\binom{p}{k}$ models, and summing over
+    all sizes gives
+    \[
+      \sum_{k=0}^{p}\binom{p}{k} = 2^{p} .
+    \]
+    For $p = 10$: $\;2^{10} = 1024$ models.
+
+    \textbf{(2) Forward stepwise.}
+    Start from the null model, then at step $k$ (for
+    $k = 0,\dots,p-1$) fit the $p - k$ models that add one predictor to
+    the current model:
+    \[
+      1 + \sum_{k=0}^{p-1}(p-k) = 1 + \frac{p(p+1)}{2} .
+    \]
+    For $p = 10$: $\;1 + \tfrac{10\cdot 11}{2} = 1 + 55 = 56$ models.
+    (Backward stepwise fits the same count, $O(p^2)$.)
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 6.1 (2/2)}
+  \begin{solutionbox}
+    \textbf{(3) The gap.}
+    Here $1024 / 56 \approx 18\times$. Best subset grows
+    \emph{exponentially} ($2^p$) while forward stepwise grows only
+    \emph{quadratically} ($O(p^2)$). For $p = 20$, best subset already
+    considers $2^{20} \approx 10^6$ models versus
+    $1 + \tfrac{20 \cdot 21}{2} = 211$ for forward stepwise --- which is
+    why best subset is infeasible beyond $p \approx 30$ and stepwise
+    heuristics are used instead.
+
+    \emph{Interpretation.} The saving is bought with greed: forward
+    stepwise commits to one predictor per step and walks a single path
+    through the model lattice, so it can miss the best subset of a given
+    size --- its winner must still be validated by CV or a penalised
+    criterion.
+
+    \emph{Common mistake:} dropping the null model from either count ---
+    both include it ($2^{10} = 1024$ subsets \emph{including}
+    $\varnothing$; $1 + 55 = 56$ stepwise fits, the leading $1$ being
+    $M_0$).
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Extended Exercise 6.2 --- Orthonormal Design: Ridge vs.\ Lasso [Math]}
+  \begin{longexercise}
+    Assume an \emph{orthonormal} design, $\mathbf{X}^\top\mathbf{X}=I$,
+    so the OLS estimates are $\hat\beta_j^{\mathrm{OLS}}
+    =(\mathbf{X}^\top\mathbf{y})_j$ and the objective separates
+    coordinate-by-coordinate.
+    \begin{enumerate}
+      \item \textbf{Ridge.} Minimise
+            $\lVert\mathbf{y}-\mathbf{X}\beta\rVert^2+\lambda
+            \lVert\beta\rVert_2^2$ and show
+            $\hat\beta_j^{\mathrm R}=\hat\beta_j^{\mathrm{OLS}}/(1+\lambda)$.
+      \item \textbf{Lasso.} Minimise
+            $\lVert\mathbf{y}-\mathbf{X}\beta\rVert^2+\lambda
+            \lVert\beta\rVert_1$ and derive the soft-threshold solution
+            $\hat\beta_j^{\mathrm L}
+            =\mathrm{sign}(\hat\beta_j^{\mathrm{OLS}})
+            \bigl(|\hat\beta_j^{\mathrm{OLS}}|-\lambda/2\bigr)_+$.
+      \item \textbf{Apply} both with $\lambda=1$ to
+            $\hat\beta^{\mathrm{OLS}}=(3.0,\,-1.5,\,0.4,\,-0.2)$ and
+            comment on shrinkage vs.\ selection.
+    \end{enumerate}
+  \end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 6.2 (1/2)}
+  \begin{solutionbox}
+    Because $\mathbf{X}^\top\mathbf{X}=I$,
+    $\lVert\mathbf{y}-\mathbf{X}\beta\rVert^2=\text{const}
+    +\sum_j\bigl(\beta_j-\hat\beta_j^{\mathrm{OLS}}\bigr)^2$, so every
+    penalty separates across $j$.
+
+    \textbf{(1) Ridge.} Minimise
+    $(\beta_j-\hat\beta_j^{\mathrm{OLS}})^2+\lambda\beta_j^2$. Setting the
+    derivative to zero,
+    $2(\beta_j-\hat\beta_j^{\mathrm{OLS}})+2\lambda\beta_j=0
+    \Rightarrow(1+\lambda)\beta_j=\hat\beta_j^{\mathrm{OLS}}$, hence
+    $\boxed{\hat\beta_j^{\mathrm R}=\hat\beta_j^{\mathrm{OLS}}/(1+\lambda)}$
+    --- a constant \emph{shrinkage factor}, never exactly zero.
+
+    \textbf{(2) Lasso.} Minimise
+    $(\beta_j-\hat\beta_j^{\mathrm{OLS}})^2+\lambda|\beta_j|$. For
+    $\beta_j>0$, $2(\beta_j-\hat\beta_j^{\mathrm{OLS}})+\lambda=0$ gives
+    $\beta_j=\hat\beta_j^{\mathrm{OLS}}-\lambda/2$ (valid while
+    positive); symmetrically for $\beta_j<0$. Combining and clamping at
+    $0$,
+    $\boxed{\hat\beta_j^{\mathrm L}
+    =\mathrm{sign}(\hat\beta_j^{\mathrm{OLS}})
+    (|\hat\beta_j^{\mathrm{OLS}}|-\lambda/2)_+}$.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 6.2 (2/2)}
+  \begin{solutionbox}
+    \textbf{(3) Apply with $\lambda=1$} (ridge factor $1/(1+\lambda)=0.5$,
+    lasso threshold $\lambda/2=0.5$):
+    \[
+      \begin{array}{c|cccc}
+        \hat\beta^{\mathrm{OLS}} & 3.0 & -1.5 & 0.4 & -0.2\\\hline
+        \hat\beta^{\mathrm R}=\hat\beta^{\mathrm{OLS}}/2 & 1.5 & -0.75 & 0.20 & -0.10\\[1pt]
+        \hat\beta^{\mathrm L}=\mathrm{soft}(\cdot,0.5) & 2.5 & -1.0 & 0 & 0
+      \end{array}
+    \]
+    \textbf{Comment.} Ridge multiplies \emph{every} coefficient by the
+    same factor $0.5$: all four survive, merely shrunk. The lasso
+    subtracts $0.5$ from each magnitude and clamps at zero, so the two
+    small coefficients ($0.4,-0.2$, below the threshold $0.5$) are set
+    \emph{exactly to zero} while the large ones are shrunk by the same
+    absolute amount. This is precisely why the $\ell_1$ penalty performs
+    \emph{variable selection} and the $\ell_2$ penalty only shrinks.
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Partial least squares (PLS)}
+  PLS components are designed to maximise covariance with $Y$.
+  \begin{block}{Construction}
+    \begin{itemize}
+      \item First component: weights $\phi_{j1} \propto \mathrm{cov}(X_j, Y)$.
+      \item Subsequent components: same idea after orthogonalising
+            against earlier components.
+    \end{itemize}
+  \end{block}
+  \begin{takeaway}
+    PLS often performs comparably to ridge regression and can
+    outperform PCR on noisy data. Cross-validate $M$ for both methods
+    on the same grid.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Exercise 6.6 --- Dimension Reduction: PCR vs.\ PLS [Concept]}
+  \begin{exercise}
+    \begin{enumerate}
+      \item In one sentence each, describe the key idea of dimension
+            reduction and how PCR and PLS choose their directions
+            $Z_1,\dots,Z_M$.
+      \item State the essential difference between PCR and PLS (which one
+            uses $Y$?).
+      \item Give a concrete situation in which PCR can perform poorly,
+            and explain how PLS addresses it.
+    \end{enumerate}
+  \end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 6.6}
+  \begin{solutionbox}
+    \textbf{(1) The idea.}
+    Dimension reduction replaces the $p$ correlated predictors with
+    $M < p$ linear combinations $Z_m = \sum_j \phi_{jm}X_j$ and fits an
+    ordinary regression on those few components, cutting variance and
+    handling collinearity. PCR takes the $\phi_{jm}$ from the
+    \emph{principal components} of $\mathbf{X}$ (the directions of
+    maximal predictor variance); PLS chooses the $\phi_{jm}$ to maximise
+    the \emph{covariance between $Z_m$ and $Y$}.
+
+    \textbf{(2) The essential difference.}
+    PCR is \emph{unsupervised} --- it ignores $Y$ when building
+    components. PLS is \emph{supervised} --- it uses $Y$, so its
+    directions are tilted toward what predicts the response.
+
+    \textbf{(3) When PCR struggles.}
+    If the direction that best predicts $Y$ happens to be a
+    \emph{low-variance} direction of $\mathbf{X}$, PCR's leading
+    components (chosen purely for high $X$-variance) will miss it, and
+    you may need many components before the predictive direction enters
+    --- wasting degrees of freedom. PLS avoids this by explicitly
+    seeking directions correlated with $Y$, so it can capture the
+    predictive signal with fewer components. In practice PLS often
+    performs comparably to ridge regression.
+  \end{solutionbox}
 \end{frame}
 
 \end{document}

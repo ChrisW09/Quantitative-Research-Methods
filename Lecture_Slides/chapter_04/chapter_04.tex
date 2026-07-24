@@ -100,6 +100,8 @@
 
 \begin{frame}{Contents}\small
   \tableofcontents[hideallsubsections]
+  \vfill
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -490,22 +492,6 @@ never be negative.}
   \end{readme}
 \end{frame}
 
-\begin{frame}{Three equivalent ways to think about the optimisation}
-  \begin{itemize}
-    \item \textbf{Maximum likelihood}: find $\hat\beta$ that makes the
-          observed data most probable under the model.
-    \item \textbf{Cross-entropy minimisation}: $-\log L$ is exactly the
-          binary cross-entropy loss --- the same objective deep nets use.
-    \item \textbf{Iteratively reweighted least squares (IRLS)}: solve a
-          sequence of weighted regressions. Equivalent to Newton's
-          method on the log-likelihood.
-  \end{itemize}
-  \begin{takeaway}
-    All three give the same $\hat\beta$. Which view to take is a matter
-    of taste; deep-learning courses prefer cross-entropy, statistics
-    courses prefer maximum likelihood.
-  \end{takeaway}
-\end{frame}
 
 \begin{frame}{Interpreting the coefficients}
   \begin{block}{Three different interpretation scales}
@@ -748,27 +734,6 @@ requiring $\eta>0.2$ instead of $\eta>\log(0.2/0.8)=-1.386$.}
 
 \subsection{Multinomial extension}
 
-\begin{frame}{From two classes to $K$: the softmax}
-  \begin{block}{Multinomial logistic model}
-    Pick a baseline class (say $K$) and set:
-    \[
-      \Pr(Y = k \mid X)
-      = \frac{e^{\beta_{k0} + \beta_{k}^\top X}}
-             {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}}.
-    \]
-  \end{block}
-  \begin{readme}
-    Coefficients depend on the chosen baseline, but predictions are
-    invariant to the choice. The equivalent symmetric ``softmax''
-    parameterisation removes the need for a baseline --- this is the
-    form used in deep learning.
-  \end{readme}
-  \begin{takeaway}
-    The $K$ outputs are non-negative and sum to $1$ by construction, so
-    they are genuine probabilities. Predict the class with the largest
-    numerator.
-  \end{takeaway}
-\end{frame}
 
 
 \begin{frame}{Mini-check: interpreting logistic coefficients}
@@ -1375,221 +1340,13 @@ the decision outright.}
 \end{solutionbox}
 \end{frame}
 
-% ---------------- Extended Exercise 4.2 ----------------
-\begin{frame}{Extended Exercise 4.2 \textemdash{} LDA from Bayes' theorem [Math]}
-\begin{longexercise}
-Two classes with a single predictor $X$. Within class $k$,
-$X\mid Y=k\sim\mathcal{N}(\mu_k,\sigma^2)$ with a \emph{shared} variance
-$\sigma^2=4$ and means $\mu_0=1$, $\mu_1=5$. Priors $\pi_0=0.7$,
-$\pi_1=0.3$.
-\begin{enumerate}
-  \item Starting from Bayes' theorem, show that comparing
-        $\log[\pi_k f_k(x)]$ across classes reduces to the linear
-        discriminant
-        $\delta_k(x)=x\,\mu_k/\sigma^2-\mu_k^2/(2\sigma^2)+\log\pi_k$.
-  \item Derive the decision boundary $x^\star$ where
-        $\delta_0=\delta_1$; give the general formula and evaluate it.
-  \item For $x=4$, compute $\delta_0,\delta_1$ and the posterior
-        $\Pr(Y=1\mid x=4)$; classify the point.
-  \item How does QDA change the derivation and the boundary?
-\end{enumerate}
-\end{longexercise}
-\end{frame}
 
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.2 (1/3)}
-\begin{solutionbox}
-\textbf{Method.} Everything is Bayes' rule; the only algebra is
-separating the terms that depend on $k$ from those that do not ---
-possible precisely because $\sigma^2$ is shared.
 
-\vspace{1mm}
-\textbf{(1) Bayes $\Rightarrow$ linear discriminant.}
-Bayes gives $\Pr(Y=k\mid x)=\pi_k f_k(x)/\sum_\ell \pi_\ell f_\ell(x)$;
-the denominator is common, and $\log$ is monotone, so we classify by
-the largest $\log[\pi_k f_k(x)]$. With
-$f_k(x)=(2\pi\sigma^2)^{-1/2}e^{-(x-\mu_k)^2/(2\sigma^2)}$, expanding
-the square $(x-\mu_k)^2 = x^2 - 2x\mu_k + \mu_k^2$ gives
-\[
-  \log[\pi_k f_k(x)]=
-  \underbrace{-\tfrac12\log(2\pi\sigma^2)-\tfrac{x^2}{2\sigma^2}}_{\text{same for every class}}
-  +\underbrace{x\tfrac{\mu_k}{\sigma^2}-\tfrac{\mu_k^2}{2\sigma^2}+\log\pi_k}_{=\;\delta_k(x)} .
-\]
-The first group is identical across classes ($\sigma^2$ shared, $x^2$ has
-no $k$), so it cancels in any comparison, leaving the \emph{linear}
-$\delta_k(x)$ --- this cancellation is the whole reason LDA's boundary
-is a line.
-\end{solutionbox}
-\end{frame}
 
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.2 (2/3)}
-\begin{solutionbox}
-\textbf{(2) Boundary.} Set $\delta_0(x)=\delta_1(x)$ and solve;
-substituting $\mu_0=1$, $\mu_1=5$, $\sigma^2=4$ and
-$\log\frac{\pi_1}{\pi_0}=\log\frac{0.3}{0.7}=-0.847$:
-\[
-  x^\star=\frac{\mu_0+\mu_1}{2}
-          -\frac{\sigma^2}{\mu_1-\mu_0}\log\frac{\pi_1}{\pi_0}
-        =\frac{1+5}{2}-\frac{4}{4}(-0.847)
-        =3+0.847=3.85 .
-\]
-Assign class $1$ if $x>3.85$. The prior tilt moves the boundary
-$0.85$ units from the midpoint $3$ \emph{toward} the rarer class, which
-needs stronger evidence.
 
-\vspace{1mm}
-\textbf{(3) Posterior at $x=4$.} Substituting into $\delta_k$:
-\[
-\begin{aligned}
-  \delta_0(4)&=\tfrac{4\cdot1}{4}-\tfrac{1}{8}+\log 0.7
-              =1-0.125-0.357=0.518,\\
-  \delta_1(4)&=\tfrac{4\cdot5}{4}-\tfrac{25}{8}+\log 0.3
-              =5-3.125-1.204=0.671.
-\end{aligned}
-\]
-Since the dropped term cancels, the posterior is the softmax of the
-$\delta_k$:
-\[
-  \Pr(Y=1\mid 4)=\frac{e^{0.671}}{e^{0.518}+e^{0.671}}
-  =\frac{1.956}{1.679+1.956}\approx 0.538
-  \;>0.5\Rightarrow\ \text{class } 1 ,
-\]
-consistent with $4>3.85$ --- but only barely: $x=4$ sits close to the
-boundary, so the posterior is near $0.5$.
-\end{solutionbox}
-\end{frame}
 
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.2 (3/3)}
-\begin{solutionbox}
-\textbf{Cross-check via the raw densities.} With $\sigma=2$,
-$f_k(4)=(2\pi\cdot 4)^{-1/2}e^{-(4-\mu_k)^2/8}=0.1995\,e^{-(4-\mu_k)^2/8}$:
-\[
-\begin{aligned}
-  \pi_0 f_0(4)&=0.7\times 0.1995\,e^{-9/8}=0.7\times 0.0648=0.0453,\\
-  \pi_1 f_1(4)&=0.3\times 0.1995\,e^{-1/8}=0.3\times 0.1760=0.0528,
-\end{aligned}
-\]
-so $\Pr(Y=1\mid 4)=\frac{0.0528}{0.0453+0.0528}
-=\frac{0.0528}{0.0981}\approx 0.538$. \checkmark\;
-Same answer by the direct route --- the discriminants are just a
-shortcut through Bayes' rule.
 
-\vspace{1mm}
-\textbf{(4) QDA.} QDA lets each class keep its own variance
-$\sigma_k^2$. Then the $-x^2/(2\sigma_k^2)$ term no longer cancels, so a
-\emph{quadratic} term in $x$ survives:
-$\delta_k(x)=-\tfrac{(x-\mu_k)^2}{2\sigma_k^2}-\tfrac12\log\sigma_k^2+\log\pi_k$.
-The boundary becomes quadratic (a conic in higher dimensions). QDA adds a
-variance per class --- lower bias, higher variance --- and reduces to LDA
-exactly when $\sigma_0^2=\sigma_1^2$.
 
-\vspace{1mm}
-\emph{Common mistake: treating the $\delta_k$ as probabilities. They
-are unnormalised log-scores (here both $\approx 0.5$--$0.7$); only the
-softmax of the $\delta_k$ gives the posterior.}
-\end{solutionbox}
-\end{frame}
-
-% ---------------- Extended Exercise 4.3 ----------------
-\begin{frame}{Extended Exercise 4.3 \textemdash{} Naive Bayes by hand [Math]}
-\begin{longexercise}
-A lender labels customers Default (D) or No-default (N) using three binary
-features: $F_1=$ high balance, $F_2=$ student, $F_3=$ a late payment in
-the past year. Priors $\pi_D=0.2$, $\pi_N=0.8$, with estimated
-class-conditional likelihoods:
-\begin{center}\small
-\begin{tabular}{lcc}
-\toprule
-$\Pr(\cdot=\text{Yes}\mid\text{class})$ & $\mid$ D & $\mid$ N \\
-\midrule
-$F_1$ high balance  & 0.8 & 0.3 \\
-$F_2$ student       & 0.3 & 0.4 \\
-$F_3$ late payment  & 0.6 & 0.1 \\
-\bottomrule
-\end{tabular}
-\end{center}
-A new customer has all three features present ($F_1=F_2=F_3=$ Yes).
-\begin{enumerate}
-  \item Under conditional independence, compute the unnormalised score
-        $\pi_k\prod_j\Pr(F_j\mid k)$ for each class.
-  \item Compute the posterior $\Pr(\text{D}\mid F_1,F_2,F_3)$ and classify.
-  \item The prior favoured N. Explain why the decision comes out as it
-        does.
-  \item Compare naive Bayes with LDA: assumptions, parameters, when each
-        is preferable.
-\end{enumerate}
-\end{longexercise}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.3 (1/3)}
-\begin{solutionbox}
-\textbf{Method.} Bayes' rule scores each class by its numerator
-$\pi_k f_k(x)$; the \emph{naive} assumption factorises the
-class-conditional likelihood into one-dimensional marginals,
-$f_k(x)=\prod_j\Pr(F_j\mid k)$, so we never estimate a joint table over
-the three features. The evidence denominator is common to both classes,
-so we compare numerators first and normalise only at the end.
-
-\vspace{1mm}
-\textbf{(1) Unnormalised scores} $\pi_k\prod_j\Pr(F_j=\text{Yes}\mid k)$:
-\[
-\begin{aligned}
-  \text{D}:&\ 0.2\,(0.8\times 0.3\times 0.6)=0.2\times 0.144=0.0288,\\
-  \text{N}:&\ 0.8\,(0.3\times 0.4\times 0.1)=0.8\times 0.012=0.0096.
-\end{aligned}
-\]
-
-\textbf{(2) Posterior.} Normalise by the sum $0.0288+0.0096=0.0384$:
-$\Pr(\text{D}\mid x)=\dfrac{0.0288}{0.0384}=0.75$
-(so $\Pr(\text{N}\mid x)=0.25$) $\Rightarrow$ classify as \textbf{Default}.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.3 (2/3)}
-\begin{solutionbox}
-\textbf{(3) Why the prior is overturned.}
-Write the posterior as prior odds $\times$ likelihood ratio:
-\[
-  \frac{\Pr(\text{D}\mid x)}{\Pr(\text{N}\mid x)}
-  =\frac{\pi_D}{\pi_N}\cdot\frac{\prod_j\Pr(F_j\mid D)}{\prod_j\Pr(F_j\mid N)}
-  =\frac{0.2}{0.8}\cdot\frac{0.144}{0.012}=0.25\times 12=3 .
-\]
-The prior favours N by $4\times$, but the features favour D by $12\times$;
-net, D is $3\times$ as likely, i.e.\ $\Pr(\text{D})=3/(3+1)=3/4$. The
-three ``Yes'' features --- above all the high balance and the late
-payment, each far more common under D --- swamp the base rate.
-
-\vspace{1mm}
-\emph{Common mistake: normalising the likelihoods alone and dropping the
-prior. That gives $0.144/(0.144+0.012)\approx 0.92$ instead of the
-correct $0.75$ --- overstating default because it forgets that
-non-defaulters are $4\times$ more common to begin with.}
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.3 (3/3)}
-\begin{solutionbox}
-\textbf{(4) Naive Bayes vs.\ LDA.} Both are \emph{generative}: model the
-priors $\pi_k$ and class-conditional densities $f_k(x)$, then apply Bayes.
-\begin{itemize}
-  \item \textbf{Assumption.} LDA: $X$ is multivariate Gaussian with a
-        \emph{common} covariance $\Sigma$, so it models linear
-        correlations between features. Naive Bayes: features are
-        conditionally \emph{independent} within a class, i.e.\
-        $f_k(x)=\prod_j f_{kj}(x_j)$; it ignores within-class
-        correlations but handles categorical / binary and mixed features
-        naturally (as here).
-  \item \textbf{Parameters.} NB estimates only one-dimensional marginals
-        $\Rightarrow$ very few parameters, low variance. LDA estimates the
-        full $\Sigma$ ($p(p+1)/2$ entries), which fails when $p$ is
-        comparable to $n$.
-  \item \textbf{When.} NB shines when $p$ is large relative to $n$ or the
-        features are discrete / non-Gaussian; LDA is better when features
-        are roughly Gaussian and their correlations carry signal.
-\end{itemize}
-Connection: Gaussian naive Bayes is exactly discriminant analysis with a
-\emph{diagonal} covariance matrix (all cross-correlations set to zero).
-\end{solutionbox}
-\end{frame}
 
 \section{Comparison}
 % ============================================================
@@ -2093,70 +1850,6 @@ matrix as $[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
 \end{solutionbox}
 \end{frame}
 
-\section{GLMs}
-% ============================================================
-
-\begin{frame}{The GLM framework: one umbrella}
-  Linear, logistic, and Poisson regression are all special cases of:
-  \begin{block}{Generalised linear model}
-    \[
-      g\bigl(E[Y \mid X]\bigr) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p,
-    \]
-    where $g$ is the \emph{link function}.
-  \end{block}
-  \vspace{-2mm}
-  \begin{center}\small
-  \begin{tabular}{lll}
-    \toprule
-    Distribution & Link & Use \\
-    \midrule
-    Gaussian   & identity   & continuous $Y$ (Ch.~3) \\
-    Bernoulli  & logit      & binary $Y$ (this chapter) \\
-    Poisson    & log        & counts \\
-    Gamma      & inverse / log & positive continuous \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \vspace{-2mm}
-  \begin{readme}
-    The \emph{link} $g$ puts the mean $E[Y\mid X]$ on a scale where a
-    linear model fits; invert $g$ to predict on the original scale.
-    Maximum likelihood fits the whole family.
-  \end{readme}
-\end{frame}
-
-\begin{frame}{Poisson regression for counts}
-  \begin{block}{Model}
-    $Y \mid X \sim \mathrm{Poisson}\bigl(\lambda(X)\bigr)$ with
-    $\log \lambda(X) = \beta_0 + \beta^\top X$.
-  \end{block}
-  \begin{readme}
-    Coefficients are on the log-rate scale: $\exp(\beta_j)$ is the
-    multiplicative effect on the expected count. Mean equals variance
-    for Poisson; if your data shows variance much greater than the
-    mean, look at negative binomial instead.
-  \end{readme}
-  \begin{numexample}[Bikeshare]
-    The Bikeshare data records bikes rented per hour. A Poisson model
-    with hour-of-day, weather, and weekday gives multiplicative
-    effects: ``rush-hour increases rental rate by a factor of 4.''
-  \end{numexample}
-\end{frame}
-
-\begin{frame}{Bikeshare: Poisson captures the commute rhythm}
-  \begin{center}
-    \includegraphics[width=0.80\textwidth,height=0.47\textheight,keepaspectratio]{4_13.pdf}
-  \end{center}
-  \begin{takeaway}
-    Ridership peaks at the morning and evening commutes and climbs with
-    temperature. The Poisson GLM captures these as \emph{multiplicative}
-    effects on the expected count --- and never predicts a negative
-    number of riders.
-  \end{takeaway}
-  \islpsource{Figure 4.13}
-\end{frame}
-
-
 % ============================================================
 \section{Python Lab}
 
@@ -2238,17 +1931,6 @@ ax.plot([0,1], [0,1], "k--", linewidth=0.8); plt.show()  # chance line
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Poisson regression on Bikeshare}
-  \begin{lstlisting}
-Bike = load_data("Bikeshare")            # hourly bike-rental counts
-X = sm.add_constant(Bike[["temp", "hum", "windspeed"]])  # add intercept
-res = sm.GLM(Bike["bikers"], X,          # count response
-             family=sm.families.Poisson()).fit()  # log link for counts
-print(res.summary())                     # coefficients on log-rate scale
-  \end{lstlisting}
-  Coefficients are on the log-rate scale; \texttt{exp(coef)} gives
-  the multiplicative effect on hourly ridership.
-\end{frame}
 
 
 % ============================================================
@@ -2540,6 +2222,355 @@ no basis for trading once transaction costs are included.
     \item The bootstrap.
     \item Why these are the most important tools in your toolbox.
   \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \small
+  Nothing in the appendix is needed to follow the chapter: each slide is a
+  formal derivation, a longer worked exercise, or a side topic.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}
+      \item \textbf{How logistic regression is actually fitted} --- log-likelihood, deviance and IRLS as three views of one optimisation. \texttt{statsmodels} does it for you.
+      \item \textbf{Multinomial logistic regression (the softmax)} --- the $K>2$ extension; the binary case carries every idea you need.
+      \item \textbf{Deriving LDA from Bayes' theorem (Extended Exercise 4.2)} --- where the discriminant comes from. The main deck states it; Exercise 4.5 applies it.
+      \item \textbf{Naive Bayes by hand (Extended Exercise 4.3)} --- a longer second pass over the calculation of Exercise 4.7.
+      \item \textbf{GLMs and Poisson regression} --- the umbrella over linear, logistic and Poisson regression, with the Bikeshare example and its lab code. Not examinable.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Three equivalent ways to think about the optimisation}
+  \begin{itemize}
+    \item \textbf{Maximum likelihood}: find $\hat\beta$ that makes the
+          observed data most probable under the model.
+    \item \textbf{Cross-entropy minimisation}: $-\log L$ is exactly the
+          binary cross-entropy loss --- the same objective deep nets use.
+    \item \textbf{Iteratively reweighted least squares (IRLS)}: solve a
+          sequence of weighted regressions. Equivalent to Newton's
+          method on the log-likelihood.
+  \end{itemize}
+  \begin{takeaway}
+    All three give the same $\hat\beta$. Which view to take is a matter
+    of taste; deep-learning courses prefer cross-entropy, statistics
+    courses prefer maximum likelihood.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{From two classes to $K$: the softmax}
+  \begin{block}{Multinomial logistic model}
+    Pick a baseline class (say $K$) and set:
+    \[
+      \Pr(Y = k \mid X)
+      = \frac{e^{\beta_{k0} + \beta_{k}^\top X}}
+             {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}}.
+    \]
+  \end{block}
+  \begin{readme}
+    Coefficients depend on the chosen baseline, but predictions are
+    invariant to the choice. The equivalent symmetric ``softmax''
+    parameterisation removes the need for a baseline --- this is the
+    form used in deep learning.
+  \end{readme}
+  \begin{takeaway}
+    The $K$ outputs are non-negative and sum to $1$ by construction, so
+    they are genuine probabilities. Predict the class with the largest
+    numerator.
+  \end{takeaway}
+\end{frame}
+
+% ---------------- Extended Exercise 4.2 ----------------
+\begin{frame}{Extended Exercise 4.2 \textemdash{} LDA from Bayes' theorem [Math]}
+\begin{longexercise}
+Two classes with a single predictor $X$. Within class $k$,
+$X\mid Y=k\sim\mathcal{N}(\mu_k,\sigma^2)$ with a \emph{shared} variance
+$\sigma^2=4$ and means $\mu_0=1$, $\mu_1=5$. Priors $\pi_0=0.7$,
+$\pi_1=0.3$.
+\begin{enumerate}
+  \item Starting from Bayes' theorem, show that comparing
+        $\log[\pi_k f_k(x)]$ across classes reduces to the linear
+        discriminant
+        $\delta_k(x)=x\,\mu_k/\sigma^2-\mu_k^2/(2\sigma^2)+\log\pi_k$.
+  \item Derive the decision boundary $x^\star$ where
+        $\delta_0=\delta_1$; give the general formula and evaluate it.
+  \item For $x=4$, compute $\delta_0,\delta_1$ and the posterior
+        $\Pr(Y=1\mid x=4)$; classify the point.
+  \item How does QDA change the derivation and the boundary?
+\end{enumerate}
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.2 (1/3)}
+\begin{solutionbox}
+\textbf{Method.} Everything is Bayes' rule; the only algebra is
+separating the terms that depend on $k$ from those that do not ---
+possible precisely because $\sigma^2$ is shared.
+
+\vspace{1mm}
+\textbf{(1) Bayes $\Rightarrow$ linear discriminant.}
+Bayes gives $\Pr(Y=k\mid x)=\pi_k f_k(x)/\sum_\ell \pi_\ell f_\ell(x)$;
+the denominator is common, and $\log$ is monotone, so we classify by
+the largest $\log[\pi_k f_k(x)]$. With
+$f_k(x)=(2\pi\sigma^2)^{-1/2}e^{-(x-\mu_k)^2/(2\sigma^2)}$, expanding
+the square $(x-\mu_k)^2 = x^2 - 2x\mu_k + \mu_k^2$ gives
+\[
+  \log[\pi_k f_k(x)]=
+  \underbrace{-\tfrac12\log(2\pi\sigma^2)-\tfrac{x^2}{2\sigma^2}}_{\text{same for every class}}
+  +\underbrace{x\tfrac{\mu_k}{\sigma^2}-\tfrac{\mu_k^2}{2\sigma^2}+\log\pi_k}_{=\;\delta_k(x)} .
+\]
+The first group is identical across classes ($\sigma^2$ shared, $x^2$ has
+no $k$), so it cancels in any comparison, leaving the \emph{linear}
+$\delta_k(x)$ --- this cancellation is the whole reason LDA's boundary
+is a line.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.2 (2/3)}
+\begin{solutionbox}
+\textbf{(2) Boundary.} Set $\delta_0(x)=\delta_1(x)$ and solve;
+substituting $\mu_0=1$, $\mu_1=5$, $\sigma^2=4$ and
+$\log\frac{\pi_1}{\pi_0}=\log\frac{0.3}{0.7}=-0.847$:
+\[
+  x^\star=\frac{\mu_0+\mu_1}{2}
+          -\frac{\sigma^2}{\mu_1-\mu_0}\log\frac{\pi_1}{\pi_0}
+        =\frac{1+5}{2}-\frac{4}{4}(-0.847)
+        =3+0.847=3.85 .
+\]
+Assign class $1$ if $x>3.85$. The prior tilt moves the boundary
+$0.85$ units from the midpoint $3$ \emph{toward} the rarer class, which
+needs stronger evidence.
+
+\vspace{1mm}
+\textbf{(3) Posterior at $x=4$.} Substituting into $\delta_k$:
+\[
+\begin{aligned}
+  \delta_0(4)&=\tfrac{4\cdot1}{4}-\tfrac{1}{8}+\log 0.7
+              =1-0.125-0.357=0.518,\\
+  \delta_1(4)&=\tfrac{4\cdot5}{4}-\tfrac{25}{8}+\log 0.3
+              =5-3.125-1.204=0.671.
+\end{aligned}
+\]
+Since the dropped term cancels, the posterior is the softmax of the
+$\delta_k$:
+\[
+  \Pr(Y=1\mid 4)=\frac{e^{0.671}}{e^{0.518}+e^{0.671}}
+  =\frac{1.956}{1.679+1.956}\approx 0.538
+  \;>0.5\Rightarrow\ \text{class } 1 ,
+\]
+consistent with $4>3.85$ --- but only barely: $x=4$ sits close to the
+boundary, so the posterior is near $0.5$.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.2 (3/3)}
+\begin{solutionbox}
+\textbf{Cross-check via the raw densities.} With $\sigma=2$,
+$f_k(4)=(2\pi\cdot 4)^{-1/2}e^{-(4-\mu_k)^2/8}=0.1995\,e^{-(4-\mu_k)^2/8}$:
+\[
+\begin{aligned}
+  \pi_0 f_0(4)&=0.7\times 0.1995\,e^{-9/8}=0.7\times 0.0648=0.0453,\\
+  \pi_1 f_1(4)&=0.3\times 0.1995\,e^{-1/8}=0.3\times 0.1760=0.0528,
+\end{aligned}
+\]
+so $\Pr(Y=1\mid 4)=\frac{0.0528}{0.0453+0.0528}
+=\frac{0.0528}{0.0981}\approx 0.538$. \checkmark\;
+Same answer by the direct route --- the discriminants are just a
+shortcut through Bayes' rule.
+
+\vspace{1mm}
+\textbf{(4) QDA.} QDA lets each class keep its own variance
+$\sigma_k^2$. Then the $-x^2/(2\sigma_k^2)$ term no longer cancels, so a
+\emph{quadratic} term in $x$ survives:
+$\delta_k(x)=-\tfrac{(x-\mu_k)^2}{2\sigma_k^2}-\tfrac12\log\sigma_k^2+\log\pi_k$.
+The boundary becomes quadratic (a conic in higher dimensions). QDA adds a
+variance per class --- lower bias, higher variance --- and reduces to LDA
+exactly when $\sigma_0^2=\sigma_1^2$.
+
+\vspace{1mm}
+\emph{Common mistake: treating the $\delta_k$ as probabilities. They
+are unnormalised log-scores (here both $\approx 0.5$--$0.7$); only the
+softmax of the $\delta_k$ gives the posterior.}
+\end{solutionbox}
+\end{frame}
+
+% ---------------- Extended Exercise 4.3 ----------------
+\begin{frame}{Extended Exercise 4.3 \textemdash{} Naive Bayes by hand [Math]}
+\begin{longexercise}
+A lender labels customers Default (D) or No-default (N) using three binary
+features: $F_1=$ high balance, $F_2=$ student, $F_3=$ a late payment in
+the past year. Priors $\pi_D=0.2$, $\pi_N=0.8$, with estimated
+class-conditional likelihoods:
+\begin{center}\small
+\begin{tabular}{lcc}
+\toprule
+$\Pr(\cdot=\text{Yes}\mid\text{class})$ & $\mid$ D & $\mid$ N \\
+\midrule
+$F_1$ high balance  & 0.8 & 0.3 \\
+$F_2$ student       & 0.3 & 0.4 \\
+$F_3$ late payment  & 0.6 & 0.1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+A new customer has all three features present ($F_1=F_2=F_3=$ Yes).
+\begin{enumerate}
+  \item Under conditional independence, compute the unnormalised score
+        $\pi_k\prod_j\Pr(F_j\mid k)$ for each class.
+  \item Compute the posterior $\Pr(\text{D}\mid F_1,F_2,F_3)$ and classify.
+  \item The prior favoured N. Explain why the decision comes out as it
+        does.
+  \item Compare naive Bayes with LDA: assumptions, parameters, when each
+        is preferable.
+\end{enumerate}
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.3 (1/3)}
+\begin{solutionbox}
+\textbf{Method.} Bayes' rule scores each class by its numerator
+$\pi_k f_k(x)$; the \emph{naive} assumption factorises the
+class-conditional likelihood into one-dimensional marginals,
+$f_k(x)=\prod_j\Pr(F_j\mid k)$, so we never estimate a joint table over
+the three features. The evidence denominator is common to both classes,
+so we compare numerators first and normalise only at the end.
+
+\vspace{1mm}
+\textbf{(1) Unnormalised scores} $\pi_k\prod_j\Pr(F_j=\text{Yes}\mid k)$:
+\[
+\begin{aligned}
+  \text{D}:&\ 0.2\,(0.8\times 0.3\times 0.6)=0.2\times 0.144=0.0288,\\
+  \text{N}:&\ 0.8\,(0.3\times 0.4\times 0.1)=0.8\times 0.012=0.0096.
+\end{aligned}
+\]
+
+\textbf{(2) Posterior.} Normalise by the sum $0.0288+0.0096=0.0384$:
+$\Pr(\text{D}\mid x)=\dfrac{0.0288}{0.0384}=0.75$
+(so $\Pr(\text{N}\mid x)=0.25$) $\Rightarrow$ classify as \textbf{Default}.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.3 (2/3)}
+\begin{solutionbox}
+\textbf{(3) Why the prior is overturned.}
+Write the posterior as prior odds $\times$ likelihood ratio:
+\[
+  \frac{\Pr(\text{D}\mid x)}{\Pr(\text{N}\mid x)}
+  =\frac{\pi_D}{\pi_N}\cdot\frac{\prod_j\Pr(F_j\mid D)}{\prod_j\Pr(F_j\mid N)}
+  =\frac{0.2}{0.8}\cdot\frac{0.144}{0.012}=0.25\times 12=3 .
+\]
+The prior favours N by $4\times$, but the features favour D by $12\times$;
+net, D is $3\times$ as likely, i.e.\ $\Pr(\text{D})=3/(3+1)=3/4$. The
+three ``Yes'' features --- above all the high balance and the late
+payment, each far more common under D --- swamp the base rate.
+
+\vspace{1mm}
+\emph{Common mistake: normalising the likelihoods alone and dropping the
+prior. That gives $0.144/(0.144+0.012)\approx 0.92$ instead of the
+correct $0.75$ --- overstating default because it forgets that
+non-defaulters are $4\times$ more common to begin with.}
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.3 (3/3)}
+\begin{solutionbox}
+\textbf{(4) Naive Bayes vs.\ LDA.} Both are \emph{generative}: model the
+priors $\pi_k$ and class-conditional densities $f_k(x)$, then apply Bayes.
+\begin{itemize}
+  \item \textbf{Assumption.} LDA: $X$ is multivariate Gaussian with a
+        \emph{common} covariance $\Sigma$, so it models linear
+        correlations between features. Naive Bayes: features are
+        conditionally \emph{independent} within a class, i.e.\
+        $f_k(x)=\prod_j f_{kj}(x_j)$; it ignores within-class
+        correlations but handles categorical / binary and mixed features
+        naturally (as here).
+  \item \textbf{Parameters.} NB estimates only one-dimensional marginals
+        $\Rightarrow$ very few parameters, low variance. LDA estimates the
+        full $\Sigma$ ($p(p+1)/2$ entries), which fails when $p$ is
+        comparable to $n$.
+  \item \textbf{When.} NB shines when $p$ is large relative to $n$ or the
+        features are discrete / non-Gaussian; LDA is better when features
+        are roughly Gaussian and their correlations carry signal.
+\end{itemize}
+Connection: Gaussian naive Bayes is exactly discriminant analysis with a
+\emph{diagonal} covariance matrix (all cross-correlations set to zero).
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{The GLM framework: one umbrella}
+  Linear, logistic, and Poisson regression are all special cases of:
+  \begin{block}{Generalised linear model}
+    \[
+      g\bigl(E[Y \mid X]\bigr) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p,
+    \]
+    where $g$ is the \emph{link function}.
+  \end{block}
+  \vspace{-2mm}
+  \begin{center}\small
+  \begin{tabular}{lll}
+    \toprule
+    Distribution & Link & Use \\
+    \midrule
+    Gaussian   & identity   & continuous $Y$ (Ch.~3) \\
+    Bernoulli  & logit      & binary $Y$ (this chapter) \\
+    Poisson    & log        & counts \\
+    Gamma      & inverse / log & positive continuous \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{-2mm}
+  \begin{readme}
+    The \emph{link} $g$ puts the mean $E[Y\mid X]$ on a scale where a
+    linear model fits; invert $g$ to predict on the original scale.
+    Maximum likelihood fits the whole family.
+  \end{readme}
+\end{frame}
+
+\begin{frame}{Poisson regression for counts}
+  \begin{block}{Model}
+    $Y \mid X \sim \mathrm{Poisson}\bigl(\lambda(X)\bigr)$ with
+    $\log \lambda(X) = \beta_0 + \beta^\top X$.
+  \end{block}
+  \begin{readme}
+    Coefficients are on the log-rate scale: $\exp(\beta_j)$ is the
+    multiplicative effect on the expected count. Mean equals variance
+    for Poisson; if your data shows variance much greater than the
+    mean, look at negative binomial instead.
+  \end{readme}
+  \begin{numexample}[Bikeshare]
+    The Bikeshare data records bikes rented per hour. A Poisson model
+    with hour-of-day, weather, and weekday gives multiplicative
+    effects: ``rush-hour increases rental rate by a factor of 4.''
+  \end{numexample}
+\end{frame}
+
+\begin{frame}{Bikeshare: Poisson captures the commute rhythm}
+  \begin{center}
+    \includegraphics[width=0.80\textwidth,height=0.47\textheight,keepaspectratio]{4_13.pdf}
+  \end{center}
+  \begin{takeaway}
+    Ridership peaks at the morning and evening commutes and climbs with
+    temperature. The Poisson GLM captures these as \emph{multiplicative}
+    effects on the expected count --- and never predicts a negative
+    number of riders.
+  \end{takeaway}
+  \islpsource{Figure 4.13}
+\end{frame}
+
+\begin{frame}[fragile]{Poisson regression on Bikeshare}
+  \begin{lstlisting}
+Bike = load_data("Bikeshare")            # hourly bike-rental counts
+X = sm.add_constant(Bike[["temp", "hum", "windspeed"]])  # add intercept
+res = sm.GLM(Bike["bikers"], X,          # count response
+             family=sm.families.Poisson()).fit()  # log link for counts
+print(res.summary())                     # coefficients on log-rate scale
+  \end{lstlisting}
+  Coefficients are on the log-rate scale; \texttt{exp(coef)} gives
+  the multiplicative effect on hourly ridership.
 \end{frame}
 
 \end{document}
