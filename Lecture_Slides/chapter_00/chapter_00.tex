@@ -1006,10 +1006,9 @@
   \begin{solutionbox}
     \scriptsize
     \textbf{(1)} With $P(F) = 0.005$:
-    \[
-      P(\text{flag}) = 0.95(0.005) + 0.02(0.995)
-                     = 0.00475 + 0.0199 = 0.02465 \approx 2.5\% .
-    \]
+    $P(\text{flag}) = 0.95(0.005) + 0.02(0.995)
+    = 0.00475 + 0.0199 = 0.02465 \approx 2.5\%$.
+
     \textbf{(2)} $P(F \mid \text{flag}) = 0.00475/0.02465 \approx
     \textbf{19\%}$: four of five flags are false alarms, despite a $95\%$
     detection rate.
@@ -1035,6 +1034,11 @@
     $0.00475 \ge f \cdot 0.995$, i.e.\ $f \le \textbf{0.48\%}$ --- four
     times stricter than today's $2\%$ and reachable only by flagging less
     aggressively, which costs detection: the ROC trade-off of Chapter 4.
+
+    \smallskip
+    \textit{Common mistake:} answering (2) with ``$95\%$'' --- that is
+    $P(\text{flag} \mid F)$, not $P(F \mid \text{flag})$. The tiny base
+    rate drags the useful direction down to $19\%$.
   \end{solutionbox}
 \end{frame}
 
@@ -1495,6 +1499,11 @@
     control stores with the campaign but no redesign (difference-in-differences);
     or, weakest, adjust for campaign exposure in a regression --- which only
     works for confounders you thought to measure.
+
+    \smallskip
+    \textit{Common mistake:} ``significant, so act''. The $p$-value compares
+    the increase with \emph{zero}; the decision needed a comparison with
+    \euro 5. Always test the threshold that actually matters.
   \end{solutionbox}
 \end{frame}
 
@@ -1669,6 +1678,11 @@ R-squared: 0.612    F-statistic: 312.1    Prob (F-statistic): 1.47e-42    n = 20
     untested and diminishing returns are likely. Never extrapolate a fitted
     model far outside the data it was estimated from; with $n = 4$ the fit
     is fragile in any case.
+
+    \smallskip
+    \textit{Common mistake:} being impressed by $R^2 = 0.997$ when $n = 4$.
+    A line has two parameters, so four points make a near-perfect fit cheap
+    --- $R^2$ measures fit to \emph{these} points, not validity.
   \end{solutionbox}
 \end{frame}
 
@@ -1727,6 +1741,11 @@ R-squared: 0.51    n = 36
     A defensible version: ``months that are $1^\circ$C warmer sell about
     \euro 900 more, on average''. To claim causation you would need an
     experiment or a design that holds the confounders fixed.
+
+    \smallskip
+    \textit{Common mistake:} the word ``effect''. With observational data a
+    coefficient is a \emph{comparison} between months, not a lever you can
+    pull --- write ``associated with'' and mean it.
   \end{solutionbox}
 \end{frame}
 
@@ -1890,6 +1909,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
 
 \begin{frame}{Solution --- Exercise 0.9}
   \begin{solutionbox}
+    \scriptsize
     \textbf{(1)} $n = 3000$ observations, $p = 11$ columns --- so with
     \texttt{wage} as the response, $10$ columns remain. But one of them is
     \texttt{logwage}, a transform \emph{of the response itself}: using it as a
@@ -1919,6 +1939,11 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     the mean is pinned down to about $\pm\$760$, while individual wages vary
     by roughly $\pm\$40{,}000$ --- the standard-deviation / standard-error
     distinction in one line.
+
+    \smallskip
+    \textit{Common mistake:} deleting the $109$ flagged wages before
+    modelling. In a right-skewed variable the fences mark the tail, not
+    errors --- deleting them would bias every later model toward low earners.
   \end{solutionbox}
 \end{frame}
 
@@ -1963,6 +1988,11 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
             Plot: grouped bar chart of the \emph{rates}, not the raw counts ---
             raw counts mislead whenever the groups differ in size.
     \end{enumerate}
+
+    \smallskip
+    \textit{Common mistake:} defaulting to mean and SD. The first question
+    is always the \emph{shape} --- skew, outliers, unequal groups --- and
+    the summary follows from the shape, not the other way round.
   \end{solutionbox}
 \end{frame}
 
@@ -2042,6 +2072,11 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     joining, which would immediately expose whether $r = 0.05$ hides a curve.
     Both are two lines of \texttt{pandas}, and both would have been drawn
     before any test in a competent analysis.
+
+    \smallskip
+    \textit{Common mistake:} softening an unearned causal claim (``members
+    tend to benefit\dots'') instead of dropping it. If only observational
+    data exist, the honest product is an association \emph{plus its threats}.
   \end{solutionbox}
 \end{frame}
 
@@ -2683,6 +2718,11 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     step is larger still --- \textbf{divergence}. The step size must respect
     the curvature of the loss, so in practice one standardises the predictors
     and tunes $\alpha$: the workflow of Chapter 10.
+
+    \smallskip
+    \textit{Common mistake:} blaming the model when descent diverges. The
+    loss surface did not change --- the step size did. Divergence is a tuning
+    failure: standardise the predictors and shrink $\alpha$.
   \end{solutionbox}
 \end{frame}
 

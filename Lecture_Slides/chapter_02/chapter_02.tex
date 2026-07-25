@@ -1449,6 +1449,7 @@ print("best K =", int(np.argmin(te)) + 1, "min test err =", round(min(te), 3))
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 2.2 (2/2)}
 \begin{solutionbox}
+\scriptsize
 Plot the two error curves against flexibility $1/K$:
 \begin{lstlisting}
 import matplotlib.pyplot as plt
@@ -1463,6 +1464,9 @@ plt.xlabel("1/K"); plt.ylabel("error rate"); plt.legend(); plt.show()
   \item \textbf{Test error} is U-shaped in $1/K$: worst at $K=1$ ($\approx0.093$, high \emph{variance}), dips near $K\approx10\text{--}20$, then drifts up for very large $K$ (rising \emph{bias}).
 \end{itemize}
 Small $K$ $=$ flexible $=$ low bias, high variance; large $K$ $=$ rigid $=$ high bias, low variance. Cross-validation would pick $K$ in the flat basin at the bottom.
+
+\smallskip
+\textit{Common mistake:} over-trusting the exact winner $K=14$. The basin is flat --- any $K$ in $10$--$20$ is statistically equivalent, and the training curve ($0$ at $K=1$ by construction) is no evidence at all.
 \end{solutionbox}
 \end{frame}
 
@@ -1635,6 +1639,9 @@ $K=3$: nearest are $x=3,4,2$ with $y=3.3,3.9,1.8$, so $\hat y(x_0)=\tfrac{3.3+3.
   \item \textbf{(c) Large $p$ ($\approx20$), modest $n$ $\Rightarrow$ linear wins.} \emph{Curse of dimensionality}: in high dimensions the ``nearest'' neighbours are actually far, so KNN averages dissimilar points. A parametric model that assumes structure is far more data-efficient.
 \end{itemize}
 \textbf{4. Rule of thumb.} Prefer nonparametric KNN when $f$ is unknown/curved, $p$ is small, and $n$ is large; prefer the parametric linear model when $n$ is small, $p$ is large, the functional form is trustworthy, or you need interpretability.
+
+\smallskip
+\textit{Common mistake:} judging KNN by its training error --- with $K=1$ that is exactly zero on \emph{every} data set. Only the test error can compare these models.
 \end{solutionbox}
 \end{frame}
 
@@ -1919,6 +1926,9 @@ Plug in: $x^\star=1+\tfrac12\ln(1.5)=1+\tfrac12(0.405)=\mathbf{1.203}$.
 Even the optimal rule misreads about $15\%$ of cases --- the price of the overlap between the two bells.
 
 \textbf{4. Interpretation.} The boundary sits at the midpoint $1$ only when $\pi_0=\pi_1$. Raising $\pi_0$ makes $\ln(\pi_0/\pi_1)>0$, sliding $x^\star$ \emph{toward the rarer class} ($\mu_1$): we cede more of the line to the commoner class~0. The Bayes error is the \emph{irreducible} classification error --- the analogue of $\mathrm{Var}(\varepsilon)$ in regression --- attainable only with the \emph{true} $\pi_k,f_k$; any estimated classifier does at least as badly.
+
+\smallskip
+\textit{Common mistake:} averaging the two tail probabilities without the priors --- $(0.115+0.212)/2 = 0.164$, not $0.154$. Each class's error must be weighted by how often that class occurs.
 \end{solutionbox}
 \end{frame}
 

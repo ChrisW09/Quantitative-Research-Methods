@@ -829,6 +829,7 @@
 
 \begin{frame}{Solution --- Exercise 3.2}
   \begin{solutionbox}
+    \scriptsize
     \textbf{(1) Standard error.}
     \[
       \mathrm{SE}(\hat\beta_1)=\frac{\mathrm{RSE}}{\sqrt{\sum(x_i-\bar x)^2}}
@@ -853,6 +854,11 @@
     \textit{Note:} with only $n=10$ the critical value $2.306$ is well
     above the large-sample value $1.96$; small samples demand larger
     $t$'s to reach significance.
+
+    \smallskip
+    \textit{Common mistake:} dividing the RSE by $\sqrt n$. The slope's
+    SE divides by $\sqrt{\sum(x_i-\bar x)^2}$ --- more spread-out
+    predictor values give a more precise slope, regardless of $n$.
   \end{solutionbox}
 \end{frame}
 
@@ -1321,6 +1327,12 @@ print(res.summary())                 # coef table: SE, t, p, R2, F
     fixed --- you must include the other relevant predictors. Simple
     correlations invite confounding; ``correlation is not causation'' is
     the practical warning.
+
+    \smallskip
+    \textit{Common mistake:} concluding ``newspaper advertising cannot
+    work''. The model says newspaper adds nothing \emph{given TV and
+    radio, in these data} --- an observational statement, not a causal
+    verdict.
   \end{solutionbox}
 \end{frame}
 
@@ -1540,6 +1552,11 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
     is simpler, loses no explanatory power, and both adjusted $R^2$ and
     RSE (which penalise useless predictors) favour it. Parsimony wins,
     and it agrees with the confounding diagnosis in part (2).
+
+    \smallskip
+    \textit{Common mistake:} citing the unchanged $R^2$ as the evidence.
+    Plain $R^2$ can only fall when a predictor is dropped --- adjusted
+    $R^2$ and RSE, which penalise dead weight, are the fair judges.
   \end{solutionbox}
 \end{frame}
 
@@ -1784,6 +1801,11 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
     drop TV: the interaction $\texttt{TV}\times\texttt{radio}$ is not
     interpretable without the TV main effect, and removing it makes the
     remaining coefficients hard to read and can bias the fit.
+
+    \smallskip
+    \textit{Common mistake:} quoting $0.019$ as ``the'' TV effect. With
+    an interaction present, that is the slope only at $\texttt{radio}=0$;
+    the TV effect must be stated at a chosen radio level.
   \end{solutionbox}
 \end{frame}
 
@@ -1970,6 +1992,12 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
     ($\beta_4=\beta_5=0$) all regions would share slope $6$ and differ
     only by a vertical shift. By the \emph{hierarchy principle} we keep
     the main effects $D_S,D_W$ whenever their interactions are present.
+
+    \smallskip
+    \textit{Common mistake:} reading $\hat\beta_4=2$ as the South's
+    slope. It is the \emph{difference} from East: the South's own slope
+    is $6+2=8$. Dummy interactions, like dummies, are contrasts against
+    the baseline.
   \end{solutionbox}
 \end{frame}
 
@@ -2073,6 +2101,11 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
     report the fit with and without it, and consider a robust
     regression. (Distinguish leverage --- unusual $x$ --- from an
     outlier --- unusual $y$; the dangerous points are high in both.)
+
+    \smallskip
+    \textit{Common mistake:} judging these assumptions from the raw
+    $y$-vs-$x$ scatter or from $R^2$. A high $R^2$ can coexist with
+    panels (1), (2) and (4) --- only the residual plot shows them cleanly.
   \end{solutionbox}
 \end{frame}
 
@@ -2409,6 +2442,11 @@ print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
     information, inflating their SEs. \emph{Fix:} drop or combine a
     redundant predictor (e.g.\ keep size, or use price-per-size), or use
     ridge / PCA regression; recompute VIFs until all $<5$.
+
+    \smallskip
+    \textit{Common mistake:} conflating the diagnoses --- an outlier is
+    unusual in $y$, a leverage point in $x$. The dangerous case is both
+    at once, and only Cook's distance measures that combination.
   \end{solutionbox}
 \end{frame}
 
@@ -2964,6 +3002,11 @@ for name, m in [("linear", lin), ("poly-2", pol), ("KNN10", knn)]:
     $\approx 38$ at $K{=}1$). The best $K$ balances bias (large $K$)
     against variance (small $K$). \emph{Takeaway:} prefer the parsimonious
     degree-2 fit; if using KNN, tune $K$ by cross-validation.
+
+    \smallskip
+    \textit{Common mistake:} choosing $K$ by training MSE --- it falls
+    monotonically to zero at $K=1$. Only test or CV error reveals the
+    U-shape that picks the right $K$.
   \end{solutionbox}
 \end{frame}
 

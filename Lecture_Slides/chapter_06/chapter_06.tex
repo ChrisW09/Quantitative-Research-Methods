@@ -391,6 +391,7 @@
 
 \begin{frame}{Solution --- Exercise 6.2}
   \begin{solutionbox}
+    \scriptsize
     \textbf{(1) Monotonicity.}
     Adding a predictor to a nested least-squares model can never
     increase RSS (the extra coefficient can always be set to zero), so
@@ -420,6 +421,11 @@
     \end{itemize}
     We pick the model that minimises $C_p$/AIC/BIC or maximises
     adjusted $R^2$.
+
+    \smallskip
+    \textit{Common mistake:} comparing models of different sizes by
+    training RSS or $R^2$ --- the biggest model always wins by
+    construction; that is exactly the problem these criteria solve.
   \end{solutionbox}
 \end{frame}
 
@@ -1236,6 +1242,13 @@ print("lasso drops:", dropped)
     variable selection), whereas ridge keeps and merely shrinks all
     predictors. Exact numbers shift with the split/seed; the qualitative
     message --- lasso selects, ridge keeps all --- is stable.
+
+    \smallskip
+    \textit{Common mistake:} reading the dropped variables as ``irrelevant
+    to salary''. \texttt{Years} and \texttt{CRBI} are highly correlated
+    with the kept career totals --- the lasso drops \emph{redundant}
+    predictors, and a different split can swap which of a correlated group
+    survives.
   \end{solutionbox}
 \end{frame}
 
@@ -1554,6 +1567,11 @@ print("lasso drops:", dropped)
     \emph{exactly to zero} while the large ones are shrunk by the same
     absolute amount. This is precisely why the $\ell_1$ penalty performs
     \emph{variable selection} and the $\ell_2$ penalty only shrinks.
+
+    \smallskip
+    \textit{Common mistake:} thinking the lasso shrinks proportionally.
+    It subtracts the same \emph{absolute} amount from every coefficient;
+    ridge is the proportional one --- compare the $3.0$ and $0.4$ rows.
   \end{solutionbox}
 \end{frame}
 
@@ -1612,6 +1630,12 @@ print("lasso drops:", dropped)
     seeking directions correlated with $Y$, so it can capture the
     predictive signal with fewer components. In practice PLS often
     performs comparably to ridge regression.
+
+    \smallskip
+    \textit{Common mistake:} concluding supervised must be better ---
+    using $Y$ also raises variance, so PCR often matches PLS. And neither
+    selects variables: every component $Z_m$ mixes \emph{all} $p$
+    predictors.
   \end{solutionbox}
 \end{frame}
 

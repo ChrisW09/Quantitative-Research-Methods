@@ -811,6 +811,11 @@ for degree in range(1, 6):
     \textbf{(5)} Without a seed the split differs on every run, so the ``best''
     degree changes between runs and neither you nor a reader can reproduce the
     number. A seed makes the result checkable --- it does not make it correct.
+
+    \smallskip
+    \textit{Common mistake:} the thread through all five bugs --- trusting a
+    printed number without asking what was computed. Off-by-one and leakage
+    errors run \emph{silently}; print intermediate objects and check them.
   \end{solutionbox}
 \end{frame}
 
@@ -844,16 +849,16 @@ for degree in range(1, 6):
     chosen model \emph{with} its test error.
 
     \textbf{(2) Looking, and splitting.} Plot before modelling --- the
-    curvature is obvious and tells you a polynomial is worth trying. And the
-    split must precede every fitting decision, so that nothing you learn from
-    the test set can influence the model.
+    curvature is obvious and says a polynomial is worth trying. The split must
+    precede every fitting decision, so nothing learned from the test set can
+    influence the model.
 
     \textbf{(3) Only the first step is real.} The drop from $4.96$ to $4.52$
-    is large and reflects genuine curvature: a line is the wrong shape. After
-    that the numbers differ by less than $0.12$, which is the size of ordinary
-    split-to-split noise. Degree $5$ is nominally lowest, but nothing
-    meaningful separates it from degree $2$ --- so choose \textbf{degree 2},
-    the simplest model that is not beaten.
+    is large and reflects genuine curvature: a line is the wrong shape. Beyond
+    that the numbers differ by less than $0.12$ --- ordinary split-to-split
+    noise. Degree $5$ is nominally lowest, but nothing meaningful separates it
+    from degree $2$ --- so choose \textbf{degree 2}, the simplest model that
+    is not beaten.
 
     \textbf{(4) The winner is unstable, so do not trust it.} A single split
     is a high-variance estimate, and the seed sweep proves it: three different
@@ -864,10 +869,9 @@ for degree in range(1, 6):
     statistically indistinguishable}. The defensible sentence is ``a quadratic
     is a real improvement on a line; beyond that this data set cannot tell''.
 
-    \textbf{(5) Leakage.} The scaler learned the mean and SD from data that
-    includes the test set, so information from the test set has entered the
-    training pipeline and the test error is no longer an honest estimate of
-    performance on new data (fit the scaler on the training set alone).
+    \textbf{(5) Leakage.} The scaler learned its mean and SD from data that
+    includes the test set, so the test error is no longer an honest estimate
+    of performance on new data. Fit the scaler on the training set alone.
 
     \textit{Common mistake:} rerunning with new seeds until the ranking
     looks right --- the sweep is a diagnostic, not a menu; a fixed seed buys
