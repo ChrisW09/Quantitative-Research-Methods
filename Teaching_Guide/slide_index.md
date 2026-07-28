@@ -72,29 +72,29 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 
 ### Ch. 1 — Introduction
 
-`chapter_01.pdf` — **70 slides** in the main flow plus **6** in the appendix, planned for **0.5 × 180 min** (≈ 72 min of actual teaching, ≈ 1.0 min per slide).
+`chapter_01.pdf` — **71 slides** in the main flow plus **6** in the appendix, planned for **0.5 × 180 min** (≈ 72 min of actual teaching, ≈ 1.0 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
-| *front matter* | 1–8 | 8 | 8 min |
-| Welcome | 9–14 | 6 | 6 min |
-| Definitions | 15–23 | 9 | 9 min |
-| Examples | 24–42 | 19 | 20 min |
-| Tools | 43–49 | 7 | 7 min |
-| Datasets | 50–54 | 5 | 5 min |
-| Roadmap | 55–60 | 6 | 6 min |
-| Pitfalls | 61–64 | 4 | 4 min |
-| Summary | 65–70 | 6 | 6 min |
-| Appendix: optional and advanced material | 71–76 | 6 | optional |
+| *front matter* | 1–9 | 9 | 9 min |
+| Welcome | 10–15 | 6 | 6 min |
+| Definitions | 16–24 | 9 | 9 min |
+| Examples | 25–43 | 19 | 19 min |
+| Tools | 44–50 | 7 | 7 min |
+| Datasets | 51–55 | 5 | 5 min |
+| Roadmap | 56–61 | 6 | 6 min |
+| Pitfalls | 62–65 | 4 | 4 min |
+| Summary | 66–71 | 6 | 6 min |
+| Appendix: optional and advanced material | 72–77 | 6 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
-| Exercise 1.1 | short | Concept | p. 21 | p. 22 |
-| Exercise 1.2 | short | Concept | p. 40 | p. 41 |
-| Exercise 1.3 | short | Math | p. 52 | p. 53 |
-| Extended Exercise 1.1 | extended | Integrative | p. 58 | p. 59 |
+| Exercise 1.1 | short | Concept | p. 22 | p. 23 |
+| Exercise 1.2 | short | Concept | p. 41 | p. 42 |
+| Exercise 1.3 | short | Math | p. 53 | p. 54 |
+| Extended Exercise 1.1 | extended | Integrative | p. 59 | p. 60 |
 
-**Notebook cues:** 1 in this deck (near pp. 64).
+**Notebook cues:** 1 in this deck (near pp. 65).
 
 ### Ch. 2 — Statistical Learning
 
