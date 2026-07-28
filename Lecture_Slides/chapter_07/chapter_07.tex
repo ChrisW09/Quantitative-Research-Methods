@@ -67,6 +67,10 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
+% Industry application callout box --- slate grey, for real business/industry use
+\definecolor{industryC}{RGB}{88,98,116}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -199,6 +203,39 @@
   \end{takeaway}
 \end{frame}
 
+\begin{frame}{Where this chapter is used in industry}
+  \scriptsize
+  \begin{tabular}{@{}p{2.5cm}p{5.5cm}p{4.7cm}@{}}
+    \toprule
+    \textbf{Sector} & \textbf{Concrete application} & \textbf{What the smooth fit delivers} \\
+    \midrule
+    Motor \& health insurance & Claim frequency and severity as smooth functions of driver age, vehicle age, mileage & The risk curve that enters the technical tariff \\
+    Energy \& utilities & Electricity demand against temperature (heating below, cooling above a comfort band) & Day-ahead procurement and capacity planning \\
+    Banking --- fixed income & Yield curves fitted to quoted bond yields (cubic splines, Nelson--Siegel--Svensson) & The discount curve used to value and hedge the book \\
+    Retail \& travel & Price-response and promotion curves, saturating at both ends & Price points, promotion depth, marketing budget \\
+    Pharma \& toxicology & Dose--response curves for efficacy and for safety endpoints & The dose carried into the next trial phase \\
+    Life insurance \& pensions & Mortality and morbidity as smooth functions of age & Reserves, annuity and longevity pricing \\
+    \bottomrule
+  \end{tabular}
+  \begin{industry}[The common thread]
+    In every row the fitted \emph{curve} is the deliverable: it gets plotted, argued about and signed off. That rules out a black box --- but a straight line would be plainly wrong.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{Industry case in depth: pricing a motor insurance policy}
+  \footnotesize
+  \begin{industry}[The model behind the tariff]
+    Insurers price in two pieces --- \textbf{frequency} (claims per policy-year, Poisson) and \textbf{severity} (cost per claim, gamma) --- and increasingly fit each as an additive model with smooth terms:
+    \[ \log\mathbb{E}[\text{claims}]=\beta_0+f_1(\text{driver age})+f_2(\text{vehicle age})+f_3(\text{mileage})+\text{region}+\text{bonus--malus}. \]
+  \end{industry}
+  \begin{readme}[What the fitted age curve looks like]
+    It is famously \emph{non-monotone}: risk is high for the youngest drivers, falls through middle age, then rises again for the oldest. A linear term in age cannot represent that shape at all --- a smooth can, and still prints as one readable curve.
+  \end{readme}
+  \begin{takeaway}[Who signs it off --- and one caveat]
+    The curves become tariff tables reviewed by pricing and the actuarial function, so they must be smooth and defensible: that, not accuracy, is why a GAM beats a black box here. \emph{Caveat:} the tariff must also price rarely observed cells, where a high-degree polynomial would swing wildly --- and additivity means an age~$\times$~vehicle-power interaction has to be added deliberately.
+  \end{takeaway}
+\end{frame}
+
 
 % ============================================================
 \section{Polynomials}
@@ -216,6 +253,9 @@
     machinery applies (standard errors, $F$-tests, CV). We are simply
     augmenting the design matrix.
   \end{readme}
+  \begin{industry}[Retail and travel: price-response curves]
+    Demand bends in price and saturates at both ends, so pricing teams fit a quadratic or cubic in (log) price and read the elasticity off the fitted curve. Miss the curvature and the recommended price lands on the flat part of the curve --- margin given away for no extra volume.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Polynomial regression: the boundary problem}
@@ -259,6 +299,9 @@
     breakpoints --- often visually ugly. Useful when natural categories
     exist (age groups, salary tiers).
   \end{readme}
+  \begin{industry}[Banking: scorecard bands]
+    Credit scorecards deliberately bin continuous inputs --- age, income, months since last arrears --- into bands and award points per band: a step function by choice, because it is auditable and easy to monitor. The price is a visible jump for two applicants either side of a cut-off.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Step function fit on Wage}
@@ -493,6 +536,9 @@ We fit a piecewise-constant (step-function) regression of \texttt{wage} on \text
     (matches second derivative). Higher degrees rarely improve the
     fit but add parameters and instability.
   \end{readme}
+  \begin{industry}[Fixed income: how many knots in a yield curve?]
+    A desk fitting a spline to quoted bond yields faces exactly this decision: more knots reproduce every quote but can imply implausible forward rates; fewer knots give a smooth curve that misprices some bonds. The chosen curve then discounts the whole book --- so a smoothness choice is a valuation choice.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Cubic vs.\ natural spline on Wage}
@@ -608,6 +654,9 @@ i.e.\ $2$ extra constraints at each of the $2$ boundaries: $4$ additional constr
       \;}
     \]
   \end{block}
+  \begin{industry}[Utilities: the temperature-response curve]
+    Electricity load against temperature is a U shape --- heating below the comfort band, cooling above it. Utilities fit that response as a smooth curve, add calendar effects, and buy power a day ahead against it. An over-smoothed peak understates demand on the hottest day --- exactly when power costs most.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Reading the smoothing-spline objective}
@@ -772,6 +821,9 @@ ranging from $n$ (at $\lambda=0$, interpolation) down to $2$ (at $\lambda\to\inf
     By construction, GAMs miss interactions. Add tensor-product terms
     $f_{jk}(X_j, X_k)$ explicitly, or move to trees (Ch.~8).
   \end{alertblock}
+  \begin{industry}[Why regulated industries reach for GAMs]
+    Insurers, utilities and banks need a model that bends \emph{and} can be defended one predictor at a time: each $f_j$ is a picture an actuary, a regulator or a model-risk reviewer can hold against domain knowledge.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{GAM fit on Wage}

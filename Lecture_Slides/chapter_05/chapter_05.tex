@@ -74,6 +74,10 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
+% Industry application callout box --- slate grey, for real business/industry use
+\definecolor{industryC}{RGB}{88,98,116}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -226,6 +230,67 @@
   \end{readme}
 \end{frame}
 
+\begin{frame}{Where this chapter is used in industry}
+  \scriptsize
+  \begin{center}
+  \begin{tabular}{@{}p{2.5cm}p{5.1cm}p{4.6cm}@{}}
+    \toprule
+    \textbf{Sector} & \textbf{Concrete application} & \textbf{What it delivers} \\
+    \midrule
+    Banking &
+      Independent validation of a credit-risk (PD) model &
+      Out-of-sample \emph{and} out-of-time error --- the evidence for sign-off \\
+    Retail, energy &
+      Walk-forward backtest of a demand or load forecast &
+      Honest error per horizon; replenishment and hedging settings \\
+    Insurance &
+      Bootstrap of a loss-reserve or capital figure &
+      A \emph{range} rather than a point --- the booked reserve \\
+    Pharma, medtech &
+      Patient-grouped CV of a diagnostic or triage model &
+      Error on \emph{unseen patients}; evidence for a submission \\
+    Tech, platforms &
+      Bootstrap interval for revenue per user in an A/B test &
+      Ship / no-ship on a heavy-tailed KPI \\
+    Manufacturing &
+      $k$-fold CV to tune a quality- or yield-prediction model &
+      The complexity choice, made before the line depends on it \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{industry}[The common thread]
+    In every row the number that leaves the room is an \emph{out-of-sample}
+    number. Resampling is what turns a model someone built into a model
+    someone is willing to sign.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{Industry case in depth: validating a credit-risk model}
+  \footnotesize
+  \begin{industry}[The setting]
+    A bank's retail portfolio needs a probability-of-default (PD) model
+    --- the Chapter~4 scorecard, now facing independent review.
+    \textbf{Response:} default within the next 12 months ($0/1$).
+    \textbf{Predictors:} months since worst delinquency, revolving-limit
+    utilisation, recent credit enquiries, months on file,
+    instalment-to-income ratio. \textbf{Output:} a PD per account, banded
+    into rating grades, with a Gini / AUC reported on \emph{two} hold-outs
+    --- one random, one \emph{out-of-time} from a later origination cohort.
+  \end{industry}
+  \begin{readme}[Which decision it feeds and who signs it off]
+    The PD drives approve/decline cut-offs, risk-based pricing and the
+    IFRS~9 expected-credit-loss provision. The modelling team does not
+    sign it off: an \emph{independent} validation unit re-runs the tests
+    for a model-risk committee (US: Federal Reserve SR~11-7 guidance;
+    euro area: ECB supervisory model reviews).
+  \end{readme}
+  \begin{takeaway}[The honest caveat]
+    Random $k$-fold folds across origination dates let the future inform
+    the past: the Gini looks excellent and then evaporates on the next
+    cohort.
+  \end{takeaway}
+\end{frame}
+
 
 % ============================================================
 \section{Validation Set}
@@ -282,6 +347,11 @@
     \emph{part} of the data. Averaging over several splits ---
     cross-validation --- attacks both at once.
   \end{takeaway}
+  \begin{industry}[Banking: a single split is only the floor]
+    A single hold-out is a fine first sanity check, but an independent
+    validation unit will ask for an \emph{out-of-time} hold-out as well:
+    score a later cohort, not just other rows from the same one.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Validation across splits: how erratic is it?}
@@ -424,6 +494,12 @@
     For \emph{ordinary least squares} (and ridge regression), there
     is a one-fit shortcut using the leverage statistic.
   \end{takeaway}
+  \begin{industry}[Where $n$ is genuinely small]
+    LOOCV earns its keep when observations are expensive: a chemometric
+    calibration built on a few dozen production batches, a pilot study, a
+    handful of clinical sites. Wasting $20\%$ of forty samples on a
+    hold-out is not an option --- so hold out one at a time.
+  \end{industry}
 \end{frame}
 
 
@@ -595,6 +671,12 @@
             (patients, customers) to avoid within-group leakage.
     \end{enumerate}
   \end{alertblock}
+  \begin{industry}[These are expensive mistakes --- not textbook ones]
+    Forecasts and trading strategies are backtested \emph{walk-forward}
+    (train to $t$, score $t+1$) for reason~2; churn, credit and healthcare
+    models split by \emph{customer} or \emph{patient} for reason~3.
+    Accuracy that came from leakage fails after deployment, not before.
+  \end{industry}
 \end{frame}
 
 
@@ -759,6 +841,14 @@
   \end{takeaway}
   We don't have many samples --- we have one. The bootstrap is a
   trick to simulate ``many samples'' from the one we have.
+  \begin{industry}[Where the formula is missing]
+    Actuaries quote loss-reserve \emph{ranges}; risk teams put error bars
+    on value-at-risk and stress figures; platform teams need a confidence
+    interval for revenue per user, which is heavy-tailed enough that the
+    textbook $t$-interval is hard to defend. None of these statistics has
+    a usable closed-form standard error --- so all of them are
+    bootstrapped.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{The bootstrap algorithm}
@@ -1329,6 +1419,11 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
     \item For grouped data: split at the group level.
     \item Always fit \emph{all} preprocessing inside the CV loop.
   \end{itemize}
+  \begin{industry}[What you report to a steering committee]
+    Never the tuned CV score. Searching hyperparameters and reporting on
+    the same folds is optimistic by construction; quote the nested-CV
+    figure or a hold-out the search never touched, with its spread.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Common pitfalls}

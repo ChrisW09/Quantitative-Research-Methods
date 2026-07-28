@@ -116,6 +116,10 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
+% Industry application callout box --- slate grey, for real business/industry use
+\definecolor{industryC}{RGB}{88,98,116}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
 \begin{document}
 
 \begin{frame}[plain]
@@ -333,6 +337,65 @@
       \end{alertblock}
     \end{column}
   \end{columns}
+\end{frame}
+
+\begin{frame}{Where this chapter is used in industry}
+  \scriptsize
+  \begin{center}
+  \begin{tabular}{@{}p{2.85cm}p{5.15cm}p{4.6cm}@{}}
+    \toprule
+    \textbf{Sector} & \textbf{Concrete application} & \textbf{Decision it drives} \\
+    \midrule
+    Consumer goods, retail & Marketing mix modelling: weekly sales on spend per channel, price, promotion, seasonality & The annual media budget split across channels \\
+    Real estate, mortgage lending & Hedonic pricing / automated valuation: price on floor area, rooms, age, location & Listing prices, collateral values, index quality adjustment \\
+    Asset management & Factor models: excess return on market, size and value factors & Beta and hedge ratios, cost of equity, performance attribution \\
+    Energy, utilities & Load forecasting: demand on temperature, day type, calendar effects & Day-ahead procurement and capacity bids \\
+    HR, legal & Pay-equity audit: log salary on grade, tenure, location \emph{plus} a group indicator & The adjusted pay gap reported to the board \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{2pt}
+  \begin{industry}[The common thread]
+    In all five, the \emph{coefficient} is the deliverable --- not the
+    prediction. Someone has to defend that number in a meeting, which is
+    why standard errors, intervals and diagnostics matter as much as the fit.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{Industry case in depth: marketing mix modelling (MMM)}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \begin{block}{The model an agency actually fits}
+        \begin{itemize}
+          \item Response: weekly $\log$(sales) per brand and region.
+          \item Predictors: spend per channel (TV, digital, print,
+                in-store), price index, promotion depth, distribution
+                coverage, month dummies.
+          \item $n$: a few hundred brand--weeks.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \begin{block}{What the output is used for}
+        Each channel coefficient is read as a contribution and an
+        elasticity, then aggregated into a decomposition of the year's
+        sales. That decomposition is the starting point for next year's
+        budget split --- signed off by the CMO together with finance,
+        and re-fitted each quarter.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \begin{industry}[Every diagnostic in this chapter shows up here]
+    Channels are flighted together, so spend variables are collinear (VIF);
+    spend has diminishing returns, so log terms are needed; promotional weeks
+    are high-leverage points; error spread grows with the sales level.
+  \end{industry}
+  \begin{alertblock}{The honest caveat}
+    \footnotesize MMM estimates \emph{association}, so turning a coefficient
+    into a budget decision is a judgement --- good teams cross-check it
+    against geo experiments or holdout regions.
+  \end{alertblock}
 \end{frame}
 
 
@@ -753,6 +816,11 @@
     between $42$ and $53$ extra units of sales, with $95\,\%$
     confidence.
   \end{numexample}
+  \begin{industry}[Marketing: what the controller actually asks for]
+    Before signing off a budget shift, finance asks for the \emph{interval},
+    not the point estimate: it shows whether the channel's payback is
+    comfortably positive or could plausibly be zero.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{A picture of the 95\% confidence interval}
@@ -979,6 +1047,11 @@
       \item there is \emph{no signal} to be found.
     \end{itemize}
   \end{alertblock}
+  \begin{industry}[Asset management: factor models]
+    Regress a fund's excess return on market, size and value factors: $R^2$
+    is the share of its movement explained by known factors --- the rest is
+    what the manager charges for.
+  \end{industry}
 \end{frame}
 
 
@@ -1593,6 +1666,12 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
     predictors fixed. Either level can serve as baseline; only the
     sign of $\hat\beta_j$ flips.
   \end{readme}
+  \begin{industry}[HR and legal: the adjusted pay gap]
+    Pay-equity audits regress $\log$(salary) on job grade, tenure,
+    performance and location \emph{plus} a protected-group dummy. That single
+    coefficient --- the gap remaining after the legitimate factors are held
+    fixed --- is the number HR and legal report to the board.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{$K$ levels: use $K-1$ dummies}
@@ -1698,6 +1777,11 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
     The slope in $X_1$ now depends on $X_2$ --- exactly the synergy we
     wanted to model.
   \end{readme}
+  \begin{industry}[Retail: price $\times$ promotion]
+    Price elasticity is not one number --- shoppers react far more strongly
+    to a cut that is also displayed. Pricing teams model
+    price $\times$ promotion, media teams TV $\times$ digital.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Interaction, drawn: one slope bends with the other predictor}
@@ -2282,6 +2366,11 @@ print("outliers:", outliers)              # 11 tracts, max |stud| = 4.0
   \end{takeaway}
   Curiously, predictions are usually fine; only the inferential
   interpretation of individual coefficients is corrupted.
+  \begin{industry}[Marketing mix modelling: channels move together]
+    Campaign weeks raise TV, digital and in-store spend at once, so channel
+    coefficients are barely identified: one turns negative, the next refresh
+    flips it back. Check VIFs before anyone reallocates budget on them.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Collinearity, seen: two predictors that move together}

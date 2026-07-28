@@ -68,6 +68,10 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
+% Industry application callout box --- slate grey, for real business/industry use
+\definecolor{industryC}{RGB}{88,98,116}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -158,6 +162,51 @@
           Smarket, NCI60) and the type of question each illustrates.
     \item \textbf{Set up} the Python tooling we will use throughout.
   \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Where this chapter is used in industry}
+  \scriptsize
+  \begin{center}
+  \begin{tabular}{@{}p{2.2cm}p{6.0cm}p{5.0cm}@{}}
+    \toprule
+    \textbf{Sector} & \textbf{Concrete application} & \textbf{Decision it drives} \\
+    \midrule
+    Retail & Weekly demand forecast per article and store & Replenishment orders, safety stock, allocation \\
+    Banking & Credit scoring at application; expected credit loss (IFRS~9) & Accept / decline, credit limit, loan-loss provisions \\
+    Insurance & Claim frequency and severity modelling & Premium rates and technical reserves \\
+    Manufacturing, aviation & Predictive maintenance from sensor and usage data & When to service a part before it fails \\
+    Telco, SaaS & Churn score per subscriber & Who receives a retention offer \\
+    E-commerce, streaming & Recommendation and search ranking & What the customer is shown next \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{industry}[The common thread]
+    Every row needs the same three things: a response worth predicting, predictors that are
+    \emph{available before} the decision, and a decision that changes when the number changes.
+    Without the third, the model is a report, not a tool.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{Industry case in depth: predictive maintenance at a manufacturer}
+  \footnotesize
+  \begin{industry}[The learning problem]
+    \textbf{Response} $Y$: will this asset need an intervention within the next $N$ operating
+    days or cycles? --- binary, supervised and heavily imbalanced. \textbf{Predictors}:
+    telemetry aggregates (vibration, temperature, pressure), operating hours and load,
+    maintenance and fault history, asset age, ambient conditions.
+  \end{industry}
+  \begin{readme}[The fitted output --- and who signs it off]
+    A \emph{risk score per asset per period}, not a failure date. The decision: pull the asset
+    into the next planned maintenance window, or let it run. Maintenance planning and
+    reliability engineering own the score; operations sign off, because an intervention costs
+    production time.
+  \end{readme}
+  \begin{takeaway}[One honest caveat]
+    Failures are rare, so labels are scarce --- and every failure the model prevents is a
+    \emph{censored} observation nobody can confirm: its own success degrades its future
+    training data. The value lies in the decision it changes, not in the score.
+  \end{takeaway}
 \end{frame}
 
 
@@ -281,6 +330,10 @@
             pattern recognition, predictive analytics.
     \end{itemize}
   \end{readme}
+  \begin{industry}[Which half a firm's questions fall into]
+    Supervised, because the outcome was recorded: churn scores, credit decisions, demand
+    forecasts. Unsupervised: segmentation, anomaly detection --- no label, so no ``accuracy''.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{The taxonomy of statistical learning}
@@ -465,6 +518,12 @@ you hand over is $\hat Y$ itself or the shape of $f$.}
       \item \textbf{NCI60}: unsupervised, structure discovery.
     \end{itemize}
   \end{takeaway}
+  \begin{industry}[The same three flavours at work]
+    A \emph{Wage}-type question is a pay-equity or compensation review --- the coefficient is
+    the deliverable. A \emph{Smarket}-type question is a trading or forecasting signal with a
+    very low signal-to-noise ratio. An \emph{NCI60}-type question is segmenting customers or
+    products where no label exists.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Example 1: Wage --- a regression problem}
@@ -736,6 +795,11 @@ type of $Y$ matters.}
     identical --- only the syntax changes. We will use Python
     throughout.
   \end{readme}
+  \begin{industry}[The production stack --- not just the teaching stack]
+    pandas, scikit-learn and statsmodels are the default analytics stack in banks, insurers
+    and retailers: \texttt{statsmodels} where a coefficient has to be defended,
+    \texttt{scikit-learn} where a score has to be produced every night.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{The core scientific stack}
@@ -827,6 +891,12 @@ yhat = model.predict(X)         # predicted wage for each row
     files. Most are tabular and modest in size --- chosen to run on a
     laptop in seconds.
   \end{takeaway}
+  \begin{industry}[Why company data never arrives this tidy]
+    The equivalent table does not exist in a firm: it has to be built by joining warehouse
+    tables \emph{as of the decision date}, and most of a project's time goes into that join.
+    Pulling in a field that was only recorded \emph{after} the decision is the classic
+    leakage bug --- the model looks excellent in testing and fails in production.
+  \end{industry}
 \end{frame}
 
 
@@ -1012,6 +1082,11 @@ A regional bank has records on \textbf{20{,}000} past personal-loan customers. F
       \item Re-using the test set during model selection.
     \end{enumerate}
   \end{alertblock}
+  \begin{industry}[What actually kills a model project in a firm]
+    Target leakage from fields written after the decision; training on a population different
+    from the one being scored; nobody owning the model once it is live; and a score nobody can
+    explain to a regulator or to a sales director.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Self-check questions}

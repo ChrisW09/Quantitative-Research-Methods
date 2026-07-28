@@ -78,6 +78,10 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
+% Industry application callout box --- slate grey, for real business/industry use
+\definecolor{industryC}{RGB}{88,98,116}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -234,6 +238,67 @@
 \end{frame}
 
 
+\begin{frame}{Where this chapter is used in industry}
+  \scriptsize
+  \begin{center}
+  \begin{tabular}{@{}p{2.3cm}p{4.7cm}p{5.4cm}@{}}
+    \toprule
+    \textbf{Sector} & \textbf{Concrete application} & \textbf{What it delivers / decision it drives} \\
+    \midrule
+    Manufacturing & Statistical process control: a chart on a critical
+      dimension, limits at $\pm 3\sigma$ &
+      Flags a drifting process before it makes scrap: stop the line, or keep
+      running \\
+    Insurance & Claim severity is strongly right-skewed, so the mean sits
+      above the typical claim &
+      Median and upper quantiles inform reserving and where reinsurance
+      attaches \\
+    E-commerce & Online A/B test of a checkout or ranking change &
+      Ship the variant or roll it back; the test size fixes the smallest
+      effect worth chasing \\
+    Market research & Brand and satisfaction trackers on a sample of a few
+      hundred to a few thousand &
+      The ``margin of error'' says which movements in the tracker are real \\
+    Supplier quality & Acceptance sampling of an incoming lot against an
+      agreed plan &
+      Accept or reject the lot from a sample, at an agreed producer and
+      consumer risk \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{industry}[The common thread]
+    Every row is the same two-step move: \emph{describe} what the data show,
+    then quantify \emph{how much of it could be noise}.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{Industry case in depth: an online A/B test}
+  \footnotesize
+  A retailer wants to know whether a redesigned checkout page raises the
+  purchase rate. This is a hypothesis test, run as an experiment.
+  \begin{industry}[The set-up]
+    \textbf{Response} $y_i$: did session $i$ end in a purchase (0/1)?
+    \textbf{Unit of randomisation}: the visitor, not the session --- otherwise
+    the same person sees both designs. \textbf{Fixed before launch}: the
+    primary metric, the segments to be reported (device, new vs.\ returning,
+    market), the run length, and the smallest effect worth acting on.
+  \end{industry}
+  \begin{numexample}[Illustrative sizing]
+    The rule of thumb for $80\%$ power at $\alpha = 0.05$ is
+    $n \approx 16\,\pi(1-\pi)/\delta^2$ per arm. At a baseline of $\pi=2.5\%$,
+    detecting a relative lift of $10\%$ ($\delta = 0.0025$) needs tens of
+    thousands of visitors per arm --- which is why small sites cannot test
+    small effects.
+  \end{numexample}
+  \begin{takeaway}[Who signs off --- and the honest caveat]
+    The product owner, plus a central experimentation platform that enforces
+    the pre-registration. Caveat: stopping the test the first time it looks
+    significant (``peeking''), or reporting whichever of twenty metrics moved,
+    breaks the $5\%$ guarantee --- the problem of Chapter 13.
+  \end{takeaway}
+\end{frame}
+
+
 % ============================================================
 \section{Data, variables and notation}
 % ============================================================
@@ -311,6 +376,11 @@
     Qualitative & counts, proportions & bar chart, contingency table \\
     \bottomrule
   \end{tabular}
+  \begin{industry}[ERP and CRM exports lie about types]
+    Plant codes, cost centres and customer segments arrive as \emph{numbers}.
+    Feed them in unchanged and the model reads ``plant 7 is seven times plant
+    1''. Recode nominal fields as dummies at load time.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Why the type matters in this course}
@@ -704,6 +774,10 @@
   closely ($r = 0.78$), newspaper spend barely ($r = 0.23$). The fourth is
   simulated data with an obvious, \emph{strong} relationship
   $y = x^2 + \varepsilon$ --- and $r = 0.08$. \textbf{Always plot the data.}
+  \begin{industry}[KPI dashboards: the correlation-matrix trap]\scriptsize
+    A threshold or curved effect reads as $r \approx 0$, and a shared driver ---
+    season, a price change, a campaign --- makes unrelated KPIs move together.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Anscombe's quartet: four data sets, one set of statistics}
@@ -1156,6 +1230,10 @@
   from the mean is unusual (about 1 in 20), and ``estimate
   $\pm\,1.96\,\mathrm{SE}$'' is a 95\% interval. That same $1.96$ appears in
   every confidence interval and every two-sided 5\% test in this course.
+  \begin{industry}[Manufacturing: the arithmetic behind Six Sigma]\scriptsize
+    Process-control charts set limits at $\pm 3\sigma$: an in-control process
+    rarely trips the alarm, while a real shift in the process trips it fast.
+  \end{industry}
 \end{frame}
 
 
@@ -1543,6 +1621,10 @@
   $e_i = y_i - \hat y_i$ that least squares squares and adds up. Right: a
   residual plot --- structure here (curvature, a funnel) means the model is
   missing something. Both plots return in Chapter 3.
+  \begin{industry}[Marketing: the first-pass driver analysis]\scriptsize
+    Sales on advertising spend starts most marketing-mix conversations --- and
+    is not causal: spend rises in strong seasons, so the slope absorbs the season.
+  \end{industry}
 \end{frame}
 
 

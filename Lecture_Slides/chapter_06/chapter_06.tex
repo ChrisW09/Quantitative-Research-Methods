@@ -72,6 +72,10 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
+% Industry application callout box --- slate grey, for real business/industry use
+\definecolor{industryC}{RGB}{88,98,116}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -215,6 +219,64 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{Where this chapter is used in industry}
+  \scriptsize
+  \begin{center}
+  \begin{tabular}{@{}p{2.9cm}p{4.9cm}p{4.4cm}@{}}
+    \toprule
+    \textbf{Sector} & \textbf{Concrete application} & \textbf{What it delivers} \\
+    \midrule
+    Banking &
+      Attribute shortlisting for a credit \mbox{scorecard} &
+      A 10--15 attribute card that can be monitored \\
+    Pharma, food, chemicals &
+      PLS on near-infrared spectra (hundreds of wavelengths) &
+      Concentration or quality without the slow lab assay \\
+    Manufacturing, energy &
+      Ridge on collinear sensor and telemetry channels &
+      Stable coefficients for a yield or load prediction \\
+    Marketing &
+      Mix model where channel spends move together &
+      A defensible budget reallocation \\
+    Health, biotech &
+      Lasso screening of gene-expression features &
+      A shortlist worth a follow-up study \\
+    Quantitative finance &
+      Sparse selection among candidate return predictors &
+      A parsimonious signal set, not fitted noise \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{industry}[The common thread]
+    Wide, correlated data plus a business need for a model small enough to
+    explain --- that is what regularisation delivers.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{Industry case in depth: near-infrared spectroscopy and PLS}
+  \footnotesize
+  \begin{industry}[The setting]
+    A plant needs the active-ingredient concentration of a blend, and the
+    reference method is a slow destructive lab assay.
+    \textbf{Response:} the reference value (\% w/w).
+    \textbf{Predictors:} absorbance at several hundred NIR wavelengths,
+    adjacent ones nearly identical, on calibration sets of only tens of
+    samples ($p \gg n$). \textbf{Output:} a PLS fit on a few components
+    ($M$ by CV), scored by root mean squared error of prediction.
+  \end{industry}
+  \begin{readme}[Which decision it feeds and who signs it off]
+    The calibration replaces routine lab testing: it feeds in-process
+    control and real-time release of a batch. QA and regulatory affairs
+    own the sign-off, because it forms part of a \emph{validated}
+    analytical method.
+  \end{readme}
+  \begin{takeaway}[The honest caveat]
+    Calibrations drift --- a new supplier or instrument moves the spectra,
+    so the model must be revalidated. And PLS mixes \emph{all}
+    wavelengths: it predicts without pointing at a cause.
+  \end{takeaway}
+\end{frame}
+
 
 % ============================================================
 \section{Subset Selection}
@@ -262,6 +324,11 @@
     --- scales to large $p$. Greedy: not guaranteed to find the best
     subset.
   \end{readme}
+  \begin{industry}[Banking: from a thousand candidate attributes to twelve]
+    Bureau files offer hundreds of candidate attributes; the scorecard that
+    ships has perhaps 10--15. Parsimony here is a monitoring and governance
+    requirement, not merely statistical taste.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Backward and hybrid stepwise}
@@ -613,6 +680,11 @@
     predictors are collinear, and (ii) \emph{lowers variance} by
     refusing to chase noise with large coefficients.
   \end{readme}
+  \begin{industry}[Manufacturing and energy: collinear sensors]
+    Process telemetry is full of channels that move together. Plain OLS
+    then returns huge, sign-flipping coefficients that move with every
+    data refresh; ridge returns a fit an engineer can act on.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{The ridge regression objective}
@@ -829,6 +901,10 @@
     In Python: \texttt{sklearn.linear\_model.RidgeCV} and
     \texttt{LassoCV} perform the grid search internally.
   \end{readme}
+  \begin{industry}[Wide SKU and customer feature tables]
+    With hundreds of engineered columns, $\lambda$ --- not the
+    coefficient list --- is what you defend.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Ridge vs.\ lasso vs.\ elastic net: when each wins}
@@ -856,6 +932,13 @@
     Try lasso first. If you see correlated predictors splitting their
     estimated effects, fall back to elastic net or ridge.
   \end{takeaway}
+  \begin{industry}[Quantitative finance: is the selected set stable?]
+    With many candidate predictors and a tiny signal-to-noise ratio,
+    shrinkage beats unconstrained least squares. But the lasso's chosen
+    \emph{set} is unstable under correlation --- so practitioners re-run
+    it over bootstrap samples and only believe a variable that survives
+    most of them.
+  \end{industry}
 \end{frame}
 
 
@@ -1019,6 +1102,10 @@
     Regularisation (ridge, lasso, elastic net), dimension reduction
     (PCR, PLS), and modern post-selection inference (Ch.~13).
   \end{takeaway}
+  \begin{industry}[Biomarker screening and health economics]
+    Biomarker studies have thousands of features on a few hundred
+    subjects; the lasso's job there is \emph{triage}.
+  \end{industry}
 \end{frame}
 
 \begin{frame}{Lasso in high dimensions}
