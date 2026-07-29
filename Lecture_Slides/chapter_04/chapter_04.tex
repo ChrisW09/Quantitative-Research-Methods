@@ -72,9 +72,14 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
+% Industry application callout box --- slate grey, for real business/industry use.
+% The title always prints the words "In industry", so the box does not rely on its
+% tint alone; every call passes an explicit title, so the default is never used.
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -308,12 +313,12 @@ calibrated probabilities in $(0,1)$ and treats the classes
 symmetrically --- exactly the gap that logistic regression (two
 classes) and its multinomial/softmax extension ($K>2$) fill in this
 chapter.
-
-\vspace{1mm}
-\emph{Common mistake: hoping a larger sample fixes the problem. No
-amount of data repairs an arbitrary coding --- the flaw sits in the
-model specification, not in sampling noise.}
 \end{solutionbox}
+\begin{mistake}
+hoping a larger sample fixes the problem. No
+amount of data repairs an arbitrary coding --- the flaw sits in the
+model specification, not in sampling noise.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Where this chapter is used in industry}
@@ -359,16 +364,21 @@ model specification, not in sampling noise.}
     \textbf{Predictors:} utilisation, months since last delinquency, recent
     bureau enquiries, income and tenure, loan-to-value.
   \end{industry}
+  \vspace{-3mm}
   \begin{numexample}[The fitted output (illustrative)]
     Utilisation gets a positive coefficient, a delinquency-free year a negative
     one; scorecards rescale the log-odds into points calibrated so that a fixed
     number of points \emph{doubles the odds}.
   \end{numexample}
+  \vspace{-3mm}
   \begin{readme}[Which decision --- and who signs off]
     The PD drives the cut-off, the rate offered, IFRS 9 expected credit loss
     ($\text{PD}\times\text{LGD}\times\text{EAD}$) and Basel capital --- and an independent
     validation function, not the analyst, signs it off (SR 11-7, ECB TRIM).
+    Day to day it is the credit-committee member and the branch lead who live
+    with that cut-off.
   \end{readme}
+  \vspace{-3mm}
   \begin{takeaway}[Why logistic regression --- and one caveat]
     A declined applicant must be told \emph{why}: adverse-action reason codes
     under US ECOA/Reg B come straight from the coefficients. Caveat: the data
@@ -525,12 +535,12 @@ solve the linear equation
 \textbf{Interpretation.} Under a $0.5$ threshold the model flags
 customers above $\approx\$1{,}936$; at \$1{,}500 our customer sits
 clearly on the safe side with $p\approx 8\%$.
-
-\vspace{1mm}
-\emph{Common mistake: reading $\eta=-2.40$ itself as a probability.
-Log-odds must first be pushed through the sigmoid --- probabilities can
-never be negative.}
 \end{solutionbox}
+\begin{mistake}
+reading $\eta=-2.40$ itself as a probability.
+Log-odds must first be pushed through the sigmoid --- probabilities can
+never be negative.
+\end{mistake}
 \end{frame}
 
 \subsection{Estimating the coefficients}
@@ -670,13 +680,13 @@ log-odds, so no constant probability effect exists.
 \]
 Same odds ratio, very different probability moves --- which is why the
 odds scale is the one with a clean single-number interpretation.
-
-\vspace{1mm}
-\emph{Common mistake: reporting part (1) as ``students are $47.6\%$
+\end{solutionbox}
+\begin{mistake}
+reporting part (1) as ``students are $47.6\%$
 less likely to default''. The reduction is in the \emph{odds}, not the
 probability; the two only coincide approximately when the event is
-rare.}
-\end{solutionbox}
+rare.
+\end{mistake}
 \end{frame}
 
 \subsection{Multiple predictors and confounding}
@@ -927,12 +937,12 @@ $L(\beta)=\prod_{y_i=1}p(x_i)\prod_{y_i=0}\bigl(1-p(x_i)\bigr)$
 (equivalently minimise the cross-entropy $-\log L$). There is no closed
 form, so software solves it numerically (Newton / IRLS) --- conceptually,
 pick the coefficients that make the observed Yes/No pattern most probable.
-
-\vspace{1mm}
-\emph{Common mistake: plugging income in dollars. $\beta_2=0.003$ is
-per \$1{,}000, so use $0.003\times 40$, not $0.003\times 40{,}000$ ---
-the latter adds $120$ to $\eta$ and drives every probability to $1$.}
 \end{solutionbox}
+\begin{mistake}
+plugging income in dollars. $\beta_2=0.003$ is
+per \$1{,}000, so use $0.003\times 40$, not $0.003\times 40{,}000$ ---
+the latter adds $120$ to $\eta$ and drives every probability to $1$.
+\end{mistake}
 \end{frame}
 
 % ============================================================
@@ -1309,13 +1319,13 @@ data per class.
 in classifier form: QDA is the ``more flexible'' model, and whether its
 lower bias pays depends on how much data must stretch across
 $K$ covariance matrices.
-
-\vspace{1mm}
-\emph{Common mistake: counting $p^2$ entries per covariance matrix ---
+\end{solutionbox}
+\begin{mistake}
+counting $p^2$ entries per covariance matrix ---
 symmetry roughly halves the count to $p(p+1)/2$. And remember QDA's
 count grows with $K$: many classes with few observations each is its
-worst case.}
-\end{solutionbox}
+worst case.
+\end{mistake}
 \end{frame}
 
 \subsection{Naive Bayes}
@@ -1413,13 +1423,13 @@ assumption is usually false (e.g.\ e-mails containing \emph{free}
 disproportionately also contain links), so the posterior
 probabilities are miscalibrated --- yet the \emph{ranking} of
 observations is often still good enough to classify well.
-
-\vspace{1mm}
-\emph{Common mistake: dropping the prior and normalising the
+\end{solutionbox}
+\begin{mistake}
+dropping the prior and normalising the
 likelihoods alone --- $0.42/(0.42+0.02)\approx 0.955$ overstates the
 spam probability. The prior matters; with rare positives it can flip
-the decision outright.}
-\end{solutionbox}
+the decision outright.
+\end{mistake}
 \end{frame}
 
 
@@ -1627,9 +1637,10 @@ feature type --- then confirm the choice with held-out AUC.
     \end{tikzpicture}
   \end{center}
   \begin{takeaway}
-    Green cells are correct decisions, red cells are the two error types.
-    Sensitivity reads down the true-positive column; specificity down the
-    true-negative column; precision across the predicted-positive row.
+    The diagonal cells --- TP and TN --- are the correct decisions; FP and
+    FN are the two error types. Sensitivity reads down the true-positive
+    column; specificity down the true-negative column; precision across the
+    predicted-positive row.
   \end{takeaway}
 \end{frame}
 
@@ -1699,14 +1710,14 @@ of the next exercise.
 \textbf{Takeaway.} On imbalanced data always report the pair
 (sensitivity, specificity) --- accuracy alone can be matched by a
 classifier that does nothing.
-
-\vspace{1mm}
-\emph{Common mistake: mixing up sensitivity and precision. Both have
+\end{solutionbox}
+\begin{mistake}
+mixing up sensitivity and precision. Both have
 TP on top, but sensitivity divides by the \emph{actual} positives
 ($\mathrm{TP+FN}=333$) while precision divides by the \emph{predicted}
 positives ($\mathrm{TP+FP}=104$) --- here $24.3\%$ vs.\ $77.9\%$, a
-huge difference.}
-\end{solutionbox}
+huge difference.
+\end{mistake}
 \end{frame}
 
 \subsection{ROC and AUC}
@@ -1845,12 +1856,12 @@ a random defaulter above a random non-defaulter. It integrates over
 \emph{all} thresholds, so it summarises ranking quality independently of
 any single cutoff --- $0.5$ is random guessing, $1$ is a perfect
 ranking.
-
-\vspace{1mm}
-\emph{Common mistake: expecting the AUC to improve after lowering the
-threshold. Threshold changes slide the operating point \emph{along} the
-curve; they can never move the curve --- only a better model can.}
 \end{solutionbox}
+\begin{mistake}
+expecting the AUC to improve after lowering the
+threshold. Threshold changes slide the operating point \emph{along} the
+curve; they can never move the curve --- only a better model can.
+\end{mistake}
 \end{frame}
 
 % ---------------- Extended Exercise 4.5 ----------------
@@ -1880,7 +1891,7 @@ from sklearn.metrics import (confusion_matrix, roc_auc_score,
                              RocCurveDisplay)        # evaluation tools
 import matplotlib.pyplot as plt                      # plotting
 
-df = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Default.csv")  # load
+df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Default.csv")  # load
 y  = (df["default"] == "Yes").astype(int)          # encode response as 0/1
 df["stud"] = (df["student"] == "Yes").astype(int)  # dummy-code student
 X  = df[["balance", "income", "stud"]].values      # predictor matrix
@@ -1953,9 +1964,9 @@ matrix as $[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
   \begin{labnote}[Companion notebook: \texttt{chapter\_04\_lab.ipynb}]
     The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
     \begin{itemize}
-      \item logistic regression and predicted probabilities;
-      \item LDA, QDA, naive Bayes and KNN head-to-head, with ROC curves;
-      \item Poisson regression on the Bikeshare data.
+      \item \S1 \emph{Logistic regression}, including \emph{Predicted probabilities};
+      \item \S2 \emph{LDA, QDA, naive Bayes, KNN --- head-to-head}, and its \emph{ROC curves} subsection;
+      \item \S3 \emph{Poisson regression on Bikeshare}.
     \end{itemize}
     Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
   \end{labnote}
@@ -2054,7 +2065,7 @@ import pandas as pd                                  # data handling
 from sklearn.linear_model import LogisticRegression  # classifier
 from sklearn.metrics import confusion_matrix         # evaluation
 
-df = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Default.csv")  # load
+df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Default.csv")  # load
 y  = (df["default"] == "Yes").astype(int)          # encode response as 0/1
 df["stud"] = (df["student"] == "Yes").astype(int)  # dummy-code student
 X  = df[["balance", "income", "stud"]].values      # predictor matrix
@@ -2121,7 +2132,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-wk = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Weekly.csv")  # load
+wk = pd.read_csv("../ALL CSV FILES - 2nd Edition/Weekly.csv")  # load
 y  = (wk["Direction"] == "Up").astype(int)            # encode Up=1, Down=0
 lags = ["Lag1","Lag2","Lag3","Lag4","Lag5","Volume"]  # predictor names
 
@@ -2284,15 +2295,19 @@ no basis for trading once transaction costs are included.
 \begin{frame}{Self-check questions}
   \begin{enumerate}
     \item Why does ordinary linear regression fail for binary $Y$?
+          (p.~11)
     \item In the Default data, why does \texttt{student} flip sign
-          once \texttt{balance} is included?
+          once \texttt{balance} is included? (pp.~33--34)
     \item Derive the LDA discriminant from Bayes' rule, assuming
           $X \mid Y = k \sim \mathcal{N}(\mu_k, \Sigma)$.
+          (pp.~47--49; step-by-step in the appendix, pp.~117--119)
     \item When does naive Bayes outperform logistic regression even
-          though its independence assumption is wrong?
+          though its independence assumption is wrong? (pp.~62 and~67)
     \item Sketch a confusion matrix for a fraud detector with $99\,\%$
           accuracy on data with $1\,\%$ fraud. Is it useful?
+          (pp.~73--75)
     \item Explain ROC and AUC. What does a $45^\circ$ ROC mean?
+          (pp.~80--82)
   \end{enumerate}
 \end{frame}
 
@@ -2572,13 +2587,13 @@ The prior favours N by $4\times$, but the features favour D by $12\times$;
 net, D is $3\times$ as likely, i.e.\ $\Pr(\text{D})=3/(3+1)=3/4$. The
 three ``Yes'' features --- above all the high balance and the late
 payment, each far more common under D --- swamp the base rate.
-
-\vspace{1mm}
-\emph{Common mistake: normalising the likelihoods alone and dropping the
+\end{solutionbox}
+\begin{mistake}
+normalising the likelihoods alone and dropping the
 prior. That gives $0.144/(0.144+0.012)\approx 0.92$ instead of the
 correct $0.75$ --- overstating default because it forgets that
-non-defaulters are $4\times$ more common to begin with.}
-\end{solutionbox}
+non-defaulters are $4\times$ more common to begin with.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Solution \textemdash{} Extended Exercise 4.3 (3/3)}

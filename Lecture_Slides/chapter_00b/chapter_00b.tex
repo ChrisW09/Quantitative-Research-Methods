@@ -80,7 +80,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -228,6 +231,7 @@
 \begin{frame}{Industry case in depth: price elasticity of demand}
   \footnotesize
   A retailer or an airline needs one number: how much volume a price rise costs.
+  \vspace{-6pt}
   \begin{industry}[The model]
     \textbf{Response}: $\log(\text{units sold})$, per product and week.
     \textbf{Predictors}: $\log(\text{price})$ plus controls --- a promotion
@@ -236,6 +240,7 @@
     regression \emph{is} the elasticity --- read straight off the output,
     nothing to transform back.
   \end{industry}
+  \vspace{-6pt}
   \begin{numexample}[Illustrative]
     An estimated $\beta_1 \approx -1.8$ says a $1\%$ price rise costs about
     $1.8\%$ of volume. For a bigger move the multiplicative form is the honest
@@ -244,9 +249,11 @@
     whole calculation: above $1$ demand is elastic and a price rise loses
     revenue; below $1$ it gains.
   \end{numexample}
+  \vspace{-6pt}
   \begin{takeaway}[Who signs off --- and the honest caveat]
     Pricing or category management own the list price, promotion depth and
-    fare-class prices; finance checks the margin. Caveat: past prices were cut
+    fare-class prices; finance checks the margin. The number itself lands with
+    the category manager setting next season's price ladder. Caveat: past prices were cut
     \emph{because} demand was weak, so the estimate is confounded unless it
     comes from experiments or genuinely exogenous price moves --- and never
     extrapolate to a price never tried.
@@ -399,12 +406,12 @@
     $\bigl(\sum_i (y_i - \hat y_i)\bigr)^2 = (1 - 1 + 0)^2 = 0$. Squaring
     first keeps the errors from cancelling --- which is the whole reason
     least squares squares.
-
-    \medskip
-    \textit{Common mistake:} writing $\min$ when $\arg\min$ is meant.
+  \end{solutionbox}
+  \begin{mistake}
+    Writing $\min$ when $\arg\min$ is meant.
     Every estimator ahead is an $\arg\min$: $\hat\beta$ is the
     \emph{coefficient value} that minimises RSS, never the RSS value itself.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 
@@ -514,12 +521,12 @@
     single zero destroys the column. Common fixes: model $\log(y + 1)$; use a
     square root instead; or --- best --- use a model built for the data type,
     such as the Poisson regression of Chapter 4 for counts.
-
-    \medskip
-    \textit{Common mistake:} inventing a rule for sums. $\log(a+b)$
+  \end{solutionbox}
+  \begin{mistake}
+    Inventing a rule for sums. $\log(a+b)$
     simplifies to nothing --- the log rules turn \emph{products} into sums;
     there is no rule for the log of a sum.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 
@@ -630,12 +637,12 @@
 
     \textbf{(5)} $p = \sigma(-1.4) = 1/(1 + e^{1.4}) = 1/(1+4.055) =
     \mathbf{0.198}$, about $20\%$.
-
-    \medskip
-    \textit{Common mistake:} reading odds as probabilities. Odds of $0.818$
+  \end{solutionbox}
+  \begin{mistake}
+    Reading odds as probabilities. Odds of $0.818$
     do not mean ``$82\%$'' --- convert back with
     $p = \mathrm{odds}/(1+\mathrm{odds}) = 0.45$.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 
@@ -1101,16 +1108,20 @@ for degree in range(1, 6):
 \begin{frame}{Self-check questions}
   \begin{enumerate}
     \item Read $\frac{1}{n}\sum_{i=1}^{n} I(y_i \ne \hat y_i)$ aloud, in words.
-    \item What is the difference between $\min_\theta f$ and $\arg\min_\theta f$?
-    \item Simplify $\log(a^2 b) - 2\log a$.
-    \item A logistic coefficient is $-0.7$. What happens to the odds?
-    \item Convert log-odds $+1.6$ into a probability.
-    \item Why is a log-likelihood a sum when a likelihood is a product?
+          (pp.~10 and 12)
+    \item What is the difference between $\min_\theta f$ and
+          $\arg\min_\theta f$? (p.~12)
+    \item Simplify $\log(a^2 b) - 2\log a$. (p.~17)
+    \item A logistic coefficient is $-0.7$. What happens to the odds? (p.~23)
+    \item Convert log-odds $+1.6$ into a probability. (p.~23)
+    \item Why is a log-likelihood a sum when a likelihood is a product? (p.~30)
     \item Under what assumption is least squares equivalent to maximum
-          likelihood?
+          likelihood? (appendix, p.~53)
     \item How many models does best-subset selection fit with $p = 20$?
-    \item What does \texttt{np.argmin} return --- and what does it not return?
-    \item Name two things that must never be fitted on the test set.
+          (appendix, p.~57)
+    \item What does \texttt{np.argmin} return --- and what does it not
+          return? (p.~12)
+    \item Name two things that must never be fitted on the test set. (p.~38)
   \end{enumerate}
 \end{frame}
 
@@ -1139,9 +1150,10 @@ for degree in range(1, 6):
   \end{itemize}
   \begin{labnote}[Companion notebook]
     \texttt{Lab\_Notebooks/chapter\_00b\_lab.ipynb} runs everything in this
-    deck: the logit conversions, a likelihood maximised by hand and by
-    \texttt{scipy}, the $2^p$ count, and a complete
-    split/fit/score experiment on \texttt{Auto}.
+    deck: the logit conversions (\S3), a likelihood maximised by hand and by
+    \texttt{scipy} (\S4), the $2^p$ count (\S5), and a complete
+    split/fit/score experiment on \texttt{Auto} (\S6,
+    \emph{The Python patterns every lab uses}).
   \end{labnote}
 \end{frame}
 
@@ -1263,12 +1275,12 @@ for degree in range(1, 6):
     numerically --- by walking uphill, exactly the gradient method of
     Part (a). Note also that $-\ell$ is the ``binary cross-entropy'' loss of
     Chapter 10: the same quantity under a different name.
-
-    \medskip
-    \textit{Common mistake:} treating $\hat\pi = k/n$ as exact. With $k=0$
+  \end{solutionbox}
+  \begin{mistake}
+    Treating $\hat\pi = k/n$ as exact. With $k=0$
     the MLE announces ``defaults are impossible'' --- an estimate inherits the
     sample's noise and needs a standard error, not blind faith.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{How many models are there?}
@@ -1344,13 +1356,13 @@ for degree in range(1, 6):
     sample well by luck, so its $R^2$ is optimistic and it may not generalise.
     That is \textbf{multiple testing} (Chapter 13), and it is also why model
     choice must be judged on held-out data (Chapter 5).
-
-    \medskip
-    \textit{Common mistake:} assuming the $22$ stepwise fits search the same
+  \end{solutionbox}
+  \begin{mistake}
+    Assuming the $22$ stepwise fits search the same
     space as the $64$. Stepwise follows one \emph{path} through the subsets,
     so it can miss the best model --- the speed is bought with a restricted
     search.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \end{document}

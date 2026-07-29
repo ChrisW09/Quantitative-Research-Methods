@@ -77,7 +77,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -214,7 +217,7 @@
 
 \begin{frame}{Industry case in depth: an item-to-item recommender}
   \footnotesize
-  \begin{industry}[The learning problem --- this chapter's own method]
+  \begin{industry}[The learning problem: this chapter's own method]
     There is no coefficient to estimate: the ``model'' is a \emph{nearest-neighbour lookup} in
     a similarity space built from co-purchase and co-view behaviour, or from learned item
     embeddings. $K$ is simply how many neighbours are retrieved for the item on the page.
@@ -222,7 +225,9 @@
   \begin{readme}[The fitted output --- and who signs it off]
     A \emph{ranked slate} of items, which fills the recommendation module on the product page
     or the home screen. Only the ordering matters --- nothing in this model is interpretable,
-    and nobody asks it to be. Merchandising and personalisation own the module.
+    and nobody asks it to be. Merchandising and personalisation own the module, and the
+    slate is judged by the category merchandiser who carries its revenue target --- whose
+    challenge is almost always ``why is my range never shown?''.
   \end{readme}
   \begin{takeaway}[Honest caveats]
     Wide sparse behaviour vectors put the curse of dimensionality centre stage --- hence
@@ -273,8 +278,8 @@
   \begin{center}
     \includegraphics[width=0.92\textwidth,height=0.66\textheight,keepaspectratio]{2_2.pdf}
   \end{center}
-  Income vs.\ years of education. The blue curve is the \emph{true}
-  $f$ --- in real data we never see it.
+  Income vs.\ years of education. The smooth curve added on the right is the
+  \emph{true} $f$ --- in real data we never see it.
   \islpsource{Figure 2.2}
 \end{frame}
 
@@ -461,7 +466,7 @@
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.66\textheight,keepaspectratio]{2_4.pdf}
   \end{center}
-  The yellow plane is the linear regression estimate. It captures the
+  The flat plane is the linear regression estimate. It captures the
   main increasing trends but misses the curvature --- this is
   \emph{bias} from a misspecified functional form.
   \islpsource{Figure 2.4}
@@ -493,7 +498,7 @@
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.66\textheight,keepaspectratio]{2_5.pdf}
   \end{center}
-  The yellow surface is now curved, matching the true $f$ much more
+  The fitted surface is now curved, matching the true $f$ much more
   closely. No misspecification bias --- this is what you want when you
   do not know the functional form.
   \islpsource{Figure 2.5}
@@ -569,12 +574,13 @@
         very flexible fit risks high \emph{variance}/overfitting --- so
         pick the smoothing by cross-validation.
 \end{enumerate}
-\smallskip
-{\itshape Common mistake: equating ``nonlinear'' with
+\end{solutionbox}
+\begin{mistake}
+Equating ``nonlinear'' with
 ``nonparametric''. A cubic polynomial is curved yet fully parametric
 --- what matters is whether the form and its parameter count are fixed
-before seeing the data.}
-\end{solutionbox}
+before seeing the data.
+\end{mistake}
 \end{frame}
 
 
@@ -708,12 +714,13 @@ before seeing the data.}
         (or a short path of splits) provide the per-case justification
         the regulation demands.
 \end{enumerate}
-\smallskip
-{\itshape Common mistake: reading the flexibility ranking in part 1 as
+\end{solutionbox}
+\begin{mistake}
+Reading the flexibility ranking in part 1 as
 a quality ranking. The U-shaped test error means the best method
 depends on the data and the goal --- ``more flexible'' is not
-``better'' by default.}
-\end{solutionbox}
+``better'' by default.
+\end{mistake}
 \end{frame}
 
 
@@ -824,11 +831,12 @@ depends on the data and the goal --- ``more flexible'' is not
 
 \begin{frame}{Reading the simulation}
   \begin{readme}
-    Left: simulated data (black dots), the true $f$ (black), and
-    three fits: linear (orange), moderate spline (blue), and very
-    flexible spline (green).\\
-    Right: training MSE (grey) and test MSE (red) as a function of
-    flexibility.
+    Left: simulated data (open circles), the true $f$ (the smooth black
+    curve), and three fits: a straight line (orange), a moderate spline that
+    almost coincides with the truth (blue), and a very flexible spline that
+    wiggles through the noise (green).\\
+    Right: the training MSE is the curve that only falls; the test MSE is the
+    U-shaped one.
   \end{readme}
   \begin{takeaway}[Three observations]
     \begin{itemize}
@@ -899,12 +907,13 @@ depends on the data and the goal --- ``more flexible'' is not
   \item \textbf{Overfitting:} when a model has low training error but
         high test error because it has fit noise rather than signal.
 \end{enumerate}
-\smallskip
-{\itshape Common mistake: treating zero training error as proof that
+\end{solutionbox}
+\begin{mistake}
+Treating zero training error as proof that
 the model has ``learned the data''. It has \emph{memorised} them ---
 interpolation is not generalisation, and only performance on unseen
-data counts.}
-\end{solutionbox}
+data counts.
+\end{mistake}
 \end{frame}
 
 
@@ -1021,10 +1030,10 @@ data counts.}
     \includegraphics[width=0.95\textwidth,height=0.66\textheight,keepaspectratio]{2_12.pdf}
   \end{center}
   \footnotesize
-  Solid blue: bias squared. Solid orange: variance. Solid red: test
-  MSE = bias$^2$ + variance + $\sigma^2$. Horizontal dashed line: the
-  irreducible $\sigma^2$. Vertical dotted line: the flexibility that
-  minimises test MSE.
+  The curve that falls is the squared bias (\emph{Bias} in the legend); the
+  one that rises is the variance (\emph{Var}); their sum plus $\sigma^2$ is
+  the U-shaped test MSE (\emph{MSE}). Horizontal dashed line: the irreducible
+  $\sigma^2$. Vertical dotted line: the flexibility that minimises test MSE.
   \islpsource{Figure 2.12}
 \end{frame}
 
@@ -1111,12 +1120,13 @@ The expected test MSE at a point $x_0$ decomposes as
         noise $\mathrm{Var}(\varepsilon)$: even the true $f$, known
         exactly, would still miss new observations by their noise.
 \end{enumerate}
-\smallskip
-{\itshape Common mistake: forgetting to square the bias (adding $-1.0$
+\end{solutionbox}
+\begin{mistake}
+Forgetting to square the bias (adding $-1.0$
 or $-0.2$ directly), or expecting a negative bias to \emph{lower} the
 MSE. Only $\mathrm{Bias}^2$ enters, so the sign is irrelevant ---
-systematic over- and under-prediction hurt equally.}
-\end{solutionbox}
+systematic over- and under-prediction hurt equally.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Exercise 2.5 --- Reading the U-shaped Test-Error Curve [Concept]}
@@ -1172,12 +1182,13 @@ horizontal dashed line at the bottom.
         \emph{estimates} the test-error curve from the training data
         alone, without sacrificing a large held-out set.
 \end{enumerate}
-\smallskip
-{\itshape Common mistake: picking the flexibility where the
+\end{solutionbox}
+\begin{mistake}
+Picking the flexibility where the
 \emph{training}-error curve flattens out. The training curve contains
 no information about the U's minimum --- only validation or test error
-does.}
-\end{solutionbox}
+does.
+\end{mistake}
 \end{frame}
 
 
@@ -1411,11 +1422,12 @@ $\arg\max_k p_k(x)$ --- the majority class among cases with that $x$
         The Bayes error is the classification analogue of the
         irreducible error $\mathrm{Var}(\varepsilon)$.
 \end{enumerate}
-\smallskip
-{\itshape Common mistake: averaging the three local errors without the
-weights, $(0.2+0.4+0.5)/3\approx0.367$ --- wrong, because the three
-$x$-values are not equally likely ($x=1$ occurs half the time).}
 \end{solutionbox}
+\begin{mistake}
+Averaging the three local errors without the
+weights, $(0.2+0.4+0.5)/3\approx0.367$ --- wrong, because the three
+$x$-values are not equally likely ($x=1$ occurs half the time).
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Exercise 2.7 --- KNN by Hand, $K=1$ and $K=3$ [Math]}
@@ -1480,13 +1492,13 @@ predict \textbf{Red}.
 and can \emph{flip and smooth} the prediction --- here from Blue to
 Red. $K=1$ trusts a single point (low bias, high variance); $K=3$
 pools three points (more stable, but pulled by farther neighbours).
-
-\smallskip
-{\itshape Common mistake: mixing scales when ranking --- comparing one
+\end{solutionbox}
+\begin{mistake}
+Mixing scales when ranking --- comparing one
 point's $d^2$ with another point's $d$. Rank every point on the same
 scale; $d$ and $d^2$ give the identical ordering, so the square roots
-are only needed if the distances themselves are reported.}
-\end{solutionbox}
+are only needed if the distances themselves are reported.
+\end{mistake}
 \end{frame}
 
 
@@ -1561,9 +1573,9 @@ Small $K$ $=$ flexible $=$ low bias, high variance; large $K$ $=$ rigid $=$ high
   \begin{labnote}[Companion notebook: \texttt{chapter\_02\_lab.ipynb}]
     The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
     \begin{itemize}
-      \item a NumPy and pandas refresher, and plotting;
-      \item reproducing the bias--variance figure (Fig.~2.9);
-      \item $K$-nearest-neighbours classification.
+      \item \S\S1--3 \emph{NumPy refresher}, \emph{pandas} and \emph{Plots};
+      \item \S4 \emph{Reproducing Figure 2.9 --- bias--variance};
+      \item \S5 \emph{KNN classification}.
     \end{itemize}
     Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
   \end{labnote}
@@ -1631,7 +1643,7 @@ entries you must handle.
 import pandas as pd
 import matplotlib.pyplot as plt
 
-Auto = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Auto.csv")
+Auto = pd.read_csv("../ALL CSV FILES - 2nd Edition/Auto.csv")
 Auto = Auto[Auto["horsepower"] != "?"].copy()   # drop 5 missing
 Auto["horsepower"] = Auto["horsepower"].astype(float)  # str -> num
 
@@ -1661,14 +1673,14 @@ pandas read \texttt{horsepower} as \emph{strings} (dtype
 \texttt{object}); the filter removes those rows and
 \texttt{astype(float)} restores a numeric column --- only then are the
 scatter plot, the correlation, and any later fit meaningful.
-
-\smallskip
-{\itshape Common mistake: skipping the conversion (the correlation
+\end{solutionbox}
+\begin{mistake}
+Skipping the conversion (the correlation
 fails or is computed on nonsense) --- and note that a strong
 correlation does \emph{not} certify a linear fit: $-0.78$ measures
 linear association, yet the visible curvature still calls for a
-nonlinear term.}
-\end{solutionbox}
+nonlinear term.
+\end{mistake}
 \end{frame}
 
 
@@ -1811,16 +1823,16 @@ $K=3$: nearest are $x=3,4,2$ with $y=3.3,3.9,1.8$, so $\hat y(x_0)=\tfrac{3.3+3.
 \begin{frame}{Self-check questions}
   \begin{enumerate}
     \item Sketch the bias-variance decomposition curves. Where is the
-          optimal flexibility?
-    \item Why is the irreducible error not a function of $\hat f$?
+          optimal flexibility? (p.~58)
+    \item Why is the irreducible error not a function of $\hat f$? (p.~14)
     \item Construct an example where a more flexible method is
-          preferable to a linear model.
-    \item For KNN, what happens to bias and variance as $K$ grows?
+          preferable to a linear model. (pp.~23 and 98)
+    \item For KNN, what happens to bias and variance as $K$ grows? (p.~78)
     \item State the Bayes classifier in words; why is it the gold
-          standard?
+          standard? (p.~70)
     \item Suppose you have $n = 50$ observations of $p = 1$ predictor
           and want to estimate $E[Y \mid X]$. Pick a method and
-          justify.
+          justify. (p.~98)
   \end{enumerate}
 \end{frame}
 
@@ -1957,10 +1969,10 @@ C & $0.09$ & $3.5$ & $1.0$ & $\mathbf{4.59}$ \\
 \end{center}
 \vspace{-1mm}
 \textbf{Best: model B} (test MSE $3.20$). Low$\to$medium: falling bias$^2$ ($4.00\to1.00$) outweighs rising variance; medium$\to$high: exploding variance ($1.2\to3.5$) dominates --- the classic U-shape. No model can beat the floor $\sigma^2=1.0$, reached only if bias \emph{and} variance were both zero.
-
-\smallskip
-{\itshape Common mistake: judging by a single column --- C has the lowest bias and A the lowest variance, yet B wins, because only the sum $\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$ is the test MSE.}
 \end{solutionbox}
+\begin{mistake}
+Judging by a single column --- C has the lowest bias and A the lowest variance, yet B wins, because only the sum $\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$ is the test MSE.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Extended Exercise 2.3 --- Bayes boundary for two Gaussians [Math]}
@@ -2006,10 +2018,10 @@ Plug in: $x^\star=1+\tfrac12\ln(1.5)=1+\tfrac12(0.405)=\mathbf{1.203}$.
 Even the optimal rule misreads about $15\%$ of cases --- the price of the overlap between the two bells.
 
 \textbf{4. Interpretation.} The boundary sits at the midpoint $1$ only when $\pi_0=\pi_1$. Raising $\pi_0$ makes $\ln(\pi_0/\pi_1)>0$, sliding $x^\star$ \emph{toward the rarer class} ($\mu_1$): we cede more of the line to the commoner class~0. The Bayes error is the \emph{irreducible} classification error --- the analogue of $\mathrm{Var}(\varepsilon)$ in regression --- attainable only with the \emph{true} $\pi_k,f_k$; any estimated classifier does at least as badly.
-
-\smallskip
-\textit{Common mistake:} averaging the two tail probabilities without the priors --- $(0.115+0.212)/2 = 0.164$, not $0.154$. Each class's error must be weighted by how often that class occurs.
 \end{solutionbox}
+\begin{mistake}
+Averaging the two tail probabilities without the priors --- $(0.115+0.212)/2 = 0.164$, not $0.154$. Each class's error must be weighted by how often that class occurs.
+\end{mistake}
 \end{frame}
 
 \end{document}

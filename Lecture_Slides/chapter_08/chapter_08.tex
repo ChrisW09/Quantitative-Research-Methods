@@ -69,7 +69,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -226,7 +229,7 @@
     \textbf{Response:} units sold per article $\times$ store $\times$ week (or day). \textbf{Predictors:} lagged and rolling sales, own and relative price, promotion and display flags, holidays and seasonality, article hierarchy and store attributes. Gradient boosting handles the mix natively --- LightGBM-based solutions dominated the M5 forecasting competition.
   \end{industry}
   \begin{readme}[What comes out --- and who uses it]
-    Not one number but a forecast \emph{distribution} per article--store--week: the replenishment system orders against a service-level quantile, while the same forecasts feed the sales and operations planning round that finance and supply chain sign off. Attributions (e.g.\ SHAP) explain to a planner why an unusual order was proposed.
+    Not one number but a forecast \emph{distribution} per article--store--week: the replenishment system orders against a service-level quantile, while the same forecasts feed the sales and operations planning round that finance and supply chain sign off. A store or category planner then releases or overrides each proposed order, with attributions (e.g.\ SHAP) explaining the unusual ones.
   \end{readme}
   \begin{takeaway}[The honest caveat]
     Trees predict step functions, so they \emph{cannot extrapolate}: a price point or a trend outside the training range gets clipped to the nearest observed level. Practitioners keep an explicit trend or price term, model in logs, and retrain on a cadence with drift monitoring.
@@ -448,10 +451,10 @@ y & 1.0 & 1.5 & 2.0 & 8.0 & 8.5 & 9.0
 
 \medskip
 \emph{Interpretation:} a regression tree predicts a \emph{step function} --- every point in a leaf gets the same value, no matter how close it sits to the boundary.
-
-\medskip
-\textit{Common mistake:} interpolating between the two leaf means for a point near the cut (e.g.\ predicting $\approx5$ at $x=3.2$). Trees do not interpolate; the prediction jumps only when $x$ crosses $3.5$.
 \end{solutionbox}
+\begin{mistake}
+Interpolating between the two leaf means for a point near the cut (e.g.\ predicting $\approx5$ at $x=3.2$). Trees do not interpolate; the prediction jumps only when $x$ crosses $3.5$.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Exercise 8.2 --- Gini index vs.\ classification error [Math]}
@@ -495,10 +498,10 @@ Both splits give error $0.25$ --- the error criterion finds them \emph{indisting
 
 \medskip
 \textbf{(d)} Classification error is insensitive to node purity: it ignores improvements that do not flip the majority class. Gini and cross-entropy do reward purity, so they are used to \emph{grow} the tree; classification error is adequate when judging (or pruning toward) the final tree's accuracy.
-
-\medskip
-\textit{Common mistake:} averaging the two regions' impurities without their size weights --- with unequal regions (Split 2) the unweighted average is misleading.
 \end{solutionbox}
+\begin{mistake}
+Averaging the two regions' impurities without their size weights --- with unequal regions (Split 2) the unweighted average is misleading.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Exercise 8.3 --- Cost-complexity pruning [Concept]}
@@ -532,10 +535,10 @@ Cost-complexity pruning selects a subtree $T\subset T_0$ minimising
 
 \medskip
 \textbf{(d) Choosing $\alpha$.} By $K$-fold cross-validation: for a grid of $\alpha$ values, find the corresponding best subtree on each training fold, estimate its CV error, pick the $\alpha$ minimising CV error, then refit that subtree on the full data.
-
-\medskip
-\textit{Common mistake:} selecting $\alpha$ on the \emph{training} criterion --- the RSS term always favours the biggest tree, so training data alone would pick $\alpha=0$. Only held-out error can choose the penalty.
 \end{solutionbox}
+\begin{mistake}
+Selecting $\alpha$ on the \emph{training} criterion --- the RSS term always favours the biggest tree, so training data alone would pick $\alpha=0$. Only held-out error can choose the penalty.
+\end{mistake}
 \end{frame}
 
 % ====================== EXTENDED EXERCISE: Trees (regression) ======================
@@ -592,10 +595,10 @@ x<5.5 & 15.0\mid21.0 & 38.0
 \end{array}
 \]
 The split $x<4.5$ wins, cutting the child's RSS from $65$ to $1.0$.
-
-\medskip
-\textit{Common mistake:} evaluating the second split on \emph{all six} points. Recursive splitting works within one node at a time --- only the right child's four points $\{12,13,20,21\}$ enter this computation.
 \end{solutionbox}
+\begin{mistake}
+Evaluating the second split on \emph{all six} points. Recursive splitting works within one node at a time --- only the right child's four points $\{12,13,20,21\}$ enter this computation.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 8.1 (3/3)}
@@ -785,10 +788,10 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
 
 \medskip
 \textbf{(c) OOB error.} Each observation is OOB for roughly $B/3$ of the trees; predicting it using \emph{only those} trees gives an honest held-out prediction. Aggregating over all $n$ observations yields the OOB error, which approximates the test / CV error --- and it comes free with a single fit, since it reuses trees that were grown anyway.
-
-\medskip
-\textit{Common mistake:} scoring OOB points with \emph{all} $B$ trees. Trees that saw the point in-bag have memorised it, so including them makes the error estimate optimistically low.
 \end{solutionbox}
+\begin{mistake}
+Scoring OOB points with \emph{all} $B$ trees. Trees that saw the point in-bag have memorised it, so including them makes the error estimate optimistically low.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Exercise 8.5 --- Random forests and decorrelation [Concept/Math]}
@@ -820,10 +823,10 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
 
 \medskip
 \textbf{(d) With $p=16$:} classification $m=\sqrt{16}=4$; regression $m=16/3\approx 5$ (round $5.33$ down to an integer).
-
-\medskip
-\textit{Common mistake:} expecting small $m$ to reduce \emph{bias}. Restricting candidates slightly \emph{raises} each tree's bias; the payoff is purely in decorrelation, i.e.\ variance reduction of the average.
 \end{solutionbox}
+\begin{mistake}
+Expecting small $m$ to reduce \emph{bias}. Restricting candidates slightly \emph{raises} each tree's bias; the payoff is purely in decorrelation, i.e.\ variance reduction of the average.
+\end{mistake}
 \end{frame}
 
 
@@ -955,10 +958,10 @@ With small $\lambda$ no single tree can dominate; the ensemble creeps toward the
 
 \medskip
 \textbf{(d) The role of $d$.} $d$ caps how many variables can interact along one tree's path, i.e.\ the \emph{interaction order}. $d=1$ gives stumps: each tree involves a single predictor, so the boosted model is purely \emph{additive} --- a tree-built cousin of a GAM. Larger $d$ allows higher-order interactions among predictors.
-
-\medskip
-\textit{Common mistake:} tuning $B$ by training error --- it decreases monotonically in $B$, so it never signals when to stop; only validation/CV error turns upward.
 \end{solutionbox}
+\begin{mistake}
+Tuning $B$ by training error --- it decreases monotonically in $B$, so it never signals when to stop; only validation/CV error turns upward.
+\end{mistake}
 \end{frame}
 
 
@@ -968,13 +971,13 @@ With small $\lambda$ no single tree can dominate; the ensemble creeps toward the
 
 \begin{frame}{Python lab --- run it live in the notebook}
   \begin{labnote}[Companion notebook: \texttt{chapter\_08\_lab.ipynb}]
-    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
+    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell, section by section:
     \begin{itemize}
-      \item a single regression tree and cost-complexity pruning;
-      \item random forests and gradient boosting;
-      \item an optional XGBoost comparison.
+      \item \S2, \emph{Single regression tree}, and \S3, \emph{Pruning via cost-complexity} --- on the Carseats data loaded in \S1;
+      \item \S4, \emph{Random forest}, and \S5, \emph{Gradient boosting};
+      \item the \emph{Optional: XGBoost} subsection that closes \S5.
     \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S6, \emph{Exercises}, closes the notebook.
   \end{labnote}
 \end{frame}
 
@@ -1047,7 +1050,7 @@ from sklearn.ensemble import (RandomForestRegressor,
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
-Boston = pd.read_csv('../../ALL CSV FILES - 2nd Edition/Boston.csv')
+Boston = pd.read_csv('../ALL CSV FILES - 2nd Edition/Boston.csv')
 Boston = Boston.drop(columns=[c for c in ['Unnamed: 0']  # drop index col
                               if c in Boston.columns])
 X = Boston.drop(columns='medv'); y = Boston['medv']  # target: medv
@@ -1083,10 +1086,10 @@ print(imp.head())  # top predictors
 
 \medskip
 The importance ranking is dominated by \texttt{lstat} (\% lower-status population) and \texttt{rm} (average number of rooms): housing value depends most on socio-economic status and dwelling size. Importances measure the total RSS reduction attributable to each variable summed across all trees, normalised to sum to $1$.
-
-\medskip
-\textit{Common mistake:} comparing models fitted or evaluated on \emph{different} splits --- always fix one train/test split (or use CV) before declaring a winner, and remember that single-split MSEs carry noticeable seed-to-seed noise.
 \end{solutionbox}
+\begin{mistake}
+Comparing models fitted or evaluated on \emph{different} splits --- always fix one train/test split (or use CV) before declaring a winner, and remember that single-split MSEs carry noticeable seed-to-seed noise.
+\end{mistake}
 \end{frame}
 
 % ====================== EXTENDED EXERCISE: Python (Boston) ======================
@@ -1100,6 +1103,9 @@ Using \texttt{Boston.csv} (target \texttt{medv}), fit and compare three ensemble
 \end{enumerate}
 Report the test MSE of each, and read off the random-forest variable-importance ranking. Which method wins, and which predictors matter?
 \end{longexercise}
+\begin{labnote}[Run this live: \emph{Extended Exercise 8.3 --- Bagging vs.\ random forest vs.\ boosting}]
+Under \emph{Lecture exercises --- worked Python solutions} in \texttt{chapter\_08\_lab.ipynb}: all four fits on one split, with the importance ranking, ready to run.
+\end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 8.3 (1/3)}
@@ -1111,7 +1117,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error as mse
-B = pd.read_csv('../../ALL CSV FILES - 2nd Edition/Boston.csv')  # load
+B = pd.read_csv('../ALL CSV FILES - 2nd Edition/Boston.csv')  # load
 B = B.drop(columns=[c for c in ['Unnamed: 0', ''] if c in B.columns])
 X, y = B.drop(columns='medv'), B['medv']; p = X.shape[1]   # p=12
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=.3, random_state=1)
@@ -1159,10 +1165,10 @@ print(imp.round(3).head())  # top predictors
 \end{array}
 \]
 \textbf{Ranking:} every ensemble slashes the single tree's error $3$--$4$-fold; well-tuned \emph{boosting} edges out bagging and the forest. Because Boston has few, strong predictors, a larger $m$ helps, so bagging is competitive with the forest here. \textbf{Importance:} \texttt{lstat} ($\approx0.40$) and \texttt{rm} ($\approx0.27$) dominate, then \texttt{dis}, \texttt{nox} --- housing value is driven mostly by neighbourhood socio-economic status and dwelling size. Boosting wins on accuracy but needs tuning; the forest is a strong low-effort default.
-
-\smallskip
-\textit{Common mistake:} reading importances as causal effects. They measure how much the ensemble \emph{uses} a variable, and correlated predictors share the credit --- \texttt{lstat}'s $0.40$ partly stands in for the whole socio-economic cluster.
 \end{solutionbox}
+\begin{mistake}
+Reading importances as causal effects. They measure how much the ensemble \emph{uses} a variable, and correlated predictors share the credit --- \texttt{lstat}'s $0.40$ partly stands in for the whole socio-economic cluster.
+\end{mistake}
 \end{frame}
 
 
@@ -1246,17 +1252,21 @@ print(imp.round(3).head())  # top predictors
 \end{frame}
 
 \begin{frame}{Self-check questions}
+  Each question names the slide that answers it --- a wrong answer tells you
+  where to read.
   \begin{enumerate}
     \item Why is recursive binary splitting greedy? When does this
-          hurt?
+          hurt? (p.~16)
     \item Why use cross-entropy or Gini, not the misclassification
-          rate, to grow classification trees?
+          rate, to grow classification trees? (p.~21)
     \item Explain why random forests reduce variance more than plain
-          bagging.
+          bagging. (p.~41)
     \item Walk through the gradient-boosting algorithm in pseudocode.
+          (p.~54)
     \item In what sense is BART a Bayesian boosting algorithm?
+          (appendix, p.~90)
     \item Rank baseline methods (logistic, RF, gradient boosting) for
-          tabular data with $p = 100$, $n = 1000$.
+          tabular data with $p = 100$, $n = 1000$. (p.~79)
   \end{enumerate}
 \end{frame}
 
@@ -1399,6 +1409,8 @@ Winners: $\alpha{=}0\!\to\!4$ leaves, $\alpha{=}5\!\to\!3$ leaves, $\alpha{=}20\
 \emph{Sample entry:} for $\alpha=5$ and the $3$-leaf tree, $R_\alpha=R+\alpha|T|=4+5\cdot3=19$ --- the smallest value in its row, so $3$ leaves win at that price.
 
 \smallskip
+% Kept as italic text: lifting this into a mistake box overflows the slide
+% by ~28pt (the solutionbox is already full).
 \textit{Common mistake:} choosing $\alpha$ by training error --- $\alpha=0$ (the full tree) always wins there, by construction. $\alpha$ is chosen by cross-validating over the pruning sequence.
 \end{solutionbox}
 \end{frame}

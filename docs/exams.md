@@ -7,18 +7,19 @@ not downloadable from this site. Instructors can request them from the author.
 This page documents what exists and how it is built.
 ```
 
-Three practice exams are matched to the course rhythm, each built from a
-**single LaTeX source** so the paper and its solutions can never diverge. All
-numeric answers were verified programmatically.
+Eight practice papers are matched to the course rhythm: **three full-length mock
+exams** and **five 60-minute short exams**. Each is built from a **single LaTeX
+source** so the paper and its solutions can never diverge, and all numeric
+answers were verified programmatically.
 
-Each exam exists in three formats:
+Every paper exists in three formats:
 
 - **Questions** — the paper as students see it;
 - **Solutions** — the same paper with full worked answers;
 - **Review deck** — a Beamer deck for going through the exam in class, step by
   step.
 
-## The exams
+## The three full-length papers
 
 | Exam | Written after | Covers | Length |
 |---|:--:|---|:--:|
@@ -30,9 +31,35 @@ The final exam also exists in three parallel versions (**A / B / C**) — same
 structure and difficulty, different numbers — for seating variants or for a
 second attempt.
 
-Alongside them, a set of **five 60-minute exams** (A–E, three problems × 20
-points) covers shorter practice slots. They live in their own subfolder and are
-built separately — see [How they are built](#how-they-are-built) below.
+## The five 60-minute short exams
+
+Alongside the three full-length papers there are **five 60-minute exams**
+(A–E), each **three problems × 20 points**, with the problems increasing in
+difficulty: P1 warm-up, P2 core, P3 advanced. They are the formative layer —
+short enough to sit in a spare hour, released one at a time as the material each
+needs is taught.
+
+| Short exam | Release after | P1 (warm-up) | P2 (core) | P3 (advanced) |
+|:--:|:--:|---|---|---|
+| A | Lecture 6 | Learning problems, descriptive statistics (Ch 0 + 1–2) | Simple linear regression by hand (Ch 3) | **Logistic regression, confusion matrix (Ch 4)** |
+| B | Lecture 7 | Bias–variance, KNN regression (Ch 2) | Reading multiple regression output (Ch 3) | **Cross-validation and the bootstrap (Ch 5)** |
+| C | Lecture 8 | Conditional probability, Bayes, odds (Ch 0 + 0b) | Dummies and interactions (Ch 3) | **Ridge and lasso (Ch 6)** |
+| D | Lecture 10 | Honest model evaluation — leakage, splits (Ch 2 + 5) | KNN classification by hand (Ch 2 + 4) | **Trees: Gini, splitting, pruning, forests (Ch 8)** |
+| E | Lecture 12 | Reading `describe()` output, SE vs SD (Ch 0) | Polynomial regression, model choice (Ch 5 + 7) | **Multiple testing: Bonferroni, Holm, BH (Ch 13)** |
+
+The bold chapter is where each paper's hardest problem sits, so the five are
+**sequenced, not interchangeable**: A needs Chapter 4, B Chapter 5, C
+Chapter 6, D Chapter 8, E Chapter 13. Because P1 and P2 reach back to earlier
+material, each paper is cumulative-to-date rather than a single-chapter test.
+They are also the only papers that touch the **precourse** material: A, C and E
+each open on Chapter 0 / 0b, while no problem in the three full-length papers
+cites either precourse deck.
+
+Each ships as the paper, a solutions PDF carrying a **grading key per problem**
+(marks per sub-step, follow-through rules), and a review deck with a "common
+mistake" box per problem and a one-slide marking table. They are built by their
+own `build.sh`, not by `make exams` — see
+[How they are built](#how-they-are-built) below.
 
 ## Question design
 
@@ -46,11 +73,17 @@ built separately — see [How they are built](#how-they-are-built) below.
 
 ## How they are built
 
+```{note}
+`Mock_Exams/` is git-ignored, so it is **absent from every clone of this
+repository** — the commands below only work on a machine that already has the
+folder from the author. On a fresh clone there is nothing to `cd` into.
+```
+
 One source file produces both the paper and the solutions; the `\withsolutions`
 flag switches between them.
 
 ```bash
-cd Mock_Exams/Exam_1_after_Lecture_04
+cd Mock_Exams/Exam_1_after_Lecture_04     # only if you have the folder
 pdflatex -jobname=Mock_Exam_1 mock_exam_1.tex
 pdflatex -jobname=Mock_Exam_1_Solutions "\def\withsolutions{1}\input{mock_exam_1.tex}"
 ```
@@ -84,5 +117,6 @@ cd Mock_Exams/Short_Exams_60min
 ## Where to go next
 
 - [The course at a glance](course.md) — where each exam sits in the calendar.
+- [For students](for-students.md) — how to revise, and where the short exams fit.
 - [Teaching it](teaching.md) — which exercises rehearse which exam problem.
 - [Lecture slides](slides.md) — the material each paper draws on.

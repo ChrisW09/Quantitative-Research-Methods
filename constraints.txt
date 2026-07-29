@@ -1,0 +1,126 @@
+# =============================================================================
+# constraints.txt -- the build that reproduces the shipped notebook outputs
+# =============================================================================
+#
+# WHAT THIS IS
+#   requirements.txt says what the labs *need* (deliberately loose, so the course
+#   keeps working as the ecosystem moves). This file records the one build that
+#   was verified to reproduce the outputs currently stored in
+#   Lab_Notebooks/*.ipynb. It is a record, not a requirement.
+#
+# HOW TO USE IT
+#   Normal use -- take the current ecosystem, nothing here applies:
+#       pip install -r requirements.txt
+#
+#   Reproduce the stored outputs exactly (e.g. a number in a notebook disagrees
+#   with what your machine prints, and you want to know whether the notebook is
+#   wrong or your stack has moved):
+#       pip install -r requirements.txt -c constraints.txt
+#
+#   A constraints file only caps versions of packages that are being installed
+#   anyway; it never pulls anything in on its own. `jupyter` and its dependencies
+#   are intentionally absent -- the notebook front end does not affect results.
+#
+# WHAT WAS VERIFIED (2026-07-29)
+#   Python 3.9.6 (macOS, arm64), ISLP installed. All 15 notebooks executed top to
+#   bottom in a fresh kernel: 0 cell errors. 202 code cells compared against the
+#   stored outputs -> every substantive number, table and summary reproduced
+#   exactly. chapter_00 and chapter_00b reproduce cell-for-cell, including figure
+#   bytes. The only remaining differences anywhere are:
+#     * statsmodels / lifelines banners that print the current date and time
+#       (chapters 3, 4, 7, 11) -- unavoidable, not drift;
+#     * occasional cells where identical stdout arrives in two chunks rather than
+#       one. This is a kernel flush-boundary artefact, not a change in output:
+#       compare stream outputs concatenated, not object by object.
+#
+#   Note for anyone diffing stored against fresh output: chapter_07 surfaces
+#   pyGAM's p-value caveat on stderr twice, by design, and it IS stored, so the
+#   caveat is visible in the rendered docs as the prose promises. The message body
+#   is stable, but the location prefix in front of it is not: pyGAM warns with
+#   stacklevel=2, so the prefix names the ipykernel temp file for the cell, whose
+#   path carries the kernel PID and a per-cell hash
+#   (/var/folders/.../T/ipykernel_66177/3808341760.py:6:). Normalise that prefix
+#   before comparing; do NOT normalise the message text, or the check stops
+#   detecting the real changes it exists to catch.
+#
+#   These two are the only stored outputs in any of the 15 notebooks that contain
+#   a filesystem path, and it is unavoidable: Python's warning machinery prints
+#   the filename of the code that raised the warning, which for notebook-level
+#   code is always the kernel's temp file. The path holds no username or project
+#   name -- just macOS's opaque per-user temp hash -- and a student running the
+#   lab sees their own equivalent.
+#
+# WHY ONLY TWO PACKAGES ARE PINNED IN requirements.txt
+#   Results proved insensitive to the rest of the stack, so freezing all of it
+#   would cost more than it buys. Cross-checked on Python 3.11 with numpy 2.4.6
+#   and scipy 1.16.3: the chapter 7 GAM still reports AIC 49773.6924, i.e. three
+#   years of numpy/scipy movement changed nothing. Two packages are the exception
+#   and are pinned in requirements.txt, not merely recorded here:
+#
+#     * pygam -- the one package measured to move a published number. 0.12.0
+#       changed the likelihood/AIC computation: chapter 7 reports AIC 30643.72
+#       rather than 49773.69 and log-likelihood -15299.66 rather than -24864.65.
+#       Python 3.9 resolves `pygam>=0.9` to 0.10.1 regardless, but Python 3.10+
+#       (Colab included) resolves it to 0.12.0 -- so the stored chapter 7 numbers
+#       had quietly stopped matching for anyone on a current interpreter.
+#
+#     * ISLP -- unpinned it spanned 0.3.1 to 0.4.1, across which load_data() does
+#       not return consistent dtypes. Pinned to the version verified above.
+# =============================================================================
+
+ISLP==0.4.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+PyYAML==6.0.3
+aiohappyeyeballs==2.6.1
+aiohttp==3.13.5
+aiosignal==1.4.0
+async-timeout==5.0.1
+autograd==1.8.0
+autograd-gamma==0.5.0
+contourpy==1.3.0
+cycler==0.12.1
+filelock==3.19.1
+fonttools==4.60.2
+formulaic==1.2.2
+frozenlist==1.8.0
+fsspec==2025.10.0
+idna==3.18
+interface-meta==1.3.0
+joblib==1.5.3
+kiwisolver==1.4.7
+lifelines==0.30.0
+lightning-utilities==0.15.2
+lxml==6.1.1
+matplotlib==3.9.4
+mpmath==1.3.0
+multidict==6.7.1
+narwhals==2.21.0
+networkx==3.2.1
+numpy==2.0.2
+packaging==26.2
+pandas==2.3.3
+patsy==1.0.2
+pillow==11.3.0
+progressbar2==4.5.0
+propcache==0.4.1
+pygam==0.10.1
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+python-utils==3.9.1
+pytorch-lightning==2.6.0
+pytz==2026.3.post1
+scikit-learn==1.6.1
+scipy==1.13.1
+seaborn==0.13.2
+six==1.17.0
+statsmodels==0.14.6
+sympy==1.14.0
+threadpoolctl==3.6.0
+torch==2.8.0
+torchmetrics==1.8.2
+tqdm==4.70.0
+tzdata==2026.3
+wrapt==2.3.0
+xgboost==2.1.4
+yarl==1.22.0

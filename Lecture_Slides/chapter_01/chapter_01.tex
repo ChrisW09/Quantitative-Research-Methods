@@ -70,7 +70,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -201,7 +204,9 @@
     A \emph{risk score per asset per period}, not a failure date. The decision: pull the asset
     into the next planned maintenance window, or let it run. Maintenance planning and
     reliability engineering own the score; operations sign off, because an intervention costs
-    production time.
+    production time. The score is read by the production planner on the affected line, who
+    either releases the asset into the window or pushes back because the order book cannot
+    absorb the downtime.
   \end{readme}
   \begin{takeaway}[One honest caveat]
     Failures are rare, so labels are scarce --- and every failure the model prevents is a
@@ -539,13 +544,13 @@ how much) means \emph{inference}.
 \end{enumerate}
 \textbf{Rule of thumb:} prediction cares only about $\hat Y$;
 inference cares about the \emph{structure} of $f$.
-
-\smallskip
-{\itshape Common mistake: classifying by the \emph{tool} instead of the
+\end{solutionbox}
+\begin{mistake}
+Classifying by the \emph{tool} instead of the
 \emph{question} (``it uses regression, so it must be inference'').
 Any model can serve either goal --- what decides is whether the answer
-you hand over is $\hat Y$ itself or the shape of $f$.}
-\end{solutionbox}
+you hand over is $\hat Y$ itself or the shape of $f$.
+\end{mistake}
 \end{frame}
 
 
@@ -814,13 +819,13 @@ $\Rightarrow$ classification.
 quantitative $\Rightarrow$ regression, qualitative $\Rightarrow$
 classification. The type of the \emph{response} decides --- not the
 predictors.
-
-\smallskip
-{\itshape Common mistake: letting the predictors vote --- e.g.\ calling
+\end{solutionbox}
+\begin{mistake}
+Letting the predictors vote --- e.g.\ calling
 digit recognition ``regression'' because pixels are numbers, or task 1
 ``classification'' because \texttt{brand} is categorical. Only the
-type of $Y$ matters.}
-\end{solutionbox}
+type of $Y$ matters.
+\end{mistake}
 \end{frame}
 
 
@@ -1014,13 +1019,13 @@ Patient & age & BMI & HR & SBP \\
 \textbf{Note on indexing:} $x_{ij}$ is row $i$ (observation),
 column $j$ (predictor). Row $i$ is one patient across all predictors;
 column $j$ is one predictor across all patients.
-
-\smallskip
-{\itshape Common mistake: reading $x_{2,3}$ column-first as ``column 2,
+\end{solutionbox}
+\begin{mistake}
+Reading $x_{2,3}$ column-first as ``column 2,
 row 3'', which would give the \texttt{BMI} of patient 3 ($26.1$)
 instead of the correct $x_{2,3}=82$; and counting the response
-\texttt{SBP} into $p$, which would wrongly give $p=4$.}
-\end{solutionbox}
+\texttt{SBP} into $p$, which would wrongly give $p=4$.
+\end{mistake}
 \end{frame}
 
 
@@ -1088,10 +1093,10 @@ A regional bank has records on \textbf{20{,}000} past personal-loan customers. F
 \textbf{2. Problem type / supervision.} $Y$ is qualitative (binary) $\Rightarrow$ a \textbf{classification} problem --- the type of $Y$ decides, not the predictors. Because every training customer carries a \emph{label} \texttt{defaulted}, this is \textbf{supervised} learning.
 
 \textbf{3. Prediction vs.\ inference.} Goal (a), flagging new applicants, is \textbf{prediction}: we only need an accurate $\hat Y$. Goal (b), which factors matter and by how much for a regulator, is \textbf{inference}: we need the structure of $f$ --- signed, quantified effects.
-
-\smallskip
-{\itshape Common mistake: counting the response \texttt{defaulted} among the predictors (giving $p=8$) --- the response is never a column of $\mathbf X$.}
 \end{solutionbox}
+\begin{mistake}
+Counting the response \texttt{defaulted} among the predictors (giving $p=8$) --- the response is never a column of $\mathbf X$.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 1.1 (2/2)}
@@ -1138,14 +1143,15 @@ A regional bank has records on \textbf{20{,}000} past personal-loan customers. F
   \begin{enumerate}
     \item In your own words, what is the difference between
           \emph{prediction} and \emph{inference}? Give one example of
-          each.
+          each. (p.~20)
     \item Which of the three motivating data sets (Wage, Smarket,
           NCI60) would benefit most from a flexible method, and why?
+          (p.~38)
     \item For the Boston housing data ($n = 506$, $p = 12$), what
           regime are we in: low-dimensional or high-dimensional?
-          Explain.
+          Explain. (pp.~36 and 40)
     \item Write the design matrix $\mathbf{X}$ for $n = 4$
-          observations of $p = 2$ predictors plus an intercept.
+          observations of $p = 2$ predictors plus an intercept. (pp.~54--55)
   \end{enumerate}
 \end{frame}
 
@@ -1155,9 +1161,9 @@ A regional bank has records on \textbf{20{,}000} past personal-loan customers. F
   \begin{labnote}[Companion notebook: \texttt{chapter\_01\_lab.ipynb}]
     These datasets are explored in the companion Jupyter notebook. Open it and run it cell by cell:
     \begin{itemize}
-      \item the \emph{Wage} data (reproducing Fig.~1.1);
-      \item the \emph{Smarket} stock-market data (Fig.~1.2);
-      \item the \emph{NCI60} cancer cell-line data.
+      \item \S1 \emph{The Wage data} --- reproducing Fig.~1.1;
+      \item \S2 \emph{The Stock Market data} --- \emph{Smarket} (Fig.~1.2);
+      \item \S3 \emph{The NCI60 cancer cell lines}.
     \end{itemize}
     Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
   \end{labnote}

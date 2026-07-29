@@ -63,6 +63,11 @@ Each session has one page, and each page has the same eight parts:
    screen.
 8. **Close on** — the last slide, and the sentence that bridges to next week.
 
+The *Before you walk in* checklist also says when a **60-minute short exam**
+becomes available: A after Lecture 6, B after 7, C after 8, D after 10, E after
+12. They are sequenced, so they cannot be handed out in any other order — see
+[Mock exams](exams.md).
+
 ## Where the appendix fits
 
 Every deck ends with an appendix holding its optional, more advanced material —
@@ -99,4 +104,5 @@ Do **not** cut the motivation slide that opens a topic, the pitfall
 
 - [Lecture slides](slides.md) — deck-by-deck contents, and what is in each appendix.
 - [The course at a glance](course.md) — the twelve-lecture plan and the split points.
-- [Mock exams](exams.md) — the assessment rhythm and how the papers are built.
+- [Mock exams](exams.md) — the assessment rhythm, the release order of the five 60-minute short exams, and how the papers are built.
+- [For students](for-students.md) — the page to point a cohort at in week one.

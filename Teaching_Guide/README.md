@@ -6,11 +6,11 @@ a 120-slide deck first.
 | File | What it is |
 |---|---|
 | [`semester_plan.md`](./semester_plan.md) | The 12 weeks on one page: what to teach when, what the assessment rhythm is, what to do if you fall behind |
-| [`runsheets/`](./runsheets/) | One page per session: timing blocks, what to cut first, which exercises to run live, the misconceptions to pre-empt |
+| [`runsheets/`](./runsheets/) | One page per session: timing blocks, what to cut first, which exercises to run live, the misconceptions to pre-empt. **Not published** — git-ignored, because they map exercises onto exam problems; instructors request them from the author |
 | [`slide_index.md`](./slide_index.md) | Every deck's sections with page ranges, every exercise with its page, generated from the compiled PDFs; each deck's appendix is listed but marked *optional* rather than given a time budget |
 | [`before_class.md`](./before_class.md) | The ten-minute checklist for the morning of a lecture |
-| [`handouts/`](./handouts/) | Printable two-up versions of every deck (`make handouts`) |
-| `make_index.py`, `check_decks.py` | The generators behind the index and the health check |
+| [`handouts/`](./handouts/) | Printable two-up versions of every deck. **Not published** — build output, git-ignored; run `make handouts` to generate the folder |
+| `make_index.py`, `check_decks.py`, `check_runsheets.py` | The generators behind the index, the deck health check, and the runsheet page-reference validator |
 
 ## The one command you need
 
@@ -18,7 +18,8 @@ From the repository root:
 
 ```bash
 make            # regenerate figures, rebuild any deck whose source changed, refresh the index
-make check      # page counts, and any slide whose content overruns the frame
+make check      # page counts, slides that overrun the frame, and stale runsheet page references
+make runsheets  # every runsheet page reference with the slide title it lands on
 make handouts   # printable 2-up PDFs for every deck
 ```
 

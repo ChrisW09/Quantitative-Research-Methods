@@ -1,12 +1,13 @@
 # Quantitative Research Methods
 
 A complete, ready-to-teach university course in statistical learning — twelve
-Beamer decks, fifteen Jupyter labs, three mock exams and the course datasets,
-sharing one notation and one twelve-week rhythm.
+Beamer decks, fifteen Jupyter notebooks, eight mock exams and the course
+datasets, sharing one notation and one twelve-week rhythm.
 
 :::{container} qrm-chips
 **12** decks · **1057** core slides *(+111 optional)* · **127** exercises with
-solutions · **15** labs · **3** mock exams · **22** datasets
+solutions · **12** labs *(+3 code references)* · **3 + 5** mock exams ·
+**22** datasets
 :::
 
 Prepared by **Prof. Dr. Christoph Weisser**, HSBI — Bielefeld University of
@@ -28,13 +29,13 @@ cite it if you reuse them — see [Citation & licence](citation.md).
 :class-container: qrm-doors
 
 :::{grid-item-card} 🎓 Learning it
-:link: quickstart
+:link: for-students
 :link-type: doc
 
-Read a deck, then run its lab in Colab with zero setup.
+Prerequisites, workload, the skip rule, how to revise — and Colab on day one.
 
 +++
-Quick start →
+For students →
 :::
 
 :::{grid-item-card} 👩‍🏫 Teaching it
@@ -83,14 +84,23 @@ with a worked solution.
 :link: labs
 :link-type: doc
 
-Fifteen notebooks, rendered here in full and runnable locally or on Colab.
+Twelve taught labs plus three code references, rendered here in full and
+runnable on Colab or locally.
 :::
 
 :::{grid-item-card} 📝 Mock exams
 :link: exams
 :link-type: doc
 
-Three exams, each in three formats — documented here, distributed on request.
+Three full-length papers plus five 60-minute short exams — documented here,
+distributed on request.
+:::
+
+:::{grid-item-card} 🚀 Quick start
+:link: quickstart
+:link-type: doc
+
+Run a lab in Colab with zero setup; install locally from week two.
 :::
 
 :::{grid-item-card} 📊 Datasets
@@ -141,8 +151,8 @@ What is pinned, why, and which chapter needs which extra package.
 |---|---|
 | Lecture decks | 10 chapters + two precourse sessions · 1057 slides, plus 111 in optional appendices |
 | Exercises | ~86 short (~5 min) + ~41 extended (~15 min), all with worked solutions |
-| Lab notebooks | 15 (2 precourse + 10 lecture chapters + 3 self-study) |
-| Mock exams | 3, each in 3 formats (not distributed publicly) |
+| Lab notebooks | 12 taught labs, each with worked solutions (2 precourse + 10 lecture chapters) · 3 code references for the untaught chapters (no deck, no solutions) |
+| Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Semester shape | 12 lectures × 180 min (+ two optional precourse sessions) |
 | Sources | LaTeX (Beamer) · Jupyter · Python 3.9+ · one `make` build |
@@ -152,6 +162,7 @@ What is pinned, why, and which chapter needs which extra package.
 :caption: Getting started
 
 quickstart
+for-students
 course
 environment
 ```

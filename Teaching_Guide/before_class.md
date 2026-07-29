@@ -9,7 +9,9 @@ somebody.
 - [ ] `make check` — no deck should be flagged `review`. If one is, a slide
       overruns its frame and the bottom line may be cut off in the room.
 - [ ] Open this session's [runsheet](./runsheets/) and pick your **cut list**
-      now, not at minute 140.
+      now, not at minute 140. (The runsheets are **not published** — they are
+      git-ignored assessment material, so a fresh clone will not have the
+      folder; request them from the author.)
 - [ ] Decide which exercises run live. The decks carry more than fits; the
       runsheet names the two or three worth the room's time.
 - [ ] Note where the deck's **appendix** starts (the runsheet says, and
@@ -28,7 +30,8 @@ somebody.
       one, decide in advance where you switch and put the cyan
       *Companion notebook* boxes on your cut list of moments to pause.
 - [ ] Print or share the handout if you use one:
-      `Teaching_Guide/handouts/chapter_NN_handout.pdf`.
+      `Teaching_Guide/handouts/chapter_NN_handout.pdf`. **Not published** — it is
+      build output, so run `make handouts` once to create the folder.
 
 ## In the room
 

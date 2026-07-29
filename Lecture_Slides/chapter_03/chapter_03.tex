@@ -116,9 +116,14 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
+% Industry application callout box --- slate grey, for real business/industry use.
+% The title always prints the words "In industry", so the box does not rely on its
+% tint alone; every call passes an explicit title, so the default is never used.
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 
@@ -378,11 +383,12 @@
       \end{industry}
     \end{column}
     \begin{column}{0.49\textwidth}
-      \begin{readme}[What the output is used for --- and who signs it off]
+      \begin{readme}[What it is used for --- and who signs off]
         Each channel coefficient is read as a contribution and an
         elasticity, then aggregated into a decomposition of the year's
         sales --- the starting point for next year's budget split,
         signed off by the CMO with finance and re-fitted quarterly.
+        Its reader is the brand manager whose channel budget it moves.
       \end{readme}
     \end{column}
   \end{columns}
@@ -728,14 +734,14 @@
     associated with an average increase of $0.7$ units in $y$.
     The intercept $1.9$ is the predicted $y$ when $x=0$ (only
     meaningful if $x=0$ is within a sensible range).
-
-    \medskip
-    \textit{Common mistake:} treating $\hat y(6)=6.1$ as just as
+  \end{solutionbox}
+  \begin{mistake}
+    treating $\hat y(6)=6.1$ as just as
     trustworthy as an in-range prediction. $x=6$ lies outside the
     observed range $[1,5]$, so this is (mild) extrapolation --- the
     further we move from the data, the less the fitted line can be
     trusted.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \subsection{Uncertainty}
@@ -759,9 +765,10 @@
     \includegraphics[width=0.72\textwidth,height=0.46\textheight,keepaspectratio]{3_3.pdf}
   \end{center}
   \begin{takeaway}
-    The population line (red) is fixed but \emph{unobserved}; each sample
-    line (blue) wobbles around it. A standard error measures that wobble
-    from a \emph{single} sample --- we never see the red line itself.
+    The flatter heavy line is the \emph{population} line: fixed, and never
+    observed. Every other line is least squares on one sample; they wobble
+    around it, and a standard error measures that wobble from a
+    \emph{single} sample.
   \end{takeaway}
   \islpsource{Figure 3.3}
 \end{frame}
@@ -1114,12 +1121,12 @@
     never decreases when predictors are added --- so a large $R^2$ is
     not by itself evidence of a good or useful model. Check the
     residual plot and the RSE as well.
-
-    \medskip
-    \textit{Common mistake:} reading $R^2=0.49$ as ``49\% of points
+  \end{solutionbox}
+  \begin{mistake}
+    reading $R^2=0.49$ as ``49\% of points
     are predicted correctly''. It is the share of \emph{variance}
     explained --- a statement about spread, not about hit rates.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 % ---------------- Extended Exercise 3.L1 [Math] ----------------
@@ -1212,12 +1219,12 @@
     i.e.\ $[4.21,\,11.79]$ (\$4210--\$11{,}790). It is wide because $n$ is
     small, $x_0=7$ extrapolates beyond the data, and it targets a
     \emph{single} car rather than the average.
-
-    \medskip
-    \textit{Common mistake:} dropping the ``$1+$'' under the root. That
+  \end{solutionbox}
+  \begin{mistake}
+    dropping the ``$1+$'' under the root. That
     gives the \emph{confidence} interval for the average 7-year-old car ---
     $8 \pm 2.58$ --- far too narrow for one specific car.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 
@@ -1292,7 +1299,7 @@
 import pandas as pd                  # data handling
 import statsmodels.api as sm         # OLS with full inference output
 
-ad = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Advertising.csv",
+ad = pd.read_csv("../ALL CSV FILES - 2nd Edition/Advertising.csv",
                  index_col=0)        # load data; column 0 = row labels
 X = sm.add_constant(ad[["TV", "radio", "newspaper"]])  # + intercept col
 res = sm.OLS(ad["sales"], X).fit()   # fit sales on all three media
@@ -1319,14 +1326,14 @@ print(res.summary())                 # coef table: SE, t, p, R2, F
     $189$ extra units --- radio is far more effective per dollar than
     the tiny (non-significant) newspaper effect. The model explains
     about $90\%$ of the variance in sales ($R^2\approx 0.897$).
-
-    \medskip
-    \textit{Common mistake:} reading the near-zero newspaper slope as
+  \end{solutionbox}
+  \begin{mistake}
+    reading the near-zero newspaper slope as
     ``newspaper advertising can never work''. The model only says that
     \emph{given} TV and radio, newspaper adds no predictive value in
     these markets; its positive simple-regression slope arises because
     newspaper spend travels with radio spend (see Exercise~3.5).
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \subsection{Confounding}
@@ -1402,13 +1409,13 @@ print(res.summary())                 # coef table: SE, t, p, R2, F
     fixed --- you must include the other relevant predictors. Simple
     correlations invite confounding; ``correlation is not causation'' is
     the practical warning.
-
-    \smallskip
-    \textit{Common mistake:} concluding ``newspaper advertising cannot
+  \end{solutionbox}
+  \begin{mistake}
+    concluding ``newspaper advertising cannot
     work''. The model says newspaper adds nothing \emph{given TV and
     radio, in these data} --- an observational statement, not a causal
     verdict.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \subsection{The four important questions}
@@ -1550,12 +1557,12 @@ print(res.summary())                 # coef table: SE, t, p, R2, F
     overall test whose Type~I error stays at $\alpha$ regardless of $p$,
     which is why we consult it \emph{first} before looking at individual
     coefficients.
-
-    \medskip
-    \textit{Common mistake:} reading the significant $F$ as ``all three
+  \end{solutionbox}
+  \begin{mistake}
+    reading the significant $F$ as ``all three
     predictors matter''. It says only that \emph{at least one} does; the
     individual $t$-tests (and Chapter~6) decide which.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 % ---------------- Extended Exercise 3.L3 [Python] ----------------
@@ -1581,7 +1588,7 @@ print(res.summary())                 # coef table: SE, t, p, R2, F
     \textbf{(1) Fit and summary.}
 \begin{lstlisting}
 import pandas as pd, numpy as np, statsmodels.api as sm  # libraries
-ad = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Advertising.csv",
+ad = pd.read_csv("../ALL CSV FILES - 2nd Edition/Advertising.csv",
                  index_col=0)          # load data; col 0 = row labels
 X   = sm.add_constant(ad[["TV", "radio", "newspaper"]])  # design + const
 res = sm.OLS(ad["sales"], X).fit()     # least-squares fit
@@ -1627,12 +1634,12 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
     is simpler, loses no explanatory power, and both adjusted $R^2$ and
     RSE (which penalise useless predictors) favour it. Parsimony wins,
     and it agrees with the confounding diagnosis in part (2).
-
-    \smallskip
-    \textit{Common mistake:} citing the unchanged $R^2$ as the evidence.
+  \end{solutionbox}
+  \begin{mistake}
+    citing the unchanged $R^2$ as the evidence.
     Plain $R^2$ can only fall when a predictor is dropped --- adjusted
     $R^2$ and RSE, which penalise dead weight, are the fair judges.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 % ============================================================
@@ -1971,7 +1978,7 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
 import pandas as pd, numpy as np
 import statsmodels.api as sm
 
-auto = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Auto.csv",
+auto = pd.read_csv("../ALL CSV FILES - 2nd Edition/Auto.csv",
                    na_values="?").dropna()  # "?" -> NaN, then drop
 hp = auto["horsepower"].astype(float)       # ensure numeric predictor
 
@@ -2003,14 +2010,14 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
     $\beta_0,\beta_1,\beta_2$ even though it is nonlinear in the
     predictor. We simply treat $\texttt{hp}^2$ as an additional
     predictor, so ordinary least squares still applies.
-
-    \medskip
-    \textit{Common mistake:} justifying the quadratic by the $R^2$
+  \end{solutionbox}
+  \begin{mistake}
+    justifying the quadratic by the $R^2$
     increase alone --- $R^2$ \emph{never} decreases when a term is
     added. The real evidence is the highly significant $t$-statistic
     on $\texttt{hp}^2$ (here $t\approx 10$) together with the
     disappearance of the U-shape from the residual plot.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 % ---------------- Extended Exercise 3.L4 [Integrative] ----------------
@@ -2079,13 +2086,13 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
     ($\beta_4=\beta_5=0$) all regions would share slope $6$ and differ
     only by a vertical shift. By the \emph{hierarchy principle} we keep
     the main effects $D_S,D_W$ whenever their interactions are present.
-
-    \smallskip
-    \textit{Common mistake:} reading $\hat\beta_4=2$ as the South's
+  \end{solutionbox}
+  \begin{mistake}
+    reading $\hat\beta_4=2$ as the South's
     slope. It is the \emph{difference} from East: the South's own slope
     is $6+2=8$. Dummy interactions, like dummies, are contrasts against
     the baseline.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 % ============================================================
@@ -2188,12 +2195,12 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
     report the fit with and without it, and consider a robust
     regression. (Distinguish leverage --- unusual $x$ --- from an
     outlier --- unusual $y$; the dangerous points are high in both.)
-
-    \smallskip
-    \textit{Common mistake:} judging these assumptions from the raw
+  \end{solutionbox}
+  \begin{mistake}
+    judging these assumptions from the raw
     $y$-vs-$x$ scatter or from $R^2$. A high $R^2$ can coexist with
     panels (1), (2) and (4) --- only the residual plot shows them cleanly.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \subsection{Heteroscedasticity}
@@ -2277,8 +2284,8 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.62\textheight,keepaspectratio]{3_13.pdf}
   \end{center}
-  Left: point 41 has an extreme $x$ and drags the fit (red) away from the fit
-  without it (blue); point 20 is unusual in $y$ only. Middle: 41 is
+  Left: point 41 has an extreme $x$ and drags the fit (solid line) away from
+  the fit without it (dashed); point 20 is unusual in $y$ only. Middle: 41 is
   unremarkable in $X_1$ or $X_2$ alone, yet still high-leverage. Right:
   studentised residual against leverage --- 41 stands out on both axes.
   \islpsource{Figure 3.13}
@@ -2308,7 +2315,7 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
 import pandas as pd, numpy as np
 import statsmodels.api as sm
 
-boston = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Boston.csv")
+boston = pd.read_csv("../ALL CSV FILES - 2nd Edition/Boston.csv")
 X = sm.add_constant(boston["lstat"])    # intercept + lstat
 res = sm.OLS(boston["medv"], X).fit()   # fit medv ~ lstat
 
@@ -2348,13 +2355,13 @@ print("outliers:", outliers)              # 11 tracts, max |stud| = 4.0
     $\texttt{medv}=50$, which the line under-predicts. The two sets do
     not overlap here --- leverage and outlyingness really are different
     things.
-
-    \medskip
-    \textit{Common mistake:} treating the thresholds as deletion rules.
+  \end{solutionbox}
+  \begin{mistake}
+    treating the thresholds as deletion rules.
     Flagged points call for \emph{inspection} (data error? capped
     response?) and a with/without sensitivity refit --- not automatic
     removal.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \subsection{Collinearity}
@@ -2439,7 +2446,7 @@ import statsmodels.api as sm
 from statsmodels.stats.outliers_influence \
     import variance_inflation_factor as vif_
 
-credit = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Credit.csv")
+credit = pd.read_csv("../ALL CSV FILES - 2nd Edition/Credit.csv")
 cols = ["Limit", "Rating", "Age"]   # CSV column names are capitalised
 X = sm.add_constant(credit[cols])   # design matrix + intercept column
 # VIF_j = 1/(1 - R2 of X_j regressed on the other columns)
@@ -2536,12 +2543,12 @@ print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
     information, inflating their SEs. \emph{Fix:} drop or combine a
     redundant predictor (e.g.\ keep size, or use price-per-size), or use
     ridge / PCA regression; recompute VIFs until all $<5$.
-
-    \smallskip
-    \textit{Common mistake:} conflating the diagnoses --- an outlier is
+  \end{solutionbox}
+  \begin{mistake}
+    conflating the diagnoses --- an outlier is
     unusual in $y$, a leverage point in $x$. The dangerous case is both
     at once, and only Cook's distance measures that combination.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 % ============================================================
@@ -2608,9 +2615,9 @@ print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
   \begin{labnote}[Companion notebook: \texttt{chapter\_03\_lab.ipynb}]
     The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
     \begin{itemize}
-      \item simple and multiple linear regression with \texttt{statsmodels};
-      \item polynomials and interactions via the ISLP \texttt{ModelSpec};
-      \item regression diagnostics; and a comparison with KNN.
+      \item \S1 \emph{Simple linear regression} and \S2 \emph{Multiple linear regression}, with \texttt{statsmodels};
+      \item \S3 \emph{Polynomials and interactions via the ISLP} \texttt{ModelSpec};
+      \item \S4 \emph{Diagnostics}, then \S5 \emph{Comparison with KNN}.
     \end{itemize}
     Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
   \end{labnote}
@@ -2809,18 +2816,19 @@ print(dict(zip(X.columns, vifs)))  # VIF near 1 fine; > 5 problematic
 \begin{frame}{Self-check questions}
   \begin{enumerate}
     \item Derive the OLS slope $\hat\beta_1$ from the normal equations.
+          (pp.~25--26; in full in the appendix, pp.~148--150)
     \item Why does adding any predictor never decrease $R^2$? What is
-          the fix?
+          the fix? (p.~69)
     \item Suppose two predictors are perfectly correlated. What goes
-          wrong with OLS? With ridge?
+          wrong with OLS? With ridge? (pp.~115--117)
     \item Interpret an interaction coefficient
           $\beta_3\,X_1 X_2 = 0.4$ when $X_1$ = TV spend in \$1k and
-          $X_2$ = radio spend in \$1k.
+          $X_2$ = radio spend in \$1k. (pp.~84--85)
     \item In the Boston data, the simple regression of \texttt{medv}
           on \texttt{age} is significantly negative, but in the
-          multiple regression it is not. Explain.
+          multiple regression it is not. Explain. (pp.~61--62)
     \item State the prediction interval for a new observation at $x_0$
-          and contrast with the confidence interval.
+          and contrast with the confidence interval. (p.~70)
   \end{enumerate}
 \end{frame}
 
@@ -3055,7 +3063,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error as mse   # test-error metric
 
-a = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Auto.csv")  # load Auto data
+a = pd.read_csv("../ALL CSV FILES - 2nd Edition/Auto.csv")  # load Auto data
 a = a[a.horsepower != "?"]; a.horsepower = a.horsepower.astype(float)  # clean
 X, y = a[["horsepower"]].values, a["mpg"].values  # one predictor, target mpg
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=.3, random_state=1)  # 70/30
@@ -3099,12 +3107,12 @@ for name, m in [("linear", lin), ("poly-2", pol), ("KNN10", knn)]:
     KNN at $K\approx25$--$50$ is marginally \emph{ahead} ($18.2$--$18.6$ vs
     $19.2$) --- but inside one standard error. Prefer the degree-2 fit for
     \emph{interpretability}, not for accuracy.
-
-    \smallskip
-    \textit{Common mistake:} choosing $K$ by training MSE --- it falls
+  \end{solutionbox}
+  \begin{mistake}
+    choosing $K$ by training MSE --- it falls
     monotonically to zero at $K=1$. Only test or CV error reveals the
     U-shape that picks the right $K$.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \end{document}

@@ -10,12 +10,19 @@
 #   make exams      rebuild the mock exam papers, solutions and review decks
 #                   (kept out of git; the 60-min set has its own build.sh)
 #   make clean      delete LaTeX build artefacts
-#   make check      report page counts and any overfull slides
+#   make check      report page counts, overfull slides, and any runsheet whose
+#                   slide numbers no longer match its deck
+#   make runsheets  the full runsheet report: every page reference in
+#                   Teaching_Guide/runsheets/ resolved to its frame title
+#                   (kept out of git; skipped if the folder is absent)
+#   make notebooks  run all 15 lab notebooks and diff their output against the
+#                   outputs stored in them — what CI does weekly (needs nbclient)
 #
 # Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages,
 # enumitem and mathtools — the last two for the exam papers and review decks)
-# and python3 with the packages in requirements.txt. "index" and "check" also
-# need Teaching_Guide/requirements.txt (pypdf); "docs" needs docs/requirements.txt.
+# and python3 with the packages in requirements.txt. "index", "check" and
+# "runsheets" also need Teaching_Guide/requirements.txt (pypdf); "docs" needs
+# docs/requirements.txt; "notebooks" needs nbclient, nbformat and ipykernel.
 
 CHAPTERS  := 00 00b 01 02 03 04 05 06 07 08 10 13
 SLIDEDIR  := Lecture_Slides
@@ -27,7 +34,7 @@ LATEX     := pdflatex -interaction=nonstopmode -halt-on-error
 DECK_PDFS := $(foreach c,$(CHAPTERS),$(SLIDEDIR)/chapter_$(c)/chapter_$(c).pdf)
 HANDOUT_PDFS := $(foreach c,$(CHAPTERS),$(HANDOUTS)/chapter_$(c)_handout.pdf)
 
-.PHONY: all decks figures handouts index docs exams clean check help
+.PHONY: all decks figures handouts index docs exams clean check runsheets notebooks help
 .DEFAULT_GOAL := all
 
 all: figures decks index
@@ -185,8 +192,44 @@ exams:
 	@echo "             Short_Exams_60min: run its own ./build.sh"
 
 # ------------------------------------------------------------------------ checks
+# Two different questions. check_decks.py reads the .log files and asks whether
+# the decks compiled cleanly; check_runsheets.py reads the .pdf and .toc files
+# and asks whether the runsheets still describe the decks they were written
+# against.
+#
+# --quiet means what it says: wrong numbers, nothing else, plus a count of the
+# heuristic warnings it held back. Those warnings are all benign until someone
+# edits a deck, and printing 57 of them on every run would train the reader to
+# skip the output — which is how the next real one gets missed. `make runsheets`
+# shows them, with the page -> frame title listing; --warnings is the middle one.
 check:
 	@$(PYTHON) $(GUIDE)/check_decks.py
+	@echo
+	@$(MAKE) --no-print-directory runsheets ARGS=--quiet
+
+# Teaching_Guide/runsheets/ is git-ignored (it maps exercises onto exam
+# problems), so a fresh clone has none. Guard the same way "exams" does — but
+# with exit 0, because unlike the exams this is part of "check" and its absence
+# is normal, not an error.
+#
+# Deliberately *not* dependent on $(DECK_PDFS): like check_decks.py this only
+# reads what a build has already left behind, so it stays cheap and never
+# launches pdflatex. It says so itself when a deck is stale or uncompiled.
+RUNSHEETDIR := $(GUIDE)/runsheets
+
+# The directory is passed on to the script rather than left to its default, so
+# that the guard above and the check below can never disagree about which folder
+# is being read — and so `make check RUNSHEETDIR=/tmp/copy` can test the checker.
+runsheets:
+	@test -d "$(RUNSHEETDIR)" || { echo "  [runsheets] $(RUNSHEETDIR)/ not present (git-ignored)"; exit 0; } \
+	  && $(PYTHON) $(GUIDE)/check_runsheets.py $(ARGS) "$(RUNSHEETDIR)"
+
+# The same command .github/workflows/notebooks.yml runs, so the CI failure can
+# be reproduced locally. About 2 minutes, and it needs nbclient on top of
+# requirements.txt. Deliberately out of "check": "check" reads files, this runs
+# 15 notebooks. Nothing is written back to the notebooks.
+notebooks:
+	@$(PYTHON) .github/scripts/check_notebooks.py $(ARGS)
 
 # Only ever touches LaTeX by-products: no .tex, .pdf or image can match. Note
 # that "check" reads the .log files and "index" the .toc files, and a deck whose

@@ -74,9 +74,14 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
+% Industry application callout box --- slate grey, for real business/industry use.
+% The title always prints the words "In industry", so the box does not rely on its
+% tint alone; every call passes an explicit title, so the default is never used.
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -282,7 +287,9 @@
     IFRS~9 expected-credit-loss provision. The modelling team does not
     sign it off: an \emph{independent} validation unit re-runs the tests
     for a model-risk committee (US: Federal Reserve SR~11-7 guidance;
-    euro area: ECB supervisory model reviews).
+    euro area: ECB supervisory model reviews). The person who has to vote
+    on the out-of-time Gini is a committee member from finance or the
+    business, not a modeller.
   \end{readme}
   \begin{takeaway}[The honest caveat]
     Random $k$-fold folds across origination dates let the future inform
@@ -523,6 +530,10 @@
     correction. One fit + the diagonal of $\mathbf{H}$ replaces $n$
     fits.
   \end{readme}
+  \begin{labnote}[Run this live: \S4 \emph{LOOCV (leave-one-out)}]
+    The notebook scores degrees $1$--$5$ with \texttt{LeaveOneOut} --- all
+    $n = 392$ fits --- which is the cost this shortcut removes.
+  \end{labnote}
 \end{frame}
 
 % ============================================================
@@ -553,8 +564,10 @@
   \begin{center}
     \includegraphics[width=0.95\textwidth,height=0.45\textheight,keepaspectratio]{5_5.pdf}
   \end{center}
-  Each row is one of the five folds. Blue blocks are training, beige
-  blocks are validation.
+  Each row is one of the five fits. The single highlighted block is the
+  validation fold: it is the leftmost fifth of the data in row~1 and slides
+  one fifth to the right in each row below, so every observation is held out
+  exactly once. The rest of each row is the training data.
   \islpsource{Figure 5.5}
 \end{frame}
 
@@ -817,11 +830,12 @@
     $\mathrm{MSE} = 10$ and $12$: unweighted mean $11.0$, correct
     weighted value $\tfrac{90(10) + 110(12)}{200} = \tfrac{2220}{200}
     = 11.1$ --- the larger fold rightly counts more.
-
-    \emph{Common mistake:} averaging fold MSEs unweighted when fold
+  \end{solutionbox}
+  \begin{mistake}
+    averaging fold MSEs unweighted when fold
     sizes differ; with equal folds the two coincide, which is why the
     slip often goes unnoticed.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 
@@ -904,7 +918,7 @@
   \end{tikzpicture}}
   \end{center}
   \begin{takeaway}
-    Resample the rows \emph{with replacement} (note the repeated observations in orange), recompute $\hat\alpha$ on each of the $B$ samples, and read the standard error off the spread of the replicates.
+    Resample the rows \emph{with replacement} (the repeated observation in each resample is set in bold), recompute $\hat\alpha$ on each of the $B$ samples, and read the standard error off the spread of the replicates.
   \end{takeaway}
 \end{frame}
 
@@ -1029,12 +1043,13 @@
     distinct original observations --- the famous $0.632$ figure. The
     remaining $\sim 36.8\%$ (the ``out-of-bag'' points) can serve as a
     built-in validation set, as used in bagging (Ch.~8).
-
-    \emph{Common mistake:} concluding that a bootstrap sample is
+  \end{solutionbox}
+  \begin{mistake}
+    concluding that a bootstrap sample is
     ``smaller'' than the data. It always contains exactly $n$ rows;
     $63.2\%$ is the expected fraction of \emph{distinct} originals ---
     the remaining slots are filled by duplicates.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 
@@ -1060,7 +1075,7 @@
 \begin{frame}[fragile]{Solution --- Extended Exercise 5.2 (1/3)}
   \begin{lstlisting}
 import numpy as np, pandas as pd
-D = "../../ALL CSV FILES - 2nd Edition/"
+D = "../ALL CSV FILES - 2nd Edition/"
 Port = pd.read_csv(D+"Portfolio.csv")        # load Portfolio data
 X, Y = Port["X"].values, Port["Y"].values    # two asset returns
 def alpha(x, y):                             # min-variance allocation
@@ -1100,7 +1115,7 @@ print(round(slopes.std(ddof=1), 5),            # bootstrap SE of slope
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 5.2 (3/3)}
-  \begin{solutionbox}[Expected numbers and interpretation]
+  \begin{solutionbox}[Solution --- Expected numbers and interpretation]
     \textbf{Portfolio $\hat\alpha$.} $\hat\alpha\approx 0.576$, bootstrap
     $\widehat{\mathrm{SE}}\approx 0.091$, $95\%$ percentile interval
     $\approx[0.41,\,0.77]$. No closed-form SE exists, so the bootstrap is
@@ -1117,12 +1132,13 @@ print(round(slopes.std(ddof=1), 5),            # bootstrap SE of slope
     bootstrap assumes neither and picks up the mild
     non-linearity/heteroscedasticity in \texttt{Auto} --- hence the
     slightly larger bootstrap SE.
-
-    \emph{Common mistake:} resampling \texttt{X} and \texttt{Y} as two
+  \end{solutionbox}
+  \begin{mistake}
+    resampling \texttt{X} and \texttt{Y} as two
     \emph{independent} columns --- that destroys the covariance
     $\hat\sigma_{XY}$ that $\hat\alpha$ is built from. Always resample
     whole \emph{rows} (pairs), i.e.\ one shared index vector.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{The bootstrap in action: the sampling distribution of $\hat\alpha$}
@@ -1137,9 +1153,9 @@ print(round(slopes.std(ddof=1), 5),            # bootstrap SE of slope
   \begin{labnote}[Companion notebook: \texttt{chapter\_05\_lab.ipynb}]
     The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
     \begin{itemize}
-      \item the validation-set approach on the Auto data;
-      \item $k$-fold cross-validation and LOOCV;
-      \item the bootstrap.
+      \item \S1 \emph{The Auto data set}, then \S2 \emph{Validation set approach};
+      \item \S3 \emph{k-fold cross-validation} and \S4 \emph{LOOCV (leave-one-out)};
+      \item \S5 \emph{The bootstrap}.
     \end{itemize}
     Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
   \end{labnote}
@@ -1213,7 +1229,7 @@ print("95%:", np.quantile(boots, [0.025, 0.975]))  # percentile CI
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Exercise 5.6 (1/2)}
-  \begin{solutionbox}[Method --- why the bootstrap is the right tool]
+  \begin{solutionbox}[Solution --- Method: why the bootstrap is the right tool]
     $\hat\alpha$ is a nonlinear \emph{ratio} of variances and a
     covariance, so no textbook SE formula applies. Bootstrap plug-in
     principle: treat the sample as the population, draw $n$ rows
@@ -1223,7 +1239,7 @@ print("95%:", np.quantile(boots, [0.025, 0.975]))  # percentile CI
   \end{solutionbox}
   \begin{lstlisting}
 import numpy as np, pandas as pd
-Port = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Portfolio.csv")
+Port = pd.read_csv("../ALL CSV FILES - 2nd Edition/Portfolio.csv")
 X = Port["X"].values; Y = Port["Y"].values   # two asset returns
 
 def alpha(x, y):                             # min-variance allocation
@@ -1247,7 +1263,7 @@ for b in range(B):
 print("alpha_hat:", round(a_hat, 4))
 print("bootstrap SE:", round(reps.std(ddof=1), 4))  # SD of replicates
   \end{lstlisting}
-  \begin{solutionbox}[Expected result]
+  \begin{solutionbox}[Solution --- Expected result]
     You should obtain $\hat\alpha \approx 0.58$ and a bootstrap standard
     error of roughly $\widehat{\mathrm{SE}}(\hat\alpha) \approx 0.09$
     (matching ISLP Section~5.2). Interpretation: across resamples the
@@ -1282,7 +1298,7 @@ print("bootstrap SE:", round(reps.std(ddof=1), 4))  # SD of replicates
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 5.3 (1/3)}
-  \begin{solutionbox}[Why full-data preprocessing leaks]
+  \begin{solutionbox}[Solution --- Why full-data preprocessing leaks]
     \textbf{(1) The leak.} Cross-validation is honest only if each
     validation fold is treated exactly like genuinely unseen data. If you
     standardise or select features using \emph{all} $n$ rows first, then
@@ -1299,7 +1315,7 @@ print("bootstrap SE:", round(reps.std(ddof=1), 4))  # SD of replicates
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 5.3 (2/3)}
-  \begin{solutionbox}[Correct procedure: everything inside the split]
+  \begin{solutionbox}[Solution --- Correct procedure: everything inside the split]
     Fit \emph{all} data-dependent steps --- scaling, feature selection,
     and the $d$/$K$ choice --- \emph{inside} each training fold only. A
     \texttt{Pipeline} makes this automatic: the search re-fits every step
@@ -1329,18 +1345,18 @@ test_err = -cross_val_score(search, X, y, cv=outer,  # nested CV
 print("chosen degree:", search.fit(X, y).best_params_)  # tuned d
 print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
   \end{lstlisting}
-  \begin{solutionbox}[Nested CV --- two loops and two jobs]
+  \begin{solutionbox}[Solution --- Nested CV: two loops and two jobs]
     \textbf{(3)} The \emph{inner} loop (inside \texttt{GridSearchCV})
     selects $d$/$K$ using only each outer-training part. The \emph{outer}
     loop scores the whole tuning procedure on data it never touched,
     giving an \emph{unbiased} test-error estimate. Tuning and evaluation
     use disjoint data, so neither contaminates the other.
-
-    \smallskip
-    \textit{Common mistake:} reporting \texttt{search.best\_score\_} as
+  \end{solutionbox}
+  \begin{mistake}
+    reporting \texttt{search.best\_score\_} as
     the test error. That score \emph{chose} the winner, so it is
     optimistically biased --- only the outer loop's score is honest.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 % ============================================================
@@ -1461,13 +1477,17 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
 \begin{frame}{Self-check questions}
   \begin{enumerate}
     \item Why does the validation-set estimate have such high variance?
+          (pp.~16--17)
     \item Show that 5-fold CV has lower variance than LOOCV.
+          (pp.~30--31)
     \item How would you cross-validate a model on a time series?
+          (p.~35, and the rules of thumb on p.~74)
     \item Describe a scenario in which the bootstrap estimate of SE is
-          wrong.
+          wrong. (p.~48)
     \item Outline a nested-CV procedure for unbiased evaluation while
-          tuning a hyperparameter.
+          tuning a hyperparameter. (pp.~66--68)
     \item For OLS, derive the LOOCV shortcut formula using leverage.
+          (p.~25; reasoning and practice in the appendix, pp.~82--83)
   \end{enumerate}
 \end{frame}
 
@@ -1577,12 +1597,13 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
     point's out-of-sample error by a factor of $4$: remove the point and
     the fitted line springs back, so the prediction misses it far more
     badly than the training residual admits.
-
-    \emph{Common mistake:} forgetting that $y_i - \hat y_i$ and $h_i$
+  \end{solutionbox}
+  \begin{mistake}
+    forgetting that $y_i - \hat y_i$ and $h_i$
     both come from the \emph{full-data} fit (no refitting is involved),
     or dividing by $1-h_i$ without squaring --- the correction factor on
     the \emph{squared} error is $1/(1-h_i)^2 = 4$, not $1/(1-h_i) = 2$.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{Extended Exercise 5.1 --- LOOCV Shortcut vs.\ 5-Fold CV [Math]}
@@ -1660,11 +1681,13 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
             shortcut is one fit versus five. This reversal is special to
             OLS/ridge; for a general model LOOCV costs $n$ fits.
     \end{itemize}
-    \emph{Common mistake:} reading $3.88 < 4.20$ as ``LOOCV is more
+  \end{solutionbox}
+  \begin{mistake}
+    reading $3.88 < 4.20$ as ``LOOCV is more
     accurate''. Both target the same test MSE; the gap mostly reflects
     5-fold's pessimistic bias (training on $160$ rather than $199$
     points), not a defect of either estimate.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \end{document}

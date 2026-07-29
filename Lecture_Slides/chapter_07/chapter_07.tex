@@ -69,7 +69,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -231,7 +234,7 @@
     \[ \log\mathbb{E}[\text{claims}]=\beta_0+f_1(\text{driver age})+f_2(\text{vehicle age})+f_3(\text{mileage})+\text{region}+\text{bonus--malus}. \]
   \end{industry}
   \begin{readme}[What the fitted age curve looks like]
-    It is famously \emph{non-monotone}: risk is high for the youngest drivers, falls through middle age, then rises again for the oldest. A linear term in age cannot represent that shape at all --- a smooth can, and still prints as one readable curve.
+    It is famously \emph{non-monotone}: risk is high for the youngest drivers, falls through middle age, then rises again for the oldest. No linear term in age can represent that; a smooth can, and prints as one readable curve --- the curve an underwriter shows a broker or a customer who asks why a premium moved.
   \end{readme}
   \begin{takeaway}[Who signs it off --- and one caveat]
     The curves become tariff tables reviewed by pricing and the actuarial function, so they must be smooth and defensible: that, not accuracy, is why a GAM beats a black box here. \emph{Caveat:} the tariff must also price rarely observed cells, where a high-degree polynomial would swing wildly --- and additivity means an age~$\times$~vehicle-power interaction has to be added deliberately.
@@ -348,10 +351,10 @@ we see $\hat f$ is a linear combination of \emph{known, pre-computed} regressors
 
 \medskip
 \emph{Interpretation:} this is the basis-function idea behind the whole chapter --- keep the linear-regression machinery, change only the columns of the design matrix.
-
-\medskip
-\textit{Common mistake:} predicting $\hat f(4)$ by doubling $\hat f(2)$. Polynomial predictions do not scale linearly in $x$; every power term must be substituted separately.
 \end{solutionbox}
+\begin{mistake}
+Predicting $\hat f(4)$ by doubling $\hat f(2)$. Polynomial predictions do not scale linearly in $x$; every power term must be substituted separately.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Exercise 7.2 --- Step functions and dummy coding [Concept]}
@@ -389,10 +392,10 @@ We fit a piecewise-constant (step-function) regression of \texttt{wage} on \text
 
 \medskip
 \textbf{(d) Limitation.} The fit is constant within each bin and jumps at the cutpoints: it ignores any trend inside a bin, and the cutpoints are chosen arbitrarily. Unless the true relationship really has breakpoints, this misses smooth structure.
-
-\medskip
-\textit{Common mistake:} reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients compare to the \emph{reference} bin; the bin-$2$-to-bin-$3$ step is $\beta_2-\beta_1=10$.
 \end{solutionbox}
+\begin{mistake}
+Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients compare to the \emph{reference} bin; the bin-$2$-to-bin-$3$ step is $\beta_2-\beta_1=10$.
+\end{mistake}
 \end{frame}
 
 
@@ -595,6 +598,8 @@ Consider a cubic regression spline with $K$ interior knots, fitted so that the f
 which is $4+K$ functions --- one regression coefficient each, exactly matching the $K+4$ df from (c). Each truncated term adds one knot while preserving continuity of $g,g',g''$, so the two counting arguments agree.
 
 \medskip
+% Kept as italic text: lifting this into a mistake box overflows the slide
+% by ~24pt (the solutionbox is already full).
 \textit{Common mistake:} counting $4$ constraints per knot (including $g'''$) or forgetting the intercept among the basis functions --- both break the $K+4$ tally.
 \end{solutionbox}
 \end{frame}
@@ -629,10 +634,10 @@ i.e.\ $2$ extra constraints at each of the $2$ boundaries: $4$ additional constr
 
 \medskip
 \textbf{(d) Consequence for confidence bands.} The pointwise band width tracks the variance of $\hat g(x)$. Because fewer parameters are spent at the extremes and the tail shape is constrained to be linear, natural-spline bands are substantially \emph{narrower} at the boundaries than cubic-spline bands, at the price of a negligible bias increase in the interior.
-
-\medskip
-\textit{Common mistake:} thinking the natural spline is linear \emph{between} the boundary knots too --- inside the boundary knots it is every bit as flexible a cubic spline; only the two tails are straightened.
 \end{solutionbox}
+\begin{mistake}
+Thinking the natural spline is linear \emph{between} the boundary knots too --- inside the boundary knots it is every bit as flexible a cubic spline; only the two tails are straightened.
+\end{mistake}
 \end{frame}
 
 
@@ -778,9 +783,10 @@ ranging from $n$ (at $\lambda=0$, interpolation) down to $2$ (at $\lambda\to\inf
 \medskip
 \textbf{(d) Choosing $\lambda$.} By cross-validation. LOOCV is essentially free because each leave-one-out residual follows from the \emph{single} full fit via the leverage $\{S_\lambda\}_{ii}$:
 \[ \mathrm{RSS}_{\text{cv}}(\lambda)=\sum_{i=1}^n\!\left(\frac{y_i-\hat g_\lambda(x_i)}{1-\{S_\lambda\}_{ii}}\right)^{\!2}. \]
-
-\textit{Common mistake:} picking $\lambda$ by minimising \emph{training} RSS --- that always selects $\lambda=0$ (interpolation). Only out-of-sample criteria can trade fit against roughness.
 \end{solutionbox}
+\begin{mistake}
+Picking $\lambda$ by minimising \emph{training} RSS --- that always selects $\lambda=0$ (interpolation). Only out-of-sample criteria can trade fit against roughness.
+\end{mistake}
 \end{frame}
 
 
@@ -884,7 +890,7 @@ with a smooth spline in \texttt{age}, a (near-)linear term in \texttt{year}, and
 import pandas as pd
 from pygam import LinearGAM, s, l, f
 
-W = pd.read_csv('../../ALL CSV FILES - 2nd Edition/Wage.csv')  # load Wage
+W = pd.read_csv('../ALL CSV FILES - 2nd Edition/Wage.csv')  # load Wage
 W['edu'] = W['education'].astype('category').cat.codes  # factor -> codes
 X = W[['age', 'year', 'edu']].values  # predictor matrix
 y = W['wage'].values                  # response
@@ -905,10 +911,10 @@ A GAM is fit by \emph{backfitting}: cycle through the terms, repeatedly re-estim
 \end{itemize}
 
 \textbf{(c) Non-linearity \& EDF.} Only \texttt{age} is genuinely non-linear: its smooth spends many effective degrees of freedom ($\approx15$ at pyGAM's default penalty, dropping to $\approx10$ once $\lambda$ is tuned by \texttt{gam.gridsearch}). \texttt{year} enters with EDF $\approx1$ (essentially a straight line); \texttt{education} as a factor contributes df $=$ (levels $-1$) $=4$. The EDF is how a GAM quantifies ``how wiggly'' each term is.
-
-\medskip
-\textit{Common mistake:} reading a partial-effect curve as an absolute wage level. Each panel is centred around zero; only its \emph{shape} and within-panel differences are meaningful, with all other predictors held fixed.
 \end{solutionbox}
+\begin{mistake}
+Reading a partial-effect curve as an absolute wage level. Each panel is centred around zero; only its \emph{shape} and within-panel differences are meaningful, with all other predictors held fixed.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 7.2 (3/3)}
@@ -930,13 +936,13 @@ A GAM is fit by \emph{backfitting}: cycle through the terms, repeatedly re-estim
 
 \begin{frame}{Python lab --- run it live in the notebook}
   \begin{labnote}[Companion notebook: \texttt{chapter\_07\_lab.ipynb}]
-    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
+    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell, section by section:
     \begin{itemize}
-      \item polynomial regression and step functions;
-      \item regression splines and LOESS;
-      \item generalised additive models (GAMs).
+      \item \S1, \emph{Polynomial regression}, and \S2, \emph{Step functions};
+      \item \S3, \emph{Regression splines}, and \S4, \emph{LOESS};
+      \item \S5, \emph{GAM}.
     \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S6, \emph{Exercises}, closes the notebook.
   \end{labnote}
 \end{frame}
 
@@ -1011,7 +1017,7 @@ Using \texttt{Wage.csv}:
 import pandas as pd
 import statsmodels.formula.api as smf
 
-Wage = pd.read_csv('../../ALL CSV FILES - 2nd Edition/Wage.csv')  # load
+Wage = pd.read_csv('../ALL CSV FILES - 2nd Edition/Wage.csv')  # load
 fit = smf.ols('wage ~ cr(age, df=5)', data=Wage).fit()  # natural spline
 print(fit.summary())  # coefficient table
 \end{lstlisting}
@@ -1041,10 +1047,10 @@ gam.summary()  # EDF per smooth term
 
 \medskip
 \emph{How to read the fit:} plot \texttt{gam.partial\_dependence()} per term rather than staring at coefficients --- the spline basis coefficients have no individual meaning; only the fitted curve does.
-
-\medskip
-\textit{Common mistake:} interpreting single spline-basis coefficients (or their $t$-tests) as ``the effect of age''. Judge the term by its fitted curve and a \emph{joint} test of all its basis columns.
 \end{solutionbox}
+\begin{mistake}
+Interpreting single spline-basis coefficients (or their $t$-tests) as ``the effect of age''. Judge the term by its fitted curve and a \emph{joint} test of all its basis columns.
+\end{mistake}
 \end{frame}
 
 % ====================== EXTENDED EXERCISE: Python (Wage) ======================
@@ -1058,6 +1064,9 @@ Using \texttt{Wage.csv}, model \texttt{wage} as a function of \texttt{age} three
 \end{enumerate}
 Overlay the three fitted curves on a scatterplot, report the chosen complexity, and interpret where the fits agree and where they differ.
 \end{longexercise}
+\begin{labnote}[Run this live: \emph{Extended Exercise 7.3 --- Three fits for wage vs.\ age}]
+Under \emph{Lecture exercises --- worked Python solutions} in \texttt{chapter\_07\_lab.ipynb}: the nested ANOVA, the three fits and the overlay plot, ready to run.
+\end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 7.3 (1/3)}
@@ -1068,7 +1077,7 @@ import numpy as np, pandas as pd
 import statsmodels.formula.api as smf
 from statsmodels.stats.anova import anova_lm
 
-W = pd.read_csv('../../ALL CSV FILES - 2nd Edition/Wage.csv')  # load Wage
+W = pd.read_csv('../ALL CSV FILES - 2nd Edition/Wage.csv')  # load Wage
 terms = lambda d: '+'.join(f'np.power(age,{k})' for k in range(1, d+1))  # power basis
 models = [smf.ols('wage ~ '+terms(d), data=W).fit() for d in range(1, 6)]  # degrees 1..5
 print(anova_lm(*models)[['df_diff', 'F', 'Pr(>F)']].round(4))  # nested F-tests
@@ -1106,10 +1115,10 @@ plt.legend(); plt.xlabel('age'); plt.ylabel('wage'); plt.show()
   \item \emph{Where they differ:} at the sparse boundaries. The polynomial can bend sharply at the extremes; the step function is blocky and \emph{discontinuous} at the cut-points; the natural cubic spline stays smooth and, being linear beyond its outer knots, is the most stable at the edges.
 \end{itemize}
 \textbf{Chosen complexity:} a cubic polynomial (degree $3$--$4$), a $6$-bin step function, and a natural spline with $\sim$5 df --- all three explain a similar share of variance ($R^2\approx0.08$--$0.09$), but the natural spline is preferred for its boundary stability.
-
-\medskip
-\textit{Common mistake:} picking the degree that maximises training $R^2$ --- it rises mechanically with every added term; only the nested $F$-tests or CV can say when the gain is real.
 \end{solutionbox}
+\begin{mistake}
+Picking the degree that maximises training $R^2$ --- it rises mechanically with every added term; only the nested $F$-tests or CV can say when the gain is real.
+\end{mistake}
 \end{frame}
 
 
@@ -1220,17 +1229,21 @@ plt.legend(); plt.xlabel('age'); plt.ylabel('wage'); plt.show()
 \end{frame}
 
 \begin{frame}{Self-check questions}
+  Each question names the slide that answers it --- a wrong answer tells you
+  where to read.
   \begin{enumerate}
     \item Why is a cubic spline preferred over a quintic spline?
+          (p.~31)
     \item Argue intuitively why smoothing splines have a unique
-          minimiser.
+          minimiser. (p.~42)
     \item How does the smoothing-spline penalty $\lambda$ relate to df?
+          (p.~44)
     \item Sketch a GAM with two predictors. Where would you add an
-          interaction?
+          interaction? (p.~53)
     \item For LOESS, what happens to bias and variance as the span
-          shrinks?
+          shrinks? (p.~47)
     \item In the Wage data, would you expect a linear or a spline term
-          in \texttt{age} to win? Why?
+          in \texttt{age} to win? Why? (p.~33)
   \end{enumerate}
 \end{frame}
 
@@ -1353,10 +1366,10 @@ Therefore
 &=40+25+6.25-0.20+0 = \mathbf{71.05}.
 \end{align*}
 Only the basis functions ``switched on'' at $x=50$ enter the sum --- this locality is the point of the truncated basis.
-
-\medskip
-\textit{Common mistake:} evaluating the third term as $(50-60)^3=(-10)^3=-1000$ instead of $0$. The ``$+$'' truncation zeroes the term for $x\le 60$; forgetting it would give the wrong value $71.05-0.30=70.75$.
 \end{solutionbox}
+\begin{mistake}
+Evaluating the third term as $(50-60)^3=(-10)^3=-1000$ instead of $0$. The ``$+$'' truncation zeroes the term for $x\le 60$; forgetting it would give the wrong value $71.05-0.30=70.75$.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 7.1 (3/3)}

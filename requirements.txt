@@ -10,10 +10,20 @@ statsmodels>=0.14
 scikit-learn>=1.3
 
 # Book companion package (datasets + helpers)
-ISLP>=0.3
+# Pinned so the version that produced the stored outputs is reproducible; the
+# unpinned range spans 0.3.1 -> 0.4.1, and load_data() does not return the same
+# dtypes throughout. See constraints.txt.
+ISLP==0.4.0
 
 # Chapter-specific extras
-pygam>=0.9        # Chapter 7 (GAMs)
+# pygam MUST stay pinned. 0.12.0 changed the likelihood/AIC computation: the
+# Chapter 7 GAM reports AIC 30643.72 instead of 49773.69 (-38%) and
+# log-likelihood -15299.66 instead of -24864.65. Everything stored in
+# chapter_07_lab.ipynb assumes 0.10.1. Python 3.9 resolves >=0.9 to 0.10.1
+# anyway, but 3.10+ (including Colab) picks up 0.12.0 -- so the numbers silently
+# stopped matching there. Verified: 0.10.1 reproduces the stored AIC on both
+# Python 3.9/numpy 2.0 and Python 3.11/numpy 2.4, so this is pygam's change alone.
+pygam==0.10.1     # Chapter 7 (GAMs)
 xgboost>=2.0      # Chapter 8 (optional gradient-boosting comparison)
 torch>=2.1        # Chapter 10 (deep learning; preinstalled on Colab)
 lifelines>=0.27   # Chapter 11 (survival analysis, self-study notebook)

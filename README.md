@@ -2,7 +2,7 @@
 
 <p align="center">
   A complete, ready-to-teach university course in statistical learning —<br>
-  twelve slide decks, fifteen Jupyter labs, three mock exams, and the course datasets.
+  twelve slide decks, fifteen Jupyter notebooks, eight mock exams, and the course datasets.
 </p>
 
 <p align="center">
@@ -17,8 +17,8 @@
 <p align="center">
   <b>1057 core slides</b> (+111 in optional appendices) ·
   <b>127 exercises</b> with worked solutions ·
-  <b>15 labs</b> that run locally &amp; on Colab ·
-  <b>3 mock exams</b> · <b>22 datasets</b>
+  <b>12 labs</b> + 3 code references, all running locally &amp; on Colab ·
+  <b>3 + 5 mock exams</b> · <b>22 datasets</b>
 </p>
 
 <p align="center">
@@ -50,7 +50,7 @@ Applied Sciences and Arts), Summer Semester 2026.
 |---|---|---|
 | [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part optional precourse · 1057 slides, plus 111 in per-deck appendices |
 | Exercises | 86 short + 41 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
-| [Lab notebooks](#-lab-notebooks) | 15 | Twelve lecture chapters + three self-study chapters (SVM, survival, unsupervised) |
+| [Lab notebooks](#-lab-notebooks) | 12 + 3 | Twelve taught labs, each paired with a deck and carrying worked solutions · three untaught **code references** (SVM, survival, unsupervised): no deck, no solutions |
 | [Mock exams](#-mock-exams) | 3 | Each as questions, worked solutions and an in-class review deck — kept out of git |
 | [Datasets](#-python-environment--datasets) | 22 CSVs | From [statlearning.com](https://www.statlearning.com), resolved automatically via `ISLP` |
 | [Teaching guide](#-teaching-it) | 1 kit | Semester plan, runsheets, slide index, before-class checklist, printable handouts |
@@ -60,16 +60,30 @@ Applied Sciences and Arts), Summer Semester 2026.
 ## 🚀 Quick start
 
 You don't need to install anything to *read* the slides — the compiled PDFs live
-right in the repo. To *run* a lab you have two options.
+right in the repo. To *run* a lab, **start in Colab**; install locally later,
+once the course is under way.
 
-**▶︎ Google Colab — zero setup (recommended).** Open any notebook from the
-[lab table](#-lab-notebooks) in your browser; nothing to install. The first cell
-detects Colab, installs the few missing packages (`ISLP`, plus
-`pygam`/`xgboost`/`lifelines` where a chapter needs them; `torch` is
-preinstalled), and resolves the data automatically. A Google account is enough —
-no account on this repository is needed.
+### ▶︎ Day one: Google Colab — nothing to install
 
-**⌥ Local Jupyter.**
+This is the route to use in the first session and the one to point a cohort at.
+Open any notebook from the [lab table](#-lab-notebooks) in your browser; nothing
+to install and nothing to debug on a projector. The first cell detects Colab,
+installs the few missing packages (`ISLP`, plus `pygam`/`xgboost`/`lifelines`
+where a chapter needs them; `torch` is preinstalled), and resolves the data
+automatically. A Google account is enough — no account on this repository is
+needed, and Colab runs every lab in the course, including the Chapter 10 deep
+learning lab.
+
+### ⌥ Week two: a local virtual environment
+
+Faster, works offline, keeps your edits, and what you want for any serious piece
+of work — but not a first-session activity. The install pulls in **around 150
+packages and several hundred megabytes**, because the book companion package
+`ISLP` *hard-requires* `torch` (along with `pytorch_lightning` and
+`torchmetrics`): on Windows `torch` alone is over 100 MB, and on Linux the wheel
+bundles the CUDA libraries and is several times larger again. Removing `torch`
+from `requirements.txt` does not help — `pip` reinstates it as an `ISLP`
+dependency. Set aside time for it outside class.
 
 ```bash
 python -m venv .venv
@@ -110,7 +124,11 @@ four questions (p. 76); Ch 4 after the Bayes-theorem framing, immediately before
 LDA (p. 46).
 
 > Chapters **9 (SVM), 11 (Survival) and 12 (Unsupervised)** aren't part of the
-> 12-lecture plan but ship as **self-study lab notebooks** for completeness.
+> 12-lecture plan and have **no lecture deck**. They ship only as **code
+> references**: notebooks that show how to run the methods in Python, to be read
+> alongside the ISLP chapter, which does the teaching. They also ship **without
+> worked solutions** — unlike the twelve taught labs, their closing exercises are
+> left unanswered.
 
 ---
 
@@ -234,10 +252,12 @@ refreshes the slide index.
 
 ## 📓 Lab notebooks
 
-Fifteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`) mirror each chapter's
-Python lab, including both precourse sessions and the three self-study chapters.
-Each runs **locally or on Google Colab**; data loads via the `ISLP` package with
-an automatic fallback to the bundled CSVs, so nothing needs downloading by hand.
+Fifteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`): **twelve taught labs**,
+one per deck (both precourse sessions included), each ending in worked Python
+solutions to that chapter's exercises — plus **three code references** for the
+untaught chapters, which have no deck and no solutions (see below). Each runs
+**locally or on Google Colab**; data loads via the `ISLP` package with an
+automatic fallback to the bundled CSVs, so nothing needs downloading by hand.
 
 | Ch. | Lab | Open in Colab |
 |:--:|--|:--:|
@@ -253,9 +273,16 @@ an automatic fallback to the bundled CSVs, so nothing needs downloading by hand.
 | 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_08_lab.ipynb) |
 | 10 · Deep Learning | `chapter_10_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_10_lab.ipynb) |
 | 13 · Multiple Testing | `chapter_13_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_13_lab.ipynb) |
-| 9 · Support Vector Machines *(self-study)* | `chapter_09_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_09_lab.ipynb) |
-| 11 · Survival Analysis *(self-study)* | `chapter_11_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_11_lab.ipynb) |
-| 12 · Unsupervised Learning *(self-study)* | `chapter_12_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_12_lab.ipynb) |
+
+**Code references — no lecture deck, no worked solutions.** Read the ISLP
+chapter first; these three notebooks show how to run the methods in Python, they
+do not teach the ideas.
+
+| Ch. | Code reference | Open in Colab |
+|:--:|--|:--:|
+| 9 | `chapter_09_lab.ipynb` — Support Vector Machines | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_09_lab.ipynb) |
+| 11 | `chapter_11_lab.ipynb` — Survival Analysis | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_11_lab.ipynb) |
+| 12 | `chapter_12_lab.ipynb` — Unsupervised Learning | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_12_lab.ipynb) |
 
 Every notebook is also
 [rendered in full](https://chrisw09.github.io/Quantitative-Research-Methods/labs.html)
@@ -303,6 +330,14 @@ exam in class.
 
 The final exam also exists in three parallel versions (A / B / C) — same
 structure and difficulty, different numbers.
+
+Alongside them, **five 60-minute short exams** (A–E, three problems × 20 points)
+form the formative layer, released one at a time as the material each needs is
+taught — A after Lecture 6 (Ch 4), B after 7 (Ch 5), C after 8 (Ch 6), D after 10
+(Ch 8), E after 12 (Ch 13). They are the papers to give a student who has fallen
+behind, and the only ones carrying grading keys and marking tables. They live in
+`Mock_Exams/Short_Exams_60min/` and build with their own `./build.sh`, not
+`make exams`.
 
 > 🔒 **Not distributed here.** The exams, their solutions and their LaTeX
 > sources are assessment material and are deliberately kept out of this

@@ -80,7 +80,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -292,7 +295,8 @@
   \end{numexample}
   \begin{takeaway}[Who signs off --- and the honest caveat]
     The product owner, plus a central experimentation platform that enforces
-    the pre-registration. Caveat: stopping the test the first time it looks
+    the pre-registration. Its consumer is the launch reviewer who ships it.
+    Caveat: stopping the test the first time it looks
     significant (``peeking''), or reporting whichever of twenty metrics moved,
     breaks the $5\%$ guarantee --- the problem of Chapter~13.
   \end{takeaway}
@@ -562,8 +566,9 @@
   while \texttt{numpy} and \texttt{pandas} interpolate between neighbours and
   can differ by half a unit.
   \begin{labnote}[Companion notebook]
-    Rebuild this plot yourself in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}
-    with \texttt{df["wage"].describe()}.
+    Rebuild this plot yourself in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb},
+    \S2 \emph{Describing one variable: centre, spread, shape}, with
+    \texttt{df["wage"].describe()}.
   \end{labnote}
 \end{frame}
 
@@ -709,11 +714,12 @@
     are reported with the median, and why a single mistyped value can move a
     least-squares fit --- squared errors magnify exactly this sensitivity
     (Chapter 3).
-
-    \textit{Common mistake:} dividing by $n$ instead of $n-1$ in $s^2$ ---
+  \end{solutionbox}
+  \begin{mistake}
+    Dividing by $n$ instead of $n-1$ in $s^2$ ---
     here $211.4/7 \approx 30.2$ instead of $35.2$. The $n-1$ pays for
     estimating $\bar x$ from the same data.
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 
@@ -1420,9 +1426,9 @@
     \includegraphics[width=0.84\textwidth,height=0.44\textheight,keepaspectratio]{ch00_power.png}
   \end{center}
   \footnotesize
-  Moving the critical value to the right shrinks the orange area (the upper
-  tail here, $\alpha/2$)
-  but grows the green one ($\beta$). Only \emph{more data} --- or a larger
+  Moving the critical value to the right shrinks the Type~I error area
+  (upper tail, $\alpha/2$)
+  but grows the Type~II error area ($\beta$). Only \emph{more data} --- or a larger
   true effect, or less noise --- shrinks both, by pushing the curves apart.
   \begin{takeaway}[Why underpowered studies mislead]
     With low power most true effects are missed, and the few that do reach
@@ -1497,11 +1503,12 @@
     one}) = 1 - 0.95^{40} \approx 0.87$. Three ``discoveries'' is therefore
     unremarkable. Correcting for this is the entire content of Chapter 13
     (Bonferroni, Holm, Benjamini--Hochberg).
-
-    \textit{Common mistake:} expecting double the data to halve the SE ---
+  \end{solutionbox}
+  \begin{mistake}
+    Expecting double the data to halve the SE ---
     it shrinks like $1/\sqrt n$, so halving the SE costs \emph{four} times
     the data, exactly as in (3).
-  \end{solutionbox}
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{Extended Exercise 0.1 --- From data to a defensible claim [Math]}
@@ -1617,7 +1624,7 @@
     \includegraphics[width=0.92\textwidth,height=0.50\textheight,keepaspectratio]{ch00_slr.png}
   \end{center}
   \footnotesize
-  Left: the fit on \texttt{Advertising}; the grey segments are the residuals
+  Left: the fit on \texttt{Advertising}; the vertical segments are the residuals
   $e_i = y_i - \hat y_i$ that least squares squares and adds up. Right: a
   residual plot --- structure here (curvature, a funnel) means the model is
   missing something. Both plots return in Chapter 3.
@@ -1957,7 +1964,8 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     \emph{with} uncertainty $\to$ check the residuals.
   \end{takeaway}
   \begin{labnote}[Companion notebook]
-    Run all of this in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}.
+    Run all of this in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb},
+    \S8 \emph{Simple linear regression --- the bridge into Chapter 3}.
   \end{labnote}
 \end{frame}
 
@@ -2318,23 +2326,26 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
 
 \begin{frame}{Self-check questions}
   \begin{enumerate}
-    \item Why does the sample variance divide by $n-1$?
-    \item Give two variables with a strong relationship but $r \approx 0$.
+    \item Why does the sample variance divide by $n-1$? (p.~22)
+    \item Give two variables with a strong relationship but $r \approx 0$. (p.~35)
     \item A test is 99\% accurate for a disease affecting 1 in 10{,}000.
-          You test positive. Estimate $P(\text{ill}\mid+)$ --- roughly.
-    \item State precisely what ``95\% confident'' means.
-    \item Why does quadrupling the sample size only halve the standard error?
+          You test positive. Estimate $P(\text{ill}\mid+)$ --- roughly. (p.~45)
+    \item State precisely what ``95\% confident'' means. (p.~60)
+    \item Why does quadrupling the sample size only halve the standard
+          error? (p.~58)
     \item In $\hat y = 4 + 0.8x$ with $x$ in years and $y$ in \euro 000s,
-          interpret both coefficients with units.
+          interpret both coefficients with units. (p.~77)
     \item If $\mathbf{X}$ is $200 \times 5$, what size is
           $(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$?
-    \item Why must predictors be standardised before ridge regression?
+          (appendix, p.~111)
+    \item Why must predictors be standardised before ridge regression? (p.~27)
     \item Why does a large learning rate make gradient descent diverge?
+          (appendix, p.~118)
     \item Two studies report the same estimate; one has twice the standard
           error. Which is more likely to be ``significant'', and why is that
-          not the same as being more \emph{true}?
+          not the same as being more \emph{true}? (p.~64)
     \item Sketch Anscombe's fourth data set from memory and say why its
-          correlation is untrustworthy.
+          correlation is untrustworthy. (p.~36)
   \end{enumerate}
 \end{frame}
 
@@ -2373,9 +2384,9 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
   \end{block}
   \begin{labnote}[Practice beats reading]
     Redo Exercises 0.2, 0.3 and Extended Exercise 0.2 \emph{by hand}, then
-    reproduce them in Python in the companion notebook
-    \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}, which rebuilds every
-    figure of this deck from the course data. That single hour is the best
+    reproduce them in Python in \texttt{Lab\_Notebooks/chapter\_00\_lab.ipynb}
+    --- \S\S1--10 rebuild every figure of this deck from the course data, and
+    \emph{Lecture exercises --- worked Python solutions} checks your answers. That single hour is the best
     preparation for Lecture 1.
   \end{labnote}
 \end{frame}

@@ -6,7 +6,7 @@ statistics, and (b) the notation, algebra and Python the chapters assume.
 
 :::{container} qrm-chips
 **12** sessions × **180 min** · **2** optional precourse sessions ·
-**3** decks split across two lectures · **3** mock exams
+**3** decks split across two lectures · **3 + 5** mock exams
 :::
 
 ## Semester plan
@@ -40,30 +40,42 @@ you stop and resume cleanly:
 - **Ch 4** — after the Bayes-theorem framing (p. 46), immediately before LDA
 ```
 
-## Self-study chapters
+## Untaught chapters
 
 Chapters **9 (Support Vector Machines)**, **11 (Survival Analysis)** and
-**12 (Unsupervised Learning)** are not part of the 12-lecture plan, but ship as
-complete [lab notebooks](labs.md) for students who want them.
+**12 (Unsupervised Learning)** are not part of the 12-lecture plan and have **no
+lecture deck**. Each ships only as a [code reference notebook](labs.md) —
+Python for the methods, to be read alongside the ISLP chapter, which does the
+teaching — and, unlike the twelve taught labs, **without worked solutions**.
 
 ## Assessment rhythm
 
-Three mock exams are matched to the calendar so students can self-test at the
-natural checkpoints — see [Mock exams](exams.md). They are not distributed with
-this repository.
+Eight papers are matched to the calendar so students can self-test at the
+natural checkpoints — see [Mock exams](exams.md). None of them is distributed
+with this repository.
 
 Each deck also carries far more exercises than a session can run: the
 [runsheets](teaching.md) name the two to four worth live time and leave the rest
 as homework.
 
-| Exam | Written after | Covers | Length |
+| Paper | Written after | Covers | Length |
 |---|:--:|---|:--:|
 | Mock Exam 1 | Lecture 4 | Chapters 1–3 | 90 min · 90 pts |
+| Short Exam A | Lecture 6 | Ch 0 + 1–2, Ch 3, **Ch 4** | 60 min · 60 pts |
+| Short Exam B | Lecture 7 | Ch 2, Ch 3, **Ch 5** | 60 min · 60 pts |
 | Mock Exam 2 | Lecture 8 | Chapters 4–6 (+ light cumulative) | 90 min · 90 pts |
+| Short Exam C | Lecture 8 | Ch 0 + 0b, Ch 3, **Ch 6** | 60 min · 60 pts |
+| Short Exam D | Lecture 10 | Ch 2 + 5, Ch 2 + 4, **Ch 8** | 60 min · 60 pts |
 | Final Mock Exam | Lecture 12 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
+| Short Exam E | Lecture 12 | Ch 0, Ch 5 + 7, **Ch 13** | 60 min · 60 pts |
+
+The three mock exams are the full-length rehearsals; the five 60-minute short
+exams are the formative layer, and the bold chapter is where each one's hardest
+problem sits — which is why they are released in order, not all at once.
 
 ## Where to go next
 
 - [Lecture slides](slides.md) — the deck for each week, and how a deck is built.
 - [Teaching it](teaching.md) — runsheets, timings and the cut list.
 - [Lab notebooks](labs.md) — the companion notebook for each chapter.
+- [For students](for-students.md) — prerequisites, workload and how to revise.

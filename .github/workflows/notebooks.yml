@@ -1,0 +1,167 @@
+name: Notebooks
+
+# Executes all 15 lab notebooks and compares their text output against the
+# outputs stored in the repository. Three silent numeric drifts were found by
+# hand in one week: none of them raised, so "does it run" is not enough. The
+# comparison lives in .github/scripts/check_notebooks.py.
+#
+# Two jobs, because there are two different questions.
+#
+#   pinned    requirements.txt -c constraints.txt — the build that was verified
+#             to reproduce the stored outputs. A diff here means the *notebooks*
+#             changed and their stored outputs were not refreshed. Deterministic,
+#             so it blocks.
+#
+#   floating  requirements.txt alone — whatever the ecosystem ships today. A diff
+#             here means a dependency moved a published number, which is how the
+#             pygam 0.12 AIC change was found. Informational: it reports into the
+#             run summary but does not fail the workflow, because "a new release
+#             reformatted a table" must not turn the repository red.
+#
+# Triggers. The notebooks need the whole course dependency set, and ISLP depends
+# on torch, which from PyPI on Linux drags in the nvidia CUDA wheels too —
+# roughly 2.5 GB onto a runner that will never see a GPU. The "CPU-only torch"
+# step cuts that to about 200 MB, and with setup-python's pip cache on top the
+# pinned job costs about 3-4 minutes. That is what makes a per-push run
+# affordable, and it is path-filtered so it only fires when the answer could
+# have changed. The weekly cron is what the schedule is really for: it runs the
+# floating job, and dependency releases arrive on their own schedule, not on
+# ours.
+#
+# If runner minutes ever get tight, drop the `push:` trigger before the cron.
+
+on:
+  schedule:
+    # Mondays 04:17 UTC. Off the hour on purpose: scheduled jobs queue heavily
+    # at :00 and GitHub silently drops runs it cannot start.
+    - cron: "17 4 * * 1"
+  push:
+    paths:
+      - "Lab_Notebooks/**"
+      - "requirements.txt"
+      - "constraints.txt"
+      - ".github/workflows/notebooks.yml"
+      - ".github/scripts/check_notebooks.py"
+  workflow_dispatch:
+    inputs:
+      compare:
+        description: "Diff against the stored outputs (off = only check that nothing raises)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notebooks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pinned:
+    name: Reproduce the stored outputs (pinned)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # 3.11, not 3.12: constraints.txt was verified on 3.9 and cross-checked on
+      # 3.11, and every pin in it has a manylinux cp311 wheel.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          # Caches the pip *download* cache, keyed on the two files that decide
+          # what gets downloaded. It does not cache the installed environment,
+          # so the unpack cost stays; what it removes is the downloads.
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            constraints.txt
+
+      - name: Install
+        run: .github/scripts/install_notebook_env.sh --pinned
+
+      - name: Record the environment
+        run: pip freeze
+
+      - name: Execute the notebooks and diff their output
+        shell: bash
+        # "true" for every trigger except a workflow_dispatch that unticked the
+        # box. Written as a negation so a cron or push run, where inputs.compare
+        # does not exist, can never come out false.
+        env:
+          COMPARE: ${{ github.event_name != 'workflow_dispatch' || inputs.compare }}
+        run: |
+          set -o pipefail
+          if [ "$COMPARE" = "true" ]; then FLAGS=""; else FLAGS="--no-compare"; fi
+          python3 .github/scripts/check_notebooks.py $FLAGS 2>&1 | tee report-pinned.txt
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notebook-report-pinned
+          path: report-pinned.txt
+          if-no-files-found: warn
+
+  floating:
+    name: Current ecosystem (informational)
+    # Nothing to learn from this on a push: the pinned job above already answers
+    # "did the notebooks change". This one answers "did the world change", which
+    # only the clock can tell us.
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install
+        run: .github/scripts/install_notebook_env.sh
+
+      - name: Record the environment
+        run: pip freeze
+
+      # continue-on-error, then a summary: a dependency release that reformats a
+      # table would otherwise turn the repository red for a cosmetic reason, and
+      # a check nobody trusts is worse than no check.
+      - name: Execute the notebooks and diff their output
+        id: run
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 .github/scripts/check_notebooks.py 2>&1 | tee report-floating.txt
+
+      - name: Report into the run summary
+        if: always()
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.run.outcome }}
+        run: |
+          {
+            if [ "$OUTCOME" = "success" ]; then
+              echo "## Notebooks reproduce on the current stack"
+            else
+              echo "## The current stack no longer reproduces the stored outputs"
+              echo
+              echo "Either refresh the stored outputs and \`constraints.txt\`, or pin the"
+              echo "package that moved. The pinned job is unaffected."
+            fi
+            echo
+            echo '```'
+            tail -c 60000 report-floating.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notebook-report-floating
+          path: report-floating.txt
+          if-no-files-found: warn

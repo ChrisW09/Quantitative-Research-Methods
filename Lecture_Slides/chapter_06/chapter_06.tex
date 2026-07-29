@@ -74,7 +74,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -268,7 +271,9 @@
     The calibration replaces routine lab testing: it feeds in-process
     control and real-time release of a batch. QA and regulatory affairs
     own the sign-off, because it forms part of a \emph{validated}
-    analytical method.
+    analytical method. The predicted concentration itself reaches a QA
+    release manager or production supervisor, who must release the batch
+    --- or hold it for the reference assay --- on the strength of it.
   \end{readme}
   \begin{takeaway}[The honest caveat]
     Calibrations drift --- a new supplier or instrument moves the spectra,
@@ -395,8 +400,9 @@
   \end{columns}
   \begin{takeaway}
     Best subset scores the \emph{whole} lattice ($2^p$ models); forward
-    keeps only the winner at each level (green) and never even fits the
-    dashed subset. At $p = 20$: $2^{20}\approx 10^6$ vs.\ $211$ models.
+    keeps only the winner at each level (the bold subsets on the arrowed
+    path) and never even fits the dashed subset. At $p = 20$:
+    $2^{20}\approx 10^6$ vs.\ $211$ models.
   \end{takeaway}
 \end{frame}
 
@@ -490,6 +496,8 @@
     adjusted $R^2$.
 
     \smallskip
+    % Kept as italic text: lifting this into a mistake box overflows the
+    % slide by ~23pt (the solutionbox is already full).
     \textit{Common mistake:} comparing models of different sizes by
     training RSS or $R^2$ --- the biggest model always wins by
     construction; that is exactly the problem these criteria solve.
@@ -555,11 +563,12 @@
     the three extra predictors of Model B more than they reduce RSS, so
     BIC prefers the smaller Model A, while the lighter $C_p$ penalty
     lets Model B's better fit win. When parsimony matters, follow BIC.
-
-    \emph{Common mistake:} using $\log_{10}(100) = 2$ instead of the
-    natural log $\ln(100) \approx 4.605$ --- with base-$10$ logs the BIC
-    penalty would collapse to $C_p$'s $2d\hat\sigma^2$ here.
   \end{solutionbox}
+  \begin{mistake}
+    Using $\log_{10}(100) = 2$ instead of the natural log
+    $\ln(100) \approx 4.605$ --- with base-$10$ logs the BIC penalty would
+    collapse to $C_p$'s $2d\hat\sigma^2$ here.
+  \end{mistake}
 \end{frame}
 
 
@@ -637,11 +646,12 @@
     \textbf{Winners.} $C_p\Rightarrow d=3$;\quad
     $\mathrm{BIC}\Rightarrow d=2$;\quad
     $\mathrm{adj}\,R^2\Rightarrow d=4$.
-
-    \emph{Common mistake:} dividing by $n - d$ instead of $n - d - 1$ in
-    the numerator --- the extra $-1$ is the intercept. At $d = 4$ the
-    correct divisor is $95$, not $96$: $314/95 = 3.305$.
   \end{solutionbox}
+  \begin{mistake}
+    Dividing by $n - d$ instead of $n - d - 1$ in the numerator --- the
+    extra $-1$ is the intercept. At $d = 4$ the correct divisor is $95$,
+    not $96$: $314/95 = 3.305$.
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 6.1 (3/3)}
@@ -806,6 +816,8 @@
     stability but does \emph{not} select variables --- for that, use the lasso.
 
     \medskip
+    % Kept as italic text: lifting this into a mistake box overflows the
+    % slide by ~18pt (the solutionbox is already full).
     \textit{Common mistake:} treating standardisation as cosmetic. For
     plain OLS it is (predictions unchanged); with a penalty it \emph{changes
     the model} --- ridge on raw and on standardised predictors gives
@@ -1017,12 +1029,13 @@
     coefficients once the penalty exceeds twice the OLS magnitude, while
     the ridge solution $\hat\beta_j/(1+\lambda)$ would only shrink,
     never reaching zero.
-
-    \emph{Common mistake:} thresholding at $\lambda$ instead of
-    $\lambda/2$. Here both give zero, but at $\lambda = 2$ the wrong
-    threshold yields $1.5 - 2 < 0 \Rightarrow 0$, killing a coefficient
-    that actually survives as $1.5 - 1.0 = 0.5$.
   \end{solutionbox}
+  \begin{mistake}
+    Thresholding at $\lambda$ instead of $\lambda/2$. Here both give zero,
+    but at $\lambda = 2$ the wrong threshold yields
+    $1.5 - 2 < 0 \Rightarrow 0$, killing a coefficient that actually
+    survives as $1.5 - 1.0 = 0.5$.
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{Lasso coefficient paths on Hitters}
@@ -1124,13 +1137,13 @@
 
 \begin{frame}{Python lab --- run it live in the notebook}
   \begin{labnote}[Companion notebook: \texttt{chapter\_06\_lab.ipynb}]
-    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
+    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell, section by section:
     \begin{itemize}
-      \item best-subset and forward stepwise selection on Hitters;
-      \item ridge regression and the lasso (coefficient paths);
-      \item principal-components and partial-least-squares regression.
+      \item \S2, \emph{Best-subset and forward stepwise selection} --- on the Hitters data loaded in \S1;
+      \item \S3, \emph{Ridge regression}, and \S4, \emph{Lasso} --- each with its coefficient-path subsection;
+      \item \S5, \emph{PCR and PLS}.
     \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S6, \emph{Exercises}, closes the notebook.
   \end{labnote}
 \end{frame}
 
@@ -1222,8 +1235,8 @@ from sklearn.linear_model    import Lasso, Ridge
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline        import make_pipeline
 from sklearn.preprocessing   import StandardScaler
-
-df = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Hitters.csv").dropna()
+# path as seen from Lab_Notebooks/, where you run the notebook
+df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Hitters.csv").dropna()
 y = df["Salary"].values
 X = pd.get_dummies(df.drop(columns=["Salary"]), drop_first=True)
 preds = X.columns                            # scale inside the CV, not here
@@ -1246,7 +1259,7 @@ rc = ridge.best_estimator_[-1].coef_
 print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
       "-- nonzero coefs:", int(np.sum(np.abs(rc) > 1e-8)))          # all p
   \end{lstlisting}
-  \begin{solutionbox}[Expected result and interpretation]
+  \begin{solutionbox}[Solution --- expected result and interpretation]
     The lasso selects a moderate $\lambda$ and \emph{drives several
     coefficients to exactly zero} --- typically it keeps strong career
     and recent-performance predictors (e.g.\ \texttt{CRBI},
@@ -1257,13 +1270,12 @@ print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
     automatic variable selection, whereas ridge stabilises the fit while
     retaining every predictor. Choose based on whether sparsity or
     keeping all predictors is preferred.
-
-    \medskip
-    \textit{Common mistake:} comparing the printed \texttt{alpha} with a
-    textbook $\lambda$ --- \texttt{scikit-learn} scales the lasso penalty by
-    $1/(2n)$, so the numbers differ across formulations even when the
-    fitted models agree.
   \end{solutionbox}
+  \begin{mistake}
+    Comparing the printed \texttt{alpha} with a textbook $\lambda$ ---
+    \texttt{scikit-learn} scales the lasso penalty by $1/(2n)$, so the
+    numbers differ across formulations even when the fitted models agree.
+  \end{mistake}
 \end{frame}
 
 
@@ -1282,6 +1294,10 @@ print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
             lasso.
     \end{enumerate}
   \end{longexercise}
+  \begin{labnote}[Run this live: \emph{Lecture exercises --- worked Python solutions}]
+    The runnable solution, with the printed numbers, is the second entry of that
+    notebook section, headed \emph{Extended Exercise 6.3} to match this deck.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 6.3 (1/3)}
@@ -1292,7 +1308,7 @@ from sklearn.preprocessing  import StandardScaler
 from sklearn.linear_model   import RidgeCV, LassoCV
 from sklearn.metrics        import mean_squared_error
 
-D  = "../../ALL CSV FILES - 2nd Edition/"
+D  = "../ALL CSV FILES - 2nd Edition/"   # path from Lab_Notebooks/
 df = pd.read_csv(D+"Hitters.csv").dropna(subset=["Salary"])  # drop NA y
 y  = df["Salary"].values
 X  = pd.get_dummies(df.drop(columns=["Salary"]),
@@ -1323,7 +1339,7 @@ print("lasso drops:", dropped)
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 6.3 (3/3)}
-  \begin{solutionbox}[Expected result and interpretation]
+  \begin{solutionbox}[Solution --- expected result and interpretation]
     With $n=263$, $p=19$ and this split you should see roughly:
     \begin{itemize}
       \item \textbf{Ridge}: $\lambda\approx0.1$, test MSE
@@ -1339,14 +1355,13 @@ print("lasso drops:", dropped)
     variable selection), whereas ridge keeps and merely shrinks all
     predictors. Exact numbers shift with the split/seed; the qualitative
     message --- lasso selects, ridge keeps all --- is stable.
-
-    \smallskip
-    \textit{Common mistake:} reading the dropped variables as ``irrelevant
-    to salary''. \texttt{Years} and \texttt{CRBI} are highly correlated
-    with the kept career totals --- the lasso drops \emph{redundant}
-    predictors, and a different split can swap which of a correlated group
-    survives.
   \end{solutionbox}
+  \begin{mistake}
+    Reading the dropped variables as ``irrelevant to salary''.
+    \texttt{Years} and \texttt{CRBI} are highly correlated with the kept
+    career totals --- the lasso drops \emph{redundant} predictors, and a
+    different split can swap which of a correlated group survives.
+  \end{mistake}
 \end{frame}
 
 % ============================================================
@@ -1441,17 +1456,20 @@ print("lasso drops:", dropped)
 \end{frame}
 
 \begin{frame}{Self-check questions}
+  Each question names the slide that answers it --- a wrong answer tells you
+  where to read.
   \begin{enumerate}
     \item Why does ridge regression always have a unique solution?
+          (p.~35)
     \item Why can lasso set coefficients to exactly zero, but ridge
-          cannot? Sketch the unit balls.
+          cannot? Sketch the unit balls. (p.~45)
     \item For two perfectly correlated predictors, what does ridge do?
-          What does lasso do? What does elastic net do?
+          What does lasso do? What does elastic net do? (p.~47)
     \item Compute the ridge estimate when $\mathbf{X}^\top\mathbf{X} = I$
-          --- a clean special case.
+          --- a clean special case. (appendix, p.~88)
     \item PCR ignores $Y$ when forming components. When can this hurt
-          and when does it help?
-    \item Outline the one-standard-error rule.
+          and when does it help? (p.~55)
+    \item Outline the one-standard-error rule. (p.~46)
   \end{enumerate}
 \end{frame}
 
@@ -1587,12 +1605,12 @@ print("lasso drops:", dropped)
     through the model lattice, so it can miss the best subset of a given
     size --- its winner must still be validated by CV or a penalised
     criterion.
-
-    \emph{Common mistake:} dropping the null model from either count ---
-    both include it ($2^{10} = 1024$ subsets \emph{including}
-    $\varnothing$; $1 + 55 = 56$ stepwise fits, the leading $1$ being
-    $M_0$).
   \end{solutionbox}
+  \begin{mistake}
+    Dropping the null model from either count --- both include it
+    ($2^{10} = 1024$ subsets \emph{including} $\varnothing$; $1 + 55 = 56$
+    stepwise fits, the leading $1$ being $M_0$).
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{Extended Exercise 6.2 --- Orthonormal Design: Ridge vs.\ Lasso [Math]}
@@ -1664,12 +1682,12 @@ print("lasso drops:", dropped)
     \emph{exactly to zero} while the large ones are shrunk by the same
     absolute amount. This is precisely why the $\ell_1$ penalty performs
     \emph{variable selection} and the $\ell_2$ penalty only shrinks.
-
-    \smallskip
-    \textit{Common mistake:} thinking the lasso shrinks proportionally.
-    It subtracts the same \emph{absolute} amount from every coefficient;
-    ridge is the proportional one --- compare the $3.0$ and $0.4$ rows.
   \end{solutionbox}
+  \begin{mistake}
+    Thinking the lasso shrinks proportionally. It subtracts the same
+    \emph{absolute} amount from every coefficient; ridge is the
+    proportional one --- compare the $3.0$ and $0.4$ rows.
+  \end{mistake}
 \end{frame}
 
 \begin{frame}{Partial least squares (PLS)}
@@ -1727,13 +1745,12 @@ print("lasso drops:", dropped)
     seeking directions correlated with $Y$, so it can capture the
     predictive signal with fewer components. In practice PLS often
     performs comparably to ridge regression.
-
-    \smallskip
-    \textit{Common mistake:} concluding supervised must be better ---
-    using $Y$ also raises variance, so PCR often matches PLS. And neither
-    selects variables: every component $Z_m$ mixes \emph{all} $p$
-    predictors.
   \end{solutionbox}
+  \begin{mistake}
+    Concluding supervised must be better --- using $Y$ also raises
+    variance, so PCR often matches PLS. And neither selects variables:
+    every component $Z_m$ mixes \emph{all} $p$ predictors.
+  \end{mistake}
 \end{frame}
 
 \end{document}

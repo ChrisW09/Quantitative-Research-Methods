@@ -69,7 +69,10 @@
 
 % Industry application callout box --- slate grey, for real business/industry use
 \definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
+
+% Common-mistake callout --- crimson, for the error to pre-empt
+\newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -206,7 +209,9 @@
     The primary metric is \emph{pre-registered} and decides ship / no-ship at the
     conventional level; the secondary panel gets BH-style FDR control; segment findings are
     labelled \textbf{exploratory} and become hypotheses for the next test. The experiment
-    owner proposes, a launch review with product and data science approves.
+    owner proposes, a launch review with product and data science approves. The number lands
+    on the \textbf{product owner}, who must defend the call and explain why a segment win is
+    only exploratory.
   \end{readme}
   \begin{takeaway}[Two honest caveats]
     Repeated \emph{peeking} at a running test is the same problem in the time dimension ---
@@ -332,9 +337,11 @@
     \mathrm{FWER}=\Pr(\text{at least one false positive})
     = 1 - (1 - \alpha)^m .
   \]
-  \textit{Common mistake: adding the per-test rates to get $m\alpha$ --- that only
-  approximates the FWER (the first-order term) and can exceed $1$.}
 \end{solutionbox}
+\begin{mistake}
+  Adding the per-test rates to get $m\alpha$ --- that only approximates the FWER
+  (the first-order term) and can exceed $1$.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 13.1 (2/2)}
@@ -355,11 +362,12 @@
   so $m = 14$ tests already give a better-than-even chance of a false
   positive. This is exactly why corrections are needed.
 
-  \medskip
-  \textit{Common mistake: dividing by $\ln 0.95$ without flipping the inequality.
-  Since $\ln 0.95<0$, $\;0.95^m\le 0.5 \iff m\,\ln 0.95\le \ln 0.5 \iff
-  m\ge \ln 0.5/\ln 0.95$ --- the sign flips at the last step.}
 \end{solutionbox}
+\begin{mistake}
+  Dividing by $\ln 0.95$ without flipping the inequality. Since $\ln 0.95<0$,
+  $\;0.95^m\le 0.5 \iff m\,\ln 0.95\le \ln 0.5 \iff m\ge \ln 0.5/\ln 0.95$ ---
+  the sign flips at the last step.
+\end{mistake}
 \end{frame}
 
 % ============================================================
@@ -657,11 +665,12 @@
           FWER here would be far too conservative and kill power.
   \end{itemize}
 
-  \medskip
-  \textit{Common mistake:} defaulting to FWER ``to be safe''. Safety is
-  not free --- the stricter criterion buys its guarantee with missed true
-  effects, so the choice is a design decision, not a formality.
 \end{solutionbox}
+\begin{mistake}
+  Defaulting to FWER ``to be safe''. Safety is not free --- the stricter
+  criterion buys its guarantee with missed true effects, so the choice is a
+  design decision, not a formality.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Exercise 13.5 --- Benjamini--Hochberg procedure [Math]}
@@ -718,12 +727,12 @@
   their thresholds here, BH would reject them via the largest passing
   $L$ regardless of any earlier borderline case.
 
-  \medskip
-  \textit{Common mistake:} treating $q$ like $\alpha$. They bound
-  different things: $\alpha$ caps the chance of \emph{any} false
-  rejection; $q$ caps only the expected \emph{fraction} of the rejected
-  list that is false.
 \end{solutionbox}
+\begin{mistake}
+  Treating $q$ like $\alpha$. They bound different things: $\alpha$ caps the
+  chance of \emph{any} false rejection; $q$ caps only the expected
+  \emph{fraction} of the rejected list that is false.
+\end{mistake}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -745,7 +754,7 @@
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 13.1 (1/3)}
-\begin{solutionbox}[Bonferroni and Holm (FWER $\le 0.05$)]
+\begin{solutionbox}[Solution --- Bonferroni and Holm (FWER $\le 0.05$)]
   \textbf{Bonferroni:} reject if $p_j\le\alpha/m=0.005$. Only $p_{(1)}=0.0008$ and
   $p_{(2)}=0.0041$ qualify $\Rightarrow$ \textbf{2 rejections}.
   \medskip
@@ -764,7 +773,7 @@
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 13.1 (2/3)}
-\begin{solutionbox}[Benjamini--Hochberg (FDR $\le 0.10$)]
+\begin{solutionbox}[Solution --- Benjamini--Hochberg (FDR $\le 0.10$)]
   Compare each $p_{(L)}$ with $Lq/m=0.01L$ and take the \emph{largest} passing $L$:
   \[
     \begin{array}{c|c|c|c}
@@ -782,7 +791,7 @@
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 13.1 (3/3)}
-\begin{solutionbox}[Comparison and error guarantees]
+\begin{solutionbox}[Solution --- comparison and error guarantees]
   \[
     \underbrace{2}_{\text{Bonferroni}}\ \le\
     \underbrace{3}_{\text{Holm}}\ \le\
@@ -797,11 +806,12 @@
   \emph{expected} $10\%$ ($\lesssim1$ here) are false. Tolerating a small false
   \emph{fraction} rather than \emph{any} false positive is exactly why BH rejects more.
 
-  \medskip
-  \textit{Common mistake:} reading ``FDR $\le 0.10$'' as ``each discovery is $90\%$
-  likely true''. The FDR is an average over the whole rejected list (and over
-  repetitions), not a per-discovery probability.
 \end{solutionbox}
+\begin{mistake}
+  Reading ``FDR $\le 0.10$'' as ``each discovery is $90\%$ likely true''. The FDR
+  is an average over the whole rejected list (and over repetitions), not a
+  per-discovery probability.
+\end{mistake}
 \end{frame}
 
 % ============================================================
@@ -849,7 +859,7 @@
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 13.2 (1/3)}
-\begin{solutionbox}[Scenario A --- confirmatory trial: control FWER]
+\begin{solutionbox}[Solution --- scenario A: control FWER]
   With $m=4$ tests at $\alpha=0.05$, naive testing expects
   \[
     E[V]=m_0\alpha=4(0.05)=0.20\ \text{false positives},\qquad
@@ -863,7 +873,7 @@
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 13.2 (2/3)}
-\begin{solutionbox}[Scenario B --- exploratory screen: control FDR]
+\begin{solutionbox}[Solution --- scenario B: control FDR]
   With $m=20\,000$ and (worst case) $m_0\approx20\,000$, naive testing expects
   \[
     E[V]=m_0\alpha=20\,000(0.05)=1000\ \text{false discoveries!}
@@ -877,7 +887,7 @@
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 13.2 (3/3)}
-\begin{solutionbox}[The power trade-off]
+\begin{solutionbox}[Solution --- the power trade-off]
   \begin{center}\footnotesize
   \begin{tabular}{lll}
     \toprule
@@ -896,11 +906,12 @@
   threshold keeps power high at scale. \textbf{Rule of thumb:} match the criterion to the
   cost of a single false positive.
 
-  \smallskip
-  \textit{Common mistake:} quoting $E[V]=m\alpha$ as a fact about your study --- it is
-  the all-null worst case ($m_0=m$). With real effects present the count is smaller,
-  though still ruinous at scale.
 \end{solutionbox}
+\begin{mistake}
+  Quoting $E[V]=m\alpha$ as a fact about your study --- it is the all-null worst
+  case ($m_0=m$). With real effects present the count is smaller, though still
+  ruinous at scale.
+\end{mistake}
 \end{frame}
 
 % ============================================================
@@ -910,11 +921,11 @@
   \begin{labnote}[Companion notebook: \texttt{chapter\_13\_lab.ipynb}]
     The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
     \begin{itemize}
-      \item simulating $m=1000$ tests with a fraction of true effects;
-      \item comparing Bonferroni, Holm and Benjamini--Hochberg;
-      \item visualising the BH threshold line and a permutation test.
+      \item \S1, \emph{Simulation} --- $m=1000$ tests with a fraction of true alternatives;
+      \item \S2, \emph{Compare procedures} --- Bonferroni, Holm and Benjamini--Hochberg side by side;
+      \item \S3, \emph{Visualise the Benjamini--Hochberg line}, then \S4, \emph{Permutation test}.
     \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S5, \emph{Exercises} ends the notebook with hands-on tasks.
   \end{labnote}
 \end{frame}
 
@@ -949,10 +960,15 @@ for method in ["bonferroni", "holm", "fdr_bh"]:  # FWER, FWER, FDR control
     \item Check BH against its theoretical bound $q\,m_0/m$, and comment on the power gap.
   \end{enumerate}
 \end{longexercise}
+\begin{labnote}[Run this live]
+  The worked solution sits in \texttt{chapter\_13\_lab.ipynb} under
+  \emph{Lecture exercises --- worked Python solutions}: the cell headed
+  \emph{Extended Exercise 13.3 --- Simulating FDR and power [Python]}.
+\end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 13.3 (1/3)}
-\begin{solutionbox}[Code: setup and the BH rule]
+\begin{solutionbox}[Solution --- code: setup and the BH rule]
 \begin{lstlisting}
 import numpy as np                 # arrays and random numbers
 from scipy import stats            # normal cdf for p-values
@@ -973,7 +989,7 @@ def bh_reject(p, q):               # Benjamini--Hochberg step-up
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 13.3 (2/3)}
-\begin{solutionbox}[Code: simulate FDR and power]
+\begin{solutionbox}[Solution --- code: simulate FDR and power]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 def simulate(method, reps=2000):                   # average FDR / power over reps
     fdr = pw = 0.0                                 # running totals
@@ -993,7 +1009,7 @@ for meth in ["bh", "bonferroni"]:                  # compare both procedures
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 13.3 (3/3)}
-\begin{solutionbox}[Expected numbers and interpretation]
+\begin{solutionbox}[Solution --- expected numbers and interpretation]
   \textbf{Typical printout.}
   \begin{center}\ttfamily\footnotesize
   bh\quad FDR=0.090\quad power=0.723\\[2pt]
@@ -1164,7 +1180,7 @@ for meth in ["bh", "bonferroni"]:                  # compare both procedures
   \end{tikzpicture}
   \end{center}
   \begin{takeaway}
-    \textbf{Type I errors} are the red cell $V$. The FWER $=\Pr(V\ge 1)$ guards against \emph{any} false positive; the FDR $=E[V/R]$ controls their \emph{expected fraction} among the $R$ rejections.
+    \textbf{Type I errors} are cell $V$ --- rejected true nulls. The FWER $=\Pr(V\ge 1)$ guards against \emph{any} false positive; the FDR $=E[V/R]$ controls their \emph{expected fraction} among the $R$ rejections.
   \end{takeaway}
 \end{frame}
 

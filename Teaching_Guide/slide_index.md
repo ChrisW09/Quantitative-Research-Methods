@@ -238,7 +238,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 5.2 | short | Math | p. 81 | p. 82 |
 | Extended Exercise 5.1 | extended | Math | p. 84 | p. 85 |
 
-**Notebook cues:** 1 in this deck (near pp. 58).
+**Notebook cues:** 2 in this deck (near pp. 58).
 
 ### Ch. 6 — Model Selection & Regularisation
 
@@ -270,7 +270,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 6.2 | extended | Math | p. 87 | p. 88 |
 | Exercise 6.6 | short | Concept | p. 91 | p. 92 |
 
-**Notebook cues:** 1 in this deck (near pp. 60).
+**Notebook cues:** 2 in this deck (near pp. 60).
 
 ### Ch. 7 — Moving Beyond Linearity
 
@@ -300,7 +300,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 7.3 | extended | Python | p. 71 | p. 72 |
 | Extended Exercise 7.1 | extended | Math | p. 89 | p. 90 |
 
-**Notebook cues:** 1 in this deck (near pp. 62).
+**Notebook cues:** 2 in this deck (near pp. 62).
 
 ### Ch. 8 — Tree-Based Methods
 
@@ -330,7 +330,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 8.3 | extended | Python | p. 71 | p. 72 |
 | Extended Exercise 8.2 | extended | Math | p. 86 | p. 87 |
 
-**Notebook cues:** 1 in this deck (near pp. 63).
+**Notebook cues:** 2 in this deck (near pp. 63).
 
 ### Ch. 10 — Deep Learning
 
@@ -361,7 +361,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 10.3 | extended | Python | p. 65 | p. 66 |
 | Extended Exercise 10.2 | extended | Math | p. 77 | p. 78 |
 
-**Notebook cues:** 1 in this deck (near pp. 15, 59).
+**Notebook cues:** 2 in this deck (near pp. 15, 59).
 
 ### Ch. 13 — Multiple Testing
 
@@ -389,4 +389,4 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 13.2 | extended | Integrative | p. 45 | p. 46 |
 | Extended Exercise 13.3 | extended | Python | p. 52 | p. 53 |
 
-**Notebook cues:** 1 in this deck (near pp. 50).
+**Notebook cues:** 2 in this deck (near pp. 50).

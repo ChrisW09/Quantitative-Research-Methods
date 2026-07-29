@@ -23,6 +23,10 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+from sphinx.util import logging as sphinx_logging
+
+logger = sphinx_logging.getLogger(__name__)
+
 # -- Paths --------------------------------------------------------------------
 
 HERE = Path(__file__).parent.resolve()
@@ -67,10 +71,21 @@ def stage_materials(app=None, config=None) -> None:
     EXTRA.mkdir(parents=True, exist_ok=True)  # keep html_extra_path valid
 
     if missing:
-        print(
-            "[docs] note: %d PDF(s) not found and will not be linkable: %s"
-            % (len(missing), ", ".join(missing[:5]) + (" …" if len(missing) > 5 else ""))
+        # A Sphinx warning, not a print: the site links to every deck, so a deck
+        # that failed to compile ships a broken download link. `sphinx-build -W`
+        # (used by the Makefile and by .github/workflows/docs.yml) turns this
+        # into a build failure, which a print could never do.
+        #
+        # Only from the event handler: stage_materials() also runs at import
+        # time, and warning from both would report every missing deck twice.
+        message = "%d lecture deck PDF(s) missing, so the site would link to nothing: %s" % (
+            len(missing),
+            ", ".join(missing[:5]) + (" …" if len(missing) > 5 else ""),
         )
+        if app is not None:
+            logger.warning(message, type="qrm", subtype="missing-deck")
+        else:
+            print("[docs] " + message)
 
 
 stage_materials()  # also run at import time so `sphinx-build` on a clean tree works

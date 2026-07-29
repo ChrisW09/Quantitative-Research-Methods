@@ -42,8 +42,9 @@ make them useless as assessment.
 ## Naming conventions
 
 - Chapter numbers always follow **ISLP**, zero-padded to two digits
-  (`chapter_04`), so slides, labs and datasets line up. The gaps (9, 11, 12 have
-  labs but no deck) are intentional — those chapters are self-study.
+  (`chapter_04`), so slides, labs and datasets line up. The gaps are intentional:
+  chapters 9, 11 and 12 have a notebook but no deck, because they are untaught
+  [code references](labs.md) rather than labs.
 - Exam folders are named for the lecture they follow
   (`Exam_2_after_Lecture_08`), not for a date, so the calendar can shift without
   renaming anything.
