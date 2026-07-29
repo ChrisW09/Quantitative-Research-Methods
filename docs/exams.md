@@ -1,10 +1,17 @@
+---
+myst:
+  html_meta:
+    description: "Three full-length mock exams and five 60-minute short exams matched to the course calendar — what each covers, how they are designed, and how they are built."
+---
+
 # Mock exams
 
 ```{warning}
 The exams, their worked solutions and their LaTeX sources are **assessment
 material** and are deliberately kept out of the public repository, so they are
-not downloadable from this site. Instructors can request them from the author.
-This page documents what exists and how it is built.
+not downloadable from this site. Instructors can request them from the author
+at [info@profweisser-ai.de](mailto:info@profweisser-ai.de). This page documents
+what exists and how it is built.
 ```
 
 Eight practice papers are matched to the course rhythm: **three full-length mock

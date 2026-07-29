@@ -1,5 +1,12 @@
+---
+myst:
+  html_meta:
+    description: "The 22 ISLP datasets bundled with the course — sizes, contents, which chapter uses each, and how the notebooks resolve them automatically."
+---
+
 # Datasets
 
+{.qrm-lead}
 The course datasets live in `ALL CSV FILES - 2nd Edition/` and are distributed
 by the textbook authors at [statlearning.com](https://www.statlearning.com) for
 use with the book.

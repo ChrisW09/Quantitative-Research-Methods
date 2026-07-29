@@ -1,3 +1,9 @@
+---
+myst:
+  html_meta:
+    description: "How this Sphinx site is built and deployed — the staging of notebooks and deck PDFs, live preview, and the GitHub Pages workflow."
+---
+
 # Building this documentation
 
 This site is built with [Sphinx](https://www.sphinx-doc.org), writing pages in

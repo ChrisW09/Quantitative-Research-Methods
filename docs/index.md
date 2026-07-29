@@ -1,14 +1,38 @@
+---
+myst:
+  html_meta:
+    description: "A complete, ready-to-teach university course in statistical learning based on ISLP — twelve Beamer lecture decks, fifteen Jupyter labs, eight mock exams and the course datasets."
+---
+
 # Quantitative Research Methods
 
+{.qrm-lead}
 A complete, ready-to-teach university course in statistical learning — twelve
 Beamer decks, fifteen Jupyter notebooks, eight mock exams and the course
 datasets, sharing one notation and one twelve-week rhythm.
 
 :::{container} qrm-chips
-**12** decks · **1057** core slides *(+111 optional)* · **127** exercises with
-solutions · **12** labs *(+3 code references)* · **3 + 5** mock exams ·
-**22** datasets
+[**12** decks]{.qrm-chip}
+[**1057** core slides *(+111 optional)*]{.qrm-chip}
+[**127** exercises with solutions]{.qrm-chip}
+[**12** labs *(+3 code references)*]{.qrm-chip}
+[**3 + 5** mock exams]{.qrm-chip}
+[**22** datasets]{.qrm-chip}
 :::
+
+::::{container} qrm-cta
+:::{button-ref} quickstart
+:color: primary
+
+🚀 Get started — a lab in Colab, one click
+:::
+:::{button-ref} slides
+:color: primary
+:outline:
+
+🎞️ Browse the lecture decks
+:::
+::::
 
 Prepared by **Prof. Dr. Christoph Weisser**, HSBI — Bielefeld University of
 Applied Sciences and Arts, Summer Semester 2026.

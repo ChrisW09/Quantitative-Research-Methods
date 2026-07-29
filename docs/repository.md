@@ -1,3 +1,9 @@
+---
+myst:
+  html_meta:
+    description: "How the repository is organised — what is committed, what is git-ignored and why, and the naming conventions that keep slides, labs and datasets aligned."
+---
+
 # Repository layout
 
 ```text

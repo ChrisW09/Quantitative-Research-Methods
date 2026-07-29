@@ -1,12 +1,21 @@
+---
+myst:
+  html_meta:
+    description: "The twelve-lecture semester plan covering ten ISLP chapters, the recommended split points, the untaught chapters, and the assessment calendar."
+---
+
 # The course at a glance
 
+{.qrm-lead}
 A 12-lecture semester (12 × 180 min) covering ten ISLP chapters, optionally
 preceded by a two-part precourse: (a) a refresher of the undergraduate
 statistics, and (b) the notation, algebra and Python the chapters assume.
 
 :::{container} qrm-chips
-**12** sessions × **180 min** · **2** optional precourse sessions ·
-**3** decks split across two lectures · **3 + 5** mock exams
+[**12** sessions × **180 min**]{.qrm-chip}
+[**2** optional precourse sessions]{.qrm-chip}
+[**3** decks split across two lectures]{.qrm-chip}
+[**3 + 5** mock exams]{.qrm-chip}
 :::
 
 ## Semester plan

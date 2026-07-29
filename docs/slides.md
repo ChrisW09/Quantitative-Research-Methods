@@ -1,12 +1,21 @@
+---
+myst:
+  html_meta:
+    description: "Twelve Beamer lecture decks for the course — 1057 slides plus optional appendices, 127 exercises with worked solutions, and ~100 purpose-built figures. All PDFs downloadable."
+---
+
 # Lecture slides
 
+{.qrm-lead}
 Twelve Beamer decks live in `Lecture_Slides/chapter_NN/`, each folder
 self-contained: `chapter_NN.tex`, its `images/`, and the compiled
 `chapter_NN.pdf`. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
-**1057** slides in the main flow · **+111** in optional appendices ·
-**86** short + **41** extended exercises · **~100** purpose-built figures
+[**1057** slides in the main flow]{.qrm-chip}
+[**+111** in optional appendices]{.qrm-chip}
+[**86** short + **41** extended exercises]{.qrm-chip}
+[**~100** purpose-built figures]{.qrm-chip}
 :::
 
 ```{figure} _static/deck-preview.png

@@ -1,5 +1,12 @@
+---
+myst:
+  html_meta:
+    description: "Run any course lab on Google Colab with zero setup, install the local Python environment from week two, and rebuild the LaTeX materials."
+---
+
 # Quick start
 
+{.qrm-lead}
 You don't need to install anything to **read** the slides — the compiled PDFs
 are linked from [Lecture slides](slides.md). To *run* a lab, **start in Colab**.
 Install locally later, in your own time, once you know you want to.

@@ -114,6 +114,7 @@ exclude_patterns = ["_build", "_extra", "Thumbs.db", ".DS_Store", "**.ipynb_chec
 
 myst_enable_extensions = [
     "amsmath",
+    "attrs_block",
     "attrs_inline",
     "colon_fence",
     "deflist",
@@ -138,10 +139,23 @@ html_short_title = "QRM"
 html_static_path = ["_static"]
 html_extra_path = ["_extra"]
 html_css_files = ["custom.css"]
+html_favicon = "_static/favicon.svg"
 html_copy_source = False
 html_show_sourcelink = False
 
+# HSBI teal as the brand colour, with a lighter tint for the dark theme so
+# links keep enough contrast against the dark background.
 html_theme_options = {
+    "light_css_variables": {
+        "color-brand-primary": "#005b7f",
+        "color-brand-content": "#00618a",
+        "color-brand-visited": "#00618a",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#5cb8dd",
+        "color-brand-content": "#6ec3e4",
+        "color-brand-visited": "#6ec3e4",
+    },
     "source_repository": "https://github.com/ChrisW09/Quantitative-Research-Methods/",
     "source_branch": "main",
     "source_directory": "docs/",

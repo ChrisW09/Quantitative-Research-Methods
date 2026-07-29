@@ -1,3 +1,9 @@
+---
+myst:
+  html_meta:
+    description: "How to cite the Quantitative Research Methods course materials and the ISLP textbook they are based on, attribution, and how to contact the author."
+---
+
 # Citation & licence
 
 The **Quantitative Research Methods** course materials are based on, and follow
@@ -47,6 +53,11 @@ repository (`Source_Material/` is git-ignored) — see
 [Repository layout](repository.md).
 
 Slides that reproduce a textbook figure attribute it to its source.
+
+## Contact
+
+Questions about the materials, or an instructor request for the mock exams and
+runsheets: **[info@profweisser-ai.de](mailto:info@profweisser-ai.de)**.
 
 ## About the author
 

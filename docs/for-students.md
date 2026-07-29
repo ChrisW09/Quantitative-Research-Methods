@@ -1,13 +1,22 @@
+---
+myst:
+  html_meta:
+    description: "What the course assumes, how much work it is, how the labs fit around the lectures, and how to revise — the one page every student should read in week one."
+---
+
 # For students
 
+{.qrm-lead}
 One page for everyone taking the course: what you are assumed to know, how much
 work it is, how the labs fit around the lectures, what to do when your output
 does not match the slides, and how to revise.
 
 :::{container} qrm-chips
-**12** sessions × **180 min** · **2** optional precourse sessions ·
-**12** labs *(with solutions)* · **5** short practice exams ·
-**Colab** on day one
+[**12** sessions × **180 min**]{.qrm-chip}
+[**2** optional precourse sessions]{.qrm-chip}
+[**12** labs *(with solutions)*]{.qrm-chip}
+[**5** short practice exams]{.qrm-chip}
+[**Colab** on day one]{.qrm-chip}
 :::
 
 ## What the course assumes
@@ -250,16 +259,6 @@ the only ones that revisit it.
 hour, tells you exactly where you stand, and comes with a full worked solution
 and a review deck. Full details are on the [Mock exams](exams.md) page; the
 papers themselves come from your lecturer.
-
-```{admonition} TODO for the professor
-:class: caution
-
-Three places in these docs promise that materials can be **requested from the
-author** ([Mock exams](exams.md), [Teaching it](teaching.md), and the repository
-`README.md`), but there is **no contact address anywhere in the repository** —
-not in the README, not in `CITATION.cff`. Please add one, or change the wording
-to name the channel students and instructors should actually use.
-```
 
 ## Where to go next
 

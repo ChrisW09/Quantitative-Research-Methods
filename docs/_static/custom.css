@@ -1,9 +1,60 @@
-/* Quantitative Research Methods — small tweaks on top of Furo.
-   Everything below uses Furo's own CSS variables, so light and dark themes
-   both follow the reader's setting. */
+/* Quantitative Research Methods — design layer on top of Furo.
+   Everything below uses Furo's own CSS variables wherever one exists, so the
+   light and dark themes both follow the reader's setting. The brand colour
+   itself (HSBI teal) is set in conf.py via light/dark_css_variables. */
 
-:root {
-  --qrm-hsbi: #005b7f;
+/* ------------------------------------------------------------- brand hooks */
+
+body {
+  /* sphinx-design components (cards, buttons, tabs) follow the brand */
+  --sd-color-primary: var(--color-brand-primary);
+  --sd-color-primary-highlight: var(--color-brand-content);
+  --sd-color-primary-text: #ffffff;
+  --qrm-card-shadow: 0 6px 18px rgba(0, 43, 61, 0.10);
+}
+
+body[data-theme="dark"] {
+  --sd-color-primary-text: #06222e;
+  --qrm-card-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) {
+    --sd-color-primary-text: #06222e;
+    --qrm-card-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* ------------------------------------------------------------- typography */
+
+/* A quiet rule under section headings gives long pages visible structure. */
+article h2 {
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--color-background-border);
+}
+
+/* The one-paragraph summary that opens a page ({.qrm-lead} in the source). */
+article p.qrm-lead {
+  font-size: 1.13em;
+  line-height: 1.65;
+  max-width: 44em;
+  color: var(--color-foreground-secondary);
+}
+
+/* Definition lists on the landing page read better with a little air. */
+article dl:not(.field-list) > dt {
+  margin-top: 0.9rem;
+}
+
+/* "Where to go next" and other closing link lists: tighter than body text. */
+article h2 + ul li + li {
+  margin-top: 0.25rem;
+}
+
+/* The site name in the sidebar carries a little more weight. */
+.sidebar-brand-text {
+  font-weight: 700;
+  color: var(--color-brand-primary);
 }
 
 /* ------------------------------------------------------------------ tables */
@@ -26,14 +77,23 @@ article table.docutils {
   overflow-x: auto;
 }
 
-/* Long listings read better a touch smaller, with a quiet header rule. */
+/* Long listings read better a touch smaller, with a quiet header rule and a
+   subtle zebra so the eye can track a row across many columns. */
 article table.docutils {
   font-size: 0.92em;
 }
 
 article table.docutils thead th {
-  border-bottom: 2px solid var(--color-background-border);
+  border-bottom: 2px solid var(--color-brand-primary);
   font-weight: 600;
+}
+
+article table.docutils tbody tr:nth-child(even) {
+  background: var(--color-background-secondary);
+}
+
+article table.docutils tbody tr:hover {
+  background: var(--color-background-hover);
 }
 
 /* A totals row (bold first cell) closes the deck tables. */
@@ -49,25 +109,63 @@ article table img[src*="colab-badge"] {
 
 /* ------------------------------------------------------- stat chip strips */
 
-/* `:::{container} qrm-chips` — the one-line "what this page is" summary that
-   opens the landing page and the material pages. */
+/* `:::{container} qrm-chips` — a row of stat pills that opens the landing
+   page and the material pages. Each `[**n** thing]{.qrm-chip}` span is one
+   pill; `display: contents` on the inner <p> lets them flow as flex items. */
 article .qrm-chips {
-  margin: 1.1rem 0 1.6rem;
-  padding: 0.6rem 0.9rem;
-  border-left: 3px solid var(--color-brand-primary);
-  border-radius: 0.2rem;
-  background: var(--color-background-secondary);
-  color: var(--color-foreground-secondary);
-  font-size: 0.94em;
-  line-height: 1.6;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.25rem 0 1.6rem;
 }
 
 article .qrm-chips p {
+  display: contents;
+}
+
+article .qrm-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.32em;
+  padding: 0.3em 0.8em;
+  border: 1px solid var(--color-background-border);
+  border-radius: 999px;
+  background: var(--color-background-secondary);
+  color: var(--color-foreground-secondary);
+  font-size: 0.86em;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+article .qrm-chip strong {
+  color: var(--color-brand-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------- call-to-action */
+
+/* `:::{container} qrm-cta` on the landing page: the buttons under the hero. */
+article .qrm-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.4rem 0 2rem;
+}
+
+article .qrm-cta p {
   margin: 0;
 }
 
-article .qrm-chips strong {
-  color: var(--color-content-foreground);
+article .qrm-cta .sd-btn {
+  border-radius: 0.5rem;
+  padding: 0.55em 1.15em;
+  font-weight: 600;
+  transition: transform 120ms ease-in-out, box-shadow 120ms ease-in-out;
+}
+
+article .qrm-cta .sd-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--qrm-card-shadow);
 }
 
 /* ------------------------------------------------------------------ cards */
@@ -76,13 +174,15 @@ article .qrm-chips strong {
    "start here" doors read as clickable. */
 article .sd-card {
   border: 1px solid var(--color-background-border);
-  border-radius: 0.4rem;
-  transition: border-color 120ms ease-in-out, transform 120ms ease-in-out;
+  border-radius: 0.55rem;
+  transition: border-color 150ms ease-in-out, transform 150ms ease-in-out,
+    box-shadow 150ms ease-in-out;
 }
 
 article .sd-card:hover {
   border-color: var(--color-brand-primary);
   transform: translateY(-2px);
+  box-shadow: var(--qrm-card-shadow);
 }
 
 article .sd-card .sd-card-title {
@@ -101,21 +201,15 @@ article .qrm-doors .sd-card {
   border-top: 3px solid var(--color-brand-primary);
 }
 
-/* ------------------------------------------------------------- typography */
-
-/* Definition lists on the landing page read better with a little air. */
-article dl:not(.field-list) > dt {
-  margin-top: 0.9rem;
-}
-
-/* "Where to go next" and other closing link lists: tighter than body text. */
-article h2 + ul li + li {
-  margin-top: 0.25rem;
-}
-
 /* --------------------------------------------------------------- figures */
 
-/* Slide previews: a caption that reads as a caption, not as body text. */
+/* Slide previews: framed like the printed page they show, with a caption
+   that reads as a caption, not as body text. */
+article figure img {
+  border: 1px solid var(--color-background-border);
+  border-radius: 0.35rem;
+}
+
 article figure figcaption p {
   font-size: 0.9em;
   color: var(--color-foreground-secondary);

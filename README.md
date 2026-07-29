@@ -342,7 +342,7 @@ behind, and the only ones carrying grading keys and marking tables. They live in
 > 🔒 **Not distributed here.** The exams, their solutions and their LaTeX
 > sources are assessment material and are deliberately kept out of this
 > repository (see [`.gitignore`](./.gitignore)). Instructors can request them
-> from the author.
+> from the author at [info@profweisser-ai.de](mailto:info@profweisser-ai.de).
 
 ---
 

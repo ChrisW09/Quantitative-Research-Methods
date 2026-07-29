@@ -1,5 +1,12 @@
+---
+myst:
+  html_meta:
+    description: "The instructor kit — semester plan, per-session runsheets, a generated slide index, a before-class checklist, and one make command that keeps it all in sync."
+---
+
 # Teaching it
 
+{.qrm-lead}
 Everything needed to walk into a room: a semester plan, a per-session runsheet,
 a generated slide index, a before-class checklist, and one `make` command that
 keeps all of it in sync with the decks.
@@ -22,7 +29,8 @@ The instructor material lives in
 
 They name which exercise rehearses which exam problem, so they are assessment
 material and stay out of the public repository alongside the exams themselves.
-Instructors can request them from the author.
+Instructors can request them from the author at
+[info@profweisser-ai.de](mailto:info@profweisser-ai.de).
 ```
 
 ## One command keeps it consistent

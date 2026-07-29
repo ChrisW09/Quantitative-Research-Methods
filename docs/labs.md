@@ -1,5 +1,12 @@
+---
+myst:
+  html_meta:
+    description: "Fifteen Jupyter notebooks — twelve taught labs with worked solutions and three code references — rendered in full and runnable on Google Colab with one click."
+---
+
 # Lab notebooks
 
+{.qrm-lead}
 Fifteen notebooks in `Lab_Notebooks/`, of two different kinds.
 
 **Twelve taught labs** — one per lecture deck, both precourse sessions
@@ -20,8 +27,9 @@ Every notebook is rendered in full below (with its stored outputs — the
 documentation build never executes them).
 
 :::{container} qrm-chips
-**12** taught labs *(with solutions)* · **3** code references *(no deck, no
-solutions)* · runs **locally** and on **Colab**
+[**12** taught labs *(with solutions)*]{.qrm-chip}
+[**3** code references *(no deck, no solutions)*]{.qrm-chip}
+[runs **locally** and on **Colab**]{.qrm-chip}
 :::
 
 ## Lecture chapters — the twelve taught labs

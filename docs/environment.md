@@ -1,5 +1,12 @@
+---
+myst:
+  html_meta:
+    description: "The pinned Python environment for the course notebooks — what is pinned and why, which chapter needs which extra package, and why the install is large."
+---
+
 # Python environment
 
+{.qrm-lead}
 `requirements.txt` pins the packages used by the notebooks and by the code
 examples printed on the slides.
 
