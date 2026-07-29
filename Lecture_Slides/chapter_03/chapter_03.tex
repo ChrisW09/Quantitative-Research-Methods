@@ -3086,16 +3086,19 @@ for name, m in [("linear", lin), ("poly-2", pol), ("KNN10", knn)]:
     \textbf{Why (bias--variance).} The true \texttt{mpg}--\texttt{horsepower}
     relationship is convex and decreasing, so a straight line
     \emph{underfits} --- high \emph{bias}, largest test MSE. The degree-2
-    polynomial captures the curvature with just one extra parameter (low
-    bias, still low variance) and wins here; a moderate-$K$ KNN is a close
-    non-parametric competitor.
+    polynomial captures the curvature with one extra parameter; a
+    moderate-$K$ KNN is an equally strong non-parametric competitor.
 
     \textbf{As $K\to 1$.} Each prediction is a single neighbour: the model
     interpolates the training points (training MSE $\to 0$) but is very
     wiggly --- high \emph{variance}, so test MSE \emph{rises} (here
-    $\approx 38$ at $K{=}1$). The best $K$ balances bias (large $K$)
-    against variance (small $K$). \emph{Takeaway:} prefer the parsimonious
-    degree-2 fit; if using KNN, tune $K$ by cross-validation.
+    $\approx 38$ at $K{=}1$); the best $K$ balances the two.
+    \emph{Takeaway:} this one split cannot rank the two flexible fits ---
+    $19.8$ against $19.3$ at $K{=}25$ is noise, and the ranking flips with
+    the seed. Scored by 10-fold CV on all $392$ cars (see the lab notebook),
+    KNN at $K\approx25$--$50$ is marginally \emph{ahead} ($18.2$--$18.6$ vs
+    $19.2$) --- but inside one standard error. Prefer the degree-2 fit for
+    \emph{interpretability}, not for accuracy.
 
     \smallskip
     \textit{Common mistake:} choosing $K$ by training MSE --- it falls

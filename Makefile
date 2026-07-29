@@ -7,11 +7,13 @@
 #   make handouts   printable 2-up handouts for every deck
 #   make index      refresh Teaching_Guide/slide_index.md
 #   make docs       build the documentation site locally
-#   make exams      rebuild the mock exams (kept out of git)
+#   make exams      rebuild the mock exam papers, solutions and review decks
+#                   (kept out of git; the 60-min set has its own build.sh)
 #   make clean      delete LaTeX build artefacts
 #   make check      report page counts and any overfull slides
 #
-# Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages)
+# Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages,
+# enumitem and mathtools — the last two for the exam papers and review decks)
 # and python3 with the packages in requirements.txt. "index" and "check" also
 # need Teaching_Guide/requirements.txt (pypdf); "docs" needs docs/requirements.txt.
 
@@ -106,18 +108,81 @@ docs:
 
 # ------------------------------------------------------------------------ exams
 # Mock_Exams/ is git-ignored; this only works on a machine that has it.
+#
+# Two kinds of source live there. A *paper* is a single .tex that produces two
+# PDFs: the paper as students see it, and the same paper with \withsolutions set.
+# A *review deck* is a separate beamer source and needs the same two passes as a
+# lecture deck, for the navigation bar.
+#
+# Short_Exams_60min/ is deliberately absent: it ships its own build.sh next to
+# its sources (see that folder's README) and stays out of this Makefile.
+EXAMDIR := Mock_Exams
+EXAM_1  := $(EXAMDIR)/Exam_1_after_Lecture_04
+EXAM_2  := $(EXAMDIR)/Exam_2_after_Lecture_08
+EXAM_F  := $(EXAMDIR)/Final_Exam_after_Lecture_12
+
+# One entry per source, written "directory|source stem|output stem". The output
+# stems are the established -jobname values, so no PDF changes its name. A bar
+# is the separator because $(word) splits on whitespace, and $(foreach) below
+# needs each entry to stay a single word.
+EXAM_PAPERS := \
+  $(EXAM_1)|mock_exam_1|Mock_Exam_1 \
+  $(EXAM_2)|mock_exam_2|Mock_Exam_2 \
+  $(EXAM_F)|final_mock_exam|Final_Mock_Exam \
+  $(EXAM_F)|final_mock_exam_a|Final_Mock_Exam_A \
+  $(EXAM_F)|final_mock_exam_b|Final_Mock_Exam_B \
+  $(EXAM_F)|final_mock_exam_c|Final_Mock_Exam_C
+
+EXAM_DECKS := \
+  $(EXAM_1)|solutions_slides_1|Mock_Exam_1_Solutions_Slides \
+  $(EXAM_2)|solutions_slides_2|Mock_Exam_2_Solutions_Slides \
+  $(EXAM_F)|solutions_slides_final|Final_Mock_Exam_Solutions_Slides \
+  $(EXAM_F)|solutions_slides_a|Final_Mock_Exam_A_Solutions_Slides \
+  $(EXAM_F)|solutions_slides_b|Final_Mock_Exam_B_Solutions_Slides \
+  $(EXAM_F)|solutions_slides_c|Final_Mock_Exam_C_Solutions_Slides
+
+exam_dir = $(word 1,$(subst |, ,$(1)))
+exam_src = $(word 2,$(subst |, ,$(1)))
+exam_out = $(word 3,$(subst |, ,$(1)))
+
+# The paper and its solutions get a rule each rather than one rule with two
+# targets: in make 3.81 a multi-target rule is shorthand for one rule per
+# target, so under -j the shared recipe would run twice at once and two
+# pdflatex processes would fight over the same -jobname. One target per recipe
+# keeps every job's aux files (.aux .log .out .nav .snm .toc) distinct, which
+# is what makes it safe for several papers to build in the same directory.
+define EXAM_PAPER_RULE
+$(1)/$(3).pdf: $(1)/$(2).tex
+	@echo "  [exam]     $(3)"
+	@cd $(1) && $(LATEX) -jobname=$(3) $(2).tex >/dev/null
+
+$(1)/$(3)_Solutions.pdf: $(1)/$(2).tex
+	@echo "  [exam]     $(3)_Solutions"
+	@cd $(1) && $(LATEX) -jobname=$(3)_Solutions "\def\withsolutions{1}\input{$(2).tex}" >/dev/null
+endef
+$(foreach p,$(EXAM_PAPERS),$(eval $(call EXAM_PAPER_RULE,$(call exam_dir,$(p)),$(call exam_src,$(p)),$(call exam_out,$(p)))))
+
+define EXAM_DECK_RULE
+$(1)/$(3).pdf: $(1)/$(2).tex
+	@echo "  [exam]     $(3)"
+	@cd $(1) && $(LATEX) -jobname=$(3) $(2).tex >/dev/null \
+	  && $(LATEX) -jobname=$(3) $(2).tex >/dev/null
+endef
+$(foreach d,$(EXAM_DECKS),$(eval $(call EXAM_DECK_RULE,$(call exam_dir,$(d)),$(call exam_src,$(d)),$(call exam_out,$(d)))))
+
+EXAM_PDFS := \
+  $(foreach p,$(EXAM_PAPERS),$(call exam_dir,$(p))/$(call exam_out,$(p)).pdf \
+                             $(call exam_dir,$(p))/$(call exam_out,$(p))_Solutions.pdf) \
+  $(foreach d,$(EXAM_DECKS),$(call exam_dir,$(d))/$(call exam_out,$(d)).pdf)
+
+# The PDFs cannot be prerequisites of "exams" directly: on a fresh clone their
+# .tex prerequisites are missing too, and make would abort with "No rule to make
+# target" instead of saying why. Guard first, then hand the list to a sub-make.
 exams:
-	@test -d Mock_Exams || { echo "Mock_Exams/ not present (git-ignored)"; exit 1; }
-	@cd Mock_Exams/Exam_1_after_Lecture_04 && \
-	  $(LATEX) -jobname=Mock_Exam_1 mock_exam_1.tex >/dev/null && \
-	  $(LATEX) -jobname=Mock_Exam_1_Solutions "\def\withsolutions{1}\input{mock_exam_1.tex}" >/dev/null
-	@cd Mock_Exams/Exam_2_after_Lecture_08 && \
-	  $(LATEX) -jobname=Mock_Exam_2 mock_exam_2.tex >/dev/null && \
-	  $(LATEX) -jobname=Mock_Exam_2_Solutions "\def\withsolutions{1}\input{mock_exam_2.tex}" >/dev/null
-	@cd Mock_Exams/Final_Exam_after_Lecture_12 && \
-	  $(LATEX) -jobname=Final_Mock_Exam final_mock_exam.tex >/dev/null && \
-	  $(LATEX) -jobname=Final_Mock_Exam_Solutions "\def\withsolutions{1}\input{final_mock_exam.tex}" >/dev/null
-	@echo "  [exams]    rebuilt"
+	@test -d $(EXAMDIR) || { echo "$(EXAMDIR)/ not present (git-ignored)"; exit 1; }
+	@$(MAKE) --no-print-directory $(EXAM_PDFS)
+	@echo "  [exams]    $(words $(EXAM_PDFS)) PDFs up to date"
+	@echo "             Short_Exams_60min: run its own ./build.sh"
 
 # ------------------------------------------------------------------------ checks
 check:

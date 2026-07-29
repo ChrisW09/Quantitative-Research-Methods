@@ -322,7 +322,7 @@ structure and difficulty, different numbers.
 | [`Makefile`](./Makefile) | One-command rebuild of figures, decks, handouts and the index |
 | [`docs/`](./docs/) | Sphinx documentation for the whole course — see [Documentation](#-documentation) |
 | [`requirements.txt`](./requirements.txt) | Pinned Python environment for the notebooks |
-| `Mock_Exams/` | Three exams (questions, solutions, review decks) — **excluded from git**: assessment material |
+| `Mock_Exams/` | Three exams plus three parallel variants of the final, and five 60-min exams (questions, solutions, review decks) — **excluded from git**: assessment material. `make exams` builds the first group; `Short_Exams_60min/build.sh` the second |
 | `Source_Material/` | Copyrighted textbook PDF & figure banks — **excluded from git** (see [`.gitignore`](./.gitignore)) |
 
 ---

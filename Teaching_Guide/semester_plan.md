@@ -72,9 +72,14 @@ Do **not** cut: the motivation slide that opens a topic, the pitfalls
 | Lecture 12 | Final Mock Exam | All, weighted to Ch 7/8/10/13 | 120 min · 120 pts |
 
 Each exists as questions, worked solutions, and a review deck for going through
-it in class. They are **git-ignored**: assessment material stays off the public
-repository. `make exams` rebuilds the papers and their solutions on a machine
-that has them; the review decks compile with a plain `pdflatex` run.
+it in class; the final also comes in three parallel variants (A / B / C). They
+are **git-ignored**: assessment material stays off the public repository.
+
+`make exams` rebuilds all 18 of those PDFs on a machine that has them — the
+three papers and the three final variants, each as questions and as solutions,
+plus all six review decks (two `pdflatex` passes each, for the navigation bar).
+The five 60-minute short exams in `Mock_Exams/Short_Exams_60min/` are not part
+of that target: they have their own `./build.sh` next to the sources.
 
 ## Workload for students
 

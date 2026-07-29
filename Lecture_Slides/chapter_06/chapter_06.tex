@@ -1159,27 +1159,32 @@ for k in range(1, 6):                         # model sizes k = 1..5
 
 \begin{frame}[fragile]{Ridge regression}
   \begin{lstlisting}
-from sklearn.linear_model import RidgeCV
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
-X = StandardScaler().fit_transform(Hitters[preds])  # standardise first!
-y = Hitters["Salary"].values
-ridge = RidgeCV(alphas=np.logspace(-2, 4, 50)).fit(X, y)  # CV over grid
-print("best alpha:", ridge.alpha_)           # lambda chosen by CV
-print(dict(zip(preds, ridge.coef_)))         # all coefs stay nonzero
+X, y = Hitters[preds], Hitters["Salary"].values
+# Scale INSIDE the search, so the scaler is re-fit on each training fold.
+# Scaling first lets every fold help standardise itself: CV then over-shrinks.
+ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),
+                     {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10).fit(X, y)
+print("best alpha:", ridge.best_params_["ridge__alpha"])
+print(dict(zip(preds, ridge.best_estimator_[-1].coef_)))  # all stay nonzero
   \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]{The lasso}
   \begin{lstlisting}
-from sklearn.linear_model import LassoCV
+from sklearn.linear_model import Lasso
 
-lasso = LassoCV(alphas=np.logspace(-3, 1, 50), cv=10,  # 10-fold CV
-                random_state=0).fit(X, y)    # fit path over alpha grid
-print("best alpha:", lasso.alpha_)           # lambda chosen by CV
-nonzero = [(p, c) for p, c in zip(preds, lasso.coef_) if c != 0]
-print(nonzero)                               # only the survivors
+# same discipline: the scaler belongs inside the cross-validated search
+lasso = GridSearchCV(make_pipeline(StandardScaler(), Lasso(max_iter=10000)),
+                     {"lasso__alpha": np.logspace(-3, 1, 50)}, cv=10).fit(X, y)
+print("best alpha:", lasso.best_params_["lasso__alpha"])
+coefs = lasso.best_estimator_[-1].coef_
+print([(p, c) for p, c in zip(preds, coefs) if c != 0])  # only the survivors
   \end{lstlisting}
 \end{frame}
 
@@ -1213,29 +1218,33 @@ for M in range(1, len(preds) + 1):           # try every component count
 \begin{frame}[fragile]{Solution --- Exercise 6.7 (1/2)}
   \begin{lstlisting}
 import numpy as np, pandas as pd
-from sklearn.linear_model  import LassoCV, RidgeCV
-from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model    import Lasso, Ridge
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline        import make_pipeline
+from sklearn.preprocessing   import StandardScaler
 
 df = pd.read_csv("../../ALL CSV FILES - 2nd Edition/Hitters.csv").dropna()
 y = df["Salary"].values
-X_raw = pd.get_dummies(df.drop(columns=["Salary"]), drop_first=True)
-preds = X_raw.columns
-X = StandardScaler().fit_transform(X_raw)    # standardise predictors
+X = pd.get_dummies(df.drop(columns=["Salary"]), drop_first=True)
+preds = X.columns                            # scale inside the CV, not here
 
-lasso = LassoCV(cv=10, random_state=0, max_iter=10000).fit(X, y)  # CV
-print("lasso alpha:", round(lasso.alpha_, 3))  # chosen lambda
-kept    = [p for p, c in zip(preds, lasso.coef_) if abs(c) > 1e-8]
-dropped = [p for p, c in zip(preds, lasso.coef_) if abs(c) <= 1e-8]
-print("kept   :", kept)      # features the lasso retains
-print("dropped:", dropped)   # features zeroed out exactly
+lasso = GridSearchCV(make_pipeline(StandardScaler(), Lasso(max_iter=10000)),
+                     {"lasso__alpha": np.logspace(-3, 2, 50)}, cv=10).fit(X, y)
+print("lasso alpha:", round(lasso.best_params_["lasso__alpha"], 3))
+coefs   = lasso.best_estimator_[-1].coef_
+kept    = [p for p, c in zip(preds, coefs) if abs(c) > 1e-8]
+dropped = [p for p, c in zip(preds, coefs) if abs(c) <= 1e-8]
+print("kept   :", kept, "\ndropped:", dropped)  # retained vs zeroed exactly
   \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Exercise 6.7 (2/2)}
   \begin{lstlisting}
-ridge = RidgeCV(alphas=np.logspace(-2, 4, 50)).fit(X, y)  # CV grid
-print("ridge alpha:", round(ridge.alpha_, 3),
-      "-- nonzero coefs:", int(np.sum(np.abs(ridge.coef_) > 1e-8)))  # all p
+ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),   # scale in CV
+                     {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10).fit(X, y)
+rc = ridge.best_estimator_[-1].coef_
+print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
+      "-- nonzero coefs:", int(np.sum(np.abs(rc) > 1e-8)))          # all p
   \end{lstlisting}
   \begin{solutionbox}[Expected result and interpretation]
     The lasso selects a moderate $\lambda$ and \emph{drives several
