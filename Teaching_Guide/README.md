@@ -23,7 +23,8 @@ make handouts   # printable 2-up PDFs for every deck
 ```
 
 `make help` lists the rest. Everything is incremental — a deck is only
-recompiled if its `.tex` is newer than its `.pdf`.
+recompiled if its `.tex` is newer than its `.pdf`, and the two precourse decks
+also rebuild when their `make_figures.py` changes.
 
 ## How the pieces fit
 

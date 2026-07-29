@@ -190,7 +190,7 @@
 \begin{frame}{Three reasons nonlinearity matters}
   \begin{block}{Concrete examples}
     \begin{itemize}
-      \item Wage data peaks at age $60$ and then drops --- not linear.
+      \item Wage data peaks in middle age and then drops --- not linear.
       \item Sales have diminishing returns to advertising spend --- not
             linear.
       \item Survival probability is bounded in $(0,1)$ --- not linear.
@@ -904,7 +904,7 @@ A GAM is fit by \emph{backfitting}: cycle through the terms, repeatedly re-estim
   \item \texttt{education}: a monotone \emph{staircase} --- each higher band pays more, ``Advanced Degree'' far above ``$<$HS Grad''.
 \end{itemize}
 
-\textbf{(c) Non-linearity \& EDF.} Only \texttt{age} is genuinely non-linear: its smooth spends several effective degrees of freedom (roughly $4$--$6$). \texttt{year} enters with EDF $\approx1$ (essentially a straight line); \texttt{education} as a factor contributes df $=$ (levels $-1$) $=4$. The EDF is how a GAM quantifies ``how wiggly'' each term is.
+\textbf{(c) Non-linearity \& EDF.} Only \texttt{age} is genuinely non-linear: its smooth spends many effective degrees of freedom ($\approx15$ at pyGAM's default penalty, dropping to $\approx10$ once $\lambda$ is tuned by \texttt{gam.gridsearch}). \texttt{year} enters with EDF $\approx1$ (essentially a straight line); \texttt{education} as a factor contributes df $=$ (levels $-1$) $=4$. The EDF is how a GAM quantifies ``how wiggly'' each term is.
 
 \medskip
 \textit{Common mistake:} reading a partial-effect curve as an absolute wage level. Each panel is centred around zero; only its \emph{shape} and within-panel differences are meaningful, with all other predictors held fixed.
@@ -1136,7 +1136,7 @@ plt.legend(); plt.xlabel('age'); plt.ylabel('wage'); plt.show()
   \begin{description}
     \item[Polynomial] $y_i=\beta_0+\beta_1 x_i+\beta_2 x_i^2+\dots+\beta_d x_i^d+\varepsilon_i$.
     \item[Step function] $y_i=\beta_0+\sum_{k=1}^{K}\beta_k C_k(x_i)+\varepsilon_i$, with bins $C_k$.
-    \item[Cubic spline] truncated-power basis $x,x^2,x^3,(x-\xi_k)_+^3$; \ $K$ knots $\Rightarrow$ df $=K+4$.
+    \item[Cubic spline] truncated-power basis $1,x,x^2,x^3,(x-\xi_k)_+^3$; \ $K$ knots $\Rightarrow$ df $=K+4$.
     \item[Natural spline] linear beyond the boundary knots; \ df $=K$.
     \item[Smoothing spline] $\min_g\ \sum_i\big(y_i-g(x_i)\big)^2+\lambda\!\int g''(t)^2\,dt$.
     \item[GAM] $y_i=\beta_0+f_1(x_{i1})+f_2(x_{i2})+\dots+f_p(x_{ip})+\varepsilon_i$.

@@ -31,12 +31,13 @@ statistics, and (b) the notation, algebra and Python the chapters assume.
 ```{admonition} Split lectures
 :class: tip
 
-Chapters 2, 3 and 4 each span two lectures. The recommended stopping points are
-a natural section boundary, so you can stop and resume cleanly:
+Chapters 2, 3 and 4 each span two lectures. The recommended stopping points let
+you stop and resume cleanly:
 
-- **Ch 2** — after the KNN / bias–variance material
-- **Ch 3** — after "Goodness of fit / the four questions"
-- **Ch 4** — after multiple logistic regression (before LDA)
+- **Ch 2** — after "regression vs. classification" (p. 42); assessing accuracy,
+  bias–variance and KNN open Lecture 2
+- **Ch 3** — after multiple regression and the four questions (p. 76)
+- **Ch 4** — after the Bayes-theorem framing (p. 46), immediately before LDA
 ```
 
 ## Self-study chapters

@@ -38,9 +38,10 @@ make docs       # build this documentation locally
 make help       # the rest
 ```
 
-Everything is incremental: a deck is only recompiled when its `.tex` changed,
-and the slide index is regenerated from the PDFs, so quoted page numbers cannot
-drift away from the slides.
+Everything is incremental: a deck is only recompiled when its `.tex` changed (or,
+for the two precourse decks, their `make_figures.py`), and the slide index is
+regenerated from the PDFs, so quoted page numbers cannot drift away from the
+slides.
 
 ## What a runsheet gives you
 

@@ -644,13 +644,13 @@
   \end{numexample}
 \end{frame}
 
-\begin{frame}{Geometric picture: 3D residuals on real data}
+\begin{frame}{The same bowl, seen from above: RSS contours on real data}
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.66\textheight,keepaspectratio]{3_2a.pdf}
   \end{center}
-  Each red segment is a residual $e_i$. Least squares minimises the
-  sum of the \emph{squared} red lengths --- not the sum of the lengths
-  themselves.
+  Each blue curve joins the $(\beta_0,\beta_1)$ pairs with the same RSS on the
+  Advertising data. The red dot at the centre is the least-squares solution
+  $(\hat\beta_0,\hat\beta_1)=(7.03,\,0.0475)$ --- the bottom of the bowl.
   \islpsource{Figure 3.2}
 \end{frame}
 
@@ -1830,14 +1830,15 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
   \end{readme}
 \end{frame}
 
-\begin{frame}{Interaction plot for Advertising}
+\begin{frame}{Why Advertising needs an interaction}
   \begin{center}
     \includegraphics[width=0.72\textwidth,height=0.46\textheight,keepaspectratio]{3_5.pdf}
   \end{center}
   \begin{takeaway}[What the figure shows]
-    A \texttt{TV}$\times$\texttt{radio} term lets the sales surface
-    \emph{bend}: a dollar of TV returns more when radio is also high.
-    Adding it lifts $R^2$ from about $0.90$ to $0.97$ on these data.
+    The additive model can only fit a \emph{flat plane}: it under-predicts
+    when the budget is split between TV and radio and over-predicts when it is
+    concentrated in one medium. A \texttt{TV}$\times$\texttt{radio} term lets
+    the surface \emph{bend}, lifting $R^2$ from about $0.90$ to $0.97$.
   \end{takeaway}
   \islpsource{Figure 3.5}
 \end{frame}
@@ -2276,8 +2277,10 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.62\textheight,keepaspectratio]{3_13.pdf}
   \end{center}
-  Left: an outlier with low leverage. Middle: a high-leverage point
-  that is \emph{not} an outlier. Right: the dangerous combination.
+  Left: point 41 has an extreme $x$ and drags the fit (red) away from the fit
+  without it (blue); point 20 is unusual in $y$ only. Middle: 41 is
+  unremarkable in $X_1$ or $X_2$ alone, yet still high-leverage. Right:
+  studentised residual against leverage --- 41 stands out on both axes.
   \islpsource{Figure 3.13}
 \end{frame}
 
@@ -2578,9 +2581,9 @@ print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.66\textheight,keepaspectratio]{3_18.pdf}
   \end{center}
-  When the truth is approximately linear (left), linear regression
-  dominates KNN. When the truth is highly nonlinear (right), KNN
-  wins --- if $n$ is large enough.
+  The truth here \emph{is} linear (left), so least squares (blue dashed) nails
+  it. Right: KNN's test MSE (green) against $1/K$ stays above the
+  least-squares MSE (dashed).
   \islpsource{Figure 3.18}
 \end{frame}
 

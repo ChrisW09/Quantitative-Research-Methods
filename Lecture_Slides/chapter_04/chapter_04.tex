@@ -1090,7 +1090,7 @@ the latter adds $120$ to $\eta$ and drives every probability to $1$.}
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.62\textheight,keepaspectratio]{4_6.pdf}
   \end{center}
-  Two-class LDA on simulated Gaussians: dashed = Bayes optimum,
+  Three-class LDA on simulated Gaussians: dashed = Bayes optimum,
   solid = LDA estimated from training data. The two are very close.
   \islpsource{Figure 4.6}
 \end{frame}
@@ -1462,14 +1462,14 @@ the decision outright.}
 
 \begin{frame}{Bayes optimum and our methods}
   \begin{center}
-    \includegraphics[width=0.80\textwidth,height=0.46\textheight,keepaspectratio]{4_10a.pdf}
+    \includegraphics[width=0.80\textwidth,height=0.46\textheight,keepaspectratio]{4_12.pdf}
   \end{center}
   \begin{takeaway}
     Test error per scenario: \emph{no classifier wins everywhere} --- the
     best method in each panel matches its data-generating process. This
     is why we compare candidates by held-out error.
   \end{takeaway}
-  \islpsource{Figure 4.10}
+  \islpsource{Figure 4.12}
 \end{frame}
 
 % ---------------- Extended Exercise 4.4 ----------------
@@ -2226,7 +2226,9 @@ no basis for trading once transaction costs are included.
     \[
       \delta_k(x) = x^\top \Sigma^{-1}\mu_k - \tfrac12 \mu_k^\top \Sigma^{-1}\mu_k + \log\pi_k.
     \]
-    QDA replaces $\Sigma$ by $\Sigma_k$ and adds $-\tfrac12\log|\Sigma_k|$.
+    QDA gives each class its own $\Sigma_k$, so the quadratic term survives:
+    $\delta_k(x) = -\tfrac12 (x-\mu_k)^\top \Sigma_k^{-1}(x-\mu_k)
+      - \tfrac12\log|\Sigma_k| + \log\pi_k$.
   \end{block}
   \begin{block}{Bayes posterior}
     $\Pr(Y = k \mid X) = \pi_k f_k(X) / \sum_\ell \pi_\ell f_\ell(X)$.
@@ -2362,10 +2364,14 @@ no basis for trading once transaction costs are included.
 \begin{frame}{From two classes to $K$: the softmax}
   \small
   \begin{block}{Multinomial logistic model}
-    Pick a baseline class (say $K$) and set:
+    Pick a baseline class (say $K$) and set, for $k = 1,\dots,K-1$,
     \[
       \Pr(Y = k \mid X)
       = \frac{e^{\beta_{k0} + \beta_{k}^\top X}}
+             {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}},
+      \qquad
+      \Pr(Y = K \mid X)
+      = \frac{1}
              {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}}.
     \]
   \end{block}
@@ -2649,15 +2655,15 @@ Connection: Gaussian naive Bayes is exactly discriminant analysis with a
 
 \begin{frame}{Bikeshare: Poisson captures the commute rhythm}
   \begin{center}
-    \includegraphics[width=0.80\textwidth,height=0.47\textheight,keepaspectratio]{4_13.pdf}
+    \includegraphics[width=0.80\textwidth,height=0.47\textheight,keepaspectratio]{4_15.pdf}
   \end{center}
   \begin{takeaway}
-    Ridership peaks at the morning and evening commutes and climbs with
-    temperature. The Poisson GLM captures these as \emph{multiplicative}
-    effects on the expected count --- and never predicts a negative
-    number of riders.
+    Fitted Poisson coefficients by month and hour: ridership rises through the
+    warmer months and peaks at the two commutes. On the \emph{log}-rate scale
+    these act \emph{multiplicatively} on the expected count, so predicted
+    ridership can never go negative.
   \end{takeaway}
-  \islpsource{Figure 4.13}
+  \islpsource{Figure 4.15}
 \end{frame}
 
 \begin{frame}[fragile]{Poisson regression on Bikeshare}

@@ -12,7 +12,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 |---|:--:|:--:|:--:|
 | *front matter* | 1–10 | 10 | 14 min |
 | Data, variables and notation | 11–18 | 8 | 11 min |
-| Describing one variable | 19–31 | 13 | 18 min |
+| Describing one variable | 19–31 | 13 | 17 min |
 | Describing two variables | 32–41 | 10 | 14 min |
 | Probability essentials | 42–51 | 10 | 14 min |
 | Distributions you will meet | 52–56 | 5 | 7 min |
@@ -53,7 +53,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Logs, exponentials and growth | 16–21 | 6 | 17 min |
 | Probability, odds and the logit | 22–27 | 6 | 17 min |
 | Likelihood and maximum likelihood | 28–33 | 6 | 17 min |
-| The Python you will actually write | 34–42 | 9 | 26 min |
+| The Python you will actually write | 34–42 | 9 | 25 min |
 | Summary | 43–51 | 9 | 26 min |
 | Appendix: optional and advanced material | 52–60 | 9 | optional |
 
@@ -79,7 +79,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | *front matter* | 1–9 | 9 | 9 min |
 | Welcome | 10–15 | 6 | 6 min |
 | Definitions | 16–24 | 9 | 9 min |
-| Examples | 25–43 | 19 | 19 min |
+| Examples | 25–43 | 19 | 20 min |
 | Tools | 44–50 | 7 | 7 min |
 | Datasets | 51–55 | 5 | 5 min |
 | Roadmap | 56–61 | 6 | 6 min |
@@ -104,15 +104,15 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 |---|:--:|:--:|:--:|
 | *front matter* | 1–9 | 9 | 18 min |
 | What is f? | 10–16 | 7 | 14 min |
-| Why f? | 17–20 | 4 | 8 min |
+| Why f? | 17–20 | 4 | 9 min |
 | Estimating | 21–31 | 11 | 22 min |
 | Flexibility | 32–38 | 7 | 14 min |
 | Supervision | 39–40 | 2 | 4 min |
 | Reg vs Class | 41–42 | 2 | 4 min |
 | Accuracy | 43–51 | 9 | 18 min |
-| Bias-Variance | 52–66 | 15 | 30 min |
-| KNN | 67–87 | 21 | 43 min |
-| Python Lab | 88–98 | 11 | 22 min |
+| Bias-Variance | 52–66 | 15 | 31 min |
+| KNN | 67–87 | 21 | 42 min |
+| Python Lab | 88–98 | 11 | 23 min |
 | Summary | 99–107 | 9 | 18 min |
 | Appendix: optional and advanced material | 108–115 | 8 | optional |
 
@@ -144,7 +144,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Simple Linear Regression | 16–54 | 39 | 79 min |
 | Multiple Linear Regression | 55–76 | 22 | 44 min |
 | Extensions | 77–99 | 23 | 46 min |
-| Diagnostics | 100–123 | 24 | 48 min |
+| Diagnostics | 100–123 | 24 | 49 min |
 | vs.\ KNN | 124–127 | 4 | 8 min |
 | Python Lab | 128–135 | 8 | 16 min |
 | Summary | 136–144 | 9 | 18 min |
@@ -181,10 +181,10 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 18 min |
 | Why this chapter matters | 8–16 | 9 | 23 min |
-| Logistic regression | 17–42 | 26 | 67 min |
-| Generative models | 43–65 | 23 | 60 min |
+| Logistic regression | 17–42 | 26 | 68 min |
+| Generative models | 43–65 | 23 | 59 min |
 | Comparison | 66–71 | 6 | 16 min |
-| Evaluation | 72–89 | 18 | 47 min |
+| Evaluation | 72–89 | 18 | 46 min |
 | Python Lab | 90–102 | 13 | 34 min |
 | Summary | 103–112 | 10 | 26 min |
 | Appendix: optional and advanced material | 113–127 | 15 | optional |
@@ -247,12 +247,12 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 13 min |
-| Why this chapter matters | 8–12 | 5 | 9 min |
-| Subset Selection | 13–30 | 18 | 32 min |
-| Ridge regression | 31–41 | 11 | 20 min |
+| Why this chapter matters | 8–12 | 5 | 8 min |
+| Subset Selection | 13–30 | 18 | 33 min |
+| Ridge regression | 31–41 | 11 | 19 min |
 | The Lasso | 42–52 | 11 | 20 min |
 | PCR / PLS | 53–55 | 3 | 5 min |
-| High-D | 56–58 | 3 | 5 min |
+| High-D | 56–58 | 3 | 6 min |
 | Python Lab | 59–71 | 13 | 23 min |
 | Summary | 72–81 | 10 | 18 min |
 | Appendix: optional and advanced material | 82–92 | 11 | optional |
@@ -279,10 +279,10 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 12 min |
-| Why this chapter matters | 8–12 | 5 | 9 min |
-| Polynomials | 13–24 | 12 | 20 min |
+| Why this chapter matters | 8–12 | 5 | 8 min |
+| Polynomials | 13–24 | 12 | 21 min |
 | Splines | 25–39 | 15 | 26 min |
-| Smoothing | 40–50 | 11 | 19 min |
+| Smoothing | 40–50 | 11 | 18 min |
 | GAMs | 51–60 | 10 | 17 min |
 | Python Lab | 61–74 | 14 | 24 min |
 | Summary | 75–85 | 11 | 19 min |
@@ -313,7 +313,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Trees | 13–36 | 24 | 42 min |
 | Bagging / RF | 37–52 | 16 | 28 min |
 | Boosting | 53–61 | 9 | 16 min |
-| Python Lab | 62–74 | 13 | 23 min |
+| Python Lab | 62–74 | 13 | 22 min |
 | Summary | 75–83 | 9 | 16 min |
 | Appendix: optional and advanced material | 84–90 | 7 | optional |
 
@@ -339,7 +339,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 14 min |
-| Why now? | 8–11 | 4 | 8 min |
+| Why now? | 8–11 | 4 | 7 min |
 | Single Layer | 12–28 | 17 | 33 min |
 | Multilayer | 29–35 | 7 | 14 min |
 | CNNs | 36–44 | 9 | 17 min |
@@ -373,8 +373,8 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | The Problem | 10–17 | 8 | 18 min |
 | FWER | 18–26 | 9 | 21 min |
 | FDR | 27–42 | 16 | 37 min |
-| Practice | 43–48 | 6 | 14 min |
-| Python Lab | 49–55 | 7 | 16 min |
+| Practice | 43–48 | 6 | 13 min |
+| Python Lab | 49–55 | 7 | 17 min |
 | Summary | 56–63 | 8 | 18 min |
 | Appendix: optional and advanced material | 64–69 | 6 | optional |
 

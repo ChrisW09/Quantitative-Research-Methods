@@ -34,16 +34,22 @@ def main() -> None:
         if m:
             pages = int(m.group(1))
 
+        # Match only the message itself. Looking the page up in a *separate*
+        # search keeps finditer from consuming the following lines — an earlier
+        # version captured 200 dotall characters here and silently swallowed
+        # any overfull box reported inside that window.
         overfull = []
-        for m in re.finditer(
-            r"Overfull \\vbox \(([\d.]+)pt too high\)[^\n]*\n?(.{0,200})", text, re.S
-        ):
-            page = re.search(r"\[(\d+)", m.group(2))
+        for m in re.finditer(r"Overfull \\vbox \(([\d.]+)pt too high\)", text):
+            page = re.search(r"\[(\d+)", text[m.end() : m.end() + 400])
             overfull.append((float(m.group(1)), page.group(1) if page else "?"))
 
         bad = [o for o in overfull if o[0] >= TOLERANCE_PT]
         note = "ok" if not bad else "review: p. " + ", ".join(p for _, p in sorted(bad, reverse=True)[:5])
         rows.append((folder.name, pages, len(overfull), max((o[0] for o in overfull), default=0.0), note))
+
+    if not rows:
+        print(f"no chapter_* folders under {SLIDES}")
+        return
 
     width = max(len(r[0]) for r in rows)
     print(f"{'deck'.ljust(width)}  pages  overfull  worst    status")
@@ -51,10 +57,12 @@ def main() -> None:
     total = 0
     for name, pages, n_over, worst, note in rows:
         total += pages or 0
+        # worst is None for a deck that was never compiled — do not format it as a float.
+        worst_col = f"{worst:5.1f}pt" if worst is not None else "     —  "
         print(
             f"{name.ljust(width)}  {str(pages or '—').rjust(5)}  "
             f"{str(n_over if n_over is not None else '—').rjust(8)}  "
-            f"{worst:5.1f}pt  {note}"
+            f"{worst_col}  {note}"
         )
     print("-" * (width + 36))
     print(f"{'total'.ljust(width)}  {str(total).rjust(5)}")

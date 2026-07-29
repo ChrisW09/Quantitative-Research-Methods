@@ -93,5 +93,5 @@ Two things worth knowing about that workflow:
 
 The output in `docs/_build/html/` is a self-contained static site, so it can
 equally be served from Read the Docs or any static host. The `html_extra_path`
-mechanism means the deck and exam PDFs are part of that output — a published
-site is enough to teach from.
+mechanism means the deck PDFs are part of that output — a published site is
+enough to teach from. The exams are not staged, so they are never part of it.

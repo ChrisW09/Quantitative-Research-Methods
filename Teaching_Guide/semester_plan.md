@@ -4,44 +4,46 @@ Twelve sessions of 180 minutes, plus two optional precourse sessions. Slide
 counts are live figures from the compiled decks; the per-session detail is in
 [`runsheets/`](./runsheets/).
 
-Slide counts are written **main flow + appendix**. Every deck now ends with an
-appendix holding the optional, more advanced material (formal derivations, the
-heaviest worked exercises, side topics); the timed plans in the runsheets cover
-the main flow only, so the appendix pages are extra material to assign, not to
-teach.
+Slide counts are written **main flow + appendix**. For the three decks that span
+two sessions the column gives the pages taught in that session instead; their
+appendices (`chapter_02` +8, `chapter_03` +11, `chapter_04` +15) sit outside
+both halves. Every deck ends with an appendix holding the optional, more
+advanced material (formal derivations, the heaviest worked exercises, side
+topics); the timed plans in the runsheets cover the main flow only, so the
+appendix pages are extra material to assign, not to teach.
 
 ## The twelve weeks
 
 | Week | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
-| — | Precourse (a) | `chapter_00` | 104 + 16 | 10 + 4 | Optional. Statistics refresher |
-| — | Precourse (b) | `chapter_00b` | 48 + 9 | 6 + 2 | Optional. Notation, logs & odds, likelihood, Python |
-| 1 | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 68 + ~55 | 3 + 1, part of 8 + 4 | Stop after KNN / bias–variance |
-| 2 | Statistical Learning II | `chapter_02` | rest | rest | Accuracy, Bayes classifier, lab |
-| 3 | Linear Regression I | `chapter_03` | ~74 | 6 of 12 | Stop after "Goodness of fit / the four questions" |
-| 4 | Linear Regression II | `chapter_03` | rest | rest | **Mock Exam 1 after this week** |
-| 5 | Classification I | `chapter_04` | ~63 | 4 of 10 | Stop after multiple logistic regression |
-| 6 | Classification II | `chapter_04` | rest | rest | LDA/QDA, naive Bayes, ROC, lab |
-| 7 | Resampling | `chapter_05` | 77 + 7 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap |
-| 8 | Model Selection & Regularisation | `chapter_06` | 79 + 11 | 7 + 3 | **Mock Exam 2 after this week** |
-| 9 | Beyond Linearity | `chapter_07` | 83 + 7 | 6 + 3 | Polynomials, splines, GAMs |
-| 10 | Tree-Based Methods | `chapter_08` | 81 + 7 | 7 + 3 | Trees, bagging, forests, boosting |
-| 11 | Deep Learning | `chapter_10` | 71 + 8 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
-| 12 | Multiple Testing | `chapter_13` | 61 + 6 | 5 + 3 | **Final mock exam after this week** |
+| — | Precourse (a) | `chapter_00` | 106 + 16 | 10 + 4 | Optional. Statistics refresher |
+| — | Precourse (b) | `chapter_00b` | 51 + 9 | 6 + 2 | Optional. Notation, logs & odds, likelihood, Python |
+| 1 | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 71, then pp. 1–42 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
+| 2 | Statistical Learning II | `chapter_02` | pp. 43–107 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
+| 3 | Linear Regression I | `chapter_03` | pp. 1–76 | 3.1–3.6 | Stop after multiple regression and the four questions |
+| 4 | Linear Regression II | `chapter_03` | pp. 77–144 | 3.7–3.12 | **Mock Exam 1 after this week** |
+| 5 | Classification I | `chapter_04` | pp. 1–46 | 4.1–4.4 | Stop after the Bayes-theorem framing, before LDA |
+| 6 | Classification II | `chapter_04` | pp. 47–112 | 4.5–4.10 | LDA/QDA, naive Bayes, ROC, lab |
+| 7 | Resampling | `chapter_05` | 79 + 7 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap |
+| 8 | Model Selection & Regularisation | `chapter_06` | 81 + 11 | 7 + 3 | **Mock Exam 2 after this week** |
+| 9 | Beyond Linearity | `chapter_07` | 85 + 7 | 6 + 3 | Polynomials, splines, GAMs |
+| 10 | Tree-Based Methods | `chapter_08` | 83 + 7 | 7 + 3 | Trees, bagging, forests, boosting |
+| 11 | Deep Learning | `chapter_10` | 75 + 8 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
+| 12 | Multiple Testing | `chapter_13` | 63 + 6 | 5 + 3 | **Final mock exam after this week** |
 
 Chapters **9 (SVM)**, **11 (Survival)** and **12 (Unsupervised)** are not
 taught; they ship as self-study notebooks for students who want them.
 
 ## The three splits, and where to break them
 
-Three decks span two sessions. The split points are section boundaries, so you
-can stop and resume without a dangling thread:
+Three decks span two sessions. The split points are chosen so you can stop and
+resume without a dangling thread:
 
 | Deck | Break after | Because |
 |---|---|---|
-| `chapter_02` | the KNN / bias–variance material | The trade-off is the punchline of part 1; assessing accuracy opens part 2 |
-| `chapter_03` | "Goodness of fit / the four questions" | Part 1 is estimation and inference; part 2 is everything that complicates it |
-| `chapter_04` | multiple logistic regression, before LDA | Part 1 is one method done properly; part 2 is the alternatives and how to compare them |
+| `chapter_02` | "regression vs. classification" (p. 42) | Part 1 is the framing — what *f* is, and how flexible to make it; assessing accuracy, bias–variance and KNN open part 2 |
+| `chapter_03` | multiple regression and the four questions (p. 76) | Part 1 is estimation and inference; part 2 is everything that complicates it |
+| `chapter_04` | the Bayes-theorem framing, before LDA (p. 46) | Part 1 is one method done properly; part 2 is the alternatives and how to compare them |
 
 ## If you are behind
 
@@ -71,7 +73,8 @@ Do **not** cut: the motivation slide that opens a topic, the pitfalls
 
 Each exists as questions, worked solutions, and a review deck for going through
 it in class. They are **git-ignored**: assessment material stays off the public
-repository. `make exams` rebuilds them on a machine that has them.
+repository. `make exams` rebuilds the papers and their solutions on a machine
+that has them; the review decks compile with a plain `pdflatex` run.
 
 ## Workload for students
 

@@ -9,9 +9,10 @@ options.
 Open any notebook in your browser; nothing to install. Every notebook's first
 cell detects Colab, quietly installs the few missing packages (`ISLP`, plus
 `pygam` / `xgboost` / `lifelines` where a chapter needs them; `torch` is
-preinstalled on Colab), and resolves the data automatically — **12 of the 13
-datasets load straight from the `ISLP` package**, and the one that isn't in
-ISLP (`Advertising`) streams from the book's official site.
+preinstalled on Colab), and resolves the data automatically — **datasets load
+straight from the `ISLP` package wherever possible**, and the four the package
+does not ship (`Advertising`, `Heart`, `Income1`, `Income2`) stream from the
+book's official site.
 
 One-click links for all fifteen labs are on the [Lab notebooks](labs.md)
 page.

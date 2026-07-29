@@ -100,6 +100,15 @@ def deck_block(folder: str, name: str, sessions: float) -> list[str]:
     # The appendix holds optional material, so it is outside the time budget.
     appendix_start = next((p for ti, p in secs if ti.lower().startswith("appendix")), None)
     taught = appendix_start - 1 if appendix_start else total
+    if taught <= 0:
+        # A deck that opens with its appendix (or an empty PDF) has nothing to
+        # budget; say so rather than dividing by zero.
+        return [
+            f"### {name}",
+            "",
+            f"`{folder}.pdf` — **{total} slides**, none of them in a main flow.",
+            "",
+        ]
 
     lines = [
         f"### {name}",
@@ -114,20 +123,25 @@ def deck_block(folder: str, name: str, sessions: float) -> list[str]:
         "|---|:--:|:--:|:--:|",
     ]
 
+    # Minutes are apportioned cumulatively, so the rows add up to
+    # teaching_minutes exactly. Rounding each row on its own drifts by a minute
+    # or two against the session total quoted just above the table.
+    spent = {"slides": 0, "minutes": 0}
+
+    def budget(span: int) -> str:
+        spent["slides"] += span
+        upto = round(teaching_minutes * spent["slides"] / taught)
+        minutes, spent["minutes"] = upto - spent["minutes"], upto
+        return f"{minutes} min"
+
     bounds = [(t, p) for t, p in secs] + [("", total + 1)]
     front = secs[0][1] - 1 if secs else total
     if front > 0:
-        share = front / taught
-        lines.append(
-            f"| *front matter* | 1–{front} | {front} | {teaching_minutes * share:.0f} min |"
-        )
+        lines.append(f"| *front matter* | 1–{front} | {front} | {budget(front)} |")
     for (title, start), (_, nxt) in zip(bounds, bounds[1:]):
         span = nxt - start
-        if appendix_start and start >= appendix_start:
-            budget = "optional"
-        else:
-            budget = f"{teaching_minutes * span / taught:.0f} min"
-        lines.append(f"| {title} | {start}–{nxt - 1} | {span} | {budget} |")
+        cell = "optional" if appendix_start and start >= appendix_start else budget(span)
+        lines.append(f"| {title} | {start}–{nxt - 1} | {span} | {cell} |")
     lines.append("")
 
     # Exercises, with their solutions folded in.
@@ -171,6 +185,24 @@ def deck_block(folder: str, name: str, sessions: float) -> list[str]:
 
 
 def main() -> None:
+    # The .toc files are LaTeX build artefacts: git-ignored, and deleted by
+    # `make clean`. Without one, every section table collapses to a single
+    # "front matter" row spanning the whole deck — so refuse to overwrite the
+    # tracked index with a gutted version, and say what to run instead.
+    stale = [
+        f for f in DECKS
+        if (SLIDES / f / f"{f}.pdf").exists() and not (SLIDES / f / f"{f}.toc").exists()
+    ]
+    if stale:
+        sys.exit(
+            "no .toc file for: " + ", ".join(stale) + "\n"
+            "Section structure comes from the .toc files LaTeX writes, and they are\n"
+            "not in git (a fresh clone has none, and `make clean` deletes them). A\n"
+            "deck whose .pdf is already current will not recompile on its own, so\n"
+            "force it:\n"
+            "    make -B decks"
+        )
+
     doc = [
         "# Slide index",
         "",

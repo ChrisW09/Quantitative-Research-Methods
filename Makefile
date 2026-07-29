@@ -12,7 +12,8 @@
 #   make check      report page counts and any overfull slides
 #
 # Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages)
-# and python3 with the packages in requirements.txt.
+# and python3 with the packages in requirements.txt. "index" and "check" also
+# need Teaching_Guide/requirements.txt (pypdf); "docs" needs docs/requirements.txt.
 
 CHAPTERS  := 00 00b 01 02 03 04 05 06 07 08 10 13
 SLIDEDIR  := Lecture_Slides
@@ -29,8 +30,10 @@ HANDOUT_PDFS := $(foreach c,$(CHAPTERS),$(HANDOUTS)/chapter_$(c)_handout.pdf)
 
 all: figures decks index
 
+# Print the comment header above, however long it grows: line 2 to the first
+# blank line. A fixed line range silently starts printing variables instead.
 help:
-	@sed -n '2,20p' Makefile
+	@sed -n '2,/^$$/p' Makefile
 
 # ---------------------------------------------------------------- lecture decks
 # A pattern rule may contain only one %, so the per-chapter rules are generated.
@@ -49,11 +52,37 @@ deck-%:
 	@$(MAKE) --no-print-directory $(SLIDEDIR)/chapter_$*/chapter_$*.pdf
 
 # ------------------------------------------------------------- generated figures
-# Only the two precourse decks generate their figures from the datasets.
-figures:
-	@echo "  [figures]  chapter_00, chapter_00b"
-	@$(PYTHON) $(SLIDEDIR)/chapter_00/make_figures.py  >/dev/null
+# Only the two precourse decks generate their figures from the datasets. Each
+# script writes a whole directory of PNGs at once, so a stamp file stands in for
+# them: it keeps the run incremental, and it lets the two decks declare a real
+# dependency on their figures. Without that dependency an edited script never
+# triggers a rebuild, and `make -j` can compile a deck while a PNG is still
+# half-written. (The datasets themselves are not listed: make cannot handle the
+# spaces in "ALL CSV FILES - 2nd Edition", and they never change.)
+FIG_STAMPS := $(SLIDEDIR)/chapter_00/.figures.stamp \
+              $(SLIDEDIR)/chapter_00b/.figures.stamp
+
+$(SLIDEDIR)/chapter_00/.figures.stamp: $(SLIDEDIR)/chapter_00/make_figures.py
+	@echo "  [figures]  chapter_00"
+	@$(PYTHON) $(SLIDEDIR)/chapter_00/make_figures.py >/dev/null
+	@touch $@
+
+$(SLIDEDIR)/chapter_00b/.figures.stamp: $(SLIDEDIR)/chapter_00b/make_figures.py
+	@echo "  [figures]  chapter_00b"
 	@$(PYTHON) $(SLIDEDIR)/chapter_00b/make_figures.py >/dev/null
+	@touch $@
+
+figures: $(FIG_STAMPS)
+
+# Extra prerequisites for the two decks that use generated figures. A rule with
+# no recipe only adds prerequisites; the build commands stay in DECK_RULE above.
+# The stamp alone is not enough: it only tracks the *script*, so a figure that
+# changed by any other route (a hand-tweaked PNG, a half-restored file) would not
+# rebuild the deck that includes it. Listing the images as well covers that.
+$(SLIDEDIR)/chapter_00/chapter_00.pdf:   $(SLIDEDIR)/chapter_00/.figures.stamp \
+                                         $(wildcard $(SLIDEDIR)/chapter_00/images/*)
+$(SLIDEDIR)/chapter_00b/chapter_00b.pdf: $(SLIDEDIR)/chapter_00b/.figures.stamp \
+                                         $(wildcard $(SLIDEDIR)/chapter_00b/images/*)
 
 # -------------------------------------------------------------------- handouts
 define HANDOUT_RULE
@@ -94,9 +123,14 @@ exams:
 check:
 	@$(PYTHON) $(GUIDE)/check_decks.py
 
+# Only ever touches LaTeX by-products: no .tex, .pdf or image can match. Note
+# that "check" reads the .log files and "index" the .toc files, and a deck whose
+# .pdf is already current will not recompile on its own, so both need a forced
+# rebuild after a clean.
 clean:
 	@find $(SLIDEDIR) $(HANDOUTS) -type f \
 	  \( -name '*.aux' -o -name '*.log' -o -name '*.nav' -o -name '*.out' \
 	  -o -name '*.snm' -o -name '*.toc' -o -name '*.vrb' -o -name '*.fls' \
 	  -o -name '*.fdb_latexmk' \) -delete 2>/dev/null || true
 	@echo "  [clean]    LaTeX artefacts removed"
+	@echo "             run 'make -B decks' before 'make check' or 'make index'"

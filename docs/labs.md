@@ -52,9 +52,9 @@ Each notebook opens with a setup cell that:
 1. detects whether it is running on Colab and installs any missing packages
    (`ISLP`, plus `pygam` / `xgboost` / `lifelines` for the chapters that need
    them — `torch` is preinstalled on Colab);
-2. loads each dataset from the `ISLP` package where possible (12 of the 13
-   datasets used in the labs), streams `Advertising` from the book's official
-   site, and falls back to the bundled
+2. loads each dataset from the `ISLP` package where possible, streams the four
+   it does not ship (`Advertising`, `Heart`, `Income1`, `Income2`) from the
+   book's official site, and falls back to the bundled
    [`ALL CSV FILES - 2nd Edition/`](datasets.md) folder otherwise.
 
 So a fresh Colab runtime works with no manual downloads, and a local checkout

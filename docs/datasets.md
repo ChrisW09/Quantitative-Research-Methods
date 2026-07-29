@@ -7,10 +7,10 @@ use with the book.
 ```{admonition} How the notebooks resolve data
 :class: tip
 
-**12 of the 13 datasets used in the labs load straight from the `ISLP`
-package**; the one that isn't in ISLP (`Advertising`) streams from the book's
-official site, and the bundled CSVs act as an offline fallback. You should
-never have to download anything by hand.
+**The labs load datasets straight from the `ISLP` package wherever possible**;
+the four the package does not ship (`Advertising`, `Heart`, `Income1`,
+`Income2`) stream from the book's official site, and the bundled CSVs act as an
+offline fallback. You should never have to download anything by hand.
 ```
 
 ## What's bundled

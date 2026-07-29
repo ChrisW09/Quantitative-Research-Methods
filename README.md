@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>1029 core slides</b> (+111 in optional appendices) ·
+  <b>1057 core slides</b> (+111 in optional appendices) ·
   <b>127 exercises</b> with worked solutions ·
   <b>15 labs</b> that run locally &amp; on Colab ·
   <b>3 mock exams</b> · <b>22 datasets</b>
@@ -48,7 +48,7 @@ Applied Sciences and Arts), Summer Semester 2026.
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part optional precourse · 1029 slides, plus 111 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part optional precourse · 1057 slides, plus 111 in per-deck appendices |
 | Exercises | 86 short + 41 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 15 | Twelve lecture chapters + three self-study chapters (SVM, survival, unsupervised) |
 | [Mock exams](#-mock-exams) | 3 | Each as questions, worked solutions and an in-class review deck — kept out of git |
@@ -103,9 +103,11 @@ A 12-lecture semester (12 × 180 min):
 | 11 | 10 | Deep learning: MLPs, CNNs, training, regularization (PyTorch) |
 | 12 | 13 | Multiple testing: FWER, Bonferroni/Holm, FDR, Benjamini–Hochberg |
 
-Chapters 2, 3 and 4 each span two lectures, breaking at a section boundary:
-after KNN / bias–variance, after "Goodness of fit / the four questions", and
-after multiple logistic regression.
+Chapters 2, 3 and 4 each span two lectures, breaking where a session can end
+cleanly: Ch 2 after "regression vs. classification" (p. 42), so accuracy,
+bias–variance and KNN open Lecture 2; Ch 3 after multiple regression and the
+four questions (p. 76); Ch 4 after the Bayes-theorem framing, immediately before
+LDA (p. 46).
 
 > Chapters **9 (SVM), 11 (Survival) and 12 (Unsupervised)** aren't part of the
 > 12-lecture plan but ship as **self-study lab notebooks** for completeness.
@@ -126,19 +128,19 @@ advanced material that the main thread never depends on.
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 104 (+16) | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
-| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 48 (+9) | [PDF](./Lecture_Slides/chapter_00b/chapter_00b.pdf) |
-| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 68 (+6) | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
-| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 105 (+8) | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
-| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 142 (+11) | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
-| 4 | Classification | Logistic regression and the odds scale, confounding, LDA, QDA, naive Bayes, confusion matrices, ROC and AUC | 10 + 6 | 110 (+15) | [PDF](./Lecture_Slides/chapter_04/chapter_04.pdf) |
-| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 77 (+7) | [PDF](./Lecture_Slides/chapter_05/chapter_05.pdf) |
-| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 79 (+11) | [PDF](./Lecture_Slides/chapter_06/chapter_06.pdf) |
-| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 83 (+7) | [PDF](./Lecture_Slides/chapter_07/chapter_07.pdf) |
-| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 81 (+7) | [PDF](./Lecture_Slides/chapter_08/chapter_08.pdf) |
-| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 71 (+8) | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
-| 13 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 5 + 3 | 61 (+6) | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
-| **Total** | | | **86 + 41** | **1029 (+111)** | |
+| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+16) | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+9) | [PDF](./Lecture_Slides/chapter_00b/chapter_00b.pdf) |
+| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+6) | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
+| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 107 (+8) | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
+| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 144 (+11) | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
+| 4 | Classification | Logistic regression and the odds scale, confounding, LDA, QDA, naive Bayes, confusion matrices, ROC and AUC | 10 + 6 | 112 (+15) | [PDF](./Lecture_Slides/chapter_04/chapter_04.pdf) |
+| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 79 (+7) | [PDF](./Lecture_Slides/chapter_05/chapter_05.pdf) |
+| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 81 (+11) | [PDF](./Lecture_Slides/chapter_06/chapter_06.pdf) |
+| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+7) | [PDF](./Lecture_Slides/chapter_07/chapter_07.pdf) |
+| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 83 (+7) | [PDF](./Lecture_Slides/chapter_08/chapter_08.pdf) |
+| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 75 (+8) | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
+| 13 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 5 + 3 | 63 (+6) | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
+| **Total** | | | **86 + 41** | **1057 (+111)** | |
 
 <details>
 <summary><b>How a deck is built</b></summary>
@@ -158,8 +160,8 @@ advanced material that the main thread never depends on.
 5. **Appendix** — the optional, advanced material, opened by a slide that says
    what is in it and why each item is optional.
 
-Throughout: **~40 purpose-built visuals** (≈22 matplotlib plots computed from
-the real course datasets + ≈18 native TikZ diagrams), commented Python on every
+Throughout: **~100 purpose-built visuals** (65 matplotlib plots computed from
+the real course datasets + 39 native TikZ diagrams), commented Python on every
 listing, and numeric answers reproduced against the real data.
 </details>
 
@@ -189,7 +191,7 @@ solution, so it works as homework.
 <details>
 <summary><b>The two precourse decks</b></summary>
 
-**Chapter 0 — the statistics refresher.** An optional session (104 slides plus a
+**Chapter 0 — the statistics refresher.** An optional session (106 slides plus a
 16-slide appendix) revisiting what the course assumes: descriptive statistics,
 probability and Bayes, the standard distributions, sampling and confidence
 intervals, hypothesis testing, simple linear regression, and the
@@ -342,9 +344,10 @@ The datasets live in
 [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) and are
 distributed by the textbook authors at
 [statlearning.com](https://www.statlearning.com) for use with the book. In the
-notebooks, **12 of the 13 datasets load straight from the `ISLP` package**; the
-one that isn't in ISLP (`Advertising`) streams from the book's official site, and
-the bundled CSVs act as an offline fallback. The decks attribute every book
+notebooks, **datasets load straight from the `ISLP` package wherever possible**;
+the four the package does not ship (`Advertising`, `Heart`, `Income1`,
+`Income2`) stream from the book's official site, and the bundled CSVs act as an
+offline fallback. The decks attribute every book
 figure to its source.
 
 ---

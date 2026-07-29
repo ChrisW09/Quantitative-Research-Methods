@@ -5,7 +5,7 @@ Beamer decks, fifteen Jupyter labs, three mock exams and the course datasets,
 sharing one notation and one twelve-week rhythm.
 
 :::{container} qrm-chips
-**12** decks · **1029** core slides *(+111 optional)* · **127** exercises with
+**12** decks · **1057** core slides *(+111 optional)* · **127** exercises with
 solutions · **15** labs · **3** mock exams · **22** datasets
 :::
 
@@ -75,7 +75,7 @@ The twelve-lecture plan, chapter map and the three split points.
 :link: slides
 :link-type: doc
 
-Twelve decks: 1029 core slides, 111 more in optional appendices, every exercise
+Twelve decks: 1057 core slides, 111 more in optional appendices, every exercise
 with a worked solution.
 :::
 
@@ -122,8 +122,9 @@ What is pinned, why, and which chapter needs which extra package.
   [appendix](slides.md), so the main thread fits the twelve sessions.
 
 **Numbers you can trust.**
-: ~40 purpose-built visuals are computed from the real course datasets (not
-  sketched), and every mock-exam answer was verified programmatically.
+: 65 purpose-built figures are computed from the real course datasets (not
+  sketched), 39 more are drawn natively in TikZ, and every mock-exam answer was
+  verified programmatically.
 
 **Ready to walk into a room.**
 : Timed runsheets, a generated [slide index](teaching.md) with page numbers, a
@@ -138,7 +139,7 @@ What is pinned, why, and which chapter needs which extra package.
 
 | | |
 |---|---|
-| Lecture decks | 10 chapters + two precourse sessions · 1029 slides, plus 111 in optional appendices |
+| Lecture decks | 10 chapters + two precourse sessions · 1057 slides, plus 111 in optional appendices |
 | Exercises | ~86 short (~5 min) + ~41 extended (~15 min), all with worked solutions |
 | Lab notebooks | 15 (2 precourse + 10 lecture chapters + 3 self-study) |
 | Mock exams | 3, each in 3 formats (not distributed publicly) |
