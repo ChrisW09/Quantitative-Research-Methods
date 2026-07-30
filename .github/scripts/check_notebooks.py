@@ -53,6 +53,16 @@ except ImportError:  # pragma: no cover - guidance, not logic
 # load-bearing before it is added: clear NORMALISERS, and the cell it exists for
 # must start failing.
 NORMALISERS: list[tuple[re.Pattern[str], str]] = [
+    # --- environment, not answers --------------------------------------------
+    # The setup cell prints this exactly when the ISLP package is absent and the
+    # bundled CSVs carry the notebook instead. Locally-refreshed outputs have
+    # the line, the CI runners (which install ISLP) do not — same data either
+    # way, so the line says nothing about the numbers.
+    (re.compile(r"^ISLP not installed; using CSV / URL fallbacks\.\n?", re.M), ""),
+    # advanced_02: the exact-Shapley cell reports its own wall time so students
+    # see the 2^p cost on a real clock. Milliseconds differ per machine.
+    (re.compile(r"wall time for one instance: \d+\.\d+s"),
+     "wall time for one instance: <TIME>s"),
     # --- timestamps a library stamps into an otherwise deterministic table ---
     # statsmodels summary(): "Date:                Wed, 29 Jul 2026   Prob (F-...
     (re.compile(r"Date:\s+\w{3}, \d{2} \w{3} \d{4}"), "Date: <DATE>"),
