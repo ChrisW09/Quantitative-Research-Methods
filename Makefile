@@ -15,8 +15,10 @@
 #   make runsheets  the full runsheet report: every page reference in
 #                   Teaching_Guide/runsheets/ resolved to its frame title
 #                   (kept out of git; skipped if the folder is absent)
-#   make notebooks  run all 15 lab notebooks and diff their output against the
-#                   outputs stored in them — what CI does weekly (needs nbclient)
+#   make notebooks  run all lab notebooks (15 course + 4 advanced) and diff
+#                   their output against the outputs stored in them — what CI
+#                   does weekly (needs nbclient)
+#   make advanced   rebuild the four advanced-module decks (Advanced/)
 #
 # Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages,
 # enumitem and mathtools — the last two for the exam papers and review decks)
@@ -34,7 +36,7 @@ LATEX     := pdflatex -interaction=nonstopmode -halt-on-error
 DECK_PDFS := $(foreach c,$(CHAPTERS),$(SLIDEDIR)/chapter_$(c)/chapter_$(c).pdf)
 HANDOUT_PDFS := $(foreach c,$(CHAPTERS),$(HANDOUTS)/chapter_$(c)_handout.pdf)
 
-.PHONY: all decks figures handouts index docs exams clean check runsheets notebooks help
+.PHONY: all decks figures handouts index docs exams clean check runsheets notebooks advanced help
 .DEFAULT_GOAL := all
 
 all: figures decks index
@@ -59,6 +61,23 @@ decks: $(DECK_PDFS)
 
 deck-%:
 	@$(MAKE) --no-print-directory $(SLIDEDIR)/chapter_$*/chapter_$*.pdf
+
+# --------------------------------------------------------------- advanced decks
+# Four optional self-study modules in Advanced/ — same two-pass LaTeX build,
+# kept out of `all` because they are not part of the 12-lecture deliverable.
+ADVANCED := advanced_01_rcts advanced_02_shapley advanced_03_conformal advanced_04_glms_splines
+ADV_DIR  := Advanced/Lecture_Slides
+ADV_PDFS := $(foreach a,$(ADVANCED),$(ADV_DIR)/$(a)/$(a).pdf)
+
+define ADV_RULE
+$(ADV_DIR)/$(1)/$(1).pdf: $(ADV_DIR)/$(1)/$(1).tex
+	@echo "  [deck]     $(1)"
+	@cd $(ADV_DIR)/$(1) && $(LATEX) $(1).tex >/dev/null \
+	  && $(LATEX) $(1).tex >/dev/null
+endef
+$(foreach a,$(ADVANCED),$(eval $(call ADV_RULE,$(a))))
+
+advanced: $(ADV_PDFS)
 
 # ------------------------------------------------------------- generated figures
 # Only the two precourse decks generate their figures from the datasets. Each

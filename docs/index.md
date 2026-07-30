@@ -141,6 +141,14 @@ The 22 ISLP datasets bundled with the course, with sizes and where each is used.
 What is pinned, why, and which chapter needs which extra package.
 :::
 
+:::{grid-item-card} 🧭 Advanced modules
+:link: advanced
+:link-type: doc
+
+Four optional self-study modules: RCTs, Shapley values, conformal prediction,
+GLMs & splines.
+:::
+
 ::::
 
 ## What makes these materials different
@@ -178,6 +186,7 @@ What is pinned, why, and which chapter needs which extra package.
 | Lab notebooks | 12 taught labs, each with worked solutions (2 precourse + 10 lecture chapters) · 3 code references for the untaught chapters (no deck, no solutions) |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
+| Advanced modules | 4 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines) · 300 slides + 4 notebooks |
 | Semester shape | 12 lectures × 180 min (+ two optional precourse sessions) |
 | Sources | LaTeX (Beamer) · Jupyter · Python 3.9+ · one `make` build |
 
@@ -199,6 +208,7 @@ slides
 labs
 exams
 datasets
+advanced
 ```
 
 ```{toctree}

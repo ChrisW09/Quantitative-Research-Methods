@@ -346,12 +346,33 @@ behind, and the only ones carrying grading keys and marking tables. They live in
 
 ---
 
+## 🧭 Advanced modules
+
+Four **optional, self-study** modules extend the course beyond ISLP — same
+house style as the twelve decks (every exercise followed by its worked
+solution, closing summary, optional appendix), each paired with a companion
+notebook whose numbers match the slides seed-for-seed:
+
+| Module | Title | Deck | Notebook |
+|:--:|---|:--:|:--:|
+| A1 | Randomised Controlled Trials — potential outcomes, selection bias, power, peeking | 71 slides | [`advanced_01_rcts_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_01_rcts_lab.ipynb) |
+| A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 73 slides | [`advanced_02_shapley_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_02_shapley_lab.ipynb) |
+| A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 74 slides | [`advanced_03_conformal_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_03_conformal_lab.ipynb) |
+| A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 82 slides | [`advanced_04_glms_splines_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_04_glms_splines_lab.ipynb) |
+
+Nothing in the twelve-lecture plan or the exams depends on them — see the
+[module guide](./Advanced/README.md) for prerequisites and build instructions;
+`make advanced` rebuilds the decks.
+
+---
+
 ## 🗂️ Repository layout
 
 | Path | Contents |
 |---|---|
 | [`Lecture_Slides/`](./Lecture_Slides/) | Twelve Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable. See its [deck guide](./Lecture_Slides/README.md). |
 | [`Lab_Notebooks/`](./Lab_Notebooks/) | Fifteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
+| [`Advanced/`](./Advanced/) | Four optional self-study modules — RCTs, Shapley values, conformal prediction, GLMs & splines — each a full deck plus companion notebook. See its [module guide](./Advanced/README.md). |
 | [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, runsheets, slide index, before-class checklist, printable handouts |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
 | [`Makefile`](./Makefile) | One-command rebuild of figures, decks, handouts and the index |

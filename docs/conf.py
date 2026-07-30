@@ -35,10 +35,22 @@ ROOT = HERE.parent
 LABS_SRC = ROOT / "Lab_Notebooks"
 LABS_DST = HERE / "labs"
 
+ADV_LABS_SRC = ROOT / "Advanced" / "Lab_Notebooks"
+ADV_LABS_DST = HERE / "advanced_labs"
+ADV_SLIDES = ROOT / "Advanced" / "Lecture_Slides"
+
 EXTRA = HERE / "_extra"
 
 # Chapters with a compiled deck ("00"/"00b" are the two precourse sessions).
 SLIDE_CHAPTERS = ["00", "00b", "01", "02", "03", "04", "05", "06", "07", "08", "10", "13"]
+
+# The four optional advanced modules (decks + labs under Advanced/).
+ADV_MODULES = [
+    "advanced_01_rcts",
+    "advanced_02_shapley",
+    "advanced_03_conformal",
+    "advanced_04_glms_splines",
+]
 
 def _copy(src: Path, dst: Path) -> bool:
     """Copy ``src`` to ``dst`` (creating parents). Returns False if missing."""
@@ -60,6 +72,13 @@ def stage_materials(app=None, config=None) -> None:
     for nb in sorted(LABS_SRC.glob("chapter_*_lab.ipynb")):
         shutil.copy2(nb, LABS_DST / nb.name)
 
+    # Advanced-module notebooks -> docs/advanced_labs/
+    if ADV_LABS_DST.exists():
+        shutil.rmtree(ADV_LABS_DST)
+    ADV_LABS_DST.mkdir(parents=True, exist_ok=True)
+    for nb in sorted(ADV_LABS_SRC.glob("advanced_*_lab.ipynb")):
+        shutil.copy2(nb, ADV_LABS_DST / nb.name)
+
     # Lecture decks -> docs/_extra/slides/
     if EXTRA.exists():
         shutil.rmtree(EXTRA)
@@ -67,6 +86,12 @@ def stage_materials(app=None, config=None) -> None:
         name = f"chapter_{ch}.pdf"
         if not _copy(ROOT / "Lecture_Slides" / f"chapter_{ch}" / name, EXTRA / "slides" / name):
             missing.append(f"Lecture_Slides/chapter_{ch}/{name}")
+
+    # Advanced-module decks -> docs/_extra/slides/
+    for mod in ADV_MODULES:
+        name = f"{mod}.pdf"
+        if not _copy(ADV_SLIDES / mod / name, EXTRA / "slides" / name):
+            missing.append(f"Advanced/Lecture_Slides/{mod}/{name}")
 
     EXTRA.mkdir(parents=True, exist_ok=True)  # keep html_extra_path valid
 

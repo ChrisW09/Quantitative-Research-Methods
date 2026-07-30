@@ -36,6 +36,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 NOTEBOOKS = ROOT / "Lab_Notebooks"
+ADVANCED = ROOT / "Advanced" / "Lab_Notebooks"
 
 try:
     import nbformat
@@ -213,7 +214,10 @@ def main() -> int:
     )
     args = ap.parse_args()
 
-    paths = args.notebooks or sorted(NOTEBOOKS.glob("chapter_*_lab.ipynb"))
+    paths = args.notebooks or (
+        sorted(NOTEBOOKS.glob("chapter_*_lab.ipynb"))
+        + sorted(ADVANCED.glob("advanced_*_lab.ipynb"))
+    )
     if not paths:
         print(f"no chapter_*_lab.ipynb under {NOTEBOOKS}")
         return 1
