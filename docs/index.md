@@ -9,7 +9,7 @@ myst:
 {.qrm-lead}
 A complete, ready-to-teach university course in statistical learning — twelve
 Beamer decks, fifteen Jupyter notebooks, eight mock exams and the course
-datasets, sharing one notation and one twelve-week rhythm.
+datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
 [**12** decks]{.qrm-chip}
@@ -93,7 +93,8 @@ Repository layout →
 :link: course
 :link-type: doc
 
-The twelve-lecture plan, chapter map and the three split points.
+The 13-session plan, the chapter map, the three split points — and how the
+course is graded.
 :::
 
 :::{grid-item-card} 🎞️ Lecture slides
@@ -155,13 +156,13 @@ GLMs & splines.
 
 **A whole course, not a pile of files.**
 : Decks, labs and exams that share one notation, one dataset set and one
-  twelve-week rhythm — ready to teach as-is or adapt.
+  semester rhythm — ready to teach as-is or adapt.
 
 **Slides built for the room.**
 : Every deck moves motivation → intuition → formal definition → worked example,
   with colour-coded callout boxes and ~86 short + ~41 extended exercises, each
   followed by a full solution. The hardest, optional material sits in a per-deck
-  [appendix](slides.md), so the main thread fits the twelve sessions.
+  [appendix](slides.md), so the main thread fits the sessions it has.
 
 **Numbers you can trust.**
 : 65 purpose-built figures are computed from the real course datasets (not
@@ -181,13 +182,14 @@ GLMs & splines.
 
 | | |
 |---|---|
-| Lecture decks | 10 chapters + two precourse sessions · 1057 slides, plus 111 in optional appendices |
+| Lecture decks | 10 chapters + two precourse decks · 1057 slides, plus 111 in optional appendices |
 | Exercises | ~86 short (~5 min) + ~41 extended (~15 min), all with worked solutions |
 | Lab notebooks | 12 taught labs, each with worked solutions (2 precourse + 10 lecture chapters) · 3 code references for the untaught chapters (no deck, no solutions) |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Advanced modules | 4 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines) · 300 slides + 4 notebooks |
-| Semester shape | 12 lectures × 180 min (+ two optional precourse sessions) |
+| Semester shape | 13 × 180 min: a taught precourse session + 12 chapter lectures · **6 ECTS** |
+| Assessment | One written exam at the end of the semester (120 min, 100% of the grade); the eight practice papers do not count |
 | Sources | LaTeX (Beamer) · Jupyter · Python 3.9+ · one `make` build |
 
 ```{toctree}

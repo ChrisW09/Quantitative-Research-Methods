@@ -1,29 +1,33 @@
 ---
 myst:
   html_meta:
-    description: "The twelve-lecture semester plan covering ten ISLP chapters, the recommended split points, the untaught chapters, and the assessment calendar."
+    description: "The thirteen-session semester plan — a taught precourse session plus twelve chapter lectures over ten ISLP chapters — with the recommended split points, the untaught chapters, and the assessment calendar."
 ---
 
 # The course at a glance
 
 {.qrm-lead}
-A 12-lecture semester (12 × 180 min) covering ten ISLP chapters, optionally
-preceded by a two-part precourse: (a) a refresher of the undergraduate
-statistics, and (b) the notation, algebra and Python the chapters assume.
+A 13-session semester (13 × 180 min), worth **6 ECTS**: one taught precourse
+session covering both precourse decks, then twelve chapter lectures over ten
+ISLP chapters.
 
 :::{container} qrm-chips
-[**12** sessions × **180 min**]{.qrm-chip}
-[**2** optional precourse sessions]{.qrm-chip}
+[**13** sessions × **180 min**]{.qrm-chip}
+[**6** ECTS]{.qrm-chip}
+[**1** taught precourse session]{.qrm-chip}
 [**3** decks split across two lectures]{.qrm-chip}
-[**3 + 5** mock exams]{.qrm-chip}
+[**3 + 5** practice exams]{.qrm-chip}
 :::
 
 ## Semester plan
 
-| Lecture | Chapter(s) | Content | Exercises |
+The precourse opens the semester as a **taught session**; the twelve chapter
+lectures keep their numbers 1–12, which is what the exam calendar and the
+[runsheets](teaching.md) refer to.
+
+| Session | Chapter(s) | Content | Exercises |
 |:--:|:--:|---|---|
-| 0 *(optional)* | Ch 0 | **Precourse (a)**: descriptive statistics; probability and Bayes; distributions; standard errors and confidence intervals; hypothesis testing and power; simple linear regression; the Python toolkit — matrix algebra and gradients in the deck's appendix (with its own [lab notebook](labs.md)) | 0.1–0.10 |
-| 0b *(optional)* | Ch 0b | **Precourse (b)**: reading mathematical notation; logs and exponentials; odds, the logit and the sigmoid; likelihood and maximum likelihood; counting and computational cost; the Python patterns the labs use (with its own [lab notebook](labs.md)) | 0b.1–0b.6 |
+| **Precourse** | Ch 0 + Ch 0b | **Taught in one session**, drawing on both precourse decks: descriptive statistics; probability and Bayes; distributions; standard errors and confidence intervals; hypothesis testing; simple linear regression; the Python toolkit — and reading mathematical notation; logs and exponentials; odds, the logit and the sigmoid; likelihood; counting and computational cost (with a [lab notebook](labs.md) each) | 0.1–0.10, 0b.1–0b.6 |
 | 1 | Ch 1 + Ch 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference; parametric vs. non-parametric | 1.1–1.3, 2.1–2.2 |
 | 2 | Ch 2 (part 2) | Assessing accuracy; bias–variance trade-off; classification & KNN; lab | 2.3–2.8 |
 | 3 | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, *t*, *F*) | 3.1–3.6 |
@@ -49,6 +53,18 @@ you stop and resume cleanly:
 - **Ch 4** — after the Bayes-theorem framing (p. 46), immediately before LDA
 ```
 
+```{admonition} One session, two decks — so it is a selection
+:class: important
+
+The two precourse decks carry **157 slides** in their main flow (106 + 51). A
+single 180-minute session cannot cover them, and is not meant to: the session
+sets up the notation, the standard-error material and the Python patterns the
+chapters lean on hardest, and both decks stay available in full as the
+reference. The tools for closing the rest yourself are built in — the
+twelve-question self-check on page 7 of `chapter_00.pdf` and the notation table
+on page 5 of `chapter_00b.pdf` — see [For students](for-students.md).
+```
+
 ## Untaught chapters
 
 Chapters **9 (Support Vector Machines)**, **11 (Survival Analysis)** and
@@ -57,11 +73,19 @@ lecture deck**. Each ships only as a [code reference notebook](labs.md) —
 Python for the methods, to be read alongside the ISLP chapter, which does the
 teaching — and, unlike the twelve taught labs, **without worked solutions**.
 
-## Assessment rhythm
+## Assessment
 
-Eight papers are matched to the calendar so students can self-test at the
-natural checkpoints — see [Mock exams](exams.md). None of them is distributed
-with this repository.
+The module is worth **6 ECTS** and is graded by a **single written exam at the
+end of the semester — 120 minutes, 100% of the mark**. The
+[Final Mock Exam](exams.md) is built as the rehearsal for that paper: same
+length, same structure, weighted to Chapters 7, 8, 10 and 13.
+
+## Practice rhythm
+
+Everything below is **practice, not assessment** — eight papers matched to the
+calendar so students can self-test at the natural checkpoints, none of which
+counts towards the grade. See [Mock exams](exams.md); none is distributed with
+this repository.
 
 Each deck also carries far more exercises than a session can run: the
 [runsheets](teaching.md) name the two to four worth live time and leave the rest

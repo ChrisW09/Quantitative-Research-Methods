@@ -18,7 +18,7 @@ myst:
 ├── Lab_Notebooks/             # fifteen Jupyter labs, local- and Colab-ready
 │   └── chapter_NN_lab.ipynb
 ├── Teaching_Guide/            # instructor kit: plan, index, checklist, handouts
-│   ├── semester_plan.md       #   the twelve weeks on one page
+│   ├── semester_plan.md       #   the thirteen weeks on one page
 │   ├── slide_index.md         #   generated: sections, exercises, page numbers
 │   ├── before_class.md        #   the ten-minute pre-lecture checklist
 │   ├── runsheets/             #   per-session scripts — git-ignored (assessment)

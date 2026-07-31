@@ -12,10 +12,10 @@ work it is, how the labs fit around the lectures, what to do when your output
 does not match the slides, and how to revise.
 
 :::{container} qrm-chips
-[**12** sessions × **180 min**]{.qrm-chip}
-[**2** optional precourse sessions]{.qrm-chip}
+[**13** sessions × **180 min**]{.qrm-chip}
+[**6** ECTS]{.qrm-chip}
+[graded by **one 120-min exam**]{.qrm-chip}
 [**12** labs *(with solutions)*]{.qrm-chip}
-[**5** short practice exams]{.qrm-chip}
 [**Colab** on day one]{.qrm-chip}
 :::
 
@@ -38,10 +38,16 @@ standard deviation. If that sentence felt uncomfortable, start with the
 precourse.
 ```
 
-## The two precourse decks, and the skip rule
+## The precourse session, and the skip rule
 
-Two optional sessions sit before Lecture 1. They exist because the ten chapter
-decks use all of this and explain none of it.
+**The precourse is taught.** It opens the semester as a single 180-minute
+session drawing on both precourse decks, because the ten chapter decks use all
+of this material and explain none of it.
+
+One session cannot cover both decks — together they run to 157 slides — so the
+session is a **guided selection**, and the two decks stay available in full as
+your reference. The skip rule below is what tells you which parts you still
+need to read on your own.
 
 **Precourse (a) — statistics refresher** (`chapter_00`, 106 slides plus a
 16-slide appendix). Descriptive statistics, probability and Bayes,
@@ -56,7 +62,7 @@ counting and computational cost, and the Python patterns every lab relies on.
 The topics were chosen by counting how often the later decks use them — slide 4
 of that deck shows the count next to each one.
 
-```{admonition} How to tell whether you can skip Precourse (a)
+```{admonition} How to tell which parts of Precourse (a) you still need
 :class: tip
 
 **Page 7 of `chapter_00.pdf` is a twelve-question self-check** — one question per
@@ -74,16 +80,8 @@ Precourse (b) has no equivalent self-check. The honest test is page 5, the
 notation table: if every symbol on it is one you could read aloud without
 hesitating, you can skim the deck.
 
-Either way, the material is **assumed from Lecture 1 onwards**, whether or not
-the sessions are taught.
-
-```{admonition} TODO for the professor
-:class: caution
-
-Whether the two precourse sessions are **taught** this semester or **set as
-self-study** is a per-cohort decision and is not recorded anywhere in the
-repository. Please state the intention for this cohort here.
-```
+Either way, the material is **assumed from Lecture 1 onwards** — the taught
+session gets you started on it, and the decks are there to finish the job.
 
 ## Running the labs
 
@@ -127,7 +125,21 @@ twelve.
 A student who runs every notebook will pass. One who only reads slides will not.
 ```
 
-## Workload
+## Credits, assessment and workload
+
+The module is worth **6 ECTS**, and your grade comes from **one written exam at
+the end of the semester: 120 minutes, 100% of the mark**. Everything else on
+this page — the mock exams, the five short exams, the deck exercises — is
+practice. None of it counts.
+
+```{admonition} What the exam looks like
+:class: important
+
+The [Final Mock Exam](exams.md) is built as the rehearsal for the real paper:
+same 120 minutes, same structure, weighted towards Chapters 7, 8, 10 and 13.
+Sitting it under time, closed-book, is the single best predictor of how the real
+one will go.
+```
 
 Per week, beyond the 180-minute session itself:
 
@@ -137,19 +149,14 @@ Per week, beyond the 180-minute session itself:
 | The deck's short exercises you did not do in the room | ~30 min |
 | Reading the ISLP chapter | varies |
 
+That comes to roughly 6–8 hours a week including the session — in the range the
+6 ECTS implies (on the standard conversion of 25–30 hours per credit, about
+150–180 hours across the semester).
+
 Each deck also carries far more exercises than a session can run — roughly one
 short exercise every 20 minutes of teaching and one extended exercise every
 45 minutes — so there will always be some left over. Every one of them has a
 worked solution behind it.
-
-```{admonition} TODO for the professor
-:class: caution
-
-The official workload figure — ECTS credits and the expected total hours for the
-module — is not recorded anywhere in the repository, and neither is **how the
-module is actually assessed** (the paper that counts towards your grade, as
-distinct from the practice papers described below). Please add both.
-```
 
 ## Solutions: what you get, and when
 
@@ -158,20 +165,17 @@ distinct from the practice papers described below). Please add both.
 | Exercises inside a deck | **Yes, immediately** — the next slide is always the worked solution, including in the appendices |
 | The twelve taught lab notebooks | **Yes** — each ends in a *Lecture exercises — worked Python solutions* section |
 | The three code-reference notebooks (Ch 9, 11, 12) | **No** — the closing exercises are deliberately left unanswered |
-| Mock exams and short exams | Worked solutions exist for every paper, but the papers are **not** published — see below |
+| Mock exams and short exams | **Yes — handed out together with the paper**; the papers themselves are not published here, see below |
 
-The exam papers, their solutions and their LaTeX sources are assessment material
-and are kept out of the public repository, so they are not downloadable from
-this site. They come from your lecturer.
+The practice papers come **with their worked solutions**, distributed at the
+same time. That puts the discipline on you: a solution you have already read
+tells you nothing about whether you could have produced it. Work the paper
+under time and closed-book *first*, then open the solutions — and use the
+in-class review deck for the parts that still do not sit.
 
-```{admonition} TODO for the professor
-:class: caution
-
-**The distribution policy for the exam solutions is not written down anywhere.**
-Please state plainly: do students receive the solutions PDF, and if so, when —
-with the paper, after attempting it, or only in the in-class review session?
-Students will ask, and at present nothing in the repository answers them.
-```
+The papers, their solutions and their LaTeX sources are kept out of the public
+repository, so they are not downloadable from this site. They come from your
+lecturer.
 
 ## When your numbers do not match the shipped output
 

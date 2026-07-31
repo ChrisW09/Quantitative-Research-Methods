@@ -1,10 +1,18 @@
 # Semester plan
 
-Twelve sessions of 180 minutes, plus two optional precourse sessions. Slide
-counts are live figures from the compiled decks; the per-session detail is in
-[`runsheets/`](./runsheets/).
+Thirteen sessions of 180 minutes: a **taught precourse session** drawing on both
+precourse decks, then the twelve chapter lectures, which keep their numbers 1–12
+(the exam calendar, the folder names and the runsheets all key off those). The
+module is 6 ECTS, graded by one 120-minute written exam at the end of the
+semester; every paper in the calendar below is practice.
 
-Slide counts are written **main flow + appendix**. For the three decks that span
+The precourse decks run to 157 slides in their main flow (106 + 51), so the one
+session is a selection — set up notation, standard errors and the lab Python
+patterns, and leave both decks with the cohort as the reference.
+
+Slide counts below are live figures from the compiled decks, written
+**main flow + appendix**; the per-session detail is in
+[`runsheets/`](./runsheets/). For the three decks that span
 two sessions the column gives the pages taught in that session instead; their
 appendices (`chapter_02` +8, `chapter_03` +11, `chapter_04` +15) sit outside
 both halves. Every deck ends with an appendix holding the optional, more
@@ -12,12 +20,11 @@ advanced material (formal derivations, the heaviest worked exercises, side
 topics); the timed plans in the runsheets cover the main flow only, so the
 appendix pages are extra material to assign, not to teach.
 
-## The twelve weeks
+## The thirteen weeks
 
 | Week | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
-| — | Precourse (a) | `chapter_00` | 106 + 16 | 10 + 4 | Optional. Statistics refresher |
-| — | Precourse (b) | `chapter_00b` | 51 + 9 | 6 + 2 | Optional. Notation, logs & odds, likelihood, Python |
+| 0 | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 106 + 16, 51 + 9 | 10 + 4, 6 + 2 | 157 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
 | 1 | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 71, then pp. 1–42 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
 | 2 | Statistical Learning II | `chapter_02` | pp. 43–107 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
 | 3 | Linear Regression I | `chapter_03` | pp. 1–76 | 3.1–3.6 | Stop after multiple regression and the four questions |
@@ -66,7 +73,7 @@ of what to sacrifice:
 Do **not** cut: the motivation slide that opens a topic, the pitfalls
 (`alertblock`) slides, or any exercise the runsheet marks as exam-relevant.
 
-## Assessment rhythm
+## Practice rhythm
 
 Two layers. The **three mock exams** are the full-length rehearsals, matched to
 the shape of the real paper. The **five 60-minute short exams** in
@@ -88,6 +95,11 @@ Every paper exists as questions, worked solutions, and a review deck for going
 through it in class; the final also comes in three parallel variants
 (A / B / C). All of it is **git-ignored**: assessment material stays off the
 public repository.
+
+**Distribution:** the worked solutions go out **together with the paper**. Say so
+when you hand it over, and say why — the paper is only diagnostic if it is
+attempted closed-book first, and once the solutions are open that discipline is
+the student's to keep. The review deck is what the session itself runs on.
 
 ### The five short exams are sequenced, not interchangeable
 

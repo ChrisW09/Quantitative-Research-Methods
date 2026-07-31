@@ -36,8 +36,8 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+16) | <a href="slides/chapter_00.pdf">Open</a> |
-| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+9) | <a href="slides/chapter_00b.pdf">Open</a> |
+| 0 | Precourse (a) — Statistics refresher | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+16) | <a href="slides/chapter_00.pdf">Open</a> |
+| 0b | Precourse (b) — Toolkit | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+9) | <a href="slides/chapter_00b.pdf">Open</a> |
 | 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+6) | <a href="slides/chapter_01.pdf">Open</a> |
 | 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, the Bayes classifier and KNN | 8 + 4 | 107 (+8) | <a href="slides/chapter_02.pdf">Open</a> |
 | 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics, KNN regression | 12 + 6 | 144 (+11) | <a href="slides/chapter_03.pdf">Open</a> |
@@ -125,8 +125,11 @@ optional.
 
 ## The two precourse decks
 
-Both are optional, both sit before Lecture 1, and both exist because the ten
-chapter decks assume their content silently.
+Both are **taught**, in the single precourse session that opens the semester,
+and both exist because the ten chapter decks assume their content silently. One
+session cannot cover 157 slides, so it draws a selection from the two and the
+decks remain the full reference — see
+[the course at a glance](course.md) and [For students](for-students.md).
 
 ### Chapter 0 — the statistics refresher
 

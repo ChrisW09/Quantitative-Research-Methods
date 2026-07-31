@@ -41,14 +41,14 @@ Applied Sciences and Arts), Summer Semester 2026.
 | | Where to go | What you get |
 |:--:|---|---|
 | 🎓 | **Learning it** — [read a deck](#-lecture-slides), then [run its lab](#-lab-notebooks) | The compiled PDFs need no toolchain; every notebook opens in Colab with one click and resolves its own data. |
-| 👩‍🏫 | **Teaching it** — [the teaching guide](#-teaching-it) | A twelve-week plan, per-session runsheets with timings and cut lists, a generated slide index, and one `make` command that keeps them in sync with the decks. |
+| 👩‍🏫 | **Teaching it** — [the teaching guide](#-teaching-it) | A thirteen-week plan, per-session runsheets with timings and cut lists, a generated slide index, and one `make` command that keeps them in sync with the decks. |
 | 🛠️ | **Adapting it** — [repository layout](#-repository-layout) | LaTeX sources for every deck and exam, figures regenerated from the datasets by script, and a pinned Python environment. |
 
 ### What's inside
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part optional precourse · 1057 slides, plus 111 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part precourse · 1057 slides, plus 111 in per-deck appendices |
 | Exercises | 86 short + 41 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 12 + 3 | Twelve taught labs, each paired with a deck and carrying worked solutions · three untaught **code references** (SVM, survival, unsupervised): no deck, no solutions |
 | [Mock exams](#-mock-exams) | 3 | Each as questions, worked solutions and an in-class review deck — kept out of git |
@@ -100,12 +100,14 @@ works offline.
 
 ## 📚 The course at a glance
 
-A 12-lecture semester (12 × 180 min):
+A 13-session semester (13 × 180 min), **6 ECTS**, graded by a single 120-minute
+written exam at the end. The precourse is **taught** in the session that opens
+the semester; the twelve chapter lectures keep their numbers, which is what the
+exam calendar and the runsheets refer to.
 
-| Lecture | Chapter | Topic |
+| Session | Chapter | Topic |
 |:--:|:--:|--|
-| 0 *(optional)* | — | **Precourse (a)**: descriptive statistics, probability, distributions, inference, simple regression, Python — matrix algebra and calculus in the appendix |
-| 0b *(optional)* | — | **Precourse (b)**: reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost, the Python patterns of the labs |
+| **Precourse** | 0 + 0b | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 157 slides across the two, so the session is a selection and the decks stay the reference |
 | 1 | 1 + 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference |
 | 2 | 2 (part 2) | Model accuracy; bias–variance trade-off; Bayes classifier; KNN |
 | 3–4 | 3 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
@@ -296,7 +298,7 @@ on the documentation site, stored outputs included.
 
 | File | What it is |
 |---|---|
-| [`semester_plan.md`](./Teaching_Guide/semester_plan.md) | The twelve weeks on one page, the three split points, and what to sacrifice when you fall behind |
+| [`semester_plan.md`](./Teaching_Guide/semester_plan.md) | The thirteen weeks on one page, the three split points, and what to sacrifice when you fall behind |
 | [`slide_index.md`](./Teaching_Guide/slide_index.md) | Generated from the PDFs: every section with its page range and time budget, every exercise and solution with its page |
 | [`before_class.md`](./Teaching_Guide/before_class.md) | The ten-minute checklist for the evening before and the morning of |
 | `runsheets/` | One page per session — timings, what to run live, what to cut, what students get wrong. Git-ignored: they map exercises onto exam problems |

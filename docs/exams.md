@@ -14,6 +14,16 @@ at [info@profweisser-ai.de](mailto:info@profweisser-ai.de). This page documents
 what exists and how it is built.
 ```
 
+```{admonition} These are practice papers, not the graded exam
+:class: important
+
+The module (**6 ECTS**) is graded by **one written exam at the end of the
+semester: 120 minutes, 100% of the mark**. None of the eight papers below counts
+towards it — they exist so students can find out where they stand before that
+paper. The **Final Mock Exam** is deliberately built to its shape: same length,
+same structure, same weighting.
+```
+
 Eight practice papers are matched to the course rhythm: **three full-length mock
 exams** and **five 60-minute short exams**. Each is built from a **single LaTeX
 source** so the paper and its solutions can never diverge, and all numeric
@@ -22,7 +32,9 @@ answers were verified programmatically.
 Every paper exists in three formats:
 
 - **Questions** — the paper as students see it;
-- **Solutions** — the same paper with full worked answers;
+- **Solutions** — the same paper with full worked answers, **handed out together
+  with the paper** (so the discipline of working it closed-book first sits with
+  the student);
 - **Review deck** — a Beamer deck for going through the exam in class, step by
   step.
 
