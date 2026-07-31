@@ -39,6 +39,8 @@ Forward stepwise selection scored by five-fold CV on the training set, and exhau
 
 That the greedy path lands on the globally best five is worth remarking on and is not guaranteed — a student who checks it has done real work.
 
+One honest footnote on that table: the four-variable figure is $2,097.4981 here, so it prints as **$2,097** or **$2,098** depending on which BLAS rounds the last digit. Every other entry is stable well inside a dollar. A student reporting either is right; a student whose whole column differs has moved the seed or the split.
+
 Fitted on the training set, in the units the board will read:
 
 | Variable | Coefficient | Read aloud as |
@@ -106,7 +108,9 @@ A student who runs both procedures, finds the disagreement, and explains it in t
 
 ## 3. Common wrong turns
 
-1. **Loading without `index_col=0`.** The college name arrives as an `Unnamed: 0` column of strings; either the fit raises, or — if the student drops it silently — an eighteenth column is quietly counted among the seventeen. *The first column of `College.csv` is a label, not a measurement: `load('College', index_col=0)`.*
+1. **Loading without `index_col=0`.** Reading the bundled CSV without it brings the college name in as an `Unnamed: 0` column of strings; either the fit raises, or — if the student drops it silently — an eighteenth column is quietly counted among the seventeen. *The first column of `College.csv` is a label, not a measurement: `load('College', index_col=0)`.*
+
+   The same wrong turn has a second, quieter form: **assuming the name is there.** `load()` prefers the `ISLP` package, whose `College` frame is indexed `0 … 776` and does not carry the names at all — so on Colab, where the setup cell installs `ISLP`, `index_col=0` has nothing to act on and there is no name to print. The rows, their order and the eighteen columns are identical either way, so no number in these notes moves; but any output that names an institution is true in one place and false in the other. *The starter therefore calls `reset_index(drop=True)` unconditionally and reports only what holds on both paths. A student who prints `college.index[:2]` as evidence of anything has written a line whose truth depends on their laptop.*
 
 2. **Penalising unstandardised predictors.** `Lasso()` on the raw columns puts essentially all of the penalty on the variables that happen to be measured in large units and none on `S.F.Ratio` or `perc.alumni`, so the "selection" it reports is a statement about units, not about tuition. *Ridge and the lasso are not scale-invariant: standardise, and do it inside a `Pipeline` so the scaler is refitted within each CV fold rather than leaking the fold's mean into its own validation set.*
 

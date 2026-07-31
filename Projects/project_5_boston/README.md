@@ -39,7 +39,10 @@
    chose it over the linear baseline.
 
 4. **Value the five tracts.** The starter names them by index — tracts
-   **401, 113, 2, 297 and 162** — spanning the cheap end of the market to the very top.
+   **400, 112, 1, 296 and 161** — spanning the cheap end of the market to the very top.
+   (The starter re-labels the 506 rows positionally from 0 the moment it loads them, so
+   these numbers mean the same five tracts whether you run locally off the CSV or on
+   Colab off the `ISLP` package, which label the same rows differently.)
    For each, report a **point estimate** and a **95% interval**. For each interval you must
    also state **what kind of interval it is** and **why that kind is the one the valuation
    office needs**. This last requirement carries more marks than the modelling.

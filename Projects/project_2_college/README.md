@@ -6,11 +6,13 @@
 **Methods:** Chapters 3, 5, 6 · Chapter 7 as an optional extension · **After:** Lecture 8 · **Time:** 3–5 hours
 **Deliverable:** a one-page memo in the final markdown cell of your notebook, containing the required numbers, a recommendation, and its caveat.
 
-The target is `Outstate`, out-of-state tuition in dollars. `Private` is recorded as `Yes`/`No` and must be encoded before any model will accept it. Load the file **with the college name as the index**:
+The target is `Outstate`, out-of-state tuition in dollars. `Private` is recorded as `Yes`/`No` and must be encoded before any model will accept it. Load the file so that the **college name never becomes an eighteenth predictor**:
 
 ```python
-college = load('College', index_col=0)   # the first column is the college's name, not a variable
+college = load('College', index_col=0).reset_index(drop=True)   # the first column is a name, not a variable
 ```
+
+The `reset_index` is there because the name arrives differently depending on where you run. `load()` prefers the `ISLP` package, and `ISLP`'s copy of these 777 rows **does not carry the names at all** — it is indexed `0 … 776`; the bundled CSV does carry them, as its index. Same rows, same order, same eighteen columns either way, so the starter normalises both to a positional index and nothing in this project depends on the name. Report nothing about a college's identity unless you have checked that it is there.
 
 ## The challenge
 

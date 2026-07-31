@@ -4,10 +4,22 @@
 > leaves the discipline of trying first to you; reading these before you have produced your own
 > five intervals costs you the only part of the exercise that transfers.
 
-Every number below was computed on `Boston.csv` (506 × 13, loaded with `index_col=0`) with
+Every number below was computed on `Boston.csv` (506 × 13, loaded with `index_col=0` and then
+re-labelled positionally with `reset_index(drop=True)`, so the index runs 0…505) with
 `random_state=2024` throughout: `KFold(n_splits=5, shuffle=True, random_state=2024)` and
 `train_test_split(X, y, test_size=0.2, random_state=2024)` — 404 training tracts, 102 held out.
 Figures in $1,000s, rounded to the precision the data supports.
+
+**Why the tracts are numbered from 0.** The starter's `load()` helper returns the `ISLP` package's
+copy of `Boston` when ISLP is installed — which it is on Colab, because the setup cell installs it
+— and the bundled CSV otherwise. The two frames hold the same 506 rows in the same order with the
+same 13 columns, but ISLP labels them 0…505 while the CSV labels them 1…506. Naming the five
+tracts by CSV label therefore selected *different rows* on Colab than locally, and the starter's
+`assert all(t in X_test.index for t in FIVE_TRACTS)` failed outright. The starter now calls
+`reset_index(drop=True)` immediately after loading, which makes the label the row's position on
+both paths, and the five tracts are quoted by that position throughout. Every figure below is
+unchanged by the re-labelling — same rows, so same numbers; only the labels moved (401 → 400,
+113 → 112, 2 → 1, 297 → 296, 162 → 161).
 
 ---
 
@@ -21,10 +33,10 @@ Figures in $1,000s, rounded to the precision the data supports.
 | `SplineTransformer(n_knots=5, degree=3)` on all predictors → OLS | **$4.58k** | 3.98, **6.87**, 4.62, 3.63, 3.79 |
 
 Improvement **7.1%**. Both numbers reproduce exactly; a student whose figures differ has changed
-the folds or the seed, or has forgotten `index_col=0` — which leaves the tract id in as a
-thirteenth "predictor" (`Unnamed: 0`) and gives $4.93k instead of $4.92k, a discrepancy small
-enough to be missed and worth catching, since the same omission makes the five tracts
-unaddressable by index.
+the folds or the seed, or — on the CSV path, i.e. without `ISLP` installed — has forgotten
+`index_col=0`, which leaves the tract id in as a thirteenth "predictor" (`Unnamed: 0`) and gives
+$4.93k instead of $4.92k. That is a discrepancy small enough to be missed and worth catching, and
+it is invisible on Colab, where `ISLP` supplies the frame and the id column never appears at all.
 
 The per-fold column already carries the honest reading. The spline wins in **four of five folds**
 and loses badly in the fifth (6.87 against 5.07). The mean improvement is real; the model is not
@@ -79,25 +91,25 @@ Linear baseline, fitted on the 404 training tracts, `statsmodels` `get_predictio
 
 | Tract | Actual | Fit | 95% CI for the **mean** | width | 95% **PI** for one tract | width |
 |---|---|---|---|---|---|---|
-| 401 | 5.6 | 10.59 | [9.21, 11.96] | 2.75 | [0.92, 20.26] | 19.34 |
-| 113 | 18.8 | 20.49 | [19.19, 21.79] | 2.60 | [10.83, 30.15] | 19.32 |
-| 2 | 21.6 | 25.10 | [23.97, 26.22] | 2.25 | [15.46, 34.74] | 19.28 |
-| 297 | 27.1 | 27.56 | [25.67, 29.45] | 3.78 | [17.80, 37.32] | 19.52 |
-| 162 | **50.0** | 36.76 | [34.68, 38.84] | 4.16 | [26.97, 46.56] | 19.59 |
+| 400 | 5.6 | 10.59 | [9.21, 11.96] | 2.75 | [0.92, 20.26] | 19.34 |
+| 112 | 18.8 | 20.49 | [19.19, 21.79] | 2.60 | [10.83, 30.15] | 19.32 |
+| 1 | 21.6 | 25.10 | [23.97, 26.22] | 2.25 | [15.46, 34.74] | 19.28 |
+| 296 | 27.1 | 27.56 | [25.67, 29.45] | 3.78 | [17.80, 37.32] | 19.52 |
+| 161 | **50.0** | 36.76 | [34.68, 38.84] | 4.16 | [26.97, 46.56] | 19.59 |
 
 The confidence interval contains the truth for **1 of the 5**. The prediction interval contains it
-for **4 of the 5** — and the one it misses is tract 162, the censored one.
+for **4 of the 5** — and the one it misses is tract 161, the censored one.
 
 A strong answer (spline basis in `lstat` and `rm`, rest linear, fitted with `statsmodels` so the
 normal-theory interval comes for free):
 
 | Tract | Actual | Fit | 95% CI | 95% PI | PI covers? |
 |---|---|---|---|---|---|
-| 401 | 5.6 | 9.04 | [7.19, 10.90] | [1.27, 16.82] | yes |
-| 113 | 18.8 | 18.76 | [17.56, 19.96] | [11.11, 26.41] | yes |
-| 2 | 21.6 | 23.78 | [22.77, 24.80] | [16.16, 31.41] | yes |
-| 297 | 27.1 | 26.39 | [24.77, 28.02] | [18.67, 34.12] | yes |
-| 162 | 50.0 | 45.45 | [42.17, 48.74] | [37.22, **53.69**] | yes |
+| 400 | 5.6 | 9.04 | [7.19, 10.90] | [1.27, 16.82] | yes |
+| 112 | 18.8 | 18.76 | [17.56, 19.96] | [11.11, 26.41] | yes |
+| 1 | 21.6 | 23.78 | [22.77, 24.80] | [16.16, 31.41] | yes |
+| 296 | 27.1 | 26.39 | [24.77, 28.02] | [18.67, 34.12] | yes |
+| 161 | 50.0 | 45.45 | [42.17, 48.74] | [37.22, **53.69**] | yes |
 
 Test RMSE 3.86; prediction intervals cover **97.1%** of the 102 held-out tracts at a mean width of
 **$15.61k**; the confidence intervals cover **42.2%** at a mean width of $3.56k.
@@ -109,10 +121,10 @@ Test RMSE 3.86; prediction intervals cover **97.1%** of the 102 held-out tracts 
 **A confidence interval for the mean response is not a prediction interval for one tract, and the
 valuation office is asking for the second one.**
 
-The office will be challenged on *tract 162* — a single census tract, whose median value is a
+The office will be challenged on *tract 161* — a single census tract, whose median value is a
 single number. That number is $\hat f(x_0)$ plus the irreducible tract-level noise $\epsilon$. A
 confidence interval covers only the first term: it is an interval for $E[Y \mid X = x_0]$, the
-average value of *all* tracts with tract 162's characteristics. It answers a question nobody
+average value of *all* tracts with tract 161's characteristics. It answers a question nobody
 asked, and it answers it far too confidently.
 
 Chapter 3's closing formula sheet ("Key formulas at a glance") puts the two side by side, and the
@@ -151,21 +163,21 @@ first appeal hearing exposes it. That is the lesson worth the three hours.
 ## 3. The censoring at $50k
 
 `medv` **tops out at exactly 50.0**, and **16 of the 506 tracts (3.2%) sit precisely there** —
-three of them in the held-out set, including tract 162. This is not a coincidence and it is not a
+three of them in the held-out set, including tract 161. This is not a coincidence and it is not a
 long tail: the variable is **censored (top-coded) at $50,000**, so a tract recorded at 50.0 is a
 tract worth *at least* 50, and how much more the data cannot say.
 
 Three consequences a good answer states:
 
-- **The model must under-predict at the top, by construction.** Tract 162 is fitted at 36.8 by the
+- **The model must under-predict at the top, by construction.** Tract 161 is fitted at 36.8 by the
   linear model and 45.5 by the spline model, against a recorded 50.0. Neither is a modelling
   failure that more flexibility can repair — the training targets themselves were clipped.
 - **Any interval whose upper end exceeds 50.0 should be flagged, not published as-is.** The
-  strong model's interval for tract 162 is [37.22, 53.69]; 9 of the 102 held-out intervals run
+  strong model's interval for tract 161 is [37.22, 53.69]; 9 of the 102 held-out intervals run
   past 50. Above 50 the data has no information at all, so that part of the interval is an
   extrapolation from a boundary the sample never crosses. The honest wording for the office is
   "at least \$50,000; the data cannot resolve the upper end", not "\$53,700".
-- **The linear model's prediction interval for tract 162, [26.97, 46.56], misses the truth
+- **The linear model's prediction interval for tract 161, [26.97, 46.56], misses the truth
   entirely** — the only one of the five it misses. The censoring bites hardest exactly where the
   valuations are largest, which is where the appeals will come from.
 
@@ -177,7 +189,7 @@ reason. It is in the output; the marks are for noticing what it means.
 ## 4. Common wrong turns
 
 1. **Reporting the confidence interval.** *The office is not asking what the average tract of this
-   description is worth — it is asking what tract 162 is worth, so the interval must carry the
+   description is worth — it is asking what tract 161 is worth, so the interval must carry the
    tract-level noise $\sigma$ as well as the estimation error, which is the `1 +` in Chapter 3's
    prediction-interval formula.*
 
@@ -244,7 +256,7 @@ fails the central requirement of the brief, and the mark should show it.
   no amount of flexibility repairs. **Split conformal** gives an interval with a *finite-sample,
   distribution-free coverage guarantee* that holds anyway: it needs only exchangeability, not a
   correct model. Calibrating inside the training tracts (a 70/30 split of the 404 — 282 to fit,
-  122 to calibrate — gives $\hat q = 7.63$ for the blanket spline, which) yields intervals of width 15.25 with **96.1%**
+  122 to calibrate — gives $\hat q = 7.63$ for the blanket spline) yields intervals of width 15.25 with **96.1%**
   coverage on the held-out set; for the spline in `lstat` and `rm`, $\hat q = 6.61$, width 13.22,
   coverage 93.1%. Same discipline, no distributional promise — which is what a valuation office
   being cross-examined actually wants. A3 also covers **CQR**, which lets the interval widen where
