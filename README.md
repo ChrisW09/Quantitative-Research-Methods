@@ -368,6 +368,29 @@ Nothing in the twelve-lecture plan or the exams depends on them — see the
 
 ---
 
+## 🎯 Short projects
+
+Six **3–5 hour challenges** in [`Projects/`](./Projects/) where students take a
+real decision on real data. Unlike the labs, there is no worked solution: each
+brief poses a problem someone actually has, fixes a seeded held-out test set,
+gives a baseline to beat, and asks for a **one-page memo with specific numbers**.
+
+| # | Project | The decision | Data | After |
+|:--:|---|---|:--:|:--:|
+| 1 | Who should we call? | A ranked shortlist of 500 prospects, and how many policies it sells | `Caravan` | Lecture 7 |
+| 2 | Five numbers or seventeen? | Whether a board-readable five-variable model is defensible | `College` | Lecture 8 |
+| 3 | Can you predict the market? | Whether a fund should trade on last week's returns | `Weekly` | Lecture 7 |
+| 4 | A model the brand manager can read | Accuracy versus explainability, and which to deploy | `OJ` | Lecture 10 |
+| 5 | What is it worth, and how sure are you? | Five valuations, each with a defensible interval | `Boston` | Lecture 9 |
+| 6 | How many managers can actually pick stocks? | One number for a pension trustee — possibly zero | `Fund` | Lecture 12 |
+
+Each has a trap the brief does not reveal, and in several of them **"this cannot
+be predicted well enough to act on" is a correct answer**. The projects are
+formative — the module is graded by the written exam — and each folder carries a
+`SOLUTION_NOTES.md` with expected findings and a marking guide.
+
+---
+
 ## 🗂️ Repository layout
 
 | Path | Contents |
@@ -375,6 +398,7 @@ Nothing in the twelve-lecture plan or the exams depends on them — see the
 | [`Lecture_Slides/`](./Lecture_Slides/) | Twelve Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable. See its [deck guide](./Lecture_Slides/README.md). |
 | [`Lab_Notebooks/`](./Lab_Notebooks/) | Fifteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
 | [`Advanced/`](./Advanced/) | Four optional self-study modules — RCTs, Shapley values, conformal prediction, GLMs & splines — each a full deck plus companion notebook. See its [module guide](./Advanced/README.md). |
+| [`Projects/`](./Projects/) | Six short projects (3–5 h): a real decision on real data, with a fixed held-out set, a baseline to beat and a one-page memo as the deliverable. See its [project guide](./Projects/README.md). |
 | [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, runsheets, slide index, before-class checklist, printable handouts |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
 | [`Makefile`](./Makefile) | One-command rebuild of figures, decks, handouts and the index |

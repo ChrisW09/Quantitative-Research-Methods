@@ -150,6 +150,13 @@ Four optional self-study modules: RCTs, Shapley values, conformal prediction,
 GLMs & splines.
 :::
 
+:::{grid-item-card} 🎯 Short projects
+:link: projects
+:link-type: doc
+
+Six 3–5 hour challenges: a real decision on real data, ending in a memo.
+:::
+
 ::::
 
 ## What makes these materials different
@@ -188,6 +195,7 @@ GLMs & splines.
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Advanced modules | 4 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines) · 300 slides + 4 notebooks |
+| Short projects | 6 challenges on real data, 3–5 h each, each with a fixed held-out set, a baseline to beat and a memo as the deliverable |
 | Semester shape | 13 × 180 min: a taught precourse session + 12 chapter lectures · **6 ECTS** |
 | Assessment | One written exam at the end of the semester (120 min, 100% of the grade); the eight practice papers do not count |
 | Sources | LaTeX (Beamer) · Jupyter · Python 3.9+ · one `make` build |
@@ -211,6 +219,7 @@ labs
 exams
 datasets
 advanced
+projects
 ```
 
 ```{toctree}

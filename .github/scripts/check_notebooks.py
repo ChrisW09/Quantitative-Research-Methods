@@ -37,6 +37,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 NOTEBOOKS = ROOT / "Lab_Notebooks"
 ADVANCED = ROOT / "Advanced" / "Lab_Notebooks"
+PROJECTS = ROOT / "Projects"
 
 try:
     import nbformat
@@ -227,6 +228,9 @@ def main() -> int:
     paths = args.notebooks or (
         sorted(NOTEBOOKS.glob("chapter_*_lab.ipynb"))
         + sorted(ADVANCED.glob("advanced_*_lab.ipynb"))
+        # Project starters ship with stored outputs too: they are the scaffolding
+        # students build on, so a starter that no longer runs is a broken project.
+        + sorted(PROJECTS.glob("project_*/project_*_starter.ipynb"))
     )
     if not paths:
         print(f"no chapter_*_lab.ipynb under {NOTEBOOKS}")
