@@ -23,6 +23,7 @@ place and no source file is ever written back to.
 
 from __future__ import annotations
 
+import datetime
 import shutil
 from pathlib import Path
 
@@ -123,8 +124,12 @@ stage_materials()  # also run at import time so `sphinx-build` on a clean tree w
 
 project = "Quantitative Research Methods"
 author = "Prof. Dr. Christoph Weisser"
-copyright = "2026, Christoph Weisser (HSBI). Based on ISLP (Springer, 2023)"
-release = "Summer Semester 2026"
+# The year comes from the clock, not from a literal that has to be remembered
+# each January. (ISLP's 2023 is the book's publication year and is fixed.)
+copyright = f"{datetime.date.today().year}, Christoph Weisser (HSBI). Based on ISLP (Springer, 2023)"
+# No semester or year anywhere in the materials: the course is re-taught each
+# semester and a version string is one more thing to forget to update.
+release = ""
 version = release
 
 # -- General configuration ----------------------------------------------------

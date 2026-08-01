@@ -32,7 +32,7 @@
 > (see [Citation & licence](#-citation--licence)).
 
 Prepared by **Prof. Dr. Christoph Weisser** (HSBI — Bielefeld University of
-Applied Sciences and Arts), Summer Semester 2026.
+Applied Sciences and Arts).
 
 ---
 
@@ -510,8 +510,7 @@ BibTeX:
 ```
 
 **Attribution.** The slides, exercises, mock exams and notebooks in this
-repository were prepared by Prof. Dr. Christoph Weisser (HSBI), Summer Semester
-2026. The ISLP textbook, its text and its figures are © the authors / Springer;
+repository were prepared by Prof. Dr. Christoph Weisser (HSBI). The ISLP textbook, its text and its figures are © the authors / Springer;
 the datasets are distributed by the authors at
 [statlearning.com](https://www.statlearning.com) for use with the book. The
 copyrighted textbook PDF and figure banks are **not** included in this

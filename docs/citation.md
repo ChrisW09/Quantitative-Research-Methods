@@ -43,7 +43,7 @@ Please cite the textbook alongside it.
 ## Attribution
 
 The slides, exercises, mock exams and notebooks in this repository were prepared
-by **Prof. Dr. Christoph Weisser** (HSBI), Summer Semester 2026.
+by **Prof. Dr. Christoph Weisser** (HSBI).
 
 The ISLP textbook, its text and its figures are © the authors / Springer. The
 datasets are distributed by the authors at

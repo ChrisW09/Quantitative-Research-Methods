@@ -35,7 +35,7 @@ datasets, sharing one notation and one semester rhythm.
 ::::
 
 Prepared by **Prof. Dr. Christoph Weisser**, HSBI — Bielefeld University of
-Applied Sciences and Arts, Summer Semester 2026.
+Applied Sciences and Arts.
 
 ```{admonition} Based on ISLP
 :class: note
