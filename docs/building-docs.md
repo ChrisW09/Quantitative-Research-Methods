@@ -1,7 +1,7 @@
 ---
 myst:
   html_meta:
-    description: "How this Sphinx site is built and deployed — the staging of notebooks and deck PDFs, live preview, and the GitHub Pages workflow."
+    description: "How this Sphinx site is built and deployed — the staging of notebooks and deck PDFs, live preview, and how to publish it by hand."
 ---
 
 # Building this documentation
@@ -86,19 +86,35 @@ row in that page's table too, for the Colab badge.
 
 The site is live at **<https://chrisw09.github.io/Quantitative-Research-Methods/>**.
 
-Deployment is automatic: [`.github/workflows/docs.yml`](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/.github/workflows/docs.yml)
-builds the site and publishes it to GitHub Pages on every push to `main` that
-touches `docs/`, a chapter's lab or deck PDF, an advanced module, or a project
-starter. It can also be run by hand from the repository's **Actions** tab
-(*Documentation* → *Run workflow*).
+```{admonition} Publishing is now a manual step
+:class: important
 
-Two things worth knowing about that workflow:
+The repository has **no GitHub Actions workflows**. The site is not rebuilt on
+push — what is published stays published until someone deploys a new build.
+```
 
-- It builds with `sphinx-build -W --keep-going`, so **any warning fails the
-  build** rather than silently publishing a broken page. If a deployment fails,
-  read the log before re-running — the warning is real.
-- It publishes the artifact directly, without Jekyll, so the `_static/`
-  directory survives (a `.nojekyll` file is added as well).
+GitHub Pages for this repository is configured with `build_type: workflow`,
+which means a workflow was the thing that uploaded each new version. With the
+workflows removed, the last deployment simply remains live. To publish changes
+you have two routes:
+
+**Build locally, then deploy from a branch.** Switch Pages to *Deploy from a
+branch* in the repository settings, then push the built HTML:
+
+```bash
+sphinx-build -b html docs docs/_build/html   # add -W to fail on warnings
+touch docs/_build/html/.nojekyll             # keep _static/ from being stripped
+git subtree push --prefix docs/_build/html origin gh-pages
+```
+
+**Or restore the workflow.** The deleted file is one `git revert` away — it
+lived at `.github/workflows/docs.yml` and is in the history if the automatic
+route is wanted back.
+
+Whichever route, build with `sphinx-build -W --keep-going` first: **any warning
+then fails the build** rather than silently publishing a broken page. That is
+how a missing deck PDF or a dead cross-reference gets caught, and it is worth
+keeping in the habit now that nothing checks it for you.
 
 The output in `docs/_build/html/` is a self-contained static site, so it can
 equally be served from Read the Docs or any static host. The `html_extra_path`

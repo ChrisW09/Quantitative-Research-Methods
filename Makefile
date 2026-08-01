@@ -15,10 +15,11 @@
 #   make runsheets  the full runsheet report: every page reference in
 #                   Teaching_Guide/runsheets/ resolved to its frame title
 #                   (kept out of git; skipped if the folder is absent)
-#   make notebooks  run all lab notebooks (15 course + 4 advanced) and diff
-#                   their output against the outputs stored in them — what CI
-#                   does weekly (needs nbclient)
-#   make advanced   rebuild the four advanced-module decks (Advanced/)
+#   make notebooks  run every notebook (15 course + 4 advanced + 6 project
+#                   starters) and diff its output against the outputs stored in
+#                   it — the repository has no CI, so run this yourself before
+#                   publishing (needs nbclient)
+#   make advanced   rebuild the four advanced-module decks (Chapters/Advanced/)
 #
 # Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages,
 # enumitem and mathtools — the last two for the exam papers and review decks)
@@ -243,12 +244,15 @@ runsheets:
 	@test -d "$(RUNSHEETDIR)" || { echo "  [runsheets] $(RUNSHEETDIR)/ not present (git-ignored)"; exit 0; } \
 	  && $(PYTHON) $(GUIDE)/check_runsheets.py $(ARGS) "$(RUNSHEETDIR)"
 
-# The same command .github/workflows/notebooks.yml runs, so the CI failure can
-# be reproduced locally. About 2 minutes, and it needs nbclient on top of
-# requirements.txt. Deliberately out of "check": "check" reads files, this runs
-# 15 notebooks. Nothing is written back to the notebooks.
+# Executes every notebook and diffs its output against the outputs stored in it.
+# There is no CI in this repository, so this is the only thing standing between a
+# silently-changed number and a published lab — worth running before a release,
+# and after any change to a notebook, a dataset or the pinned environment.
+# About 2 minutes, and it needs nbclient on top of requirements.txt. Deliberately
+# out of "check": "check" reads files, this runs 25 notebooks. Nothing is written
+# back to the notebooks.
 notebooks:
-	@$(PYTHON) .github/scripts/check_notebooks.py $(ARGS)
+	@$(PYTHON) Teaching_Guide/check_notebooks.py $(ARGS)
 
 # Only ever touches LaTeX by-products: no .tex, .pdf or image can match. Note
 # that "check" reads the .log files and "index" the .toc files, and a deck whose

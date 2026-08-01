@@ -34,7 +34,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOKS = ROOT / "Chapters"
 ADVANCED = ROOT / "Chapters" / "Advanced"
 PROJECTS = ROOT / "Projects"

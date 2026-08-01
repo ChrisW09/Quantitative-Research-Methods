@@ -442,9 +442,9 @@ figure to its source.
 
 Everything above — the lecture plan, the decks, all fifteen labs rendered in
 full, the teaching guide, the exams and the datasets — is published as a
-browsable site, rebuilt automatically by
-[GitHub Actions](./.github/workflows/docs.yml) on every push to `main` that
-touches the materials.
+browsable site. It is **built and published by hand** — the repository carries
+no CI — so after changing the materials, rebuild and deploy it (see
+[Building the docs](https://chrisw09.github.io/Quantitative-Research-Methods/building-docs.html)).
 
 To build it locally from [`docs/`](./docs/):
 
