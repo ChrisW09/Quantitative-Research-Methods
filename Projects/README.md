@@ -5,7 +5,7 @@ the methods of the course. Each takes about **3–5 hours**, uses one of the
 bundled course datasets, and ends in a **one-page memo with specific numbers**
 rather than a notebook full of output.
 
-They are deliberately unlike the [lab notebooks](../Lab_Notebooks/). A lab is
+They are deliberately unlike the [lab notebooks](../Chapters/). A lab is
 guided, mirrors one chapter and ends with worked solutions. A project poses a
 problem someone actually has, gives no solution, and asks the student to commit
 to an answer and defend it.

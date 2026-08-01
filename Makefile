@@ -27,7 +27,7 @@
 # docs/requirements.txt; "notebooks" needs nbclient, nbformat and ipykernel.
 
 CHAPTERS  := 00 00b 01 02 03 04 05 06 07 08 10 13
-SLIDEDIR  := Lecture_Slides
+SLIDEDIR  := Chapters
 GUIDE     := Teaching_Guide
 HANDOUTS  := $(GUIDE)/handouts
 PYTHON    ?= python3
@@ -66,7 +66,7 @@ deck-%:
 # Four optional self-study modules in Advanced/ — same two-pass LaTeX build,
 # kept out of `all` because they are not part of the 12-lecture deliverable.
 ADVANCED := advanced_01_rcts advanced_02_shapley advanced_03_conformal advanced_04_glms_splines
-ADV_DIR  := Advanced/Lecture_Slides
+ADV_DIR  := Advanced
 ADV_PDFS := $(foreach a,$(ADVANCED),$(ADV_DIR)/$(a)/$(a).pdf)
 
 define ADV_RULE

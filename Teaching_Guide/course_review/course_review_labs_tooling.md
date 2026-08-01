@@ -6,7 +6,7 @@ single repository file. Everything below is anchored to a `file:line`, a
 notebook cell index, or a command I ran; where I am guessing about students
 rather than measuring something, I say so explicitly.
 
-Two caveats up front. `Makefile` and `Lab_Notebooks/chapter_03_lab.ipynb` were
+Two caveats up front. `Makefile` and `Chapters/chapter_03/chapter_03_lab.ipynb` were
 being edited by other agents while I worked (`git status --porcelain` showed
 both dirty, and HEAD moved from `2e1e1f2` to `1ad1891` mid-session), so treat
 my chapter-3 notebook observations as provisional. And `Mock_Exams/` I left
@@ -174,8 +174,8 @@ one; the string "Data loads via the `ISLP` package or the bundled CSV files;
 the notebook ends with hands-on exercises" appears **nine times byte-identical**.
 None of the 14 names a notebook section or cell — even though the anchors
 exist (`## 4. Diagnostics`, `## 3. Pruning via cost-complexity`). The one
-counter-example, `Lecture_Slides/chapter_00/chapter_00.tex:564` ("Rebuild this
-plot yourself in `Lab_Notebooks/chapter_00_lab.ipynb` with
+counter-example, `Chapters/chapter_00/chapter_00.tex:564` ("Rebuild this
+plot yourself in `Chapters/chapter_00/chapter_00_lab.ipynb` with
 `df["wage"].describe()`"), shows what the other 13 could be.
 
 **Two places model the practice the lectures warn against.** These are worth
@@ -227,7 +227,7 @@ decision before it is.
 **Accessibility: the figures are better than the type.** The two
 `make_figures.py` scripts use a disciplined three-colour palette
 (`ACCENT #26468C`, `ORANGE #C8641E`, `GREY #7A7A7A` at
-`Lecture_Slides/chapter_00/make_figures.py:28-30`); grepping both files for
+`Chapters/chapter_00/make_figures.py:28-30`); grepping both files for
 `jet`, `cmap`, `'red'`, `coolwarm`, `RdYlGn` returns **nothing**, and
 multi-series plots pair colour with linestyle and a label. That is genuinely
 well done. The problems are elsewhere:
@@ -244,12 +244,12 @@ well done. The problems are elsewhere:
   type word — including **86 of 86** `industry` boxes, whose slate-grey tint is
   the only cue. `takeaway` (`green!4`) vs `solutionbox` (`teal!5`) are adjacent
   hues at 4–5 % tint with no icons and a 2.5 pt vs 3 pt border; 27 solution
-  boxes drop the word "Solution". `Lecture_Slides/chapter_04/chapter_04.tex:1631`
+  boxes drop the word "Solution". `Chapters/chapter_04/chapter_04.tex:1631`
   instructs colour-reading directly: "Green cells are correct decisions, red
   cells are the two error types."
 - **`chapter_00` shrinks whole slides.** 93 font-shrink commands, 36 of them
   wrapping the *first line of a frame body*. Worst:
-  `Lecture_Slides/chapter_00/chapter_00.tex:2269`, `\tiny` on a 20-row table
+  `Chapters/chapter_00/chapter_00.tex:2269`, `\tiny` on a 20-row table
   (≈ 6 pt projected), and `:194`, a 237-word twelve-item self-check at
   whole-frame `\scriptsize` — which is the entry point for exactly the students
   least confident in the material. There are 46 double-shrinks where
@@ -261,7 +261,7 @@ well done. The problems are elsewhere:
   TikZ diagrams. Separately, code copied out of a deck PDF **loses all
   indentation** and will not run (`chapter_06.pdf` p. 61 extracts
   `for k in range(1, 6):# model sizes` with a flush-left body).
-- **No German-language support exists anywhere.** Grepping `Lecture_Slides/`
+- **No German-language support exists anywhere.** Grepping `Chapters/`
   for `glossar|german|deutsch|bilingual|translat` yields six hits, all false
   positives ("translation invariance", "Translating notation [Math]"). Not one
   German gloss for `confounding`, `shrinkage` or `overfitting`. The densest
@@ -595,7 +595,7 @@ alone. Restore the word "Solution" on the 27 `solutionbox` calls that drop it
 (`chapter_10.tex:530`, `:556`, `:585`, `:1303`, `:1326` are the ones most likely
 to mislead, titled `[Forward pass]`, `[Code: load / standardise …]`). And
 rewrite `chapter_04.tex:1631` and the parallel line at `chapter_13.tex:1156-1157`
-so they name the cells rather than the colours. `Lecture_Slides/chapter_05`'s
+so they name the cells rather than the colours. `Chapters/chapter_05`'s
 k-fold diagrams (`:446-463`, `:570-572`) are your own best-practice example:
 blue/orange plus printed "Train"/"Test" in every cell.
 

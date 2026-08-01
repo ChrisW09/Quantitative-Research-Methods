@@ -7,7 +7,8 @@ myst:
 # Lab notebooks
 
 {.qrm-lead}
-Fifteen notebooks in `Lab_Notebooks/`, of two different kinds.
+Fifteen notebooks, one per chapter, each living beside the deck it accompanies
+in `Chapters/chapter_NN/chapter_NN_lab.ipynb`. They come in two kinds.
 
 **Twelve taught labs** — one per lecture deck, both precourse sessions
 included. Each mirrors its chapter's Python lab and closes with **worked
@@ -36,18 +37,18 @@ documentation build never executes them).
 
 | Ch. | Lab | Read here | Open in Colab |
 |:--:|---|:--:|:--:|
-| 0 · Precourse (a) — Statistics | `chapter_00_lab.ipynb` | [Rendered](labs/chapter_00_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00_lab.ipynb) |
-| 0b · Precourse (b) — Toolkit | `chapter_00b_lab.ipynb` | [Rendered](labs/chapter_00b_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00b_lab.ipynb) |
-| 1 · Introduction | `chapter_01_lab.ipynb` | [Rendered](labs/chapter_01_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_01_lab.ipynb) |
-| 2 · Statistical Learning | `chapter_02_lab.ipynb` | [Rendered](labs/chapter_02_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_02_lab.ipynb) |
-| 3 · Linear Regression | `chapter_03_lab.ipynb` | [Rendered](labs/chapter_03_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_03_lab.ipynb) |
-| 4 · Classification | `chapter_04_lab.ipynb` | [Rendered](labs/chapter_04_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_04_lab.ipynb) |
-| 5 · Resampling Methods | `chapter_05_lab.ipynb` | [Rendered](labs/chapter_05_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_05_lab.ipynb) |
-| 6 · Model Selection & Regularization | `chapter_06_lab.ipynb` | [Rendered](labs/chapter_06_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_06_lab.ipynb) |
-| 7 · Moving Beyond Linearity | `chapter_07_lab.ipynb` | [Rendered](labs/chapter_07_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_07_lab.ipynb) |
-| 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [Rendered](labs/chapter_08_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_08_lab.ipynb) |
-| 10 · Deep Learning | `chapter_10_lab.ipynb` | [Rendered](labs/chapter_10_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_10_lab.ipynb) |
-| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [Rendered](labs/chapter_13_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_13_lab.ipynb) |
+| 0 · Precourse (a) — Statistics | `chapter_00_lab.ipynb` | [Rendered](labs/chapter_00_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_00/chapter_00_lab.ipynb) |
+| 0b · Precourse (b) — Toolkit | `chapter_00b_lab.ipynb` | [Rendered](labs/chapter_00b_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_00b/chapter_00b_lab.ipynb) |
+| 1 · Introduction | `chapter_01_lab.ipynb` | [Rendered](labs/chapter_01_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_01/chapter_01_lab.ipynb) |
+| 2 · Statistical Learning | `chapter_02_lab.ipynb` | [Rendered](labs/chapter_02_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_02/chapter_02_lab.ipynb) |
+| 3 · Linear Regression | `chapter_03_lab.ipynb` | [Rendered](labs/chapter_03_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_03/chapter_03_lab.ipynb) |
+| 4 · Classification | `chapter_04_lab.ipynb` | [Rendered](labs/chapter_04_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_04/chapter_04_lab.ipynb) |
+| 5 · Resampling Methods | `chapter_05_lab.ipynb` | [Rendered](labs/chapter_05_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_05/chapter_05_lab.ipynb) |
+| 6 · Model Selection & Regularization | `chapter_06_lab.ipynb` | [Rendered](labs/chapter_06_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_06/chapter_06_lab.ipynb) |
+| 7 · Moving Beyond Linearity | `chapter_07_lab.ipynb` | [Rendered](labs/chapter_07_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_07/chapter_07_lab.ipynb) |
+| 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [Rendered](labs/chapter_08_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_08/chapter_08_lab.ipynb) |
+| 10 · Deep Learning | `chapter_10_lab.ipynb` | [Rendered](labs/chapter_10_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_10/chapter_10_lab.ipynb) |
+| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [Rendered](labs/chapter_13_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_13/chapter_13_lab.ipynb) |
 
 ## Untaught chapters — three code references
 
@@ -59,9 +60,9 @@ twelve above.
 
 | Ch. | Code reference | Read here | Open in Colab |
 |:--:|---|:--:|:--:|
-| 9 · Support Vector Machines | `chapter_09_lab.ipynb` | [Rendered](labs/chapter_09_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_09_lab.ipynb) |
-| 11 · Survival Analysis | `chapter_11_lab.ipynb` | [Rendered](labs/chapter_11_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_11_lab.ipynb) |
-| 12 · Unsupervised Learning | `chapter_12_lab.ipynb` | [Rendered](labs/chapter_12_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_12_lab.ipynb) |
+| 9 · Support Vector Machines | `chapter_09_lab.ipynb` | [Rendered](labs/chapter_09_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_09/chapter_09_lab.ipynb) |
+| 11 · Survival Analysis | `chapter_11_lab.ipynb` | [Rendered](labs/chapter_11_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_11/chapter_11_lab.ipynb) |
+| 12 · Unsupervised Learning | `chapter_12_lab.ipynb` | [Rendered](labs/chapter_12_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_12/chapter_12_lab.ipynb) |
 
 ```{tip}
 The Colab badges open straight from the public GitHub repository; a Google

@@ -1,7 +1,7 @@
 """Execute the lab notebooks and compare their output against what is stored.
 
     python3 .github/scripts/check_notebooks.py                 all 15 notebooks
-    python3 .github/scripts/check_notebooks.py Lab_Notebooks/chapter_03_lab.ipynb
+    python3 .github/scripts/check_notebooks.py Chapters/chapter_03/chapter_03_lab.ipynb
     python3 .github/scripts/check_notebooks.py --no-compare    run only
 
 Two different failures are reported, and either one exits 1:
@@ -35,8 +35,8 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-NOTEBOOKS = ROOT / "Lab_Notebooks"
-ADVANCED = ROOT / "Advanced" / "Lab_Notebooks"
+NOTEBOOKS = ROOT / "Chapters"
+ADVANCED = ROOT / "Advanced"
 PROJECTS = ROOT / "Projects"
 
 try:
@@ -217,7 +217,7 @@ def unified(before: str, after: str, context: int = 1, limit: int = 40) -> list[
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("notebooks", nargs="*", type=Path, help="default: all of Lab_Notebooks/")
+    ap.add_argument("notebooks", nargs="*", type=Path, help="default: all of Chapters/")
     ap.add_argument(
         "--no-compare",
         action="store_true",
@@ -226,8 +226,8 @@ def main() -> int:
     args = ap.parse_args()
 
     paths = args.notebooks or (
-        sorted(NOTEBOOKS.glob("chapter_*_lab.ipynb"))
-        + sorted(ADVANCED.glob("advanced_*_lab.ipynb"))
+        sorted(NOTEBOOKS.glob("chapter_*/chapter_*_lab.ipynb"))
+        + sorted(ADVANCED.glob("advanced_*/advanced_*_lab.ipynb"))
         # Project starters ship with stored outputs too: they are the scaffolding
         # students build on, so a starter that no longer runs is a broken project.
         + sorted(PROJECTS.glob("project_*/project_*_starter.ipynb"))

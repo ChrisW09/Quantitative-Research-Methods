@@ -297,7 +297,7 @@ customer.
   (Shapley values).** This is the natural extension, and not merely a technical
   one: an insurer that targets customers must be able to justify the targeting,
   to a regulator and to the customer. Module A2
-  ([`Advanced/Lab_Notebooks/advanced_02_shapley_lab.ipynb`](../../Advanced/Lab_Notebooks/advanced_02_shapley_lab.ipynb))
+  ([`Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb`](../../Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb))
   gives you the machinery to decompose a single prospect's score into per-feature
   contributions that sum exactly to it, which is what a "reason code" on a call
   sheet has to be. Two warnings the module makes precise apply directly here.

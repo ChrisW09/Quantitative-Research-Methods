@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-SLIDES = ROOT / "Lecture_Slides"
+SLIDES = ROOT / "Chapters"
 OUT = Path(__file__).parent / "slide_index.md"
 
 try:
@@ -90,7 +90,7 @@ def deck_block(folder: str, name: str, sessions: float) -> list[str]:
     toc = SLIDES / folder / f"{folder}.toc"
     tex = SLIDES / folder / f"{folder}.tex"
     if not pdf.exists():
-        return [f"### {name}\n", f"*Not compiled — run `pdflatex` in `Lecture_Slides/{folder}/`.*\n"]
+        return [f"### {name}\n", f"*Not compiled — run `pdflatex` in `Chapters/{folder}/`.*\n"]
 
     titles = frame_titles(pdf)
     total = len(titles)

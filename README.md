@@ -89,7 +89,7 @@ dependency. Set aside time for it outside class.
 python -m venv .venv
 source .venv/bin/activate         # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-jupyter lab Lab_Notebooks/chapter_03_lab.ipynb
+jupyter lab Chapters/chapter_03/chapter_03_lab.ipynb
 ```
 
 Tested with **Python 3.9+**. Data loads via the `ISLP` package when installed,
@@ -136,8 +136,10 @@ LDA (p. 46).
 
 ## 🎞️ Lecture slides
 
-Twelve decks in `Lecture_Slides/chapter_NN/`, each folder self-contained
-(`chapter_NN.tex`, its `images/`, and the compiled PDF). Slide counts are given
+Twelve decks in `Chapters/chapter_NN/`, each folder self-contained
+(`chapter_NN.tex`, its `images/`, the compiled PDF — and the chapter's
+[companion lab](#-lab-notebooks), so everything for one week sits in one place).
+Slide counts are given
 as **main flow (+ appendix)**: every deck ends with an appendix of optional,
 advanced material that the main thread never depends on.
 
@@ -148,18 +150,18 @@ advanced material that the main thread never depends on.
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+16) | [PDF](./Lecture_Slides/chapter_00/chapter_00.pdf) |
-| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+9) | [PDF](./Lecture_Slides/chapter_00b/chapter_00b.pdf) |
-| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+6) | [PDF](./Lecture_Slides/chapter_01/chapter_01.pdf) |
-| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 107 (+8) | [PDF](./Lecture_Slides/chapter_02/chapter_02.pdf) |
-| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 144 (+11) | [PDF](./Lecture_Slides/chapter_03/chapter_03.pdf) |
-| 4 | Classification | Logistic regression and the odds scale, confounding, LDA, QDA, naive Bayes, confusion matrices, ROC and AUC | 10 + 6 | 112 (+15) | [PDF](./Lecture_Slides/chapter_04/chapter_04.pdf) |
-| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 79 (+7) | [PDF](./Lecture_Slides/chapter_05/chapter_05.pdf) |
-| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 81 (+11) | [PDF](./Lecture_Slides/chapter_06/chapter_06.pdf) |
-| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+7) | [PDF](./Lecture_Slides/chapter_07/chapter_07.pdf) |
-| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 83 (+7) | [PDF](./Lecture_Slides/chapter_08/chapter_08.pdf) |
-| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 75 (+8) | [PDF](./Lecture_Slides/chapter_10/chapter_10.pdf) |
-| 13 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 5 + 3 | 63 (+6) | [PDF](./Lecture_Slides/chapter_13/chapter_13.pdf) |
+| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+16) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+9) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
+| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+6) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
+| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 107 (+8) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
+| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 144 (+11) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
+| 4 | Classification | Logistic regression and the odds scale, confounding, LDA, QDA, naive Bayes, confusion matrices, ROC and AUC | 10 + 6 | 112 (+15) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
+| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 79 (+7) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
+| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 81 (+11) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
+| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+7) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
+| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 83 (+7) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
+| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 75 (+8) | [PDF](./Chapters/chapter_10/chapter_10.pdf) |
+| 13 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 5 + 3 | 63 (+6) | [PDF](./Chapters/chapter_13/chapter_13.pdf) |
 | **Total** | | | **86 + 41** | **1057 (+111)** | |
 
 <details>
@@ -221,8 +223,8 @@ students can decide whether they need it, and closes with a table mapping every
 topic to the chapter that uses it. Eighteen figures — Anscombe's quartet,
 Simpson's paradox, the CLT, CI coverage, power, gradient descent — are computed
 from the course data by
-[`make_figures.py`](./Lecture_Slides/chapter_00/make_figures.py); the companion
-notebook is [`chapter_00_lab.ipynb`](./Lab_Notebooks/chapter_00_lab.ipynb).
+[`make_figures.py`](./Chapters/chapter_00/make_figures.py); the companion
+notebook is [`chapter_00_lab.ipynb`](./Chapters/chapter_00/chapter_00_lab.ipynb).
 
 **Chapter 0b — the toolkit.** A second optional session covering what the later
 chapters use but never explain, chosen by counting actual usage across the ten
@@ -231,7 +233,7 @@ logs and exponentials (176), odds and the logit (108), likelihood and maximum
 likelihood (37), counting and the 2ᵖ cost (13), and the Python patterns every
 lab relies on (functions, loops, seeds, `fit`/`predict`, train/test discipline).
 Companion notebook:
-[`chapter_00b_lab.ipynb`](./Lab_Notebooks/chapter_00b_lab.ipynb).
+[`chapter_00b_lab.ipynb`](./Chapters/chapter_00b/chapter_00b_lab.ipynb).
 </details>
 
 <details>
@@ -241,7 +243,7 @@ Requires a TeX Live distribution (with `beamer`, `tcolorbox`, `tikz`,
 `listings`, `booktabs`):
 
 ```bash
-cd Lecture_Slides/chapter_NN
+cd Chapters/chapter_NN
 pdflatex chapter_NN.tex
 pdflatex chapter_NN.tex   # second pass for the navigation bar
 ```
@@ -254,27 +256,28 @@ refreshes the slide index.
 
 ## 📓 Lab notebooks
 
-Fifteen notebooks (`Lab_Notebooks/chapter_NN_lab.ipynb`): **twelve taught labs**,
-one per deck (both precourse sessions included), each ending in worked Python
-solutions to that chapter's exercises — plus **three code references** for the
-untaught chapters, which have no deck and no solutions (see below). Each runs
+Fifteen notebooks, each beside the deck it accompanies at
+`Chapters/chapter_NN/chapter_NN_lab.ipynb`: **twelve taught labs**, one per deck
+(both precourse sessions included), each ending in worked Python solutions to
+that chapter's exercises — plus **three code references** for the untaught
+chapters, which have no deck and no solutions (see below). Each runs
 **locally or on Google Colab**; data loads via the `ISLP` package with an
 automatic fallback to the bundled CSVs, so nothing needs downloading by hand.
 
 | Ch. | Lab | Open in Colab |
 |:--:|--|:--:|
-| 0 · Precourse (a) — Statistics | `chapter_00_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00_lab.ipynb) |
-| 0b · Precourse (b) — Toolkit | `chapter_00b_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_00b_lab.ipynb) |
-| 1 · Introduction | `chapter_01_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_01_lab.ipynb) |
-| 2 · Statistical Learning | `chapter_02_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_02_lab.ipynb) |
-| 3 · Linear Regression | `chapter_03_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_03_lab.ipynb) |
-| 4 · Classification | `chapter_04_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_04_lab.ipynb) |
-| 5 · Resampling Methods | `chapter_05_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_05_lab.ipynb) |
-| 6 · Model Selection & Regularization | `chapter_06_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_06_lab.ipynb) |
-| 7 · Moving Beyond Linearity | `chapter_07_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_07_lab.ipynb) |
-| 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_08_lab.ipynb) |
-| 10 · Deep Learning | `chapter_10_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_10_lab.ipynb) |
-| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_13_lab.ipynb) |
+| 0 · Precourse (a) — Statistics | `chapter_00_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_00/chapter_00_lab.ipynb) |
+| 0b · Precourse (b) — Toolkit | `chapter_00b_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_00b/chapter_00b_lab.ipynb) |
+| 1 · Introduction | `chapter_01_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_01/chapter_01_lab.ipynb) |
+| 2 · Statistical Learning | `chapter_02_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_02/chapter_02_lab.ipynb) |
+| 3 · Linear Regression | `chapter_03_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_03/chapter_03_lab.ipynb) |
+| 4 · Classification | `chapter_04_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_04/chapter_04_lab.ipynb) |
+| 5 · Resampling Methods | `chapter_05_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_05/chapter_05_lab.ipynb) |
+| 6 · Model Selection & Regularization | `chapter_06_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_06/chapter_06_lab.ipynb) |
+| 7 · Moving Beyond Linearity | `chapter_07_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_07/chapter_07_lab.ipynb) |
+| 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_08/chapter_08_lab.ipynb) |
+| 10 · Deep Learning | `chapter_10_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_10/chapter_10_lab.ipynb) |
+| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_13/chapter_13_lab.ipynb) |
 
 **Code references — no lecture deck, no worked solutions.** Read the ISLP
 chapter first; these three notebooks show how to run the methods in Python, they
@@ -282,9 +285,9 @@ do not teach the ideas.
 
 | Ch. | Code reference | Open in Colab |
 |:--:|--|:--:|
-| 9 | `chapter_09_lab.ipynb` — Support Vector Machines | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_09_lab.ipynb) |
-| 11 | `chapter_11_lab.ipynb` — Survival Analysis | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_11_lab.ipynb) |
-| 12 | `chapter_12_lab.ipynb` — Unsupervised Learning | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Lab_Notebooks/chapter_12_lab.ipynb) |
+| 9 | `chapter_09_lab.ipynb` — Support Vector Machines | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_09/chapter_09_lab.ipynb) |
+| 11 | `chapter_11_lab.ipynb` — Survival Analysis | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_11/chapter_11_lab.ipynb) |
+| 12 | `chapter_12_lab.ipynb` — Unsupervised Learning | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_12/chapter_12_lab.ipynb) |
 
 Every notebook is also
 [rendered in full](https://chrisw09.github.io/Quantitative-Research-Methods/labs.html)
@@ -357,10 +360,10 @@ notebook whose numbers match the slides seed-for-seed:
 
 | Module | Title | Deck | Notebook |
 |:--:|---|:--:|:--:|
-| A1 | Randomised Controlled Trials — potential outcomes, selection bias, power, peeking | 71 slides | [`advanced_01_rcts_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_01_rcts_lab.ipynb) |
-| A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 73 slides | [`advanced_02_shapley_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_02_shapley_lab.ipynb) |
-| A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 74 slides | [`advanced_03_conformal_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_03_conformal_lab.ipynb) |
-| A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 82 slides | [`advanced_04_glms_splines_lab.ipynb`](./Advanced/Lab_Notebooks/advanced_04_glms_splines_lab.ipynb) |
+| A1 | Randomised Controlled Trials — potential outcomes, selection bias, power, peeking | 71 slides | [`advanced_01_rcts_lab.ipynb`](./Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) |
+| A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 73 slides | [`advanced_02_shapley_lab.ipynb`](./Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) |
+| A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 74 slides | [`advanced_03_conformal_lab.ipynb`](./Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) |
+| A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 82 slides | [`advanced_04_glms_splines_lab.ipynb`](./Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) |
 
 Nothing in the twelve-lecture plan or the exams depends on them — see the
 [module guide](./Advanced/README.md) for prerequisites and build instructions;
@@ -395,8 +398,7 @@ formative — the module is graded by the written exam — and each folder carri
 
 | Path | Contents |
 |---|---|
-| [`Lecture_Slides/`](./Lecture_Slides/) | Twelve Beamer decks (`chapter_NN/chapter_NN.tex` + `.pdf` + images) — the core deliverable. See its [deck guide](./Lecture_Slides/README.md). |
-| [`Lab_Notebooks/`](./Lab_Notebooks/) | Fifteen Jupyter notebooks (`chapter_NN_lab.ipynb`), local- and Colab-ready |
+| [`Chapters/`](./Chapters/) | **One folder per chapter, holding its deck and its lab together**: `chapter_NN/` contains `chapter_NN.tex`, the compiled `.pdf`, `images/`, and `chapter_NN_lab.ipynb`. Twelve decks and fifteen notebooks — chapters 9, 11 and 12 are notebook-only code references. See its [deck guide](./Chapters/README.md). |
 | [`Advanced/`](./Advanced/) | Four optional self-study modules — RCTs, Shapley values, conformal prediction, GLMs & splines — each a full deck plus companion notebook. See its [module guide](./Advanced/README.md). |
 | [`Projects/`](./Projects/) | Six short projects (3–5 h): a real decision on real data, with a fixed held-out set, a baseline to beat and a one-page memo as the deliverable. See its [project guide](./Projects/README.md). |
 | [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, runsheets, slide index, before-class checklist, printable handouts |

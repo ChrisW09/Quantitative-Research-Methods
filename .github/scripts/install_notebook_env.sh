@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install everything needed to execute Lab_Notebooks/, for CI or for a local
+# Install everything needed to execute Chapters/, for CI or for a local
 # check. One script rather than four workflow steps, so the pinned and floating
 # jobs cannot drift apart.
 #

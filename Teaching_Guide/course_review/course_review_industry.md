@@ -12,7 +12,7 @@ on a slide. I have invented nothing; where I could not verify a detail I say so 
 supplying one.
 
 **One caveat on line numbers.** While I was reading, other work was in flight on
-`Lecture_Slides/chapter_03/chapter_03.tex`, `Lab_Notebooks/chapter_03_lab.ipynb`, the `Makefile`,
+`Chapters/chapter_03/chapter_03.tex`, `Chapters/chapter_03/chapter_03_lab.ipynb`, the `Makefile`,
 `README.md`, `Teaching_Guide/semester_plan.md` and `docs/exams.md`. My `chapter_03.tex` line numbers
 were read from the working copy at review time and may have shifted by a few lines since; the frame
 titles and the quoted text are the reliable handles. All other decks were untouched during the review.
@@ -21,7 +21,7 @@ titles and the quoted text are the reliable handles. All other decks were untouc
 
 ## 0. What I examined
 
-- All 12 deck sources (`Lecture_Slides/chapter_*/chapter_*.tex`, 22,399 lines total).
+- All 12 deck sources (`Chapters/chapter_*/chapter_*.tex`, 22,399 lines total).
 - Every `industry` callout, every **"Where this chapter is used in industry"** frame, every
   **"Industry case in depth"** frame, and the **"Two business problems we follow all semester"**
   frame — **25 chapter-level frames** (12 + 12 + 1) and **86 `industry` environments** in total, of

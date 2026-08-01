@@ -50,7 +50,7 @@ libraries. Budget time for it, on a decent connection, outside class.
 python -m venv .venv
 source .venv/bin/activate         # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-jupyter lab Lab_Notebooks/chapter_03_lab.ipynb
+jupyter lab Chapters/chapter_03/chapter_03_lab.ipynb
 ```
 
 Tested with **Python 3.9+**. Data loads via the `ISLP` package when installed,
@@ -69,7 +69,7 @@ can be edited and rebuilt. This needs a TeX Live distribution with `beamer`,
 :::{tab-item} A lecture deck
 
 ```bash
-cd Lecture_Slides/chapter_03
+cd Chapters/chapter_03
 pdflatex chapter_03.tex
 pdflatex chapter_03.tex   # second pass for the navigation bar
 ```

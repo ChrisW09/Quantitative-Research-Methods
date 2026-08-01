@@ -1,6 +1,6 @@
 # Deck triage — what could become optional or appendix material
 
-*A proposal, not a change. Nothing in `Lecture_Slides/` has been moved. Each
+*A proposal, not a change. Nothing in `Chapters/` has been moved. Each
 deck was audited independently against its own runsheet; the per-deck detail,
 including the "do not move" lists, is summarised below.*
 

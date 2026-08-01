@@ -291,7 +291,7 @@ def check_runsheet(path: Path, rep: Report) -> None:
 
     # The deck the file names in its own header, so a copied-and-renamed
     # runsheet pointing at the wrong deck is caught rather than assumed away.
-    m = re.search(r"Lecture_Slides/(chapter_[\w]+)/", text)
+    m = re.search(r"Chapters/(chapter_[\w]+)/", text)
     folder = m.group(1) if m else f"chapter_{path.stem.split('_', 1)[1]}"
     pdf = SLIDES / folder / f"{folder}.pdf"
     toc = SLIDES / folder / f"{folder}.toc"

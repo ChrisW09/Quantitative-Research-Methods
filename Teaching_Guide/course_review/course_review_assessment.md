@@ -1,14 +1,14 @@
 # Quantitative Research Methods — assessment review
 
 **For:** Prof. Dr. Christoph Weisser, HSBI
-**Scope:** assessment only — the eight papers in `Mock_Exams/`, their solutions and review decks, the 127 in-deck exercises, the 67 student exercises in `Lab_Notebooks/`, and how `Teaching_Guide/semester_plan.md`, `Teaching_Guide/runsheets/` and `docs/exams.md` position all of it.
+**Scope:** assessment only — the eight papers in `Mock_Exams/`, their solutions and review decks, the 127 in-deck exercises, the 67 student exercises in `Chapters/`, and how `Teaching_Guide/semester_plan.md`, `Teaching_Guide/runsheets/` and `docs/exams.md` position all of it.
 **Method:** read-only. Nothing in the repository was modified.
 
 ### Two caveats on the state of the files
 
 1. `Mock_Exams/` was being edited while I read it. `final_mock_exam_a.tex` and `solutions_slides_a.tex` had been touched shortly before I started; all main-paper `.tex` files were touched again at 14:39–14:40 during my read. **Where I flag an inconsistency between a paper and its solutions deck, treat it as mid-edit rather than as a defect** — I say so explicitly each time.
 2. Every paper in the repository is labelled *mock*. `docs/course.md:51–52` calls them self-test material at the natural checkpoints. **Nothing anywhere in the repository states what the summative instrument actually is** — no ECTS weighting, no grade split, no statement that the real HSBI paper is isomorphic to these. My remarks about "the assessment" therefore describe the rehearsal system and infer the shape of the real paper from it. If the real paper differs materially, several recommendations below change priority.
-3. Files outside `Mock_Exams/` were also changing during the review — `git status` showed live modifications to `Teaching_Guide/semester_plan.md`, `docs/exams.md`, `Lecture_Slides/chapter_03/chapter_03.tex`, `Lab_Notebooks/chapter_03_lab.ipynb`, `README.md` and the `Makefile`. I re-verified every line anchor in this document against the files as they stood at the end of the review and corrected two that had drifted. **Line numbers may drift again; the quoted text and the problem/exercise numbers will not.** Where precision matters, search on the quoted string rather than the line.
+3. Files outside `Mock_Exams/` were also changing during the review — `git status` showed live modifications to `Teaching_Guide/semester_plan.md`, `docs/exams.md`, `Chapters/chapter_03/chapter_03.tex`, `Chapters/chapter_03/chapter_03_lab.ipynb`, `README.md` and the `Makefile`. I re-verified every line anchor in this document against the files as they stood at the end of the review and corrected two that had drifted. **Line numbers may drift again; the quoted text and the problem/exercise numbers will not.** Where precision matters, search on the quoted string rather than the line.
 
 ---
 

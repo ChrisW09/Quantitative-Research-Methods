@@ -27,17 +27,18 @@ Each module assumes the course chapters it extends:
 
 ## Layout
 
+Each module is one self-contained folder holding its deck and its lab together,
+the same shape as a chapter folder in [`Chapters/`](../Chapters/):
+
 ```text
 Advanced/
-├── Lecture_Slides/
-│   └── advanced_0N_topic/
-│       ├── advanced_0N_topic.tex   # source (course preamble, self-contained)
-│       ├── advanced_0N_topic.pdf   # compiled deck (committed)
-│       ├── images/                 # matplotlib figures used by the deck
-│       └── make_figures.py         # regenerates every figure from the course data
-├── Lab_Notebooks/
-│   └── advanced_0N_topic_lab.ipynb # companion lab, stored outputs, Colab-ready
-├── STYLE_DECK.md                   # the house style, distilled (for new modules)
+├── advanced_0N_topic/
+│   ├── advanced_0N_topic.tex        # source (course preamble, self-contained)
+│   ├── advanced_0N_topic.pdf        # compiled deck (committed)
+│   ├── advanced_0N_topic_lab.ipynb  # companion lab, stored outputs, Colab-ready
+│   ├── images/                      # matplotlib figures used by the deck
+│   └── make_figures.py              # regenerates every figure from the course data
+├── STYLE_DECK.md                    # the house style, distilled (for new modules)
 └── STYLE_NOTEBOOK.md
 ```
 
@@ -46,7 +47,8 @@ Advanced/
 Every notebook opens with a Colab badge — one click, nothing to install; the
 setup cell resolves data via the `ISLP` package, the book's site, or the
 bundled `ALL CSV FILES - 2nd Edition/` folder, exactly like the course labs.
-Locally: run from `Advanced/Lab_Notebooks/` so the relative CSV path resolves.
+Locally: run it from inside its own module folder so the relative CSV path
+resolves.
 No packages beyond the course `requirements.txt` are needed — Shapley values,
 conformal prediction and the P-splines are implemented from scratch on purpose
 (`shap` and `MAPIE` are named on the slides as the production tools).
@@ -54,7 +56,7 @@ conformal prediction and the P-splines are implemented from scratch on purpose
 ## Rebuilding a deck
 
 ```bash
-cd Advanced/Lecture_Slides/advanced_01_rcts
+cd Advanced/advanced_01_rcts
 python3 make_figures.py     # regenerate images/ from the course datasets
 pdflatex advanced_01_rcts.tex
 pdflatex advanced_01_rcts.tex   # second pass for the navigation bar

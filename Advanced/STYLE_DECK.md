@@ -1,7 +1,7 @@
 # STYLE_DECK.md — How to author a lecture deck in this course's house style
 
 This brief lets you write a Beamer deck that is indistinguishable from the existing
-`Lecture_Slides/chapter_XX/chapter_XX.tex` decks (canonical short example: chapter 13,
+`Chapters/chapter_XX/chapter_XX.tex` decks (canonical short example: chapter 13,
 1246 lines; canonical mid-size example: chapter 5, 1693 lines). Follow it exactly.
 
 ---
@@ -271,7 +271,7 @@ with a concrete sector title like `[Quantitative finance: backtest overfitting]`
 
 ## 8. make_figures.py conventions (deck figures)
 
-Model: `Lecture_Slides/chapter_00/make_figures.py`. Rules:
+Model: `Chapters/chapter_00/make_figures.py`. Rules:
 
 - **matplotlib only — seaborn is NOT installed on this machine.** `matplotlib.use("Agg")`
   before importing pyplot. numpy/pandas/scipy allowed.

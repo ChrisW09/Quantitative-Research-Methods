@@ -7,9 +7,10 @@ myst:
 # Lecture slides
 
 {.qrm-lead}
-Twelve Beamer decks live in `Lecture_Slides/chapter_NN/`, each folder
-self-contained: `chapter_NN.tex`, its `images/`, and the compiled
-`chapter_NN.pdf`. The PDFs below are served with this documentation.
+Twelve Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
+`chapter_NN.tex`, its `images/`, the compiled `chapter_NN.pdf` — and the
+[companion lab](labs.md) for that chapter, so everything for one week sits
+together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
 [**1057** slides in the main flow]{.qrm-chip}
@@ -155,7 +156,7 @@ closes with a table mapping every topic to the chapter that uses it. Eighteen
 figures — the boxplot anatomy, a gallery of shapes, Anscombe's quartet,
 Simpson's paradox, the CLT, confidence-interval coverage, $p$-values as areas,
 power, leverage, and gradient descent on a real loss surface — are computed from
-the course data by `Lecture_Slides/chapter_00/make_figures.py`, and every one is
+the course data by `Chapters/chapter_00/make_figures.py`, and every one is
 rebuilt in code in the [companion notebook](labs.md).
 
 ### Chapter 0b — the toolkit
@@ -184,7 +185,7 @@ Requires a TeX Live distribution with `beamer`, `tcolorbox`, `tikz`, `listings`
 and `booktabs`:
 
 ```bash
-cd Lecture_Slides/chapter_08
+cd Chapters/chapter_08
 pdflatex chapter_08.tex
 pdflatex chapter_08.tex   # second pass for the navigation bar
 ```

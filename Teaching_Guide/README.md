@@ -30,13 +30,13 @@ also rebuild when their `make_figures.py` changes.
 ## How the pieces fit
 
 ```
-Lecture_Slides/chapter_NN/chapter_NN.tex   the deck you project
+Chapters/chapter_NN/chapter_NN.tex   the deck you project
         │
         ├─ make ──────────► chapter_NN.pdf        (two pdflatex passes)
         ├─ make handouts ─► Teaching_Guide/handouts/chapter_NN_handout.pdf
         └─ make index ────► Teaching_Guide/slide_index.md   (page numbers)
 
-Lab_Notebooks/chapter_NN_lab.ipynb          what students run
+Chapters/chapter_NN_lab.ipynb          what students run
 Mock_Exams/                                 assessment (kept out of git)
 ```
 

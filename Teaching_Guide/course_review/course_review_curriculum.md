@@ -2,8 +2,8 @@
 
 Prof. Dr. Christoph Weisser, HSBI · ISLP (James et al. 2023) · 12 × 180 min + 2 precourse decks
 
-Reviewed: the twelve `Lecture_Slides/chapter_*/chapter_*.tex` sources (1,168 pages), all fifteen
-`Lab_Notebooks/*.ipynb`, `Teaching_Guide/` (semester plan, twelve runsheets, `slide_index.md`,
+Reviewed: the twelve `Chapters/chapter_*/chapter_*.tex` sources (1,168 pages), all fifteen
+`Chapters/*.ipynb`, `Teaching_Guide/` (semester plan, twelve runsheets, `slide_index.md`,
 `before_class.md`, `make_index.py`, `check_decks.py`), `README.md`, `docs/`, and — because the
 alignment question cannot be answered without them — the sources in `Mock_Exams/`.
 

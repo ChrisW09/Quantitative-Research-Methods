@@ -1,20 +1,23 @@
 """Sphinx configuration for the Quantitative Research Methods course docs.
 
-The course materials live outside ``docs/`` (notebooks in ``Lab_Notebooks/``,
-compiled decks in ``Lecture_Slides/``).  Sphinx can
-only read sources from inside the source directory, so before the build starts
-we stage what the site needs:
+The course materials live outside ``docs/``: each chapter keeps its deck and its
+lab together in ``Chapters/chapter_NN/``, and each advanced module does the same
+in ``Advanced/advanced_NN_topic/``.  Sphinx can only read sources from inside
+the source directory, so before the build starts we stage what the site needs:
 
-* ``Lab_Notebooks/*.ipynb``   -> ``docs/labs/``     (rendered by myst-nb)
-* lecture-deck PDFs          -> ``docs/_extra/``   (copied verbatim into the
-                                                    HTML output via
-                                                    ``html_extra_path``)
+* ``Chapters/chapter_NN/chapter_NN_lab.ipynb``   -> ``docs/labs/``
+* ``Advanced/*/*_lab.ipynb``                       -> ``docs/advanced_labs/``
+  (both rendered by myst-nb)
+* every deck PDF, course and advanced           -> ``docs/_extra/slides/``
+  (copied verbatim into the HTML output via ``html_extra_path``)
 
 The mock exams are deliberately **not** staged: they are assessment material,
 kept out of the public repository (see ``.gitignore``) and therefore off the
-published site.
+published site.  The project starters are not staged either — the projects page
+links them on GitHub and in Colab, because a starter is meant to be run rather
+than read.
 
-Both staging directories are generated and git-ignored; nothing is edited in
+All staging directories are generated and git-ignored; nothing is edited in
 place and no source file is ever written back to.
 """
 
@@ -32,12 +35,12 @@ logger = sphinx_logging.getLogger(__name__)
 HERE = Path(__file__).parent.resolve()
 ROOT = HERE.parent
 
-LABS_SRC = ROOT / "Lab_Notebooks"
+LABS_SRC = ROOT / "Chapters"
 LABS_DST = HERE / "labs"
 
-ADV_LABS_SRC = ROOT / "Advanced" / "Lab_Notebooks"
+ADV_LABS_SRC = ROOT / "Advanced"
 ADV_LABS_DST = HERE / "advanced_labs"
-ADV_SLIDES = ROOT / "Advanced" / "Lecture_Slides"
+ADV_SLIDES = ROOT / "Advanced"
 
 EXTRA = HERE / "_extra"
 
@@ -69,14 +72,14 @@ def stage_materials(app=None, config=None) -> None:
     if LABS_DST.exists():
         shutil.rmtree(LABS_DST)
     LABS_DST.mkdir(parents=True, exist_ok=True)
-    for nb in sorted(LABS_SRC.glob("chapter_*_lab.ipynb")):
+    for nb in sorted(LABS_SRC.glob("chapter_*/chapter_*_lab.ipynb")):
         shutil.copy2(nb, LABS_DST / nb.name)
 
     # Advanced-module notebooks -> docs/advanced_labs/
     if ADV_LABS_DST.exists():
         shutil.rmtree(ADV_LABS_DST)
     ADV_LABS_DST.mkdir(parents=True, exist_ok=True)
-    for nb in sorted(ADV_LABS_SRC.glob("advanced_*_lab.ipynb")):
+    for nb in sorted(ADV_LABS_SRC.glob("advanced_*/advanced_*_lab.ipynb")):
         shutil.copy2(nb, ADV_LABS_DST / nb.name)
 
     # Lecture decks -> docs/_extra/slides/
@@ -84,14 +87,14 @@ def stage_materials(app=None, config=None) -> None:
         shutil.rmtree(EXTRA)
     for ch in SLIDE_CHAPTERS:
         name = f"chapter_{ch}.pdf"
-        if not _copy(ROOT / "Lecture_Slides" / f"chapter_{ch}" / name, EXTRA / "slides" / name):
-            missing.append(f"Lecture_Slides/chapter_{ch}/{name}")
+        if not _copy(ROOT / "Chapters" / f"chapter_{ch}" / name, EXTRA / "slides" / name):
+            missing.append(f"Chapters/chapter_{ch}/{name}")
 
     # Advanced-module decks -> docs/_extra/slides/
     for mod in ADV_MODULES:
         name = f"{mod}.pdf"
         if not _copy(ADV_SLIDES / mod / name, EXTRA / "slides" / name):
-            missing.append(f"Advanced/Lecture_Slides/{mod}/{name}")
+            missing.append(f"Advanced/{mod}/{name}")
 
     EXTRA.mkdir(parents=True, exist_ok=True)  # keep html_extra_path valid
 

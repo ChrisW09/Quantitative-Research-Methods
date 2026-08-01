@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-SLIDES = ROOT / "Lecture_Slides"
+SLIDES = ROOT / "Chapters"
 
 # Anything above this is worth fixing; below it the eye cannot see the overflow.
 TOLERANCE_PT = 12.0
@@ -24,6 +24,12 @@ def main() -> None:
     for folder in sorted(SLIDES.glob("chapter_*")):
         log = folder / f"{folder.name}.log"
         pdf = folder / f"{folder.name}.pdf"
+        # Chapters 9, 11 and 12 are untaught code references: the folder holds a
+        # notebook and no deck at all. That is by design, not a missing build,
+        # so say so rather than reporting a deck that was never meant to exist.
+        if not (folder / f"{folder.name}.tex").exists():
+            rows.append((folder.name, None, None, None, "no deck (code reference)"))
+            continue
         if not log.exists():
             rows.append((folder.name, None, None, None, "not compiled"))
             continue
