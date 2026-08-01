@@ -2,11 +2,11 @@
 
 The course materials live outside ``docs/``: each chapter keeps its deck and its
 lab together in ``Chapters/chapter_NN/``, and each advanced module does the same
-in ``Advanced/advanced_NN_topic/``.  Sphinx can only read sources from inside
+in ``Chapters/Advanced/advanced_NN_topic/``.  Sphinx can only read sources from inside
 the source directory, so before the build starts we stage what the site needs:
 
 * ``Chapters/chapter_NN/chapter_NN_lab.ipynb``   -> ``docs/labs/``
-* ``Advanced/*/*_lab.ipynb``                       -> ``docs/advanced_labs/``
+* ``Chapters/Advanced/*/*_lab.ipynb``                       -> ``docs/advanced_labs/``
   (both rendered by myst-nb)
 * every deck PDF, course and advanced           -> ``docs/_extra/slides/``
   (copied verbatim into the HTML output via ``html_extra_path``)
@@ -38,9 +38,9 @@ ROOT = HERE.parent
 LABS_SRC = ROOT / "Chapters"
 LABS_DST = HERE / "labs"
 
-ADV_LABS_SRC = ROOT / "Advanced"
+ADV_LABS_SRC = ROOT / "Chapters" / "Advanced"
 ADV_LABS_DST = HERE / "advanced_labs"
-ADV_SLIDES = ROOT / "Advanced"
+ADV_SLIDES = ROOT / "Chapters" / "Advanced"
 
 EXTRA = HERE / "_extra"
 

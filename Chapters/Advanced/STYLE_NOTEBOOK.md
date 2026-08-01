@@ -23,8 +23,8 @@ This brief lets you write a Jupyter notebook indistinguishable from the existing
 *This notebook runs on Colab as-is. The badge link above and the `GITHUB_RAW` line in the setup cell already point to this repository, so everything installs and loads automatically.*
 ```
 
-For a notebook living in **`Advanced/`**, the badge URL path must be
-`.../blob/main/Advanced/chapter_XX_lab.ipynb` (only the path segment
+For a notebook living in **`Chapters/Advanced/`**, the badge URL path must be
+`.../blob/main/Chapters/Advanced/chapter_XX_lab.ipynb` (only the path segment
 changes; repo stays `ChrisW09/Quantitative-Research-Methods`).
 
 **Cell 1 — markdown, header:**
@@ -141,10 +141,10 @@ def load(name, **read_csv_kwargs):
         f"Could not load {name!r}. Put the CSV in '{CSV}/' or check your connection for the GITHUB_RAW fallback.")
 ```
 
-**Adaptations for a notebook in `Advanced/`:** none inside this cell
+**Adaptations for a notebook in `Chapters/Advanced/`:** none inside this cell
 except awareness — the `_CANDIDATES` list already contains
 `'../../ALL CSV FILES - 2nd Edition'`, which is exactly the relative path from
-`Advanced/` to the repo-root CSV folder, so local loading works as-is.
+`Chapters/Advanced/` to the repo-root CSV folder, so local loading works as-is.
 Only the Colab badge URL in cell 0 changes (see above). If the chapter needs extra
 pip packages on Colab (e.g. `pygam`), add them to the `for _pkg, _imp in [...]` list.
 
@@ -216,7 +216,7 @@ self-study; numbered as the next section, e.g. `## 5. Exercises` / `## 6. Exerci
 - **`ISLP` is NOT installed locally.** The setup cell's CSV fallback must carry the
   whole notebook: every dataset you use must exist as
   `ALL CSV FILES - 2nd Edition/<Name>.csv` at the repo root (reachable via the
-  `'../../ALL CSV FILES - 2nd Edition'` candidate from `Advanced/`), or be
+  `'../../ALL CSV FILES - 2nd Edition'` candidate from `Chapters/Advanced/`), or be
   simulated. Expect and keep the printed line `ISLP not installed; using CSV / URL
   fallbacks.` in the stored setup-cell output.
 - **`seaborn` is NOT installed.** matplotlib (plus pandas plotting) only.
@@ -241,7 +241,7 @@ self-study; numbered as the next section, e.g. `## 5. Exercises` / `## 6. Exerci
 
 ## 6. Checklist before committing
 
-1. Badge URL points at the notebook's real path under `Advanced/`.
+1. Badge URL points at the notebook's real path under `Chapters/Advanced/`.
 2. Header cell: title, "Lab:" subtitle, Course / Instructor (Prof. Dr. Christoph
    Weisser, HSBI) / Source lines present.
 3. Setup cell verbatim (plus any Colab-only extra packages) and `rng = np.random.default_rng(2024)`.

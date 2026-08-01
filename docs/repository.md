@@ -16,22 +16,22 @@ shape.
 .
 ├── Chapters/                        # one folder per ISLP chapter — deck + lab together
 │   ├── README.md                    #   deck guide: design, exercise counts, lecture plan
-│   └── chapter_NN/
-│       ├── chapter_NN.tex           #   deck source
-│       ├── chapter_NN.pdf           #   compiled deck (committed)
-│       ├── chapter_NN_lab.ipynb     #   companion lab, with stored outputs
-│       ├── images/                  #   matplotlib figures used by the deck
-│       └── make_figures.py          #   (chapter_00, chapter_00b) regenerates them
-├── Advanced/                        # four optional self-study modules, same shape
-│   ├── README.md
-│   ├── STYLE_DECK.md                #   the house style, distilled, for adding a module
-│   ├── STYLE_NOTEBOOK.md
-│   └── advanced_NN_topic/
-│       ├── advanced_NN_topic.tex    #   deck, PDF, lab, figures — as above
-│       ├── advanced_NN_topic.pdf
-│       ├── advanced_NN_topic_lab.ipynb
-│       ├── images/
-│       └── make_figures.py
+│   ├── chapter_NN/
+│   │   ├── chapter_NN.tex           #   deck source
+│   │   ├── chapter_NN.pdf           #   compiled deck (committed)
+│   │   ├── chapter_NN_lab.ipynb     #   companion lab, with stored outputs
+│   │   ├── images/                  #   matplotlib figures used by the deck
+│   │   └── make_figures.py          #   (chapter_00, chapter_00b) regenerates them
+│   └── Advanced/                    #   four optional self-study modules, same shape
+│       ├── README.md
+│       ├── STYLE_DECK.md            #   the house style, distilled, for a new module
+│       ├── STYLE_NOTEBOOK.md
+│       └── advanced_NN_topic/
+│           ├── advanced_NN_topic.tex
+│           ├── advanced_NN_topic.pdf
+│           ├── advanced_NN_topic_lab.ipynb   #  deck, PDF, lab, figures — as above
+│           ├── images/
+│           └── make_figures.py
 ├── Projects/                        # six short projects: a decision on real data
 │   ├── README.md
 │   └── project_N_slug/

@@ -33,7 +33,7 @@ lectures keep their numbers 1–12, which is what the exam calendar and the
 | 3 | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, *t*, *F*) | 3.1–3.6 |
 | 4 | Ch 3 (part 2) | Qualitative predictors; interactions; diagnostics; KNN vs. OLS; lab | 3.7–3.12 |
 | 5 | Ch 4 (part 1) | Logistic regression; odds; multiple logistic regression; confounding | 4.1–4.4 |
-| 6 | Ch 4 (part 2) | LDA, QDA, naive Bayes; confusion matrix; ROC/AUC; lab | 4.5–4.10 |
+| 6 | Ch 4 (part 2) | The confusion matrix; ROC/AUC; lab — the generative models (LDA, QDA, naive Bayes) are appendix material | 4.8–4.10 |
 | 7 | Ch 5 | Validation set, LOOCV, *k*-fold CV, the bootstrap | 5.1–5.6 |
 | 8 | Ch 6 | Subset selection; Cₚ/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
 | 9 | Ch 7 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
@@ -50,7 +50,7 @@ you stop and resume cleanly:
 - **Ch 2** — after "regression vs. classification" (p. 42); assessing accuracy,
   bias–variance and KNN open Lecture 2
 - **Ch 3** — after multiple regression and the four questions (p. 76)
-- **Ch 4** — after the Bayes-theorem framing (p. 46), immediately before LDA
+- **Ch 4** — after the logistic-regression section (p. 42); the confusion matrix, ROC/AUC and the lab open Lecture 6
 ```
 
 ```{admonition} One session, two decks — so it is a selection

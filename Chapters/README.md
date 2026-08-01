@@ -81,7 +81,7 @@ works as homework.
 | 1  | the design matrix entry by entry · the two dataset lookup tables | 6 |
 | 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 8 |
 | 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 11 |
-| 4  | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression | 15 |
+| 4  | **the generative models in full — Bayes refresher, LDA, QDA, naive Bayes, with Exercises 4.5–4.7** · how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · **comparing the classifiers, with Extended Exercise 4.4** · GLMs and Poisson regression | 43 |
 | 5  | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 7 |
 | 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
 | 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
@@ -98,7 +98,7 @@ works as homework.
 | 1  | Introduction | 3 | 1 | 68 + 6 |
 | 2  | Statistical Learning | 8 | 4 | 105 + 8 |
 | 3  | Linear Regression | 12 | 6 | 142 + 11 |
-| 4  | Classification | 10 | 6 | 110 + 15 |
+| 4  | Classification | 10 | 6 | 82 + 43 |
 | 5  | Resampling Methods | 6 | 3 | 77 + 7 |
 | 6  | Linear Model Selection & Regularization | 7 | 3 | 79 + 11 |
 | 7  | Moving Beyond Linearity | 6 | 3 | 83 + 7 |
@@ -121,7 +121,7 @@ section boundary so you can stop and resume cleanly.
 | 3  | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, t, F) | 3.1–3.6 |
 | 4  | Ch 3 (part 2) | Qualitative predictors; interactions; diagnostics; KNN vs OLS; lab | 3.7–3.12 |
 | 5  | Ch 4 (part 1) | Logistic regression; odds; multiple logistic; confounding | 4.1–4.4 |
-| 6  | Ch 4 (part 2) | LDA, QDA, naive Bayes; confusion matrix, ROC/AUC; lab | 4.5–4.10 |
+| 6  | Ch 4 (part 2) | The confusion matrix, ROC/AUC; lab — generative models are appendix material | 4.8–4.10 |
 | 7  | Ch 5 | Validation set, LOOCV, k-fold CV, the bootstrap | 5.1–5.6 |
 | 8  | Ch 6 | Subset selection; Cp/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
 | 9  | Ch 7 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
@@ -131,7 +131,7 @@ section boundary so you can stop and resume cleanly.
 
 For the split lectures, the recommended stopping points are: **Ch 2** after the
 KNN / bias–variance material; **Ch 3** after "Goodness of fit / the four
-questions"; **Ch 4** after multiple logistic regression (before LDA).
+questions"; **Ch 4** after the logistic-regression section (p. 42), so evaluation and the lab open Lecture 6.
 
 The plan above covers the main flow of each deck. Appendix pages sit outside it
 — assign them, or reach for them when a room wants the derivation.

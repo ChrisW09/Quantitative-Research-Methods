@@ -14,7 +14,7 @@ Slide counts below are live figures from the compiled decks, written
 **main flow + appendix**; the per-session detail is in
 [`runsheets/`](./runsheets/). For the three decks that span
 two sessions the column gives the pages taught in that session instead; their
-appendices (`chapter_02` +8, `chapter_03` +11, `chapter_04` +15) sit outside
+appendices (`chapter_02` +8, `chapter_03` +11, `chapter_04` +43) sit outside
 both halves. Every deck ends with an appendix holding the optional, more
 advanced material (formal derivations, the heaviest worked exercises, side
 topics); the timed plans in the runsheets cover the main flow only, so the
@@ -29,8 +29,8 @@ appendix pages are extra material to assign, not to teach.
 | 2 | Statistical Learning II | `chapter_02` | pp. 43–107 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
 | 3 | Linear Regression I | `chapter_03` | pp. 1–76 | 3.1–3.6 | Stop after multiple regression and the four questions |
 | 4 | Linear Regression II | `chapter_03` | pp. 77–144 | 3.7–3.12 | **Mock Exam 1 after this week** |
-| 5 | Classification I | `chapter_04` | pp. 1–46 | 4.1–4.4 | Stop after the Bayes-theorem framing, before LDA |
-| 6 | Classification II | `chapter_04` | pp. 47–112 | 4.5–4.10 | LDA/QDA, naive Bayes, ROC, lab · **release Short Exam A** |
+| 5 | Classification I | `chapter_04` | pp. 1–42 | 4.1–4.4 | Logistic regression end to end; stop after the section, before evaluation |
+| 6 | Classification II | `chapter_04` | pp. 43–82 | 4.8–4.10 | Confusion matrix, ROC/AUC, lab (LDA/QDA and naive Bayes are appendix material) · **release Short Exam A** |
 | 7 | Resampling | `chapter_05` | 79 + 7 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap · **release Short Exam B** |
 | 8 | Model Selection & Regularisation | `chapter_06` | 81 + 11 | 7 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
 | 9 | Beyond Linearity | `chapter_07` | 85 + 7 | 6 + 3 | Polynomials, splines, GAMs |
@@ -53,7 +53,7 @@ resume without a dangling thread:
 |---|---|---|
 | `chapter_02` | "regression vs. classification" (p. 42) | Part 1 is the framing — what *f* is, and how flexible to make it; assessing accuracy, bias–variance and KNN open part 2 |
 | `chapter_03` | multiple regression and the four questions (p. 76) | Part 1 is estimation and inference; part 2 is everything that complicates it |
-| `chapter_04` | the Bayes-theorem framing, before LDA (p. 46) | Part 1 is one method done properly; part 2 is the alternatives and how to compare them |
+| `chapter_04` | the end of the logistic-regression section (p. 42) | Part 1 is the model itself — fitting, interpreting, confounding; part 2 is judging any classifier: confusion matrix, ROC/AUC, and the lab |
 
 ## If you are behind
 

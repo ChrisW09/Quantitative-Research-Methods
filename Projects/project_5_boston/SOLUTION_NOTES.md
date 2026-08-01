@@ -249,7 +249,7 @@ fails the central requirement of the brief, and the mark should show it.
 
 ## 6. Extensions
 
-- **`Advanced/` module A3 — Conformal Prediction** is the natural next step, and it is a precise
+- **`Chapters/Advanced/` module A3 — Conformal Prediction** is the natural next step, and it is a precise
   fit to this problem. The normal-theory prediction interval inherits every assumption of the
   model: homoscedastic, normal errors, and correct specification. None holds here — the errors
   fan out with the fitted value, and the target is censored, so the model is misspecified in a way
@@ -262,7 +262,7 @@ fails the central requirement of the brief, and the mark should show it.
   being cross-examined actually wants. A3 also covers **CQR**, which lets the interval widen where
   the market is volatile instead of carrying one width everywhere; here the constant-width normal
   interval is visibly too wide for cheap tracts and too narrow for expensive ones.
-- **`Advanced/` module A4 — GLMs and Splines** formalises the Chapter 7 machinery this project
+- **`Chapters/Advanced/` module A4 — GLMs and Splines** formalises the Chapter 7 machinery this project
   leans on: penalised splines, effective degrees of freedom, and why a penalty is the principled
   answer to the ill-conditioned basis rather than the ad-hoc ridge used above.
 - **The censoring, properly.** A **Tobit** model (or interval regression treating the 50.0 records

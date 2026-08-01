@@ -93,7 +93,7 @@
      & 1 & Ch.\ 1 + 2 --- Introduction; what is statistical learning \\
      & 2 & Ch.\ 2 --- Accuracy, bias--variance, Bayes classifier, KNN \\
      & 3--4 & Ch.\ 3 --- Linear regression (estimation, inference, diagnostics) \\
-    $\blacktriangleright$ & \textbf{5--6} & \textbf{Ch.\ 4 --- Classification (logistic, LDA/QDA, naive Bayes, ROC)} \\
+    $\blacktriangleright$ & \textbf{5--6} & \textbf{Ch.\ 4 --- Classification (logistic regression, confusion matrix, ROC/AUC)} \\
      & 7 & Ch.\ 5 --- Resampling (validation, CV, bootstrap) \\
      & 8 & Ch.\ 6 --- Model selection and regularisation (ridge, lasso) \\
      & 9 & Ch.\ 7 --- Moving beyond linearity (splines, GAMs) \\
@@ -110,7 +110,10 @@
 \begin{frame}{Contents}\small
   \tableofcontents[hideallsubsections]
   \vfill
-  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
+  {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the
+  deck: the \textbf{generative models} (Bayes refresher, LDA, QDA, naive Bayes, Exercises
+  4.5--4.7), the classifier comparison (Extended Exercise 4.4), the derivations
+  (Extended Exercises 4.2--4.3), and GLMs / Poisson regression.}
 \end{frame}
 
 \begin{frame}{Notation in this chapter}
@@ -124,16 +127,20 @@
     $p(X)/(1-p(X))$ & odds of class $1$ (ranges over $(0,\infty)$) \\
     $\log\bigl[p(X)/(1-p(X))\bigr]$ & log-odds (logit); linear in $X$ in logistic regression \\
     $\beta_0,\beta_1,\dots$;\ $e^{\beta_j}$ & coefficients; multiplicative effect of $X_j$ on the odds \\
-    $\pi_k$ & prior probability of class $k$ \\
-    $f_k(x)$ & class-conditional density of $X$ within class $k$ \\
-    $\mu_k$, $\Sigma$ & class-$k$ mean vector; (shared) covariance matrix \\
-    $\delta_k(x)$ & discriminant score of class $k$; predict the largest \\
+    $\pi_k$ & prior probability of class $k$ \quad\emph{(appendix)} \\
+    $f_k(x)$ & class-conditional density of $X$ within class $k$ \quad\emph{(appendix)} \\
+    $\mu_k$, $\Sigma$ & class-$k$ mean vector; (shared) covariance matrix \quad\emph{(appendix)} \\
+    $\delta_k(x)$ & discriminant score of class $k$; predict the largest \quad\emph{(appendix)} \\
     TP, FP, TN, FN & true/false positives and negatives (confusion matrix) \\
     sensitivity; specificity & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$;\ \ $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ \\
     AUC & area under the ROC curve (threshold-free ranking quality) \\
     \bottomrule
   \end{tabular}
   \end{center}
+  \vspace{2pt}
+  {\scriptsize Symbols marked \emph{(appendix)} belong to the generative
+  models (LDA, QDA, naive Bayes), which are optional material at the end of
+  the deck.}
 \end{frame}
 
 \begin{frame}{Sources and references}
@@ -156,31 +163,41 @@
           a categorical response.
     \item \textbf{Fit} logistic regression by maximum likelihood and
           \textbf{interpret} its coefficients on the odds scale.
-    \item \textbf{Derive} linear and quadratic discriminant analysis
-          (LDA, QDA) from Bayes' theorem.
-    \item \textbf{Distinguish} logistic regression, LDA, QDA, naive
-          Bayes, and KNN classifiers; choose the right one.
+    \item \textbf{Extend} the model to several predictors and
+          \textbf{recognise} confounding in the fitted coefficients.
     \item \textbf{Read} confusion matrices, sensitivity, specificity,
-          ROC (receiver operating characteristic) curves, and AUC; \textbf{tune} the threshold to your loss
-          function.
-    \item \textbf{Generalise} to multinomial responses and Poisson
-          regression through the GLM framework.
+          precision, ROC (receiver operating characteristic) curves, and AUC;
+          \textbf{tune} the threshold to your loss function.
+    \item \textbf{Run} the whole workflow in Python
+          (\texttt{statsmodels} and \texttt{scikit-learn}).
   \end{itemize}
+  \vspace{1mm}
+  {\footnotesize \textbf{Optional (appendix).} The \emph{generative} classifiers ---
+  the Bayes refresher, LDA, QDA and naive Bayes, their comparison with logistic
+  regression and KNN, and the GLM / Poisson extension --- are covered in the
+  appendix and are not part of the taught thread.}
 \end{frame}
 
 
 \begin{frame}{Roadmap of this chapter}
-  \begin{takeaway}[Five families of classifiers]
+  \begin{takeaway}[The taught thread --- one model done properly]
     \begin{enumerate}
-      \item Logistic regression --- discriminative, log-odds linear.
-      \item LDA --- generative, common covariance.
-      \item QDA --- generative, class-specific covariance.
-      \item Naive Bayes --- generative, independence assumption.
-      \item KNN --- nonparametric (revisited from Ch.~2).
+      \item \textbf{Why} linear regression fails on a categorical response.
+      \item \textbf{Logistic regression} --- discriminative, linear in the
+            log-odds: the model, maximum likelihood, coefficients on the odds
+            scale, several predictors and confounding.
+      \item \textbf{Evaluation} --- confusion matrix, sensitivity /
+            specificity / precision, ROC and AUC, choosing the threshold.
+      \item \textbf{Python lab} --- the same workflow end-to-end.
     \end{enumerate}
   \end{takeaway}
-  Plus: confusion matrices, ROC/AUC, and the GLM framework that ties
-  linear, logistic, and Poisson regression together.
+  \begin{block}{In the appendix (optional)}
+    \footnotesize
+    The \emph{generative} family --- LDA, QDA and naive Bayes, built from
+    Bayes' theorem --- together with the head-to-head comparison against
+    logistic regression and KNN, and the GLM framework that ties linear,
+    logistic and Poisson regression together.
+  \end{block}
 \end{frame}
 
 % ============================================================
@@ -304,8 +321,8 @@ reverses the fitted ordering although the data are unchanged. Because
 the answer depends on an arbitrary
 choice, linear regression is \emph{not appropriate} for an unordered
 multiclass response. (For two classes, $0/1$ OLS happens to give the
-same classification as LDA, but its fitted values are still not valid
-probabilities.)
+same classification as linear discriminant analysis --- see the appendix
+--- but its fitted values are still not valid probabilities.)
 
 \vspace{1mm}
 \textbf{Interpretation.} What we actually need is a model that outputs
@@ -341,7 +358,7 @@ model specification, not in sampling noise.
       Underwriting referral; claims-fraud and claims-severity triage &
       Which applications and claims a human examines \\
     Healthcare, pharma &
-      Diagnostic and screening tests; biomarker and spectral panels (a classic home of LDA) &
+      Diagnostic and screening tests; biomarker and spectral panels (classic LDA territory: appendix) &
       Who is referred for a confirmatory test \\
     Tech, operations &
       Spam, content and support-ticket classification (multinomial) &
@@ -946,8 +963,904 @@ the latter adds $120$ to $\eta$ and drives every probability to $1$.
 \end{frame}
 
 % ============================================================
-\section{Generative models}
+\section{Evaluation}
 % ============================================================
+\subsection{Confusion matrix}
+
+\begin{frame}{Why we need more than ``accuracy''}
+  Imagine a fraud detector with $99\,\%$ accuracy on a stream where
+  $1\,\%$ of transactions are fraudulent.
+  \begin{alertblock}{The trivial classifier}
+    The model that simply \emph{always predicts ``no fraud''} has
+    accuracy $99\,\%$ --- and detects zero fraud.
+  \end{alertblock}
+  \begin{takeaway}
+    Accuracy alone is uninformative on imbalanced data. We need to
+    decompose it into the four cells of a \emph{confusion matrix}.
+  \end{takeaway}
+  \begin{industry}[Payments: fraud and AML screening]
+    This is not a toy example --- it is how card fraud and money-laundering alerts
+    actually look. A missed fraud costs the chargeback; a false positive blocks a
+    good customer at checkout. Fraud teams therefore price each cell of the
+    matrix, and set the threshold to the number of alerts their reviewers can
+    actually work through in a day.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{The confusion matrix}
+  After choosing a threshold (default $0.5$), tabulate predicted vs.\
+  actual:
+  \begin{center}
+  \begin{tabular}{l|cc|c}
+    \toprule
+    & Pred.\ neg.\ & Pred.\ pos.\ & Total \\
+    \midrule
+    True neg.\ & TN & FP & N \\
+    True pos.\ & FN & TP & P \\
+    \midrule
+    Total & N$^*$ & P$^*$ & n \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{readme}
+    \begin{itemize}
+      \item Sensitivity / recall: $\mathrm{TP}/(\mathrm{TP+FN})$ ---
+            of true positives, how many did we catch?
+      \item Specificity: $\mathrm{TN}/(\mathrm{TN+FP})$ --- of true
+            negatives, how many did we correctly leave alone?
+      \item Precision: $\mathrm{TP}/(\mathrm{TP+FP})$ --- of those we
+            flagged, how many were truly positive?
+    \end{itemize}
+  \end{readme}
+\end{frame}
+
+\begin{frame}{The confusion matrix as a picture}
+  \begin{center}
+    \begin{tikzpicture}[scale=0.9,font=\small,
+        cell/.style={minimum width=2.5cm,minimum height=1.6cm,draw=black!45,align=center}]
+      \node[font=\bfseries] at (1.25,3.0) {Actual $+$};
+      \node[font=\bfseries] at (3.75,3.0) {Actual $-$};
+      \node[rotate=90,font=\bfseries] at (-0.75,1.7) {Predicted $+$};
+      \node[rotate=90,font=\bfseries] at (-0.75,0.1) {Predicted $-$};
+      \node[cell,fill=green!18] at (1.25,1.7) {\textbf{TP}\\true positive};
+      \node[cell,fill=red!13]   at (3.75,1.7) {\textbf{FP}\\false positive};
+      \node[cell,fill=red!13]   at (1.25,0.1) {\textbf{FN}\\false negative};
+      \node[cell,fill=green!18] at (3.75,0.1) {\textbf{TN}\\true negative};
+      \node[anchor=west] at (5.4,2.05)
+        {\textcolor{green!45!black}{\textbf{Sensitivity}} $=\dfrac{\mathrm{TP}}{\mathrm{TP+FN}}$};
+      \node[anchor=west] at (5.4,0.9)
+        {\textcolor{green!45!black}{\textbf{Specificity}} $=\dfrac{\mathrm{TN}}{\mathrm{TN+FP}}$};
+      \node[anchor=west] at (5.4,-0.25)
+        {\textcolor{accent}{\textbf{Precision}} $=\dfrac{\mathrm{TP}}{\mathrm{TP+FP}}$};
+    \end{tikzpicture}
+  \end{center}
+  \begin{takeaway}
+    The diagonal cells --- TP and TN --- are the correct decisions; FP and
+    FN are the two error types. Sensitivity reads down the true-positive
+    column; specificity down the true-negative column; precision across the
+    predicted-positive row.
+  \end{takeaway}
+\end{frame}
+
+
+% ---------------- Exercise 4.8 ----------------
+\begin{frame}{Exercise 4.8 \textemdash{} Reading a confusion matrix [Concept]}
+\begin{exercise}
+A classifier fitted to the Default data ($n=10{,}000$), scored at
+threshold $0.5$, gives:
+\begin{center}\small
+\begin{tabular}{l|cc|c}
+\toprule
+ & Pred.\ No & Pred.\ Yes & Total \\
+\midrule
+True No  & 9644 & 23 & 9667 \\
+True Yes & 252  & 81 & 333 \\
+\midrule
+Total & 9896 & 104 & 10000 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Compute (a) the accuracy and error rate, (b) sensitivity/recall,
+(c) specificity, (d) precision. (e) Given that only $3.3\%$ of
+customers default, comment on how good this classifier really is.
+\end{exercise}
+{\scriptsize Nothing here depends on \emph{which} classifier produced the
+table --- these are the ISLP Table~4.4 counts (LDA; appendix).}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Exercise 4.8 (1/2)}
+\begin{solutionbox}
+\textbf{Method.} First pin down the four cells --- every metric is a
+ratio of them:
+$\mathrm{TN}=9644$, $\mathrm{FP}=23$, $\mathrm{FN}=252$,
+$\mathrm{TP}=81$, with $P=333$ actual defaulters and $N=9667$ actual
+non-defaulters.
+
+\vspace{1mm}
+\textbf{(a) Accuracy} $=\dfrac{9644+81}{10000}=\dfrac{9725}{10000}
+=0.9725$; error rate $=1-0.9725=2.75\%$.
+
+\textbf{(b) Sensitivity} $=\dfrac{\mathrm{TP}}{P}=\dfrac{81}{333}
+\approx 0.243$: of the $333$ customers who really default, the
+classifier catches only $81$ and misses $252$.
+
+\textbf{(c) Specificity} $=\dfrac{\mathrm{TN}}{N}=\dfrac{9644}{9667}
+\approx 0.9976$: non-defaulters are almost never disturbed (only $23$
+false alarms).
+
+\textbf{(d) Precision} $=\dfrac{\mathrm{TP}}{\mathrm{TP+FP}}
+=\dfrac{81}{104}\approx 0.779$: of the $104$ customers flagged, $81$
+truly default.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Exercise 4.8 (2/2)}
+\begin{solutionbox}
+\textbf{(e) Interpretation.}
+The trivial classifier that \emph{always predicts ``No''} has an error
+rate of $333/10000=3.33\%$ --- barely worse than the model's $2.75\%$. So
+almost all of the headline accuracy comes from the $96.7\%$ base rate
+of non-defaulters, not from skill. The
+high accuracy hides a poor sensitivity: the model \emph{misses
+$252/333=75.7\%$ of actual defaulters}. For a bank a missed defaulter
+(FN) is the expensive kind of error,
+which motivates lowering the classification threshold --- the subject
+of the next exercise.
+
+\vspace{1mm}
+\textbf{Takeaway.} On imbalanced data always report the pair
+(sensitivity, specificity) --- accuracy alone can be matched by a
+classifier that does nothing.
+\end{solutionbox}
+\begin{mistake}
+mixing up sensitivity and precision. Both have
+TP on top, but sensitivity divides by the \emph{actual} positives
+($\mathrm{TP+FN}=333$) while precision divides by the \emph{predicted}
+positives ($\mathrm{TP+FP}=104$) --- here $24.3\%$ vs.\ $77.9\%$, a
+huge difference.
+\end{mistake}
+\end{frame}
+
+\subsection{ROC and AUC}
+
+\begin{frame}{Why a single threshold is not enough}
+  Predicting ``positive'' at $\hat p > 0.5$ is only \emph{one} operating
+  point; any threshold $t$ trades sensitivity vs.\ specificity:
+  \vspace{-1mm}
+  \begin{center}
+    \includegraphics[width=0.84\textwidth,height=0.40\textheight,keepaspectratio]{ch04_x_threshold.png}
+  \end{center}
+  \vspace{-2mm}
+  \begin{takeaway}
+    Lower $t$ $\Rightarrow$ more true positives (sensitivity $\uparrow$)
+    but more false alarms (specificity $\downarrow$); raise $t$ for the
+    reverse. Choose $t$ by the cost of a false negative vs.\ a false
+    positive --- a cancer screen lowers it, a spam filter raises it.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{The ROC curve}
+  \begin{center}
+    \includegraphics[width=0.50\textwidth,height=0.46\textheight,keepaspectratio]{4_8.pdf}
+  \end{center}
+  \begin{readme}
+    $y$-axis $=$ sensitivity (true-positive rate); $x$-axis $=1-$
+    specificity (false-positive rate). Each point is \emph{one}
+    threshold; the $45^\circ$ diagonal is random guessing --- top-left is
+    better.
+  \end{readme}
+  \islpsource{Figure 4.8}
+\end{frame}
+
+\begin{frame}{ROC and AUC on the Default data}
+  \begin{center}
+    \includegraphics[width=0.88\textwidth,height=0.55\textheight,keepaspectratio]{ch04_roc.png}
+  \end{center}
+  \begin{takeaway}
+    A high AUC means the model ranks defaulters above non-defaulters. The
+    default $0.5$ cutoff sits low on the curve; lowering it trades
+    specificity for sensitivity.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{AUC: area under the ROC curve}
+  \begin{block}{Probabilistic interpretation}
+    AUC $= \Pr\bigl(\hat p(\text{positive}) > \hat p(\text{negative})\bigr)$
+    for a randomly chosen positive--negative pair.
+  \end{block}
+  \begin{readme}
+    \begin{itemize}
+      \item AUC $= 0.5$: model is no better than random.
+      \item AUC $= 1$: perfect ranking of positives above negatives.
+      \item Threshold-free summary; widely used in medicine and
+            credit scoring.
+    \end{itemize}
+  \end{readme}
+  \begin{alertblock}{Caveat under heavy class imbalance}
+    AUC can look misleadingly good when one class is rare. Use
+    precision-recall curves or balanced accuracy in that regime.
+  \end{alertblock}
+\end{frame}
+
+
+% ============================================================
+
+% ---------------- Exercise 4.9 ----------------
+\begin{frame}{Exercise 4.9 \textemdash{} Threshold, ROC and AUC [Concept]}
+\begin{exercise}
+Lowering the threshold of the same classifier to $0.2$ on the same
+Default data gives:
+\begin{center}\small
+\begin{tabular}{l|cc|c}
+\toprule
+ & Pred.\ No & Pred.\ Yes & Total \\
+\midrule
+True No  & 9432 & 235 & 9667 \\
+True Yes & 138  & 195 & 333 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{enumerate}
+  \item Compute sensitivity and specificity at threshold $0.2$ and
+        compare with the $0.5$ results (Exercise 4.8).
+  \item Compute the overall error rate at $0.2$.
+  \item On ROC axes (sensitivity vs.\ $1-$specificity), how does the
+        operating point move as the threshold drops from $0.5$ to $0.2$?
+  \item State the probabilistic meaning of the AUC and why it is
+        threshold-free.
+\end{enumerate}
+\end{exercise}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Exercise 4.9 (1/2)}
+\begin{solutionbox}
+\textbf{Method.} Same model, same data --- only the cutoff moved, so we
+recompute the two rates from the new cell counts
+($\mathrm{TN}=9432$, $\mathrm{FP}=235$, $\mathrm{FN}=138$,
+$\mathrm{TP}=195$) and compare operating points.
+
+\vspace{1mm}
+\textbf{(1) At threshold $0.2$.}
+Sensitivity $=\dfrac{\mathrm{TP}}{\mathrm{TP+FN}}=\dfrac{195}{333}
+\approx 0.586$; specificity
+$=\dfrac{\mathrm{TN}}{\mathrm{TN+FP}}=\dfrac{9432}{9667}\approx 0.9757$.
+Compared with $0.5$ (Exercise 4.8): sensitivity
+rises from $24.3\%$ to $58.6\%$ ($81\to195$ defaulters caught), while
+specificity falls from $99.76\%$ to $97.57\%$ ($23\to235$ false
+alarms).
+
+\vspace{1mm}
+\textbf{(2) Error rate} $=\dfrac{\mathrm{FP+FN}}{n}
+=\dfrac{235+138}{10000}=\dfrac{373}{10000}
+=3.73\%$ (up from $2.75\%$) --- yet arguably the \emph{better} bank
+decision, because the errors it now makes are the cheap kind.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Exercise 4.9 (2/2)}
+\begin{solutionbox}
+\textbf{(3) ROC movement.}
+With $y=$ sensitivity and $x=1-$specificity:
+\[
+  x:\ 1-0.9976=0.0024 \;\to\; 1-0.9757=0.0243, \qquad
+  y:\ 0.243 \;\to\; 0.586 .
+\]
+The operating point moves \emph{up and to the right along the same ROC
+curve}: a small loss of specificity buys a large gain in sensitivity.
+The curve itself is fixed --- it belongs to the model's ranking, and
+each threshold merely picks a point on it.
+
+\vspace{1mm}
+\textbf{(4) AUC.}
+AUC $=\Pr\big(\hat p(\text{a random positive}) >
+\hat p(\text{a random negative})\big)$: the probability the model ranks
+a random defaulter above a random non-defaulter. It integrates over
+\emph{all} thresholds, so it summarises ranking quality independently of
+any single cutoff --- $0.5$ is random guessing, $1$ is a perfect
+ranking.
+\end{solutionbox}
+\begin{mistake}
+expecting the AUC to improve after lowering the
+threshold. Threshold changes slide the operating point \emph{along} the
+curve; they can never move the curve --- only a better model can.
+\end{mistake}
+\end{frame}
+
+% ---------------- Extended Exercise 4.5 ----------------
+\begin{frame}{Extended Exercise 4.5 \textemdash{} Default: logistic, confusion, ROC/AUC [Python]}
+\begin{longexercise}
+Using \texttt{Default.csv}:
+\begin{enumerate}
+  \item Fit a logistic regression of \texttt{default} on \texttt{balance},
+        \texttt{income} and a $0/1$ \texttt{student} indicator
+        (scikit-learn).
+  \item Build the confusion matrix at thresholds $0.5$ and $0.2$.
+  \item At each threshold compute accuracy, sensitivity, specificity and
+        precision.
+  \item Plot the ROC curve, report the AUC, and interpret the whole
+        picture.
+\end{enumerate}
+Write runnable code and state the numbers you expect.
+\end{longexercise}
+\end{frame}
+
+\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.5 (1/3)}
+\begin{solutionbox}
+\begin{lstlisting}
+import pandas as pd                                  # data handling
+from sklearn.linear_model import LogisticRegression  # classifier
+from sklearn.metrics import (confusion_matrix, roc_auc_score,
+                             RocCurveDisplay)        # evaluation tools
+import matplotlib.pyplot as plt                      # plotting
+
+df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Default.csv")  # load
+y  = (df["default"] == "Yes").astype(int)          # encode response as 0/1
+df["stud"] = (df["student"] == "Yes").astype(int)  # dummy-code student
+X  = df[["balance", "income", "stud"]].values      # predictor matrix
+
+clf   = LogisticRegression(max_iter=10000).fit(X, y)  # fit model (MLE)
+proba = clf.predict_proba(X)[:, 1]  # predicted P(default=Yes) per customer
+\end{lstlisting}
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.5 (2/3)}
+\begin{solutionbox}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize\linespread{0.9}\selectfont]
+for t in (0.5, 0.2):                       # two decision thresholds
+    tn, fp, fn, tp = confusion_matrix(y, proba > t).ravel()  # cell counts
+    sens, spec = tp/(tp+fn), tn/(tn+fp)    # sensitivity, specificity
+    prec, acc  = tp/(tp+fp), (tp+tn)/len(y)  # precision, accuracy
+    print(t, tn, fp, fn, tp,               # report all metrics
+          round(acc,3), round(sens,3), round(spec,3), round(prec,3))
+
+print("AUC =", round(roc_auc_score(y, proba), 3))  # threshold-free AUC
+RocCurveDisplay.from_predictions(y, proba); plt.show()  # draw ROC curve
+\end{lstlisting}
+\textbf{Expected} (counts close to):
+\begin{center}\scriptsize
+\begin{tabular}{ccccccccc}
+\toprule
+$t$ & TN & FP & FN & TP & acc & sens & spec & prec\\
+\midrule
+0.5 & 9627 & 40  & 228 & 105 & .973 & .315 & .996 & .724\\
+0.2 & 9390 & 277 & 130 & 203 & .959 & .610 & .971 & .423\\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{-1mm}
+AUC $\approx 0.950$ --- ranking quality, unchanged by the threshold.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.5 (3/3)}
+\begin{solutionbox}
+\textbf{Interpretation.}
+\begin{itemize}
+  \item \textbf{Threshold $0.5$.} Accuracy is high ($97.3\%$) but
+        sensitivity is only $31.5\%$: the model misses about two-thirds of
+        true defaulters. Precision is decent ($72\%$) only because it
+        flags very few customers --- the always-predict-``No'' trap on
+        imbalanced data.
+  \item \textbf{Threshold $0.2$.} Sensitivity nearly doubles (to $61\%$),
+        catching far more defaulters, at the cost of specificity
+        ($99.6\%\!\to\!97.1\%$) and precision ($72\%\!\to\!42\%$): more
+        false alarms. Accuracy dips slightly --- but accuracy is the wrong
+        yardstick here.
+  \item \textbf{ROC / AUC.} AUC $\approx 0.95$ summarises ranking quality
+        over \emph{all} thresholds: a random defaulter outscores a random
+        non-defaulter about $95\%$ of the time. The $0.5$ and $0.2$
+        cut-offs are two operating points on the \emph{same} ROC curve, so
+        the AUC does not change with the threshold.
+\end{itemize}
+Choose the operating point by the bank's relative cost of a missed
+defaulter (FN) versus a false alarm (FP). Note \texttt{sklearn} orders the
+matrix as $[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
+\end{solutionbox}
+\end{frame}
+
+% ============================================================
+\section{Python Lab}
+
+\begin{frame}{Python lab --- run it live in the notebook}
+  \begin{labnote}[Companion notebook: \texttt{chapter\_04\_lab.ipynb}]
+    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
+    \begin{itemize}
+      \item \S1 \emph{Logistic regression}, including \emph{Predicted probabilities};
+      \item the \emph{ROC curves} subsection of \S2;
+      \item \emph{optional:} the rest of \S2, \emph{LDA, QDA, naive Bayes, KNN --- head-to-head}, and \S3 \emph{Poisson regression on Bikeshare} --- both appendix material.
+    \end{itemize}
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
+  \end{labnote}
+\end{frame}
+
+
+% ============================================================
+
+\begin{frame}[fragile]{Logistic regression with statsmodels}
+  \begin{lstlisting}
+import statsmodels.api as sm          # GLM fitting with inference
+from ISLP import load_data            # textbook data loader
+
+Default = load_data("Default")                       # load Default data
+y = (Default["default"] == "Yes").astype(int)        # encode response 0/1
+X = sm.add_constant(Default[["balance", "income"]])  # add intercept column
+
+res = sm.GLM(y, X, family=sm.families.Binomial()).fit()  # logit link fit
+print(res.summary())                  # coefficients, SEs, z, p-values
+  \end{lstlisting}
+  \texttt{statsmodels} reports each coefficient with its standard
+  error, $z$-statistic, and $p$-value, plus deviance-based
+  goodness-of-fit measures.
+\end{frame}
+
+\begin{frame}[fragile]{Logistic regression with scikit-learn}
+  \begin{lstlisting}
+from sklearn.linear_model import LogisticRegression    # classifier
+from sklearn.model_selection import train_test_split   # data splitting
+from sklearn.metrics import classification_report, roc_auc_score
+
+X = Default[["balance", "income"]].values   # predictor matrix
+# hold out 30% as a test set (fixed seed for reproducibility)
+Xtr,Xte,ytr,yte = train_test_split(X, y, test_size=0.3, random_state=0)
+
+lr = LogisticRegression(max_iter=1000).fit(Xtr, ytr)  # fit on training set
+proba = lr.predict_proba(Xte)[:, 1]             # test-set P(default=Yes)
+print(classification_report(yte, proba > 0.5))  # metrics at threshold 0.5
+print("AUC:", roc_auc_score(yte, proba))        # ranking quality
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{ROC curves}
+  \begin{lstlisting}
+from sklearn.metrics import RocCurveDisplay   # ROC plotting helper
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(5, 5))        # one axes, all curves
+RocCurveDisplay.from_estimator(lr, Xte, yte, ax=ax)      # logistic ROC
+ax.plot([0,1], [0,1], "k--", linewidth=0.8)   # chance line (AUC = 0.5)
+ax.set_title("Default: ROC on the held-out 30%"); plt.show()
+  \end{lstlisting}
+  Every extra classifier is one more
+  \texttt{RocCurveDisplay.from\_estimator(...)} call on the same
+  \texttt{ax} --- the appendix does exactly that for LDA and QDA.
+\end{frame}
+
+
+
+% ============================================================
+
+% ---------------- Exercise 4.10 ----------------
+\begin{frame}{Exercise 4.10 \textemdash{} Logistic regression + confusion matrix in Python [Python]}
+\begin{exercise}
+Using \texttt{Default.csv}:
+\begin{enumerate}
+  \item Fit a logistic regression of \texttt{default} on
+        \texttt{balance}, \texttt{income} and a $0/1$ \texttt{student}
+        indicator with scikit-learn.
+  \item Produce the confusion matrix at thresholds $0.5$ and $0.2$.
+  \item Report the sensitivity at each threshold and interpret the
+        trade-off.
+\end{enumerate}
+Write the code and describe the output you expect.
+\end{exercise}
+\end{frame}
+
+\begin{frame}[fragile]{Solution \textemdash{} Exercise 4.10 (1/2)}
+\begin{solutionbox}
+\begin{lstlisting}
+import pandas as pd                                  # data handling
+from sklearn.linear_model import LogisticRegression  # classifier
+from sklearn.metrics import confusion_matrix         # evaluation
+
+df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Default.csv")  # load
+y  = (df["default"] == "Yes").astype(int)          # encode response as 0/1
+df["stud"] = (df["student"] == "Yes").astype(int)  # dummy-code student
+X  = df[["balance", "income", "stud"]].values      # predictor matrix
+
+clf   = LogisticRegression(max_iter=10000).fit(X, y)  # fit model (MLE)
+proba = clf.predict_proba(X)[:, 1]  # predicted P(default=Yes) per customer
+\end{lstlisting}
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}[fragile]{Solution \textemdash{} Exercise 4.10 (2/2)}
+\begin{solutionbox}
+\begin{lstlisting}
+for t in (0.5, 0.2):                    # default and lowered threshold
+    tn, fp, fn, tp = confusion_matrix(y, proba > t).ravel()  # cell counts
+    sens = tp / (tp + fn)               # sensitivity = true-positive rate
+    print(f"t={t}: TN={tn} FP={fp} FN={fn} TP={tp}  sens={sens:.3f}")
+\end{lstlisting}
+
+\textbf{Expected output} (counts close to):
+\begin{lstlisting}
+t=0.5: TN=9627 FP=40  FN=228 TP=105  sens=0.315
+t=0.2: TN=9390 FP=277 FN=130 TP=203  sens=0.610
+\end{lstlisting}
+
+\textbf{Interpretation.} At the default threshold $0.5$ the model is
+very accurate overall but has \emph{low sensitivity} (about $30\%$): it
+misses most true defaulters, exactly as in Exercise 4.8. Dropping the threshold
+to $0.2$ roughly doubles sensitivity (to about $60\%$) by flagging more
+customers, at the cost of more false positives (lower specificity). The
+right threshold depends on the bank's relative cost of a missed
+defaulter versus a false alarm. Note \texttt{sklearn}'s
+\texttt{confusion\_matrix} orders cells as
+$[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
+\end{solutionbox}
+\end{frame}
+
+% ---------------- Extended Exercise 4.6 ----------------
+\begin{frame}{Extended Exercise 4.6 \textemdash{} Predicting market direction out-of-sample [Python]}
+\begin{longexercise}
+Using \texttt{Weekly.csv} (weekly S\&P~500 returns 1990--2010;
+\texttt{Direction} is Up / Down):
+\begin{enumerate}
+  \item Fit a logistic regression of \texttt{Direction} on
+        \texttt{Lag1}--\texttt{Lag5} and \texttt{Volume} on the full data.
+        What in-sample accuracy do you get, and what does the confusion
+        matrix reveal?
+  \item Do an \emph{honest} out-of-sample test: train on
+        Year $\le 2008$, test on 2009--2010, using \texttt{Lag2} as the
+        only predictor. Report test accuracy and the confusion matrix for
+        logistic regression --- and, as a one-line bonus, for LDA
+        (appendix material; here it is a single \texttt{scikit-learn} import).
+  \item Compare with the naive ``always predict Up'' baseline and explain
+        why market-direction prediction is so hard.
+\end{enumerate}
+Write runnable code and give the expected numbers.
+\end{longexercise}
+\end{frame}
+
+\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.6 (1/3)}
+\begin{solutionbox}
+\begin{lstlisting}
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+wk = pd.read_csv("../ALL CSV FILES - 2nd Edition/Weekly.csv")  # load
+y  = (wk["Direction"] == "Up").astype(int)            # encode Up=1, Down=0
+lags = ["Lag1","Lag2","Lag3","Lag4","Lag5","Volume"]  # predictor names
+
+# (1) in-sample logistic on all predictors
+full = LogisticRegression(max_iter=10000).fit(wk[lags], y)  # fit full model
+print("acc:", round(full.score(wk[lags], y), 3))    # training accuracy
+print(confusion_matrix(y, full.predict(wk[lags])))  # [[TN,FP],[FN,TP]]
+\end{lstlisting}
+\emph{Output:} \texttt{acc: 0.561}; confusion
+$[[54,430],[48,557]]$ in order $[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.6 (2/3)}
+\begin{solutionbox}
+\begin{lstlisting}
+# (2) train Year<=2008, test 2009-2010, using Lag2 only
+tr, te = wk["Year"] <= 2008, wk["Year"] >= 2009    # boolean masks
+for nm, mdl in [("logit", LogisticRegression(max_iter=10000)),
+                ("LDA", LDA())]:                   # two linear classifiers
+    mdl.fit(wk.loc[tr, ["Lag2"]], y[tr])           # fit on training years
+    pred = mdl.predict(wk.loc[te, ["Lag2"]])       # 0/1 test predictions
+    print(nm, round(accuracy_score(y[te], pred), 3),
+          confusion_matrix(y[te], pred).ravel())   # acc and TN FP FN TP
+\end{lstlisting}
+\emph{Output:}\ \ \texttt{logit 0.625 [ 9 34 5 56]}\quad
+\texttt{LDA 0.625 [ 9 34 5 56]}\ (TN FP FN TP). Both linear classifiers
+give the \emph{same} result on the 2009--2010 hold-out ($n=104$).
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.6 (3/3)}
+\begin{solutionbox}
+\textbf{Reading it.}
+\begin{itemize}
+  \item The full-data model reaches only $56\%$, and its confusion matrix
+        shows it predicts ``Up'' almost always ($430+557$ of $1089$): the
+        apparent edge is mostly the market's upward drift, not skill ---
+        and this is optimistic, being in-sample.
+  \item Out-of-sample (2009--2010) logistic regression and LDA give the
+        \emph{same} $62.5\%$ and confusion matrix (near-identical linear
+        classifiers). Both still predict ``Up'' almost every week, catching
+        $56/61$ up-weeks (sensitivity $0.92$) but only $9/43$ down-weeks
+        (specificity $0.21$).
+  \item \textbf{Baseline.} ``Always predict Up'' already scores
+        $61/104=58.7\%$; the models beat it only marginally.
+\end{itemize}
+\textbf{Why it is hard.} Weekly returns are close to a random walk: the
+lagged predictors carry almost no signal, the signal-to-noise ratio is
+tiny, and any real pattern is arbitraged away (market efficiency). Barely
+beating the ``always Up'' baseline --- and only by riding the drift --- is
+no basis for trading once transaction costs are included.
+\end{solutionbox}
+\end{frame}
+
+\section{Summary}
+% ============================================================
+
+\begin{frame}{Chapter 4 in one slide}
+  \begin{block}{What we accomplished}
+    One classifier done properly --- \textbf{logistic regression} --- plus the
+    tools to judge \emph{any} classifier: the confusion matrix, ROC and AUC.
+  \end{block}
+  \begin{itemize}
+    \item Saw why linear regression cannot model a categorical response.
+    \item Modelled $\Pr(Y=1\mid X)$ as a logistic curve, linear in the
+          log-odds; fitted it by maximum likelihood.
+    \item Read coefficients on the odds scale, and watched a slope flip
+          sign under confounding (the student paradox).
+    \item Evaluated by confusion matrix, sensitivity / specificity /
+          precision, ROC and AUC --- and chose the threshold by cost.
+    \item Ran the whole workflow in \texttt{statsmodels} and
+          \texttt{scikit-learn}.
+  \end{itemize}
+  \vspace{1mm}
+  {\footnotesize \textbf{Appendix (optional):} the generative family --- Bayes
+  refresher, LDA, QDA, naive Bayes --- their comparison with logistic
+  regression and KNN, and the GLM / Poisson extension.}
+\end{frame}
+
+\begin{frame}{Vocabulary checklist}
+  \footnotesize
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Term} & \textbf{Meaning} \\
+    \midrule
+    Odds & $p / (1 - p)$; $e^{\beta_j}$ is the odds multiplier for $X_j$ \\
+    Logit / log-odds & $\log[p / (1 - p)]$; linear in $X$ \\
+    Maximum likelihood & Choose $\beta$ to maximise $\Pr(\mathrm{data} \mid \beta)$ \\
+    Discriminative model & Models $\Pr(Y \mid X)$ directly (logistic regression) \\
+    Confusion matrix & TP, FP, TN, FN at one chosen threshold \\
+    Sensitivity / specificity & TP/(TP+FN) / TN/(TN+FP) \\
+    Precision & TP/(TP+FP) \\
+    ROC / AUC & TPR vs.\ FPR / area under that curve \\
+    \midrule
+    \multicolumn{2}{@{}l@{}}{\emph{Appendix vocabulary (optional):}} \\
+    Generative model & Models $\pi_k$ and $f_k(X)$, applies Bayes \\
+    LDA / QDA & Linear / quadratic discriminant analysis \\
+    Naive Bayes & Class-conditional independence assumption \\
+    GLM / link function & Family of regression-style models / $g(E[Y])$ \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Key formulas at a glance}
+  \footnotesize
+  \begin{block}{Logistic regression}
+    $p(X) = e^{\beta_0 + \beta^\top X}/(1 + e^{\beta_0 + \beta^\top X})$,
+    \qquad
+    $\log\frac{p}{1-p} = \beta_0 + \beta^\top X = \eta$.
+  \end{block}
+  \vspace{-2.6mm}
+  \begin{block}{Evaluation: confusion-matrix rates, ROC, AUC}
+    Sensitivity (recall, TPR) $=\mathrm{TP}/(\mathrm{TP+FN})$;\ \
+    specificity (TNR) $=\mathrm{TN}/(\mathrm{TN+FP})$;\ \
+    precision $=\mathrm{TP}/(\mathrm{TP+FP})$;\ \
+    FPR $=1-$spec.\ $=\mathrm{FP}/(\mathrm{FP+TN})$.
+    ROC: TPR vs.\ FPR across thresholds;
+    AUC $=\Pr\bigl(\hat p(\text{pos})>\hat p(\text{neg})\bigr)$, $0.5$ chance, $1$ perfect.
+  \end{block}
+  \vspace{-2.6mm}
+  \textbf{Threshold $\to$ boundary:}
+  $p>t \iff \eta > \log\frac{t}{1-t}$ \ ($t=0.5\iff\eta>0$).
+  \vspace{-0.5mm}
+  \begin{block}{Generative models --- appendix, kept here for reference}
+    Bayes posterior:
+    $\Pr(Y = k \mid X) = \pi_k f_k(X) / \sum_\ell \pi_\ell f_\ell(X)$.
+    \\[1pt]
+    LDA: $\delta_k(x) = x^\top \Sigma^{-1}\mu_k - \tfrac12 \mu_k^\top \Sigma^{-1}\mu_k + \log\pi_k$;
+    QDA gives each class its own $\Sigma_k$, so the quadratic term survives:
+    $\delta_k(x) = -\tfrac12 (x-\mu_k)^\top \Sigma_k^{-1}(x-\mu_k)
+      - \tfrac12\log|\Sigma_k| + \log\pi_k$.
+    \\[1pt]
+    1-D LDA, common $\sigma^2$:
+    $x^\star = \frac{\mu_0+\mu_1}{2} - \frac{\sigma^2}{\mu_1-\mu_0}\log\frac{\pi_1}{\pi_0}$.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Decision rules of thumb}
+  \begin{itemize}
+    \item Binary or categorical response $\Rightarrow$ never ordinary least
+          squares; start with logistic regression.
+    \item Large $n$, modest $p$, no idea about the distribution of $X$
+          $\Rightarrow$ logistic regression is the safe default.
+    \item Report a \emph{probability}, then set the threshold; never let
+          $0.5$ be an unexamined default.
+    \item On imbalanced data, judge by sensitivity / specificity / AUC,
+          never by accuracy alone.
+    \item Interpret coefficients on the odds scale, and only ever
+          \emph{holding the other predictors fixed}.
+    \item Highly nonlinear boundary, plenty of data $\Rightarrow$ trees and
+          ensembles (Ch.~8), KNN or kernel SVM (Ch.~9).
+  \end{itemize}
+  \vspace{1mm}
+  {\footnotesize \textbf{Appendix rules of thumb.} Small $n$ with roughly
+  Gaussian, equally spread classes $\Rightarrow$ LDA; visibly unequal class
+  covariances with enough data $\Rightarrow$ QDA; many binary / categorical
+  features with $p\gg n$ $\Rightarrow$ naive Bayes. Standardise features
+  before any distance-based model.}
+\end{frame}
+
+\begin{frame}{Common pitfalls}
+  \begin{alertblock}{Don't}
+    \begin{enumerate}
+      \item Compare classifiers by accuracy alone on imbalanced data.
+      \item Treat logistic-regression probabilities as calibrated
+            without checking.
+      \item Read $e^{\beta_j}$ as a change in \emph{probability} --- it is a
+            multiplier on the \emph{odds}, and the probability effect
+            depends on where you sit on the curve.
+      \item Interpret a univariate slope as a causal effect: adding
+            \texttt{balance} flips the sign of \texttt{student}.
+      \item Report a confusion matrix without saying which threshold
+            produced it --- change the threshold, change every cell.
+      \item Ignore the base rate --- in rare-event detection a
+            ``perfect-looking'' classifier can be useless.
+    \end{enumerate}
+  \end{alertblock}
+  {\footnotesize \emph{Appendix pitfalls:} LDA on visibly unequal class
+  covariances; forgetting that QDA needs $\sim K p^2/2$ parameters.}
+\end{frame}
+
+\begin{frame}{Connections to the rest of the course}
+  \begin{itemize}
+    \item Ch.~2: the Bayes classifier and KNN --- the benchmark today's
+          logistic regression is measured against.
+    \item Ch.~3: linear regression is logistic regression's continuous
+          twin (both are GLMs; see the appendix).
+    \item Ch.~5: cross-validation for choosing thresholds and tuning.
+    \item Ch.~6: ridge / lasso regularisation extends to logistic
+          regression.
+    \item Ch.~8: tree ensembles often beat logistic regression on
+          tabular data --- but are harder to explain to a regulator.
+    \item Ch.~9: SVMs as another linear / kernelised classifier.
+    \item Ch.~10: deep learning is logistic regression with
+          representation learning baked in (the softmax output layer is
+          the multinomial logit of the appendix).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Self-check questions}
+  \small
+  \begin{enumerate}
+    \item Why does ordinary linear regression fail for binary $Y$?
+          (p.~11)
+    \item Write the logistic model and its log-odds form. What exactly does
+          $e^{\beta_j}=1.15$ tell a client? (pp.~19--20 and~27)
+    \item In the Default data, why does \texttt{student} flip sign
+          once \texttt{balance} is included? (pp.~33--34)
+    \item Sketch a confusion matrix for a fraud detector with $99\,\%$
+          accuracy on data with $1\,\%$ fraud. Is it useful?
+          (pp.~44--46)
+    \item Explain ROC and AUC. What does a $45^\circ$ ROC mean?
+          (pp.~51--53)
+    \item The threshold drops from $0.5$ to $0.2$. Which way do
+          sensitivity, specificity and the ROC operating point move, and
+          what decides whether that is an improvement? (pp.~50 and~54--56)
+  \end{enumerate}
+  \vspace{1mm}
+  {\footnotesize \textbf{Appendix questions (optional).}
+  Derive the LDA discriminant from Bayes' rule assuming
+  $X\mid Y=k\sim\mathcal{N}(\mu_k,\Sigma)$ (pp.~90--91; step-by-step pp.~108--111).
+  When does naive Bayes outperform logistic regression even though its
+  independence assumption is wrong? (pp.~104 and~116)}
+\end{frame}
+
+\begin{frame}{Ten things to remember}
+  \begin{enumerate}
+    \item Linear regression is wrong for a categorical $Y$.
+    \item Logistic regression: linear in the log-odds, $S$-shaped in $p$.
+    \item $e^{\beta_j}$ multiplies the \emph{odds}, not the probability.
+    \item Estimation is by maximum likelihood; no closed form.
+    \item Univariate slopes can flip sign --- watch for confounding.
+    \item A model outputs a probability; a \emph{threshold} turns it into
+          a decision.
+    \item Accuracy alone is meaningless on imbalanced data.
+    \item Confusion matrix $\Rightarrow$ sensitivity, specificity,
+          precision --- always at a stated threshold.
+    \item ROC sweeps every threshold; AUC $=\Pr(\hat p_{\text{pos}}>\hat p_{\text{neg}})$
+          is threshold-free.
+    \item Threshold choice is a business decision, driven by the relative
+          cost of a false negative and a false positive.
+  \end{enumerate}
+  \vspace{1mm}
+  {\footnotesize \emph{Eleventh, if you read the appendix:} LDA, QDA and naive
+  Bayes are all one idea --- model $\pi_k$ and $f_k(x)$, then apply Bayes'
+  rule; they differ only in how they model $f_k$.}
+\end{frame}
+
+\begin{frame}{What's next}
+  Chapter 5: \emph{Resampling Methods}.
+  \begin{itemize}
+    \item Validation set, LOOCV, $k$-fold cross-validation.
+    \item The bootstrap.
+    \item Why these are the most important tools in your toolbox.
+  \end{itemize}
+\end{frame}
+
+
+% ============================================================
+\appendix
+\AtBeginSection[]{}
+\section{Appendix: optional and advanced material}
+% ============================================================
+
+\begin{frame}{Appendix --- what is in here, and why}
+  \scriptsize
+  Nothing here is needed to follow the chapter. The taught thread is
+  \textbf{logistic regression and classifier evaluation}; everything below is a
+  side topic, a formal derivation or a longer worked exercise.
+  \begin{block}{Contents of the appendix}
+    \begin{itemize}\itemsep2pt
+      \item \textbf{Generative models --- Bayes refresher, LDA, QDA, naive
+            Bayes} (Exercises 4.5--4.7): the whole family, from the
+            prior~$\times$~likelihood picture to the two discriminants and the
+            naive independence assumption. Read it as one block.
+      \item \textbf{Deriving LDA from Bayes' theorem} (Extended Exercise 4.2):
+            where that discriminant comes from, line by line.
+      \item \textbf{Naive Bayes by hand} (Extended Exercise 4.3): a longer
+            second pass over Exercise 4.7, and how naive Bayes relates to LDA.
+      \item \textbf{Comparing the classifiers} (Extended Exercise 4.4):
+            logistic regression vs.\ LDA / QDA / naive Bayes / KNN --- when each
+            wins, the Bayes optimum, and the head-to-head lab cell.
+      \item \textbf{Behind logistic regression:} log-likelihood, deviance and
+            IRLS as three views of one optimisation; the softmax for $K>2$.
+      \item \textbf{GLMs and Poisson regression:} the umbrella over linear,
+            logistic and Poisson regression, with Bikeshare. Not examinable.
+    \end{itemize}
+  \end{block}
+  \vspace{-1mm}
+  Exercise numbers are unchanged: 4.5--4.7 and Extended 4.2--4.4 live here, not in the main flow.
+\end{frame}
+
+\begin{frame}{Three equivalent ways to think about the optimisation}
+  \begin{itemize}
+    \item \textbf{Maximum likelihood}: find $\hat\beta$ that makes the
+          observed data most probable under the model.
+    \item \textbf{Cross-entropy minimisation}: $-\log L$ is exactly the
+          binary cross-entropy loss --- the same objective deep nets use.
+    \item \textbf{Iteratively reweighted least squares (IRLS)}: solve a
+          sequence of weighted regressions. Equivalent to Newton's
+          method on the log-likelihood.
+  \end{itemize}
+  \begin{takeaway}
+    All three give the same $\hat\beta$. Which view to take is a matter
+    of taste; deep-learning courses prefer cross-entropy, statistics
+    courses prefer maximum likelihood.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{From two classes to $K$: the softmax}
+  \small
+  \begin{block}{Multinomial logistic model}
+    Pick a baseline class (say $K$) and set, for $k = 1,\dots,K-1$,
+    \[
+      \Pr(Y = k \mid X)
+      = \frac{e^{\beta_{k0} + \beta_{k}^\top X}}
+             {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}},
+      \qquad
+      \Pr(Y = K \mid X)
+      = \frac{1}
+             {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}}.
+    \]
+  \end{block}
+  \begin{readme}
+    Coefficients depend on the chosen baseline, but predictions are
+    invariant to the choice. The equivalent symmetric ``softmax''
+    parameterisation removes the need for a baseline --- this is the
+    form used in deep learning.
+  \end{readme}
+  \begin{takeaway}
+    The $K$ outputs are non-negative and sum to $1$ by construction, so
+    they are genuine probabilities. Predict the class with the largest
+    numerator.
+  \end{takeaway}
+\end{frame}
+
+% ---------------- Generative models (moved to appendix) ----------------
 \subsection{Bayes refresher}
 
 \begin{frame}{Two philosophies of classification}
@@ -1433,989 +2346,6 @@ the decision outright.
 \end{frame}
 
 
-
-
-
-
-
-
-
-\section{Comparison}
-% ============================================================
-
-\begin{frame}{Method comparison: when each wins}
-  \footnotesize
-  \begin{tabular}{lll}
-    \toprule
-    \textbf{Method} & \textbf{Boundary} & \textbf{Best when} \\
-    \midrule
-    Logistic regression & linear & no Gaussian assumption needed \\
-    LDA & linear & classes share covariance, normal \\
-    QDA & quadratic & classes have unequal covariance \\
-    Naive Bayes & flexible (per-feature) & many features, $n$ small \\
-    KNN & nonparametric & truth is highly nonlinear \\
-    \bottomrule
-  \end{tabular}
-  \vspace{0.5em}
-  \begin{takeaway}[In practice]
-    No method dominates universally. Treat all five as candidates;
-    pick by held-out AUC. With one line of scikit-learn each, the
-    comparison is essentially free.
-  \end{takeaway}
-  \begin{industry}[Risk and campaign teams: how it is actually reported]
-    Risk teams quote AUC as the Gini coefficient ($2\,\text{AUC}-1$) and the KS
-    statistic; campaign teams compare models at the \emph{top decile}, because
-    that is where the budget goes. Boosted trees (Chapter~8) often win outright ---
-    which is why regulated decisions keep the model they can explain.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Bayes optimum and our methods}
-  \begin{center}
-    \includegraphics[width=0.80\textwidth,height=0.46\textheight,keepaspectratio]{4_12.pdf}
-  \end{center}
-  \begin{takeaway}
-    Test error per scenario: \emph{no classifier wins everywhere} --- the
-    best method in each panel matches its data-generating process. This
-    is why we compare candidates by held-out error.
-  \end{takeaway}
-  \islpsource{Figure 4.12}
-\end{frame}
-
-% ---------------- Extended Exercise 4.4 ----------------
-\begin{frame}{Extended Exercise 4.4 \textemdash{} Choosing a classifier: three cases [Integrative]}
-\begin{longexercise}
-For each dataset, pick the most appropriate classifier from
-\{logistic regression, LDA, QDA, naive Bayes, KNN\} and justify it in
-terms of boundary shape, $n$ vs.\ $p$, within-class normality, feature
-type, and number of classes.
-\begin{description}
-  \item[A. Credit scoring.] $n=30{,}000$ applicants, $p=6$ continuous
-        predictors, $K=2$. The log-odds of default look approximately
-        linear; the two classes have similar spread; income is heavily
-        right-skewed.
-  \item[B. Tumour diagnosis.] $n=200$ patients, $p=3$ continuous features
-        that are roughly Gaussian within each class, $K=2$
-        (benign / malignant). The malignant class is visibly more
-        variable than the benign class.
-  \item[C. Spam filtering.] $n=1{,}000$ e-mails, $p=5{,}000$ binary
-        word-presence indicators, $K=2$. Features are discrete and many
-        are correlated; $p\gg n$.
-\end{description}
-Recommend a method for each and name your runner-up.
-\end{longexercise}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.4 (1/2)}
-\begin{solutionbox}
-\textbf{A quick decision checklist.}
-Boundary linear? $\to$ logistic / LDA. Curved? $\to$ QDA / KNN.
-Gaussian within class with equal covariance? $\to$ LDA; unequal? $\to$
-QDA. $p\gg n$ or discrete features? $\to$ naive Bayes (or regularised
-logistic). Highly nonlinear, large $n$, standardised continuous? $\to$
-KNN.
-
-\vspace{1mm}
-\textbf{A --- Credit scoring $\Rightarrow$ logistic regression.}
-Large $n$, small $p$, binary response, and an approximately linear
-log-odds make logistic regression the natural first choice. It assumes
-nothing about the distribution of $X$, so the skewed income variable is
-harmless, and its coefficients are interpretable on the odds scale.
-\emph{Runner-up:} LDA (fine under approximate normality and equal
-covariance) --- but the skew makes logistic safer.
-
-\vspace{1mm}
-\textbf{B --- Tumour diagnosis $\Rightarrow$ QDA.}
-Features are roughly Gaussian within class, but the covariances clearly
-\emph{differ}, so the optimal boundary is quadratic --- exactly QDA's
-model. With $p=3$ each class covariance has only $6$ free entries, and
-$n=200$ easily supports two of them, so QDA's extra variance is
-affordable. \emph{Runner-up:} LDA (its lower variance would win if $n$
-were much smaller).
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.4 (2/2)}
-\begin{solutionbox}
-\scriptsize
-\textbf{C --- Spam filtering $\Rightarrow$ naive Bayes.}
-With $p=5{,}000\gg n=1{,}000$, LDA/QDA cannot estimate a $p\times p$
-covariance (singular, millions of entries) and unregularised logistic
-regression would overfit badly. The features are binary, not Gaussian.
-Naive Bayes assumes conditional independence, needs only one-dimensional
-marginals, has very low variance, and is the classic strong text
-baseline. \emph{Runner-up:} $L_1/L_2$-regularised logistic regression.
-
-\vspace{1mm}
-\textbf{Where the remaining methods fit.}
-\begin{itemize}
-  \item \textbf{LDA} is the pick when features are Gaussian with a shared
-        covariance --- a middle ground between logistic and QDA; it is the
-        closest call in scenario A.
-  \item \textbf{KNN} wins only when the boundary is highly nonlinear,
-        the features are continuous and standardised, and $n$ is large
-        relative to $p$. None of A--C qualifies; C is catastrophic for
-        KNN (curse of dimensionality at $p=5{,}000$).
-\end{itemize}
-\begin{takeaway}
-Match the method to the boundary shape, the $n$-vs-$p$ budget, and the
-feature type --- then confirm the choice with held-out AUC.
-\end{takeaway}
-\end{solutionbox}
-\end{frame}
-
-% ============================================================
-\section{Evaluation}
-% ============================================================
-\subsection{Confusion matrix}
-
-\begin{frame}{Why we need more than ``accuracy''}
-  Imagine a fraud detector with $99\,\%$ accuracy on a stream where
-  $1\,\%$ of transactions are fraudulent.
-  \begin{alertblock}{The trivial classifier}
-    The model that simply \emph{always predicts ``no fraud''} has
-    accuracy $99\,\%$ --- and detects zero fraud.
-  \end{alertblock}
-  \begin{takeaway}
-    Accuracy alone is uninformative on imbalanced data. We need to
-    decompose it into the four cells of a \emph{confusion matrix}.
-  \end{takeaway}
-  \begin{industry}[Payments: fraud and AML screening]
-    This is not a toy example --- it is how card fraud and money-laundering alerts
-    actually look. A missed fraud costs the chargeback; a false positive blocks a
-    good customer at checkout. Fraud teams therefore price each cell of the
-    matrix, and set the threshold to the number of alerts their reviewers can
-    actually work through in a day.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{The confusion matrix}
-  After choosing a threshold (default $0.5$), tabulate predicted vs.\
-  actual:
-  \begin{center}
-  \begin{tabular}{l|cc|c}
-    \toprule
-    & Pred.\ neg.\ & Pred.\ pos.\ & Total \\
-    \midrule
-    True neg.\ & TN & FP & N \\
-    True pos.\ & FN & TP & P \\
-    \midrule
-    Total & N$^*$ & P$^*$ & n \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \begin{readme}
-    \begin{itemize}
-      \item Sensitivity / recall: $\mathrm{TP}/(\mathrm{TP+FN})$ ---
-            of true positives, how many did we catch?
-      \item Specificity: $\mathrm{TN}/(\mathrm{TN+FP})$ --- of true
-            negatives, how many did we correctly leave alone?
-      \item Precision: $\mathrm{TP}/(\mathrm{TP+FP})$ --- of those we
-            flagged, how many were truly positive?
-    \end{itemize}
-  \end{readme}
-\end{frame}
-
-\begin{frame}{The confusion matrix as a picture}
-  \begin{center}
-    \begin{tikzpicture}[scale=0.9,font=\small,
-        cell/.style={minimum width=2.5cm,minimum height=1.6cm,draw=black!45,align=center}]
-      \node[font=\bfseries] at (1.25,3.0) {Actual $+$};
-      \node[font=\bfseries] at (3.75,3.0) {Actual $-$};
-      \node[rotate=90,font=\bfseries] at (-0.75,1.7) {Predicted $+$};
-      \node[rotate=90,font=\bfseries] at (-0.75,0.1) {Predicted $-$};
-      \node[cell,fill=green!18] at (1.25,1.7) {\textbf{TP}\\true positive};
-      \node[cell,fill=red!13]   at (3.75,1.7) {\textbf{FP}\\false positive};
-      \node[cell,fill=red!13]   at (1.25,0.1) {\textbf{FN}\\false negative};
-      \node[cell,fill=green!18] at (3.75,0.1) {\textbf{TN}\\true negative};
-      \node[anchor=west] at (5.4,2.05)
-        {\textcolor{green!45!black}{\textbf{Sensitivity}} $=\dfrac{\mathrm{TP}}{\mathrm{TP+FN}}$};
-      \node[anchor=west] at (5.4,0.9)
-        {\textcolor{green!45!black}{\textbf{Specificity}} $=\dfrac{\mathrm{TN}}{\mathrm{TN+FP}}$};
-      \node[anchor=west] at (5.4,-0.25)
-        {\textcolor{accent}{\textbf{Precision}} $=\dfrac{\mathrm{TP}}{\mathrm{TP+FP}}$};
-    \end{tikzpicture}
-  \end{center}
-  \begin{takeaway}
-    The diagonal cells --- TP and TN --- are the correct decisions; FP and
-    FN are the two error types. Sensitivity reads down the true-positive
-    column; specificity down the true-negative column; precision across the
-    predicted-positive row.
-  \end{takeaway}
-\end{frame}
-
-
-% ---------------- Exercise 4.8 ----------------
-\begin{frame}{Exercise 4.8 \textemdash{} Reading a confusion matrix [Concept]}
-\begin{exercise}
-LDA on the Default data ($n=10{,}000$) with threshold $0.5$ gives:
-\begin{center}\small
-\begin{tabular}{l|cc|c}
-\toprule
- & Pred.\ No & Pred.\ Yes & Total \\
-\midrule
-True No  & 9644 & 23 & 9667 \\
-True Yes & 252  & 81 & 333 \\
-\midrule
-Total & 9896 & 104 & 10000 \\
-\bottomrule
-\end{tabular}
-\end{center}
-Compute (a) the accuracy and error rate, (b) sensitivity/recall,
-(c) specificity, (d) precision. (e) Given that only $3.3\%$ of
-customers default, comment on how good this classifier really is.
-\end{exercise}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Exercise 4.8 (1/2)}
-\begin{solutionbox}
-\textbf{Method.} First pin down the four cells --- every metric is a
-ratio of them:
-$\mathrm{TN}=9644$, $\mathrm{FP}=23$, $\mathrm{FN}=252$,
-$\mathrm{TP}=81$, with $P=333$ actual defaulters and $N=9667$ actual
-non-defaulters.
-
-\vspace{1mm}
-\textbf{(a) Accuracy} $=\dfrac{9644+81}{10000}=\dfrac{9725}{10000}
-=0.9725$; error rate $=1-0.9725=2.75\%$.
-
-\textbf{(b) Sensitivity} $=\dfrac{\mathrm{TP}}{P}=\dfrac{81}{333}
-\approx 0.243$: of the $333$ customers who really default, the
-classifier catches only $81$ and misses $252$.
-
-\textbf{(c) Specificity} $=\dfrac{\mathrm{TN}}{N}=\dfrac{9644}{9667}
-\approx 0.9976$: non-defaulters are almost never disturbed (only $23$
-false alarms).
-
-\textbf{(d) Precision} $=\dfrac{\mathrm{TP}}{\mathrm{TP+FP}}
-=\dfrac{81}{104}\approx 0.779$: of the $104$ customers flagged, $81$
-truly default.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Exercise 4.8 (2/2)}
-\begin{solutionbox}
-\textbf{(e) Interpretation.}
-The trivial classifier that \emph{always predicts ``No''} has an error
-rate of $333/10000=3.33\%$ --- barely worse than LDA's $2.75\%$. So
-almost all of the headline accuracy comes from the $96.7\%$ base rate
-of non-defaulters, not from skill. The
-high accuracy hides a poor sensitivity: LDA \emph{misses
-$252/333=75.7\%$ of actual defaulters}. For a bank a missed defaulter
-(FN) is the expensive kind of error,
-which motivates lowering the classification threshold --- the subject
-of the next exercise.
-
-\vspace{1mm}
-\textbf{Takeaway.} On imbalanced data always report the pair
-(sensitivity, specificity) --- accuracy alone can be matched by a
-classifier that does nothing.
-\end{solutionbox}
-\begin{mistake}
-mixing up sensitivity and precision. Both have
-TP on top, but sensitivity divides by the \emph{actual} positives
-($\mathrm{TP+FN}=333$) while precision divides by the \emph{predicted}
-positives ($\mathrm{TP+FP}=104$) --- here $24.3\%$ vs.\ $77.9\%$, a
-huge difference.
-\end{mistake}
-\end{frame}
-
-\subsection{ROC and AUC}
-
-\begin{frame}{Why a single threshold is not enough}
-  Predicting ``positive'' at $\hat p > 0.5$ is only \emph{one} operating
-  point; any threshold $t$ trades sensitivity vs.\ specificity:
-  \vspace{-1mm}
-  \begin{center}
-    \includegraphics[width=0.84\textwidth,height=0.40\textheight,keepaspectratio]{ch04_x_threshold.png}
-  \end{center}
-  \vspace{-2mm}
-  \begin{takeaway}
-    Lower $t$ $\Rightarrow$ more true positives (sensitivity $\uparrow$)
-    but more false alarms (specificity $\downarrow$); raise $t$ for the
-    reverse. Choose $t$ by the cost of a false negative vs.\ a false
-    positive --- a cancer screen lowers it, a spam filter raises it.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{The ROC curve}
-  \begin{center}
-    \includegraphics[width=0.50\textwidth,height=0.46\textheight,keepaspectratio]{4_8.pdf}
-  \end{center}
-  \begin{readme}
-    $y$-axis $=$ sensitivity (true-positive rate); $x$-axis $=1-$
-    specificity (false-positive rate). Each point is \emph{one}
-    threshold; the $45^\circ$ diagonal is random guessing --- top-left is
-    better.
-  \end{readme}
-  \islpsource{Figure 4.8}
-\end{frame}
-
-\begin{frame}{ROC and AUC on the Default data}
-  \begin{center}
-    \includegraphics[width=0.88\textwidth,height=0.55\textheight,keepaspectratio]{ch04_roc.png}
-  \end{center}
-  \begin{takeaway}
-    A high AUC means the model ranks defaulters above non-defaulters. The
-    default $0.5$ cutoff sits low on the curve; lowering it trades
-    specificity for sensitivity.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{AUC: area under the ROC curve}
-  \begin{block}{Probabilistic interpretation}
-    AUC $= \Pr\bigl(\hat p(\text{positive}) > \hat p(\text{negative})\bigr)$
-    for a randomly chosen positive--negative pair.
-  \end{block}
-  \begin{readme}
-    \begin{itemize}
-      \item AUC $= 0.5$: model is no better than random.
-      \item AUC $= 1$: perfect ranking of positives above negatives.
-      \item Threshold-free summary; widely used in medicine and
-            credit scoring.
-    \end{itemize}
-  \end{readme}
-  \begin{alertblock}{Caveat under heavy class imbalance}
-    AUC can look misleadingly good when one class is rare. Use
-    precision-recall curves or balanced accuracy in that regime.
-  \end{alertblock}
-\end{frame}
-
-
-% ============================================================
-
-% ---------------- Exercise 4.9 ----------------
-\begin{frame}{Exercise 4.9 \textemdash{} Threshold, ROC and AUC [Concept]}
-\begin{exercise}
-Lowering the LDA threshold to $0.2$ on the same Default data gives:
-\begin{center}\small
-\begin{tabular}{l|cc|c}
-\toprule
- & Pred.\ No & Pred.\ Yes & Total \\
-\midrule
-True No  & 9432 & 235 & 9667 \\
-True Yes & 138  & 195 & 333 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\begin{enumerate}
-  \item Compute sensitivity and specificity at threshold $0.2$ and
-        compare with the $0.5$ results (Exercise 4.8).
-  \item Compute the overall error rate at $0.2$.
-  \item On ROC axes (sensitivity vs.\ $1-$specificity), how does the
-        operating point move as the threshold drops from $0.5$ to $0.2$?
-  \item State the probabilistic meaning of the AUC and why it is
-        threshold-free.
-\end{enumerate}
-\end{exercise}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Exercise 4.9 (1/2)}
-\begin{solutionbox}
-\textbf{Method.} Same model, same data --- only the cutoff moved, so we
-recompute the two rates from the new cell counts
-($\mathrm{TN}=9432$, $\mathrm{FP}=235$, $\mathrm{FN}=138$,
-$\mathrm{TP}=195$) and compare operating points.
-
-\vspace{1mm}
-\textbf{(1) At threshold $0.2$.}
-Sensitivity $=\dfrac{\mathrm{TP}}{\mathrm{TP+FN}}=\dfrac{195}{333}
-\approx 0.586$; specificity
-$=\dfrac{\mathrm{TN}}{\mathrm{TN+FP}}=\dfrac{9432}{9667}\approx 0.9757$.
-Compared with $0.5$ (Exercise 4.8): sensitivity
-rises from $24.3\%$ to $58.6\%$ ($81\to195$ defaulters caught), while
-specificity falls from $99.76\%$ to $97.57\%$ ($23\to235$ false
-alarms).
-
-\vspace{1mm}
-\textbf{(2) Error rate} $=\dfrac{\mathrm{FP+FN}}{n}
-=\dfrac{235+138}{10000}=\dfrac{373}{10000}
-=3.73\%$ (up from $2.75\%$) --- yet arguably the \emph{better} bank
-decision, because the errors it now makes are the cheap kind.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Exercise 4.9 (2/2)}
-\begin{solutionbox}
-\textbf{(3) ROC movement.}
-With $y=$ sensitivity and $x=1-$specificity:
-\[
-  x:\ 1-0.9976=0.0024 \;\to\; 1-0.9757=0.0243, \qquad
-  y:\ 0.243 \;\to\; 0.586 .
-\]
-The operating point moves \emph{up and to the right along the same ROC
-curve}: a small loss of specificity buys a large gain in sensitivity.
-The curve itself is fixed --- it belongs to the model's ranking, and
-each threshold merely picks a point on it.
-
-\vspace{1mm}
-\textbf{(4) AUC.}
-AUC $=\Pr\big(\hat p(\text{a random positive}) >
-\hat p(\text{a random negative})\big)$: the probability the model ranks
-a random defaulter above a random non-defaulter. It integrates over
-\emph{all} thresholds, so it summarises ranking quality independently of
-any single cutoff --- $0.5$ is random guessing, $1$ is a perfect
-ranking.
-\end{solutionbox}
-\begin{mistake}
-expecting the AUC to improve after lowering the
-threshold. Threshold changes slide the operating point \emph{along} the
-curve; they can never move the curve --- only a better model can.
-\end{mistake}
-\end{frame}
-
-% ---------------- Extended Exercise 4.5 ----------------
-\begin{frame}{Extended Exercise 4.5 \textemdash{} Default: logistic, confusion, ROC/AUC [Python]}
-\begin{longexercise}
-Using \texttt{Default.csv}:
-\begin{enumerate}
-  \item Fit a logistic regression of \texttt{default} on \texttt{balance},
-        \texttt{income} and a $0/1$ \texttt{student} indicator
-        (scikit-learn).
-  \item Build the confusion matrix at thresholds $0.5$ and $0.2$.
-  \item At each threshold compute accuracy, sensitivity, specificity and
-        precision.
-  \item Plot the ROC curve, report the AUC, and interpret the whole
-        picture.
-\end{enumerate}
-Write runnable code and state the numbers you expect.
-\end{longexercise}
-\end{frame}
-
-\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.5 (1/3)}
-\begin{solutionbox}
-\begin{lstlisting}
-import pandas as pd                                  # data handling
-from sklearn.linear_model import LogisticRegression  # classifier
-from sklearn.metrics import (confusion_matrix, roc_auc_score,
-                             RocCurveDisplay)        # evaluation tools
-import matplotlib.pyplot as plt                      # plotting
-
-df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Default.csv")  # load
-y  = (df["default"] == "Yes").astype(int)          # encode response as 0/1
-df["stud"] = (df["student"] == "Yes").astype(int)  # dummy-code student
-X  = df[["balance", "income", "stud"]].values      # predictor matrix
-
-clf   = LogisticRegression(max_iter=10000).fit(X, y)  # fit model (MLE)
-proba = clf.predict_proba(X)[:, 1]  # predicted P(default=Yes) per customer
-\end{lstlisting}
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.5 (2/3)}
-\begin{solutionbox}
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize\linespread{0.9}\selectfont]
-for t in (0.5, 0.2):                       # two decision thresholds
-    tn, fp, fn, tp = confusion_matrix(y, proba > t).ravel()  # cell counts
-    sens, spec = tp/(tp+fn), tn/(tn+fp)    # sensitivity, specificity
-    prec, acc  = tp/(tp+fp), (tp+tn)/len(y)  # precision, accuracy
-    print(t, tn, fp, fn, tp,               # report all metrics
-          round(acc,3), round(sens,3), round(spec,3), round(prec,3))
-
-print("AUC =", round(roc_auc_score(y, proba), 3))  # threshold-free AUC
-RocCurveDisplay.from_predictions(y, proba); plt.show()  # draw ROC curve
-\end{lstlisting}
-\textbf{Expected} (counts close to):
-\begin{center}\scriptsize
-\begin{tabular}{ccccccccc}
-\toprule
-$t$ & TN & FP & FN & TP & acc & sens & spec & prec\\
-\midrule
-0.5 & 9627 & 40  & 228 & 105 & .973 & .315 & .996 & .724\\
-0.2 & 9390 & 277 & 130 & 203 & .959 & .610 & .971 & .423\\
-\bottomrule
-\end{tabular}
-\end{center}
-\vspace{-1mm}
-AUC $\approx 0.950$ --- ranking quality, unchanged by the threshold.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.5 (3/3)}
-\begin{solutionbox}
-\textbf{Interpretation.}
-\begin{itemize}
-  \item \textbf{Threshold $0.5$.} Accuracy is high ($97.3\%$) but
-        sensitivity is only $31.5\%$: the model misses about two-thirds of
-        true defaulters. Precision is decent ($72\%$) only because it
-        flags very few customers --- the always-predict-``No'' trap on
-        imbalanced data.
-  \item \textbf{Threshold $0.2$.} Sensitivity nearly doubles (to $61\%$),
-        catching far more defaulters, at the cost of specificity
-        ($99.6\%\!\to\!97.1\%$) and precision ($72\%\!\to\!42\%$): more
-        false alarms. Accuracy dips slightly --- but accuracy is the wrong
-        yardstick here.
-  \item \textbf{ROC / AUC.} AUC $\approx 0.95$ summarises ranking quality
-        over \emph{all} thresholds: a random defaulter outscores a random
-        non-defaulter about $95\%$ of the time. The $0.5$ and $0.2$
-        cut-offs are two operating points on the \emph{same} ROC curve, so
-        the AUC does not change with the threshold.
-\end{itemize}
-Choose the operating point by the bank's relative cost of a missed
-defaulter (FN) versus a false alarm (FP). Note \texttt{sklearn} orders the
-matrix as $[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
-\end{solutionbox}
-\end{frame}
-
-% ============================================================
-\section{Python Lab}
-
-\begin{frame}{Python lab --- run it live in the notebook}
-  \begin{labnote}[Companion notebook: \texttt{chapter\_04\_lab.ipynb}]
-    The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell:
-    \begin{itemize}
-      \item \S1 \emph{Logistic regression}, including \emph{Predicted probabilities};
-      \item \S2 \emph{LDA, QDA, naive Bayes, KNN --- head-to-head}, and its \emph{ROC curves} subsection;
-      \item \S3 \emph{Poisson regression on Bikeshare}.
-    \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
-  \end{labnote}
-\end{frame}
-
-
-% ============================================================
-
-\begin{frame}[fragile]{Logistic regression with statsmodels}
-  \begin{lstlisting}
-import statsmodels.api as sm          # GLM fitting with inference
-from ISLP import load_data            # textbook data loader
-
-Default = load_data("Default")                       # load Default data
-y = (Default["default"] == "Yes").astype(int)        # encode response 0/1
-X = sm.add_constant(Default[["balance", "income"]])  # add intercept column
-
-res = sm.GLM(y, X, family=sm.families.Binomial()).fit()  # logit link fit
-print(res.summary())                  # coefficients, SEs, z, p-values
-  \end{lstlisting}
-  \texttt{statsmodels} reports each coefficient with its standard
-  error, $z$-statistic, and $p$-value, plus deviance-based
-  goodness-of-fit measures.
-\end{frame}
-
-\begin{frame}[fragile]{Logistic regression with scikit-learn}
-  \begin{lstlisting}
-from sklearn.linear_model import LogisticRegression    # classifier
-from sklearn.model_selection import train_test_split   # data splitting
-from sklearn.metrics import classification_report, roc_auc_score
-
-X = Default[["balance", "income"]].values   # predictor matrix
-# hold out 30% as a test set (fixed seed for reproducibility)
-Xtr,Xte,ytr,yte = train_test_split(X, y, test_size=0.3, random_state=0)
-
-lr = LogisticRegression(max_iter=1000).fit(Xtr, ytr)  # fit on training set
-proba = lr.predict_proba(Xte)[:, 1]             # test-set P(default=Yes)
-print(classification_report(yte, proba > 0.5))  # metrics at threshold 0.5
-print("AUC:", roc_auc_score(yte, proba))        # ranking quality
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{LDA, QDA, naive Bayes head-to-head}
-  \begin{lstlisting}
-from sklearn.discriminant_analysis import (
-    LinearDiscriminantAnalysis    as LDA,
-    QuadraticDiscriminantAnalysis as QDA)    # Gaussian discriminants
-from sklearn.naive_bayes import GaussianNB   # naive Bayes (Gaussian)
-
-for name, mdl in [("LDA", LDA()),
-                  ("QDA", QDA()),
-                  ("NB",  GaussianNB())]:    # three models, same split
-    mdl.fit(Xtr, ytr)                        # estimate means/covariances
-    p = mdl.predict_proba(Xte)[:, 1]         # posterior P(class 1) on test
-    print(name, "AUC:", roc_auc_score(yte, p))  # compare by AUC
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{ROC curves}
-  \begin{lstlisting}
-from sklearn.metrics import RocCurveDisplay   # ROC plotting helper
-import matplotlib.pyplot as plt
-
-fig, ax = plt.subplots(figsize=(5, 5))        # one axes, all curves
-RocCurveDisplay.from_estimator(lr,  Xte, yte, ax=ax)   # logistic ROC
-RocCurveDisplay.from_estimator(LDA().fit(Xtr,ytr), Xte, yte, ax=ax)  # LDA
-RocCurveDisplay.from_estimator(QDA().fit(Xtr,ytr), Xte, yte, ax=ax)  # QDA
-ax.plot([0,1], [0,1], "k--", linewidth=0.8); plt.show()  # chance line
-  \end{lstlisting}
-\end{frame}
-
-
-
-% ============================================================
-
-% ---------------- Exercise 4.10 ----------------
-\begin{frame}{Exercise 4.10 \textemdash{} Logistic regression + confusion matrix in Python [Python]}
-\begin{exercise}
-Using \texttt{Default.csv}:
-\begin{enumerate}
-  \item Fit a logistic regression of \texttt{default} on
-        \texttt{balance}, \texttt{income} and a $0/1$ \texttt{student}
-        indicator with scikit-learn.
-  \item Produce the confusion matrix at thresholds $0.5$ and $0.2$.
-  \item Report the sensitivity at each threshold and interpret the
-        trade-off.
-\end{enumerate}
-Write the code and describe the output you expect.
-\end{exercise}
-\end{frame}
-
-\begin{frame}[fragile]{Solution \textemdash{} Exercise 4.10 (1/2)}
-\begin{solutionbox}
-\begin{lstlisting}
-import pandas as pd                                  # data handling
-from sklearn.linear_model import LogisticRegression  # classifier
-from sklearn.metrics import confusion_matrix         # evaluation
-
-df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Default.csv")  # load
-y  = (df["default"] == "Yes").astype(int)          # encode response as 0/1
-df["stud"] = (df["student"] == "Yes").astype(int)  # dummy-code student
-X  = df[["balance", "income", "stud"]].values      # predictor matrix
-
-clf   = LogisticRegression(max_iter=10000).fit(X, y)  # fit model (MLE)
-proba = clf.predict_proba(X)[:, 1]  # predicted P(default=Yes) per customer
-\end{lstlisting}
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}[fragile]{Solution \textemdash{} Exercise 4.10 (2/2)}
-\begin{solutionbox}
-\begin{lstlisting}
-for t in (0.5, 0.2):                    # default and lowered threshold
-    tn, fp, fn, tp = confusion_matrix(y, proba > t).ravel()  # cell counts
-    sens = tp / (tp + fn)               # sensitivity = true-positive rate
-    print(f"t={t}: TN={tn} FP={fp} FN={fn} TP={tp}  sens={sens:.3f}")
-\end{lstlisting}
-
-\textbf{Expected output} (counts close to):
-\begin{lstlisting}
-t=0.5: TN=9627 FP=40  FN=228 TP=105  sens=0.315
-t=0.2: TN=9390 FP=277 FN=130 TP=203  sens=0.610
-\end{lstlisting}
-
-\textbf{Interpretation.} At the default threshold $0.5$ the model is
-very accurate overall but has \emph{low sensitivity} (about $30\%$): it
-misses most true defaulters, exactly as LDA did. Dropping the threshold
-to $0.2$ roughly doubles sensitivity (to about $60\%$) by flagging more
-customers, at the cost of more false positives (lower specificity). The
-right threshold depends on the bank's relative cost of a missed
-defaulter versus a false alarm. Note \texttt{sklearn}'s
-\texttt{confusion\_matrix} orders cells as
-$[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
-\end{solutionbox}
-\end{frame}
-
-% ---------------- Extended Exercise 4.6 ----------------
-\begin{frame}{Extended Exercise 4.6 \textemdash{} Predicting market direction out-of-sample [Python]}
-\begin{longexercise}
-Using \texttt{Weekly.csv} (weekly S\&P~500 returns 1990--2010;
-\texttt{Direction} is Up / Down):
-\begin{enumerate}
-  \item Fit a logistic regression of \texttt{Direction} on
-        \texttt{Lag1}--\texttt{Lag5} and \texttt{Volume} on the full data.
-        What in-sample accuracy do you get, and what does the confusion
-        matrix reveal?
-  \item Do an \emph{honest} out-of-sample test: train on
-        Year $\le 2008$, test on 2009--2010, using \texttt{Lag2} as the
-        only predictor. Report test accuracy and the confusion matrix for
-        logistic regression \emph{and} LDA.
-  \item Compare with the naive ``always predict Up'' baseline and explain
-        why market-direction prediction is so hard.
-\end{enumerate}
-Write runnable code and give the expected numbers.
-\end{longexercise}
-\end{frame}
-
-\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.6 (1/3)}
-\begin{solutionbox}
-\begin{lstlisting}
-import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-from sklearn.metrics import accuracy_score, confusion_matrix
-
-wk = pd.read_csv("../ALL CSV FILES - 2nd Edition/Weekly.csv")  # load
-y  = (wk["Direction"] == "Up").astype(int)            # encode Up=1, Down=0
-lags = ["Lag1","Lag2","Lag3","Lag4","Lag5","Volume"]  # predictor names
-
-# (1) in-sample logistic on all predictors
-full = LogisticRegression(max_iter=10000).fit(wk[lags], y)  # fit full model
-print("acc:", round(full.score(wk[lags], y), 3))    # training accuracy
-print(confusion_matrix(y, full.predict(wk[lags])))  # [[TN,FP],[FN,TP]]
-\end{lstlisting}
-\emph{Output:} \texttt{acc: 0.561}; confusion
-$[[54,430],[48,557]]$ in order $[[\mathrm{TN},\mathrm{FP}],[\mathrm{FN},\mathrm{TP}]]$.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}[fragile]{Solution \textemdash{} Extended Exercise 4.6 (2/3)}
-\begin{solutionbox}
-\begin{lstlisting}
-# (2) train Year<=2008, test 2009-2010, using Lag2 only
-tr, te = wk["Year"] <= 2008, wk["Year"] >= 2009    # boolean masks
-for nm, mdl in [("logit", LogisticRegression(max_iter=10000)),
-                ("LDA", LDA())]:                   # two linear classifiers
-    mdl.fit(wk.loc[tr, ["Lag2"]], y[tr])           # fit on training years
-    pred = mdl.predict(wk.loc[te, ["Lag2"]])       # 0/1 test predictions
-    print(nm, round(accuracy_score(y[te], pred), 3),
-          confusion_matrix(y[te], pred).ravel())   # acc and TN FP FN TP
-\end{lstlisting}
-\emph{Output:}\ \ \texttt{logit 0.625 [ 9 34 5 56]}\quad
-\texttt{LDA 0.625 [ 9 34 5 56]}\ (TN FP FN TP). Both linear classifiers
-give the \emph{same} result on the 2009--2010 hold-out ($n=104$).
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution \textemdash{} Extended Exercise 4.6 (3/3)}
-\begin{solutionbox}
-\textbf{Reading it.}
-\begin{itemize}
-  \item The full-data model reaches only $56\%$, and its confusion matrix
-        shows it predicts ``Up'' almost always ($430+557$ of $1089$): the
-        apparent edge is mostly the market's upward drift, not skill ---
-        and this is optimistic, being in-sample.
-  \item Out-of-sample (2009--2010) logistic regression and LDA give the
-        \emph{same} $62.5\%$ and confusion matrix (near-identical linear
-        classifiers). Both still predict ``Up'' almost every week, catching
-        $56/61$ up-weeks (sensitivity $0.92$) but only $9/43$ down-weeks
-        (specificity $0.21$).
-  \item \textbf{Baseline.} ``Always predict Up'' already scores
-        $61/104=58.7\%$; the models beat it only marginally.
-\end{itemize}
-\textbf{Why it is hard.} Weekly returns are close to a random walk: the
-lagged predictors carry almost no signal, the signal-to-noise ratio is
-tiny, and any real pattern is arbitraged away (market efficiency). Barely
-beating the ``always Up'' baseline --- and only by riding the drift --- is
-no basis for trading once transaction costs are included.
-\end{solutionbox}
-\end{frame}
-
-\section{Summary}
-% ============================================================
-
-\begin{frame}{Chapter 4 in one slide}
-  \begin{block}{What we accomplished}
-    A complete classification toolkit: discriminative (logistic),
-    generative (LDA / QDA / naive Bayes), evaluation (ROC, AUC), and
-    the unified GLM view.
-  \end{block}
-  \begin{itemize}
-    \item Modelled $\Pr(Y = k \mid X)$ in three different ways.
-    \item Used Bayes' theorem to derive LDA and QDA.
-    \item Evaluated classifiers via confusion matrices, ROC, AUC.
-    \item Generalised to count data via Poisson regression.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Vocabulary checklist}
-  \footnotesize
-  \begin{tabular}{ll}
-    \toprule
-    \textbf{Term} & \textbf{Meaning} \\
-    \midrule
-    Logit / log-odds & $\log[p / (1 - p)]$ \\
-    Maximum likelihood & Choose $\beta$ to maximise $\Pr(\mathrm{data} \mid \beta)$ \\
-    Discriminative model & Models $\Pr(Y \mid X)$ directly \\
-    Generative model & Models $\pi_k$ and $f_k(X)$, applies Bayes \\
-    LDA / QDA & Linear / quadratic discriminant analysis \\
-    Naive Bayes & Class-conditional independence assumption \\
-    Sensitivity / specificity & TP/(TP+FN) / TN/(TN+FP) \\
-    Precision & TP/(TP+FP) \\
-    ROC / AUC & TPR vs.\ FPR / area under that curve \\
-    GLM / link function & Family of regression-style models / $g(E[Y])$ \\
-    \bottomrule
-  \end{tabular}
-\end{frame}
-
-\begin{frame}{Key formulas at a glance}
-  \footnotesize
-  \begin{block}{Logistic regression}
-    $p(X) = e^{\beta_0 + \beta^\top X}/(1 + e^{\beta_0 + \beta^\top X})$,
-    \qquad
-    $\log\frac{p}{1-p} = \beta_0 + \beta^\top X = \eta$.
-  \end{block}
-  \vspace{-2.6mm}
-  \begin{block}{LDA / QDA}
-    $\delta_k(x) = x^\top \Sigma^{-1}\mu_k - \tfrac12 \mu_k^\top \Sigma^{-1}\mu_k + \log\pi_k$;
-    QDA gives each class its own $\Sigma_k$, so the quadratic term survives:
-    $\delta_k(x) = -\tfrac12 (x-\mu_k)^\top \Sigma_k^{-1}(x-\mu_k)
-      - \tfrac12\log|\Sigma_k| + \log\pi_k$.
-  \end{block}
-  \vspace{-2.6mm}
-  \begin{block}{Bayes posterior}
-    $\Pr(Y = k \mid X) = \pi_k f_k(X) / \sum_\ell \pi_\ell f_\ell(X)$.
-  \end{block}
-  \vspace{-2.6mm}
-  \begin{block}{Evaluation: confusion-matrix rates, ROC, AUC}
-    Sensitivity (recall, TPR) $=\mathrm{TP}/(\mathrm{TP+FN})$;\ \
-    specificity (TNR) $=\mathrm{TN}/(\mathrm{TN+FP})$;\ \
-    precision $=\mathrm{TP}/(\mathrm{TP+FP})$;\ \
-    FPR $=1-$spec.\ $=\mathrm{FP}/(\mathrm{FP+TN})$.
-    ROC: TPR vs.\ FPR across thresholds;
-    AUC $=\Pr\bigl(\hat p(\text{pos})>\hat p(\text{neg})\bigr)$, $0.5$ chance, $1$ perfect.
-  \end{block}
-  \vspace{-1mm}
-  \textbf{Threshold $\to$ boundary:}
-  $p>t \iff \eta > \log\frac{t}{1-t}$ ($t=0.5\iff\eta>0$);\ \
-  1-D LDA, common $\sigma^2$:
-  $x^\star = \frac{\mu_0+\mu_1}{2} - \frac{\sigma^2}{\mu_1-\mu_0}\log\frac{\pi_1}{\pi_0}$.
-\end{frame}
-
-\begin{frame}{Decision rules of thumb}
-  \begin{itemize}
-    \item Large $n$, modest $p$, no idea about distributions
-          $\Rightarrow$ logistic regression first.
-    \item Small $n$, classes look Gaussian $\Rightarrow$ LDA.
-    \item Many binary / categorical features, $p$ huge $\Rightarrow$
-          naive Bayes.
-    \item Highly nonlinear boundary, plenty of data $\Rightarrow$ try
-          KNN or kernel SVM (Ch.~9).
-    \item Choose the threshold by your loss function, not by default.
-    \item Standardise features before fitting any distance-based model.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Common pitfalls}
-  \begin{alertblock}{Don't}
-    \begin{enumerate}
-      \item Compare classifiers by accuracy alone on imbalanced data.
-      \item Treat logistic-regression probabilities as calibrated
-            without checking.
-      \item Use LDA on data with obviously different class
-            covariances.
-      \item Forget that QDA has $\sim K p^2/2$ parameters --- it overfits
-            with small $n$.
-      \item Combine LDA / QDA features without re-standardising.
-      \item Ignore class priors --- in rare-event detection a
-            ``perfect'' classifier with the wrong prior is unusable.
-    \end{enumerate}
-  \end{alertblock}
-\end{frame}
-
-\begin{frame}{Connections to the rest of the course}
-  \begin{itemize}
-    \item Ch.~3: linear regression is logistic regression's continuous
-          twin within the GLM framework.
-    \item Ch.~5: cross-validation for choosing thresholds and tuning.
-    \item Ch.~6: ridge / lasso regularisation extends to logistic
-          regression and GLMs.
-    \item Ch.~8: tree ensembles often beat all of today's methods on
-          tabular data.
-    \item Ch.~9: SVMs as another linear / kernelised classifier.
-    \item Ch.~10: deep learning is logistic regression with
-          representation learning baked in.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Self-check questions}
-  \begin{enumerate}
-    \item Why does ordinary linear regression fail for binary $Y$?
-          (p.~11)
-    \item In the Default data, why does \texttt{student} flip sign
-          once \texttt{balance} is included? (pp.~33--34)
-    \item Derive the LDA discriminant from Bayes' rule, assuming
-          $X \mid Y = k \sim \mathcal{N}(\mu_k, \Sigma)$.
-          (pp.~47--49; step-by-step in the appendix, pp.~117--119)
-    \item When does naive Bayes outperform logistic regression even
-          though its independence assumption is wrong? (pp.~62 and~67)
-    \item Sketch a confusion matrix for a fraud detector with $99\,\%$
-          accuracy on data with $1\,\%$ fraud. Is it useful?
-          (pp.~73--75)
-    \item Explain ROC and AUC. What does a $45^\circ$ ROC mean?
-          (pp.~80--82)
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Ten things to remember}
-  \begin{enumerate}
-    \item Linear regression is wrong for categorical $Y$ --- use a GLM.
-    \item Logistic regression: linear in log-odds.
-    \item Estimation by maximum likelihood; no closed form.
-    \item LDA: Gaussian classes, common $\Sigma$ $\Rightarrow$ linear
-          boundary.
-    \item QDA: separate $\Sigma_k$ $\Rightarrow$ quadratic boundary.
-    \item Naive Bayes: feature independence $\Rightarrow$ very low
-          variance.
-    \item Univariate slopes can flip sign --- watch for confounding.
-    \item Confusion matrix, sensitivity, specificity, ROC, AUC.
-    \item Threshold choice depends on costs.
-    \item Poisson GLM for counts; same framework via the link.
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{What's next}
-  Chapter 5: \emph{Resampling Methods}.
-  \begin{itemize}
-    \item Validation set, LOOCV, $k$-fold cross-validation.
-    \item The bootstrap.
-    \item Why these are the most important tools in your toolbox.
-  \end{itemize}
-\end{frame}
-
-
-% ============================================================
-\appendix
-\AtBeginSection[]{}
-\section{Appendix: optional and advanced material}
-% ============================================================
-
-\begin{frame}{Appendix --- what is in here, and why}
-  \small
-  Nothing in the appendix is needed to follow the chapter: each slide is a
-  formal derivation, a longer worked exercise, or a side topic.
-  \begin{block}{Contents of the appendix}
-    \begin{itemize}
-      \item \textbf{How logistic regression is actually fitted} --- log-likelihood, deviance and IRLS as three views of one optimisation. \texttt{statsmodels} does it for you.
-      \item \textbf{Multinomial logistic regression (the softmax)} --- the $K>2$ extension; the binary case carries every idea you need.
-      \item \textbf{Deriving LDA from Bayes' theorem (Extended Exercise 4.2)} --- where the discriminant comes from. The main deck states it; Exercise 4.5 applies it.
-      \item \textbf{Naive Bayes by hand (Extended Exercise 4.3)} --- a longer second pass over the calculation of Exercise 4.7.
-      \item \textbf{GLMs and Poisson regression} --- the umbrella over linear, logistic and Poisson regression, with the Bikeshare example and its lab code. Not examinable.
-    \end{itemize}
-  \end{block}
-\end{frame}
-
-\begin{frame}{Three equivalent ways to think about the optimisation}
-  \begin{itemize}
-    \item \textbf{Maximum likelihood}: find $\hat\beta$ that makes the
-          observed data most probable under the model.
-    \item \textbf{Cross-entropy minimisation}: $-\log L$ is exactly the
-          binary cross-entropy loss --- the same objective deep nets use.
-    \item \textbf{Iteratively reweighted least squares (IRLS)}: solve a
-          sequence of weighted regressions. Equivalent to Newton's
-          method on the log-likelihood.
-  \end{itemize}
-  \begin{takeaway}
-    All three give the same $\hat\beta$. Which view to take is a matter
-    of taste; deep-learning courses prefer cross-entropy, statistics
-    courses prefer maximum likelihood.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{From two classes to $K$: the softmax}
-  \small
-  \begin{block}{Multinomial logistic model}
-    Pick a baseline class (say $K$) and set, for $k = 1,\dots,K-1$,
-    \[
-      \Pr(Y = k \mid X)
-      = \frac{e^{\beta_{k0} + \beta_{k}^\top X}}
-             {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}},
-      \qquad
-      \Pr(Y = K \mid X)
-      = \frac{1}
-             {1 + \sum_{\ell=1}^{K-1} e^{\beta_{\ell 0} + \beta_\ell^\top X}}.
-    \]
-  \end{block}
-  \begin{readme}
-    Coefficients depend on the chosen baseline, but predictions are
-    invariant to the choice. The equivalent symmetric ``softmax''
-    parameterisation removes the need for a baseline --- this is the
-    form used in deep learning.
-  \end{readme}
-  \begin{takeaway}
-    The $K$ outputs are non-negative and sum to $1$ by construction, so
-    they are genuine probabilities. Predict the class with the largest
-    numerator.
-  \end{takeaway}
-\end{frame}
-
 % ---------------- Extended Exercise 4.2 ----------------
 \begin{frame}{Extended Exercise 4.2 \textemdash{} LDA from Bayes' theorem [Math]}
 \begin{longexercise}
@@ -2633,6 +2563,150 @@ Connection: Gaussian naive Bayes is exactly discriminant analysis with a
 \emph{diagonal} covariance matrix (all cross-correlations set to zero).
 \end{solutionbox}
 \end{frame}
+
+\subsection{Comparing the classifiers}
+
+\begin{frame}{Method comparison: when each wins}
+  \footnotesize
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Method} & \textbf{Boundary} & \textbf{Best when} \\
+    \midrule
+    Logistic regression & linear & no Gaussian assumption needed \\
+    LDA & linear & classes share covariance, normal \\
+    QDA & quadratic & classes have unequal covariance \\
+    Naive Bayes & flexible (per-feature) & many features, $n$ small \\
+    KNN & nonparametric & truth is highly nonlinear \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.5em}
+  \begin{takeaway}[In practice]
+    No method dominates universally. Treat all five as candidates;
+    pick by held-out AUC. With one line of scikit-learn each, the
+    comparison is essentially free.
+  \end{takeaway}
+  \begin{industry}[Risk and campaign teams: how it is actually reported]
+    Risk teams quote AUC as the Gini coefficient ($2\,\text{AUC}-1$) and the KS
+    statistic; campaign teams compare models at the \emph{top decile}, because
+    that is where the budget goes. Boosted trees (Chapter~8) often win outright ---
+    which is why regulated decisions keep the model they can explain.
+  \end{industry}
+\end{frame}
+
+\begin{frame}{Bayes optimum and our methods}
+  \begin{center}
+    \includegraphics[width=0.80\textwidth,height=0.46\textheight,keepaspectratio]{4_12.pdf}
+  \end{center}
+  \begin{takeaway}
+    Test error per scenario: \emph{no classifier wins everywhere} --- the
+    best method in each panel matches its data-generating process. This
+    is why we compare candidates by held-out error.
+  \end{takeaway}
+  \islpsource{Figure 4.12}
+\end{frame}
+
+% ---------------- Extended Exercise 4.4 ----------------
+\begin{frame}{Extended Exercise 4.4 \textemdash{} Choosing a classifier: three cases [Integrative]}
+\begin{longexercise}
+For each dataset, pick the most appropriate classifier from
+\{logistic regression, LDA, QDA, naive Bayes, KNN\} and justify it in
+terms of boundary shape, $n$ vs.\ $p$, within-class normality, feature
+type, and number of classes.
+\begin{description}
+  \item[A. Credit scoring.] $n=30{,}000$ applicants, $p=6$ continuous
+        predictors, $K=2$. The log-odds of default look approximately
+        linear; the two classes have similar spread; income is heavily
+        right-skewed.
+  \item[B. Tumour diagnosis.] $n=200$ patients, $p=3$ continuous features
+        that are roughly Gaussian within each class, $K=2$
+        (benign / malignant). The malignant class is visibly more
+        variable than the benign class.
+  \item[C. Spam filtering.] $n=1{,}000$ e-mails, $p=5{,}000$ binary
+        word-presence indicators, $K=2$. Features are discrete and many
+        are correlated; $p\gg n$.
+\end{description}
+Recommend a method for each and name your runner-up.
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.4 (1/2)}
+\begin{solutionbox}
+\textbf{A quick decision checklist.}
+Boundary linear? $\to$ logistic / LDA. Curved? $\to$ QDA / KNN.
+Gaussian within class with equal covariance? $\to$ LDA; unequal? $\to$
+QDA. $p\gg n$ or discrete features? $\to$ naive Bayes (or regularised
+logistic). Highly nonlinear, large $n$, standardised continuous? $\to$
+KNN.
+
+\vspace{1mm}
+\textbf{A --- Credit scoring $\Rightarrow$ logistic regression.}
+Large $n$, small $p$, binary response, and an approximately linear
+log-odds make logistic regression the natural first choice. It assumes
+nothing about the distribution of $X$, so the skewed income variable is
+harmless, and its coefficients are interpretable on the odds scale.
+\emph{Runner-up:} LDA (fine under approximate normality and equal
+covariance) --- but the skew makes logistic safer.
+
+\vspace{1mm}
+\textbf{B --- Tumour diagnosis $\Rightarrow$ QDA.}
+Features are roughly Gaussian within class, but the covariances clearly
+\emph{differ}, so the optimal boundary is quadratic --- exactly QDA's
+model. With $p=3$ each class covariance has only $6$ free entries, and
+$n=200$ easily supports two of them, so QDA's extra variance is
+affordable. \emph{Runner-up:} LDA (its lower variance would win if $n$
+were much smaller).
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution \textemdash{} Extended Exercise 4.4 (2/2)}
+\begin{solutionbox}
+\scriptsize
+\textbf{C --- Spam filtering $\Rightarrow$ naive Bayes.}
+With $p=5{,}000\gg n=1{,}000$, LDA/QDA cannot estimate a $p\times p$
+covariance (singular, millions of entries) and unregularised logistic
+regression would overfit badly. The features are binary, not Gaussian.
+Naive Bayes assumes conditional independence, needs only one-dimensional
+marginals, has very low variance, and is the classic strong text
+baseline. \emph{Runner-up:} $L_1/L_2$-regularised logistic regression.
+
+\vspace{1mm}
+\textbf{Where the remaining methods fit.}
+\begin{itemize}
+  \item \textbf{LDA} is the pick when features are Gaussian with a shared
+        covariance --- a middle ground between logistic and QDA; it is the
+        closest call in scenario A.
+  \item \textbf{KNN} wins only when the boundary is highly nonlinear,
+        the features are continuous and standardised, and $n$ is large
+        relative to $p$. None of A--C qualifies; C is catastrophic for
+        KNN (curse of dimensionality at $p=5{,}000$).
+\end{itemize}
+\begin{takeaway}
+Match the method to the boundary shape, the $n$-vs-$p$ budget, and the
+feature type --- then confirm the choice with held-out AUC.
+\end{takeaway}
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}[fragile]{LDA, QDA, naive Bayes head-to-head}
+  \begin{lstlisting}
+from sklearn.discriminant_analysis import (
+    LinearDiscriminantAnalysis    as LDA,
+    QuadraticDiscriminantAnalysis as QDA)    # Gaussian discriminants
+from sklearn.naive_bayes import GaussianNB   # naive Bayes (Gaussian)
+
+for name, mdl in [("LDA", LDA()),
+                  ("QDA", QDA()),
+                  ("NB",  GaussianNB())]:    # three models, same split
+    mdl.fit(Xtr, ytr)                        # estimate means/covariances
+    p = mdl.predict_proba(Xte)[:, 1]         # posterior P(class 1) on test
+    print(name, "AUC:", roc_auc_score(yte, p))  # compare by AUC
+  \end{lstlisting}
+  Continues the Python lab: \texttt{Xtr, Xte, ytr, yte} are the same
+  train/test split used for logistic regression, so the AUCs are directly
+  comparable. Add each model to the ROC axes with one more
+  \texttt{RocCurveDisplay.from\_estimator(...)} call.
+\end{frame}
+
 
 \begin{frame}{The GLM framework: one umbrella}
   Linear, logistic, and Poisson regression are all special cases of:

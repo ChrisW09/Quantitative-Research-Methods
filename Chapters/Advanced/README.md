@@ -28,7 +28,7 @@ Each module assumes the course chapters it extends:
 ## Layout
 
 Each module is one self-contained folder holding its deck and its lab together,
-the same shape as a chapter folder in [`Chapters/`](../Chapters/):
+the same shape as a chapter folder in [`Chapters/`](../):
 
 ```text
 Advanced/
@@ -56,7 +56,7 @@ conformal prediction and the P-splines are implemented from scratch on purpose
 ## Rebuilding a deck
 
 ```bash
-cd Advanced/advanced_01_rcts
+cd Chapters/Advanced/advanced_01_rcts
 python3 make_figures.py     # regenerate images/ from the course datasets
 pdflatex advanced_01_rcts.tex
 pdflatex advanced_01_rcts.tex   # second pass for the navigation bar

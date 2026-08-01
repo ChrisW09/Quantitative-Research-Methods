@@ -232,11 +232,11 @@ rule from the baseline and frame the pilot as the way to collect the missing
   across held-out windows is a more useful question for the fund than its value
   in any one window — and it is the honest version of cross-validation for a
   series.
-- **Nonlinearity in the lags.** `Advanced/` module **A4 (GLMs and splines)**
+- **Nonlinearity in the lags.** `Chapters/Advanced/` module **A4 (GLMs and splines)**
   fits a logistic GAM: replace the linear term in `Lag2` with a smooth and ask
   whether the extra flexibility survives an honest split. It does not, which is
   itself the lesson.
-- **Intervals without the normal approximation.** `Advanced/` module **A3
+- **Intervals without the normal approximation.** `Chapters/Advanced/` module **A3
   (conformal prediction)** builds prediction sets with finite-sample validity,
   and raises the question this project only touches: what would it mean to
   abstain on the weeks where the model has no opinion? Compare also the Wilson

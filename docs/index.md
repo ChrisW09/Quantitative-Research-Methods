@@ -13,7 +13,7 @@ datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
 [**12** decks]{.qrm-chip}
-[**1057** core slides *(+111 optional)*]{.qrm-chip}
+[**1027** core slides *(+139 optional)*]{.qrm-chip}
 [**127** exercises with solutions]{.qrm-chip}
 [**12** labs *(+3 code references)*]{.qrm-chip}
 [**3 + 5** mock exams]{.qrm-chip}
@@ -101,7 +101,7 @@ course is graded.
 :link: slides
 :link-type: doc
 
-Twelve decks: 1057 core slides, 111 more in optional appendices, every exercise
+Twelve decks: 1027 core slides, 139 more in optional appendices, every exercise
 with a worked solution.
 :::
 
@@ -189,7 +189,7 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 | | |
 |---|---|
-| Lecture decks | 10 chapters + two precourse decks · 1057 slides, plus 111 in optional appendices |
+| Lecture decks | 10 chapters + two precourse decks · 1027 slides, plus 139 in optional appendices |
 | Exercises | ~86 short (~5 min) + ~41 extended (~15 min), all with worked solutions |
 | Lab notebooks | 12 taught labs, each with worked solutions (2 precourse + 10 lecture chapters) · 3 code references for the untaught chapters (no deck, no solutions) |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |

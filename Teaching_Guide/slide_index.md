@@ -175,19 +175,17 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 
 ### Ch. 4 — Classification
 
-`chapter_04.pdf` — **112 slides** in the main flow plus **15** in the appendix, planned for **2 × 180 min** (≈ 290 min of actual teaching, ≈ 2.6 min per slide).
+`chapter_04.pdf` — **82 slides** in the main flow plus **43** in the appendix, planned for **2 × 180 min** (≈ 290 min of actual teaching, ≈ 3.5 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
-| *front matter* | 1–7 | 7 | 18 min |
-| Why this chapter matters | 8–16 | 9 | 23 min |
-| Logistic regression | 17–42 | 26 | 68 min |
-| Generative models | 43–65 | 23 | 59 min |
-| Comparison | 66–71 | 6 | 16 min |
-| Evaluation | 72–89 | 18 | 46 min |
-| Python Lab | 90–102 | 13 | 34 min |
-| Summary | 103–112 | 10 | 26 min |
-| Appendix: optional and advanced material | 113–127 | 15 | optional |
+| *front matter* | 1–7 | 7 | 25 min |
+| Why this chapter matters | 8–16 | 9 | 32 min |
+| Logistic regression | 17–42 | 26 | 92 min |
+| Evaluation | 43–60 | 18 | 63 min |
+| Python Lab | 61–72 | 12 | 43 min |
+| Summary | 73–82 | 10 | 35 min |
+| Appendix: optional and advanced material | 83–125 | 43 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
@@ -196,19 +194,19 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 4.3 | short | Math | p. 29 | p. 30 |
 | Exercise 4.4 | short | Math | p. 35 | p. 36 |
 | Extended Exercise 4.1 | extended | Math | p. 39 | p. 40 |
-| Exercise 4.5 | short | Math | p. 52 | p. 53 |
-| Exercise 4.6 | short | Concept | p. 59 | p. 60 |
-| Exercise 4.7 | short | Math | p. 63 | p. 64 |
-| Extended Exercise 4.4 | extended | Integrative | p. 69 | p. 70 |
-| Exercise 4.8 | short | Concept | p. 76 | p. 77 |
-| Exercise 4.9 | short | Concept | p. 83 | p. 84 |
-| Extended Exercise 4.5 | extended | Python | p. 86 | p. 87 |
-| Exercise 4.10 | short | Python | p. 96 | p. 97 |
-| Extended Exercise 4.6 | extended | Python | p. 99 | p. 100 |
-| Extended Exercise 4.2 | extended | Math | p. 116 | p. 117 |
-| Extended Exercise 4.3 | extended | Math | p. 120 | p. 121 |
+| Exercise 4.8 | short | Concept | p. 47 | p. 48 |
+| Exercise 4.9 | short | Concept | p. 54 | p. 55 |
+| Extended Exercise 4.5 | extended | Python | p. 57 | p. 58 |
+| Exercise 4.10 | short | Python | p. 66 | p. 67 |
+| Extended Exercise 4.6 | extended | Python | p. 69 | p. 70 |
+| Exercise 4.5 | short | Math | p. 94 | p. 95 |
+| Exercise 4.6 | short | Concept | p. 101 | p. 102 |
+| Exercise 4.7 | short | Math | p. 105 | p. 106 |
+| Extended Exercise 4.2 | extended | Math | p. 108 | p. 109 |
+| Extended Exercise 4.3 | extended | Math | p. 112 | p. 113 |
+| Extended Exercise 4.4 | extended | Integrative | p. 118 | p. 119 |
 
-**Notebook cues:** 1 in this deck (near pp. 91).
+**Notebook cues:** 1 in this deck (near pp. 62).
 
 ### Ch. 5 — Resampling Methods
 

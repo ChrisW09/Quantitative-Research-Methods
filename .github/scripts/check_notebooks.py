@@ -36,7 +36,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 NOTEBOOKS = ROOT / "Chapters"
-ADVANCED = ROOT / "Advanced"
+ADVANCED = ROOT / "Chapters" / "Advanced"
 PROJECTS = ROOT / "Projects"
 
 try:
