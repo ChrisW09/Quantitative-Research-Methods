@@ -44,7 +44,7 @@ Every paper exists in three formats:
 |---|:--:|---|:--:|
 | Mock Exam 1 | Lecture 4 | Ch 1–3 | 90 min · 90 pts |
 | Mock Exam 2 | Lecture 8 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Final Mock Exam | Lecture 12 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
+| Final Mock Exam | Lecture 15 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
 
 The final exam also exists in three parallel versions (**A / B / C**) — same
 structure and difficulty, different numbers — for seating variants or for a
@@ -64,7 +64,7 @@ needs is taught.
 | B | Lecture 7 | Bias–variance, KNN regression (Ch 2) | Reading multiple regression output (Ch 3) | **Cross-validation and the bootstrap (Ch 5)** |
 | C | Lecture 8 | Conditional probability, Bayes, odds (Ch 0 + 0b) | Dummies and interactions (Ch 3) | **Ridge and lasso (Ch 6)** |
 | D | Lecture 10 | Honest model evaluation — leakage, splits (Ch 2 + 5) | KNN classification by hand (Ch 2 + 4) | **Trees: Gini, splitting, pruning, forests (Ch 8)** |
-| E | Lecture 12 | Reading `describe()` output, SE vs SD (Ch 0) | Polynomial regression, model choice (Ch 5 + 7) | **Multiple testing: Bonferroni, Holm, BH (Ch 13)** |
+| E | Lecture 15 | Reading `describe()` output, SE vs SD (Ch 0) | Polynomial regression, model choice (Ch 5 + 7) | **Multiple testing: Bonferroni, Holm, BH (Ch 13)** |
 
 The bold chapter is where each paper's hardest problem sits, so the five are
 **sequenced, not interchangeable**: A needs Chapter 4, B Chapter 5, C

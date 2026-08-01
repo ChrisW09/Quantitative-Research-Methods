@@ -46,7 +46,8 @@ ADV_SLIDES = ROOT / "Chapters" / "Advanced"
 EXTRA = HERE / "_extra"
 
 # Chapters with a compiled deck ("00"/"00b" are the two precourse sessions).
-SLIDE_CHAPTERS = ["00", "00b", "01", "02", "03", "04", "05", "06", "07", "08", "10", "13"]
+SLIDE_CHAPTERS = ["00", "00b", "01", "02", "03", "04", "05", "06", "07", "08",
+                  "09", "10", "11", "12", "13"]
 
 # The four optional advanced modules (decks + labs under Advanced/).
 ADV_MODULES = [

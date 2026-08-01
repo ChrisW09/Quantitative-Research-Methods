@@ -1,18 +1,18 @@
 ---
 myst:
   html_meta:
-    description: "The thirteen-session semester plan — a taught precourse session plus twelve chapter lectures over ten ISLP chapters — with the recommended split points, the untaught chapters, and the assessment calendar."
+    description: "The sixteen-session semester plan — a taught precourse session plus fifteen chapter lectures over thirteen ISLP chapters — with the recommended split points and the assessment calendar."
 ---
 
 # The course at a glance
 
 {.qrm-lead}
-A 13-session semester (13 × 180 min), worth **6 ECTS**: one taught precourse
-session covering both precourse decks, then twelve chapter lectures over ten
-ISLP chapters.
+A 16-session semester (16 × 180 min), worth **6 ECTS**: one taught precourse
+session covering both precourse decks, then fifteen chapter lectures over
+thirteen ISLP chapters.
 
 :::{container} qrm-chips
-[**13** sessions × **180 min**]{.qrm-chip}
+[**16** sessions × **180 min**]{.qrm-chip}
 [**6** ECTS]{.qrm-chip}
 [**1** taught precourse session]{.qrm-chip}
 [**3** decks split across two lectures]{.qrm-chip}
@@ -21,9 +21,9 @@ ISLP chapters.
 
 ## Semester plan
 
-The precourse opens the semester as a **taught session**; the twelve chapter
-lectures keep their numbers 1–12, which is what the exam calendar and the
-[runsheets](teaching.md) refer to.
+The precourse opens the semester as a **taught session**; the fifteen chapter
+lectures run in ISLP order and keep their numbers 1–15, which is what the exam
+calendar and the [runsheets](teaching.md) refer to.
 
 | Session | Chapter(s) | Content | Exercises |
 |:--:|:--:|---|---|
@@ -38,8 +38,11 @@ lectures keep their numbers 1–12, which is what the exam calendar and the
 | 8 | Ch 6 | Subset selection; Cₚ/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
 | 9 | Ch 7 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | 10 | Ch 8 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
-| 11 | Ch 10 | Neural nets; forward pass; backprop/GD; CNNs; regularization (PyTorch) | 10.1–10.6 |
-| 12 | Ch 13 | Multiple testing; FWER; Bonferroni; Holm; FDR & Benjamini–Hochberg | 13.1–13.5 |
+| 11 | Ch 9 | The maximal-margin classifier; the soft margin and *C*; kernels; SVMs tuned by CV | 9.x |
+| 12 | Ch 10 | Neural nets; forward pass; backprop/GD; CNNs; regularization (PyTorch) | 10.1–10.6 |
+| 13 | Ch 11 | Censoring; the survival and hazard functions; Kaplan–Meier; the log-rank test; Cox regression | 11.x |
+| 14 | Ch 12 | Principal components; *K*-means; hierarchical clustering and linkage | 12.x |
+| 15 | Ch 13 | Multiple testing; FWER; Bonferroni; Holm; FDR & Benjamini–Hochberg | 13.1–13.5 |
 
 ```{admonition} Split lectures
 :class: tip
@@ -65,13 +68,17 @@ twelve-question self-check on page 7 of `chapter_00.pdf` and the notation table
 on page 5 of `chapter_00b.pdf` — see [For students](for-students.md).
 ```
 
-## Untaught chapters
+```{admonition} All thirteen ISLP chapters are taught, in book order
+:class: note
 
 Chapters **9 (Support Vector Machines)**, **11 (Survival Analysis)** and
-**12 (Unsupervised Learning)** are not part of the 12-lecture plan and have **no
-lecture deck**. Each ships only as a [code reference notebook](labs.md) —
-Python for the methods, to be read alongside the ISLP chapter, which does the
-teaching — and, unlike the twelve taught labs, **without worked solutions**.
+**12 (Unsupervised Learning)** used to sit outside the plan as code-reference
+notebooks without a deck. They are now full lectures — 11, 13 and 14 — each with
+its own [deck](slides.md) and a [lab](labs.md) carrying worked solutions like
+every other. Lectures 1–10 kept their numbers, so anything pegged to the first
+ten sessions is unaffected; deep learning moved to Lecture 12 and multiple
+testing to Lecture 15.
+```
 
 ## Assessment
 
@@ -99,8 +106,8 @@ as homework.
 | Mock Exam 2 | Lecture 8 | Chapters 4–6 (+ light cumulative) | 90 min · 90 pts |
 | Short Exam C | Lecture 8 | Ch 0 + 0b, Ch 3, **Ch 6** | 60 min · 60 pts |
 | Short Exam D | Lecture 10 | Ch 2 + 5, Ch 2 + 4, **Ch 8** | 60 min · 60 pts |
-| Final Mock Exam | Lecture 12 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
-| Short Exam E | Lecture 12 | Ch 0, Ch 5 + 7, **Ch 13** | 60 min · 60 pts |
+| Final Mock Exam | Lecture 15 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
+| Short Exam E | Lecture 15 | Ch 0, Ch 5 + 7, **Ch 13** | 60 min · 60 pts |
 
 The three mock exams are the full-length rehearsals; the five 60-minute short
 exams are the formative layer, and the bold chapter is where each one's hardest

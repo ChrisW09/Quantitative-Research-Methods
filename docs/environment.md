@@ -57,9 +57,9 @@ megabytes — see [Why the install is large](#why-the-install-is-large) below.
   support. Note that it arrives whether you ask for it or not — see below.
 
 `lifelines`
-: Chapter 11 (survival analysis) — a self-study code reference, so you can skip
-  the notebook if you only teach the 12-lecture plan. The package still
-  installs, because `ISLP` requires it.
+: Chapter 11 (survival analysis). Required, not optional: Chapter 11 is a taught
+  lecture with its own deck and lab, and the Kaplan–Meier and Cox fits in that
+  lab run on `lifelines`. It arrives with `ISLP` in any case.
 
 ## Why the install is large
 

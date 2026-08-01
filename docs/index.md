@@ -1,21 +1,21 @@
 ---
 myst:
   html_meta:
-    description: "A complete, ready-to-teach university course in statistical learning based on ISLP — twelve Beamer lecture decks, fifteen Jupyter labs, eight mock exams and the course datasets."
+    description: "A complete, ready-to-teach university course in statistical learning based on ISLP — fifteen Beamer lecture decks, fifteen Jupyter labs, eight mock exams and the course datasets."
 ---
 
 # Quantitative Research Methods
 
 {.qrm-lead}
-A complete, ready-to-teach university course in statistical learning — twelve
+A complete, ready-to-teach university course in statistical learning — fifteen
 Beamer decks, fifteen Jupyter notebooks, eight mock exams and the course
 datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
-[**12** decks]{.qrm-chip}
-[**1027** core slides *(+139 optional)*]{.qrm-chip}
+[**15** decks]{.qrm-chip}
+[**1287** core slides *(+165 optional)*]{.qrm-chip}
 [**127** exercises with solutions]{.qrm-chip}
-[**12** labs *(+3 code references)*]{.qrm-chip}
+[**15** labs *(with solutions)*]{.qrm-chip}
 [**3 + 5** mock exams]{.qrm-chip}
 [**22** datasets]{.qrm-chip}
 :::
@@ -93,7 +93,7 @@ Repository layout →
 :link: course
 :link-type: doc
 
-The 13-session plan, the chapter map, the three split points — and how the
+The 16-session plan, the chapter map, the three split points — and how the
 course is graded.
 :::
 
@@ -101,7 +101,7 @@ course is graded.
 :link: slides
 :link-type: doc
 
-Twelve decks: 1027 core slides, 139 more in optional appendices, every exercise
+Fifteen decks: 1287 core slides, 165 more in optional appendices, every exercise
 with a worked solution.
 :::
 
@@ -109,8 +109,8 @@ with a worked solution.
 :link: labs
 :link-type: doc
 
-Twelve taught labs plus three code references, rendered here in full and
-runnable on Colab or locally.
+Fifteen labs, one per deck, each closing with worked solutions — rendered here
+in full and runnable on Colab or locally.
 :::
 
 :::{grid-item-card} 📝 Mock exams
@@ -167,7 +167,7 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 **Slides built for the room.**
 : Every deck moves motivation → intuition → formal definition → worked example,
-  with colour-coded callout boxes and ~86 short + ~41 extended exercises, each
+  with colour-coded callout boxes and ~106 short + ~50 extended exercises, each
   followed by a full solution. The hardest, optional material sits in a per-deck
   [appendix](slides.md), so the main thread fits the sessions it has.
 
@@ -189,14 +189,14 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 | | |
 |---|---|
-| Lecture decks | 10 chapters + two precourse decks · 1027 slides, plus 139 in optional appendices |
-| Exercises | ~86 short (~5 min) + ~41 extended (~15 min), all with worked solutions |
-| Lab notebooks | 12 taught labs, each with worked solutions (2 precourse + 10 lecture chapters) · 3 code references for the untaught chapters (no deck, no solutions) |
+| Lecture decks | 13 ISLP chapters + two precourse decks · 1287 slides, plus 165 in optional appendices |
+| Exercises | ~106 short (~5 min) + ~50 extended (~15 min), all with worked solutions |
+| Lab notebooks | 15 labs, one per deck (2 precourse + 13 chapters), each closing with worked Python solutions |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Advanced modules | 4 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines) · 300 slides + 4 notebooks |
 | Short projects | 6 challenges on real data, 3–5 h each, each with a fixed held-out set, a baseline to beat and a memo as the deliverable |
-| Semester shape | 13 × 180 min: a taught precourse session + 12 chapter lectures · **6 ECTS** |
+| Semester shape | 16 × 180 min: a taught precourse session + 15 chapter lectures · **6 ECTS** |
 | Assessment | One written exam at the end of the semester (120 min, 100% of the grade); the eight practice papers do not count |
 | Sources | LaTeX (Beamer) · Jupyter · Python 3.9+ · one `make` build |
 

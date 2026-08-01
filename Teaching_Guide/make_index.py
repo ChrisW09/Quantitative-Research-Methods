@@ -43,7 +43,10 @@ DECKS = {
     "chapter_06":  ("Ch. 6 — Model Selection & Regularisation", 1),
     "chapter_07":  ("Ch. 7 — Moving Beyond Linearity", 1),
     "chapter_08":  ("Ch. 8 — Tree-Based Methods", 1),
+    "chapter_09":  ("Ch. 9 — Support Vector Machines", 1),
     "chapter_10":  ("Ch. 10 — Deep Learning", 1),
+    "chapter_11":  ("Ch. 11 — Survival Analysis", 1),
+    "chapter_12":  ("Ch. 12 — Unsupervised Learning", 1),
     "chapter_13":  ("Ch. 13 — Multiple Testing", 1),
 }
 

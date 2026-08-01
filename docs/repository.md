@@ -21,7 +21,7 @@ shape.
 │   │   ├── chapter_NN.pdf           #   compiled deck (committed)
 │   │   ├── chapter_NN_lab.ipynb     #   companion lab, with stored outputs
 │   │   ├── images/                  #   matplotlib figures used by the deck
-│   │   └── make_figures.py          #   (chapter_00, chapter_00b) regenerates them
+│   │   └── make_figures.py          #   regenerates them, where a deck ships one
 │   └── Advanced/                    #   four optional self-study modules, same shape
 │       ├── README.md
 │       ├── STYLE_DECK.md            #   the house style, distilled, for a new module
@@ -39,7 +39,7 @@ shape.
 │       ├── project_N_starter.ipynb  #   Colab-ready scaffolding
 │       └── SOLUTION_NOTES.md        #   expected findings, the trap, marking guide
 ├── Teaching_Guide/                  # instructor kit: plan, index, checklist, handouts
-│   ├── semester_plan.md             #   the thirteen weeks on one page
+│   ├── semester_plan.md             #   the sixteen weeks on one page
 │   ├── slide_index.md               #   generated: sections, exercises, page numbers
 │   ├── before_class.md              #   the ten-minute pre-lecture checklist
 │   ├── deck_triage_proposal.md      #   audit: what could become appendix material
@@ -53,15 +53,6 @@ shape.
 ├── requirements.txt                 # pinned Python environment for the notebooks
 ├── CITATION.cff                     # how to cite these materials
 └── README.md
-```
-
-```{admonition} Three chapters have a lab but no deck
-:class: note
-
-`chapter_09`, `chapter_11` and `chapter_12` (SVM, survival analysis,
-unsupervised learning) sit outside the taught plan, so their folders hold a
-notebook and nothing else. That is deliberate, not an unfinished build —
-`make check` reports them as *no deck (code reference)*.
 ```
 
 ## What is and isn't committed
@@ -79,9 +70,9 @@ make them useless as assessment.
 ## Naming conventions
 
 - Chapter numbers always follow **ISLP**, zero-padded to two digits
-  (`chapter_04`), so slides, labs and datasets line up. The gaps are intentional:
-  chapters 9, 11 and 12 have a notebook but no deck, because they are untaught
-  [code references](labs.md) rather than labs.
+  (`chapter_04`), so slides, labs and datasets line up. There are no gaps: all
+  thirteen chapters carry a deck and a [lab](labs.md), and `chapter_00` /
+  `chapter_00b` hold the two precourse decks.
 - Every file in a chapter folder is named for that folder, so a path is
   self-describing and a glob is unambiguous: `chapter_04/chapter_04.tex`,
   `chapter_04/chapter_04_lab.ipynb`. The build scripts rely on this — they find

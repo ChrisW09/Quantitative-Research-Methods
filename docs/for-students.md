@@ -12,10 +12,10 @@ work it is, how the labs fit around the lectures, what to do when your output
 does not match the slides, and how to revise.
 
 :::{container} qrm-chips
-[**13** sessions × **180 min**]{.qrm-chip}
+[**16** sessions × **180 min**]{.qrm-chip}
 [**6** ECTS]{.qrm-chip}
 [graded by **one 120-min exam**]{.qrm-chip}
-[**12** labs *(with solutions)*]{.qrm-chip}
+[**15** labs *(with solutions)*]{.qrm-chip}
 [**Colab** on day one]{.qrm-chip}
 :::
 
@@ -41,8 +41,8 @@ precourse.
 ## The precourse session, and the skip rule
 
 **The precourse is taught.** It opens the semester as a single 180-minute
-session drawing on both precourse decks, because the ten chapter decks use all
-of this material and explain none of it.
+session drawing on both precourse decks, because the thirteen chapter decks use
+all of this material and explain none of it.
 
 One session cannot cover both decks — together they run to 157 slides — so the
 session is a **guided selection**, and the two decks stay available in full as
@@ -101,8 +101,8 @@ what is pinned and why the download is so large.
 
 ## How the labs relate to the lectures
 
-Each of the twelve taught chapters has **one deck and one notebook**, and they
-are written as a pair:
+Every chapter has **one deck and one notebook** — fifteen of each, the two
+precourse sessions included — and they are written as a pair:
 
 - the deck moves motivation → intuition → definition → worked example, and drops
   a cyan **"switch to the notebook now"** box at each point where the lab picks
@@ -112,12 +112,11 @@ are written as a pair:
 - every exercise *inside* a deck is followed immediately by its own full
   solution slide, so you are never stuck on a prompt with nowhere to go.
 
-Three ISLP chapters — **9 (Support Vector Machines)**, **11 (Survival
-Analysis)** and **12 (Unsupervised Learning)** — are outside the twelve-lecture
-plan. They have **no deck**, and their notebooks are **code references without
-worked solutions**: read the ISLP chapter first, then use the notebook to see
-how the methods are run in Python. Do not treat them as labs equivalent to the
-twelve.
+That holds for **all thirteen ISLP chapters**, support vector machines (Ch 9),
+survival analysis (Ch 11) and unsupervised learning (Ch 12) included: each is a
+taught lecture with its own deck, and each lab closes with worked solutions.
+There is no chapter in the course you are expected to teach yourself from the
+book alone.
 
 ```{admonition} The labs are the part that matters
 :class: important
@@ -163,8 +162,7 @@ worked solution behind it.
 | Material | Solutions |
 |---|---|
 | Exercises inside a deck | **Yes, immediately** — the next slide is always the worked solution, including in the appendices |
-| The twelve taught lab notebooks | **Yes** — each ends in a *Lecture exercises — worked Python solutions* section |
-| The three code-reference notebooks (Ch 9, 11, 12) | **No** — the closing exercises are deliberately left unanswered |
+| The fifteen lab notebooks | **Yes, every one** — each ends in a *Lecture exercises — worked Python solutions* section |
 | Mock exams and short exams | **Yes — handed out together with the paper**; the papers themselves are not published here, see below |
 
 The practice papers come **with their worked solutions**, distributed at the
@@ -252,7 +250,7 @@ released once the material it needs has been taught:
 | B | Lecture 7 | Cross-validation and the bootstrap (Ch 5) |
 | C | Lecture 8 | Ridge and the lasso (Ch 6) |
 | D | Lecture 10 | Trees: Gini, splitting, pruning, forests (Ch 8) |
-| E | Lecture 12 | Multiple testing: Bonferroni, Holm, BH (Ch 13) |
+| E | Lecture 15 | Multiple testing: Bonferroni, Holm, BH (Ch 13) |
 
 The first two problems of each paper reach back to earlier chapters, so a short
 exam is a cumulative check on everything up to that point rather than a test of
@@ -267,7 +265,7 @@ papers themselves come from your lecturer.
 ## Where to go next
 
 - [Quick start](quickstart.md) — Colab in one click, and the local install for later.
-- [The course at a glance](course.md) — the twelve-lecture plan and the assessment calendar.
+- [The course at a glance](course.md) — the fifteen-lecture plan and the assessment calendar.
 - [Lecture slides](slides.md) — every deck, what it covers, and what is in its appendix.
 - [Lab notebooks](labs.md) — all fifteen notebooks, rendered in full.
 - [Mock exams](exams.md) — the eight practice papers and what each covers.

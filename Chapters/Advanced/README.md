@@ -1,12 +1,12 @@
 # Advanced modules
 
-Four optional, self-study modules that extend the 12-lecture course beyond
+Four optional, self-study modules that extend the 15-lecture course beyond
 ISLP: causal inference, model explanation, distribution-free uncertainty, and
 the GLM/spline machinery behind Chapters 4 and 7. Each module is a full Beamer
 deck in the course's house style — same box grammar, every exercise followed
 immediately by its worked solution, closing summary block, optional appendix —
 paired with a companion Jupyter notebook whose numbers match the slides
-seed-for-seed. They are **not** part of the 12-lecture plan and are not
+seed-for-seed. They are **not** part of the 15-lecture plan and are not
 required by any exam.
 
 | Module | Title | What it covers | Deck | Exercises | Notebook |

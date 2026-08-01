@@ -9,10 +9,11 @@ Each chapter folder (`chapter_NN/`) is self-contained and holds **everything for
 that chapter**: the deck source `chapter_NN.tex`, its `images/`, the compiled
 `chapter_NN.pdf`, and the companion lab `chapter_NN_lab.ipynb`.
 
-Twelve chapters carry a deck. Three — `chapter_09` (SVM), `chapter_11`
-(survival analysis) and `chapter_12` (unsupervised learning) — sit outside the
-taught plan and hold only a notebook: code references to read alongside the ISLP
-chapter, without worked solutions.
+Every chapter carries both — fifteen decks and fifteen notebooks, counting the
+two precourse sessions. `chapter_09` (SVM), `chapter_11` (survival analysis) and
+`chapter_12` (unsupervised learning) were once notebook-only code references;
+they are now taught chapters like the rest, with a deck each and worked
+solutions in their labs.
 
 `chapter_00/` is the **first half of the taught precourse session**, a refresher of the undergraduate
 material the course assumes. It is not an ISLP chapter: it revisits descriptive
@@ -41,10 +42,10 @@ strand are in its appendix. Companion notebook:
 Every deck follows the same flow — motivation → intuition → formal definition →
 worked example — in the HSBI house style, with:
 
-- **86 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
+- **106 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
   slide immediately followed by a teal worked-solution slide; long solutions run
   across a clean `(1/2)` / `(2/2)` pair.
-- **41 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
+- **50 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
   "Extended exercise" box — integrative, multi-part problems with detailed
   multi-slide solutions.
 - Every exercise is tagged **[Concept]/[Math]/[Python]** (short) or
@@ -86,31 +87,38 @@ works as homework.
 | 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
 | 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
 | 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
+| 9  | the geometry in full — distance to a hyperplane and why *M* = 1/‖β‖ · the dual problem and where the αᵢ come from · support vector regression · Extended Exercise 9.3 (choosing a classifier) | 9 |
 | 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
+| 11 | Greenwood's formula · other censoring, and truncation · deriving the partial likelihood, and ties · the log-rank test as a score test of the Cox model · time-varying covariates and immortal-time bias · Exercise 11.7 (the exponential model) | 8 |
+| 12 | the two forms of the *K*-means objective · PCA as the best low-rank approximation · matrix completion for missing values · the silhouette width · Extended Exercise 12.3 (a full workflow on gene expression) | 9 |
 | 13 | the four outcomes drawn · resampling-based inference · post-selection inference | 6 |
 
 ## Exercises per chapter
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher | 10 | 4 | 104 + 16 |
-| 0b | Precourse (b) — toolkit | 6 | 2 | 48 + 9 |
-| 1  | Introduction | 3 | 1 | 68 + 6 |
-| 2  | Statistical Learning | 8 | 4 | 105 + 8 |
-| 3  | Linear Regression | 12 | 6 | 142 + 11 |
+| 0  | Precourse (a) — statistics refresher | 10 | 4 | 106 + 16 |
+| 0b | Precourse (b) — toolkit | 6 | 2 | 51 + 9 |
+| 1  | Introduction | 3 | 1 | 71 + 6 |
+| 2  | Statistical Learning | 8 | 4 | 107 + 8 |
+| 3  | Linear Regression | 12 | 6 | 144 + 11 |
 | 4  | Classification | 10 | 6 | 82 + 43 |
-| 5  | Resampling Methods | 6 | 3 | 77 + 7 |
-| 6  | Linear Model Selection & Regularization | 7 | 3 | 79 + 11 |
-| 7  | Moving Beyond Linearity | 6 | 3 | 83 + 7 |
-| 8  | Tree-Based Methods | 7 | 3 | 81 + 7 |
-| 10 | Deep Learning | 6 | 3 | 71 + 8 |
-| 13 | Multiple Testing | 5 | 3 | 61 + 6 |
-| **Total** | | **86** | **41** | **1029 + 111** |
+| 5  | Resampling Methods | 6 | 3 | 79 + 7 |
+| 6  | Linear Model Selection & Regularization | 7 | 3 | 81 + 11 |
+| 7  | Moving Beyond Linearity | 6 | 3 | 85 + 7 |
+| 8  | Tree-Based Methods | 7 | 3 | 83 + 7 |
+| 9  | Support Vector Machines | 7 | 3 | 84 + 9 |
+| 10 | Deep Learning | 6 | 3 | 75 + 8 |
+| 11 | Survival Analysis | 7 | 3 | 85 + 8 |
+| 12 | Unsupervised Learning | 6 | 3 | 91 + 9 |
+| 13 | Multiple Testing | 5 | 3 | 63 + 6 |
+| **Total** | | **106** | **50** | **1287 + 165** |
 
-## Suggested 12-lecture plan (180 min each)
+## Suggested 15-lecture plan (180 min each)
 
-Ten chapters mapped onto twelve 180-minute lectures, preceded by the taught precourse session — thirteen sessions in all. The three heaviest
-chapters (2, 3, 4) each span two lectures; the split point is a natural
+Thirteen chapters mapped onto fifteen 180-minute lectures in ISLP order,
+preceded by the taught precourse session — sixteen sessions in all. The three
+heaviest chapters (2, 3, 4) each span two lectures; the split point is a natural
 section boundary so you can stop and resume cleanly.
 
 | Lecture | Chapter(s) | Content | Exercises |
@@ -126,8 +134,11 @@ section boundary so you can stop and resume cleanly.
 | 8  | Ch 6 | Subset selection; Cp/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
 | 9  | Ch 7 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | 10 | Ch 8 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
-| 11 | Ch 10 | Neural nets; forward pass; backprop/GD; CNNs; regularization | 10.1–10.6 |
-| 12 | Ch 13 | Multiple testing; FWER; Bonferroni; Holm; FDR & Benjamini–Hochberg | 13.1–13.5 |
+| 11 | Ch 9  | The maximal margin; the soft margin and C; kernels; SVMs tuned by CV | 9.x |
+| 12 | Ch 10 | Neural nets; forward pass; backprop/GD; CNNs; regularization | 10.1–10.6 |
+| 13 | Ch 11 | Censoring; the survival and hazard functions; Kaplan–Meier; log-rank; Cox | 11.x |
+| 14 | Ch 12 | Principal components; K-means; hierarchical clustering and linkage | 12.x |
+| 15 | Ch 13 | Multiple testing; FWER; Bonferroni; Holm; FDR & Benjamini–Hochberg | 13.1–13.5 |
 
 For the split lectures, the recommended stopping points are: **Ch 2** after the
 KNN / bias–variance material; **Ch 3** after "Goodness of fit / the four

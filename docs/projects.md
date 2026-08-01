@@ -35,7 +35,7 @@ predicted well enough to act on."
 | 3 | Can you predict the market? | Tell a fund whether to trade on last week's returns — with an interval | `Weekly` | Ch 4, 5 | Lecture 7 |
 | 4 | A model the brand manager can read | Choose between the most accurate model and one you can explain | `OJ` | Ch 8 | Lecture 10 |
 | 5 | What is it worth, and how sure are you? | Value five neighbourhoods, each with a defensible interval | `Boston` | Ch 3, 7 | Lecture 9 |
-| 6 | How many managers can actually pick stocks? | Give a pension trustee one number — it may be zero | `Fund` | Ch 13 | Lecture 12 |
+| 6 | How many managers can actually pick stocks? | Give a pension trustee one number — it may be zero | `Fund` | Ch 13 | Lecture 15 |
 
 The briefs, starters and notes live in
 [`Projects/`](https://github.com/ChrisW09/Quantitative-Research-Methods/tree/main/Projects).

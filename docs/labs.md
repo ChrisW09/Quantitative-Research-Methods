@@ -1,23 +1,19 @@
 ---
 myst:
   html_meta:
-    description: "Fifteen Jupyter notebooks — twelve taught labs with worked solutions and three code references — rendered in full and runnable on Google Colab with one click."
+    description: "Fifteen Jupyter notebooks — one per lecture deck, each closing with worked solutions — rendered in full and runnable on Google Colab with one click."
 ---
 
 # Lab notebooks
 
 {.qrm-lead}
 Fifteen notebooks, one per chapter, each living beside the deck it accompanies
-in `Chapters/chapter_NN/chapter_NN_lab.ipynb`. They come in two kinds.
+in `Chapters/chapter_NN/chapter_NN_lab.ipynb` — **one lab per lecture deck**,
+both precourse sessions included.
 
-**Twelve taught labs** — one per lecture deck, both precourse sessions
-included. Each mirrors its chapter's Python lab and closes with **worked
-solutions** to that chapter's exercises. These are the labs the course is built
-around.
-
-**Three code references** — chapters 9, 11 and 12 have a notebook but **no
-lecture deck** and **no worked solutions**. They show how to run the methods in
-Python; the ISLP chapter does the teaching. Read the chapter first.
+Each mirrors its chapter's Python lab and closes with **worked solutions** to
+that chapter's exercises. Every chapter, without exception: these are the labs
+the course is built around.
 
 Each notebook runs **locally or on Google Colab**; data loads via the `ISLP`
 package with an automatic fallback to the bundled CSVs, so nothing needs
@@ -28,12 +24,12 @@ Every notebook is rendered in full below (with its stored outputs — the
 documentation build never executes them).
 
 :::{container} qrm-chips
-[**12** taught labs *(with solutions)*]{.qrm-chip}
-[**3** code references *(no deck, no solutions)*]{.qrm-chip}
+[**15** labs *(with solutions)*]{.qrm-chip}
+[**one** lab per deck]{.qrm-chip}
 [runs **locally** and on **Colab**]{.qrm-chip}
 :::
 
-## Lecture chapters — the twelve taught labs
+## The fifteen labs
 
 | Ch. | Lab | Read here | Open in Colab |
 |:--:|---|:--:|:--:|
@@ -47,22 +43,11 @@ documentation build never executes them).
 | 6 · Model Selection & Regularization | `chapter_06_lab.ipynb` | [Rendered](labs/chapter_06_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_06/chapter_06_lab.ipynb) |
 | 7 · Moving Beyond Linearity | `chapter_07_lab.ipynb` | [Rendered](labs/chapter_07_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_07/chapter_07_lab.ipynb) |
 | 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [Rendered](labs/chapter_08_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_08/chapter_08_lab.ipynb) |
-| 10 · Deep Learning | `chapter_10_lab.ipynb` | [Rendered](labs/chapter_10_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_10/chapter_10_lab.ipynb) |
-| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [Rendered](labs/chapter_13_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_13/chapter_13_lab.ipynb) |
-
-## Untaught chapters — three code references
-
-These three ISLP chapters are outside the twelve-lecture plan. There is **no
-deck** for them, and the notebooks ship **without worked solutions**: the
-exercises at the end are left unanswered on purpose. Treat each as a code
-reference to read *alongside* its ISLP chapter, not as a lab equivalent to the
-twelve above.
-
-| Ch. | Code reference | Read here | Open in Colab |
-|:--:|---|:--:|:--:|
 | 9 · Support Vector Machines | `chapter_09_lab.ipynb` | [Rendered](labs/chapter_09_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_09/chapter_09_lab.ipynb) |
+| 10 · Deep Learning | `chapter_10_lab.ipynb` | [Rendered](labs/chapter_10_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_10/chapter_10_lab.ipynb) |
 | 11 · Survival Analysis | `chapter_11_lab.ipynb` | [Rendered](labs/chapter_11_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_11/chapter_11_lab.ipynb) |
 | 12 · Unsupervised Learning | `chapter_12_lab.ipynb` | [Rendered](labs/chapter_12_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_12/chapter_12_lab.ipynb) |
+| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [Rendered](labs/chapter_13_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_13/chapter_13_lab.ipynb) |
 
 ```{tip}
 The Colab badges open straight from the public GitHub repository; a Google
@@ -95,7 +80,7 @@ labs/chapter_*_lab
 
 ## Where to go next
 
-- [Lecture slides](slides.md) — the deck each taught lab accompanies.
+- [Lecture slides](slides.md) — the deck each lab accompanies.
 - [For students](for-students.md) — how the labs relate to the lectures, and what to do when your numbers differ.
 - [Datasets](datasets.md) — what is bundled, and which chapter uses it.
 - [Python environment](environment.md) — the pinned packages, and the four chapter-specific ones.

@@ -24,11 +24,11 @@ def main() -> None:
     for folder in sorted(SLIDES.glob("chapter_*")):
         log = folder / f"{folder.name}.log"
         pdf = folder / f"{folder.name}.pdf"
-        # Chapters 9, 11 and 12 are untaught code references: the folder holds a
-        # notebook and no deck at all. That is by design, not a missing build,
-        # so say so rather than reporting a deck that was never meant to exist.
+        # A folder with no .tex holds no deck at all, so there is nothing that
+        # could have failed to compile: say that rather than reporting a build
+        # that was never meant to run. (Every chapter carries a deck today.)
         if not (folder / f"{folder.name}.tex").exists():
-            rows.append((folder.name, None, None, None, "no deck (code reference)"))
+            rows.append((folder.name, None, None, None, "no deck (no .tex)"))
             continue
         if not log.exists():
             rows.append((folder.name, None, None, None, "not compiled"))

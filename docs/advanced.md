@@ -24,7 +24,7 @@ Each module is built exactly like a course deck — the same colour-coded callou
 boxes, every exercise followed immediately by its worked solution, a closing
 summary block and an optional appendix — and each is paired with a companion
 notebook whose printed numbers match the slides seed-for-seed
-(`np.random.default_rng(2024)`). The modules sit **outside** the twelve-lecture
+(`np.random.default_rng(2024)`). The modules sit **outside** the fifteen-lecture
 plan: nothing in the course or its exams depends on them.
 
 ## The modules
@@ -80,5 +80,5 @@ advanced_labs/advanced_*_lab
 
 - [Lecture slides](slides.md) — the twelve course decks these modules extend.
 - [Lab notebooks](labs.md) — the course labs, built to the same pattern.
-- [The course at a glance](course.md) — where the twelve-lecture plan ends and these begin.
+- [The course at a glance](course.md) — where the fifteen-lecture plan ends and these begin.
 - [Repository layout](repository.md) — where everything lives.

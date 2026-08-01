@@ -1,8 +1,10 @@
 # Semester plan
 
-Thirteen sessions of 180 minutes: a **taught precourse session** drawing on both
-precourse decks, then the twelve chapter lectures, which keep their numbers 1–12
-(the exam calendar, the folder names and the runsheets all key off those). The
+Sixteen sessions of 180 minutes: a **taught precourse session** drawing on both
+precourse decks, then **fifteen chapter lectures** in ISLP order. Lectures 1–10
+keep their numbers, so every exam released up to Lecture 10 is unaffected; the
+three new chapters slot in as Lectures 11, 13 and 14, which pushes deep learning
+to 12 and multiple testing to 15. The
 module is 6 ECTS, graded by one 120-minute written exam at the end of the
 semester; every paper in the calendar below is practice.
 
@@ -20,7 +22,7 @@ advanced material (formal derivations, the heaviest worked exercises, side
 topics); the timed plans in the runsheets cover the main flow only, so the
 appendix pages are extra material to assign, not to teach.
 
-## The thirteen weeks
+## The sixteen weeks
 
 | Week | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
@@ -35,14 +37,15 @@ appendix pages are extra material to assign, not to teach.
 | 8 | Model Selection & Regularisation | `chapter_06` | 81 + 11 | 7 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
 | 9 | Beyond Linearity | `chapter_07` | 85 + 7 | 6 + 3 | Polynomials, splines, GAMs |
 | 10 | Tree-Based Methods | `chapter_08` | 83 + 7 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
-| 11 | Deep Learning | `chapter_10` | 75 + 8 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
-| 12 | Multiple Testing | `chapter_13` | 63 + 6 | 5 + 3 | **Final mock exam after this week** · **release Short Exam E** |
+| 11 | Support Vector Machines | `chapter_09` | 84 + 9 | 7 + 3 | Margins, the soft margin and C, kernels; tuned by CV |
+| 12 | Deep Learning | `chapter_10` | 75 + 8 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
+| 13 | Survival Analysis | `chapter_11` | 85 + 8 | 7 + 3 | Censoring, Kaplan–Meier, log-rank, Cox |
+| 14 | Unsupervised Learning | `chapter_12` | 91 + 9 | 6 + 3 | PCA, K-means, hierarchical clustering |
+| 15 | Multiple Testing | `chapter_13` | 63 + 6 | 5 + 3 | **Final mock exam after this week** · **release Short Exam E** |
 
-Chapters **9 (SVM)**, **11 (Survival)** and **12 (Unsupervised)** are not
-taught and have no deck. They ship as **code references** — notebooks showing
-how to run the methods in Python, to be read alongside the ISLP chapter — and,
-unlike the twelve taught labs, without worked solutions. Do not set them as
-homework expecting students to self-mark.
+All thirteen ISLP chapters in the plan are now taught, in book order. Chapters 9,
+11 and 12 were previously code-reference notebooks without decks; they now have
+full decks and their labs carry worked solutions like the rest.
 
 ## The three splits, and where to break them
 
@@ -88,8 +91,8 @@ handed out one at a time as the material each needs is taught.
 | Lecture 8 | Mock Exam 2 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
 | Lecture 8 | Short Exam C | Ch 0 + 0b · Ch 3 · **Ch 6** | 60 min · 60 pts |
 | Lecture 10 | Short Exam D | Ch 2 + 5 · Ch 2 + 4 · **Ch 8** | 60 min · 60 pts |
-| Lecture 12 | Final Mock Exam | All, weighted to Ch 7/8/10/13 | 120 min · 120 pts |
-| Lecture 12 | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** | 60 min · 60 pts |
+| Lecture 15 | Final Mock Exam | All, weighted to Ch 7/8/10/13 | 120 min · 120 pts |
+| Lecture 15 | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** | 60 min · 60 pts |
 
 Every paper exists as questions, worked solutions, and a review deck for going
 through it in class; the final also comes in three parallel variants

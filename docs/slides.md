@@ -1,19 +1,19 @@
 ---
 myst:
   html_meta:
-    description: "Twelve Beamer lecture decks for the course — 1027 slides plus optional appendices, 127 exercises with worked solutions, and ~100 purpose-built figures. All PDFs downloadable."
+    description: "Fifteen Beamer lecture decks for the course — one per chapter, with optional appendices, every exercise carrying a worked solution, and ~100 purpose-built figures. All PDFs downloadable."
 ---
 
 # Lecture slides
 
 {.qrm-lead}
-Twelve Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
+Fifteen Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
 `chapter_NN.tex`, its `images/`, the compiled `chapter_NN.pdf` — and the
 [companion lab](labs.md) for that chapter, so everything for one week sits
 together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
-[**1027** slides in the main flow]{.qrm-chip}
+[**1287** slides in the main flow]{.qrm-chip}
 [**+139** in optional appendices]{.qrm-chip}
 [**86** short + **41** extended exercises]{.qrm-chip}
 [**~100** purpose-built figures]{.qrm-chip}
@@ -47,9 +47,12 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 | 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 81 (+11) | <a href="slides/chapter_06.pdf">Open</a> |
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+7) | <a href="slides/chapter_07.pdf">Open</a> |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 83 (+7) | <a href="slides/chapter_08.pdf">Open</a> |
+| 9 | Support Vector Machines | The maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by cross-validation | 7 + 3 | 84 (+9) | <a href="slides/chapter_09.pdf">Open</a> |
 | 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 6 + 3 | 75 (+8) | <a href="slides/chapter_10.pdf">Open</a> |
+| 11 | Survival Analysis | Censoring and why it breaks ordinary regression, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 7 + 3 | 85 (+8) | <a href="slides/chapter_11.pdf">Open</a> |
+| 12 | Unsupervised Learning | Principal components and the variance explained, *K*-means, hierarchical clustering and linkage, scaling decisions | 6 + 3 | 91 (+9) | <a href="slides/chapter_12.pdf">Open</a> |
 | 13 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 5 + 3 | 63 (+6) | <a href="slides/chapter_13.pdf">Open</a> |
-| **Total** | | | **86 + 41** | **1027 (+139)** | |
+| **Total** | | | **106 + 50** | **1287 (+165)** | |
 
 ## How a deck is built
 
@@ -121,14 +124,17 @@ optional.
 | 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
 | 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
 | 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
+| 9 | the geometry in full — distance to a hyperplane and why *M* = 1/‖β‖ · the dual problem and where the αᵢ come from · support vector regression · Extended Exercise 9.3 (choosing a classifier) | 9 |
 | 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
+| 11 | Greenwood's formula · other censoring, and truncation · deriving the partial likelihood, and ties · the log-rank test as a score test of the Cox model · time-varying covariates and immortal-time bias · Exercise 11.7 (the exponential model) | 8 |
+| 12 | the two forms of the *K*-means objective · PCA as the best low-rank approximation · matrix completion for missing values · the silhouette width · Extended Exercise 12.3 (a full workflow on gene expression) | 9 |
 | 13 | the four outcomes drawn · resampling-based inference · post-selection inference | 6 |
 
 ## The two precourse decks
 
 Both are **taught**, in the single precourse session that opens the semester,
-and both exist because the ten chapter decks assume their content silently. One
-session cannot cover 157 slides, so it draws a selection from the two and the
+and both exist because the thirteen chapter decks assume their content silently.
+One session cannot cover 157 slides, so it draws a selection from the two and the
 decks remain the full reference — see
 [the course at a glance](course.md) and [For students](for-students.md).
 
@@ -161,7 +167,7 @@ rebuilt in code in the [companion notebook](labs.md).
 
 ### Chapter 0b — the toolkit
 
-Covering what the ten lecture decks *use* but never *explain*. Its scope was not
+Covering what the chapter decks *use* but never *explain*. Its scope was not
 guessed — it comes from counting usage across the decks:
 
 | Topic | Where it bites | Uses |
