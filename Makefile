@@ -7,6 +7,9 @@
 #   make handouts   printable 2-up handouts for every deck
 #   make index      refresh Teaching_Guide/slide_index.md
 #   make docs       build the documentation site locally
+#   make deploy     build it and publish to the gh-pages branch GitHub Pages
+#                   serves — there is no CI, so the site only updates when you
+#                   run this
 #   make exams      rebuild the mock exam papers, solutions and review decks
 #                   (kept out of git; the 60-min set has its own build.sh)
 #   make clean      delete LaTeX build artefacts
@@ -132,6 +135,34 @@ index: $(DECK_PDFS)
 # ------------------------------------------------------------------------- docs
 docs:
 	@$(PYTHON) -m sphinx -b html -W --keep-going docs docs/_build/html
+
+# Publishing is a deliberate act now that there is no CI: build the site, then
+# put it on the gh-pages branch that GitHub Pages serves. The build happens in a
+# throwaway worktree so your working tree is never touched, and .nojekyll stops
+# Pages from hiding Sphinx's _static/ directory.
+WORKTREE := .gh-pages
+deploy: docs
+	@git rev-parse --abbrev-ref HEAD | grep -qx main \
+	  || { echo "deploy from main, not $$(git rev-parse --abbrev-ref HEAD)"; exit 1; }
+	@rm -rf $(WORKTREE)
+	@if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then \
+	   git fetch -q origin gh-pages && \
+	   git worktree add -q -B gh-pages $(WORKTREE) origin/gh-pages; \
+	 else \
+	   git worktree add -q --detach $(WORKTREE) HEAD && \
+	   git -C $(WORKTREE) checkout -q --orphan gh-pages && \
+	   git -C $(WORKTREE) rm -rqf . >/dev/null; \
+	 fi
+	@find $(WORKTREE) -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+	@cp -R docs/_build/html/. $(WORKTREE)/
+	@touch $(WORKTREE)/.nojekyll
+	@git -C $(WORKTREE) add -A
+	@git -C $(WORKTREE) diff --cached --quiet \
+	  && echo "site already up to date" \
+	  || git -C $(WORKTREE) commit -qm "Publish site from $$(git rev-parse --short HEAD)"
+	@git -C $(WORKTREE) push -q origin gh-pages
+	@git worktree remove --force $(WORKTREE)
+	@echo "published -> https://chrisw09.github.io/Quantitative-Research-Methods/"
 
 # ------------------------------------------------------------------------ exams
 # Mock_Exams/ is git-ignored; this only works on a machine that has it.
