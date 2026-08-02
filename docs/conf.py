@@ -47,14 +47,17 @@ EXTRA = HERE / "_extra"
 
 # Chapters with a compiled deck ("00"/"00b" are the two precourse sessions).
 SLIDE_CHAPTERS = ["00", "00b", "01", "02", "03", "04", "05", "06", "07", "08",
-                  "09", "10", "11", "12", "13"]
+                  "10", "12"]
 
-# The four optional advanced modules (decks + labs under Advanced/).
+# The seven optional advanced modules (decks + labs under Advanced/).
 ADV_MODULES = [
     "advanced_01_rcts",
     "advanced_02_shapley",
     "advanced_03_conformal",
     "advanced_04_glms_splines",
+    "advanced_05_svm",
+    "advanced_06_survival",
+    "advanced_07_multiple_testing",
 ]
 
 def _copy(src: Path, dst: Path) -> bool:

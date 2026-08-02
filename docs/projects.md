@@ -30,12 +30,12 @@ predicted well enough to act on."
 
 | # | Project | The decision the student must make | Data | Methods | After |
 |:--:|---|---|:--:|:--:|:--:|
-| 1 | Who should we call? | Hand back a ranked shortlist of 500 prospects and say how many policies it will sell | `Caravan` | Ch 4, 5 | Lecture 7 |
-| 2 | Five numbers or seventeen? | Decide whether a board-readable five-variable model is defensible, and price the simplicity | `College` | Ch 3, 6 | Lecture 8 |
-| 3 | Can you predict the market? | Tell a fund whether to trade on last week's returns — with an interval | `Weekly` | Ch 4, 5 | Lecture 7 |
-| 4 | A model the brand manager can read | Choose between the most accurate model and one you can explain | `OJ` | Ch 8 | Lecture 10 |
-| 5 | What is it worth, and how sure are you? | Value five neighbourhoods, each with a defensible interval | `Boston` | Ch 3, 7 | Lecture 9 |
-| 6 | How many managers can actually pick stocks? | Give a pension trustee one number — it may be zero | `Fund` | Ch 13 | Lecture 15 |
+| 1 | Who should we call? | Hand back a ranked shortlist of 500 prospects and say how many policies it will sell | `Caravan` | Ch 4, 5 | after Ch 5 |
+| 2 | Five numbers or seventeen? | Decide whether a board-readable five-variable model is defensible, and price the simplicity | `College` | Ch 3, 6 | after Ch 6 |
+| 3 | Can you predict the market? | Tell a fund whether to trade on last week's returns — with an interval | `Weekly` | Ch 4, 5 | after Ch 5 |
+| 4 | A model the brand manager can read | Choose between the most accurate model and one you can explain | `OJ` | Ch 8 | after Ch 8 |
+| 5 | What is it worth, and how sure are you? | Value five neighbourhoods, each with a defensible interval | `Boston` | Ch 3, 7 | after Ch 7 |
+| 6 | How many managers can actually pick stocks? | Give a pension trustee one number — it may be zero | `Fund` | Ch 13 *(module A7)* | end of course |
 
 The briefs, starters and notes live in
 [`Projects/`](https://github.com/ChrisW09/Quantitative-Research-Methods/tree/main/Projects).

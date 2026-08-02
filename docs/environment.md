@@ -69,7 +69,7 @@ chapter-specific libraries — it **hard-requires** them. Its declared
 dependencies include `torch`, `pytorch_lightning`, `torchmetrics`, `lifelines`
 and `pygam` alongside the core scientific stack.
 
-So asking for the datasets and helpers used from Lecture 1 onwards also installs
+So asking for the datasets and helpers used from Chapter 1 onwards also installs
 the deep-learning stack you will not touch until Chapter 10:
 
 - resolving `requirements.txt` pulls in roughly **150 packages**;

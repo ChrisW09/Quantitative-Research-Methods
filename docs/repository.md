@@ -22,7 +22,7 @@ shape.
 │   │   ├── chapter_NN_lab.ipynb     #   companion lab, with stored outputs
 │   │   ├── images/                  #   matplotlib figures used by the deck
 │   │   └── make_figures.py          #   regenerates them, where a deck ships one
-│   └── Advanced/                    #   four optional self-study modules, same shape
+│   └── Advanced/                    #   seven optional self-study modules, same shape
 │       ├── README.md
 │       ├── STYLE_DECK.md            #   the house style, distilled, for a new module
 │       ├── STYLE_NOTEBOOK.md
@@ -39,7 +39,7 @@ shape.
 │       ├── project_N_starter.ipynb  #   Colab-ready scaffolding
 │       └── SOLUTION_NOTES.md        #   expected findings, the trap, marking guide
 ├── Teaching_Guide/                  # instructor kit: plan, index, checklist, handouts
-│   ├── semester_plan.md             #   the sixteen weeks on one page
+│   ├── semester_plan.md             #   the thirteen sessions on one page
 │   ├── slide_index.md               #   generated: sections, exercises, page numbers
 │   ├── before_class.md              #   the ten-minute pre-lecture checklist
 │   ├── deck_triage_proposal.md      #   audit: what could become appendix material

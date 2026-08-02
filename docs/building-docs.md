@@ -49,7 +49,7 @@ its source directory. `docs/conf.py` therefore stages them before each build:
 | Source | Staged to | Why |
 |---|---|---|
 | `Chapters/chapter_NN/chapter_NN_lab.ipynb` | `docs/labs/` | MyST-NB renders them as pages |
-| `Chapters/Advanced/advanced_NN_topic/advanced_NN_topic_lab.ipynb` | `docs/advanced_labs/` | same, for the four advanced modules |
+| `Chapters/Advanced/advanced_NN_topic/advanced_NN_topic_lab.ipynb` | `docs/advanced_labs/` | same, for the seven advanced modules |
 | `Chapters/chapter_NN/chapter_NN.pdf` | `docs/_extra/slides/` | copied verbatim into the HTML output via `html_extra_path`, so `slides/chapter_NN.pdf` links resolve |
 | `Chapters/Advanced/advanced_NN_topic/advanced_NN_topic.pdf` | `docs/_extra/slides/` | same, so the advanced decks are downloadable too |
 

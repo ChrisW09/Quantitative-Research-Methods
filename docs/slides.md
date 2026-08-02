@@ -1,21 +1,21 @@
 ---
 myst:
   html_meta:
-    description: "Fifteen Beamer lecture decks for the course — one per chapter, with optional appendices, every exercise carrying a worked solution, and ~100 purpose-built figures. All PDFs downloadable."
+    description: "Twelve Beamer lecture decks for the course — one per taught chapter, with optional appendices, every exercise carrying a worked solution, and ~100 purpose-built figures. All PDFs downloadable."
 ---
 
 # Lecture slides
 
 {.qrm-lead}
-Fifteen Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
+Twelve Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
 `chapter_NN.tex`, its `images/`, the compiled `chapter_NN.pdf` — and the
 [companion lab](labs.md) for that chapter, so everything for one week sits
 together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
-[**1287** slides in the main flow]{.qrm-chip}
-[**+139** in optional appendices]{.qrm-chip}
-[**86** short + **41** extended exercises]{.qrm-chip}
+[**1055** slides in the main flow]{.qrm-chip}
+[**+142** in optional appendices]{.qrm-chip}
+[**87** short + **41** extended exercises]{.qrm-chip}
 [**~100** purpose-built figures]{.qrm-chip}
 :::
 
@@ -47,12 +47,13 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 | 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 81 (+11) | <a href="slides/chapter_06.pdf">Open</a> |
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+7) | <a href="slides/chapter_07.pdf">Open</a> |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 83 (+7) | <a href="slides/chapter_08.pdf">Open</a> |
-| 9 | Support Vector Machines | The maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by cross-validation | 7 + 3 | 84 (+9) | <a href="slides/chapter_09.pdf">Open</a> |
 | 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 6 + 3 | 75 (+8) | <a href="slides/chapter_10.pdf">Open</a> |
-| 11 | Survival Analysis | Censoring and why it breaks ordinary regression, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 7 + 3 | 85 (+8) | <a href="slides/chapter_11.pdf">Open</a> |
 | 12 | Unsupervised Learning | Principal components and the variance explained, *K*-means, hierarchical clustering and linkage, scaling decisions | 6 + 3 | 91 (+9) | <a href="slides/chapter_12.pdf">Open</a> |
-| 13 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 5 + 3 | 63 (+6) | <a href="slides/chapter_13.pdf">Open</a> |
-| **Total** | | | **106 + 50** | **1287 (+165)** | |
+| **Total** | | | **87 + 41** | **1055 (+142)** | |
+
+Chapters 9 (support vector machines), 11 (survival analysis) and 13 (multiple
+testing) are no longer part of the taught sequence — their decks and labs now
+live as self-study [advanced modules](advanced.md) A5, A6 and A7.
 
 ## How a deck is built
 

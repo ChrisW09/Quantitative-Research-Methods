@@ -18,7 +18,7 @@ The instructor material lives in
 
 | File | What it is | On GitHub |
 |---|---|:--:|
-| `semester_plan.md` | The sixteen weeks on one page: what to teach when, where the three split lectures break, what to sacrifice when you fall behind | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/semester_plan.md) |
+| `semester_plan.md` | The thirteen sessions on one page: what to teach when, where the three split chapters break, what to sacrifice when you fall behind | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/semester_plan.md) |
 | `slide_index.md` | Generated from the compiled PDFs: every section with its page range and time budget, every exercise and solution with its page | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/slide_index.md) |
 | `before_class.md` | The ten-minute checklist for the evening before and the morning of | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/before_class.md) |
 | `runsheets/` | One page per session — timings, what to run live, what to cut, what students get wrong | not published |
@@ -72,8 +72,8 @@ Each session has one page, and each page has the same eight parts:
 8. **Close on** — the last slide, and the sentence that bridges to next week.
 
 The *Before you walk in* checklist also says when a **60-minute short exam**
-becomes available: A after Lecture 6, B after 7, C after 8, D after 10, E after
-15. They are sequenced, so they cannot be handed out in any other order — see
+becomes available: A after Ch 4, B after Ch 5, C after Ch 6, D after Ch 8, and E
+at the end of the course. They are sequenced, so they cannot be handed out in any other order — see
 [Mock exams](exams.md).
 
 ## Where the appendix fits
@@ -111,6 +111,6 @@ Do **not** cut the motivation slide that opens a topic, the pitfall
 ## Where to go next
 
 - [Lecture slides](slides.md) — deck-by-deck contents, and what is in each appendix.
-- [The course at a glance](course.md) — the fifteen-lecture plan and the split points.
+- [The course at a glance](course.md) — the ten-chapter plan and the split points.
 - [Mock exams](exams.md) — the assessment rhythm, the release order of the five 60-minute short exams, and how the papers are built.
 - [For students](for-students.md) — the page to point a cohort at in week one.

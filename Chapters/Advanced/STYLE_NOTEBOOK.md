@@ -18,7 +18,7 @@ This brief lets you write a Jupyter notebook indistinguishable from the existing
 **Cell 0 — markdown, Colab badge:**
 
 ```markdown
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_13/chapter_13_lab.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb)
 
 *This notebook runs on Colab as-is. The badge link above and the `GITHUB_RAW` line in the setup cell already point to this repository, so everything installs and loads automatically.*
 ```
@@ -59,7 +59,7 @@ Run this cell once. The `ISLP` package can be installed with `pip install ISLP`.
 > **Google Colab:** this notebook also runs on Colab out of the box — the setup cell below installs any missing packages and downloads the data automatically.
 ```
 
-**Cell 4 — code, THE setup cell.** Copy this VERBATIM from chapter_13 as the template:
+**Cell 4 — code, THE setup cell.** Copy this VERBATIM from advanced_07_multiple_testing as the template:
 
 ```python
 # --- Setup: runs locally AND on Google Colab --------------------------------

@@ -1,14 +1,14 @@
 ---
 myst:
   html_meta:
-    description: "A complete, ready-to-teach university course in statistical learning based on ISLP — fifteen Beamer lecture decks, fifteen Jupyter labs, eight mock exams and the course datasets."
+    description: "A complete, ready-to-teach university course in statistical learning based on ISLP — twelve Beamer lecture decks, twelve Jupyter labs, seven advanced modules, eight mock exams and the course datasets."
 ---
 
 # Quantitative Research Methods
 
 {.qrm-lead}
-A complete, ready-to-teach university course in statistical learning — fifteen
-Beamer decks, fifteen Jupyter notebooks, eight mock exams and the course
+A complete, ready-to-teach university course in statistical learning — twelve
+Beamer decks, twelve Jupyter notebooks, seven advanced modules, eight mock exams and the course
 datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
@@ -101,7 +101,7 @@ course is graded.
 :link: slides
 :link-type: doc
 
-Fifteen decks: 1287 core slides, 165 more in optional appendices, every exercise
+Twelve decks: 1055 core slides, 142 more in optional appendices, every exercise
 with a worked solution.
 :::
 
@@ -109,7 +109,7 @@ with a worked solution.
 :link: labs
 :link-type: doc
 
-Fifteen labs, one per deck, each closing with worked solutions — rendered here
+Twelve labs, one per deck, each closing with worked solutions — rendered here
 in full and runnable on Colab or locally.
 :::
 
@@ -146,8 +146,8 @@ What is pinned, why, and which chapter needs which extra package.
 :link: advanced
 :link-type: doc
 
-Four optional self-study modules: RCTs, Shapley values, conformal prediction,
-GLMs & splines.
+Seven optional self-study modules: RCTs, Shapley values, conformal prediction,
+GLMs & splines, SVMs, survival analysis, multiple testing.
 :::
 
 :::{grid-item-card} 🎯 Short projects

@@ -24,7 +24,7 @@ them; `torch` is preinstalled on Colab), and resolves the data automatically —
 four the package does not ship (`Advertising`, `Heart`, `Income1`, `Income2`)
 stream from the book's official site.
 
-One-click links for all fifteen notebooks are on the
+One-click links for all twelve notebooks are on the
 [Lab notebooks](labs.md) page.
 
 ```{tip}
@@ -91,7 +91,7 @@ See [Building the docs](building-docs.md) for live-reload and PDF output.
 ## Where to go next
 
 - [For students](for-students.md) — prerequisites, the precourse skip rule, workload, and how to revise.
-- [The course at a glance](course.md) — the 15-lecture plan.
+- [The course at a glance](course.md) — the ten-chapter plan.
 - [Lecture slides](slides.md) — deck-by-deck contents, exercise counts, and what sits in each deck's optional appendix.
 - [Lab notebooks](labs.md) — every lab, rendered in full.
 - [Python environment](environment.md) — what's pinned and why.

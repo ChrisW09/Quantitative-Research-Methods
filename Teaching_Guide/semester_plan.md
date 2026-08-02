@@ -1,12 +1,13 @@
 # Semester plan
 
-Sixteen sessions of 180 minutes: a **taught precourse session** drawing on both
-precourse decks, then **fifteen chapter lectures** in ISLP order. Lectures 1–10
-keep their numbers, so every exam released up to Lecture 10 is unaffected; the
-three new chapters slot in as Lectures 11, 13 and 14, which pushes deep learning
-to 12 and multiple testing to 15. The
-module is 6 ECTS, graded by one 120-minute written exam at the end of the
-semester; every paper in the calendar below is practice.
+Thirteen sessions of 180 minutes: a **taught precourse session** drawing on both
+precourse decks, then **ten ISLP chapters** in book order. The plan is keyed to
+chapter numbers, not session numbers. Chapters 9 (support vector machines),
+11 (survival analysis) and 13 (multiple testing) are no longer taught in the
+sequence — they keep their decks and labs as self-study modules A5, A6 and A7
+under [`../Chapters/Advanced/`](../Chapters/Advanced/). The module is 6 ECTS,
+graded by one 120-minute written exam at the end of the semester; every paper in
+the calendar below is practice.
 
 The precourse decks run to 157 slides in their main flow (106 + 51), so the one
 session is a selection — set up notation, standard errors and the lab Python
@@ -22,30 +23,28 @@ advanced material (formal derivations, the heaviest worked exercises, side
 topics); the timed plans in the runsheets cover the main flow only, so the
 appendix pages are extra material to assign, not to teach.
 
-## The sixteen weeks
+## The thirteen sessions
 
-| Week | Session | Deck | Slides | Exercises | Notes |
+| Chapter | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
-| 0 | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 106 + 16, 51 + 9 | 10 + 4, 6 + 2 | 157 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
-| 1 | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 71, then pp. 1–42 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
-| 2 | Statistical Learning II | `chapter_02` | pp. 43–107 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
-| 3 | Linear Regression I | `chapter_03` | pp. 1–76 | 3.1–3.6 | Stop after multiple regression and the four questions |
-| 4 | Linear Regression II | `chapter_03` | pp. 77–144 | 3.7–3.12 | **Mock Exam 1 after this week** |
-| 5 | Classification I | `chapter_04` | pp. 1–42 | 4.1–4.4 | Logistic regression end to end; stop after the section, before evaluation |
-| 6 | Classification II | `chapter_04` | pp. 43–82 | 4.8–4.10 | Confusion matrix, ROC/AUC, lab (LDA/QDA and naive Bayes are appendix material) · **release Short Exam A** |
-| 7 | Resampling | `chapter_05` | 79 + 7 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap · **release Short Exam B** |
-| 8 | Model Selection & Regularisation | `chapter_06` | 81 + 11 | 7 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
-| 9 | Beyond Linearity | `chapter_07` | 85 + 7 | 6 + 3 | Polynomials, splines, GAMs |
-| 10 | Tree-Based Methods | `chapter_08` | 83 + 7 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
-| 11 | Support Vector Machines | `chapter_09` | 84 + 9 | 7 + 3 | Margins, the soft margin and C, kernels; tuned by CV |
-| 12 | Deep Learning | `chapter_10` | 75 + 8 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
-| 13 | Survival Analysis | `chapter_11` | 85 + 8 | 7 + 3 | Censoring, Kaplan–Meier, log-rank, Cox |
-| 14 | Unsupervised Learning | `chapter_12` | 91 + 9 | 6 + 3 | PCA, K-means, hierarchical clustering |
-| 15 | Multiple Testing | `chapter_13` | 63 + 6 | 5 + 3 | **Final mock exam after this week** · **release Short Exam E** |
+| **0 + 0b** | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 106 + 16, 51 + 9 | 10 + 4, 6 + 2 | 157 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
+| **1 + 2** | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 71, then pp. 1–42 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
+| **2** | Statistical Learning II | `chapter_02` | pp. 43–107 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
+| **3** | Linear Regression I | `chapter_03` | pp. 1–76 | 3.1–3.6 | Stop after multiple regression and the four questions |
+| **3** | Linear Regression II | `chapter_03` | pp. 77–144 | 3.7–3.12 | **Mock Exam 1 after this week** |
+| **4** | Classification I | `chapter_04` | pp. 1–42 | 4.1–4.4 | Logistic regression end to end; stop after the section, before evaluation |
+| **4** | Classification II | `chapter_04` | pp. 43–82 | 4.8–4.10 | Confusion matrix, ROC/AUC, lab (LDA/QDA and naive Bayes are appendix material) · **release Short Exam A** |
+| **5** | Resampling | `chapter_05` | 79 + 7 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap · **release Short Exam B** |
+| **6** | Model Selection & Regularisation | `chapter_06` | 81 + 11 | 7 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
+| **7** | Beyond Linearity | `chapter_07` | 85 + 7 | 6 + 3 | Polynomials, splines, GAMs |
+| **8** | Tree-Based Methods | `chapter_08` | 83 + 7 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
+| **10** | Deep Learning | `chapter_10` | 75 + 8 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
+| **12** | Unsupervised Learning | `chapter_12` | 91 + 9 | 6 + 3 | PCA, K-means, hierarchical clustering · **final mock exam after this week** · **release Short Exam E** |
 
-All thirteen ISLP chapters in the plan are now taught, in book order. Chapters 9,
-11 and 12 were previously code-reference notebooks without decks; they now have
-full decks and their labs carry worked solutions like the rest.
+Ten ISLP chapters are taught, in book order. Chapters 9, 11 and 13 keep their
+full decks and labs but sit outside the plan as advanced modules A5, A6 and A7.
+Short Exam E and the final mock still carry a multiple-testing problem, which
+now draws on module A7 rather than on a taught session.
 
 ## The three splits, and where to break them
 

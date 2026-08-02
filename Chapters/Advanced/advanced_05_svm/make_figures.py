@@ -7,9 +7,9 @@ simulation (``np.random.default_rng(2024)`` for the separable geometry data,
 ``make_circles(..., random_state=0)`` for the non-linear data).  Nothing is
 sketched by hand.  Run from anywhere:
 
-    python3 "Chapters/chapter_09/make_figures.py"
+    python3 "Chapters/Advanced/advanced_05_svm/make_figures.py"
 
-Output: Chapters/chapter_09/images/ch09_*.png at 150 dpi, matching the figure
+Output: Chapters/Advanced/advanced_05_svm/images/ch09_*.png at 150 dpi, matching the figure
 size and resolution used by the other decks.
 """
 

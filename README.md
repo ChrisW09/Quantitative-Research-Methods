@@ -2,7 +2,7 @@
 
 <p align="center">
   A complete, ready-to-teach university course in statistical learning —<br>
-  fifteen slide decks, fifteen Jupyter notebooks, eight mock exams, and the course datasets.
+  twelve slide decks, twelve Jupyter notebooks, seven advanced modules, eight mock exams, and the course datasets.
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>1287 core slides</b> (+165 in optional appendices) ·
+  <b>1055 core slides</b> (+142 in optional appendices) ·
   <b>156 exercises</b> with worked solutions ·
   <b>15 labs</b> with worked solutions, all running locally &amp; on Colab ·
   <b>3 + 5 mock exams</b> · <b>22 datasets</b>
@@ -41,14 +41,14 @@ Applied Sciences and Arts).
 | | Where to go | What you get |
 |:--:|---|---|
 | 🎓 | **Learning it** — [read a deck](#-lecture-slides), then [run its lab](#-lab-notebooks) | The compiled PDFs need no toolchain; every notebook opens in Colab with one click and resolves its own data. |
-| 👩‍🏫 | **Teaching it** — [the teaching guide](#-teaching-it) | A sixteen-week plan, per-session runsheets with timings and cut lists, a generated slide index, and one `make` command that keeps them in sync with the decks. |
+| 👩‍🏫 | **Teaching it** — [the teaching guide](#-teaching-it) | A thirteen-session plan, per-session runsheets with timings and cut lists, a generated slide index, and one `make` command that keeps them in sync with the decks. |
 | 🛠️ | **Adapting it** — [repository layout](#-repository-layout) | LaTeX sources for every deck and exam, figures regenerated from the datasets by script, and a pinned Python environment. |
 
 ### What's inside
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 15 | Thirteen ISLP chapters + a two-part precourse · 1287 slides, plus 165 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part precourse · 1055 slides, plus 142 in per-deck appendices |
 | Exercises | 106 short + 50 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 15 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
 | [Mock exams](#-mock-exams) | 3 | Each as questions, worked solutions and an in-class review deck — kept out of git |
@@ -100,46 +100,45 @@ works offline.
 
 ## 📚 The course at a glance
 
-A 16-session semester (16 × 180 min), **6 ECTS**, graded by a single 120-minute
+A 13-session semester (13 × 180 min), **6 ECTS**, graded by a single 120-minute
 written exam at the end. The precourse is **taught** in the session that opens
-the semester; the fifteen chapter lectures run in ISLP order and keep their
-numbers 1–15, which is what the exam calendar and the runsheets refer to.
+the semester; the ten chapters follow in ISLP book order. The plan is keyed to
+**chapter numbers** — that is what the decks, labs, exercises and runsheets all
+refer to.
 
-| Session | Chapter | Topic |
+| Chapter | Sessions | Topic |
 |:--:|:--:|--|
-| **Precourse** | 0 + 0b | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 157 slides across the two, so the session is a selection and the decks stay the reference |
-| 1 | 1 + 2 (part 1) | Introduction; what is statistical learning; prediction vs. inference |
-| 2 | 2 (part 2) | Model accuracy; bias–variance trade-off; Bayes classifier; KNN |
-| 3–4 | 3 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
-| 5–6 | 4 | Classification: logistic regression, the confusion matrix, ROC/AUC (LDA/QDA, naive Bayes and Poisson are in the appendix) |
-| 7 | 5 | Resampling: validation set, k-fold CV, LOOCV, bootstrap |
-| 8 | 6 | Model selection & regularization: subset selection, ridge, lasso, PCR/PLS |
-| 9 | 7 | Beyond linearity: polynomials, splines, smoothing splines, GAMs |
-| 10 | 8 | Tree-based methods: trees, bagging, random forests, boosting |
-| 11 | 9 | Support vector machines: the maximal margin, the soft margin and *C*, kernels |
-| 12 | 10 | Deep learning: MLPs, CNNs, training, regularization (PyTorch) |
-| 13 | 11 | Survival analysis: censoring, Kaplan–Meier, the log-rank test, Cox regression |
-| 14 | 12 | Unsupervised learning: principal components, *K*-means, hierarchical clustering |
-| 15 | 13 | Multiple testing: FWER, Bonferroni/Holm, FDR, Benjamini–Hochberg |
+| **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 157 slides across the two, so the session is a selection and the decks stay the reference |
+| **1** | ½ | Introduction; prediction vs. inference |
+| **2** | 1½ | What is statistical learning; model accuracy; bias–variance trade-off; Bayes classifier; KNN |
+| **3** | 2 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
+| **4** | 2 | Classification: logistic regression, the confusion matrix, ROC/AUC (LDA/QDA, naive Bayes and Poisson are in the appendix) |
+| **5** | 1 | Resampling: validation set, k-fold CV, LOOCV, bootstrap |
+| **6** | 1 | Model selection & regularization: subset selection, ridge, lasso, PCR/PLS |
+| **7** | 1 | Beyond linearity: polynomials, splines, smoothing splines, GAMs |
+| **8** | 1 | Tree-based methods: trees, bagging, random forests, boosting |
+| **10** | 1 | Deep learning: MLPs, CNNs, training, regularization (PyTorch) |
+| **12** | 1 | Unsupervised learning: principal components, *K*-means, hierarchical clustering |
 
-Chapters 2, 3 and 4 each span two lectures, breaking where a session can end
+Chapter 1 is short and opens the same session as the first half of Chapter 2.
+
+Chapters 2, 3 and 4 each span two sessions, breaking where a session can end
 cleanly: Ch 2 after "regression vs. classification" (p. 42), so accuracy,
-bias–variance and KNN open Lecture 2; Ch 3 after multiple regression and the
+bias–variance and KNN open the second; Ch 3 after multiple regression and the
 four questions (p. 76); Ch 4 after the logistic-regression section (p. 42), so
-evaluation and the lab open Lecture 6.
+evaluation and the lab open the second.
 
-> Chapters **9 (SVM), 11 (Survival) and 12 (Unsupervised)** used to ship as
-> notebook-only code references, without a deck and without worked solutions.
-> They are now **fully taught** — Lectures 11, 13 and 14, each with its own deck
-> and a lab carrying worked solutions like the rest. Lectures 1–10 kept their
-> numbers, so nothing pegged to the first ten sessions moved; deep learning is now
-> Lecture 12 and multiple testing Lecture 15.
+> Chapters **9 (SVM), 11 (Survival) and 13 (Multiple Testing)** are no longer
+> taught in the sequence. Each keeps its full deck and its lab as a self-study
+> [advanced module](./Chapters/Advanced/) — A5, A6 and A7. The mock exams were
+> not rewritten: the final papers and Short Exam E still carry a multiple-testing
+> problem, which now draws on module A7.
 
 ---
 
 ## 🎞️ Lecture slides
 
-Fifteen decks in `Chapters/chapter_NN/`, each folder self-contained
+Twelve decks in `Chapters/chapter_NN/`, each folder self-contained
 (`chapter_NN.tex`, its `images/`, the compiled PDF — and the chapter's
 [companion lab](#-lab-notebooks), so everything for one week sits in one place).
 Slide counts are given
@@ -163,12 +162,9 @@ advanced material that the main thread never depends on.
 | 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 81 (+11) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+7) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 83 (+7) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
-| 9 | Support Vector Machines | The maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by CV | 7 + 3 | 84 (+9) | [PDF](./Chapters/chapter_09/chapter_09.pdf) |
 | 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 75 (+8) | [PDF](./Chapters/chapter_10/chapter_10.pdf) |
-| 11 | Survival Analysis | Censoring and why it breaks ordinary regression, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 7 + 3 | 85 (+8) | [PDF](./Chapters/chapter_11/chapter_11.pdf) |
 | 12 | Unsupervised Learning | No test error to validate against, principal components and the variance explained, scaling, *K*-means and its local optima, dendrograms, linkage and dissimilarity, clusters in pure noise | 6 + 3 | 91 (+9) | [PDF](./Chapters/chapter_12/chapter_12.pdf) |
-| 13 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 5 + 3 | 63 (+6) | [PDF](./Chapters/chapter_13/chapter_13.pdf) |
-| **Total** | | | **106 + 50** | **1287 (+165)** | |
+| **Total** | | | **87 + 41** | **1055 (+142)** | |
 
 <details>
 <summary><b>How a deck is built</b></summary>
@@ -265,7 +261,7 @@ refreshes the slide index.
 
 ## 📓 Lab notebooks
 
-Fifteen notebooks, each beside the deck it accompanies at
+Twelve notebooks, each beside the deck it accompanies at
 `Chapters/chapter_NN/chapter_NN_lab.ipynb` — **one per deck**, both precourse
 sessions included, each ending in worked Python solutions to that chapter's
 exercises. Each runs **locally or on Google Colab**; data loads via the `ISLP`
@@ -284,11 +280,8 @@ downloading by hand.
 | 6 · Model Selection & Regularization | `chapter_06_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_06/chapter_06_lab.ipynb) |
 | 7 · Moving Beyond Linearity | `chapter_07_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_07/chapter_07_lab.ipynb) |
 | 8 · Tree-Based Methods | `chapter_08_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_08/chapter_08_lab.ipynb) |
-| 9 · Support Vector Machines | `chapter_09_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_09/chapter_09_lab.ipynb) |
 | 10 · Deep Learning | `chapter_10_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_10/chapter_10_lab.ipynb) |
-| 11 · Survival Analysis | `chapter_11_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_11/chapter_11_lab.ipynb) |
 | 12 · Unsupervised Learning | `chapter_12_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_12/chapter_12_lab.ipynb) |
-| 13 · Multiple Testing | `chapter_13_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_13/chapter_13_lab.ipynb) |
 
 Every notebook is also
 [rendered in full](https://chrisw09.github.io/Quantitative-Research-Methods/labs.html)
@@ -302,7 +295,7 @@ on the documentation site, stored outputs included.
 
 | File | What it is |
 |---|---|
-| [`semester_plan.md`](./Teaching_Guide/semester_plan.md) | The sixteen weeks on one page, the three split points, and what to sacrifice when you fall behind |
+| [`semester_plan.md`](./Teaching_Guide/semester_plan.md) | The thirteen sessions on one page, the three split points, and what to sacrifice when you fall behind |
 | [`slide_index.md`](./Teaching_Guide/slide_index.md) | Generated from the PDFs: every section with its page range and time budget, every exercise and solution with its page |
 | [`before_class.md`](./Teaching_Guide/before_class.md) | The ten-minute checklist for the evening before and the morning of |
 | `runsheets/` | One page per session — timings, what to run live, what to cut, what students get wrong. Git-ignored: they map exercises onto exam problems |
@@ -330,16 +323,16 @@ exam in class.
 
 | Exam | After | Covers | Format |
 |--|:--:|--|:--:|
-| Mock Exam 1 | Lecture 4 | Ch 1–3 | 90 min · 90 pts |
-| Mock Exam 2 | Lecture 8 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Final Mock Exam | Lecture 15 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
+| Mock Exam 1 | after Ch 3 | Ch 1–3 | 90 min · 90 pts |
+| Mock Exam 2 | after Ch 6 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
+| Final Mock Exam | end of course | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
 
 The final exam also exists in three parallel versions (A / B / C) — same
 structure and difficulty, different numbers.
 
 Alongside them, **five 60-minute short exams** (A–E, three problems × 20 points)
 form the formative layer, released one at a time as the material each needs is
-taught — A after Lecture 6 (Ch 4), B after 7 (Ch 5), C after 8 (Ch 6), D after 10
+taught — A after Ch 4, B after Ch 5, C after Ch 6, D after Ch 8
 (Ch 8), E after 15 (Ch 13). They are the papers to give a student who has fallen
 behind, and the only ones carrying grading keys and marking tables. They live in
 `Mock_Exams/Short_Exams_60min/` and build with their own `./build.sh`, not
@@ -355,7 +348,7 @@ behind, and the only ones carrying grading keys and marking tables. They live in
 ## 🧭 Advanced modules
 
 Four **optional, self-study** modules extend the course beyond ISLP — same
-house style as the fifteen decks (every exercise followed by its worked
+house style as the chapter decks (every exercise followed by its worked
 solution, closing summary, optional appendix), each paired with a companion
 notebook whose numbers match the slides seed-for-seed:
 
@@ -365,8 +358,12 @@ notebook whose numbers match the slides seed-for-seed:
 | A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 73 slides | [`advanced_02_shapley_lab.ipynb`](./Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) |
 | A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 74 slides | [`advanced_03_conformal_lab.ipynb`](./Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) |
 | A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 82 slides | [`advanced_04_glms_splines_lab.ipynb`](./Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) |
+| A5 | Support Vector Machines *(ISLP Ch 9)* — margins, the soft margin and *C*, kernels, tuning by CV | 93 slides | [`advanced_05_svm_lab.ipynb`](./Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) |
+| A6 | Survival Analysis *(ISLP Ch 11)* — censoring, Kaplan–Meier, the log-rank test, Cox regression | 93 slides | [`advanced_06_survival_lab.ipynb`](./Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) |
+| A7 | Multiple Testing *(ISLP Ch 13)* — FWER, Bonferroni and Holm, FDR, Benjamini–Hochberg | 69 slides | [`advanced_07_multiple_testing_lab.ipynb`](./Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) |
 
-Nothing in the fifteen-lecture plan or the exams depends on them — see the
+Nothing in the taught plan depends on them — but the mock exams still carry a
+multiple-testing problem, which now draws on module A7. See the
 [module guide](./Chapters/Advanced/README.md) for prerequisites and build instructions;
 `make advanced` rebuilds the decks.
 
@@ -381,12 +378,12 @@ gives a baseline to beat, and asks for a **one-page memo with specific numbers**
 
 | # | Project | The decision | Data | After |
 |:--:|---|---|:--:|:--:|
-| 1 | Who should we call? | A ranked shortlist of 500 prospects, and how many policies it sells | `Caravan` | Lecture 7 |
-| 2 | Five numbers or seventeen? | Whether a board-readable five-variable model is defensible | `College` | Lecture 8 |
-| 3 | Can you predict the market? | Whether a fund should trade on last week's returns | `Weekly` | Lecture 7 |
-| 4 | A model the brand manager can read | Accuracy versus explainability, and which to deploy | `OJ` | Lecture 10 |
-| 5 | What is it worth, and how sure are you? | Five valuations, each with a defensible interval | `Boston` | Lecture 9 |
-| 6 | How many managers can actually pick stocks? | One number for a pension trustee — possibly zero | `Fund` | Lecture 15 |
+| 1 | Who should we call? | A ranked shortlist of 500 prospects, and how many policies it sells | `Caravan` | after Ch 5 |
+| 2 | Five numbers or seventeen? | Whether a board-readable five-variable model is defensible | `College` | after Ch 6 |
+| 3 | Can you predict the market? | Whether a fund should trade on last week's returns | `Weekly` | after Ch 5 |
+| 4 | A model the brand manager can read | Accuracy versus explainability, and which to deploy | `OJ` | after Ch 8 |
+| 5 | What is it worth, and how sure are you? | Five valuations, each with a defensible interval | `Boston` | after Ch 7 |
+| 6 | How many managers can actually pick stocks? | One number for a pension trustee — possibly zero | `Fund` | end of course *(module A7)* |
 
 Each has a trap the brief does not reveal, and in several of them **"this cannot
 be predicted well enough to act on" is a correct answer**. The projects are
@@ -399,8 +396,8 @@ formative — the module is graded by the written exam — and each folder carri
 
 | Path | Contents |
 |---|---|
-| [`Chapters/`](./Chapters/) | **One folder per chapter, holding its deck and its lab together**: `chapter_NN/` contains `chapter_NN.tex`, the compiled `.pdf`, `images/`, and `chapter_NN_lab.ipynb`. Fifteen decks and fifteen notebooks, one pair per chapter. See its [deck guide](./Chapters/README.md). |
-| [`Chapters/Advanced/`](./Chapters/Advanced/) | Four optional self-study modules — RCTs, Shapley values, conformal prediction, GLMs & splines — each a full deck plus companion notebook. See its [module guide](./Chapters/Advanced/README.md). |
+| [`Chapters/`](./Chapters/) | **One folder per chapter, holding its deck and its lab together**: `chapter_NN/` contains `chapter_NN.tex`, the compiled `.pdf`, `images/`, and `chapter_NN_lab.ipynb`. Twelve decks and twelve notebooks, one pair per chapter. See its [deck guide](./Chapters/README.md). |
+| [`Chapters/Advanced/`](./Chapters/Advanced/) | Seven optional self-study modules — RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing — each a full deck plus companion notebook. See its [module guide](./Chapters/Advanced/README.md). |
 | [`Projects/`](./Projects/) | Six short projects (3–5 h): a real decision on real data, with a fixed held-out set, a baseline to beat and a one-page memo as the deliverable. See its [project guide](./Projects/README.md). |
 | [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, runsheets, slide index, before-class checklist, printable handouts |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
@@ -441,7 +438,7 @@ figure to its source.
 
 **📖 <https://chrisw09.github.io/Quantitative-Research-Methods/>**
 
-Everything above — the lecture plan, the decks, all fifteen labs rendered in
+Everything above — the course plan, the decks, all twelve labs rendered in
 full, the teaching guide, the exams and the datasets — is published as a
 browsable site. It is **built and published by hand** — the repository carries
 no CI — so after changing the materials, rebuild and deploy it (see

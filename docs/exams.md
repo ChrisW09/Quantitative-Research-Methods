@@ -42,9 +42,9 @@ Every paper exists in three formats:
 
 | Exam | Written after | Covers | Length |
 |---|:--:|---|:--:|
-| Mock Exam 1 | Lecture 4 | Ch 1–3 | 90 min · 90 pts |
-| Mock Exam 2 | Lecture 8 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Final Mock Exam | Lecture 15 | All chapters (weighted to Ch 7/8/10/13) | 120 min · 120 pts |
+| Mock Exam 1 | after Ch 3 | Ch 1–3 | 90 min · 90 pts |
+| Mock Exam 2 | after Ch 6 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
+| Final Mock Exam | end of course | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
 
 The final exam also exists in three parallel versions (**A / B / C**) — same
 structure and difficulty, different numbers — for seating variants or for a
@@ -60,11 +60,11 @@ needs is taught.
 
 | Short exam | Release after | P1 (warm-up) | P2 (core) | P3 (advanced) |
 |:--:|:--:|---|---|---|
-| A | Lecture 6 | Learning problems, descriptive statistics (Ch 0 + 1–2) | Simple linear regression by hand (Ch 3) | **Logistic regression, confusion matrix (Ch 4)** |
-| B | Lecture 7 | Bias–variance, KNN regression (Ch 2) | Reading multiple regression output (Ch 3) | **Cross-validation and the bootstrap (Ch 5)** |
-| C | Lecture 8 | Conditional probability, Bayes, odds (Ch 0 + 0b) | Dummies and interactions (Ch 3) | **Ridge and lasso (Ch 6)** |
-| D | Lecture 10 | Honest model evaluation — leakage, splits (Ch 2 + 5) | KNN classification by hand (Ch 2 + 4) | **Trees: Gini, splitting, pruning, forests (Ch 8)** |
-| E | Lecture 15 | Reading `describe()` output, SE vs SD (Ch 0) | Polynomial regression, model choice (Ch 5 + 7) | **Multiple testing: Bonferroni, Holm, BH (Ch 13)** |
+| A | after Ch 4 | Learning problems, descriptive statistics (Ch 0 + 1–2) | Simple linear regression by hand (Ch 3) | **Logistic regression, confusion matrix (Ch 4)** |
+| B | after Ch 5 | Bias–variance, KNN regression (Ch 2) | Reading multiple regression output (Ch 3) | **Cross-validation and the bootstrap (Ch 5)** |
+| C | after Ch 6 | Conditional probability, Bayes, odds (Ch 0 + 0b) | Dummies and interactions (Ch 3) | **Ridge and lasso (Ch 6)** |
+| D | after Ch 8 | Honest model evaluation — leakage, splits (Ch 2 + 5) | KNN classification by hand (Ch 2 + 4) | **Trees: Gini, splitting, pruning, forests (Ch 8)** |
+| E | end of course | Reading `describe()` output, SE vs SD (Ch 0) | Polynomial regression, model choice (Ch 5 + 7) | **Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md))** |
 
 The bold chapter is where each paper's hardest problem sits, so the five are
 **sequenced, not interchangeable**: A needs Chapter 4, B Chapter 5, C

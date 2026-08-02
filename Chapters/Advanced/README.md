@@ -1,13 +1,15 @@
 # Advanced modules
 
-Four optional, self-study modules that extend the 15-lecture course beyond
-ISLP: causal inference, model explanation, distribution-free uncertainty, and
-the GLM/spline machinery behind Chapters 4 and 7. Each module is a full Beamer
+Seven optional, self-study modules. Four extend the taught course beyond ISLP —
+causal inference, model explanation, distribution-free uncertainty, and the
+GLM/spline machinery behind Chapters 4 and 7 — and three are ISLP chapters
+lifted out of the taught sequence: support vector machines (Ch 9), survival
+analysis (Ch 11) and multiple testing (Ch 13). Each module is a full Beamer
 deck in the course's house style — same box grammar, every exercise followed
 immediately by its worked solution, closing summary block, optional appendix —
 paired with a companion Jupyter notebook whose numbers match the slides
-seed-for-seed. They are **not** part of the 15-lecture plan and are not
-required by any exam.
+seed-for-seed. They are **not** part of the taught plan. Note that the mock exams still carry a
+multiple-testing problem, which now draws on module A7.
 
 | Module | Title | What it covers | Deck | Exercises | Notebook |
 |---|---|---|---|---|---|
@@ -15,15 +17,21 @@ required by any exam.
 | A2 | Explainable AI with Shapley Values | Cooperative games, the Shapley axioms, exact enumeration vs Monte-Carlo, waterfalls, global importance, correlated-feature and retrain pitfalls | 73 pages | 6 + 2 extended | `advanced_02_shapley_lab.ipynb` |
 | A3 | Conformal Prediction | Exchangeability, split conformal, the finite-sample quantile, marginal vs conditional coverage, CQR, prediction sets, the OLS stress test | 74 pages | 6 + 2 extended | `advanced_03_conformal_lab.ipynb` |
 | A4 | GLMs and Splines | Exponential family, Poisson regression on `Bikeshare`, deviance/LRT/AIC, overdispersion (quasi-Poisson, NB), penalized splines and edf, a count GAM | 82 pages | 7 + 2 extended | `advanced_04_glms_splines_lab.ipynb` |
+| A5 | Support Vector Machines *(ISLP Ch 9)* | Maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by CV | 93 pages | 7 + 3 | `advanced_05_svm_lab.ipynb` |
+| A6 | Survival Analysis *(ISLP Ch 11)* | Censoring, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 93 pages | 7 + 3 | `advanced_06_survival_lab.ipynb` |
+| A7 | Multiple Testing *(ISLP Ch 13)* | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 69 pages | 5 + 3 | `advanced_07_multiple_testing_lab.ipynb` |
 
 ## Prerequisites
 
 Each module assumes the course chapters it extends:
 
-- **A1** — Ch 0 (standard errors, tests), Ch 3 (regression), Ch 5 (simulation), Ch 13 (multiple testing).
+- **A1** — Ch 0 (standard errors, tests), Ch 3 (regression), Ch 5 (simulation), A7 (multiple testing).
 - **A2** — Ch 0b (counting, 2ᵖ), Ch 8 (boosting, variable importance), Ch 10 (black-box models).
 - **A3** — Ch 3 (prediction intervals), Ch 5 (train/validation splits).
 - **A4** — Ch 3 (linear regression), Ch 4 (logistic regression), Ch 5–6 (CV, AIC), Ch 7 (splines, GAMs).
+- **A5** — Ch 4 (classification, ROC/AUC), Ch 5 (cross-validation).
+- **A6** — Ch 0 (distributions, tests), Ch 3 (regression), Ch 4 (logistic regression).
+- **A7** — Ch 0 (hypothesis testing, *p*-values), Ch 5 (resampling).
 
 ## Layout
 

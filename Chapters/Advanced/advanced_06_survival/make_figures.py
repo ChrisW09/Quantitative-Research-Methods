@@ -8,7 +8,7 @@ Cox hazard ratios drawn here are exactly the ones quoted on the slides.
 
 matplotlib only (seaborn is not installed).  Run with
 
-    cd "Chapters/chapter_11" && python3 make_figures.py
+    cd "Chapters/Advanced/advanced_06_survival" && python3 make_figures.py
 """
 
 from pathlib import Path

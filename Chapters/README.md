@@ -9,11 +9,11 @@ Each chapter folder (`chapter_NN/`) is self-contained and holds **everything for
 that chapter**: the deck source `chapter_NN.tex`, its `images/`, the compiled
 `chapter_NN.pdf`, and the companion lab `chapter_NN_lab.ipynb`.
 
-Every chapter carries both — fifteen decks and fifteen notebooks, counting the
-two precourse sessions. `chapter_09` (SVM), `chapter_11` (survival analysis) and
-`chapter_12` (unsupervised learning) were once notebook-only code references;
-they are now taught chapters like the rest, with a deck each and worked
-solutions in their labs.
+Every chapter carries both — twelve decks and twelve notebooks, counting the two
+precourse sessions. Support vector machines (Ch 9), survival analysis (Ch 11)
+and multiple testing (Ch 13) are no longer part of the taught sequence: their
+decks and labs live on in [`Advanced/`](./Advanced/) as self-study modules A5,
+A6 and A7.
 
 `chapter_00/` is the **first half of the taught precourse session**, a refresher of the undergraduate
 material the course assumes. It is not an ISLP chapter: it revisits descriptive

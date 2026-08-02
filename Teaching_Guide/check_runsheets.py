@@ -291,12 +291,14 @@ def check_runsheet(path: Path, rep: Report) -> None:
 
     # The deck the file names in its own header, so a copied-and-renamed
     # runsheet pointing at the wrong deck is caught rather than assumed away.
-    m = re.search(r"Chapters/(chapter_[\w]+)/", text)
+    m = re.search(r"Chapters/(?:Advanced/)?((?:chapter|advanced)_[\w]+)/", text)
     folder = m.group(1) if m else f"chapter_{path.stem.split('_', 1)[1]}"
-    pdf = SLIDES / folder / f"{folder}.pdf"
-    toc = SLIDES / folder / f"{folder}.toc"
+    # Advanced modules live one level deeper, under Chapters/Advanced/.
+    base = SLIDES / "Advanced" if folder.startswith("advanced_") else SLIDES
+    pdf = base / folder / f"{folder}.pdf"
+    toc = base / folder / f"{folder}.toc"
 
-    tex = SLIDES / folder / f"{folder}.tex"
+    tex = base / folder / f"{folder}.tex"
 
     if not pdf.exists():
         rep.head(f"{path.name}  ->  {folder}")
@@ -486,9 +488,9 @@ def main(argv: list[str]) -> int:
         print(f"{where}/ not present (git-ignored) — nothing to check")
         return 0
 
-    files = sorted(where.glob("lecture_*.md"))
+    files = sorted(list(where.glob("lecture_*.md")) + list(where.glob("module_*.md")))
     if not files:
-        print(f"no lecture_*.md under {where}/")
+        print(f"no lecture_*.md or module_*.md under {where}/")
         return 0
 
     rep = Report(level)

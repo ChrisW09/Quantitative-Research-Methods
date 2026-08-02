@@ -22,7 +22,7 @@ does not match the slides, and how to revise.
 ## What the course assumes
 
 The course teaches *statistical learning*, not statistics from scratch. From
-Lecture 1 onwards the decks assume undergraduate statistics silently: variable
+Chapter 1 onwards the decks assume undergraduate statistics silently: variable
 types, means and spreads, correlation, probability and Bayes, the standard
 distributions, standard errors, confidence intervals, hypothesis tests, and
 simple linear regression. On the Python side it assumes you can open a notebook,
@@ -71,7 +71,7 @@ scoring rule:
 
 - **comfortable with 9 or more** — skim the deck and move on;
 - **fewer than 6** — work through it *with* the exercises; it pays for itself by
-  Lecture 3.
+  Chapter 3.
 
 Between 6 and 8, read the sections your wrong answers point at.
 ```
@@ -80,13 +80,13 @@ Precourse (b) has no equivalent self-check. The honest test is page 5, the
 notation table: if every symbol on it is one you could read aloud without
 hesitating, you can skim the deck.
 
-Either way, the material is **assumed from Lecture 1 onwards** — the taught
+Either way, the material is **assumed from Chapter 1 onwards** — the taught
 session gets you started on it, and the decks are there to finish the job.
 
 ## Running the labs
 
 **Day one: use [Google Colab](quickstart.md).** Every notebook has a Colab badge
-in its first cell, and one-click links for all fifteen are on the
+in its first cell, and one-click links for all twelve are on the
 [Lab notebooks](labs.md) page. There is nothing to install: the first cell
 detects Colab, adds the few packages that are missing, and loads the data for
 you. A Google account is all you need. Colab runs every lab in the course,
@@ -101,7 +101,7 @@ what is pinned and why the download is so large.
 
 ## How the labs relate to the lectures
 
-Every chapter has **one deck and one notebook** — fifteen of each, the two
+Every chapter has **one deck and one notebook** — twelve of each, the two
 precourse sessions included — and they are written as a pair:
 
 - the deck moves motivation → intuition → definition → worked example, and drops
@@ -112,11 +112,11 @@ precourse sessions included — and they are written as a pair:
 - every exercise *inside* a deck is followed immediately by its own full
   solution slide, so you are never stuck on a prompt with nowhere to go.
 
-That holds for **all thirteen ISLP chapters**, support vector machines (Ch 9),
-survival analysis (Ch 11) and unsupervised learning (Ch 12) included: each is a
-taught lecture with its own deck, and each lab closes with worked solutions.
-There is no chapter in the course you are expected to teach yourself from the
-book alone.
+That holds for **every taught chapter**, and for the three chapters that now sit
+outside the sequence as [advanced modules](advanced.md) — support vector
+machines (Ch 9), survival analysis (Ch 11) and multiple testing (Ch 13). Each
+has its own deck, and each lab closes with worked solutions. There is no chapter
+in the course you are expected to teach yourself from the book alone.
 
 ```{admonition} The labs are the part that matters
 :class: important
@@ -162,7 +162,7 @@ worked solution behind it.
 | Material | Solutions |
 |---|---|
 | Exercises inside a deck | **Yes, immediately** — the next slide is always the worked solution, including in the appendices |
-| The fifteen lab notebooks | **Yes, every one** — each ends in a *Lecture exercises — worked Python solutions* section |
+| The twelve lab notebooks | **Yes, every one** — each ends in a *Lecture exercises — worked Python solutions* section |
 | Mock exams and short exams | **Yes — handed out together with the paper**; the papers themselves are not published here, see below |
 
 The practice papers come **with their worked solutions**, distributed at the
@@ -246,11 +246,11 @@ released once the material it needs has been taught:
 
 | Short exam | Available after | The hardest problem is on |
 |:--:|:--:|---|
-| A | Lecture 6 | Logistic regression and the confusion matrix (Ch 4) |
-| B | Lecture 7 | Cross-validation and the bootstrap (Ch 5) |
-| C | Lecture 8 | Ridge and the lasso (Ch 6) |
-| D | Lecture 10 | Trees: Gini, splitting, pruning, forests (Ch 8) |
-| E | Lecture 15 | Multiple testing: Bonferroni, Holm, BH (Ch 13) |
+| A | after Ch 4 | Logistic regression and the confusion matrix (Ch 4) |
+| B | after Ch 5 | Cross-validation and the bootstrap (Ch 5) |
+| C | after Ch 6 | Ridge and the lasso (Ch 6) |
+| D | after Ch 8 | Trees: Gini, splitting, pruning, forests (Ch 8) |
+| E | end of course | Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md)) |
 
 The first two problems of each paper reach back to earlier chapters, so a short
 exam is a cumulative check on everything up to that point rather than a test of
@@ -265,7 +265,7 @@ papers themselves come from your lecturer.
 ## Where to go next
 
 - [Quick start](quickstart.md) — Colab in one click, and the local install for later.
-- [The course at a glance](course.md) — the fifteen-lecture plan and the assessment calendar.
+- [The course at a glance](course.md) — the ten-chapter plan and the assessment calendar.
 - [Lecture slides](slides.md) — every deck, what it covers, and what is in its appendix.
-- [Lab notebooks](labs.md) — all fifteen notebooks, rendered in full.
+- [Lab notebooks](labs.md) — all twelve notebooks, rendered in full.
 - [Mock exams](exams.md) — the eight practice papers and what each covers.
