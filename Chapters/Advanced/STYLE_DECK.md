@@ -24,7 +24,7 @@ editing only the chapter number/title in the comment header and in `\title`/`\su
 
 ```latex
 % ============================================================
-% HSBI Beamer — ISLP Lecture Series — IMPROVED EDITION
+% Beamer — ISLP Lecture Series — IMPROVED EDITION
 % Chapter 13: Multiple Testing
 % ============================================================
 \documentclass[aspectratio=169,11pt]{beamer}
@@ -80,7 +80,7 @@ editing only the chapter number/title in the comment header and in `\title`/`\su
 
 \title{Quantitative Research Methods}
 \subtitle{Chapter 13: Multiple Testing}
-\author{Prof.\ Dr.\ Christoph Weisser}\institute{HSBI}
+\author{Prof.\ Dr.\ Christoph Weisser}
 \date{}\graphicspath{{images/}}
 
 \newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
