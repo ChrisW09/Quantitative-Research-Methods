@@ -42,7 +42,6 @@ shape.
 │   ├── semester_plan.md             #   the thirteen sessions on one page
 │   ├── slide_index.md               #   generated: sections, exercises, page numbers
 │   ├── before_class.md              #   the ten-minute pre-lecture checklist
-│   ├── deck_triage_proposal.md      #   audit: what could become appendix material
 │   ├── runsheets/                   #   per-session scripts — git-ignored (assessment)
 │   └── handouts/                    #   printable 2-up decks — build output
 ├── Mock_Exams/                      # eight papers — git-ignored (assessment material)
