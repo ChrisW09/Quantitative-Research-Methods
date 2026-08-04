@@ -15,6 +15,17 @@ Each mirrors its chapter's Python lab and closes with **worked solutions** to
 that chapter's exercises. Every chapter, without exception: these are the labs
 the course is built around.
 
+Several also **check the deck's by-hand arithmetic in code** — the `[Math]`
+exercises whose answers a student would otherwise have to take on trust. Chapter
+2 classifies the six-point KNN query and watches the prediction flip between
+$K=1$ and $K=3$; chapter 5 confirms the $1 - 1/e$ bootstrap inclusion
+probability by simulation; chapter 6 counts the $2^{p}$ models best-subset
+selection would need; chapter 7 takes the rank of a spline basis to show a cubic
+spline with $K$ knots has $K+4$ degrees of freedom; chapter 8 shows Gini
+separating two splits that classification error scores identically; chapter 10
+reproduces the 931-parameter count and the convolution arithmetic. Where the
+deck asserts a number, the lab computes it.
+
 Each notebook runs **locally or on Google Colab**; data loads via the `ISLP`
 package with an automatic fallback to the bundled CSVs, so nothing needs
 downloading by hand. [Colab is the recommended route](quickstart.md) — nothing

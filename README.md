@@ -268,6 +268,13 @@ exercises. Each runs **locally or on Google Colab**; data loads via the `ISLP`
 package with an automatic fallback to the bundled CSVs, so nothing needs
 downloading by hand.
 
+Several labs also **verify the deck's by-hand arithmetic in code** — the KNN
+prediction that flips between *K*=1 and *K*=3, the 1 − 1/e bootstrap inclusion
+probability, the 2^p models best-subset selection would fit, the *K*+4 degrees
+of freedom of a cubic spline, Gini separating two splits that classification
+error cannot, the 931-parameter network. Where a deck asserts a number, the lab
+computes it.
+
 | Ch. | Lab | Open in Colab |
 |:--:|--|:--:|
 | 0 · Precourse (a) — Statistics | `chapter_00_lab.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_00/chapter_00_lab.ipynb) |
