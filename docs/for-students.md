@@ -15,7 +15,7 @@ does not match the slides, and how to revise.
 [**16** sessions × **180 min**]{.qrm-chip}
 [**6** ECTS]{.qrm-chip}
 [graded by **one 120-min exam**]{.qrm-chip}
-[**15** labs *(with solutions)*]{.qrm-chip}
+[**12** labs *(with solutions)*]{.qrm-chip}
 [**Colab** on day one]{.qrm-chip}
 :::
 

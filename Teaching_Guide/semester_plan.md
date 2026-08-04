@@ -84,14 +84,14 @@ handed out one at a time as the material each needs is taught.
 
 | After | Paper | Covers | Length |
 |:--:|---|---|:--:|
-| Lecture 4 | Mock Exam 1 | Ch 1–3 | 90 min · 90 pts |
-| Lecture 6 | Short Exam A | Ch 0 + 1–2 · Ch 3 · **Ch 4** | 60 min · 60 pts |
-| Lecture 7 | Short Exam B | Ch 2 · Ch 3 · **Ch 5** | 60 min · 60 pts |
-| Lecture 8 | Mock Exam 2 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Lecture 8 | Short Exam C | Ch 0 + 0b · Ch 3 · **Ch 6** | 60 min · 60 pts |
-| Lecture 10 | Short Exam D | Ch 2 + 5 · Ch 2 + 4 · **Ch 8** | 60 min · 60 pts |
-| Lecture 15 | Final Mock Exam | All, weighted to Ch 7/8/10/13 | 120 min · 120 pts |
-| Lecture 15 | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** | 60 min · 60 pts |
+| after Ch 3 | Mock Exam 1 | Ch 1–3 | 90 min · 90 pts |
+| after Ch 4 | Short Exam A | Ch 0 + 1–2 · Ch 3 · **Ch 4** | 60 min · 60 pts |
+| after Ch 5 | Short Exam B | Ch 2 · Ch 3 · **Ch 5** | 60 min · 60 pts |
+| after Ch 6 | Mock Exam 2 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
+| after Ch 6 | Short Exam C | Ch 0 + 0b · Ch 3 · **Ch 6** | 60 min · 60 pts |
+| after Ch 8 | Short Exam D | Ch 2 + 5 · Ch 2 + 4 · **Ch 8** | 60 min · 60 pts |
+| end of course | Final Mock Exam | All, weighted to Ch 7/8/10 and module A7 | 120 min · 120 pts |
+| end of course | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** *(module A7)* | 60 min · 60 pts |
 
 Every paper exists as questions, worked solutions, and a review deck for going
 through it in class; the final also comes in three parallel variants

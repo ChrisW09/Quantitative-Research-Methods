@@ -12,10 +12,11 @@ Beamer decks, twelve Jupyter notebooks, seven advanced modules, eight mock exams
 datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
-[**15** decks]{.qrm-chip}
-[**1287** core slides *(+165 optional)*]{.qrm-chip}
-[**127** exercises with solutions]{.qrm-chip}
-[**15** labs *(with solutions)*]{.qrm-chip}
+[**12** decks]{.qrm-chip}
+[**1055** core slides *(+142 optional)*]{.qrm-chip}
+[**128** exercises with solutions]{.qrm-chip}
+[**12** labs *(with solutions)*]{.qrm-chip}
+[**7** advanced modules]{.qrm-chip}
 [**3 + 5** mock exams]{.qrm-chip}
 [**22** datasets]{.qrm-chip}
 :::
@@ -166,7 +167,7 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 **Slides built for the room.**
 : Every deck moves motivation → intuition → formal definition → worked example,
-  with colour-coded callout boxes and ~106 short + ~50 extended exercises, each
+  with colour-coded callout boxes and 87 short + 41 extended exercises, each
   followed by a full solution. The hardest, optional material sits in a per-deck
   [appendix](slides.md), so the main thread fits the sessions it has.
 
@@ -188,9 +189,9 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 | | |
 |---|---|
-| Lecture decks | 13 ISLP chapters + two precourse decks · 1287 slides, plus 165 in optional appendices |
-| Exercises | ~106 short (~5 min) + ~50 extended (~15 min), all with worked solutions |
-| Lab notebooks | 15 labs, one per deck (2 precourse + 13 chapters), each closing with worked Python solutions |
+| Lecture decks | 10 taught ISLP chapters + two precourse decks · 1055 slides, plus 142 in optional appendices |
+| Exercises | 87 short (~5 min) + 41 extended (~15 min), all with worked solutions |
+| Lab notebooks | 12 labs, one per deck (2 precourse + 10 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Advanced modules | 4 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines) · 300 slides + 4 notebooks |

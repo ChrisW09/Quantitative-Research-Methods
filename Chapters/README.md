@@ -87,11 +87,8 @@ works as homework.
 | 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
 | 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
 | 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
-| 9  | the geometry in full — distance to a hyperplane and why *M* = 1/‖β‖ · the dual problem and where the αᵢ come from · support vector regression · Extended Exercise 9.3 (choosing a classifier) | 9 |
 | 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
-| 11 | Greenwood's formula · other censoring, and truncation · deriving the partial likelihood, and ties · the log-rank test as a score test of the Cox model · time-varying covariates and immortal-time bias · Exercise 11.7 (the exponential model) | 8 |
 | 12 | the two forms of the *K*-means objective · PCA as the best low-rank approximation · matrix completion for missing values · the silhouette width · Extended Exercise 12.3 (a full workflow on gene expression) | 9 |
-| 13 | the four outcomes drawn · resampling-based inference · post-selection inference | 6 |
 
 ## Exercises per chapter
 
@@ -107,42 +104,42 @@ works as homework.
 | 6  | Linear Model Selection & Regularization | 7 | 3 | 81 + 11 |
 | 7  | Moving Beyond Linearity | 6 | 3 | 85 + 7 |
 | 8  | Tree-Based Methods | 7 | 3 | 83 + 7 |
-| 9  | Support Vector Machines | 7 | 3 | 84 + 9 |
 | 10 | Deep Learning | 6 | 3 | 75 + 8 |
-| 11 | Survival Analysis | 7 | 3 | 85 + 8 |
 | 12 | Unsupervised Learning | 6 | 3 | 91 + 9 |
-| 13 | Multiple Testing | 5 | 3 | 63 + 6 |
-| **Total** | | **106** | **50** | **1287 + 165** |
+| **Total** | | **87** | **41** | **1055 + 142** |
 
-## Suggested 15-lecture plan (180 min each)
+Support vector machines (Ch 9), survival analysis (Ch 11) and multiple testing
+(Ch 13) are no longer part of the taught sequence — their decks, labs and
+appendices moved to [`Advanced/`](./Advanced/) as self-study modules A5, A6 and A7.
 
-Thirteen chapters mapped onto fifteen 180-minute lectures in ISLP order,
-preceded by the taught precourse session — sixteen sessions in all. The three
-heaviest chapters (2, 3, 4) each span two lectures; the split point is a natural
+## Suggested plan (13 sessions of 180 min)
+
+Ten ISLP chapters in book order, preceded by the taught precourse session — 13
+sessions in all. The plan is keyed to **chapter numbers**, not session numbers,
+because that is what the decks, labs and exercise numbering all use. The three
+heaviest chapters (2, 3, 4) each span two sessions, splitting at a natural
 section boundary so you can stop and resume cleanly.
 
-| Lecture | Chapter(s) | Content | Exercises |
-|---|---|---|---|
-| **Precourse** | Ch 0 + Ch 0b | **Taught in one session**, drawing on both decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and notation, logs and odds, likelihood, counting, the Python of the labs | 0.1–0.10, 0b.1–0b.6 |
-| 1  | Ch 1 + Ch 2 (part 1) | Introduction; what is statistical learning; prediction vs inference; parametric vs non-parametric | 1.1–1.3, 2.1–2.2 |
-| 2  | Ch 2 (part 2) | Assessing accuracy; bias–variance trade-off; classification & KNN; lab | 2.3–2.8 |
-| 3  | Ch 3 (part 1) | Simple & multiple linear regression; estimation; inference (SE, t, F) | 3.1–3.6 |
-| 4  | Ch 3 (part 2) | Qualitative predictors; interactions; diagnostics; KNN vs OLS; lab | 3.7–3.12 |
-| 5  | Ch 4 (part 1) | Logistic regression; odds; multiple logistic; confounding | 4.1–4.4 |
-| 6  | Ch 4 (part 2) | The confusion matrix, ROC/AUC; lab — generative models are appendix material | 4.8–4.10 |
-| 7  | Ch 5 | Validation set, LOOCV, k-fold CV, the bootstrap | 5.1–5.6 |
-| 8  | Ch 6 | Subset selection; Cp/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
-| 9  | Ch 7 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
-| 10 | Ch 8 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
-| 11 | Ch 9  | The maximal margin; the soft margin and C; kernels; SVMs tuned by CV | 9.x |
-| 12 | Ch 10 | Neural nets; forward pass; backprop/GD; CNNs; regularization | 10.1–10.6 |
-| 13 | Ch 11 | Censoring; the survival and hazard functions; Kaplan–Meier; log-rank; Cox | 11.x |
-| 14 | Ch 12 | Principal components; K-means; hierarchical clustering and linkage | 12.x |
-| 15 | Ch 13 | Multiple testing; FWER; Bonferroni; Holm; FDR & Benjamini–Hochberg | 13.1–13.5 |
+| Chapter | Sessions | Content | Exercises |
+|:--:|:--:|---|---|
+| **Precourse** — Ch 0 + Ch 0b | 1 | **Taught in one session**, drawing on both decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and notation, logs and odds, likelihood, counting, the Python of the labs | 0.1–0.10, 0b.1–0b.6 |
+| **Ch 1** | ½ | Introduction; prediction vs inference; the three motivating data sets | 1.1–1.3 |
+| **Ch 2** | 1½ | What is statistical learning; parametric vs non-parametric; assessing accuracy; bias–variance; the Bayes classifier and KNN; lab | 2.1–2.8 |
+| **Ch 3** | 2 | Simple & multiple linear regression; estimation; inference (SE, t, F); qualitative predictors; interactions; diagnostics; KNN vs OLS; lab | 3.1–3.12 |
+| **Ch 4** | 2 | Logistic regression; odds; confounding; the confusion matrix; ROC/AUC; lab — generative models are appendix material | 4.1–4.10 |
+| **Ch 5** | 1 | Validation set, LOOCV, k-fold CV, the bootstrap | 5.1–5.6 |
+| **Ch 6** | 1 | Subset selection; Cp/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
+| **Ch 7** | 1 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
+| **Ch 8** | 1 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
+| **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization | 10.1–10.6 |
+| **Ch 12** | 1 | Principal components; K-means; hierarchical clustering and linkage | 12.x |
 
-For the split lectures, the recommended stopping points are: **Ch 2** after the
+Chapter 1 is short and opens the same session as the first half of Chapter 2.
+
+For the split chapters, the recommended stopping points are: **Ch 2** after the
 KNN / bias–variance material; **Ch 3** after "Goodness of fit / the four
-questions"; **Ch 4** after the logistic-regression section (p. 42), so evaluation and the lab open Lecture 6.
+questions"; **Ch 4** after the logistic-regression section (p. 42), so evaluation
+and the lab open the second session.
 
 The plan above covers the main flow of each deck. Appendix pages sit outside it
 — assign them, or reach for them when a room wants the derivation.

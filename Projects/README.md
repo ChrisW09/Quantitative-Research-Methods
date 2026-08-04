@@ -14,12 +14,12 @@ to an answer and defend it.
 
 | # | Project | The decision | Data | Methods | After |
 |:--:|---|---|---|:--:|:--:|
-| 1 | **Who should we call?** | Hand back a ranked shortlist of 500 prospects and say how many policies it will sell | `Caravan` (5,822 × 86) | Ch 4, 5 | Lecture 7 |
-| 2 | **Five numbers or seventeen?** | Decide whether a board-readable five-variable model is defensible, and price the simplicity | `College` (777 × 18) | Ch 3, 6 | Lecture 8 |
-| 3 | **Can you predict the market?** | Tell a fund whether to trade on last week's returns — with an interval | `Weekly` (1,089 × 9) | Ch 4, 5 | Lecture 7 |
-| 4 | **A model the brand manager can read** | Choose between the most accurate model and one you can explain | `OJ` (1,070 × 18) | Ch 8 | Lecture 10 |
-| 5 | **What is it worth, and how sure are you?** | Value five neighbourhoods, each with a defensible interval | `Boston` (506 × 13) | Ch 3, 7 | Lecture 9 |
-| 6 | **How many managers can actually pick stocks?** | Give a pension trustee one number — it may be zero | `Fund` (50 × 2,000) | Ch 13 | Lecture 15 |
+| 1 | **Who should we call?** | Hand back a ranked shortlist of 500 prospects and say how many policies it will sell | `Caravan` (5,822 × 86) | Ch 4, 5 | after Ch 5 |
+| 2 | **Five numbers or seventeen?** | Decide whether a board-readable five-variable model is defensible, and price the simplicity | `College` (777 × 18) | Ch 3, 6 | after Ch 6 |
+| 3 | **Can you predict the market?** | Tell a fund whether to trade on last week's returns — with an interval | `Weekly` (1,089 × 9) | Ch 4, 5 | after Ch 5 |
+| 4 | **A model the brand manager can read** | Choose between the most accurate model and one you can explain | `OJ` (1,070 × 18) | Ch 8 | after Ch 8 |
+| 5 | **What is it worth, and how sure are you?** | Value five neighbourhoods, each with a defensible interval | `Boston` (506 × 13) | Ch 3, 7 | after Ch 7 |
+| 6 | **How many managers can actually pick stocks?** | Give a pension trustee one number — it may be zero | `Fund` (50 × 2,000) | Ch 13 *(module A7)* | end of course |
 
 Each folder holds three files:
 

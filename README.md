@@ -17,7 +17,7 @@
 <p align="center">
   <b>1055 core slides</b> (+142 in optional appendices) ·
   <b>156 exercises</b> with worked solutions ·
-  <b>15 labs</b> with worked solutions, all running locally &amp; on Colab ·
+  <b>12 labs</b> with worked solutions, all running locally &amp; on Colab ·
   <b>3 + 5 mock exams</b> · <b>22 datasets</b>
 </p>
 

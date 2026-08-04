@@ -82,6 +82,55 @@ Dropping `torch>=2.1` from `requirements.txt` does not help: `pip` reinstates it
 as a dependency of `ISLP`. The only genuinely light route is
 [Colab](quickstart.md), where `torch` is already present.
 
+## Reproducing the stored numbers
+
+Every notebook ships **with its outputs**, and those outputs are treated as a
+contract: the slides quote numbers the labs compute, so a lab that silently stops
+reproducing them desynchronises the course. Two files and one command keep that
+honest.
+
+`requirements.txt` says what the labs *need*, deliberately loosely, so the course
+keeps working as the ecosystem moves. `constraints.txt` records the one build
+that was verified to produce the outputs currently stored in the notebooks — it
+is a record, not a requirement. To reproduce the stored outputs exactly:
+
+```bash
+pip install -r requirements.txt -c constraints.txt
+```
+
+Then check the notebooks against themselves:
+
+```bash
+make notebooks     # re-executes all 25 and diffs each cell against its stored output
+```
+
+The check reports two different failures and the distinction matters. An
+**error** means a cell raised — usually a missing package. **Drift** means the
+cell ran fine and printed something else, which is either a code change whose
+outputs were never refreshed or a dependency that changed the answer. The
+current state is 25 notebooks, **0 errors and 0 drift**.
+
+```{admonition} Two packages are pinned, and only two
+:class: note
+
+Results proved insensitive to the rest of the stack — the Chapter 7 GAM reports
+the same AIC across three years of numpy and scipy movement. The exceptions are
+pinned in `requirements.txt` rather than merely recorded:
+
+- **`pygam==0.10.1`** — 0.12.0 changed the likelihood/AIC computation, moving
+  Chapter 7's reported AIC from 49773.69 to 30643.72. Python 3.9 resolves
+  `pygam>=0.9` to 0.10.1 anyway, but 3.10+ (Colab included) picks up 0.12.0, so
+  the stored numbers had quietly stopped matching there.
+- **`ISLP==0.4.0`** — unpinned it spans 0.3.1 to 0.4.1, across which
+  `load_data()` does not return consistent dtypes.
+```
+
+A handful of stored outputs differ on every run and are *not* drift: the
+statsmodels and lifelines summaries print the current date, and pyGAM's warning
+prefix names a kernel temp file whose path carries the process id. The checker
+normalises exactly those and nothing else, so it keeps catching the real changes
+it exists to catch.
+
 ## Colab — the recommended route
 
 Every notebook's first cell detects Colab and installs only what's missing, so
@@ -102,3 +151,4 @@ committed.
 - [For students](for-students.md) — prerequisites, workload, and what to do when your numbers differ.
 - [Lab notebooks](labs.md) — what the environment is for.
 - [Building the docs](building-docs.md) — the separate, documentation-only requirements.
+- [Lab notebooks](labs.md) — including which deck arithmetic each lab verifies in code.
