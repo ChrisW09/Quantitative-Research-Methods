@@ -130,7 +130,7 @@ project = "Quantitative Research Methods"
 author = "Prof. Dr. Christoph Weisser"
 # The year comes from the clock, not from a literal that has to be remembered
 # each January. (ISLP's 2023 is the book's publication year and is fixed.)
-copyright = f"{datetime.date.today().year}, Christoph Weisser (HSBI). Based on ISLP (Springer, 2023)"
+copyright = f"{datetime.date.today().year}, Christoph Weisser. Based on ISLP (Springer, 2023)"
 # No semester or year anywhere in the materials: the course is re-taught each
 # semester and a version string is one more thing to forget to update.
 release = ""
@@ -180,7 +180,7 @@ html_favicon = "_static/favicon.svg"
 html_copy_source = False
 html_show_sourcelink = False
 
-# HSBI teal as the brand colour, with a lighter tint for the dark theme so
+# Course teal as the brand colour, with a lighter tint for the dark theme so
 # links keep enough contrast against the dark background.
 html_theme_options = {
     "light_css_variables": {

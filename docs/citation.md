@@ -43,7 +43,7 @@ Please cite the textbook alongside it.
 ## Attribution
 
 The slides, exercises, mock exams and notebooks in this repository were prepared
-by **Prof. Dr. Christoph Weisser** (HSBI).
+by **Prof. Dr. Christoph Weisser**.
 
 The ISLP textbook, its text and its figures are © the authors / Springer. The
 datasets are distributed by the authors at
@@ -62,7 +62,7 @@ runsheets: **[info@profweisser-ai.de](mailto:info@profweisser-ai.de)**.
 ## About the author
 
 I am Christoph Weisser, Professor of Mathematics, specializing in Business Data
-Science at Hochschule Bielefeld (HSBI), and former Technical Lead Analytics &
+Science at Hochschule Bielefeld, and former Technical Lead Analytics &
 Artificial Intelligence at BASF. My work focuses on Artificial Intelligence,
 Generative AI, Business Data Science, and agentic AI systems that bridge
 research with real-world industrial applications.

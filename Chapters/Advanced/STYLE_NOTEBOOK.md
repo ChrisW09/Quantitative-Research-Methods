@@ -34,7 +34,7 @@ changes; repo stays `ChrisW09/Quantitative-Research-Methods`).
 ## Lab: Bonferroni, Holm, Benjamini–Hochberg, permutation tests
 
 **Course:** Quantitative Research Methods  
-**Instructor:** Prof. Dr. Christoph Weisser, HSBI  
+**Instructor:** Prof. Dr. Christoph Weisser  
 **Source:** James, Witten, Hastie, Tibshirani & Taylor (2023), *An Introduction to Statistical Learning, with Applications in Python*, Springer. Companion code at [statlearning.com](https://www.statlearning.com).
 ```
 
@@ -243,7 +243,7 @@ self-study; numbered as the next section, e.g. `## 5. Exercises` / `## 6. Exerci
 
 1. Badge URL points at the notebook's real path under `Chapters/Advanced/`.
 2. Header cell: title, "Lab:" subtitle, Course / Instructor (Prof. Dr. Christoph
-   Weisser, HSBI) / Source lines present.
+   Weisser) / Source lines present.
 3. Setup cell verbatim (plus any Colab-only extra packages) and `rng = np.random.default_rng(2024)`.
 4. Section numbering contiguous; names match the deck's Python-lab slide.
 5. Every `[Python]` exercise from the deck appears under "Lecture exercises — worked

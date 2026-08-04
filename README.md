@@ -31,8 +31,7 @@
 > labs follow the book; please cite it if you reuse these materials
 > (see [Citation & licence](#-citation--licence)).
 
-Prepared by **Prof. Dr. Christoph Weisser** (HSBI — Bielefeld University of
-Applied Sciences and Arts).
+Prepared by **Prof. Dr. Christoph Weisser**.
 
 ---
 
@@ -469,7 +468,7 @@ how the deployment works, are in
 ## 👤 About
 
 I am Christoph Weisser, Professor of Mathematics, specializing in Business Data
-Science at Hochschule Bielefeld (HSBI), and former Technical Lead Analytics &
+Science at Hochschule Bielefeld, and former Technical Lead Analytics &
 Artificial Intelligence at BASF. My work focuses on Artificial Intelligence,
 Generative AI, Business Data Science, and agentic AI systems that bridge research
 with real-world industrial applications.
@@ -515,7 +514,7 @@ BibTeX:
 ```
 
 **Attribution.** The slides, exercises, mock exams and notebooks in this
-repository were prepared by Prof. Dr. Christoph Weisser (HSBI). The ISLP textbook, its text and its figures are © the authors / Springer;
+repository were prepared by Prof. Dr. Christoph Weisser. The ISLP textbook, its text and its figures are © the authors / Springer;
 the datasets are distributed by the authors at
 [statlearning.com](https://www.statlearning.com) for use with the book. The
 copyrighted textbook PDF and figure banks are **not** included in this

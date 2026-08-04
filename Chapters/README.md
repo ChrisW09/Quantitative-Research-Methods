@@ -3,7 +3,7 @@
 The course material, one folder per chapter — for the **Quantitative Research
 Methods** course, based on *An Introduction to Statistical Learning, with
 Applications in Python* (James, Witten, Hastie, Tibshirani & Taylor, 2023),
-prepared for HSBI by Prof. Dr. Christoph Weisser.
+prepared by Prof. Dr. Christoph Weisser.
 
 Each chapter folder (`chapter_NN/`) is self-contained and holds **everything for
 that chapter**: the deck source `chapter_NN.tex`, its `images/`, the compiled
@@ -40,7 +40,7 @@ strand are in its appendix. Companion notebook:
 ## Teaching design
 
 Every deck follows the same flow — motivation → intuition → formal definition →
-worked example — in the HSBI house style, with:
+worked example — in the course house style, with:
 
 - **106 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
   slide immediately followed by a teal worked-solution slide; long solutions run
