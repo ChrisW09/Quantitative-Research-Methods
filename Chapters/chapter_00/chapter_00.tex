@@ -304,7 +304,6 @@
   \end{takeaway}
 \end{frame}
 
-
 % ============================================================
 \section[Data and notation]{Data, variables and notation}
 % ============================================================
@@ -330,7 +329,7 @@
 
 \begin{frame}{The shape of a data set: $n$ observations, $p$ variables}
   \begin{center}
-    \begin{tikzpicture}[scale=0.95]
+    \begin{tikzpicture}[scale=0.88]
       \draw[fill=accent!8,draw=accent] (0,0) rectangle (5,3);
       \foreach \i in {1,...,4} \draw[accent!40] (\i,0) -- (\i,3);
       \foreach \j in {1,...,2} \draw[accent!40] (0,\j) -- (5,\j);
@@ -353,7 +352,7 @@
     cell. Every method in this course expects data in this shape.
   \end{takeaway}
   \begin{labnote}[{{Live demo --- \S1 of the notebook}}]
-    Run \texttt{chapter\_00\_lab.ipynb} \S1: \texttt{load('Wage')} is exactly this
+    \scriptsize Run \texttt{chapter\_00\_lab.ipynb} \S1: \texttt{load('Wage')} is exactly this
     picture ($n = 3000$, $p = 11$), and \texttt{.dtypes} separates the column types.
   \end{labnote}
 \end{frame}
@@ -386,11 +385,6 @@
     Qualitative & counts, proportions & bar chart, contingency table \\
     \bottomrule
   \end{tabular}
-  \begin{industry}[Data engineering: ERP and CRM exports lie about types]
-    Plant codes, cost centres and customer segments arrive as \emph{numbers}.
-    Feed them in unchanged and the model reads ``plant 7 is seven times plant
-    1''. Recode nominal fields as dummies at load time.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Why the type matters in this course}
@@ -987,10 +981,6 @@
     which is why Chapter 4 reports sensitivity, specificity and ROC curves
     rather than one accuracy number.
   \end{takeaway}
-  \begin{labnote}[{{Live demo --- \S4 of the notebook}}]
-    Run \texttt{chapter\_00\_lab.ipynb} \S4: the \texttt{posterior} cell returns
-    $0.154$ and prints the 1000-people tree; the next cell sweeps the prevalence.
-  \end{labnote}
 \end{frame}
 
 \begin{frame}{The same calculation, without any algebra}
@@ -1217,10 +1207,6 @@
     $t$- and $F$-tests in small samples. With large $n$ the CLT does the
     work instead.
   \end{readme}
-  \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
-    Run \texttt{chapter\_00\_lab.ipynb} \S5: the gallery cell draws the standard
-    distributions, and the CLT cell shows means of skewed wages turning normal.
-  \end{labnote}
 \end{frame}
 
 \begin{frame}{The 68--95--99.7 rule, drawn}
@@ -1303,13 +1289,17 @@
     \]
   \end{block}
   \begin{center}
-    \includegraphics[width=0.66\textwidth,height=0.42\textheight,keepaspectratio]{ch00_ci_coverage.png}
+    \includegraphics[width=0.66\textwidth,height=0.30\textheight,keepaspectratio]{ch00_ci_coverage.png}
   \end{center}
   \vspace{-2pt}
   \footnotesize
   Each horizontal bar is one 95\% CI from one sample. Two of the 25 miss the
   true $\mu$. With 95\% coverage we expect about one miss in 25, so two is an
   ordinary draw --- the promise is about the long run, not any one batch.
+  \begin{labnote}[{{Live demo --- \S6 of the notebook}}]
+    Run \texttt{chapter\_00\_lab.ipynb} \S6: the coverage cell redraws this picture
+    from \texttt{Wage} samples, then repeats the procedure $5\,000$ times.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{What a confidence interval does and does not say}
@@ -1792,9 +1782,8 @@ R-squared: 0.612    F-statistic: 312.1    Prob (F-statistic): 1.47e-42    n = 20
 \begin{frame}[fragile]{Exercise 0.7 --- Interrogating a regression table [Python]}
   \begin{exercise}
     \scriptsize
-    A colleague regresses a city's monthly ice-cream sales (\euro 000s) on
-    average temperature ($^\circ$C) and reports:
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+    A colleague regresses monthly ice-cream sales (\euro 000s) on temperature ($^\circ$C):
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,aboveskip=3pt,belowskip=1pt]
                 coef   std err       t   P>|t|    [0.025   0.975]
 Intercept     4.2000     1.4000    3.00   0.005    1.3552   7.0448
 temp          0.9000     0.1500    6.00   0.000    0.5952   1.2048
@@ -1802,20 +1791,20 @@ R-squared: 0.51    n = 36
 \end{lstlisting}
     \begin{enumerate}
       \item Interpret the slope in words, with units.
-      \item Verify the $t$-value and check the confidence interval against the
+      \item Verify the $t$-value and check the CI against the
             ``$\pm 1.96\,\mathrm{SE}$'' rule of thumb.
       \item Interpret the intercept. Is it meaningful here?
       \item What does $R^2 = 0.51$ say, and what does it \emph{not} say?
       \item Your colleague concludes: ``raising the temperature by
-            $1^\circ$C would raise sales by \euro 900''. What is wrong with
-            the wording, and what would make the claim defensible?
+            $1^\circ$C would raise sales by \euro 900''. What is wrong,
+            and what would make the claim defensible?
     \end{enumerate}
   \end{exercise}
-  \vspace{-3pt}
+  \vspace{-5pt}
   \begin{labnote}[{{Run this live}}]
-    Worked solution: \texttt{chapter\_00\_lab.ipynb}, \emph{Lecture exercises ---
-    worked Python solutions}, cell \emph{Exercise 0.7 --- Interrogating a
-    regression table [Python]}.
+    \scriptsize Worked solution: \texttt{chapter\_00\_lab.ipynb}, \emph{Lecture
+    exercises --- worked Python solutions}, cell \emph{Exercise 0.7 ---
+    Interrogating a regression table [Python]}.
   \end{labnote}
 \end{frame}
 
@@ -1993,30 +1982,28 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
   \begin{exercise}
     \scriptsize
     A student runs this on the \texttt{Wage} data:
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,aboveskip=3pt,belowskip=1pt]
 >>> df.shape                          # (3000, 11)
 >>> df["wage"].describe()
-# count 3000 | mean 111.70 | std 41.73 | min 20.09
-# 25% 85.38 | 50% 104.92 | 75% 128.68 | max 318.34
+# count 3000 | mean 111.70 | std 41.73 | 25% 85.38 | 50% 104.92 | 75% 128.68 | max 318.34
 >>> df["age"].corr(df["wage"])        # 0.1956
 \end{lstlisting}
     \begin{enumerate}
       \item What are $n$ and $p$?
-      \item Compute the IQR. Would a wage of $220$ (thousand dollars, the
-            data's units) be flagged as an outlier by the
-            $1.5\times\mathrm{IQR}$ rule?
-      \item Compare mean and median. What does the comparison say about the
-            shape, and which should be reported?
+      \item Compute the IQR. Would a wage of $220$ (thousand dollars) be
+            flagged by the $1.5\times\mathrm{IQR}$ rule?
+      \item Compare mean and median: what does that say about the shape,
+            and which should be reported?
       \item Interpret the correlation of $0.196$. Does it mean age barely
             matters for wage?
       \item Compute the standard error of the mean wage.
     \end{enumerate}
   \end{exercise}
-  \vspace{-3pt}
+  \vspace{-5pt}
   \begin{labnote}[{{Run this live}}]
-    Worked solution: \texttt{chapter\_00\_lab.ipynb}, \emph{Lecture exercises ---
-    worked Python solutions}, cell \emph{Exercise 0.9 --- Reading Python
-    output [Python]}.
+    \scriptsize Worked solution: \texttt{chapter\_00\_lab.ipynb}, \emph{Lecture
+    exercises --- worked Python solutions}, cell \emph{Exercise 0.9 --- Reading
+    Python output [Python]}.
   \end{labnote}
 \end{frame}
 
@@ -2585,11 +2572,6 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     not exist. Ridge regression inverts
     $\mathbf{X}^\top\mathbf{X} + \lambda\mathbf{I}$ instead (Ch.\ 6).
   \end{alertblock}
-  \begin{labnote}[{{Live demo --- \S\S9--10 of the notebook}}]
-    Run \texttt{chapter\_00\_lab.ipynb} \S9: \texttt{np.linalg.solve} applies this
-    formula to Exercise 0.8's data ($\hat\beta = (0.3333,\ 1.5)$); \S10 then
-    minimises the same loss by gradient descent.
-  \end{labnote}
 \end{frame}
 
 \begin{frame}{Norms, distances and eigenvectors --- where they show up}
