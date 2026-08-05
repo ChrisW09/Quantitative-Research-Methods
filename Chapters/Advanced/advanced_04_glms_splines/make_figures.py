@@ -270,6 +270,59 @@ def fig_gam_partial():
     save(fig, "adv04_gam_partial.png")
 
 
+
+def fig_rate_ratios():
+    """The rate-ratio table, drawn: exp(beta) with 95% CIs for the Bikeshare
+    Poisson fit. Same model as the deck's statsmodels slide, so the numbers
+    match the table (temp 4.79, light rain 0.603, heavy rain 0.260, ...)."""
+    import statsmodels.formula.api as smf
+    import statsmodels.api as sm
+
+    df = pd.read_csv(DATA / "Bikeshare.csv")
+    df["weathersit"] = pd.Categorical(
+        df["weathersit"], categories=["clear", "cloudy/misty", "light rain/snow",
+                                      "heavy rain/snow"])
+    df["hr"] = pd.Categorical(df["hr"])
+    fit = smf.glm("bikers ~ hr + workingday + temp + weathersit",
+                  data=df, family=sm.families.Poisson()).fit()
+
+    rows = [("temp (full unit)", "temp"),
+            ("workingday", "workingday"),
+            ("cloudy/misty", "weathersit[T.cloudy/misty]"),
+            ("light rain/snow", "weathersit[T.light rain/snow]"),
+            ("heavy rain/snow", "weathersit[T.heavy rain/snow]"),
+            ("hr = 8 (vs midnight)", "hr[T.8]"),
+            ("hr = 17 (vs midnight)", "hr[T.17]"),
+            ("hr = 4 (vs midnight)", "hr[T.4]")]
+    labels = [r[0] for r in rows]
+    est = np.array([fit.params[r[1]] for r in rows])
+    se = np.array([fit.bse[r[1]] for r in rows])
+    rr = np.exp(est); lo = np.exp(est - 1.96 * se); hi = np.exp(est + 1.96 * se)
+
+    fig, ax = plt.subplots(figsize=(6.6, 3.4))
+    y = np.arange(len(rows))[::-1]
+    ax.axvline(1.0, color=GREY, lw=1.1, ls="--", zorder=1)
+    for yi, l, h, r, name in zip(y, lo, hi, rr, labels):
+        flag = name == "heavy rain/snow"
+        col = ORANGE if flag else ACCENT
+        ax.plot([l, h], [yi, yi], color=col, lw=1.6, zorder=3)
+        ax.plot(r, yi, "o", color=col, ms=6, mec="white", mew=0.8, zorder=4)
+        txt = f"{r:.3f}" if abs(r - 1) < 0.1 else f"{r:.3g}"
+        ax.annotate(txt, (r, yi), xytext=(0, 7), textcoords="offset points",
+                    ha="center", fontsize=8, color=col)
+    ax.annotate("one observation wide \u2014 the deck's warning, visible",
+                xy=(np.exp(est[4] - 1.96 * se[4]), y[4]), xytext=(0.16, y[4] - 1.05),
+                fontsize=8, color="#8A4513",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+    ax.set_yticks(y, labels, fontsize=8.5)
+    ax.set_xscale("log")
+    ax.set_xticks([0.125, 0.25, 0.5, 1, 2, 4, 8],
+                  ["0.125", "0.25", "0.5", "1", "2", "4", "8"])
+    ax.set_xlabel(r"rate ratio $e^{\hat\beta}$ (log scale), with 95% CI")
+    save(fig, "adv04_rate_ratios.png")
+    print("adv04_rate_ratios:", {n: round(v, 3) for n, v in zip(labels, rr)})
+
+
 if __name__ == "__main__":
     fig_lm_vs_glm()
     fig_varfun()
@@ -278,3 +331,4 @@ if __name__ == "__main__":
     fig_pspline_lambda()
     fig_gam_partial()
     print("all figures written to", OUT)
+    fig_rate_ratios()

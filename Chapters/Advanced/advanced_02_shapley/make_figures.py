@@ -293,9 +293,40 @@ def fig_offmanifold():
     save(fig, "a2_offmanifold.png")
 
 
+
+def fig_orders():
+    """Player A's marginal contribution in each of the 3! arrival orders of the
+    consultancy game --- the histogram whose mean IS the Shapley value."""
+    v = {frozenset(): 0, frozenset("A"): 120, frozenset("B"): 60, frozenset("C"): 0,
+         frozenset("AB"): 270, frozenset("AC"): 150, frozenset("BC"): 90,
+         frozenset("ABC"): 300}
+    import itertools
+    orders, contribs = [], []
+    for perm in itertools.permutations("ABC"):
+        before = frozenset(perm[:perm.index("A")])
+        contribs.append(v[before | frozenset("A")] - v[before])
+        orders.append("".join(perm))
+    phi_A = sum(contribs) / len(contribs)
+
+    fig, ax = plt.subplots(figsize=(6.0, 3.2))
+    ax.bar(range(6), contribs, color=ACCENT, width=0.62, zorder=3)
+    ax.axhline(phi_A, color=ORANGE, lw=2, zorder=4)
+    ax.text(5.42, phi_A + 6, rf"mean $= \varphi_A = {phi_A:.0f}$", color=ORANGE,
+            fontsize=10, ha="right")
+    for i, cv in enumerate(contribs):
+        ax.text(i, cv + 5, str(cv), ha="center", fontsize=9, color=ACCENT)
+    ax.set_xticks(range(6), orders)
+    ax.set_xlabel("arrival order")
+    ax.set_ylabel("A's marginal contribution (k\u20ac)")
+    ax.set_ylim(0, 245)
+    save(fig, "a2_orders.png")
+    print("a2_orders: contribs", contribs, "mean", phi_A)
+
+
 if __name__ == "__main__":
     fig_convergence()
     fig_local_waterfall()
     fig_global_importance()
     fig_dependence()
     fig_offmanifold()
+    fig_orders()

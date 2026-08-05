@@ -373,6 +373,40 @@ def fig_tradeoff():
                           for a, c, s in zip(alphas, covs, sizes)])
 
 
+
+def fig_staircase():
+    """What n_cal buys: the guaranteed coverage of split conformal at
+    alpha = 0.05, k = ceil((n+1)(1-alpha)), and the n >= 19 threshold from
+    Exercise A3.3."""
+    alpha = 0.05
+    n = np.arange(2, 201)
+    k = np.ceil((n + 1) * (1 - alpha))
+    finite = k <= n                       # k = n+1 means the interval is (-inf, inf)
+    level = np.where(finite, k / (n + 1), np.nan)
+    upper = 1 - alpha + 1 / (n + 1)
+
+    fig, ax = plt.subplots(figsize=(6.4, 3.3))
+    ax.axhline(1 - alpha, color=GREY, lw=1.1, ls="--")
+    ax.step(n, level, where="post", color=ACCENT, lw=1.8, zorder=3)
+    ax.plot(n, upper, color=ORANGE, lw=1.4, ls=":", zorder=2)
+    ax.axvspan(2, 19, color="#B03030", alpha=0.08, zorder=1)
+
+    ax.text(3.4, 0.985, "$n < 19$: the 95% interval\nis $(-\\infty, \\infty)$",
+            fontsize=8.5, color="#8A2020")
+    ax.annotate("$n = 19$: $k = 19$, exactly the largest score",
+                xy=(19, 19/20), xytext=(31, 0.905), fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+    ax.text(150, 0.9445, "guarantee $1-\\alpha$", color=GREY, fontsize=8.5)
+    ax.text(150, 0.968, "upper bound $1-\\alpha+\\frac{1}{n+1}$", color=ORANGE, fontsize=8.5)
+    ax.text(97, 0.9655, "achieved level $k/(n+1)$", color=ACCENT, fontsize=8.5)
+
+    ax.set_xlabel("calibration set size $n$")
+    ax.set_ylabel("coverage")
+    ax.set_xlim(2, 200); ax.set_ylim(0.90, 1.005)
+    save(fig, "a3_staircase.png")
+    print("a3_staircase: n=19 gives k=19, level", round(19/20, 3))
+
+
 if __name__ == "__main__":
     fig_scores_band()
     fig_coverage_hist()
@@ -383,3 +417,4 @@ if __name__ == "__main__":
     fig_tradeoff()
     print("done; qhat =", round(QHAT, 2), "k =", K,
           "test coverage =", round(COVERED.mean(), 4))
+    fig_staircase()

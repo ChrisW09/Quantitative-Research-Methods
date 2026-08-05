@@ -846,79 +846,22 @@
 \end{frame}
 
 
+\begin{frame}{What $p$-hacking harvests, drawn}
+  \begin{center}
+    \includegraphics[width=0.74\textwidth,height=0.54\textheight,keepaspectratio]{ch13_min_p.png}
+  \end{center}
+  \begin{takeaway}
+    Test $m=20$ outcomes on pure noise and report the best: $64\%$ of
+    studies hand you a ``significant'' result ($1-0.95^{20} = 0.642$ --- the
+    same arithmetic as the FWER explosion, now read as a publication
+    strategy). The smallest $p$-value in a fishing expedition is not a
+    $p$-value.
+  \end{takeaway}
+\end{frame}
+
+
 % ------------------------------------------------------------
 % EXTENDED (INTEGRATIVE) EXERCISE 13.2 --- FWER vs FDR design decision
-\begin{frame}{Extended Exercise 13.2 --- FWER or FDR? A design decision [Integrative]}
-\begin{longexercise}
-  For each study, choose an error criterion and justify it, using the naive expected
-  number of false discoveries $E[V]=m_0\,\alpha$ (all-null worst case $m_0=m$) and the
-  power consequences.
-  \begin{enumerate}
-    \item \textbf{Scenario A --- confirmatory phase-III trial:} $m=4$ co-primary
-          endpoints; one false ``significant'' endpoint could license an ineffective drug.
-    \item \textbf{Scenario B --- exploratory screen:} $m=20\,000$ genes tested for
-          follow-up; a shortlist with a few false leads is acceptable.
-    \item Contrast the statistical power the two criteria leave on the table.
-  \end{enumerate}
-\end{longexercise}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 13.2 (1/3)}
-\begin{solutionbox}[Solution --- scenario A: control FWER]
-  With $m=4$ tests at $\alpha=0.05$, naive testing expects
-  \[
-    E[V]=m_0\alpha=4(0.05)=0.20\ \text{false positives},\qquad
-    \mathrm{FWER}=1-0.95^4=0.185 .
-  \]
-  A $\sim$$19\%$ chance of \emph{any} false endpoint is unacceptable when the decision is
-  regulatory and irreversible. \textbf{Choose FWER control} (Bonferroni threshold
-  $\alpha/m=0.0125$, or Holm). One false positive is the outcome we must not allow, so we
-  pay the power cost gladly --- with only $m=4$ tests that cost is tiny.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 13.2 (2/3)}
-\begin{solutionbox}[Solution --- scenario B: control FDR]
-  With $m=20\,000$ and (worst case) $m_0\approx20\,000$, naive testing expects
-  \[
-    E[V]=m_0\alpha=20\,000(0.05)=1000\ \text{false discoveries!}
-  \]
-  Bonferroni would shrink the threshold to $\alpha/m=2.5\times10^{-6}$, cutting $E[V]$ to
-  $\approx0.05$ but \textbf{destroying power} for realistic effect sizes. \textbf{Choose
-  FDR control} (BH at $q=0.10$): accept that an expected $\le 10\%$ of the shortlist is
-  false in exchange for detecting far more true signals --- the false leads are removed by
-  follow-up experiments.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Extended Exercise 13.2 (3/3)}
-\begin{solutionbox}[Solution --- the power trade-off]
-  \begin{center}\footnotesize
-  \begin{tabular}{lll}
-    \toprule
-     & Confirmatory ($m=4$) & Exploratory ($m=20\,000$) \\
-    \midrule
-    Criterion       & FWER (Bonferroni/Holm) & FDR (BH) \\
-    Threshold shape & $\alpha/m$ (fixed, tiny) & adaptive $Lq/m$ \\
-    Naive $E[V]$    & $0.20$ & $1000$ \\
-    Priority        & no false positive & many true findings \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \textbf{Trade-off.} The FWER threshold shrinks like $\alpha/m$, so power collapses as
-  $m$ grows --- fine for a handful of endpoints, ruinous for $20\,000$ genes. FDR asks
-  only that false positives be a small \emph{fraction} of discoveries, so its adaptive
-  threshold keeps power high at scale. \textbf{Rule of thumb:} match the criterion to the
-  cost of a single false positive.
-
-\end{solutionbox}
-\begin{mistake}
-  Quoting $E[V]=m\alpha$ as a fact about your study --- it is the all-null worst
-  case ($m_0=m$). With real effects present the count is smaller, though still
-  ruinous at scale.
-\end{mistake}
-\end{frame}
-
 % ============================================================
 \section{Python Lab}
 
@@ -1159,11 +1102,84 @@ for meth in ["bh", "bonferroni"]:                  # compare both procedures
   you want the full story, or when a later chapter sends you back here.
   \begin{block}{Contents of the appendix}
     \begin{itemize}
+      \item \textbf{Extended Exercise 13.2 --- FWER or FDR? A design decision} --- Exercise 13.4 expanded with arithmetic, over three solution slides. Run it from here if the concept version left doubts; otherwise it is homework.
       \item \textbf{The four outcomes, drawn} --- a diagram of the same $2\times2$ table the main deck already gives as a table.
       \item \textbf{Resampling-based inference} --- permutation $p$-values, the resampling estimate of the FDR, and what the histogram of many $p$-values looks like. Use it when the null distribution is not available in closed form.
       \item \textbf{Post-selection inference} --- why a $p$-value computed after looking at the data is not a $p$-value. Important in research practice, beyond the exam.
     \end{itemize}
   \end{block}
+\end{frame}
+
+
+\begin{frame}{Extended Exercise 13.2 --- FWER or FDR? A design decision [Integrative]}
+\begin{longexercise}
+  For each study, choose an error criterion and justify it, using the naive expected
+  number of false discoveries $E[V]=m_0\,\alpha$ (all-null worst case $m_0=m$) and the
+  power consequences.
+  \begin{enumerate}
+    \item \textbf{Scenario A --- confirmatory phase-III trial:} $m=4$ co-primary
+          endpoints; one false ``significant'' endpoint could license an ineffective drug.
+    \item \textbf{Scenario B --- exploratory screen:} $m=20\,000$ genes tested for
+          follow-up; a shortlist with a few false leads is acceptable.
+    \item Contrast the statistical power the two criteria leave on the table.
+  \end{enumerate}
+\end{longexercise}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 13.2 (1/3)}
+\begin{solutionbox}[Solution --- scenario A: control FWER]
+  With $m=4$ tests at $\alpha=0.05$, naive testing expects
+  \[
+    E[V]=m_0\alpha=4(0.05)=0.20\ \text{false positives},\qquad
+    \mathrm{FWER}=1-0.95^4=0.185 .
+  \]
+  A $\sim$$19\%$ chance of \emph{any} false endpoint is unacceptable when the decision is
+  regulatory and irreversible. \textbf{Choose FWER control} (Bonferroni threshold
+  $\alpha/m=0.0125$, or Holm). One false positive is the outcome we must not allow, so we
+  pay the power cost gladly --- with only $m=4$ tests that cost is tiny.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 13.2 (2/3)}
+\begin{solutionbox}[Solution --- scenario B: control FDR]
+  With $m=20\,000$ and (worst case) $m_0\approx20\,000$, naive testing expects
+  \[
+    E[V]=m_0\alpha=20\,000(0.05)=1000\ \text{false discoveries!}
+  \]
+  Bonferroni would shrink the threshold to $\alpha/m=2.5\times10^{-6}$, cutting $E[V]$ to
+  $\approx0.05$ but \textbf{destroying power} for realistic effect sizes. \textbf{Choose
+  FDR control} (BH at $q=0.10$): accept that an expected $\le 10\%$ of the shortlist is
+  false in exchange for detecting far more true signals --- the false leads are removed by
+  follow-up experiments.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 13.2 (3/3)}
+\begin{solutionbox}[Solution --- the power trade-off]
+  \begin{center}\footnotesize
+  \begin{tabular}{lll}
+    \toprule
+     & Confirmatory ($m=4$) & Exploratory ($m=20\,000$) \\
+    \midrule
+    Criterion       & FWER (Bonferroni/Holm) & FDR (BH) \\
+    Threshold shape & $\alpha/m$ (fixed, tiny) & adaptive $Lq/m$ \\
+    Naive $E[V]$    & $0.20$ & $1000$ \\
+    Priority        & no false positive & many true findings \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \textbf{Trade-off.} The FWER threshold shrinks like $\alpha/m$, so power collapses as
+  $m$ grows --- fine for a handful of endpoints, ruinous for $20\,000$ genes. FDR asks
+  only that false positives be a small \emph{fraction} of discoveries, so its adaptive
+  threshold keeps power high at scale. \textbf{Rule of thumb:} match the criterion to the
+  cost of a single false positive.
+
+\end{solutionbox}
+\begin{mistake}
+  Quoting $E[V]=m\alpha$ as a fact about your study --- it is the all-null worst
+  case ($m_0=m$). With real effects present the count is smaller, though still
+  ruinous at scale.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{The four outcomes of a test decision}

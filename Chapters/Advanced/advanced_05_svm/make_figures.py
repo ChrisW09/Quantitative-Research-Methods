@@ -31,7 +31,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 HERE = Path(__file__).parent
-ROOT = HERE.parents[1]
+ROOT = HERE.parents[2]
 DATA = ROOT / "ALL CSV FILES - 2nd Edition"
 OUT = HERE / "images"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -548,6 +548,41 @@ def fig_x_svr():
     save(fig, "ch09_x_svr.png")
 
 
+
+
+def fig_feature_blowup():
+    """Explicit polynomial features vs the kernel: the cost curve behind the
+    kernel trick. Monomials up to degree d in p variables = C(p+d, d)."""
+    from math import comb
+    p_grid = np.arange(2, 201)
+    d2 = np.array([comb(pp + 2, 2) for pp in p_grid], dtype=float)
+    d3 = np.array([comb(pp + 3, 3) for pp in p_grid], dtype=float)
+    kernel = p_grid + 1.0                     # one inner product: O(p) work
+
+    fig, ax = plt.subplots(figsize=(6.4, 3.4))
+    ax.plot(p_grid, d3, color=ACCENT, lw=2)
+    ax.plot(p_grid, d2, color=ACCENT, lw=1.4, ls="--")
+    ax.plot(p_grid, kernel, color=ORANGE, lw=2)
+
+    ax.plot(100, 176851, "o", color=ACCENT, ms=6, mec="white", mew=0.8, zorder=4)
+    ax.annotate("$p=100$, $d=3$:\n$176{,}851$ columns", xy=(100, 176851),
+                xytext=(24, 3.5e5), fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+
+    ax.text(150, 2.4e6, "explicit features, $d=3$", color=ACCENT, fontsize=9, ha="center")
+    ax.text(168, 2.3e4, "$d=2$", color=ACCENT, fontsize=9)
+    ax.text(150, 4.0e1, "the kernel: $O(p)$ per\ninner product", color=ORANGE,
+            fontsize=9, ha="center", va="top")
+
+    ax.set_yscale("log")
+    ax.set_xlabel("number of predictors $p$")
+    ax.set_ylabel("cost (columns, or ops per evaluation)")
+    ax.set_xlim(2, 200)
+    save(fig, "ch09_feature_blowup.png")
+    from math import comb as c
+    print("ch09_feature_blowup: C(103,3) =", c(103, 3))
+
+
 if __name__ == "__main__":
     fig_hyperplane()
     fig_many_hyperplanes()
@@ -565,3 +600,4 @@ if __name__ == "__main__":
     fig_losses()
     fig_x_margin_geometry()
     fig_x_svr()
+    fig_feature_blowup()

@@ -13,13 +13,13 @@ multiple-testing problem, which now draws on module A7.
 
 | Module | Title | What it covers | Deck | Exercises | Notebook |
 |---|---|---|---|---|---|
-| A1 | Randomised Controlled Trials | Potential outcomes, selection-bias decomposition, randomisation, regression adjustment (HC2), power/MDE, ITT vs per-protocol, peeking | 71 pages | 6 + 2 extended | `advanced_01_rcts_lab.ipynb` |
-| A2 | Explainable AI with Shapley Values | Cooperative games, the Shapley axioms, exact enumeration vs Monte-Carlo, waterfalls, global importance, correlated-feature and retrain pitfalls | 73 pages | 6 + 2 extended | `advanced_02_shapley_lab.ipynb` |
+| A1 | Randomised Controlled Trials | Potential outcomes, selection-bias decomposition, randomisation, regression adjustment (HC2), power/MDE, ITT vs per-protocol, peeking | 72 pages | 6 + 2 extended | `advanced_01_rcts_lab.ipynb` |
+| A2 | Explainable AI with Shapley Values | Cooperative games, the Shapley axioms, exact enumeration vs Monte-Carlo, waterfalls, global importance, correlated-feature and retrain pitfalls | 75 pages | 6 + 2 extended | `advanced_02_shapley_lab.ipynb` |
 | A3 | Conformal Prediction | Exchangeability, split conformal, the finite-sample quantile, marginal vs conditional coverage, CQR, prediction sets, the OLS stress test | 74 pages | 6 + 2 extended | `advanced_03_conformal_lab.ipynb` |
-| A4 | GLMs and Splines | Exponential family, Poisson regression on `Bikeshare`, deviance/LRT/AIC, overdispersion (quasi-Poisson, NB), penalized splines and edf, a count GAM | 82 pages | 7 + 2 extended | `advanced_04_glms_splines_lab.ipynb` |
-| A5 | Support Vector Machines *(ISLP Ch 9)* | Maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by CV | 93 pages | 7 + 3 | `advanced_05_svm_lab.ipynb` |
-| A6 | Survival Analysis *(ISLP Ch 11)* | Censoring, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 93 pages | 7 + 3 | `advanced_06_survival_lab.ipynb` |
-| A7 | Multiple Testing *(ISLP Ch 13)* | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 69 pages | 5 + 3 | `advanced_07_multiple_testing_lab.ipynb` |
+| A4 | GLMs and Splines | Exponential family, Poisson regression on `Bikeshare`, deviance/LRT/AIC, overdispersion (quasi-Poisson, NB), penalized splines and edf, a count GAM | 83 pages | 7 + 2 extended | `advanced_04_glms_splines_lab.ipynb` |
+| A5 | Support Vector Machines *(ISLP Ch 9)* | Maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by CV | 94 pages | 7 + 3 | `advanced_05_svm_lab.ipynb` |
+| A6 | Survival Analysis *(ISLP Ch 11)* | Censoring, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 94 pages | 7 + 3 | `advanced_06_survival_lab.ipynb` |
+| A7 | Multiple Testing *(ISLP Ch 13)* | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 70 pages | 5 + 3 | `advanced_07_multiple_testing_lab.ipynb` |
 
 ## Prerequisites
 

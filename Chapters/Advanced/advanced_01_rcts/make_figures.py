@@ -311,6 +311,39 @@ def fig_balance():
     print("   balance SMDs:", {n_: round(s, 3) for n_, s in zip(names, smds)})
 
 
+
+def fig_itt_dilution():
+    """Non-compliance dilutes the ITT effect linearly --- and the sample size
+    needed to detect it grows with 1/c^2."""
+    c = np.linspace(0.05, 1.0, 200)
+
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.1))
+    ax = axes[0]
+    ax.plot(c, c, color=ACCENT, lw=2)
+    ax.plot([0.6, 0.6], [0, 0.6], color=GREY, lw=0.9, ls=":")
+    ax.plot([0.05, 0.6], [0.6, 0.6], color=GREY, lw=0.9, ls=":")
+    ax.annotate("60% compliance:\nITT = 0.6 x CACE", xy=(0.6, 0.6), xytext=(0.62, 0.30),
+                fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+    ax.set_xlabel("compliance rate $c$"); ax.set_ylabel("ITT effect / CACE")
+    ax.set_title("the effect you measure", fontsize=9, color=ACCENT)
+    ax.set_xlim(0, 1.02); ax.set_ylim(0, 1.05)
+
+    ax = axes[1]
+    ax.plot(c, 1 / c**2, color=ORANGE, lw=2)
+    for cc in (0.5, 0.7):
+        ax.plot(cc, 1/cc**2, "o", color=ORANGE, ms=5, mec="white", mew=0.8)
+    ax.annotate("50% compliance:\n$4\\times$ the sample", xy=(0.5, 4.0), xytext=(0.56, 6.5),
+                fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+    ax.set_xlabel("compliance rate $c$"); ax.set_ylabel("relative $n$ for equal power")
+    ax.set_title("the price you pay ($1/c^2$)", fontsize=9, color=ORANGE)
+    ax.set_xlim(0.2, 1.02); ax.set_ylim(0, 12)
+
+    save(fig, "cha1_itt_dilution.png")
+    print("cha1_itt_dilution: c=0.6 -> ITT 0.6*CACE, n multiplier", round(1/0.36, 2))
+
+
 if __name__ == "__main__":
     fig_simpson()
     fig_po_table()
@@ -318,3 +351,4 @@ if __name__ == "__main__":
     fig_power()
     fig_peeking()
     fig_balance()
+    fig_itt_dilution()

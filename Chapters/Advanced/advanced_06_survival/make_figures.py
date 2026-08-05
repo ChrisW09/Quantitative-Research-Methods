@@ -23,7 +23,7 @@ from lifelines import CoxPHFitter, KaplanMeierFitter
 from lifelines.statistics import logrank_test
 
 HERE = Path(__file__).parent
-ROOT = HERE.parents[1]
+ROOT = HERE.parents[2]
 DATA = ROOT / "ALL CSV FILES - 2nd Edition"
 OUT = HERE / "images"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -448,6 +448,48 @@ def fig_x_publication():
     save(fig, "ch11_x_publication.png")
 
 
+
+
+def fig_logrank_oe():
+    """The log-rank arithmetic drawn: cumulative observed vs expected male
+    deaths on BrainCancer, ending at O = 20 vs E = 16.46 (Z = 1.20)."""
+    df = pd.read_csv(DATA / "BrainCancer.csv")
+    df = df.dropna(subset=["time", "status", "sex"])
+    times = np.sort(df.loc[df["status"] == 1, "time"].unique())
+    cum_o, cum_e, tt = [], [], []
+    o = e = 0.0
+    for t in times:
+        at_risk = df["time"] >= t
+        deaths = (df["time"] == t) & (df["status"] == 1)
+        n, d = at_risk.sum(), deaths.sum()
+        n_m = (at_risk & (df["sex"] == "Male")).sum()
+        d_m = (deaths & (df["sex"] == "Male")).sum()
+        o += d_m
+        e += d * n_m / n
+        tt.append(t); cum_o.append(o); cum_e.append(e)
+
+    fig, ax = plt.subplots(figsize=(6.2, 3.4))
+    ax.step(tt, cum_o, where="post", color=ACCENT, lw=2, zorder=3)
+    ax.plot(tt, cum_e, color=ORANGE, lw=2, zorder=2)
+    ax.text(tt[2], cum_o[-1] - 0.4, f"observed male deaths: {cum_o[-1]:.0f}",
+            color=ACCENT, fontsize=9, ha="left", va="top")
+    ax.text(tt[-1] * 0.80, cum_e[-1] - 4.8, f"expected under\n'no sex effect': {cum_e[-1]:.2f}",
+            color=ORANGE, fontsize=9, ha="right", va="top")
+    xb = tt[-1] * 1.015
+    ax.plot([xb, xb], [cum_e[-1], cum_o[-1]], color=GREY, lw=1.4,
+            solid_capstyle="butt", zorder=4)
+    for yv in (cum_e[-1], cum_o[-1]):
+        ax.plot([xb - 0.5, xb], [yv, yv], color=GREY, lw=1.0, zorder=4)
+    ax.text(tt[-1] * 0.985, (cum_o[-1] + cum_e[-1]) / 2,
+            f"gap = {cum_o[-1]-cum_e[-1]:.2f} deaths\n= 1.20 SEs ($p = 0.23$)",
+            fontsize=8.5, color="#333333", ha="right", va="center")
+    ax.set_xlim(0, tt[-1] * 1.05)
+    ax.set_xlabel("months of follow-up")
+    ax.set_ylabel("cumulative male deaths")
+    save(fig, "ch11_logrank_oe.png")
+    print("ch11_logrank_oe: O =", cum_o[-1], "E =", round(cum_e[-1], 4))
+
+
 if __name__ == "__main__":
     fig_censoring()
     fig_naive()
@@ -459,3 +501,4 @@ if __name__ == "__main__":
     fig_loglog()
     fig_predict()
     fig_x_publication()
+    fig_logrank_oe()
