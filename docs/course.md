@@ -51,8 +51,8 @@ you stop and resume cleanly:
 
 - **Ch 2** — after "regression vs. classification" (p. 42); assessing accuracy,
   bias–variance and KNN open the second session
-- **Ch 3** — after multiple regression and the four questions (p. 76)
-- **Ch 4** — after the logistic-regression section (p. 42); the confusion matrix, ROC/AUC and the lab open the second session
+- **Ch 3** — after multiple regression and the four questions (p. 75)
+- **Ch 4** — after the logistic-regression section (p. 41); the confusion matrix, ROC/AUC and the lab open the second session
 ```
 
 ```{admonition} One session, two decks — so it is a selection

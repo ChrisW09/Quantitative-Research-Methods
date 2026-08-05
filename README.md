@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>1055 core slides</b> (+142 in optional appendices) ·
+  <b>1049 core slides</b> (+160 in optional appendices) ·
   <b>156 exercises</b> with worked solutions ·
   <b>12 labs</b> with worked solutions, all running locally &amp; on Colab ·
   <b>3 + 5 mock exams</b> · <b>22 datasets</b>
@@ -47,7 +47,7 @@ Prepared by **Prof. Dr. Christoph Weisser**.
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part precourse · 1055 slides, plus 142 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 12 | Ten ISLP chapters + a two-part precourse · 1049 slides, plus 160 in per-deck appendices |
 | Exercises | 106 short + 50 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 15 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
 | [Mock exams](#-mock-exams) | 3 | Each as questions, worked solutions and an in-class review deck — kept out of git |
@@ -124,7 +124,7 @@ Chapter 1 is short and opens the same session as the first half of Chapter 2.
 Chapters 2, 3 and 4 each span two sessions, breaking where a session can end
 cleanly: Ch 2 after "regression vs. classification" (p. 42), so accuracy,
 bias–variance and KNN open the second; Ch 3 after multiple regression and the
-four questions (p. 76); Ch 4 after the logistic-regression section (p. 42), so
+four questions (p. 75); Ch 4 after the logistic-regression section (p. 41), so
 evaluation and the lab open the second.
 
 > Chapters **9 (SVM), 11 (Survival) and 13 (Multiple Testing)** are no longer
@@ -151,19 +151,19 @@ advanced material that the main thread never depends on.
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+16) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
-| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+9) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
-| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+6) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
-| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 107 (+8) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
-| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 144 (+11) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
-| 4 | Classification | Logistic regression and the odds scale, confounding, confusion matrices, ROC and AUC — LDA, QDA and naive Bayes moved to the appendix | 10 + 6 | 82 (+43) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
-| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 79 (+7) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
-| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 81 (+11) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
-| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+7) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
-| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 83 (+7) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
-| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 75 (+8) | [PDF](./Chapters/chapter_10/chapter_10.pdf) |
-| 12 | Unsupervised Learning | No test error to validate against, principal components and the variance explained, scaling, *K*-means and its local optima, dendrograms, linkage and dissimilarity, clusters in pure noise | 6 + 3 | 91 (+9) | [PDF](./Chapters/chapter_12/chapter_12.pdf) |
-| **Total** | | | **87 + 41** | **1055 (+142)** | |
+| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+17) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+10) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
+| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 70 (+8) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
+| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 107 (+9) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
+| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 143 (+13) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
+| 4 | Classification | Logistic regression and the odds scale, confounding, confusion matrices, ROC and AUC — LDA, QDA and naive Bayes moved to the appendix | 10 + 6 | 82 (+44) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
+| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 79 (+8) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
+| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 78 (+15) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
+| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+8) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
+| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 82 (+9) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
+| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 75 (+9) | [PDF](./Chapters/chapter_10/chapter_10.pdf) |
+| 12 | Unsupervised Learning | No test error to validate against, principal components and the variance explained, scaling, *K*-means and its local optima, dendrograms, linkage and dissimilarity, clusters in pure noise | 6 + 3 | 91 (+10) | [PDF](./Chapters/chapter_12/chapter_12.pdf) |
+| **Total** | | | **87 + 41** | **1049 (+160)** | |
 
 <details>
 <summary><b>How a deck is built</b></summary>
@@ -183,7 +183,7 @@ advanced material that the main thread never depends on.
 5. **Appendix** — the optional, advanced material, opened by a slide that says
    what is in it and why each item is optional.
 
-Throughout: **~100 purpose-built visuals** (65 matplotlib plots computed from
+Throughout: **~110 purpose-built visuals** (77 matplotlib plots computed from
 the real course datasets + 39 native TikZ diagrams), commented Python on every
 listing, and numeric answers reproduced against the real data.
 </details>
@@ -197,21 +197,18 @@ solution, so it works as homework.
 
 | Ch. | In its appendix | Pages |
 |:--:|---|:--:|
-| 0 | χ²/*t*/*F* and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 16 |
-| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 9 |
-| 1 | the design matrix entry by entry · the two dataset lookup tables | 6 |
-| 2 | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 8 |
-| 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 11 |
-| 4 | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression | 15 |
-| 5 | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 7 |
-| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
-| 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
-| 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
-| 9 | the geometry in full — distance to a hyperplane and why *M* = 1/‖β‖ · the dual problem and where the αᵢ come from · support vector regression · Extended Exercise 9.3 (choosing a classifier) | 9 |
-| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
-| 11 | Greenwood's formula · other censoring, and truncation · deriving the partial likelihood, and ties · the log-rank test as a score test of the Cox model · time-varying covariates and immortal-time bias · Exercise 11.7 (the exponential model) | 8 |
-| 12 | the two forms of the *K*-means objective · PCA as the best low-rank approximation · matrix completion for missing values · the silhouette width · Extended Exercise 12.3 (a full workflow on gene expression) | 9 |
-| 13 | the four outcomes drawn · resampling-based inference · post-selection inference | 6 |
+| 0 | χ²/*t*/*F* and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) · the four-shapes gallery | 17 |
+| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) · the three scales, drawn | 10 |
+| 1 | the design matrix entry by entry · the two dataset lookup tables · the two recreated overview figures | 8 |
+| 2 | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) · the third U-curve rendering | 9 |
+| 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · the RSS surface and ISLP Fig 3.1 recreated | 13 |
+| 4 | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression · ISLP Fig 4.2 recreated on Default | 44 |
+| 5 | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills · ISLP Fig 5.5 (5-fold CV) | 8 |
+| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 · Extended Exercise 6.1 (all criteria across sizes) | 15 |
+| 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) · the four-models panel | 8 |
+| 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART · ISLP Figs 8.1 and 8.2 (the Hitters tree) | 9 |
+| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent · the gradient-descent loss surface | 9 |
+| 12 | the two forms of the *K*-means objective · PCA as the best low-rank approximation · matrix completion for missing values · the silhouette width · Extended Exercise 12.3 (a full workflow on gene expression) · the same tree, drawn two ways | 10 |
 </details>
 
 <details>

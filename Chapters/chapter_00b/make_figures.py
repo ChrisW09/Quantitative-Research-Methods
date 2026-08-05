@@ -273,6 +273,39 @@ def fig_split():
     save(fig, "ch00b_split.png")
 
 
+
+
+def fig_log_loss():
+    """Why the log appears in the likelihood: the penalty -log p for the
+    probability you gave the outcome that actually happened."""
+    p = np.linspace(0.005, 1.0, 400)
+
+    fig, ax = plt.subplots(figsize=(6.0, 3.3))
+    ax.plot(p, -np.log(p), color=ACCENT, lw=2)
+
+    pts = [(0.99, "confident and right:\nalmost free"),
+           (0.5, "hedging: $-\\log 0.5 = 0.69$"),
+           (0.05, "confident and wrong:\n$-\\log 0.05 = 3.0$")]
+    for px, lab in pts:
+        ax.plot(px, -np.log(px), "o", color=ORANGE, ms=6, mec="white", mew=0.8, zorder=4)
+    ax.annotate(pts[0][1], xy=(0.99, -np.log(0.99)), xytext=(0.73, 0.62),
+                fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+    ax.annotate(pts[1][1], xy=(0.5, -np.log(0.5)), xytext=(0.45, 1.55),
+                fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+    ax.annotate(pts[2][1], xy=(0.05, -np.log(0.05)), xytext=(0.13, 3.6),
+                fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+
+    ax.text(0.62, 2.9, r"$-\log \hat p$", color=ACCENT, fontsize=11)
+    ax.set_xlabel(r"$\hat p$ assigned to the outcome that actually happened")
+    ax.set_ylabel("penalty (nats)")
+    ax.set_xlim(0, 1.02); ax.set_ylim(0, 5.4)
+    save(fig, "ch00b_log_loss.png")
+    print("ch00b_log_loss: -log(0.5) =", round(np.log(2), 3))
+
+
 if __name__ == "__main__":
     fig_exp_log()
     fig_log_scale()
@@ -282,3 +315,4 @@ if __name__ == "__main__":
     fig_likelihood_normal()
     fig_subset_growth()
     fig_split()
+    fig_log_loss()

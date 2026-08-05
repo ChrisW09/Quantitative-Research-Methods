@@ -94,19 +94,19 @@ works as homework.
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher | 10 | 4 | 106 + 16 |
-| 0b | Precourse (b) — toolkit | 6 | 2 | 51 + 9 |
-| 1  | Introduction | 3 | 1 | 71 + 6 |
-| 2  | Statistical Learning | 8 | 4 | 107 + 8 |
-| 3  | Linear Regression | 12 | 6 | 144 + 11 |
-| 4  | Classification | 10 | 6 | 82 + 43 |
-| 5  | Resampling Methods | 6 | 3 | 79 + 7 |
-| 6  | Linear Model Selection & Regularization | 7 | 3 | 81 + 11 |
-| 7  | Moving Beyond Linearity | 6 | 3 | 85 + 7 |
-| 8  | Tree-Based Methods | 7 | 3 | 83 + 7 |
-| 10 | Deep Learning | 6 | 3 | 75 + 8 |
-| 12 | Unsupervised Learning | 6 | 3 | 91 + 9 |
-| **Total** | | **87** | **41** | **1055 + 142** |
+| 0  | Precourse (a) — statistics refresher | 10 | 4 | 106 + 17 |
+| 0b | Precourse (b) — toolkit | 6 | 2 | 51 + 10 |
+| 1  | Introduction | 3 | 1 | 70 + 8 |
+| 2  | Statistical Learning | 8 | 4 | 107 + 9 |
+| 3  | Linear Regression | 12 | 6 | 143 + 13 |
+| 4  | Classification | 10 | 6 | 82 + 44 |
+| 5  | Resampling Methods | 6 | 3 | 79 + 8 |
+| 6  | Linear Model Selection & Regularization | 7 | 3 | 78 + 15 |
+| 7  | Moving Beyond Linearity | 6 | 3 | 85 + 8 |
+| 8  | Tree-Based Methods | 7 | 3 | 82 + 9 |
+| 10 | Deep Learning | 6 | 3 | 75 + 9 |
+| 12 | Unsupervised Learning | 6 | 3 | 91 + 10 |
+| **Total** | | **87** | **41** | **1049 + 160** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11) and multiple testing
 (Ch 13) are no longer part of the taught sequence — their decks, labs and
@@ -138,7 +138,7 @@ Chapter 1 is short and opens the same session as the first half of Chapter 2.
 
 For the split chapters, the recommended stopping points are: **Ch 2** after the
 KNN / bias–variance material; **Ch 3** after "Goodness of fit / the four
-questions"; **Ch 4** after the logistic-regression section (p. 42), so evaluation
+questions" (p. 75); **Ch 4** after the logistic-regression section (p. 41), so evaluation
 and the lab open the second session.
 
 The plan above covers the main flow of each deck. Appendix pages sit outside it

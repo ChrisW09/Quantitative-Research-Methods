@@ -661,6 +661,47 @@ def fig_gradient_descent():
     save(fig, "ch00_gradient_descent.png")
 
 
+
+
+def fig_se_shrinks():
+    """The square-root law: SE of the mean vs n, theory and simulation.
+
+    Complements fig_lln (which tracks one running mean): here each dot is the
+    *standard deviation of 4,000 sample means* at that n, against sigma/sqrt(n).
+    """
+    sigma = 10.0
+    n_grid = np.unique(np.round(np.logspace(np.log10(2), 3, 50)).astype(int))
+    theory = sigma / np.sqrt(n_grid)
+
+    n_sim = np.array([2, 5, 10, 25, 60, 150, 400, 1000])
+    sim = [RNG.normal(50, sigma, size=(4000, n)).mean(axis=1).std(ddof=1)
+           for n in n_sim]
+
+    fig, ax = plt.subplots(figsize=(6.2, 3.3))
+    ax.plot(n_grid, theory, color=ACCENT, lw=2, zorder=3)
+    ax.plot(n_sim, sim, "o", color=ORANGE, ms=5, mec="white", mew=0.8, zorder=4)
+    ax.text(6.4, 5.6, r"theory: $\mathrm{SE} = \sigma/\sqrt{n}$", color=ACCENT, fontsize=9.5)
+    ax.text(150, 1.15, "simulation: SD of 4,000\nsample means at each $n$",
+            color=ORANGE, fontsize=8.5)
+
+    for n0 in (25, 100):
+        se = sigma / np.sqrt(n0)
+        ax.plot([n0, n0], [0, se], color=GREY, lw=0.9, ls=":", zorder=1)
+        ax.plot([2, n0], [se, se], color=GREY, lw=0.9, ls=":", zorder=1)
+    ax.annotate("quadruple $n$ (25 $\\to$ 100)\nto halve the SE (2 $\\to$ 1)",
+                xy=(100, 1.0), xytext=(28, 3.4), fontsize=8.5, color="#333333",
+                arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
+
+    ax.set_xscale("log")
+    ax.set_xlabel("sample size $n$")
+    ax.set_ylabel(r"standard error of $\bar{x}$  ($\sigma = 10$)")
+    ax.set_xlim(1.8, 1100); ax.set_ylim(0, 7.5)
+    ax.set_xticks([2, 5, 10, 25, 100, 1000])
+    ax.get_xaxis().set_major_formatter(plt.ScalarFormatter())
+    save(fig, "ch00_se_shrinks.png")
+    print("ch00_se_shrinks: SE(25) =", round(sigma/5, 2), " SE(100) =", round(sigma/10, 2))
+
+
 if __name__ == "__main__":
     fig_center_spread()
     fig_boxplot_anatomy()
@@ -680,3 +721,4 @@ if __name__ == "__main__":
     fig_outlier_influence()
     fig_standardisation()
     fig_gradient_descent()
+    fig_se_shrinks()

@@ -451,6 +451,41 @@ def fig_x_silhouette():
     save(fig, "ch12_x_silhouette.png")
 
 
+
+
+def fig_method_agreement():
+    """K-means and complete-linkage on scaled USArrests: do they agree?
+
+    A 4x4 crosstab of cluster labels, the same validation move the lab makes
+    on NCI60 (clusters against cancer types). ARI quantifies the agreement.
+    """
+    df = pd.read_csv(DATA / "USArrests.csv", index_col=0)
+    X = StandardScaler().fit_transform(df.values)
+
+    km = KMeans(n_clusters=4, n_init=20, random_state=2024).fit_predict(X)
+    hc = fcluster(linkage(X, method="complete"), t=4, criterion="maxclust") - 1
+
+    tab = np.zeros((4, 4), dtype=int)
+    for a, b in zip(km, hc):
+        tab[a, b] += 1
+    ari = adjusted_rand_score(km, hc)
+
+    fig, ax = plt.subplots(figsize=(4.6, 3.4))
+    im = ax.imshow(tab, cmap=plt.cm.Blues, vmin=0, vmax=tab.max())
+    for i in range(4):
+        for j in range(4):
+            ax.text(j, i, tab[i, j], ha="center", va="center", fontsize=10,
+                    color="white" if tab[i, j] > tab.max() * 0.6 else "#333333")
+    ax.set_xticks(range(4), [f"H{j+1}" for j in range(4)])
+    ax.set_yticks(range(4), [f"K{i+1}" for i in range(4)])
+    ax.set_xlabel("complete linkage, cut at 4 clusters")
+    ax.set_ylabel("$K$-means, $K=4$")
+    ax.set_title(f"states per label pair — ARI = {ari:.2f}", fontsize=9)
+    ax.grid(False)
+    save(fig, "ch12_method_agreement.png")
+    print("ch12_method_agreement: ARI =", round(ari, 3), "| row sums", tab.sum(1).tolist())
+
+
 if __name__ == "__main__":
     fig_pc1_direction()
     fig_biplot()
@@ -469,3 +504,4 @@ if __name__ == "__main__":
     fig_x_rectangle()
     fig_x_outlier()
     fig_x_silhouette()
+    fig_method_agreement()
