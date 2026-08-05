@@ -260,6 +260,9 @@
     Minimise within-region variability:
     $\sum_{j = 1}^J \sum_{i \in R_j} (y_i - \bar y_{R_j})^2$.
   \end{block}
+  \begin{labnote}[{{Live demo --- \S2 of the notebook}}]
+    Switch to \texttt{chapter\_08\_lab.ipynb} \S2 and run the \texttt{plot\_tree} cell: a depth-4 regression tree on the Carseats data, with \texttt{ShelveLoc} and \texttt{Price} taking the top splits and a test MSE of $3.612$ printed by the next cell.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{Reading the tree-fit objective}
@@ -471,6 +474,9 @@ A binary node contains $400$ positive and $400$ negative cases ($800$ total). Tw
   \item Why are Gini / entropy preferred for \emph{growing} the tree?
 \end{enumerate}
 \end{exercise}
+\begin{labnote}[{{Check it in code --- \S6 of the notebook}}]
+\S6 of \texttt{chapter\_08\_lab.ipynb} recomputes this exercise: both splits print error $0.250$, while Gini prints $0.375$ vs.\ $0.333$ and picks the split with the pure node.
+\end{labnote}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 8.2 (1/2)}
@@ -515,6 +521,9 @@ Cost-complexity pruning selects a subtree $T\subset T_0$ minimising
   \item How is $\alpha$ chosen?
 \end{enumerate}
 \end{exercise}
+\begin{labnote}[{{Live demo --- \S3 of the notebook}}]
+Run the \S3 cell of \texttt{chapter\_08\_lab.ipynb}: ten-fold CV picks $\alpha\approx0.013$, yet the pruned tree's test MSE ($4.62$) is \emph{worse} than the depth-4 tree's $3.612$ --- CV pruned a tree that \texttt{max\_depth=4} had already regularised.
+\end{labnote}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 8.3 (1/2)}
@@ -697,6 +706,9 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
     pairwise correlation, which makes the average more effective.
     With $m = p$ random forests reduce to bagging.
   \end{takeaway}
+  \begin{labnote}[{{Live demo --- \S4 of the notebook}}]
+    In \texttt{chapter\_08\_lab.ipynb} \S4, fit the $500$-tree forest with \texttt{oob\_score=True}: OOB $R^2=0.629$ appears without touching the test set (test MSE $2.312$), and the next cell draws the importance plot.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{Random forest: error vs.\ number of trees}
@@ -939,6 +951,9 @@ Gradient boosting with regression trees has three tuning parameters.
   \item What does $d$ control? What model do we get when $d=1$?
 \end{enumerate}
 \end{exercise}
+\begin{labnote}[{{Live demo --- \S5 and \S7 of the notebook}}]
+Run \S5 of \texttt{chapter\_08\_lab.ipynb} ($B{=}2000$, $\lambda{=}0.01$, $d{=}3$ $\to$ test MSE $2.195$ on Carseats), then the \S7 table: forest $2.312$ vs.\ boosting $2.195$ --- both roughly halve the single tree's $3.612$.
+\end{labnote}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 8.6 (1/2)}
@@ -973,11 +988,11 @@ Tuning $B$ by training error --- it decreases monotonically in $B$, so it never 
   \begin{labnote}[Companion notebook: \texttt{chapter\_08\_lab.ipynb}]
     The code in this section is meant to be \textbf{demonstrated live}. Open the companion Jupyter notebook and run it cell by cell, section by section:
     \begin{itemize}
-      \item \S2, \emph{Single regression tree}, and \S3, \emph{Pruning via cost-complexity} --- on the Carseats data loaded in \S1;
-      \item \S4, \emph{Random forest}, and \S5, \emph{Gradient boosting};
-      \item the \emph{Optional: XGBoost} subsection that closes \S5.
+      \item \S2, \emph{Single regression tree}, and \S3, \emph{Pruning via cost-complexity} --- on the Carseats data loaded in \S1, \emph{The Carseats data};
+      \item \S4, \emph{Random forest}, and \S5, \emph{Gradient boosting} --- with the \emph{Optional: XGBoost} subsection that closes \S5;
+      \item \S6, \emph{Why Gini and not classification error?} --- Exercise 8.2 re-done in code --- and \S7, \emph{The four models side by side}.
     \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S6, \emph{Exercises}, closes the notebook.
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S8, \emph{Exercises}, closes the notebook.
   \end{labnote}
 \end{frame}
 
@@ -1018,7 +1033,7 @@ imp.sort_values().plot.barh()  # importance plot
 \begin{frame}[fragile]{Gradient boosting and XGBoost}
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 from sklearn.ensemble import GradientBoostingRegressor
-gb = GradientBoostingRegressor(n_estimators=1000, learning_rate=0.01,  # B=1000, lambda=0.01
+gb = GradientBoostingRegressor(n_estimators=2000, learning_rate=0.01,  # B=2000, lambda=0.01
                                max_depth=3, random_state=0).fit(Xtr, ytr)  # depth d=3
 print("Test MSE:", ((yte - gb.predict(Xte))**2).mean())  # boosted test error
 
@@ -1039,6 +1054,9 @@ Using \texttt{Boston.csv} (target \texttt{medv}):
   \item Interpret the result.
 \end{enumerate}
 \end{exercise}
+\begin{labnote}[{{Run this live}}]
+The worked solution sits in \texttt{chapter\_08\_lab.ipynb} under \emph{Lecture exercises --- worked Python solutions}: the cell headed \emph{Exercise 8.7 --- Random forest \& boosting on Boston [Python]}.
+\end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Exercise 8.7 (1/3)}
@@ -1103,8 +1121,8 @@ Using \texttt{Boston.csv} (target \texttt{medv}), fit and compare three ensemble
 \end{enumerate}
 Report the test MSE of each, and read off the random-forest variable-importance ranking. Which method wins, and which predictors matter?
 \end{longexercise}
-\begin{labnote}[Run this live: \emph{Extended Exercise 8.3 --- Bagging vs.\ random forest vs.\ boosting}]
-Under \emph{Lecture exercises --- worked Python solutions} in \texttt{chapter\_08\_lab.ipynb}: all four fits on one split, with the importance ranking, ready to run.
+\begin{labnote}[{{Run this live}}]
+The worked solution sits in \texttt{chapter\_08\_lab.ipynb} under \emph{Lecture exercises --- worked Python solutions}: the cell headed \emph{Extended Exercise 8.3 --- Bagging vs.\ forest vs.\ boosting [Python]} --- all four fits on one split (seed 1), with $m$ and $(B,\lambda,d)$ tuned by CV \emph{inside} the training set.
 \end{labnote}
 \end{frame}
 
@@ -1127,7 +1145,7 @@ bag  = RandomForestRegressor(n_estimators=500, max_features=p,  # m=p
 print('tree', round(mse(yte, tree.predict(Xte)), 2),  # compare test MSE
       'bag', round(mse(yte, bag.predict(Xte)), 2))
 \end{lstlisting}
-\emph{What it prints (seed 1):} tree $\approx26.7$, bagging $\approx8.5$ --- averaging $500$ bootstrap trees alone cuts the single tree's test error to a third.
+\emph{What it prints (seed 1):} tree $\approx26.7$, bagging $\approx8.6$ --- averaging $500$ bootstrap trees alone cuts the single tree's test error to a third.
 \end{solutionbox}
 \end{frame}
 
@@ -1149,7 +1167,7 @@ imp = pd.Series(rf.feature_importances_,  # last RF's importances
                 index=X.columns).sort_values(ascending=False)
 print(imp.round(3).head())  # top predictors
 \end{lstlisting}
-\emph{What it prints (seed 1):} RF $m{=}\sqrt p$: $9.79$, $m{=}4$: $9.47$, $m{=}6$: $8.90$; GBM $(0.1,1000,2)$: $10.24$, $(0.01,2000,3)$: $7.36$ --- slow learning with more trees wins.
+\emph{What it prints (seed 1):} RF $m{=}\sqrt p$: $9.81$, $m{=}4$: $9.43$, $m{=}6$: $8.73$; GBM $(0.1,1000,2)$: $10.24$, $(0.01,2000,3)$: $7.34$ --- slow learning with more trees wins.
 \end{solutionbox}
 \end{frame}
 
@@ -1159,9 +1177,9 @@ print(imp.round(3).head())  # top predictors
 \[
 \begin{array}{l|c}
 \text{single tree} & \approx 27\\
-\text{bagging } (m=p) & \approx 8.5\\
-\text{random forest } (m=\sqrt p \ \to\ 6) & \approx 9.8\ \to\ 8.9\\
-\text{boosting } (\lambda{=}0.01,\,B{=}2000,\,d{=}3) & \approx 7.4
+\text{bagging } (m=p) & \approx 8.6\\
+\text{random forest } (m=\sqrt p \ \to\ 6) & \approx 9.8\ \to\ 8.7\\
+\text{boosting } (\lambda{=}0.01,\,B{=}2000,\,d{=}3) & \approx 7.3
 \end{array}
 \]
 \textbf{Ranking:} every ensemble slashes the single tree's error $3$--$4$-fold; well-tuned \emph{boosting} edges out bagging and the forest. Because Boston has few, strong predictors, a larger $m$ helps, so bagging is competitive with the forest here. \textbf{Importance:} \texttt{lstat} ($\approx0.40$) and \texttt{rm} ($\approx0.27$) dominate, then \texttt{dis}, \texttt{nox} --- housing value is driven mostly by neighbourhood socio-economic status and dwelling size. Boosting wins on accuracy but needs tuning; the forest is a strong low-effort default.

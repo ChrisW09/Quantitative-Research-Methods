@@ -209,6 +209,9 @@
     cleverly chosen \emph{basis expansion} of the original predictors.
     The OLS machinery still applies.
   \end{takeaway}
+  \begin{labnote}[{{Live demo --- \S1 of the notebook}}]
+    Switch to \texttt{chapter\_07\_lab.ipynb} \S1 and run the two polynomial cells: a raw-power degree-4 OLS on Wage ($R^2\approx0.086$) whose grid plot shows exactly that middle-age wage hump.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{Where this chapter is used in industry}
@@ -372,6 +375,9 @@ We fit a piecewise-constant (step-function) regression of \texttt{wage} on \text
   \item State one limitation of this approach.
 \end{enumerate}
 \end{exercise}
+\begin{labnote}[{{Live demo --- \S2 of the notebook}}]
+  Switch to \texttt{chapter\_07\_lab.ipynb} \S2 and run the binning cell: four age bins give mean wages $94.2 \to 118.2 \to 117.8 \to 101.8$ --- the hump no straight line can produce, at the price of a jump at age $33.5$.
+\end{labnote}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 7.2 (1/2)}
@@ -443,6 +449,9 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
     \textbf{Cubic splines} ($d = 3$) are the standard choice --- they
     are smooth visually. Total degrees of freedom: $K + d + 1$.
   \end{takeaway}
+  \begin{labnote}[{{Live demo --- \S3 of the notebook}}]
+    Switch to \texttt{chapter\_07\_lab.ipynb} \S3 and run the \texttt{SplineTransformer} cell: a cubic B-spline basis with $6$ knots, fitted by plain least squares --- the curve bends like the polynomial but stays smooth with no jumps.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{Why the continuity constraints? Broken vs.\ smooth joins}
@@ -570,6 +579,9 @@ Consider a cubic regression spline with $K$ interior knots, fitted so that the f
   \item How many basis functions does the truncated-power basis use (including the intercept)? Confirm consistency.
 \end{enumerate}
 \end{exercise}
+\begin{labnote}[{{Live demo --- \S6 of the notebook}}]
+  Switch to \texttt{chapter\_07\_lab.ipynb} \S6 and run the basis-building cell: it constructs the truncated-power basis on Wage ($K=3$ knots at the age quartiles) and confirms the design matrix has rank $7=K+4$ --- the count you are about to derive.
+\end{labnote}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 7.3 (1/2)}
@@ -951,9 +963,9 @@ Reading a partial-effect curve as an absolute wage level. Each panel is centred 
     \begin{itemize}
       \item \S1, \emph{Polynomial regression}, and \S2, \emph{Step functions};
       \item \S3, \emph{Regression splines}, and \S4, \emph{LOESS};
-      \item \S5, \emph{GAM}.
+      \item \S5, \emph{GAM}, and \S6, \emph{Where the degrees of freedom come from}.
     \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S6, \emph{Exercises}, closes the notebook.
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S7, \emph{Exercises}, closes the notebook.
   \end{labnote}
 \end{frame}
 
@@ -995,18 +1007,23 @@ plt.scatter(Wage["age"], Wage["wage"], s=4, alpha=0.3)  # raw data
 plt.plot(l[:, 0], l[:, 1], color="orange")  # fitted LOESS curve
 plt.show()
   \end{lstlisting}
+  \begin{labnote}[{{Live demo --- \S4 of the notebook}}]
+    Switch to \texttt{chapter\_07\_lab.ipynb} \S4 and run the \texttt{lowess} cell: with span $0.2$ each local fit uses $20\%$ of the $3\,000$ workers, and the curve traces the same rise--plateau--fall as the splines.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{A simple GAM with pyGAM}
   \begin{lstlisting}
-from pygam import LinearGAM, s, f
+from pygam import LinearGAM, s
 
-Wage["education"] = Wage["education"].astype("category").cat.codes  # encode factor
-X = Wage[["year", "age", "education"]]  # three predictors
-y = Wage["wage"]                        # response
-gam = LinearGAM(s(0) + s(1) + f(2)).fit(X, y)  # smooth year, age; factor edu
-gam.summary()  # EDF and p-values per term
+X = Wage[["year", "age"]].values  # two predictors
+y = Wage["wage"].values           # response
+gam = LinearGAM(s(0) + s(1)).fit(X, y)  # smooth terms in year and age
+gam.summary()  # EDF per term: year ~7, age ~14
   \end{lstlisting}
+  \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
+    Switch to \texttt{chapter\_07\_lab.ipynb} \S5 and run the two GAM cells: the summary reports $\approx21.2$ total effective df (age's smooth alone spends $\approx14$), and the partial-dependence panels show the age hump next to the gentle year drift.
+  \end{labnote}
 \end{frame}
 
 % ====================== EXERCISE: Python (Wage) ======================
@@ -1019,6 +1036,9 @@ Using \texttt{Wage.csv}:
   \item Describe the estimated effect of \texttt{age}.
 \end{enumerate}
 \end{exercise}
+\begin{labnote}[{{Run this live}}]
+  The worked solution sits in \texttt{chapter\_07\_lab.ipynb} under \emph{Lecture exercises --- worked Python solutions}: the cell headed \emph{Exercise 7.6 --- Natural spline / GAM on Wage [Python]}.
+\end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Exercise 7.6 (1/3)}
@@ -1032,7 +1052,7 @@ Wage = pd.read_csv('../ALL CSV FILES - 2nd Edition/Wage.csv')  # load
 fit = smf.ols('wage ~ cr(age, df=5)', data=Wage).fit()  # natural spline
 print(fit.summary())  # coefficient table
 \end{lstlisting}
-\emph{What the output shows:} $6$ coefficients (intercept $+$ $5$ basis columns), $R^2\approx0.087$, and an overall $F$-test with $p\approx10^{-56}$ --- the spline terms are jointly highly significant, even though \texttt{age} alone explains only a modest share of wage variance.
+\emph{What the output shows:} $6$ coefficients (intercept $+$ $5$ basis columns), $R^2\approx0.087$, and an overall $F$-test with $p\approx6\times10^{-58}$ --- the spline terms are jointly highly significant, even though \texttt{age} alone explains only a modest share of wage variance.
 \end{solutionbox}
 \end{frame}
 
@@ -1075,8 +1095,8 @@ Using \texttt{Wage.csv}, model \texttt{wage} as a function of \texttt{age} three
 \end{enumerate}
 Overlay the three fitted curves on a scatterplot, report the chosen complexity, and interpret where the fits agree and where they differ.
 \end{longexercise}
-\begin{labnote}[Run this live: \emph{Extended Exercise 7.3 --- Three fits for wage vs.\ age}]
-Under \emph{Lecture exercises --- worked Python solutions} in \texttt{chapter\_07\_lab.ipynb}: the nested ANOVA, the three fits and the overlay plot, ready to run.
+\begin{labnote}[{{Run this live}}]
+The worked solution sits in \texttt{chapter\_07\_lab.ipynb} under \emph{Lecture exercises --- worked Python solutions}: the cell headed \emph{Extended Exercise 7.3 --- Three fits for wage vs.\ age [Python]} --- the nested ANOVA, the three fits and the overlay plot, ready to run.
 \end{labnote}
 \end{frame}
 

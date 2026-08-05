@@ -465,6 +465,11 @@
     This reduces estimating an infinite-dimensional function to
     estimating $p + 1$ numbers.
   \end{readme}
+  \begin{labnote}[{{Live demo --- \S4 of the notebook}}]
+    Switch to \texttt{chapter\_02\_lab.ipynb} \S4 and run the fits cell: on the same
+    simulated data a straight line (two parameters) sits beside two splines --- the
+    line misses the curvature exactly as the flat plane misses it in Figure 2.4.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{Linear fit on Income}
@@ -662,6 +667,10 @@ before seeing the data.
             require interpretability by law.
     \end{itemize}
   \end{takeaway}
+  \begin{labnote}[{{Live demo --- \S\S2--3 of the notebook}}]
+    Switch to \texttt{chapter\_02\_lab.ipynb} \S\S2--3 and run the \texttt{Auto} cells:
+    \texttt{groupby('origin')} splits mean \texttt{mpg} ($20.0$/$27.6$/$30.5$), and the pairplot shows the curvature a good model must bend to.
+  \end{labnote}
 \end{frame}
 
 
@@ -829,8 +838,13 @@ depends on the data and the goal --- ``more flexible'' is not
 
 \begin{frame}{Simulated data: candidate fits and their train/test MSE}
   \begin{center}
-    \includegraphics[width=0.95\textwidth,height=0.66\textheight,keepaspectratio]{2_9.pdf}
+    \includegraphics[width=0.95\textwidth,height=0.52\textheight,keepaspectratio]{2_9.pdf}
   \end{center}
+  \begin{labnote}[{{Live demo --- \S4 of the notebook}}]
+    Switch to \texttt{chapter\_02\_lab.ipynb} \S4 and run the MSE-curve cell: training MSE
+    only falls, test MSE turns up past moderate flexibility, and neither drops below the
+    grey dashed $\mathrm{Var}(\varepsilon)=0.16$ floor.
+  \end{labnote}
   \islpsource{Figure 2.9}
 \end{frame}
 
@@ -1274,6 +1288,11 @@ does.
       \item Classify $x_0$ to the class with the largest $\hat\Pr$.
     \end{enumerate}
   \end{block}
+  \begin{labnote}[{{Live demo --- \S6 of the notebook}}]
+    Switch to \texttt{chapter\_02\_lab.ipynb} \S6 and run the voting cell: this algorithm coded
+    in a few lines and checked against \texttt{KNeighborsClassifier} --- watch the prediction
+    flip when $K$ widens from $1$ to $3$.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}{How KNN votes: the neighbourhood of a query point}
@@ -1526,6 +1545,11 @@ Build a controlled experiment that exposes the bias--variance trade-off in KNN.
 \end{enumerate}
 Provide runnable code and state the expected qualitative result.
 \end{longexercise}
+\begin{labnote}[{{Run this live}}]
+  The worked solution sits in \texttt{chapter\_02\_lab.ipynb} under
+  \emph{Lecture exercises --- worked Python solutions}: the cell headed
+  \emph{Extended Exercise 2.2 --- KNN simulation study [Python]}.
+\end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 2.2 (1/2)}
@@ -1585,7 +1609,8 @@ Small $K$ $=$ flexible $=$ low bias, high variance; large $K$ $=$ rigid $=$ high
     \begin{itemize}
       \item \S\S1--3 \emph{NumPy refresher}, \emph{pandas} and \emph{Plots};
       \item \S4 \emph{Reproducing Figure 2.9 --- bias--variance};
-      \item \S5 \emph{KNN classification}.
+      \item \S5 \emph{KNN classification};
+      \item \S6 \emph{KNN by hand, then by scikit-learn}.
     \end{itemize}
     Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
   \end{labnote}
@@ -1616,6 +1641,11 @@ x.sum(), x.mean(), x.std(ddof=1)  # basic stats (sample sd)
 A = np.array([[1, 2], [3, 4]])    # 2 x 2 matrix
 A.shape, A.T, np.linalg.inv(A), A @ A  # shape, transpose, inverse, product
   \end{lstlisting}
+  \begin{labnote}[{{Live demo --- \S1 of the notebook}}]
+    Switch to \texttt{chapter\_02\_lab.ipynb} \S1 and run these cells live: note
+    \texttt{std(ddof=1)} returns the \emph{sample} sd ($1.0$ here) --- NumPy's default
+    \texttt{ddof=0} divides by $n$, while pandas defaults to \texttt{ddof=1}.
+  \end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{KNN classification}
@@ -1623,7 +1653,6 @@ A.shape, A.T, np.linalg.inv(A), A @ A  # shape, transpose, inverse, product
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-
 Default = load_data("Default")             # credit-card default data
 y = (Default["default"] == "Yes").astype(int).values  # 1 = default
 X = Default[["balance", "income"]].values  # two numeric predictors
@@ -1634,6 +1663,10 @@ scaler = StandardScaler().fit(Xtr)         # KNN needs scaled features
 knn = KNeighborsClassifier(n_neighbors=10).fit(scaler.transform(Xtr), ytr)
 print(knn.score(scaler.transform(Xte), yte))  # test-set accuracy
   \end{lstlisting}
+  \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
+    Run \S5 of \texttt{chapter\_02\_lab.ipynb}: the same code, looped over $K$ from $1$ to $200$,
+    turns this single fit into the U-shaped test-error curve against $1/K$.
+  \end{labnote}
 \end{frame}
 
 
@@ -1645,6 +1678,11 @@ level of \emph{flexibility} a good model of this relationship needs.
 Note that \texttt{horsepower} contains a few ``\texttt{?}'' missing
 entries you must handle.
 \end{exercise}
+\begin{labnote}[{{Run this live}}]
+  The worked solution sits in \texttt{chapter\_02\_lab.ipynb} under
+  \emph{Lecture exercises --- worked Python solutions}: the cell headed
+  \emph{Exercise 2.8 --- Scatter and Flexibility on Auto [Python]}.
+\end{labnote}
 \end{frame}
 
 \begin{frame}[fragile]{Solution --- Exercise 2.8 (1/2)}
