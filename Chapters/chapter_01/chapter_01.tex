@@ -68,10 +68,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -97,12 +93,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -181,42 +176,16 @@
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Retail & Weekly demand forecast per article and store & Replenishment orders, safety stock, allocation \\
-    Banking & Credit scoring at application; expected credit loss (IFRS~9) & Accept / decline, credit limit, loan-loss provisions \\
-    Insurance & Claim frequency and severity modelling & Premium rates and technical reserves \\
-    Manufacturing, aviation & Predictive maintenance from sensor and usage data & When to service a part before it fails \\
-    Telco, SaaS & Churn score per subscriber & Who receives a retention offer \\
-    E-commerce, streaming & Recommendation and search ranking & What the customer is shown next \\
+    Banking & Credit scoring at application: probability of default from bureau and application data & Accept or decline this applicant; where to set the cut-off and the credit limit \\
+    Retail & Weekly demand forecast per article and store & How many units to order and where to set the reorder point \\
+    Telco, SaaS & Churn score per subscriber for the coming quarter & Which subscribers receive a retention offer, and which are left alone \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Every row needs the same three things: a response worth predicting, predictors that are
-    \emph{available before} the decision, and a decision that changes when the number changes.
-    Without the third, the model is a report, not a tool.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: predictive maintenance at a manufacturer}
-  \footnotesize
-  \begin{industry}[The learning problem]
-    \textbf{Response} $Y$: will this asset need an intervention within the next $N$ operating
-    days or cycles? --- binary, supervised and heavily imbalanced. \textbf{Predictors}:
-    telemetry aggregates (vibration, temperature, pressure), operating hours and load,
-    maintenance and fault history, asset age, ambient conditions.
-  \end{industry}
-  \begin{readme}[The fitted output --- and who signs it off]
-    A \emph{risk score per asset per period}, not a failure date. The decision: pull the asset
-    into the next planned maintenance window, or let it run. Maintenance planning and
-    reliability engineering own the score; operations sign off, because an intervention costs
-    production time. The score is read by the production planner on the affected line, who
-    either releases the asset into the window or pushes back because the order book cannot
-    absorb the downtime.
-  \end{readme}
-  \begin{takeaway}[One honest caveat]
-    Failures are rare, so labels are scarce --- and every failure the model prevents is a
-    \emph{censored} observation nobody can confirm: its own success degrades its future
-    training data. The value lies in the decision it changes, not in the score.
+  \begin{takeaway}[A number is only worth modelling if it moves a lever]
+    All three rows need the same three ingredients: a response somebody actually recorded,
+    predictors that are \emph{available before} the decision is taken, and a lever that moves
+    when the number moves. Without the third, the model is a report, not a tool.
   \end{takeaway}
 \end{frame}
 
@@ -256,12 +225,12 @@
   \end{columns}
   \vspace{0.8ex}
 
-  \begin{industry}[Banking and retail: one problem --- many chapters]
+  \begin{takeaway}[One decision --- many chapters]
     Neither list is a tour of techniques. The same decision --- accept this applicant, set this
     price --- keeps coming back, and each chapter adds the piece the previous tool could not
     supply: a validated card, a shorter list of attributes, a curve that saturates. Methods are
     chosen by what the decision needs, never because they are new.
-  \end{industry}
+  \end{takeaway}
 \end{frame}
 
 
@@ -370,54 +339,83 @@
 % ============================================================
 
 \begin{frame}{What is statistical learning?}
-  \begin{block}{Working definition}
-    A vast set of tools for \emph{understanding data}. These tools are
-    classified as either \emph{supervised} (we predict an output) or
-    \emph{unsupervised} (we look for structure without an output).
+  \begin{block}{In one sentence}
+    Statistical learning is the use of \textbf{past data} to build a \textbf{rule} that turns
+    what we \emph{can} measure into what we \emph{want to know} --- together with an honest
+    account of how far that rule can be trusted.
   \end{block}
-  \begin{readme}
-    \begin{itemize}
-      \item Supervised: regression (numerical $Y$) and classification
-            (categorical $Y$).
-      \item Unsupervised: clustering, dimension reduction, density
-            estimation.
-      \item Closely related fields: machine learning, data mining,
-            pattern recognition, predictive analytics.
-    \end{itemize}
+  \begin{readme}[The same sentence with a data set attached]
+    \emph{Past data}: $3\,000$ recorded salaries, each with the age, education and year that
+    came with it. \emph{The rule}: what to expect a 45-year-old graduate to earn.
+    \emph{How far to trust it}: two people with identical records still earn different
+    salaries, and a useful model says how wide that spread is.
   \end{readme}
-  \begin{industry}[Analytics teams: which half a firm's questions fall into]
-    Supervised, because the outcome was recorded: churn scores, credit decisions, demand
-    forecasts. Unsupervised: segmentation, anomaly detection --- no label, so no ``accuracy''.
-  \end{industry}
+  \begin{takeaway}The second half is what makes it \emph{statistical}. Any program can print a number; a statistical model also says how much of that number is noise.\end{takeaway}
 \end{frame}
 
-\begin{frame}{The taxonomy of statistical learning}
+\begin{frame}{The one equation the whole course rests on}
+  \begin{block}{The statistical-learning model}
+    \setlength{\abovedisplayskip}{3pt}\setlength{\belowdisplayskip}{1pt}
+    With a response $Y$ and predictors $X=(X_1,\dots,X_p)$, assume a systematic relationship:
+    \[ \boxed{\;Y=f(X)+\varepsilon\;} \]
+  \end{block}
+  \begin{readme}
+    $f$ is the \emph{systematic} part --- what $X$ genuinely says about $Y$: fixed, real, never
+    observed. $\varepsilon$ is everything else (variables nobody recorded, plain chance), with
+    mean zero. \emph{Learning} means estimating $f$ by an $\hat f$ built from $n$ past cases.
+  \end{readme}
+  \begin{takeaway}Every method in this course is another way of estimating the same $f$; they differ only in what they assume about its shape --- and none can beat $\varepsilon$.\end{takeaway}
+\end{frame}
+
+\begin{frame}{Which box is my problem in? Two questions decide (native diagram)}
+  Do not start from the method. Start from two questions about the data you already have.
+  \vspace{-1mm}
   \begin{center}
   \begin{tikzpicture}[
-    root/.style={rounded corners=3pt,draw=accent,fill=accent,text=white,font=\small\bfseries,minimum width=3.4cm,minimum height=0.8cm,align=center},
-    branch/.style={rounded corners=3pt,draw=accent,fill=accent!75,text=white,font=\small\bfseries,minimum width=2.9cm,minimum height=0.75cm,align=center},
-    leaf/.style={rounded corners=3pt,draw=accent,fill=accent!15,font=\small,minimum width=2.3cm,minimum height=0.85cm,align=center},
-    ex/.style={rounded corners=2pt,draw=green!55!black,fill=green!8,font=\scriptsize\itshape,minimum width=1.8cm,minimum height=0.6cm,align=center},
-    ed/.style={draw=accent,thick}]
-   \node[root]   (r)   at (0,3.2)      {Statistical learning};
-   \node[branch] (sup) at (-3.5,1.7)   {Supervised};
-   \node[branch] (uns) at (3.5,1.7)    {Unsupervised};
-   \node[leaf]   (reg) at (-5.2,0.0)   {Regression\\{\scriptsize numeric $Y$}};
-   \node[leaf]   (cla) at (-1.8,0.0)   {Classification\\{\scriptsize categorical $Y$}};
-   \node[leaf]   (clu) at (1.8,0.0)    {Clustering};
-   \node[leaf]   (dim) at (5.2,0.0)    {Dim.\ reduction};
-   \node[ex]     (e1)  at (-5.2,-1.5)  {Wage};
-   \node[ex]     (e2)  at (-1.8,-1.5)  {Default};
-   \node[ex]     (e3)  at (1.8,-1.5)   {gene clusters};
-   \node[ex]     (e4)  at (5.2,-1.5)   {PCA};
-   \draw[ed] (r)--(sup); \draw[ed] (r)--(uns);
-   \draw[ed] (sup)--(reg); \draw[ed] (sup)--(cla);
-   \draw[ed] (uns)--(clu); \draw[ed] (uns)--(dim);
-   \draw[ed] (reg)--(e1); \draw[ed] (cla)--(e2);
-   \draw[ed] (clu)--(e3); \draw[ed] (dim)--(e4);
+    q/.style={rounded corners=3pt,draw=accent,fill=accent,text=white,font=\small\bfseries,text width=2.8cm,align=center,inner sep=2.5pt,minimum height=0.95cm},
+    cat/.style={rounded corners=3pt,draw=accent,fill=accent!15,font=\small\bfseries,text width=2.4cm,align=center,inner sep=2.5pt,minimum height=0.9cm},
+    ex/.style={rounded corners=2pt,draw=green!55!black,fill=green!8,font=\scriptsize,text width=2.4cm,align=center,inner sep=2.5pt,minimum height=0.8cm},
+    ed/.style={-{Latex[length=2mm]},thick,draw=accent},
+    lab/.style={font=\scriptsize\itshape,inner sep=1.5pt,fill=white}]
+   \node[q]   (q1)  at (-5.4, 0.00) {Q1. Is a response $Y$ recorded for the training cases?};
+   \node[q]   (q2)  at (-1.7,-1.35) {Q2. Is that $Y$ a number or a class?};
+   \node[cat] (uns) at ( 2.05, 1.35) {Unsupervised\\{\scriptsize no $Y$ at all}};
+   \node[cat] (reg) at ( 2.05,-0.35) {Regression\\{\scriptsize $Y$ is a number}};
+   \node[cat] (cla) at ( 2.05,-2.05) {Classification\\{\scriptsize $Y$ is a class}};
+   \node[ex]  (e3)  at ( 5.30, 1.35) {\textbf{NCI60}\\gene expression, no label at all};
+   \node[ex]  (e1)  at ( 5.30,-0.35) {\textbf{Wage}\\a salary in dollars};
+   \node[ex]  (e2)  at ( 5.30,-2.05) {\textbf{Smarket}\\market up or down};
+   \draw[ed] (q1.east) -- ++(0.45,0) |- (uns.west);
+   \draw[ed] (q1.east) -- ++(0.45,0) |- (q2.west);
+   \draw[ed] (q2.east) -- ++(0.35,0) |- (reg.west);
+   \draw[ed] (q2.east) -- ++(0.35,0) |- (cla.west);
+   \node[lab] at (-3.55, 0.85) {no};
+   \node[lab] at (-3.55,-0.85) {yes};
+   \draw[ed] (uns.east)--(e3.west);
+   \draw[ed] (reg.east)--(e1.west);
+   \draw[ed] (cla.east)--(e2.west);
   \end{tikzpicture}
   \end{center}
-  \begin{takeaway}A response $Y$ splits the field: supervised (predict $Y$) vs.\ unsupervised (discover structure).\end{takeaway}
+  \vspace{-3.5mm}
+  \begin{takeaway}Two answers fix the branch. Which algorithm you then use --- and how flexible it is --- is a choice \emph{inside} the box, and that is what the rest of the course is about.\end{takeaway}
+\end{frame}
+
+\begin{frame}{Answering the two questions --- and the usual traps}
+  \vspace{-1mm}
+  \begin{readme}[Q1 asks what your rows contain --- not what you wish they contained]
+    A firm that wants to score churn but never recorded who churned has no supervised problem
+    --- it has a labelling project. Outcome written down: credit decisions, weekly demand,
+    churn. Nothing written down: segmentation, anomaly detection.
+  \end{readme}
+  \begin{readme}[Q2 asks about the response only --- never the predictors]
+    A postcode stored as an integer is a class; a five-star rating stored as text is a number.
+    The test: what would being \emph{wrong} mean? Off by how much $\Rightarrow$ regression; in
+    the wrong bucket $\Rightarrow$ classification.
+  \end{readme}
+  \begin{takeaway}[Why the branch matters at all]
+    It fixes how you keep score: squared error, or misclassification rate --- and for
+    unsupervised problems, no ``accuracy'' at all: nothing to be right about.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{The fundamental setup}
@@ -568,17 +566,17 @@ you hand over is $\hat Y$ itself or the shape of $f$.
   major flavour of problem.
   \begin{takeaway}
     \begin{itemize}
-      \item \textbf{Wage}: regression, mostly inference.
-      \item \textbf{Smarket}: classification, weak signal.
-      \item \textbf{NCI60}: unsupervised, structure discovery.
+      \item \textbf{Wage}: regression, mostly inference --- the same
+            shape as a pay-equity review, where the coefficient
+            \emph{is} the deliverable.
+      \item \textbf{Smarket}: classification, weak signal --- the same
+            shape as a trading or forecasting signal with a very low
+            signal-to-noise ratio.
+      \item \textbf{NCI60}: unsupervised, structure discovery --- the
+            same shape as segmenting customers or products where no
+            label exists.
     \end{itemize}
   \end{takeaway}
-  \begin{industry}[From HR to trading: the same three flavours]
-    A \emph{Wage}-type question is a pay-equity or compensation review --- the coefficient is
-    the deliverable. A \emph{Smarket}-type question is a trading or forecasting signal with a
-    very low signal-to-noise ratio. An \emph{NCI60}-type question is segmenting customers or
-    products where no label exists.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Example 1: Wage --- a regression problem}
@@ -708,7 +706,8 @@ you hand over is $\hat Y$ itself or the shape of $f$.
   \begin{takeaway}
     Where a data set sits decides which chapters apply. Below the diagonal
     ($n \gg p$) least squares behaves; NCI60 sits at $p/n \approx 107$,
-    where no unique least-squares fit exists --- hence Chapters~6 and~12.
+    where no unique least-squares fit exists --- hence Chapter~6, and the
+    unsupervised Advanced module (Ch.~12).
   \end{takeaway}
 \end{frame}
 
@@ -824,7 +823,8 @@ $\Rightarrow$ classification.
         predictors; historical demand records supply the labels.
   \item \textbf{Unsupervised} (dimension reduction); no response $Y$.
         We seek a few latent ``factors'' that summarise 20 correlated
-        answers --- PCA / factor-analysis territory (Ch.~12).
+        answers --- PCA / factor-analysis territory (Ch.~12, an
+        optional Advanced module).
   \item \textbf{Supervised classification}; $Y=$ digit $0,\ldots,9$
         (10 qualitative classes). The pixel intensities are
         \emph{numeric predictors}, but numeric inputs do not make it a
@@ -862,11 +862,10 @@ type of $Y$ matters.
     identical --- only the syntax changes. We will use Python
     throughout.
   \end{readme}
-  \begin{industry}[Banking and retail: the production stack]
-    pandas, scikit-learn and statsmodels are the default analytics stack in banks, insurers
-    and retailers: \texttt{statsmodels} where a coefficient has to be defended,
+  \begin{takeaway}[{{Two libraries, two jobs}}]
+    Reach for \texttt{statsmodels} where a coefficient has to be defended, and for
     \texttt{scikit-learn} where a score has to be produced every night.
-  \end{industry}
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{The core scientific stack}
@@ -977,14 +976,11 @@ yhat = model.predict(X)         # apply f-hat: y-hat for every row
   \begin{takeaway}
     All accessible via the \texttt{ISLP} Python package, also as CSV
     files. Most are tabular and modest in size --- chosen to run on a
-    laptop in seconds.
+    laptop in seconds. Outside a textbook no such tidy table exists: it
+    has to be joined together \emph{as of the decision date}, and a
+    field recorded only \emph{after} the decision is the classic
+    leakage bug.
   \end{takeaway}
-  \begin{industry}[Data engineering: why company data never arrives tidy]
-    The equivalent table does not exist in a firm: it has to be built by joining warehouse
-    tables \emph{as of the decision date}, and most of a project's time goes into that join.
-    Pulling in a field that was only recorded \emph{after} the decision is the classic
-    leakage bug --- the model looks excellent in testing and fails in production.
-  \end{industry}
   \begin{labnote}[{{Run this live}}]
     Exercise 1.3 (next slides) is worked in Python in \texttt{chapter\_01\_lab.ipynb}, under \emph{Lecture exercises --- worked Python solutions}: the cell recomputes every number ($n=5$, $p=3$, $x_{2,3}=82$).
   \end{labnote}
@@ -1084,13 +1080,17 @@ instead of the correct $x_{2,3}=82$; and counting the response
     Ch.\,6  & Linear Model Selection and Regularisation \\
     Ch.\,7  & Moving Beyond Linearity (splines, GAMs) \\
     Ch.\,8  & Tree-Based Methods (CART, RF, boosting, BART) \\
-    Ch.\,9  & Support Vector Machines \\
+    Ch.\,9  & Support Vector Machines\,{\color{black!45}--- Advanced module} \\
     Ch.\,10 & Deep Learning \\
-    Ch.\,11 & Survival Analysis and Censored Data \\
-    Ch.\,12 & Unsupervised Learning (PCA, clustering) \\
-    Ch.\,13 & Multiple Testing \\
+    Ch.\,11 & Survival Analysis and Censored Data\,{\color{black!45}--- Advanced module} \\
+    Ch.\,12 & Unsupervised Learning (PCA, clustering)\,{\color{black!45}--- Advanced module} \\
+    Ch.\,13 & Multiple Testing\,{\color{black!45}--- Advanced module} \\
     \bottomrule
   \end{tabular}
+  \vspace{1mm}
+
+  {\scriptsize The four modules marked \emph{Advanced} are not taught in the nine sessions ---
+  they sit in \texttt{Chapters/Advanced/} as optional self-study decks.}
 \end{frame}
 
 \begin{frame}{The narrative arc}
@@ -1104,7 +1104,9 @@ instead of the correct $x_{2,3}=82$; and counting the response
     \item Chapters 7--10 add increasing flexibility: nonlinear, trees,
           SVMs, deep nets.
     \item Chapter 11 specialises to time-to-event data.
-    \item Chapter 12 returns to unsupervised problems.
+    \item Chapter 12 returns to unsupervised problems --- an optional
+          Advanced module, and the natural sequel to this chapter's
+          NCI60 example.
     \item Chapter 13 reasons about many simultaneous tests.
   \end{itemize}
   \begin{takeaway}The arc: build \emph{vocabulary} and baseline methods, learn to \emph{evaluate honestly}, then add \emph{flexibility} step by step before specialising.\end{takeaway}
@@ -1173,11 +1175,10 @@ Counting the response \texttt{defaulted} among the predictors (giving $p=8$) ---
       \item Re-using the test set during model selection.
     \end{enumerate}
   \end{alertblock}
-  \begin{industry}[Project delivery: what kills a model project]
-    Target leakage from fields written after the decision; training on a population different
-    from the one being scored; nobody owning the model once it is live; and a score nobody can
-    explain to a regulator or to a sales director.
-  \end{industry}
+  \begin{takeaway}[The two that kill whole projects]
+    Training on a population different from the one you will score, and shipping a score nobody
+    can explain to the person who has to act on it.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Self-check questions}
@@ -1411,7 +1412,7 @@ Counting the response \texttt{defaulted} among the predictors (giving $p=8$) ---
     \midrule
     Wage         & 3000 &  10 & wage (num.)        & Ch.~1, 7 \\
     Smarket      & 1250 &   8 & Direction (binary) & Ch.~1, 4 \\
-    NCI60        &   64 & 6830 & --- (unsup.)       & Ch.~1, 12 \\
+    NCI60        &   64 & 6830 & --- (unsup.)       & Ch.~1, 12$^{\dagger}$ \\
     Auto         &  392 &   8 & mpg (num.)         & Ch.~3 \\
     Boston       &  506 &  12 & medv (num.)        & Ch.~3, 8 \\
     Carseats     &  400 &  10 & Sales (num.)       & Ch.~3, 8 \\
@@ -1420,6 +1421,9 @@ Counting the response \texttt{defaulted} among the predictors (giving $p=8$) ---
     Heart        &  303 &  13 & AHD (binary)       & Ch.~4, 8 \\
     \bottomrule
   \end{tabular}
+  \vspace{1mm}
+
+  {\scriptsize $\dagger$ optional Advanced self-study module.}
 \end{frame}
 
 \begin{frame}{Datasets at a glance (2/2)}
@@ -1429,14 +1433,17 @@ Counting the response \texttt{defaulted} among the predictors (giving $p=8$) ---
     \textbf{Name} & $n$ & $p$ & \textbf{Response} & \textbf{Used in} \\
     \midrule
     Caravan      & 5822 &  85 & Purchase (binary)  & Ch.~4 \\
-    OJ           & 1070 &  17 & Purchase (binary)  & Ch.~8, 9 \\
+    OJ           & 1070 &  17 & Purchase (binary)  & Ch.~8, 9$^{\dagger}$ \\
     Hitters      &  322 &  19 & Salary (num.)      & Ch.~6, 8 \\
     College      &  777 &  17 & Apps (num.)        & Ch.~6 \\
-    BrainCancer  &   88 &   8 & survival           & Ch.~11 \\
-    USArrests    &   50 &   4 & --- (unsup.)       & Ch.~12 \\
+    BrainCancer  &   88 &   8 & survival           & Ch.~11$^{\dagger}$ \\
+    USArrests    &   50 &   4 & --- (unsup.)       & Ch.~12$^{\dagger}$ \\
     Bikeshare    & 8645 &  14 & bikers (num.)      & Ch.~4 \\
     \bottomrule
   \end{tabular}
+  \vspace{1mm}
+
+  {\scriptsize $\dagger$ optional Advanced self-study module.}
 \end{frame}
 
 \end{document}

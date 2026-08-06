@@ -67,10 +67,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -96,12 +92,11 @@
     \rowcolor{accent!18} \textbf{Ch.\ 7} & \textbf{Moving beyond linearity}\,{\color{accent!75!black}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -217,35 +212,18 @@
 \begin{frame}{Where this chapter is used in industry}
   \scriptsize
   \begin{center}
-  \begin{tabular}{@{}p{2.5cm}p{5.5cm}p{4.7cm}@{}}
+  \begin{tabular}{@{}p{3.0cm}p{5.2cm}p{4.5cm}@{}}
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Motor, health insurance & Claim frequency and severity as smooth functions of driver age, vehicle age, mileage & The tariff a policy is priced from \\
-    Energy, utilities & Electricity demand against temperature (heating below, cooling above a comfort band) & Day-ahead procurement and capacity planning \\
-    Banking, fixed income & Yield curves fitted to quoted bond yields (cubic splines, Nelson--Siegel--Svensson) & How the book is valued and hedged \\
-    Retail, travel & Price-response and promotion curves, saturating at both ends & Price points, promotion depth, marketing budget \\
-    Pharma, toxicology & Dose--response curves for efficacy and for safety endpoints & The dose carried into the next trial phase \\
-    Life insurance, pensions & Mortality and morbidity as smooth functions of age & Reserves, annuity and longevity pricing \\
+    Motor, health insurance & Claim frequency as a smooth, famously non-monotone function of driver age --- high for the youngest, falling, then rising again & The premium loading printed in the tariff table for each age band \\
+    Energy, utilities & Electricity load against temperature: a U shape, heating below and cooling above a comfort band & How much power is bought in the day-ahead auction \\
+    Banking, fixed income & Yield curves fitted through quoted bond yields (cubic splines, Nelson--Siegel--Svensson) & The discount factor every position in the book is revalued at \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    In every row the fitted \emph{curve} is the deliverable: it gets plotted, argued about and signed off. That rules out a black box --- but a straight line would be plainly wrong.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: pricing a motor insurance policy}
-  \footnotesize
-  \begin{industry}[The model behind the tariff]
-    Insurers price in two pieces --- \textbf{frequency} (claims per policy-year, Poisson) and \textbf{severity} (cost per claim, gamma) --- and increasingly fit each as an additive model with smooth terms:
-    \[ \log\mathbb{E}[\text{claims}]=\beta_0+f_1(\text{driver age})+f_2(\text{vehicle age})+f_3(\text{mileage})+\text{region}+\text{bonus--malus}. \]
-  \end{industry}
-  \begin{readme}[What the fitted age curve looks like]
-    It is famously \emph{non-monotone}: risk is high for the youngest drivers, falls through middle age, then rises again for the oldest. No linear term in age can represent that; a smooth can, and prints as one readable curve --- the curve an underwriter shows a broker or a customer who asks why a premium moved.
-  \end{readme}
-  \begin{takeaway}[Who signs it off --- and one caveat]
-    The curves become tariff tables reviewed by pricing and the actuarial function, so they must be smooth and defensible: that, not accuracy, is why a GAM beats a black box here. \emph{Caveat:} the tariff must also price rarely observed cells, where a high-degree polynomial would swing wildly --- and additivity means an age~$\times$~vehicle-power interaction has to be added deliberately.
+  \begin{takeaway}[The common thread: the fitted curve \emph{is} the deliverable]
+    In all three the curve itself gets plotted, argued over and signed off --- an underwriter, a trader or a regulator reads it directly. That rules out a black box, while a straight line would be visibly wrong: hence a basis flexible enough to bend, restricted enough to defend.
   \end{takeaway}
 \end{frame}
 
@@ -266,9 +244,6 @@
     machinery applies (standard errors, $F$-tests, CV). We are simply
     augmenting the design matrix.
   \end{readme}
-  \begin{industry}[Retail and travel: price-response curves]
-    Demand bends in price and saturates at both ends, so pricing teams fit a quadratic or cubic in (log) price and read the elasticity off the fitted curve. Miss the curvature and the recommended price lands on the flat part of the curve --- margin given away for no extra volume.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Polynomial regression: the boundary problem}
@@ -310,11 +285,10 @@
   \begin{readme}[Pros and cons]
     Easy to interpret (``income bracket''), but discontinuous at the
     breakpoints --- often visually ugly. Useful when natural categories
-    exist (age groups, salary tiers).
+    exist (age groups, salary tiers), or when banding is chosen
+    deliberately for auditability --- at the price of a visible jump for
+    two cases either side of a cut-off.
   \end{readme}
-  \begin{industry}[Banking: scorecard bands]
-    Credit scorecards deliberately bin continuous inputs --- age, income, months since last arrears --- into bands and award points per band: a step function by choice, because it is auditable and easy to monitor. The price is a visible jump for two applicants either side of a cut-off.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Step function fit on Wage}
@@ -555,9 +529,11 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
     (matches second derivative). Higher degrees rarely improve the
     fit but add parameters and instability.
   \end{readme}
-  \begin{industry}[Fixed income: how many knots in a yield curve?]
-    A desk fitting a spline to quoted bond yields faces exactly this decision: more knots reproduce every quote but can imply implausible forward rates; fewer knots give a smooth curve that misprices some bonds. The chosen curve then discounts the whole book --- so a smoothness choice is a valuation choice.
-  \end{industry}
+  \begin{takeaway}
+    The knot count is the real tuning parameter: more knots track every
+    wiggle in the data, fewer give a smooth curve that misses some of it.
+    Choose it by cross-validation, not by eye.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Cubic vs.\ natural spline on Wage}
@@ -684,9 +660,11 @@ Thinking the natural spline is linear \emph{between} the boundary knots too --- 
       \;}
     \]
   \end{block}
-  \begin{industry}[Utilities: the temperature-response curve]
-    Electricity load against temperature is a U shape --- heating below the comfort band, cooling above it. Utilities fit that response as a smooth curve, add calendar effects, and buy power a day ahead against it. An over-smoothed peak understates demand on the hottest day --- exactly when power costs most.
-  \end{industry}
+  \begin{takeaway}
+    Two terms pull opposite ways: the RSS wants a curve through every
+    point, the penalty wants a straight line. $\lambda$ sets the exchange
+    rate --- and over-smoothing flattens exactly the peaks that matter most.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Reading the smoothing-spline objective}
@@ -852,9 +830,6 @@ Picking $\lambda$ by minimising \emph{training} RSS --- that always selects $\la
     By construction, GAMs miss interactions. Add tensor-product terms
     $f_{jk}(X_j, X_k)$ explicitly, or move to trees (Ch.~8).
   \end{alertblock}
-  \begin{industry}[Insurance and utilities: why they reach for GAMs]
-    Insurers, utilities and banks need a model that bends \emph{and} can be defended one predictor at a time: each $f_j$ is a picture an actuary, a regulator or a model-risk reviewer can hold against domain knowledge.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{GAM fit on Wage}

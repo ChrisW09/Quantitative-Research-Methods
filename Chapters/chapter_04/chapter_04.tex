@@ -72,12 +72,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use.
-% The title always prints the words "In industry", so the box does not rely on its
-% tint alone; every call passes an explicit title, so the default is never used.
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -103,12 +97,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -352,59 +345,24 @@ model specification, not in sampling noise.
     \midrule
     Retail banking &
       Probability of default (PD) on card, loan and mortgage applications &
-      Accept/decline cut-off, risk-based pricing, IFRS 9 loss provisions \\
+      Where the accept/decline cut-off sits, and the rate a borderline
+      applicant is offered \\
     Payments &
       Card-fraud and anti-money-laundering transaction screening &
-      Block at checkout, or send to a human review queue \\
-    Telco, SaaS, banking &
-      Monthly churn (attrition) propensity scoring &
-      Who receives a retention offer this month \\
-    Insurance &
-      Underwriting referral; claims-fraud and claims-severity triage &
-      Which applications and claims a human examines \\
+      Block the transaction at checkout, or queue it for a human reviewer \\
     Healthcare, pharma &
-      Diagnostic and screening tests; biomarker and spectral panels (classic LDA territory: appendix) &
-      Who is referred for a confirmatory test \\
-    Tech, operations &
-      Spam, content and support-ticket classification (multinomial) &
-      Auto-route to a queue, or escalate to an agent \\
+      Diagnostic and screening tests; biomarker panels (the classic LDA
+      setting: appendix) &
+      Who is called back for a confirmatory test \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{2pt}
-  \begin{industry}[The common thread]
-    All six deliver a \emph{probability}, not a verdict. The verdict comes from a
-    \textbf{threshold chosen on business costs} --- and where the decision has to be
-    explained to a customer or a regulator, the explainable model usually wins.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: credit scoring (probability of default)}
-  \footnotesize
-  \begin{industry}[The model behind an accept/decline decision]
-    \textbf{Response:} 90+ days past due within 12 months of scoring.\quad
-    \textbf{Predictors:} utilisation, months since last delinquency, recent
-    bureau enquiries, income and tenure, loan-to-value.
-  \end{industry}
-  \vspace{-3mm}
-  \begin{numexample}[The fitted output (illustrative)]
-    Utilisation gets a positive coefficient, a delinquency-free year a negative
-    one; scorecards rescale the log-odds into points calibrated so that a fixed
-    number of points \emph{doubles the odds}.
-  \end{numexample}
-  \vspace{-3mm}
-  \begin{readme}[Which decision --- and who signs off]
-    The PD drives the cut-off, the rate offered, IFRS 9 expected credit loss
-    ($\text{PD}\times\text{LGD}\times\text{EAD}$) and Basel capital --- and an independent
-    validation function, not the analyst, signs it off (SR 11-7, ECB TRIM).
-    Day to day it is the credit-committee member and the branch lead who live
-    with that cut-off.
-  \end{readme}
-  \vspace{-3mm}
-  \begin{takeaway}[Why logistic regression --- and one caveat]
-    A declined applicant must be told \emph{why}: adverse-action reason codes
-    under US ECOA/Reg B come straight from the coefficients. Caveat: the data
-    contain only \emph{accepted} applicants, so the sample is selected.
+  \begin{takeaway}[The common thread: the model gives a probability and the threshold gives the verdict]
+    None of the three acts on the fitted probability directly. Each picks a
+    \textbf{threshold from the cost of the two errors} --- a missed default, a
+    blocked good customer, a missed diagnosis --- so moving the cut-off, not
+    refitting the model, is the lever that changes the decision.
   \end{takeaway}
 \end{frame}
 
@@ -615,12 +573,11 @@ never be negative.
     probability from under $10\,\%$ to over $95\,\%$ because we are
     crossing the steep middle of the sigmoid.
   \end{numexample}
-  \begin{industry}[Credit: coefficients become reason codes]
-    A declined applicant must be told \emph{which} factors counted against them;
-    the signed coefficients supply exactly that, which is why scorecards stay
-    logistic. Quote an odds ratio as if it were a change in probability and the
-    notice is simply wrong.
-  \end{industry}
+  \begin{mistake}
+    Quoting the odds ratio as if it were a change in probability. ``The odds
+    multiply by $245$'' does \emph{not} mean the probability rises by a factor
+    of $245$ --- probabilities are capped at one.
+  \end{mistake}
 \end{frame}
 
 
@@ -738,14 +695,11 @@ rare.
   \end{alertblock}
   \begin{takeaway}
     A textbook case of confounding. Always run multiple logistic
-    regression when several predictors might be related.
+    regression when several predictors might be related. The same trap sits in
+    every segment-level report: a group looks riskier only because it carries
+    larger balances, so acting on the raw cross-tabulation acts on the
+    \emph{mix}, not on the risk.
   \end{takeaway}
-  \begin{industry}[Portfolio analytics: mix effects]
-    The same trap sits in every management report: a segment or a channel looks
-    riskier (or more churn-prone) only because it carries larger balances,
-    younger accounts or cheaper tariffs. Repricing a segment on the raw
-    cross-tabulation prices the mix, not the risk.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{The student paradox visualised}
@@ -980,15 +934,9 @@ the latter adds $120$ to $\eta$ and drives every probability to $1$.
   \end{alertblock}
   \begin{takeaway}
     Accuracy alone is uninformative on imbalanced data. We need to
-    decompose it into the four cells of a \emph{confusion matrix}.
+    decompose it into the four cells of a \emph{confusion matrix} --- the two
+    errors cost different amounts, and only the decomposition shows them.
   \end{takeaway}
-  \begin{industry}[Payments: fraud and AML screening]
-    This is not a toy example --- it is how card fraud and money-laundering alerts
-    actually look. A missed fraud costs the chargeback; a false positive blocks a
-    good customer at checkout. Fraud teams therefore price each cell of the
-    matrix, and set the threshold to the number of alerts their reviewers can
-    actually work through in a day.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{The confusion matrix}
@@ -1967,14 +1915,10 @@ no basis for trading once transaction costs are included.
     when data are plentiful. Generative models (LDA, QDA, naive Bayes)
     add structure through $f_k$, which pays off when $n$ is small, when
     classes are well separated, or when some features are missing ---
-    situations where logistic regression can be unstable.
+    situations where logistic regression can be unstable. They also make the
+    base rate explicit: $\pi_k$ \emph{is} the prevalence, so when a class is
+    rare even a sharp rule flags mostly false positives.
   \end{takeaway}
-  \begin{industry}[Screening: the prior is the prevalence]
-    Generative models make the base rate explicit: in a diagnostic or fraud
-    screen, $\pi_k$ \emph{is} the prevalence. When the condition is rare, even a
-    sharp test flags mostly false positives --- which is why a screening result is
-    confirmed, not acted on.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Bayes' theorem in the classification setting}
@@ -2667,14 +2611,9 @@ Connection: Gaussian naive Bayes is exactly discriminant analysis with a
   \begin{takeaway}[In practice]
     No method dominates universally. Treat all five as candidates;
     pick by held-out AUC. With one line of scikit-learn each, the
-    comparison is essentially free.
+    comparison is essentially free. Boosted trees (Chapter~8) often beat all
+    five on raw AUC --- which is why the choice is rarely accuracy alone.
   \end{takeaway}
-  \begin{industry}[Risk and campaign teams: how it is actually reported]
-    Risk teams quote AUC as the Gini coefficient ($2\,\text{AUC}-1$) and the KS
-    statistic; campaign teams compare models at the \emph{top decile}, because
-    that is where the budget goes. Boosted trees (Chapter~8) often win outright ---
-    which is why regulated decisions keep the model they can explain.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Bayes optimum and our methods}

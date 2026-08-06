@@ -73,10 +73,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -204,50 +200,20 @@
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
     Consumer credit & Adverse-action reasons for each declined loan
-      application & Which ``principal reasons'' appear on the legally required notice \\
-    Insurance & Justifying a boosted pricing model factor by factor &
-      Whether a rating factor survives actuarial and regulatory review \\
-    Healthcare & Which vitals and labs drove a patient's risk score &
-      Whether the clinician trusts, overrides or escalates the alert \\
-    Fraud \& AML & Explaining why a transaction was flagged &
-      Investigator triage; evidence in the case file \\
-    Tech / marketing & Debugging ranking and churn models: what drove a
-      bad score & Fix the data pipeline vs.\ retrain the model \\
-    Model risk / audit & Global driver analysis and drift monitoring &
-      Model approval, re-validation, decommissioning \\
+      application & Which ``principal reasons'' are printed on the legally required notice \\
+    Insurance & What drives an individual quote in a boosted tariff &
+      Whether a rating factor stays in the filed tariff \\
+    Healthcare & Which vitals and labs pushed a patient's deterioration
+      score up & Whether the clinician escalates the alert or dismisses it \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    In every row the model is a \emph{tree ensemble or neural net} that beats the
-    interpretable alternative --- and a human downstream who must \emph{account} for a
-    single prediction. Shapley values are the de-facto standard answer because they
-    come with a guarantee: the attributions \textbf{sum exactly} to the prediction.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: explaining a credit decline}
-  \footnotesize
-  \begin{industry}[The setting: a boosted model decides --- the law wants reasons]
-    A bank scores consumer-loan applications with a gradient-boosted model --- hundreds
-    of trees over $\sim 40$ features. US regulation (ECOA / Regulation B) requires the
-    bank to give each declined applicant the \textbf{principal reasons}; the EU AI Act
-    classifies credit scoring as high-risk with transparency duties. ``The model said
-    so'' is not a legal answer.
-  \end{industry}
-  \begin{readme}[How Shapley values enter the pipeline]
-    For each declined applicant $x$ the bank computes attributions
-    $\varphi_1,\dots,\varphi_p$ that split $f(x)-E[f(X)]$ across features. The most
-    negative $\varphi_j$'s are mapped to standardised reason codes (``debt-to-income
-    ratio too high''). The \emph{background} is chosen deliberately --- e.g.\ approved
-    applicants --- so the reasons answer ``why you, compared to those who were
-    approved''.
-  \end{readme}
-  \begin{takeaway}[Two honest caveats --- both taught in this module]
-    The reasons describe the \emph{model}, not the applicant's causal reality --- they
-    are not financial advice. And with correlated features (income, debt, limits) the
-    split between related reasons is partly a modelling choice, so banks fix background,
-    seed and model version in their model-risk documentation.
+  \begin{takeaway}[All three must account for one prediction rather than the model as a whole]
+    In each row an opaque ensemble beats the interpretable alternative, and a human
+    downstream has to justify a \textbf{single} case --- one letter, one quote, one
+    patient. Shapley values are the de-facto standard answer because they come with a
+    guarantee no rival attribution has: the numbers \textbf{sum exactly} to
+    $f(x)$ minus the baseline, so nothing in the decision is left unaccounted for.
   \end{takeaway}
 \end{frame}
 
@@ -370,13 +336,9 @@
     coalition they join deserves more. The natural raw material is the
     \textbf{marginal contribution} $v(S\cup\{j\})-v(S)$ --- what $j$ adds when
     joining the coalition $S$. The difficulty: this number \emph{depends on} $S$.
+    Shapley's 1953 answer long predates machine learning --- airports still split runway
+    costs across aircraft types with it --- and it is the formula we are about to build.
   \end{readme}
-  \begin{industry}[Cost allocation: the original use]
-    Shapley's 1953 idea long predates machine learning: utilities split shared
-    infrastructure costs, airports split runway costs across airline types, and
-    firms allocate IT platform costs to business units --- all with the same formula
-    we are about to build.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{A three-player game with concrete numbers}
@@ -916,14 +878,11 @@ print(round(phi.sum(), 4), round(fx - base, 4))   # 0.7564 both ways
     Efficiency holds \textbf{exactly}, not approximately: across all $263$ players the
     largest violation of $\sum_j\varphi_j = f(x)-\varphi_0$ is $4.4\times10^{-15}$ ---
     floating-point noise. This is the property no rival attribution method
-    (gradients, single-feature ablations) gives you for free.
+    (gradients, single-feature ablations) gives you for free. It is also the cheapest
+    audit test there is: if reported attributions fail to reproduce $f(x)-\varphi_0$ to
+    numerical precision, something in the pipeline --- wrong background, stale model
+    version --- is broken.
   \end{takeaway}
-  \begin{industry}[Model risk: the audit test]
-    Validation teams re-run exactly this check on sampled instances: if reported
-    attributions do not reproduce $f(x)-\varphi_0$ to numerical precision, the
-    explanation pipeline (wrong background, stale model version) is flagged before
-    the numbers reach a customer letter.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Monte-Carlo: sample arrival orders instead of enumerating}
@@ -980,14 +939,14 @@ print(round(phi.sum(), 4), round(fx - base, 4))   # 0.7564 both ways
     For trees, the expectations $E[f(x_S, X_{\bar S})]$ can be pushed \emph{through
     the tree structure}: exact Shapley values in polynomial time (roughly \#trees
     $\times$ \#leaves $\times$ depth$^2$ per instance) --- no $2^p$, no sampling
-    noise. This is why boosted trees $+$ SHAP became the industry pairing.
+    noise. This is why boosted trees $+$ SHAP became the standard production pairing.
   \end{readme}
-  \begin{industry}[The production tool]
+  \begin{takeaway}
     The \texttt{shap} package ships all of this (\texttt{TreeExplainer},
     \texttt{KernelExplainer}, the plots). We built everything from scratch so that
     \texttt{shap}'s output is a convenience, not a mystery --- it is not installed on
     the course machines, but one \texttt{pip install shap} away in Colab.
-  \end{industry}
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Extended Exercise A2.1 --- Monte-Carlo Shapley from scratch [Python]}
@@ -1289,13 +1248,12 @@ est = mc_shapley(x_star, 100, rng)          # 100 orders = 600 v-calls
     interchangeable to the fit --- so the fit chooses arbitrarily, and the
     attribution follows.
   \end{numexample}
-  \begin{industry}[Model risk \& regulation: pinning the explanation down]
-    Under SR 11-7-style model governance and the EU AI Act, banks version
-    \emph{everything the explanation depends on}: model artefact, background sample,
-    seed, and \texttt{shap} version. A declined customer who reapplies must not
-    receive contradictory ``principal reasons'' because a nightly retrain shuffled
-    credit between two collinear features.
-  \end{industry}
+  \begin{takeaway}[Version everything the explanation depends on]
+    Model artefact, background sample, seed and library version are all inputs to
+    $\varphi_j$, so all four belong in the documentation. A declined customer who
+    reapplies must not receive contradictory ``principal reasons'' because a nightly
+    retrain shuffled credit between two collinear features.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Extended Exercise A2.2 --- Designing a credit-explanation pipeline [Integrative]}

@@ -74,12 +74,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use.
-% The title always prints the words "In industry", so the box does not rely on its
-% tint alone; every call passes an explicit title, so the default is never used.
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -105,12 +99,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -247,59 +240,26 @@
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Banking &
-      Independent validation of a credit-risk (PD) model &
-      Whether the model may go live \\
     Retail, energy &
-      Walk-forward backtest of a demand or load forecast &
-      Replenishment and hedging settings \\
+      Walk-forward backtest of a demand or load forecast (rolling-origin
+      CV, never random folds) &
+      The reorder point and the size of the hedge booked for next week \\
     Insurance &
-      Bootstrap of a loss-reserve or capital figure &
-      The reserve that gets booked \\
+      Bootstrap of a loss-reserve or capital figure, where no closed-form
+      standard error exists &
+      The reserve that actually gets booked \\
     Pharma, medtech &
       Patient-grouped CV of a diagnostic or triage model &
-      Whether the model goes into a submission \\
-    Tech, platforms &
-      Bootstrap interval for revenue per user in an A/B test &
-      Ship or do not ship \\
-    Manufacturing &
-      $k$-fold CV to tune a quality- or yield-prediction model &
-      Which model complexity goes to production \\
+      Whether the model goes into a regulatory submission at all \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    In every row the number that leaves the room is an \emph{out-of-sample}
-    number. Resampling is what turns a model someone built into a model
-    someone is willing to sign.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: validating a credit-risk model}
-  \footnotesize
-  \begin{industry}[The setting]
-    A bank's retail portfolio needs a probability-of-default (PD) model
-    --- the Chapter~4 scorecard, now facing independent review.
-    \textbf{Response:} default within the next 12 months ($0/1$).
-    \textbf{Predictors:} months since worst delinquency, revolving-limit
-    utilisation, recent credit enquiries, months on file,
-    instalment-to-income ratio. \textbf{Output:} a PD per account, banded
-    into rating grades, with a Gini / AUC reported on \emph{two} hold-outs
-    --- one random, one \emph{out-of-time} from a later origination cohort.
-  \end{industry}
-  \begin{readme}[Which decision it feeds and who signs it off]
-    The PD drives approve/decline cut-offs, risk-based pricing and the
-    IFRS~9 expected-credit-loss provision. The modelling team does not
-    sign it off: an \emph{independent} validation unit re-runs the tests
-    for a model-risk committee (US: Federal Reserve SR~11-7 guidance;
-    euro area: ECB supervisory model reviews). The person who has to vote
-    on the out-of-time Gini is a committee member from finance or the
-    business, not a modeller.
-  \end{readme}
-  \begin{takeaway}[The honest caveat]
-    Random $k$-fold folds across origination dates let the future inform
-    the past: the Gini looks excellent and then evaporates on the next
-    cohort.
+  \begin{takeaway}[The common thread: the resampling scheme has to match how the model will be used]
+    Each row resamples \emph{differently} --- by time, by resampling the
+    sample itself, by patient --- because each faces a different leak. Get
+    the scheme wrong and the number is optimistic in exactly the way that
+    matters, which is why the resampling design, not the score, is what an
+    independent reviewer checks first.
   \end{takeaway}
 \end{frame}
 
@@ -359,11 +319,6 @@
     \emph{part} of the data. Averaging over several splits ---
     cross-validation --- attacks both at once.
   \end{takeaway}
-  \begin{industry}[Banking: a single split is only the floor]
-    A single hold-out is a fine first sanity check, but an independent
-    validation unit will ask for an \emph{out-of-time} hold-out as well:
-    score a later cohort, not just other rows from the same one.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Validation across splits: how erratic is it?}
@@ -509,14 +464,11 @@
   \end{alertblock}
   \begin{takeaway}[The OLS shortcut]
     For \emph{ordinary least squares} (and ridge regression), there
-    is a one-fit shortcut using the leverage statistic.
+    is a one-fit shortcut using the leverage statistic. LOOCV earns the
+    cost when observations are expensive --- a few dozen production
+    batches, a handful of clinical sites --- where surrendering $20\%$ of
+    forty samples to a hold-out is not an option.
   \end{takeaway}
-  \begin{industry}[Chemometrics and pilot studies: where $n$ is small]
-    LOOCV earns its keep when observations are expensive: a chemometric
-    calibration built on a few dozen production batches, a pilot study, a
-    handful of clinical sites. Wasting $20\%$ of forty samples on a
-    hold-out is not an option --- so hold out one at a time.
-  \end{industry}
 \end{frame}
 
 
@@ -688,12 +640,11 @@
             (patients, customers) to avoid within-group leakage.
     \end{enumerate}
   \end{alertblock}
-  \begin{industry}[Forecasting and credit: expensive --- not textbook --- mistakes]
-    Forecasts and trading strategies are backtested \emph{walk-forward}
-    (train to $t$, score $t+1$) for reason~2; churn, credit and healthcare
-    models split by \emph{customer} or \emph{patient} for reason~3.
-    Accuracy that came from leakage fails after deployment, not before.
-  \end{industry}
+  \begin{takeaway}
+    All three failures share a signature: accuracy that came from leakage
+    looks excellent in validation and collapses after deployment --- never
+    before.
+  \end{takeaway}
 \end{frame}
 
 
@@ -859,14 +810,6 @@
   \end{takeaway}
   We don't have many samples --- we have one. The bootstrap is a
   trick to simulate ``many samples'' from the one we have.
-  \begin{industry}[Insurance and platforms: where the formula is missing]
-    Actuaries quote loss-reserve \emph{ranges}; risk teams put error bars
-    on value-at-risk and stress figures; platform teams need a confidence
-    interval for revenue per user, which is heavy-tailed enough that the
-    textbook $t$-interval is hard to defend. None of these statistics has
-    a usable closed-form standard error --- so all of them are
-    bootstrapped.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{The bootstrap algorithm}
@@ -1496,11 +1439,11 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
     \item For grouped data: split at the group level.
     \item Always fit \emph{all} preprocessing inside the CV loop.
   \end{itemize}
-  \begin{industry}[Governance: what you report to a steering committee]
-    Never the tuned CV score. Searching hyperparameters and reporting on
-    the same folds is optimistic by construction; quote the nested-CV
-    figure or a hold-out the search never touched, with its spread.
-  \end{industry}
+  \begin{takeaway}[What you report is never the tuned CV score]
+    Searching hyperparameters and reporting on the same folds is
+    optimistic by construction. Quote the nested-CV figure, or a hold-out
+    the search never touched, and give its spread alongside it.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Common pitfalls}
@@ -1567,7 +1510,6 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
   \begin{itemize}
     \item Subset selection.
     \item Ridge regression and the lasso.
-    \item Dimension reduction: PCR and PLS.
     \item How to use cross-validation to pick tuning parameters.
   \end{itemize}
 \end{frame}

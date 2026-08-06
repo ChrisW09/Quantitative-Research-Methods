@@ -72,10 +72,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -101,12 +97,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -132,8 +127,6 @@
     $\lambda$ & Tuning parameter: penalty strength, chosen by CV \\
     $\lambda\sum_j \beta_j^2$ & Ridge ($\ell_2$) penalty: shrinks, never exactly zero \\
     $\lambda\sum_j |\beta_j|$ & Lasso ($\ell_1$) penalty: shrinks and selects \\
-    $Z_m$, $\phi_{jm}$ & Derived components and their loadings \\
-    $M$ & Number of components used in PCR (principal components regression) / PLS (partial least squares) \\
     \bottomrule
   \end{tabular}
   \end{center}
@@ -161,22 +154,25 @@
           their coefficient paths.
     \item \textbf{Articulate} the geometric reason the lasso produces
           sparsity while ridge does not.
-    \item \textbf{Use} principal-components and partial-least-squares
-          regression for highly collinear or high-dimensional designs.
-    \item \textbf{Reason} about the high-dimensional regime ($p > n$)
-          where OLS breaks down.
+    \item \textbf{Tune} $\lambda$ by cross-validation and \textbf{avoid}
+          the leakage that comes from standardising outside the CV loop.
   \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Roadmap of this chapter}
-  \begin{takeaway}[Three families that fix OLS's problems]
+  \begin{takeaway}[{{Select, then shrink, then select \emph{by} shrinking}}]
     \begin{enumerate}
-      \item \textbf{Subset selection}: best subset / forward / backward.
-      \item \textbf{Shrinkage}: ridge ($\ell_2$), lasso ($\ell_1$),
-            elastic net.
-      \item \textbf{Dimension reduction}: PCR (unsupervised), PLS
-            (supervised).
+      \item Why plain OLS needs help: variance, interpretability,
+            collinearity.
+      \item \textbf{Subset selection}: best subset, forward and backward
+            stepwise --- and how to choose the size with $C_p$, AIC, BIC
+            or adjusted $R^2$.
+      \item \textbf{Ridge} ($\ell_2$): shrink every coefficient, keep
+            every predictor.
+      \item \textbf{Lasso} ($\ell_1$): shrink \emph{and} select, so some
+            coefficients are exactly zero.
+      \item Which to reach for when, and how to tune $\lambda$ honestly.
     \end{enumerate}
   \end{takeaway}
   Cross-validation (Ch.~5) is used throughout to choose tuning
@@ -197,39 +193,38 @@
             very high variance, especially when $p \approx n$.
       \item \textbf{Interpretability.} With many predictors, only a
             few usually matter. We want a model that highlights them.
-      \item \textbf{High dimensions.} When $p > n$, OLS is undefined
-            --- $\mathbf{X}^\top\mathbf{X}$ is singular.
+      \item \textbf{Collinearity.} When predictors move together,
+            $\mathbf{X}^\top\mathbf{X}$ is near-singular and the OLS
+            coefficients swing wildly with every data refresh.
     \end{enumerate}
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Three families of solutions}
+\begin{frame}{Two families of solutions}
   \begin{columns}[T]
-    \begin{column}{0.32\textwidth}
+    \begin{column}{0.47\textwidth}
       \begin{block}{Subset selection}
-        Pick a subset of predictors. Combinatorial.
+        Pick a subset of predictors, then fit OLS on it. Discrete and
+        combinatorial.
       \end{block}
       Best subset, forward, backward stepwise.
     \end{column}
-    \begin{column}{0.32\textwidth}
+    \begin{column}{0.47\textwidth}
       \begin{block}{Shrinkage}
-        Keep all predictors, shrink their coefficients.
+        Keep all predictors but penalise the size of their
+        coefficients. Continuous, tuned by one $\lambda$.
       \end{block}
       Ridge, lasso, elastic net.
     \end{column}
-    \begin{column}{0.32\textwidth}
-      \begin{block}{Dimension reduction}
-        Construct fewer linear combinations of the original
-        predictors.
-      \end{block}
-      PCR, PLS.
-    \end{column}
   \end{columns}
-  \medskip
+  \begin{takeaway}
+    Both answer \emph{which predictors should carry weight?} --- one by
+    searching, the other by taxing.
+  \end{takeaway}
   \begin{labnote}[{{Live demo --- \S1 of the notebook}}]
     Switch to \texttt{chapter\_06\_lab.ipynb} \S1 and run the loading cell: the
     Hitters data ($263$ players, $19$ predictors after dummy coding, heavily
-    collinear career totals) is the testbed for all three families today.
+    collinear career totals) is the testbed for both families today.
   \end{labnote}
 \end{frame}
 
@@ -241,55 +236,23 @@
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
     Banking &
-      Attribute shortlisting for a credit \mbox{scorecard} &
-      Which attributes ship on the scorecard \\
-    Pharma, food, chemicals &
-      PLS on near-infrared spectra (hundreds of wavelengths) &
-      Release the batch, or send it to the lab \\
-    Manufacturing, energy &
-      Ridge on collinear sensor and telemetry channels &
-      Which process settings to trust \\
+      Stepwise shortlisting of bureau attributes for a credit
+      \mbox{scorecard} &
+      Which ten to fifteen attributes ship on the scorecard \\
     Marketing &
-      Mix model where channel spends move together &
-      A defensible budget reallocation \\
-    Health, biotech &
-      Lasso screening of gene-expression features &
-      Which features get a follow-up study \\
+      Ridge on a mix model whose channel spends move almost in lockstep &
+      How much budget moves from one channel to another next quarter \\
     Quantitative finance &
-      Sparse selection among candidate return predictors &
-      Which signals get capital \\
+      Lasso over a long list of candidate return predictors &
+      Which signals get capital, and which are switched off \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Wide, correlated data plus a business need for a model small enough to
-    explain --- that is what regularisation delivers.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: near-infrared spectroscopy and PLS}
-  \footnotesize
-  \begin{industry}[The setting]
-    A plant needs the active-ingredient concentration of a blend, and the
-    reference method is a slow destructive lab assay.
-    \textbf{Response:} the reference value (\% w/w).
-    \textbf{Predictors:} absorbance at several hundred NIR wavelengths,
-    adjacent ones nearly identical, on calibration sets of only tens of
-    samples ($p \gg n$). \textbf{Output:} a PLS fit on a few components
-    ($M$ by CV), scored by root mean squared error of prediction.
-  \end{industry}
-  \begin{readme}[Which decision it feeds and who signs it off]
-    The calibration replaces routine lab testing: it feeds in-process
-    control and real-time release of a batch. QA and regulatory affairs
-    own the sign-off, because it forms part of a \emph{validated}
-    analytical method. The predicted concentration itself reaches a QA
-    release manager or production supervisor, who must release the batch
-    --- or hold it for the reference assay --- on the strength of it.
-  \end{readme}
-  \begin{takeaway}[The honest caveat]
-    Calibrations drift --- a new supplier or instrument moves the spectra,
-    so the model must be revalidated. And PLS mixes \emph{all}
-    wavelengths: it predicts without pointing at a cause.
+  \begin{takeaway}[All three ship a shortlist that someone has to defend]
+    The deliverable is never the fit --- it is a small set of predictors a
+    committee will challenge. Subset selection reaches it by searching,
+    ridge and lasso by taxing; in each case the penalty (or the criterion)
+    is the part you must justify.
   \end{takeaway}
 \end{frame}
 
@@ -343,11 +306,6 @@
     --- scales to large $p$. Greedy: not guaranteed to find the best
     subset.
   \end{readme}
-  \begin{industry}[Banking: from a thousand candidate attributes to twelve]
-    Bureau files offer hundreds of candidate attributes; the scorecard that
-    ships has perhaps 10--15. Parsimony here is a monitoring and governance
-    requirement, not merely statistical taste.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Backward and hybrid stepwise}
@@ -470,8 +428,6 @@
     more robust when distributional assumptions are uncertain.
   \end{takeaway}
 \end{frame}
-
-
 
 
 \begin{frame}{Exercise 6.2 --- Why RSS and $R^2$ Cannot Pick the Size [Concept]}
@@ -606,9 +562,6 @@
 \end{frame}
 
 
-
-
-
 % ============================================================
 \section{Ridge regression}
 % ============================================================
@@ -623,14 +576,11 @@
   \end{takeaway}
   \begin{readme}
     Two payoffs at once: the penalty (i) \emph{stabilises} the fit when
-    predictors are collinear, and (ii) \emph{lowers variance} by
-    refusing to chase noise with large coefficients.
+    predictors are collinear --- where plain OLS returns huge,
+    sign-flipping coefficients that move with every data refresh --- and
+    (ii) \emph{lowers variance} by refusing to chase noise with large
+    coefficients.
   \end{readme}
-  \begin{industry}[Manufacturing and energy: collinear sensors]
-    Process telemetry is full of channels that move together. Plain OLS
-    then returns huge, sign-flipping coefficients that move with every
-    data refresh; ridge returns a fit an engineer can act on.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{The ridge regression objective}
@@ -853,10 +803,9 @@
     In Python: \texttt{sklearn.linear\_model.RidgeCV} and
     \texttt{LassoCV} perform the grid search internally.
   \end{readme}
-  \begin{industry}[Retail analytics: wide SKU and customer tables]
-    With hundreds of engineered columns, $\lambda$ --- not the
-    coefficient list --- is what you defend.
-  \end{industry}
+  \begin{takeaway}
+    It is $\lambda$ --- not the coefficient list --- that you defend.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Ridge vs.\ lasso vs.\ elastic net: when each wins}
@@ -882,15 +831,11 @@
   \end{columns}
   \begin{takeaway}[Default workflow]
     Try lasso first. If you see correlated predictors splitting their
-    estimated effects, fall back to elastic net or ridge.
+    estimated effects, fall back to elastic net or ridge. And remember
+    that the lasso's chosen \emph{set} is itself unstable under
+    correlation --- re-run it over bootstrap samples and believe only the
+    variables that survive most of them.
   \end{takeaway}
-  \begin{industry}[Quantitative finance: is the selected set stable?]
-    With many candidate predictors and a tiny signal-to-noise ratio,
-    shrinkage beats unconstrained least squares. But the lasso's chosen
-    \emph{set} is unstable under correlation --- so practitioners re-run
-    it over bootstrap samples and only believe a variable that survives
-    most of them.
-  \end{industry}
 \end{frame}
 
 
@@ -991,97 +936,6 @@
 \end{frame}
 
 
-
-
-
-% ============================================================
-\section{PCR / PLS}
-% ============================================================
-
-\begin{frame}{Dimension reduction: idea}
-  Construct $M < p$ new predictors $Z_1, \ldots, Z_M$ as linear
-  combinations of the original $X_j$, then fit linear regression on
-  these.
-  \begin{block}{Common form}
-    \[
-      Z_m = \sum_{j=1}^p \phi_{jm} X_j, \quad
-      Y \approx \theta_0 + \theta_1 Z_1 + \cdots + \theta_M Z_M.
-    \]
-  \end{block}
-  \begin{takeaway}[Two flavours]
-    \begin{itemize}
-      \item \textbf{PCR}: the $\phi_{jm}$ come from PCA on $\mathbf{X}$
-            alone. Unsupervised.
-      \item \textbf{PLS}: the $\phi_{jm}$ are chosen to maximise
-            covariance with $Y$. Supervised.
-    \end{itemize}
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Principal components regression (PCR)}
-  \begin{block}{Recipe}
-    \begin{enumerate}
-      \item Compute the principal components of $\mathbf{X}$ (after
-            standardisation).
-      \item Use the first $M$ components as predictors in a linear
-            regression on $Y$.
-    \end{enumerate}
-  \end{block}
-  Choose $M$ by cross-validation.
-  \begin{alertblock}{Caveat}
-    PCR ignores $Y$ when forming the components. The leading
-    components capture maximal $X$-variance, but the most predictive
-    direction for $Y$ may lie in lower-variance components.
-  \end{alertblock}
-  \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
-    Switch to \texttt{chapter\_06\_lab.ipynb} \S5 and run the PCR/PLS cell: both CV
-    curves bottom out near an MSE of $1.15\times10^5$, but PLS is close to its best
-    by $M \approx 8$ components while PCR needs $M \gtrsim 16$.
-  \end{labnote}
-\end{frame}
-
-
-
-
-
-% ============================================================
-\section{High-D}
-% ============================================================
-
-\begin{frame}{The high-dimensional regime}
-  Modern data sets routinely have $p$ in the thousands (genomics,
-  text) or millions (images). When $p > n$ classical methods break
-  down.
-  \begin{alertblock}{What goes wrong with OLS}
-    \begin{itemize}
-      \item $\mathbf{X}^\top\mathbf{X}$ is singular --- OLS is
-            undefined.
-      \item $R^2$ can be made arbitrarily inflated by adding noise
-            predictors.
-      \item Standard $p$-values, $C_p$, AIC, BIC do not apply.
-    \end{itemize}
-  \end{alertblock}
-  \begin{takeaway}[What works instead]
-    Regularisation (ridge, lasso, elastic net), dimension reduction
-    (PCR, PLS), and modern post-selection inference (Ch.~13).
-  \end{takeaway}
-  \begin{industry}[Biotech: biomarker screening as triage]
-    Biomarker studies have thousands of features on a few hundred
-    subjects; the lasso's job there is \emph{triage}.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Lasso in high dimensions}
-  \begin{center}
-    \includegraphics[width=0.92\textwidth,height=0.62\textheight,keepaspectratio]{6_24.pdf}
-  \end{center}
-  Lasso keeps working when $p \gg n$ if the truth is sparse \emph{and} the
-  sample can see it: with $n = 100$ and $20$ true predictors, by $p = 2{,}000$
-  (right) no amount of shrinkage recovers the fit.
-  \islpsource{Figure 6.24}
-\end{frame}
-
-
 % ============================================================
 \section{Python Lab}
 
@@ -1091,10 +945,9 @@
     \begin{itemize}
       \item \S2, \emph{Best-subset and forward stepwise selection} --- on the Hitters data loaded in \S1;
       \item \S3, \emph{Ridge regression}, and \S4, \emph{Lasso} --- each with its coefficient-path subsection;
-      \item \S5, \emph{PCR and PLS};
-      \item \S6, \emph{How many models did we skip?} --- the search space, counted.
+      \item \S5, \emph{How many models did we skip?} --- the search space, counted.
     \end{itemize}
-    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S7, \emph{Exercises}, closes the notebook.
+    Data loads via the \texttt{ISLP} package or the bundled CSV files; \S6, \emph{Exercises}, closes the notebook.
   \end{labnote}
 \end{frame}
 
@@ -1166,28 +1019,7 @@ print([(p, c) for p, c in zip(preds, coefs) if c != 0])  # only the survivors
   \end{readme}
 \end{frame}
 
-\begin{frame}[fragile]{Principal components regression}
-  \begin{lstlisting}
-from sklearn.decomposition import PCA  # max-variance directions of X
-from sklearn.linear_model  import LinearRegression  # unpenalised fit
-from sklearn.pipeline      import Pipeline  # PCA and OLS as one model
-from sklearn.model_selection import cross_val_score
-
-scores = []
-for M in range(1, len(preds) + 1):           # try every component count
-    pcr = Pipeline([("pca", PCA(n_components=M)),  # M principal comps
-                    ("ols", LinearRegression())])  # then plain OLS
-    s = -cross_val_score(pcr, X, y, cv=10,   # 10-fold CV MSE
-                          scoring="neg_mean_squared_error").mean()
-    scores.append(s)                         # CV curve over M
-# M, not lambda, is the knob: M=19 reproduces OLS, small M shrinks hard.
-  \end{lstlisting}
-  \begin{readme}
-    PCA never sees \texttt{y}: nothing makes the top components predict it.
-  \end{readme}
-\end{frame}
-
-\begin{frame}[fragile]{Exercise 6.7 --- CV Ridge and Lasso on Hitters [Python]}
+\begin{frame}[fragile]{Exercise 6.6 --- CV Ridge and Lasso on Hitters [Python]}
   \begin{exercise}
     On the \texttt{Hitters} data (predict \texttt{Salary}), (i) fit
     lasso with a cross-validated $\lambda$ on standardised predictors,
@@ -1198,11 +1030,11 @@ for M in range(1, len(preds) + 1):           # try every component count
   \begin{labnote}[{{Run this live}}]
     The worked solution sits in \texttt{chapter\_06\_lab.ipynb} under
     \emph{Lecture exercises --- worked Python solutions}: the cell headed
-    \emph{Exercise 6.7 --- CV Ridge and Lasso on Hitters [Python]}.
+    \emph{Exercise 6.6 --- CV Ridge and Lasso on Hitters [Python]}.
   \end{labnote}
 \end{frame}
 
-\begin{frame}[fragile]{Solution --- Exercise 6.7 (1/2)}
+\begin{frame}[fragile]{Solution --- Exercise 6.6 (1/2)}
   \begin{lstlisting}
 import numpy as np, pandas as pd
 from sklearn.linear_model    import Lasso, Ridge  # L1 and L2 penalty
@@ -1225,7 +1057,7 @@ print("kept   :", kept, "\ndropped:", dropped)  # retained vs zeroed exactly
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Solution --- Exercise 6.7 (2/2)}
+\begin{frame}[fragile]{Solution --- Exercise 6.6 (2/2)}
   \begin{lstlisting}
 ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),   # scale in CV
                      {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10).fit(X, y)
@@ -1350,13 +1182,15 @@ print("lasso drops:", dropped)
 
 \begin{frame}{Chapter 6 in one slide}
   \begin{block}{What we accomplished}
-    Three families of methods that turn the linear model into a
-    workhorse for high-dimensional and sparse problems.
+    Two families of methods that turn the linear model into a workhorse
+    for wide, collinear and sparse problems.
   \end{block}
   \begin{itemize}
-    \item Subset selection (best, forward, backward).
+    \item Subset selection (best, forward, backward), scored by $C_p$,
+          AIC, BIC or adjusted $R^2$.
     \item Shrinkage (ridge, lasso, elastic net).
-    \item Dimension reduction (PCR, PLS).
+    \item The geometry that makes the lasso --- and only the lasso ---
+          set coefficients to exactly zero.
     \item Honest tuning via cross-validation throughout.
   \end{itemize}
 \end{frame}
@@ -1389,8 +1223,7 @@ print("lasso drops:", dropped)
     Lasso ($\ell_1$) & Penalty $\lambda \sum |\beta_j|$ \\
     Elastic net & Mix of $\ell_1$ and $\ell_2$ penalties \\
     Tuning parameter $\lambda$ & Strength of the penalty \\
-    PCR & Regression on principal components of $\mathbf{X}$ \\
-    PLS & Regression on directions correlated with $Y$ \\
+    One-standard-error rule & Largest $\lambda$ within one SE of the CV minimum \\
     Sparsity & Many estimated $\beta_j$ exactly zero \\
     \bottomrule
   \end{tabular}
@@ -1398,13 +1231,13 @@ print("lasso drops:", dropped)
 
 \begin{frame}{Decision rules of thumb}
   \begin{itemize}
-    \item Always standardise predictors before ridge / lasso / PCR /
-          PLS.
+    \item Always standardise predictors before ridge or lasso.
     \item Choose $\lambda$ by 10-fold CV; consider the
           one-standard-error rule for parsimony.
     \item Use BIC for parsimonious model selection; AIC / $C_p$ for
           predictive accuracy.
-    \item In $p > n$ regimes: ridge or lasso is mandatory.
+    \item With strongly collinear predictors prefer ridge (or elastic
+          net): the lasso's chosen \emph{set} is the unstable part.
     \item Re-fit OLS on the lasso-selected variables (``relaxed lasso'')
           if you want unbiased coefficients with the sparse support.
   \end{itemize}
@@ -1415,13 +1248,13 @@ print("lasso drops:", dropped)
     \begin{enumerate}
       \item Apply lasso / ridge without standardising.
       \item Treat post-selection $p$-values as valid (Ch.~13).
-      \item Use AIC / BIC for high-dimensional data --- they assume
+      \item Use AIC / BIC once $p$ approaches $n$ --- they assume
             $n \gg p$.
       \item Tune $\lambda$ on the same data you evaluate on.
-      \item Throw away PCs based purely on variance --- a low-variance
-            PC can be highly predictive of $Y$.
-      \item Forget that PCR ignores $Y$; PLS is the supervised
-            alternative.
+      \item Standardise on the full data before cross-validating ---
+            the scaler must be re-fit inside every fold.
+      \item Read the lasso's dropped variables as ``irrelevant'' when
+            they are merely redundant with a kept one.
     \end{enumerate}
   \end{alertblock}
 \end{frame}
@@ -1431,7 +1264,8 @@ print("lasso drops:", dropped)
     \item Ch.~3: linear regression with no penalty.
     \item Ch.~5: how to choose $\lambda$ honestly via CV.
     \item Ch.~7: GAMs are an additive ridge-like extension.
-    \item Ch.~8: random forests / boosting handle high-dim differently.
+    \item Ch.~8: trees and boosting tame many correlated predictors in a
+          quite different way.
     \item Ch.~10: deep nets use weight decay (ridge in disguise).
     \item Ch.~13: post-selection inference and the lasso.
   \end{itemize}
@@ -1442,29 +1276,29 @@ print("lasso drops:", dropped)
   where to read.
   \begin{enumerate}
     \item Why does ridge regression always have a unique solution?
-          (p.~35)
+          (p.~31)
     \item Why can lasso set coefficients to exactly zero, but ridge
-          cannot? Sketch the unit balls. (p.~45)
+          cannot? Sketch the unit balls. (p.~41)
     \item For two perfectly correlated predictors, what does ridge do?
-          What does lasso do? What does elastic net do? (p.~47)
+          What does lasso do? What does elastic net do? (p.~43)
     \item Compute the ridge estimate when $\mathbf{X}^\top\mathbf{X} = I$
-          --- a clean special case. (appendix, p.~88)
-    \item PCR ignores $Y$ when forming components. When can this hurt
-          and when does it help? (p.~55)
-    \item Outline the one-standard-error rule. (p.~46)
+          --- a clean special case. (appendix, p.~81)
+    \item Why must the scaler be re-fit inside every cross-validation
+          fold rather than once on the full data? (p.~52)
+    \item Outline the one-standard-error rule. (p.~42)
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Eight things to remember}
+\begin{frame}{Seven things to remember}
   \begin{enumerate}
     \item Subset selection: clean conceptually but combinatorial.
     \item Stepwise selection: greedy and fast.
+    \item $C_p$, AIC, BIC and adjusted $R^2$ all read ``training fit
+          $+$ complexity penalty''; CV needs no such assumption.
     \item Ridge: $\ell_2$ penalty $\to$ smooth shrinkage, no zeros.
     \item Lasso: $\ell_1$ penalty $\to$ sparse solutions.
-    \item Always standardise before shrinkage.
+    \item Always standardise before shrinkage --- inside the CV loop.
     \item Choose $\lambda$ by cross-validation.
-    \item PCR / PLS: dimension reduction; PLS uses $Y$.
-    \item In high dimensions, regularisation is essential.
   \end{enumerate}
 \end{frame}
 
@@ -1496,7 +1330,6 @@ print("lasso drops:", dropped)
       \item \textbf{The constraint geometry, drawn a second time} --- a duplicate of the diamond-vs-circle picture that is already in the main deck.
       \item \textbf{Counting the models (Exercise 6.1)} --- how many subsets best subset and forward stepwise actually fit, $2^p$ against $1+p(p+1)/2$. The lattice picture in the main deck makes the same point in one slide.
       \item \textbf{Ridge and lasso under an orthonormal design (Extended Exercise 6.2)} --- the closed forms that explain \emph{why} the lasso thresholds coefficients to zero and ridge only shrinks them. The cleanest proof in the chapter --- and the hardest algebra.
-      \item \textbf{Partial least squares} --- PLS as the supervised cousin of PCR, with Exercise 6.6. PCR is the version that appears in the lab and the exam.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -1593,10 +1426,6 @@ print("lasso drops:", dropped)
 \end{frame}
 
 
-
-
-
-
 \begin{frame}{Why the lasso is sparse: the constraint geometry}
   \begin{columns}[c]
     \begin{column}{0.5\textwidth}\centering
@@ -1640,7 +1469,7 @@ print("lasso drops:", dropped)
             stepwise here, and why does the gap explode as $p$ grows?
     \end{enumerate}
   \end{exercise}
-  \begin{labnote}[{{Live demo --- \S6 of the notebook}}]
+  \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
     Switch to \texttt{chapter\_06\_lab.ipynb} \S6 and run the counting cell: it prints
     $2^{19} = 524\,288$ best-subset fits against $191$ for forward stepwise on Hitters,
     plus this slide's $p=10$ case ($1\,024$ vs.\ $56$).
@@ -1767,69 +1596,6 @@ print("lasso drops:", dropped)
     Thinking the lasso shrinks proportionally. It subtracts the same
     \emph{absolute} amount from every coefficient; ridge is the
     proportional one --- compare the $3.0$ and $0.4$ rows.
-  \end{mistake}
-\end{frame}
-
-\begin{frame}{Partial least squares (PLS)}
-  PLS components are designed to maximise covariance with $Y$.
-  \begin{block}{Construction}
-    \begin{itemize}
-      \item First component: weights $\phi_{j1} \propto \mathrm{cov}(X_j, Y)$.
-      \item Subsequent components: same idea after orthogonalising
-            against earlier components.
-    \end{itemize}
-  \end{block}
-  \begin{takeaway}
-    PLS often performs comparably to ridge regression and can
-    outperform PCR on noisy data. Cross-validate $M$ for both methods
-    on the same grid.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Exercise 6.6 --- Dimension Reduction: PCR vs.\ PLS [Concept]}
-  \begin{exercise}
-    \begin{enumerate}
-      \item In one sentence each, describe the key idea of dimension
-            reduction and how PCR and PLS choose their directions
-            $Z_1,\dots,Z_M$.
-      \item State the essential difference between PCR and PLS (which one
-            uses $Y$?).
-      \item Give a concrete situation in which PCR can perform poorly,
-            and explain how PLS addresses it.
-    \end{enumerate}
-  \end{exercise}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 6.6}
-  \begin{solutionbox}
-    \textbf{(1) The idea.}
-    Dimension reduction replaces the $p$ correlated predictors with
-    $M < p$ linear combinations $Z_m = \sum_j \phi_{jm}X_j$ and fits an
-    ordinary regression on those few components, cutting variance and
-    handling collinearity. PCR takes the $\phi_{jm}$ from the
-    \emph{principal components} of $\mathbf{X}$ (the directions of
-    maximal predictor variance); PLS chooses the $\phi_{jm}$ to maximise
-    the \emph{covariance between $Z_m$ and $Y$}.
-
-    \textbf{(2) The essential difference.}
-    PCR is \emph{unsupervised} --- it ignores $Y$ when building
-    components. PLS is \emph{supervised} --- it uses $Y$, so its
-    directions are tilted toward what predicts the response.
-
-    \textbf{(3) When PCR struggles.}
-    If the direction that best predicts $Y$ happens to be a
-    \emph{low-variance} direction of $\mathbf{X}$, PCR's leading
-    components (chosen purely for high $X$-variance) will miss it, and
-    you may need many components before the predictive direction enters
-    --- wasting degrees of freedom. PLS avoids this by explicitly
-    seeking directions correlated with $Y$, so it can capture the
-    predictive signal with fewer components. In practice PLS often
-    performs comparably to ridge regression.
-  \end{solutionbox}
-  \begin{mistake}
-    Concluding supervised must be better --- using $Y$ also raises
-    variance, so PCR often matches PLS. And neither selects variables:
-    every component $Z_m$ mixes \emph{all} $p$ predictors.
   \end{mistake}
 \end{frame}
 

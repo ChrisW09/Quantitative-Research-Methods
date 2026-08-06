@@ -73,10 +73,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -201,46 +197,18 @@
     Pharma, medtech & Overall and progression-free survival in oncology trials &
       Whether the drug goes to the regulator at all \\
     Subscription tech & Time to churn for customers who have \emph{not yet} churned &
-      Retention spend, and which cohorts get it \\
-    Banking, credit & Time to default or to early repayment on a loan book &
-      Provisioning, pricing, and prepayment risk \\
-    Insurance & Time to lapse of a policy; time to claim &
-      Reserving and commission clawback rules \\
+      Which cohorts the retention budget is spent on \\
     Manufacturing & Time to failure of a component still in the field &
-      Warranty terms and maintenance intervals \\
-    HR analytics & Time to resignation among current employees &
-      Which retention interventions are funded \\
+      The warranty term offered, and the maintenance interval \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    In every row the interesting subjects are the ones \emph{nothing has happened to yet}.
-    A churn model that quietly drops all still-active customers is trained on the unhappy
-    minority; a warranty analysis that ignores components still running will promise a
-    shorter life than the product has.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: a subscription business models churn}
-  \footnotesize
-  \begin{industry}[The data as it actually arrives]
-    A SaaS firm has $180$ months of history. For a customer who cancelled in month $14$ the
-    response is unambiguous: $T=14$. For a customer who signed up eight months ago and is
-    still paying, all we know is $T>8$ --- a \textbf{right-censored} observation. At any
-    snapshot the majority of the book is censored, and the newest, fastest-growing cohorts
-    are censored the most heavily.
-  \end{industry}
-  \begin{readme}[Why the naive pipeline fails --- and what replaces it]
-    The tempting shortcut is a classifier for ``churned in the last 12 months, yes/no''. It
-    throws away \emph{when}, cannot use customers with less than $12$ months of tenure, and
-    silently changes definition every time the snapshot moves. The survival framing keeps
-    every customer: Kaplan--Meier for the cohort curve, Cox for the drivers, and the fitted
-    curve integrates into an expected customer lifetime.
-  \end{readme}
-  \begin{takeaway}[Who signs off --- and the honest caveat]
-    Finance owns the resulting lifetime-value number, so the curve has to be defensible.
-    The caveat: customers who leave \emph{because} a price rise is coming are not censored
-    independently of their risk --- and no amount of estimation fixes that.
+  \begin{takeaway}[{{In all three, the informative subjects are the ones nothing has happened to yet}}]
+    Drop them and every number moves the same way --- too pessimistic. A churn model that
+    quietly discards still-active customers is fitted on the unhappy minority; a warranty
+    analysis that ignores components still running will promise a shorter life than the
+    product has; a trial analysed only on patients who have already progressed understates
+    the drug. Censoring is not missing data to be cleaned away: it is the observation.
   \end{takeaway}
 \end{frame}
 
@@ -694,14 +662,12 @@
       \item The median comes with a one-sided story here: its $95\%$ interval is
             $[31.25,\ \infty)$, because $\hat S$ never gets far enough below $0.5$ to
             pin down an upper limit.
-      \item Never extrapolate past the largest observed time ($82.56$ months).
+      \item Never extrapolate past the largest observed time ($82.56$ months). A curve
+            that flattens at $0.45$ does not say that $45\%$ of subjects last forever ---
+            it says follow-up ran out. Either extrapolate with a parametric tail and
+            declare it, or report a restricted quantity such as $\mathrm{RMST}(\tau)$.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Insurance: the flat tail is a modelling decision]
-    A lapse curve that flattens at $0.45$ does not mean $45\%$ of policies last forever ---
-    it means follow-up ran out. Reserving teams must either extrapolate with a parametric
-    tail and say so, or report a restricted quantity such as $\mathrm{RMST}(\tau)$.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Censored observations do not step the curve down}
@@ -944,15 +910,11 @@ print(et.head(7)[['at_risk', 'observed', 'censored']])   # check the hand arithm
   \begin{takeaway}
     $p=0.230$: with $88$ patients and $35$ deaths there is \textbf{no evidence} of a sex
     difference in survival. A visible gap between two curves and a $20$-month gap between
-    medians is entirely consistent with chance at this sample size.
+    medians is entirely consistent with chance at this sample size. Note what drives the
+    precision: $V_1$ grows with the number of \emph{events}, not with the number of
+    patients --- which is why trials are sized in events, and why recruiting more subjects
+    into a low-event setting buys surprisingly little power.
   \end{takeaway}
-  \begin{industry}[Clinical development: powering on events rather than patients]
-  \scriptsize
-    The precision of a log-rank test is governed by $V_1$, which grows with the number of
-    \emph{events}. Trials are therefore sized in events, and event-driven analyses are
-    triggered when the count is reached --- recruiting more patients into a low-event
-    setting buys surprisingly little power.
-  \end{industry}
 \end{frame}
 
 
@@ -1133,13 +1095,11 @@ print(et.head(7)[['at_risk', 'observed', 'censored']])   # check the hand arithm
             asymptotically normal, with the usual Wald and likelihood-ratio tests. Censored
             subjects contribute no factor but populate the risk sets of earlier deaths.
       \item \textbf{Buys:} no distribution for $T$; only the \emph{order} of the times
-            matters. \textbf{Costs:} no absolute risk from $\hat\beta$ alone.
+            matters --- so a prepayment model fitted on loan age transfers unchanged to a
+            book measured in payment counts. \textbf{Costs:} no absolute risk from
+            $\hat\beta$ alone.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Credit risk: why ordering-only matters]
-    A prepayment model fitted on loan age transfers to a book measured in payment counts,
-    because the partial likelihood uses only who-was-at-risk-when.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Coefficients are log hazard ratios}
@@ -1381,13 +1341,12 @@ print(et.head(7)[['at_risk', 'observed', 'censored']])   # check the hand arithm
       \item So pair it with calibration --- bucket subjects by $\hat\eta$ and overlay the
             predicted curve on each bucket's Kaplan--Meier curve --- and cross-validate,
             exactly as in Chapter 5: read on the training data, $C$ is optimistic.
+      \item Those are the two questions any reviewer will ask, in order:
+            \emph{discrimination} (does it rank?) and \emph{calibration} (are the
+            probabilities right at the horizons the decision uses?). A model can pass the
+            first and fail the second.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Model risk: the two questions a validator asks]
-    \emph{Discrimination} --- does it rank? (C-index, cross-validated.) \emph{Calibration}
-    --- are the probabilities right at the horizons the business uses? A provisioning model
-    fails validation on the second even when it passes the first.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{High-dimensional survival: the regularised Cox model}
@@ -1407,15 +1366,11 @@ print(et.head(7)[['at_risk', 'observed', 'censored']])   # check the hand arithm
             ridge-Cox; in between, the elastic net. Choose $\lambda$ by cross-validating
             the partial likelihood, \emph{not} the C-index alone.
       \item The resulting linear predictor $x^\top\hat\beta$ is the risk score behind
-            commercial genomic assays.
+            commercial genomic assays: a handful of genes, one score, dichotomised at a
+            threshold chosen on \emph{clinical} grounds and validated on an independent
+            cohort. Sparsity is what makes the assay cheap enough to run.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Oncology diagnostics: from a signature to a decision]
-  \scriptsize
-    A lasso-Cox on gene expression yields a handful of genes and one score; the score is
-    then dichotomised at a threshold chosen on \emph{clinical} grounds and validated on an
-    independent cohort. Sparsity is what makes the assay cheap enough to run.
-  \end{industry}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -1851,15 +1806,16 @@ proportional_hazard_test(cph, X, time_transform='rank').print_summary()  # p per
             and ridge machinery, applied to a different loss.
       \item \textbf{Back to Chapter 5:} cross-validate the C-index --- an in-sample
             $0.794$ is optimistic for exactly the Chapter 5 reasons.
-      \item \textbf{Chapter 12:} unsupervised learning, where there is no response at all.
+      \item \textbf{Unsupervised learning (Chapter 12):} no response at all --- a sibling
+            self-study module in \texttt{Chapters/Advanced/}, worth reading next.
       \item \textbf{Chapter 13:} multiple testing --- and a survival study with many
             subgroups is precisely a multiplicity problem.
     \end{itemize}
   \end{readme}
   \begin{takeaway}
-    Chapters 11 and 12 are the two ``unusual response'' chapters: here the response
-    is only partly observed, there it is absent. Both are handled by changing the
-    likelihood, not the loss you happen to know.
+    This module and the unsupervised-learning one are the two ``unusual response''
+    topics: here the response is only partly observed, there it is absent. Both are
+    handled by changing the likelihood, not the loss you happen to know.
   \end{takeaway}
 \end{frame}
 

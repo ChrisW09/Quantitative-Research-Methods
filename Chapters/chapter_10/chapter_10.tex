@@ -67,10 +67,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -96,12 +92,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
     \rowcolor{accent!18} \textbf{Ch.\ 10} & \textbf{Deep learning}\,{\color{accent!75!black}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -124,7 +119,7 @@
     $w_{kj}$, $w_{k0}$ & weight from input $j$ into hidden unit $k$; its bias \\
     $\beta_k$, $\beta_0$ & output weight of hidden unit $k$; output bias \\
     softmax & output activation $e^{z_m}/\sum_{m'} e^{z_{m'}}$ for multiclass labels \\
-    $W$, $F$, $P$, $S$ & conv arithmetic: input width, filter size, padding, stride \\
+    $W$, $F$, $P$, $S$ & conv arithmetic (appendix): input width, filter size, padding, stride \\
     $\theta$ & all weights and biases of the network collectively \\
     $\eta$ & learning rate of (stochastic) gradient descent \\
     $\ell$ & per-observation loss (squared error, cross-entropy) \\
@@ -145,10 +140,10 @@
   By the end of this chapter you will be able to:
   \begin{itemize}
     \item \textbf{Define} a single-layer and multilayer perceptron.
-    \item \textbf{Explain} how convolutional networks exploit local
-          structure and translation invariance.
     \item \textbf{Outline} recurrent networks and the basic
           transformer idea.
+    \item \textbf{Recognise} where convolutional networks belong ---
+          the appendix develops them as optional self-study.
     \item \textbf{Train} a small network with stochastic gradient
           descent + backpropagation.
     \item \textbf{Reason} about when deep learning is worth it.
@@ -161,10 +156,11 @@
     \begin{enumerate}
       \item Single-layer networks (logistic regression in disguise).
       \item Multilayer perceptrons.
-      \item Convolutional networks for images.
       \item Recurrent networks and transformers for sequences.
       \item How they are trained (SGD, backprop) and regularised.
     \end{enumerate}
+    Convolutional networks for images sit in the \textbf{appendix}: the same
+    ideas, developed as optional self-study rather than taught here.
   \end{takeaway}
 \end{frame}
 
@@ -178,16 +174,13 @@
   attention).
   \begin{takeaway}
     Dominant in image, speech, and natural-language tasks. Less
-    consistently dominant on small to medium tabular data --- where
-    gradient-boosted trees often win.
+    consistently dominant on small to medium tabular data --- on the wide
+    customer, policy and transaction tables of a bank or an insurer,
+    gradient boosting (Chapter~8) usually matches or beats a neural network
+    at a fraction of the cost, and is far easier to document for model
+    validation. Deep learning earns its keep on the \emph{unstructured}
+    assets those firms also hold: scanned documents, call recordings, images.
   \end{takeaway}
-  \begin{industry}[Banking and insurance: the tabular reality check]
-    On the wide customer, policy and transaction tables that dominate a bank's or
-    insurer's analytics stack, gradient boosting (Chapter~8) usually matches or beats a
-    neural network at a fraction of the cost --- and is far easier to document for model
-    validation. Deep learning earns its keep on the \emph{unstructured} assets those firms
-    also hold: scanned documents, call recordings, images.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Where this chapter is used in industry}
@@ -197,48 +190,20 @@
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Manufacturing & CNN on line-scan camera images: surface defects, missing components,
-      assembly faults & Scrap, rework or stop the line \\
-    Healthcare & Radiology screening and triage; many AI imaging devices are cleared by
-      regulators & Which scans the radiologist reads first \\
-    Insurance, banking & OCR plus sequence models on claims forms, invoices, contracts,
-      KYC documents & Straight-through processing; route exceptions to a human \\
-    Retail, streaming & Embedding-based recommendation and two-tower retrieval &
-      What appears on the home page and in the ranking \\
-    Telco, services & Speech recognition and call-centre analytics &
-      Route, summarise and quality-check conversations \\
+    Manufacturing & Convolutional network on line-scan camera images: surface defects,
+      missing components, assembly faults & Scrap it, send it to rework, or stop the line \\
+    Insurance, banking & OCR plus sequence models reading claims forms, invoices and KYC
+      documents & Which files clear straight through and which go to a human handler \\
     Retail, energy & One network trained across thousands of related demand series &
-      Purchasing, staffing and dispatch volumes \\
+      The purchasing, staffing and dispatch volumes booked for next week \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Every row has an \emph{unstructured} input --- pixels, characters, waveforms --- where
-    the network learns the features a human would otherwise hand-code.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: automated visual inspection}
-  \footnotesize
-  \begin{industry}[Semiconductors and automotive: end-of-line inspection]
-    \textbf{Response.} A binary label per image, \emph{defect} / \emph{no defect}, usually
-    with a location (bounding box or heat map) so the operator can see what was flagged.\\
-    \textbf{Inputs.} Line-scan or area-scan camera images of each unit under fixed
-    lighting; often several views per unit, sometimes with the process metadata (machine,
-    shift, recipe) attached for later diagnosis.
-  \end{industry}
-  \begin{readme}[What the fitted model produces and who acts on it]
-    A defect probability per image. A threshold turns it into an action: pass, divert to
-    \textbf{rework}, \textbf{scrap}, or --- if the flagged rate spikes --- \textbf{stop the
-    line} and call process engineering. Quality engineering owns the threshold; the
-    production manager signs off on any rule that can halt output. The flag itself lands on
-    the \textbf{shift supervisor}, who must act on it and answer for the stopped line.
-  \end{readme}
-  \begin{takeaway}[Honest caveats]
-    Defects are \emph{rare}, so labelled positives are scarce and badly imbalanced ---
-    augmentation, transfer learning and a cost-weighted threshold do the heavy lifting. A
-    false stop is expensive, a missed defect can be worse, and the model must be
-    \emph{revalidated} whenever the product, the fixture or the lighting changes.
+  \begin{takeaway}[Each row ends in a threshold somebody owns]
+    In all three the network learns features a human would otherwise hand-code --- from
+    pixels, characters or thousands of related series --- but the number it emits only
+    matters once a threshold turns it into an action, and someone has to answer for
+    that threshold.
   \end{takeaway}
 \end{frame}
 
@@ -641,8 +606,9 @@
     \end{align*}
   \end{block}
   \begin{readme}
-    $h$ is the output activation: identity for regression, softmax
-    for multiclass classification.
+    $h$ is the output activation: identity for regression, softmax for multiclass
+    classification. A first layer can also \emph{embed} a high-cardinality identifier
+    (SKU, store) as a short learned vector rather than a wide one-hot block.
   \end{readme}
 \end{frame}
 
@@ -656,23 +622,6 @@
   \end{takeaway}
   \islpsource{Figure 10.4}
 \end{frame}
-
-\begin{frame}{Where plain MLPs still pay off in business}
-  \begin{industry}[Retail and energy: one network for many series]
-    Retailers and grid operators forecast demand for thousands of related items or nodes. A
-    single ``global'' network trained across \emph{all} series shares structure ---
-    holidays, promotions, weather --- that a per-series model cannot borrow, and its output
-    sets purchasing, staffing and dispatch volumes. The error is paid in stock-outs at one
-    end and write-offs at the other.
-  \end{industry}
-  \begin{industry}[High-cardinality categories: learned embeddings]
-    Business tables are full of identifiers with thousands of levels --- SKU, store,
-    postcode, merchant. A network can map each level to a short learned vector
-    (an \emph{embedding}) instead of a wide one-hot block, which is often the one place a
-    neural model clearly beats a tree ensemble on tabular data.
-  \end{industry}
-\end{frame}
-
 
 % ------------------------------------------------------------
 \begin{frame}{Exercise 10.3 --- Counting parameters [Math]}
@@ -750,214 +699,6 @@
 \end{frame}
 
 % ============================================================
-\section{CNNs}
-% ============================================================
-
-\begin{frame}{Why convolutions?}
-  Image data have local, translation-invariant structure.
-  \begin{takeaway}
-    A cat remains a cat shifted by 10 pixels. Fully-connected networks
-    ignore this and need much more data.
-  \end{takeaway}
-  \begin{readme}[Two key layer types]
-    \begin{itemize}
-      \item \textbf{Convolutional layers}: each unit looks at a small
-            patch of the input; weights are shared across positions.
-      \item \textbf{Pooling layers}: down-sample (max or average) for
-            translation tolerance.
-    \end{itemize}
-  \end{readme}
-  \begin{industry}[Healthcare: radiology triage]
-    Many AI-enabled imaging devices hold regulatory clearance, mostly in radiology. They
-    \emph{prioritise or flag} studies rather than decide --- a radiologist still signs the
-    report.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{The convolution operation}
-  \begin{center}
-  \begin{tikzpicture}[x=0.60cm,y=0.56cm,>={Stealth[length=2mm]},font=\small]
-    \foreach \r in {0,...,4}\foreach \c in {0,...,4}
-      \draw[fill=accent!6,draw=accent!40] (\c,-\r) rectangle ++(1,-1);
-    \draw[draw=orange!80!black,line width=1.4pt,fill=orange!18,fill opacity=0.5]
-      (0,0) rectangle (3,-3);
-    \node[font=\scriptsize,text=orange!70!black] at (1.5,0.6) {$3\times3$ kernel};
-    \node[font=\footnotesize,text=accent] at (2.5,-5.5) {input $5\times5$};
-    \begin{scope}[shift={(8.2,-1)}]
-      \foreach \r in {0,...,2}\foreach \c in {0,...,2}
-        \draw[fill=green!8,draw=green!45] (\c,-\r) rectangle ++(1,-1);
-      \draw[draw=green!55!black,line width=1.4pt,fill=green!25] (0,0) rectangle (1,-1);
-      \node[font=\footnotesize,text=green!45!black] at (1.5,-3.6) {feature map $3\times3$};
-    \end{scope}
-    \draw[->,line width=1pt,orange!70!black] (3.05,-1.5) .. controls (5.6,0.3) .. (8.2,-1.5);
-    \node[font=\scriptsize] at (5.6,0.9) {$\sum(\text{filter}\odot\text{patch})+b$};
-    \node[font=\scriptsize,text=gray] at (5.6,-6.4) {stride $=1$, valid $\Rightarrow 5-3+1=3$};
-  \end{tikzpicture}
-  \end{center}
-  \begin{takeaway}
-    Each output cell is a dot product of the shared-weight filter with a local input patch. Weight sharing plus locality make convolutional neural networks (CNNs) data-efficient for images.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Max-pooling: downsampling by local maxima}
-  \begin{center}
-  \begin{tikzpicture}[x=0.8cm,y=0.8cm,>={Stealth[length=2.4mm]},font=\small]
-    \fill[blue!12]   (0,0) rectangle (2,-2);
-    \fill[orange!14] (2,0) rectangle (4,-2);
-    \fill[green!14]  (0,-2) rectangle (2,-4);
-    \fill[purple!12] (2,-2) rectangle (4,-4);
-    \foreach \r in {0,...,3}\foreach \c in {0,...,3} \draw[black!35] (\c,-\r) rectangle ++(1,-1);
-    \foreach \c/\r/\v in {0/0/1,1/0/3,2/0/2,3/0/4, 0/1/5,1/1/6,2/1/1,3/1/2,
-                          0/2/8,1/2/2,2/2/3,3/2/0, 0/3/4,1/3/1,2/3/5,3/3/7}
-      \node at (\c+0.5,-\r-0.5) {\v};
-    \draw[blue!55!black,line width=1.1pt]   (0,0) rectangle (2,-2);
-    \draw[orange!70!black,line width=1.1pt] (2,0) rectangle (4,-2);
-    \draw[green!55!black,line width=1.1pt]  (0,-2) rectangle (2,-4);
-    \draw[purple!60!black,line width=1.1pt] (2,-2) rectangle (4,-4);
-    \node[font=\footnotesize,text=accent] at (2,-4.55) {input $4\times4$, \ $2\times2$ windows, stride $2$};
-    \draw[->,line width=1pt,gray] (4.4,-2) -- (6.2,-2);
-    \node[font=\scriptsize,text=gray] at (5.3,-1.5) {take max};
-    \begin{scope}[shift={(6.7,-0.5)}]
-      \fill[blue!12]   (0,0) rectangle (1,-1);
-      \fill[orange!14] (1,0) rectangle (2,-1);
-      \fill[green!14]  (0,-1) rectangle (1,-2);
-      \fill[purple!12] (1,-1) rectangle (2,-2);
-      \foreach \c in {0,1}\foreach \r in {0,1}\draw[black!45] (\c,-\r) rectangle ++(1,-1);
-      \node at (0.5,-0.5){6}; \node at (1.5,-0.5){4};
-      \node at (0.5,-1.5){8}; \node at (1.5,-1.5){7};
-      \node[font=\footnotesize,text=green!45!black] at (1,-2.55) {feature map $2\times2$};
-    \end{scope}
-  \end{tikzpicture}
-  \end{center}
-  \begin{takeaway}
-    Each outlined $2\times2$ window is replaced by its maximum, shrinking $H,W$ by the stride
-    while keeping the depth. This buys small-shift tolerance and cuts computation ---
-    and pooling has \emph{no} trainable parameters.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{A simple CNN architecture}
-  \begin{center}
-    \includegraphics[width=0.92\textwidth,height=0.52\textheight,keepaspectratio]{10_8.pdf}
-  \end{center}
-  \begin{takeaway}
-    The pattern repeats: convolutions extract local features, pooling shrinks the
-    maps, and a final dense layer classifies. Early layers learn edges; deeper
-    layers assemble them into whole objects.
-  \end{takeaway}
-  \islpsource{Figure 10.8}
-\end{frame}
-
-\begin{frame}{Modern CNN tricks}
-  \begin{itemize}
-    \item \textbf{Batch normalisation}: re-centre and scale each layer's inputs per
-          mini-batch --- stabilises and speeds up training.
-    \item \textbf{Dropout}: randomly switch off units so the net cannot rely on any
-          single one (detailed in the Fitting section).
-    \item \textbf{Data augmentation}: random crops, flips, colour jitter --- free
-          extra ``images'' that teach invariance.
-    \item \textbf{Skip / residual connections} (ResNet): let gradients bypass layers,
-          enabling very deep networks.
-    \item \textbf{Transfer learning}: reuse features pretrained on ImageNet, then
-          fine-tune on your (smaller) task.
-  \end{itemize}
-  \begin{takeaway}
-    These tricks turned CNNs from finicky to reliable. Most are cheap to add and
-    mainly improve \emph{generalisation}.
-  \end{takeaway}
-\end{frame}
-
-
-% ------------------------------------------------------------
-\begin{frame}{Exercise 10.4 --- CNN layer arithmetic [Math]}
-\begin{exercise}
-  A colour image of size $32 \times 32 \times 3$ is fed to a
-  convolutional layer with $16$ filters, each $5 \times 5$, stride
-  $1$, no padding (``valid''). Recall the spatial-size formula
-  \[
-    O = \left\lfloor\frac{W - F + 2P}{S}\right\rfloor + 1 .
-  \]
-  \begin{enumerate}
-    \item Compute the output volume (height, width, depth) of the
-          conv layer.
-    \item Compute the number of trainable parameters in the conv layer
-          (include biases).
-    \item A $2 \times 2$ max-pooling layer (stride $2$) follows. What
-          is its output volume and how many parameters does it add?
-    \item Redo part (1) if instead padding $P = 2$ (``same'') is used.
-  \end{enumerate}
-\end{exercise}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 10.4 (1/2)}
-\begin{solutionbox}
-  \textbf{Part 1 --- conv output.} With $W = 32$, $F = 5$, $P = 0$,
-  $S = 1$:
-  \[
-    O = \frac{32 - 5 + 0}{1} + 1 = 28 .
-  \]
-  Each filter slides over the image and produces \emph{one} $28 \times 28$
-  feature map, so depth $=$ number of filters: the output volume is
-  $28 \times 28 \times 16$.
-
-  \medskip
-  \textbf{Part 2 --- conv parameters.} Each filter spans the full
-  input depth: $5 \times 5 \times 3 = 75$ weights, $+1$ bias $= 76$
-  per filter. With $16$ filters:
-  \[
-    16 \times 76 = \boxed{1216} \text{ parameters.}
-  \]
-  \emph{Why so few?} A dense layer from the $32 \times 32 \times 3 = 3072$
-  inputs to the same $28 \times 28 \times 16 = 12\,544$ outputs would need
-  $3072 \times 12\,544 + 12\,544 \approx 38.5$ million parameters --- weight
-  sharing cuts that by a factor of about $30\,000$.
-\end{solutionbox}
-\end{frame}
-
-\begin{frame}{Solution --- Exercise 10.4 (2/2)}
-\begin{solutionbox}
-  \textbf{Part 3 --- pooling.} Max-pooling with $F = 2$, $S = 2$:
-  \[
-    O = \frac{28 - 2}{2} + 1 = 14 ,
-  \]
-  giving $14 \times 14 \times 16$: pooling acts on each of the $16$ channels
-  separately, so depth is preserved. It has \textbf{no} trainable
-  parameters --- it only takes a maximum.
-
-  \medskip
-  \textbf{Part 4 --- with padding $P = 2$.}
-  \[
-    O = \frac{32 - 5 + 2(2)}{1} + 1 = \frac{31}{1} + 1 = 32 .
-  \]
-  Output $32 \times 32 \times 16$: ``same'' padding preserves the
-  spatial size. In general, stride-$1$ ``same'' padding takes
-  $P = (F-1)/2$ --- here $(5-1)/2 = 2$ --- so conv layers can be stacked
-  without shrinking the maps.
-
-  \medskip
-  \textit{Common mistake: adding a $+2P$ term for the pooling layer (it uses
-  $P = 0$) or forgetting to divide by the stride \emph{before} adding $1$.}
-\end{solutionbox}
-\end{frame}
-
-
-\begin{frame}{Why convolution wins: the parameter count, drawn}
-  \begin{center}
-    \includegraphics[width=0.76\textwidth,height=0.54\textheight,keepaspectratio]{ch10_conv_vs_dense.png}
-  \end{center}
-  \begin{takeaway}
-    Exercise 10.4 as a curve. The dense layer's cost grows with the
-    \emph{fourth power} of the image side; the convolution stays at $1\,216$
-    parameters at every size, because the same $5\times5$ filters slide
-    everywhere. Weight sharing, not depth, is what makes images tractable.
-  \end{takeaway}
-\end{frame}
-
-
-
-
-
-% ============================================================
 \section{Sequences}
 % ============================================================
 
@@ -972,7 +713,7 @@
       \item $W_x$: weights on the new input; \ $W_h$: weights on the previous state
             $h_{t-1}$; \ $b$: bias.
       \item The \emph{same} $W_x,W_h,b$ are reused at every step --- weight sharing
-            across time.
+            across time (convolutions share weights across space; see the appendix).
     \end{itemize}
   \end{readme}
   \begin{takeaway}
@@ -992,25 +733,6 @@
   \end{takeaway}
   \islpsource{Figure 10.12}
 \end{frame}
-
-\begin{frame}{Sequence models in commercial use}
-  \begin{industry}[Insurance and banking: document and claims processing]
-    OCR plus sequence models read claims forms, invoices, contracts and KYC documents and
-    extract the fields --- claim amount, IBAN, policy number, counterparty. This is one of
-    the highest-volume commercial uses of deep learning: it decides which files clear
-    \emph{straight through} and which are routed to a human handler. A silently
-    mis-extracted amount becomes a wrong payment, so confidence thresholds and sampling
-    audits are part of the design, not an afterthought.
-  \end{industry}
-  \begin{industry}[Telco and services: speech and language]
-    Speech recognition turns call recordings into text for routing, summarising and
-    compliance checks; large language models over retrieved document embeddings answer
-    customer and internal support queries. The business case is handling time, not
-    accuracy for its own sake.
-  \end{industry}
-\end{frame}
-
-
 
 % ============================================================
 \section{Fitting}
@@ -1033,11 +755,6 @@
       \item Modern optimisers add memory: SGD${+}$momentum, Adam, RMSprop.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Operations: what training costs an organisation]
-    Behind this one line sit GPU capacity, large labelled data sets and an MLOps stack:
-    pipelines, versioning, monitoring, retraining. Projects stall on that plumbing far more
-    often than on the optimiser.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Training a network: descent and early stopping}
@@ -1060,13 +777,6 @@
       \item Architecture choice is itself a strong inductive bias.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Regulated deployment: generalising is not the only bar]
-    Where a network is used to assess creditworthiness, to screen job applicants or for a
-    medical purpose, the EU AI Act places it in the \emph{high-risk} category, with
-    documentation, logging, monitoring and human-oversight obligations. That raises the bar
-    for an opaque model: a validation team will ask not only ``does it generalise?'' but
-    ``can you show why it said this, and who reviewed it?''
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Dropout: randomly switch off units during training}
@@ -1199,7 +909,7 @@
       \item \S1, \emph{Data} --- loading \texttt{Default}, the train/test split and standardisation;
       \item \S2, \emph{PyTorch model} --- the \texttt{MLP} class, seeded with \texttt{torch.manual\_seed(1)} so the AUC below is reproducible;
       \item \S3, \emph{Training loop} --- mini-batches via \texttt{DataLoader}, then the test AUC;
-      \item \S4, \emph{Counting the parameters} --- Exercises 10.3 and 10.4 re-done in code, confirmed by PyTorch;
+      \item \S4, \emph{Counting the parameters} --- Exercise 10.3 re-done in code and confirmed by PyTorch; the convolution count (Exercise 10.4) follows in the same cell and is optional, appendix material;
       \item \S5, \emph{Does the network actually beat logistic regression?} --- the honest tabular comparison.
     \end{itemize}
     Requires \texttt{torch}; \S6, \emph{Exercises} ends the notebook with hands-on tasks.
@@ -1439,10 +1149,11 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
   \end{block}
   \begin{itemize}
     \item Single- and multilayer perceptrons.
-    \item Convolutional networks for images.
     \item Recurrent networks and transformers.
     \item Optimisation: SGD, momentum, Adam, backpropagation.
     \item Regularisation: dropout, weight decay, early stopping.
+    \item Convolutional networks for images --- in the \textbf{appendix},
+          as optional self-study.
   \end{itemize}
 \end{frame}
 
@@ -1455,8 +1166,8 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
     \item[Loss] regression $\sum_i(y_i-f(x_i))^2$; \ classification $-\sum_i\sum_k y_{ik}\log f_k(x_i)$.
     \item[Gradient descent] $\theta \leftarrow \theta-\eta\,\nabla_\theta L(\theta)$ \ (learning rate $\eta$).
     \item[Dense params] $\#\text{params}=n_{\text{in}}\,n_{\text{out}}+n_{\text{out}}$ \ (weight matrix $+$ one bias per unit).
-    \item[Conv output] size $=\big\lfloor (W-F+2P)/S\big\rfloor+1$ \ (input $W$, filter $F$, pad $P$, stride $S$).
-    \item[Conv params] $\#\text{params}=(F^2 d_{\text{in}}+1)\times(\text{\#filters})$; \ pooling has none.
+    \item[Conv output (appendix)] size $=\big\lfloor (W-F+2P)/S\big\rfloor+1$ \ (input $W$, filter $F$, pad $P$, stride $S$).
+    \item[Conv params (appendix)] $\#\text{params}=(F^2 d_{\text{in}}+1)\times(\text{\#filters})$; \ pooling has none.
   \end{description}
 \end{frame}
 
@@ -1473,7 +1184,7 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
     Adam & Adaptive per-parameter learning rates \\
     Dropout & Random unit muting during training \\
     Weight decay & $\ell_2$ penalty on weights \\
-    CNN & Conv + pool + dense layers for images \\
+    CNN & Conv + pool + dense layers for images (appendix) \\
     RNN / LSTM & Sequential models with hidden state \\
     Transformer & Self-attention based sequence model \\
     Double descent & Test-error second dip \\
@@ -1536,8 +1247,9 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
   you want the full story, or when a later chapter sends you back here.
   \begin{block}{Contents of the appendix}
     \begin{itemize}
-      \item \textbf{Gradient descent on a loss surface: the real path} --- the seeded 2-D descent figure; the learning-rate trade-off it illustrates is stated in the main deck and proved in Exercise 10.5.
-      \item \textbf{CNN architecture arithmetic (Extended Exercise 10.2)} --- shapes and parameter counts through a whole network. Exercise 10.4 does the same arithmetic for a single layer.
+      \item \textbf{Gradient descent on a loss surface: the real path} --- the seeded 2-D descent figure; the learning-rate trade-off it illustrates is proved in Exercise 10.5.
+      \item \textbf{Convolutional networks (CNNs)} --- convolution, pooling, a full architecture, and Exercise 10.4 on layer arithmetic. The ideas carry over from the MLP, so the taught session spends its time on training instead; read this block when you work with images.
+      \item \textbf{CNN architecture arithmetic (Extended Exercise 10.2)} --- shapes and parameter counts through a whole network; Exercise 10.4 above does the same for a single layer.
       \item \textbf{Transformers} --- self-attention in one slide. Outside the scope of ISLP Chapter 10; here so that the word is not a mystery.
       \item \textbf{Backpropagation} --- the chain rule that computes the gradients. Every framework does this for you; the main deck keeps what you must know --- that training is gradient descent on a loss.
       \item \textbf{Double descent} --- why very over-parameterised models can improve again past the interpolation point. A genuinely advanced topic.
@@ -1549,6 +1261,203 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
 \begin{frame}{Gradient descent on a loss surface: the real path}
   \begin{center}\includegraphics[width=0.88\textwidth,height=0.52\textheight,keepaspectratio]{ch10_x_gradient_descent.png}\end{center}
   \begin{takeaway}Each step is perpendicular to the local contour: with $\eta=0.05$ the loss falls from $27$ to $0.05$ in $25$ steps --- fast down the steep $w_2$ axis, then a crawl along the flat valley --- while the too-large $\eta=0.115$ overshoots and zigzags in the steep direction.\end{takeaway}
+\end{frame}
+
+% ------------------------------------------------------------
+% CONVOLUTIONAL NETWORKS --- moved out of the taught flow, optional self-study
+\begin{frame}{Why convolutions?}
+  Image data have local, translation-invariant structure.
+  \begin{takeaway}
+    A cat remains a cat shifted by 10 pixels. Fully-connected networks
+    ignore this and need much more data.
+  \end{takeaway}
+  \begin{readme}[Two key layer types]
+    \begin{itemize}
+      \item \textbf{Convolutional layers}: each unit looks at a small
+            patch of the input; weights are shared across positions.
+      \item \textbf{Pooling layers}: down-sample (max or average) for
+            translation tolerance.
+    \end{itemize}
+  \end{readme}
+\end{frame}
+
+\begin{frame}{The convolution operation}
+  \begin{center}
+  \begin{tikzpicture}[x=0.60cm,y=0.56cm,>={Stealth[length=2mm]},font=\small]
+    \foreach \r in {0,...,4}\foreach \c in {0,...,4}
+      \draw[fill=accent!6,draw=accent!40] (\c,-\r) rectangle ++(1,-1);
+    \draw[draw=orange!80!black,line width=1.4pt,fill=orange!18,fill opacity=0.5]
+      (0,0) rectangle (3,-3);
+    \node[font=\scriptsize,text=orange!70!black] at (1.5,0.6) {$3\times3$ kernel};
+    \node[font=\footnotesize,text=accent] at (2.5,-5.5) {input $5\times5$};
+    \begin{scope}[shift={(8.2,-1)}]
+      \foreach \r in {0,...,2}\foreach \c in {0,...,2}
+        \draw[fill=green!8,draw=green!45] (\c,-\r) rectangle ++(1,-1);
+      \draw[draw=green!55!black,line width=1.4pt,fill=green!25] (0,0) rectangle (1,-1);
+      \node[font=\footnotesize,text=green!45!black] at (1.5,-3.6) {feature map $3\times3$};
+    \end{scope}
+    \draw[->,line width=1pt,orange!70!black] (3.05,-1.5) .. controls (5.6,0.3) .. (8.2,-1.5);
+    \node[font=\scriptsize] at (5.6,0.9) {$\sum(\text{filter}\odot\text{patch})+b$};
+    \node[font=\scriptsize,text=gray] at (5.6,-6.4) {stride $=1$, valid $\Rightarrow 5-3+1=3$};
+  \end{tikzpicture}
+  \end{center}
+  \begin{takeaway}
+    Each output cell is a dot product of the shared-weight filter with a local input patch. Weight sharing plus locality make convolutional neural networks (CNNs) data-efficient for images.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Max-pooling: downsampling by local maxima}
+  \begin{center}
+  \begin{tikzpicture}[x=0.8cm,y=0.8cm,>={Stealth[length=2.4mm]},font=\small]
+    \fill[blue!12]   (0,0) rectangle (2,-2);
+    \fill[orange!14] (2,0) rectangle (4,-2);
+    \fill[green!14]  (0,-2) rectangle (2,-4);
+    \fill[purple!12] (2,-2) rectangle (4,-4);
+    \foreach \r in {0,...,3}\foreach \c in {0,...,3} \draw[black!35] (\c,-\r) rectangle ++(1,-1);
+    \foreach \c/\r/\v in {0/0/1,1/0/3,2/0/2,3/0/4, 0/1/5,1/1/6,2/1/1,3/1/2,
+                          0/2/8,1/2/2,2/2/3,3/2/0, 0/3/4,1/3/1,2/3/5,3/3/7}
+      \node at (\c+0.5,-\r-0.5) {\v};
+    \draw[blue!55!black,line width=1.1pt]   (0,0) rectangle (2,-2);
+    \draw[orange!70!black,line width=1.1pt] (2,0) rectangle (4,-2);
+    \draw[green!55!black,line width=1.1pt]  (0,-2) rectangle (2,-4);
+    \draw[purple!60!black,line width=1.1pt] (2,-2) rectangle (4,-4);
+    \node[font=\footnotesize,text=accent] at (2,-4.55) {input $4\times4$, \ $2\times2$ windows, stride $2$};
+    \draw[->,line width=1pt,gray] (4.4,-2) -- (6.2,-2);
+    \node[font=\scriptsize,text=gray] at (5.3,-1.5) {take max};
+    \begin{scope}[shift={(6.7,-0.5)}]
+      \fill[blue!12]   (0,0) rectangle (1,-1);
+      \fill[orange!14] (1,0) rectangle (2,-1);
+      \fill[green!14]  (0,-1) rectangle (1,-2);
+      \fill[purple!12] (1,-1) rectangle (2,-2);
+      \foreach \c in {0,1}\foreach \r in {0,1}\draw[black!45] (\c,-\r) rectangle ++(1,-1);
+      \node at (0.5,-0.5){6}; \node at (1.5,-0.5){4};
+      \node at (0.5,-1.5){8}; \node at (1.5,-1.5){7};
+      \node[font=\footnotesize,text=green!45!black] at (1,-2.55) {feature map $2\times2$};
+    \end{scope}
+  \end{tikzpicture}
+  \end{center}
+  \begin{takeaway}
+    Each outlined $2\times2$ window is replaced by its maximum, shrinking $H,W$ by the stride
+    while keeping the depth. This buys small-shift tolerance and cuts computation ---
+    and pooling has \emph{no} trainable parameters.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{A simple CNN architecture}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth,height=0.52\textheight,keepaspectratio]{10_8.pdf}
+  \end{center}
+  \begin{takeaway}
+    The pattern repeats: convolutions extract local features, pooling shrinks the
+    maps, and a final dense layer classifies. Early layers learn edges; deeper
+    layers assemble them into whole objects.
+  \end{takeaway}
+  \islpsource{Figure 10.8}
+\end{frame}
+
+\begin{frame}{Modern CNN tricks}
+  \begin{itemize}
+    \item \textbf{Batch normalisation}: re-centre and scale each layer's inputs per
+          mini-batch --- stabilises and speeds up training.
+    \item \textbf{Dropout}: randomly switch off units so the net cannot rely on any
+          single one (detailed in the Fitting section).
+    \item \textbf{Data augmentation}: random crops, flips, colour jitter --- free
+          extra ``images'' that teach invariance.
+    \item \textbf{Skip / residual connections} (ResNet): let gradients bypass layers,
+          enabling very deep networks.
+    \item \textbf{Transfer learning}: reuse features pretrained on ImageNet, then
+          fine-tune on your (smaller) task.
+  \end{itemize}
+  \begin{takeaway}
+    These tricks turned CNNs from finicky to reliable. Most are cheap to add and
+    mainly improve \emph{generalisation}.
+  \end{takeaway}
+\end{frame}
+
+
+% ------------------------------------------------------------
+\begin{frame}{Exercise 10.4 --- CNN layer arithmetic [Math]}
+\begin{exercise}
+  A colour image of size $32 \times 32 \times 3$ is fed to a
+  convolutional layer with $16$ filters, each $5 \times 5$, stride
+  $1$, no padding (``valid''). Recall the spatial-size formula
+  \[
+    O = \left\lfloor\frac{W - F + 2P}{S}\right\rfloor + 1 .
+  \]
+  \begin{enumerate}
+    \item Compute the output volume (height, width, depth) of the
+          conv layer.
+    \item Compute the number of trainable parameters in the conv layer
+          (include biases).
+    \item A $2 \times 2$ max-pooling layer (stride $2$) follows. What
+          is its output volume and how many parameters does it add?
+    \item Redo part (1) if instead padding $P = 2$ (``same'') is used.
+  \end{enumerate}
+\end{exercise}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 10.4 (1/2)}
+\begin{solutionbox}
+  \textbf{Part 1 --- conv output.} With $W = 32$, $F = 5$, $P = 0$,
+  $S = 1$:
+  \[
+    O = \frac{32 - 5 + 0}{1} + 1 = 28 .
+  \]
+  Each filter slides over the image and produces \emph{one} $28 \times 28$
+  feature map, so depth $=$ number of filters: the output volume is
+  $28 \times 28 \times 16$.
+
+  \medskip
+  \textbf{Part 2 --- conv parameters.} Each filter spans the full
+  input depth: $5 \times 5 \times 3 = 75$ weights, $+1$ bias $= 76$
+  per filter. With $16$ filters:
+  \[
+    16 \times 76 = \boxed{1216} \text{ parameters.}
+  \]
+  \emph{Why so few?} A dense layer from the $32 \times 32 \times 3 = 3072$
+  inputs to the same $28 \times 28 \times 16 = 12\,544$ outputs would need
+  $3072 \times 12\,544 + 12\,544 \approx 38.5$ million parameters --- weight
+  sharing cuts that by a factor of about $30\,000$.
+\end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Exercise 10.4 (2/2)}
+\begin{solutionbox}
+  \textbf{Part 3 --- pooling.} Max-pooling with $F = 2$, $S = 2$:
+  \[
+    O = \frac{28 - 2}{2} + 1 = 14 ,
+  \]
+  giving $14 \times 14 \times 16$: pooling acts on each of the $16$ channels
+  separately, so depth is preserved. It has \textbf{no} trainable
+  parameters --- it only takes a maximum.
+
+  \medskip
+  \textbf{Part 4 --- with padding $P = 2$.}
+  \[
+    O = \frac{32 - 5 + 2(2)}{1} + 1 = \frac{31}{1} + 1 = 32 .
+  \]
+  Output $32 \times 32 \times 16$: ``same'' padding preserves the
+  spatial size. In general, stride-$1$ ``same'' padding takes
+  $P = (F-1)/2$ --- here $(5-1)/2 = 2$ --- so conv layers can be stacked
+  without shrinking the maps.
+
+  \medskip
+  \textit{Common mistake: adding a $+2P$ term for the pooling layer (it uses
+  $P = 0$) or forgetting to divide by the stride \emph{before} adding $1$.}
+\end{solutionbox}
+\end{frame}
+
+
+\begin{frame}{Why convolution wins: the parameter count, drawn}
+  \begin{center}
+    \includegraphics[width=0.76\textwidth,height=0.54\textheight,keepaspectratio]{ch10_conv_vs_dense.png}
+  \end{center}
+  \begin{takeaway}
+    Exercise 10.4 as a curve. The dense layer's cost grows with the
+    \emph{fourth power} of the image side; the convolution stays at $1\,216$
+    parameters at every size, because the same $5\times5$ filters slide
+    everywhere. Weight sharing, not depth, is what makes images tractable.
+  \end{takeaway}
 \end{frame}
 
 % ------------------------------------------------------------

@@ -24,7 +24,7 @@ them; `torch` is preinstalled on Colab), and resolves the data automatically —
 four the package does not ship (`Advertising`, `Heart`, `Income1`, `Income2`)
 stream from the book's official site.
 
-One-click links for all twelve notebooks are on the
+One-click links for all eleven notebooks are on the
 [Lab notebooks](labs.md) page.
 
 ```{tip}

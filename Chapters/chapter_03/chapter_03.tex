@@ -115,12 +115,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use.
-% The title always prints the words "In industry", so the box does not rely on its
-% tint alone; every call passes an explicit title, so the default is never used.
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -149,12 +143,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -357,56 +350,14 @@
     \midrule
     Consumer goods, retail & Marketing mix modelling: weekly sales on spend per channel, price, promotion, seasonality & How to split the annual media budget across channels \\
     Real estate, mortgage lending & Hedonic pricing / automated valuation: price on floor area, rooms, age, location & What to list the property at, and how much to lend against it \\
-    Asset management & Factor models: excess return on market, size and value factors & How much of the market move to hedge away \\
-    Energy, utilities & Load forecasting: demand on temperature, day type, calendar effects & How much power to buy day-ahead, and what to bid \\
     HR, legal & Pay-equity audit: log salary on grade, tenure, location \emph{plus} a group indicator & Which pay adjustments the board signs off \\
-    Manufacturing & Yield or quality on process settings: temperature, pressure, feed rate & Which setting to change, and by how much \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \vspace{2pt}
-  \begin{industry}[The common thread]
-    In all six, the \emph{coefficient} is the deliverable --- not the
-    prediction. Someone has to defend that number in a meeting, which is
-    why standard errors, intervals and diagnostics matter as much as the fit.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: marketing mix modelling (MMM)}
-  \footnotesize
-  \begin{columns}[T]
-    \begin{column}{0.49\textwidth}
-      \begin{industry}[The model an agency actually fits]
-        \begin{itemize}\setlength{\itemsep}{0pt}
-          \item Response: weekly $\log$(sales) per brand and region;
-                $n$ is a few hundred brand--weeks.
-          \item Predictors: spend per channel (TV, digital, print,
-                in-store), price index, promotion depth, distribution
-                coverage, month dummies.
-        \end{itemize}
-      \end{industry}
-    \end{column}
-    \begin{column}{0.49\textwidth}
-      \begin{readme}[What it is used for --- and who signs off]
-        Each channel coefficient is read as a contribution and an
-        elasticity, then aggregated into a decomposition of the year's
-        sales --- the starting point for next year's budget split,
-        signed off by the CMO with finance and re-fitted quarterly.
-        Its reader is the brand manager whose channel budget it moves.
-      \end{readme}
-    \end{column}
-  \end{columns}
-  \vspace{-1mm}
-  \begin{industry}[Every diagnostic in this chapter shows up here]
-    Channels are flighted together, so spend variables are collinear (VIF);
-    spend has diminishing returns, so log terms are needed; promotional weeks
-    are high-leverage points; error spread grows with the sales level.
-  \end{industry}
-  \vspace{-2mm}
-  \begin{takeaway}[The honest caveat]
-    MMM estimates \emph{association}, so turning a coefficient
-    into a budget decision is a judgement --- good teams cross-check it
-    against geo experiments or holdout regions.
+  \begin{takeaway}[All three deliver a coefficient --- not a prediction]
+    Nobody in these rows wants a forecast: they want one number, read off one
+    predictor, that someone then has to defend in a meeting. That is why
+    standard errors, intervals and diagnostics matter here as much as the fit.
   \end{takeaway}
 \end{frame}
 
@@ -805,11 +756,9 @@
     between $42$ and $53$ extra units of sales, with $95\,\%$
     confidence.
   \end{numexample}
-  \begin{industry}[Marketing: what the controller actually asks for]
-    Before signing off a budget shift, finance asks for the \emph{interval},
-    not the point estimate: it shows whether the channel's payback is
-    comfortably positive or could plausibly be zero.
-  \end{industry}
+  The interval, not the point estimate, is what a controller asks for before
+  signing off a budget shift: it shows whether the channel's payback is
+  comfortably positive or could plausibly be zero.
 \end{frame}
 
 \begin{frame}{A picture of the 95\% confidence interval}
@@ -1042,11 +991,9 @@
       \item there is \emph{no signal} to be found.
     \end{itemize}
   \end{alertblock}
-  \begin{industry}[Asset management: factor models]
-    Regress a fund's excess return on market, size and value factors: $R^2$
-    is the share of its movement explained by known factors --- the rest is
-    what the manager charges for.
-  \end{industry}
+  A factor model makes the second point concrete: regress a fund's excess return
+  on market, size and value factors and $R^2$ is the share of its movement
+  explained by known factors --- the rest is what the manager charges for.
 \end{frame}
 
 
@@ -1700,12 +1647,10 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit; did slopes move?
     predictors fixed. Either level can serve as baseline; only the
     sign of $\hat\beta_j$ flips.
   \end{readme}
-  \begin{industry}[HR and legal: the adjusted pay gap]
-    Pay-equity audits regress $\log$(salary) on job grade, tenure,
-    performance and location \emph{plus} a protected-group dummy. That single
-    coefficient --- the gap remaining after the legitimate factors are held
-    fixed --- is the number HR and legal report to the board.
-  \end{industry}
+  The adjusted pay gap is exactly this coefficient: regress $\log$(salary) on
+  job grade, tenure, performance and location \emph{plus} a protected-group
+  dummy, and the dummy's coefficient is the gap that survives once the
+  legitimate factors are held fixed.
 \end{frame}
 
 \begin{frame}{$K$ levels: use $K-1$ dummies}
@@ -1811,11 +1756,9 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit; did slopes move?
     The slope in $X_1$ now depends on $X_2$ --- exactly the synergy we
     wanted to model.
   \end{readme}
-  \begin{industry}[Retail: price $\times$ promotion]
-    Price elasticity is not one number --- shoppers react far more strongly
-    to a cut that is also displayed. Pricing teams model
-    price $\times$ promotion, media teams TV $\times$ digital.
-  \end{industry}
+  Price elasticity is the standard example: it is not one number, because
+  shoppers react far more strongly to a cut that is also displayed. Hence
+  price $\times$ promotion in pricing models, TV $\times$ digital in media ones.
 \end{frame}
 
 \begin{frame}{Interaction, drawn: one slope bends with the other predictor}
@@ -2423,12 +2366,11 @@ print("outliers:", outliers)              # 11 tracts, max |stud| = 4.0
     classical symptoms.
   \end{takeaway}
   Curiously, predictions are usually fine; only the inferential
-  interpretation of individual coefficients is corrupted.
-  \begin{industry}[Marketing mix modelling: channels move together]
-    Campaign weeks raise TV, digital and in-store spend at once, so channel
-    coefficients are barely identified: one turns negative, the next refresh
-    flips it back. Check VIFs before anyone reallocates budget on them.
-  \end{industry}
+  interpretation of individual coefficients is corrupted. Marketing mix models
+  are the classic casualty: campaign weeks raise TV, digital and in-store spend
+  at once, so channel coefficients are barely identified --- one turns negative,
+  and the next refresh flips it back. Check the VIFs before anyone reallocates
+  a budget on them.
 \end{frame}
 
 \begin{frame}{Collinearity, seen: two predictors that move together}

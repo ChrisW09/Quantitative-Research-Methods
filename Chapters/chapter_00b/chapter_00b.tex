@@ -78,10 +78,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -108,12 +104,11 @@
     \rowcolor{black!3} {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
      {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-     {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize The precourse is taught in one 180-minute session drawing on both decks, before Chapter 1; the ten chapter decks follow. It assumes nothing beyond an introductory undergraduate course. Today's session is highlighted.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize The precourse is taught in one 180-minute session drawing on both decks, before Chapter 1; the nine chapter decks follow. It assumes nothing beyond an introductory undergraduate course. Today's session is highlighted.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 \begin{frame}{Contents}
@@ -214,51 +209,14 @@
       How far a price is allowed to move \\
     Insurance & Frequency and severity models fitted by maximum likelihood &
       The technical premium quoted for a policy \\
-    Finance & Continuously compounded log returns; CAGR &
-      What gets reported as performance and volatility \\
-    Telco, SaaS & Retention curves that decay roughly exponentially &
-      How much may be spent to acquire a customer \\
-    Operations, call centres & Arrival counts and service times fitted by
-      Poisson and exponential likelihoods &
-      Staffing levels set for each interval \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
+  \begin{takeaway}[All three are linear on a scale nobody decides on]
     In each row the model is linear on a \emph{transformed} scale --- log,
-    log-odds --- and someone must transform back before the number is used.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: price elasticity of demand}
-  \footnotesize
-  A retailer or an airline needs one number: how much volume a price rise costs.
-  \vspace{-6pt}
-  \begin{industry}[The model]
-    \textbf{Response}: $\log(\text{units sold})$, per product and week.
-    \textbf{Predictors}: $\log(\text{price})$ plus controls --- a promotion
-    flag, seasonality, a competitor price index, the channel.
-    \textbf{Why both sides are logged}: the slope of a $\log$--$\log$
-    regression \emph{is} the elasticity --- read straight off the output,
-    nothing to transform back.
-  \end{industry}
-  \vspace{-6pt}
-  \begin{numexample}[Illustrative]
-    An estimated $\beta_1 \approx -1.8$ says a $1\%$ price rise costs about
-    $1.8\%$ of volume. For a bigger move the multiplicative form is the honest
-    one: a $10\%$ price cut lifts volume by $0.9^{-1.8}-1 \approx 21\%$ (not
-    $18\%$), so revenue \emph{rises}. Comparing $|\beta_1|$ with $1$ is the
-    whole calculation: above $1$ demand is elastic and a price rise loses
-    revenue; below $1$ it gains.
-  \end{numexample}
-  \vspace{-6pt}
-  \begin{takeaway}[Who signs off --- and the honest caveat]
-    Pricing or category management own the list price, promotion depth and
-    fare-class prices; finance checks the margin. The number itself lands with
-    the category manager setting next season's price ladder. Caveat: past prices were cut
-    \emph{because} demand was weak, so the estimate is confounded unless it
-    comes from experiments or genuinely exogenous price moves --- and never
-    extrapolate to a price never tried.
+    log-odds --- while the decision is taken on the original one. Someone must
+    transform back before the number is used, and that step is where the
+    mistakes happen.
   \end{takeaway}
 \end{frame}
 
@@ -459,7 +417,8 @@
             (Section after that.)
       \item \textbf{Tames skew and turns effects into percentages.} A right tail
             is compressed, and a coefficient on $\log y$ reads as a
-            \emph{relative} change.
+            \emph{relative} change --- in a $\log$--$\log$ demand model the
+            slope \emph{is} the price elasticity.
     \end{enumerate}
   \end{takeaway}
   \begin{numexample}[Numerical underflow --- the practical reason]
@@ -468,10 +427,6 @@
     number a computer can store; at $n = 2000$ it underflows to zero and every
     model looks equally good. Its log $\approx -693$ is perfectly ordinary.
   \end{numexample}
-  \begin{industry}[Finance and pricing: why logs are everywhere]\scriptsize
-    Log returns add up over time; and in a $\log$--$\log$ demand model the slope
-    \emph{is} the price elasticity.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{A log scale can straighten a relationship}
@@ -688,18 +643,13 @@
 
 \begin{frame}{Maximum likelihood outside the classroom}
   \footnotesize
-  \begin{industry}[Insurance and banking: pricing models]
-    Claim frequency and severity models, probability-of-default models and
-    demand models are nearly all fitted by maximum likelihood rather than least
-    squares --- because the response is a count, a $0/1$ event, or a skewed
-    positive amount, and none of those has normal errors.
-  \end{industry}
-  \begin{industry}[Telco and software: exponential decay]
-    Retention curves fall away roughly exponentially, so the log of the share
-    still active is close to linear in time. Fitting on that scale gives the
-    expected customer lifetime that acquisition budgets and lifetime-value
-    figures rest on.
-  \end{industry}
+  Least squares is the special case, not the rule. Claim frequency and severity
+  models, probability-of-default models and demand models are nearly all fitted
+  by maximum likelihood instead --- because the response is a count, a $0/1$
+  event, or a skewed positive amount, and none of those has normal errors.
+  Durations behave the same way: a retention curve falls away roughly
+  exponentially, so the log of the share still active is close to linear in
+  time, and fitting on that scale returns the expected customer lifetime.
   \begin{takeaway}[What one principle buys]
     The same estimation idea covers continuous responses, classes, counts and
     durations --- which is why Chapters~4, 6 and~10 all report a
@@ -1105,7 +1055,7 @@ for degree in range(1, 6):                  # now all five degrees
     \textbf{Topic from this session} & \textbf{Comes back in} \\
     \midrule
     $\sum$, $\prod$, $\arg\min$, $I(\cdot)$ & every chapter; RSS and error rates from Ch.\ 2 \\
-    Sets and $|\mathcal{S}|$ & Ch.\ 8 (tree regions), Ch.\ 12 (clusters) \\
+    Sets and $|\mathcal{S}|$ & Ch.\ 8 (tree regions), Ch.\ 12 clusters (Advanced) \\
     Logs and exponentials & Ch.\ 3 (logged responses), Ch.\ 4, Ch.\ 10 \\
     Odds, logits, the sigmoid & Ch.\ 4 (logistic regression), Ch.\ 10 (activations) \\
     Likelihood and log-likelihood & Ch.\ 4 (fitting), Ch.\ 6 (AIC, BIC) \\
@@ -1220,12 +1170,9 @@ for degree in range(1, 6):                  # now all five degrees
   log-odds ($-\infty$ to $\infty$), and the logistic function
   $\sigma(z) = 1/(1+e^{-z})$ carries them back. Because $\sigma$ can never
   leave $(0,1)$, \emph{any} number a linear model produces becomes a legal
-  probability.
-  \begin{industry}[Betting and insurance: odds are not probabilities]\scriptsize
-    A bookmaker's price is odds; converting back gives implied probabilities
-    that sum to more than one --- the margin. Read odds as probabilities and
-    you misprice the risk.
-  \end{industry}
+  probability. Read the picture right to left and you have the standing warning
+  about odds: they are not probabilities, and converting a full set back gives
+  numbers that sum to more than one.
 \end{frame}
 
 \begin{frame}{Least squares is maximum likelihood in disguise}

@@ -41,7 +41,7 @@ precourse.
 ## The precourse session, and the skip rule
 
 **The precourse is taught.** It opens the semester as a single 180-minute
-session drawing on both precourse decks, because the thirteen chapter decks use
+session drawing on both precourse decks, because the eleven chapter decks use
 all of this material and explain none of it.
 
 One session cannot cover both decks — together they run to 157 slides — so the
@@ -86,7 +86,7 @@ session gets you started on it, and the decks are there to finish the job.
 ## Running the labs
 
 **Day one: use [Google Colab](quickstart.md).** Every notebook has a Colab badge
-in its first cell, and one-click links for all twelve are on the
+in its first cell, and one-click links for all eleven are on the
 [Lab notebooks](labs.md) page. There is nothing to install: the first cell
 detects Colab, adds the few packages that are missing, and loads the data for
 you. A Google account is all you need. Colab runs every lab in the course,
@@ -101,7 +101,7 @@ what is pinned and why the download is so large.
 
 ## How the labs relate to the lectures
 
-Every chapter has **one deck and one notebook** — twelve of each, the two
+Every chapter has **one deck and one notebook** — eleven of each, the two
 precourse sessions included — and they are written as a pair:
 
 - the deck moves motivation → intuition → definition → worked example, and drops
@@ -112,9 +112,10 @@ precourse sessions included — and they are written as a pair:
 - every exercise *inside* a deck is followed immediately by its own full
   solution slide, so you are never stuck on a prompt with nowhere to go.
 
-That holds for **every taught chapter**, and for the three chapters that now sit
+That holds for **every taught chapter**, and for the four chapters that now sit
 outside the sequence as [advanced modules](advanced.md) — support vector
-machines (Ch 9), survival analysis (Ch 11) and multiple testing (Ch 13). Each
+machines (Ch 9), survival analysis (Ch 11), unsupervised learning (Ch 12) and
+multiple testing (Ch 13). Each
 has its own deck, and each lab closes with worked solutions. There is no chapter
 in the course you are expected to teach yourself from the book alone.
 
@@ -162,7 +163,7 @@ worked solution behind it.
 | Material | Solutions |
 |---|---|
 | Exercises inside a deck | **Yes, immediately** — the next slide is always the worked solution, including in the appendices |
-| The twelve lab notebooks | **Yes, every one** — each ends in a *Lecture exercises — worked Python solutions* section |
+| The eleven lab notebooks | **Yes, every one** — each ends in a *Lecture exercises — worked Python solutions* section |
 | Mock exams and short exams | **Yes — handed out together with the paper**; the papers themselves are not published here, see below |
 
 The practice papers come **with their worked solutions**, distributed at the
@@ -250,7 +251,7 @@ released once the material it needs has been taught:
 | B | after Ch 5 | Cross-validation and the bootstrap (Ch 5) |
 | C | after Ch 6 | Ridge and the lasso (Ch 6) |
 | D | after Ch 8 | Trees: Gini, splitting, pruning, forests (Ch 8) |
-| E | end of course | Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md)) |
+| E | after Ch 10 | Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md)) |
 
 The first two problems of each paper reach back to earlier chapters, so a short
 exam is a cumulative check on everything up to that point rather than a test of
@@ -267,5 +268,5 @@ papers themselves come from your lecturer.
 - [Quick start](quickstart.md) — Colab in one click, and the local install for later.
 - [The course at a glance](course.md) — the ten-chapter plan and the assessment calendar.
 - [Lecture slides](slides.md) — every deck, what it covers, and what is in its appendix.
-- [Lab notebooks](labs.md) — all twelve notebooks, rendered in full.
+- [Lab notebooks](labs.md) — all eleven notebooks, rendered in full.
 - [Mock exams](exams.md) — the eight practice papers and what each covers.

@@ -1,14 +1,15 @@
-"""Generate the matplotlib figures for the Chapter 12 deck (Unsupervised Learning).
+"""Generate the matplotlib figures for advanced module A8 (Unsupervised Learning).
 
 Every figure is computed from the bundled course datasets (``USArrests.csv``,
 ``Ch12Ex13.csv``) or from a clearly labelled, seeded simulation --- nothing is
 sketched by hand, and every number quoted on a slide comes out of this file.
 Run from anywhere:
 
-    python Chapters/chapter_12/make_figures.py
+    python Chapters/Advanced/advanced_08_unsupervised/make_figures.py
 
-Output: Chapters/chapter_12/images/ch12_*.png at 150 dpi, matching the figure
-size and resolution used by the other decks.
+Output: Chapters/Advanced/advanced_08_unsupervised/images/ch12_*.png at 150 dpi
+(the ``ch12`` prefix is the book chapter, kept as the other modules keep theirs),
+matching the figure size and resolution used by the other decks.
 """
 
 from pathlib import Path
@@ -27,7 +28,7 @@ from sklearn.metrics import adjusted_rand_score, silhouette_score
 from sklearn.preprocessing import StandardScaler
 
 HERE = Path(__file__).parent
-ROOT = HERE.parents[1]
+ROOT = HERE.parents[2]
 DATA = ROOT / "ALL CSV FILES - 2nd Edition"
 OUT = HERE / "images"
 OUT.mkdir(parents=True, exist_ok=True)

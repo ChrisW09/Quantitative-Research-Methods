@@ -22,7 +22,7 @@ shape.
 │   │   ├── chapter_NN_lab.ipynb     #   companion lab, with stored outputs
 │   │   ├── images/                  #   matplotlib figures used by the deck
 │   │   └── make_figures.py          #   regenerates them, where a deck ships one
-│   └── Advanced/                    #   seven optional self-study modules, same shape
+│   └── Advanced/                    #   eight optional self-study modules, same shape
 │       ├── README.md
 │       ├── STYLE_DECK.md            #   the house style, distilled, for a new module
 │       ├── STYLE_NOTEBOOK.md
@@ -39,7 +39,7 @@ shape.
 │       ├── project_N_starter.ipynb  #   Colab-ready scaffolding
 │       └── SOLUTION_NOTES.md        #   expected findings, the trap, marking guide
 ├── Teaching_Guide/                  # instructor kit: plan, index, checklist, handouts
-│   ├── semester_plan.md             #   the thirteen sessions on one page
+│   ├── semester_plan.md             #   the twelve sessions on one page
 │   ├── slide_index.md               #   generated: sections, exercises, page numbers
 │   ├── before_class.md              #   the ten-minute pre-lecture checklist
 │   ├── runsheets/                   #   lecture_NN.md + module_aN_*.md — git-ignored (assessment)
@@ -98,6 +98,6 @@ make them useless as assessment.
 
 - [`Chapters/README.md`](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/README.md)
   — the deck guide, with per-chapter exercise counts, the contents of each
-  deck's appendix, and the full 13-session plan.
+  deck's appendix, and the full 12-session plan.
 - [Teaching it](teaching.md) — the instructor kit and the `make` targets.
 - [Building the docs](building-docs.md) — how this site is assembled.

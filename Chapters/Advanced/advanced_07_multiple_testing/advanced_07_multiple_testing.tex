@@ -67,10 +67,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -184,45 +180,14 @@
       Whether a confirmatory claim can go on the label \\
     Genomics & Millions of variants in a genome-wide association study &
       Which variants are reported as hits \\
-    Asset management & Hundreds of backtested strategy variants on one price history &
-      Which strategy gets capital \\
-    Marketing & Dozens of creatives, offers and CRM segments tested at once &
-      Which offer is rolled out, not which looked best \\
-    Banking, insurance & Model-risk fairness and drift tests across many subgroups and
-      metrics & Which gaps are real enough to act on \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    The bar for ``significant'' is set by the number of tests you \emph{ran}, not the number
-    you \emph{report}. Genomics even has a standing constant for it: the genome-wide
-    threshold $5\times10^{-8}$ is Bonferroni at roughly a million effectively independent
-    tests.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: an online experimentation platform}
-  \footnotesize
-  \begin{industry}[The family of tests inside one A/B test]
-    One experiment carries \textbf{one primary metric} (say revenue per visitor), a panel of
-    \textbf{secondary metrics} (conversion, basket size, retention), a set of
-    \textbf{guardrail metrics} (latency, crash rate, unsubscribes) and automatic
-    \textbf{segment} breakdowns by country, device and tenure. The statistic per metric is a
-    difference in means with its $p$-value --- so the family is easily $m>100$.
-  \end{industry}
-  \begin{readme}[The rule the platform enforces and who signs off]
-    The primary metric is \emph{pre-registered} and decides ship / no-ship at the
-    conventional level; the secondary panel gets BH-style FDR control; segment findings are
-    labelled \textbf{exploratory} and become hypotheses for the next test. The experiment
-    owner proposes, a launch review with product and data science approves. The number lands
-    on the \textbf{product owner}, who must defend the call and explain why a segment win is
-    only exploratory.
-  \end{readme}
-  \begin{takeaway}[Two honest caveats]
-    Repeated \emph{peeking} at a running test is the same problem in the time dimension ---
-    hence fixed horizons or sequential (``always-valid'') procedures. And metrics within one
-    experiment are strongly correlated, so BH's positive-dependence assumption is an
-    approximation, not a guarantee.
+  \begin{takeaway}[{{The bar is set by the tests you ran, not the ones you report}}]
+    In all three the number of hypotheses is fixed \emph{before} anyone looks at a
+    $p$-value, and the threshold moves with it. Genomics has even frozen the arithmetic
+    into a standing constant: the genome-wide threshold $5\times10^{-8}$ is Bonferroni at
+    roughly a million effectively independent tests.
   \end{takeaway}
 \end{frame}
 
@@ -241,12 +206,11 @@
       \item Naive thresholding fails dramatically.
     \end{itemize}
   \end{numexample}
-  \begin{industry}[Technology: why ``some metric always wins'']
-    A firm running thousands of experiments a year, each scored on dozens of metrics and
-    segments, faces exactly this arithmetic: without control, \emph{something} looks
-    significant in every test. That is how a change with no real effect gets shipped to
-    every user.
-  \end{industry}
+  \begin{takeaway}[{{Why ``some metric always wins''}}]
+    Score one experiment on dozens of metrics and segments and this arithmetic guarantees
+    that \emph{something} comes back significant --- every time, whether or not the change
+    does anything. That is the mechanism by which a null change gets shipped to every user.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Why the family-wise error rate explodes}
@@ -294,13 +258,11 @@
       \item Family-wise error rate (FWER): $\Pr(V \ge 1)$.
       \item False discovery rate (FDR): $E[V/R \mid R > 0]\Pr(R > 0)$.
       \item Power: $E[S]/m_1$.
+      \item Read it as an alert queue and the letters become staffing: $R$ is the alerts
+            raised, $V$ those that waste an investigator's day, $V/R$ the false-positive
+            rate operations argues about, and $T$ the fraud nobody ever sees.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Fraud and AML: the table is an alert queue]
-    In a monitoring team $R$ is the alerts raised, $V$ those that waste an investigator's
-    day, $V/R$ the false-positive rate operations argues about, and $T$ the missed fraud
-    nobody sees.
-  \end{industry}
 \end{frame}
 
 
@@ -595,6 +557,7 @@
 \end{frame}
 
 \begin{frame}{FDR vs.\ FWER: which to use?}
+  \footnotesize
   \begin{readme}
     \begin{itemize}
       \item Use \textbf{FWER} when even one false discovery is
@@ -606,15 +569,13 @@
             large and a non-trivial fraction of nulls are false.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Governance: FWER or FDR?]
-    Use \textbf{FWER} when a single false claim is expensive and public: a drug label, a
-    regulatory filing, a change shipped to every user. Use \textbf{FDR} when the output is a
-    \emph{ranked shortlist for further investigation} --- candidate biomarkers, leads for a
-    fraud team, hypotheses for the next experiment --- and a known fraction of false leads
-    is an acceptable cost of doing business. Regulators expect the first: FDA guidance on
-    multiple endpoints requires a \emph{pre-specified} multiplicity strategy for any
-    confirmatory claim, and an unadjusted subgroup finding does not support a label claim.
-  \end{industry}
+  \begin{takeaway}[{{Ask what the output is for}}]
+    A false claim that is expensive and \emph{public} --- a drug label, a filing, a change
+    shipped to every user --- calls for FWER. A \emph{ranked shortlist for further
+    investigation} calls for FDR, because a known fraction of false leads is an acceptable
+    cost of doing business. Where it is regulated the choice is not yours: FDA guidance on
+    multiple endpoints requires a \emph{pre-specified} multiplicity strategy.
+  \end{takeaway}
 \end{frame}
 
 
@@ -834,15 +795,12 @@
   \begin{takeaway}
     Multiple-testing correction must include \emph{every} test you
     ran, not only the ones you report. Pre-register hypotheses where
-    possible; out-of-sample replication is the gold standard.
+    possible; out-of-sample replication is the gold standard. Backtesting hundreds of
+    strategy variants on one price history is the same failure wearing a different hat:
+    an impressive Sharpe ratio arrives by chance, which is why practitioners deflate
+    reported performance for the number of trials and demand out-of-time evidence before
+    allocating capital.
   \end{takeaway}
-  \begin{industry}[Quantitative finance: backtest overfitting]
-    Backtesting hundreds of strategy variants on the same price history guarantees an
-    impressive Sharpe ratio by chance. Practitioners call this data snooping, deflate the
-    reported performance for the number of trials, and insist on out-of-sample and
-    out-of-time evidence before allocating capital --- the Chapter~5 lesson, restated as a
-    multiplicity problem.
-  \end{industry}
 \end{frame}
 
 

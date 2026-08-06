@@ -75,10 +75,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -104,12 +100,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -205,40 +200,16 @@
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Telco, SaaS & Churn score per subscriber & A \emph{ranking}: who gets a retention offer \\
-    Retail & Weekly demand forecast per article and store & The order quantity, and the spread that sets safety stock \\
+    Telco, SaaS & Churn score per subscriber: a pure prediction problem, and nobody asks the model why & A \emph{ranking}: who gets a retention offer \\
     Pricing & Price elasticity estimated for a coefficient, not a ranking & The list price a manager sets \\
-    E-commerce & Item--item nearest neighbours (``customers who bought this'') & The products shown next to the basket \\
-    Marketing & Lookalike audiences: nearest neighbours of known good customers & Whom a campaign is targeted at \\
-    Payments, compliance & Nearest-neighbour matching for duplicates, entity resolution, fraud triage & Which cases a human reviewer sees \\
+    E-commerce & Item--item nearest neighbours (``customers who bought this'') --- this chapter's own method, run at scale & The products shown next to the basket \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Before picking a method, each row answers two questions from this chapter: do we need a
-    \emph{rank} or a \emph{coefficient}, and how much of the variation is irreducible?
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: an item-to-item recommender}
-  \footnotesize
-  \begin{industry}[The learning problem: this chapter's own method]
-    There is no coefficient to estimate: the ``model'' is a \emph{nearest-neighbour lookup} in
-    a similarity space built from co-purchase and co-view behaviour, or from learned item
-    embeddings. $K$ is simply how many neighbours are retrieved for the item on the page.
-  \end{industry}
-  \begin{readme}[The fitted output --- and who signs it off]
-    A \emph{ranked slate} of items, which fills the recommendation module on the product page
-    or the home screen. Only the ordering matters --- nothing in this model is interpretable,
-    and nobody asks it to be. Merchandising and personalisation own the module, and the
-    slate is judged by the category merchandiser who carries its revenue target --- whose
-    challenge is almost always ``why is my range never shown?''.
-  \end{readme}
-  \begin{takeaway}[Honest caveats]
-    Wide sparse behaviour vectors put the curse of dimensionality centre stage --- hence
-    embeddings and approximate nearest-neighbour search in production. Add popularity bias,
-    cold start for new items, and a feedback loop: showing an item creates the very co-view
-    data the next model trains on.
+  \begin{takeaway}[All three answer ``rank or coefficient?'' before choosing a method]
+    Row one needs only an ordering, row two needs a number a person can act on, and row
+    three needs neighbours in a sensible distance. The method follows from that answer ---
+    together with how much of the variation is irreducible whatever we fit.
   \end{takeaway}
 \end{frame}
 
@@ -390,12 +361,9 @@
       \item Random forests or neural networks are perfectly fine here.
     \end{itemize}
   \end{numexample}
-  \begin{industry}[Telco and SaaS: churn scoring]
-    A churn model only has to \emph{rank} subscribers well: the retention team calls the top
-    few per cent, and nobody asks why a customer is on the list --- so a black box is
-    acceptable. Rank badly and the discount budget goes to customers who would have stayed
-    anyway.
-  \end{industry}
+  A churn score has exactly this shape: the retention team calls the top few per cent, so
+  only the \emph{ranking} matters and a black box is acceptable. Rank badly and the discount
+  budget goes to customers who would have stayed anyway.
 \end{frame}
 
 \begin{frame}{Worked example: inference goal}
@@ -411,11 +379,9 @@
             nothing about the magnitude of effects.
     \end{itemize}
   \end{numexample}
-  \begin{industry}[Pricing and pay equity: the coefficient \emph{is} the deliverable]
-    A price-elasticity model must hand over a signed, quantified effect --- ``a $1\,\%$ price
-    rise costs us this much volume'' --- because a person sets the price from it. A pay-equity
-    review is the same: only a model whose structure can be reviewed answers it.
-  \end{industry}
+  A price-elasticity model is the same shape of question: it must hand over a signed,
+  quantified effect --- ``a $1\,\%$ price rise costs us this much volume'' --- because a
+  person sets the price from it. Here the coefficient \emph{is} the deliverable.
 \end{frame}
 
 
@@ -759,8 +725,9 @@ depends on the data and the goal --- ``more flexible'' is not
     \end{column}
   \end{columns}
   \begin{takeaway}
-    Most of this course focuses on supervised learning. Chapter 12
-    returns to the unsupervised case.
+    This course is supervised learning throughout. The unsupervised case
+    --- principal components and clustering --- is the optional Chapter 12
+    module in \texttt{Chapters/Advanced/}.
   \end{takeaway}
 \end{frame}
 
@@ -827,13 +794,10 @@ depends on the data and the goal --- ``more flexible'' is not
   \begin{alertblock}{The cardinal sin}
     Training MSE is essentially never what we care about. We minimise
     training MSE in order to make test MSE small --- not as a goal in
-    itself.
+    itself. An accuracy figure quoted on the data the model was fitted
+    to is worth nothing: ask instead for performance on a \emph{later}
+    period than the one used for fitting.
   \end{alertblock}
-  \begin{industry}[Procurement: buying a model from a vendor]
-    An accuracy figure quoted on the data the model was fitted to is worth nothing. Ask for
-    performance on a \emph{later} period than the one used for fitting --- out-of-time
-    validation is exactly what a model risk function will demand before the model goes live.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Simulated data: candidate fits and their train/test MSE}
@@ -1005,12 +969,11 @@ data counts.
     \item Their sum is a U-shape: the bias-variance trade-off.
     \item The optimal model lies at the bottom of the U.
   \end{itemize}
-  \begin{industry}[Asset management: why parsimony wins]
-    In settings where the signal is tiny relative to the noise --- asset returns are the
-    textbook case --- flexible models mostly fit noise, so the variance term dominates and
-    small, heavily constrained models routinely beat them out of sample. The same logic
-    explains why a few well-chosen predictors often outperform a large automated feature set.
-  \end{industry}
+  Where the U has its minimum depends on the signal-to-noise ratio. When the signal is tiny
+  --- asset returns are the textbook case --- a flexible method mostly fits noise, the
+  variance term dominates, and small, heavily constrained models routinely win out of
+  sample. It is the same reason a few well-chosen predictors often beat a large automated
+  feature set.
 \end{frame}
 
 \begin{frame}{The bias-variance trade-off, schematically}
@@ -1369,13 +1332,11 @@ does.
             to scaling.
     \end{itemize}
   \end{takeaway}
-  \begin{industry}[E-commerce and marketing: where nearest neighbours run]
-    Item--item ``customers who bought this'' recommenders, lookalike audience targeting,
-    duplicate and entity resolution, and $k$-NN over embeddings for vector search and
-    retrieval. The curse of dimensionality is the practical catch: run naively over a wide
-    customer table, the ``nearest'' neighbours are not near, so firms reduce dimension or
-    learn embeddings first.
-  \end{industry}
+  \begin{mistake}[Trusting ``nearest'' in a wide table]
+    Run KNN naively over a customer table with hundreds of columns and the nearest
+    neighbours are not near at all --- the curse of dimensionality again. Reduce the
+    dimension, or learn an embedding, before the distance means anything.
+  \end{mistake}
 \end{frame}
 
 

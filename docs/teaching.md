@@ -18,7 +18,7 @@ The instructor material lives in
 
 | File | What it is | On GitHub |
 |---|---|:--:|
-| `semester_plan.md` | The thirteen sessions on one page: what to teach when, where the three split chapters break, what to sacrifice when you fall behind | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/semester_plan.md) |
+| `semester_plan.md` | The twelve sessions on one page: what to teach when, where the three split chapters break, what to sacrifice when you fall behind | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/semester_plan.md) |
 | `slide_index.md` | Generated from the compiled PDFs: every section with its page range and time budget, every exercise and solution with its page | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/slide_index.md) |
 | `before_class.md` | The ten-minute checklist for the evening before and the morning of | [open](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Teaching_Guide/before_class.md) |
 | `runsheets/` | One page per session (`lecture_NN.md`) and one per self-study module (`module_aN_*.md`) — timings, what to run live, what to cut, what students get wrong | not published |

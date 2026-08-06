@@ -1,22 +1,22 @@
 ---
 myst:
   html_meta:
-    description: "A complete, ready-to-teach university course in statistical learning based on ISLP — twelve Beamer lecture decks, twelve Jupyter labs, seven advanced modules, eight mock exams and the course datasets."
+    description: "A complete, ready-to-teach university course in statistical learning based on ISLP — eleven Beamer lecture decks, eleven Jupyter labs, eight advanced modules, eight mock exams and the course datasets."
 ---
 
 # Quantitative Research Methods
 
 {.qrm-lead}
-A complete, ready-to-teach university course in statistical learning — twelve
-Beamer decks, twelve Jupyter notebooks, seven advanced modules, eight mock exams and the course
+A complete, ready-to-teach university course in statistical learning — eleven
+Beamer decks, eleven Jupyter notebooks, eight advanced modules, eight mock exams and the course
 datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
-[**12** decks]{.qrm-chip}
-[**1049** core slides *(+160 optional)*]{.qrm-chip}
-[**128** exercises with solutions]{.qrm-chip}
-[**12** labs *(with solutions)*]{.qrm-chip}
-[**7** advanced modules]{.qrm-chip}
+[**11** decks]{.qrm-chip}
+[**958** core slides *(+150 optional)*]{.qrm-chip}
+[**119** exercises with solutions]{.qrm-chip}
+[**11** labs *(with solutions)*]{.qrm-chip}
+[**8** advanced modules]{.qrm-chip}
 [**3 + 5** mock exams]{.qrm-chip}
 [**22** datasets]{.qrm-chip}
 :::
@@ -101,7 +101,7 @@ course is graded.
 :link: slides
 :link-type: doc
 
-Twelve decks: 1049 core slides, 160 more in optional appendices, every exercise
+Eleven decks: 958 core slides, 150 more in optional appendices, every exercise
 with a worked solution.
 :::
 
@@ -109,7 +109,7 @@ with a worked solution.
 :link: labs
 :link-type: doc
 
-Twelve labs, one per deck, each closing with worked solutions — rendered here
+Eleven labs, one per deck, each closing with worked solutions — rendered here
 in full and runnable on Colab or locally.
 :::
 
@@ -146,8 +146,8 @@ What is pinned, why, and which chapter needs which extra package.
 :link: advanced
 :link-type: doc
 
-Seven optional self-study modules: RCTs, Shapley values, conformal prediction,
-GLMs & splines, SVMs, survival analysis, multiple testing.
+Eight optional self-study modules: RCTs, Shapley values, conformal prediction,
+GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning.
 :::
 
 :::{grid-item-card} 🎯 Short projects

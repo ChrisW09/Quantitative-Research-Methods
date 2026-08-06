@@ -73,10 +73,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -184,41 +180,21 @@
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Insurance & Claim \emph{frequency} as a Poisson/NB GLM with exposure offsets; age curves as GAM smooths & The premium each tariff cell pays \\
-    Retail, e-commerce & Daily demand counts per SKU and store, weather and calendar smooths & Ordering, staffing and markdowns \\
-    Energy & Load forecasting with GAMs: smooth effects of temperature and time of day & How much generation to schedule \\
-    Public health & Case and admission counts vs exposure population & Staffing, stockpiles, early warnings \\
-    Banking & Default (yes/no) as a logistic GLM --- the same machinery & Approve or decline; capital held \\
-    Mobility platforms & Hourly ride counts vs hour, weather, events (this module's dataset) & Fleet rebalancing and surge staffing \\
+    Insurance & Claim \emph{frequency} per policy-year: Poisson/NB GLM with a
+      $\log(\text{exposure})$ offset and a spline in driver age & The premium each tariff cell pays \\
+    Energy & National load forecast as a GAM: smooth(temperature) $+$ smooth(hour) $+$
+      calendar dummies & How much generation to schedule for tomorrow \\
+    Retail & Daily demand counts per SKU, fitted negative-binomial because promotions
+      overdisperse & The reorder quantity and safety stock per store \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Whenever the response is a \textbf{count} or a \textbf{rate}, industry reaches for exactly
-    this stack: GLM for interpretability and valid uncertainty, smooth terms for the
-    shapes no one wants to guess, offsets for unequal exposure.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: pricing motor insurance}
-  \footnotesize
-  \begin{industry}[Claim frequency at a motor insurer]
-    A pricing team models the \textbf{number of claims} per policy-year for millions of
-    policies. Policies are observed for unequal durations --- three months here, a full
-    year there --- so the model is a Poisson GLM for the claim \emph{rate} with
-    $\log(\text{exposure})$ as an \textbf{offset}. Tariff factors (region, vehicle class,
-    bonus--malus) enter as dummies; \textbf{driver age} enters as a penalized-spline smooth,
-    because its effect is famously U-shaped and no polynomial degree is defensible to a regulator.
-  \end{industry}
-  \begin{readme}[Why the family matters commercially]
-    The premium is roughly $\text{frequency}\times\text{severity}$. If the frequency model
-    ignores \textbf{overdispersion}, its standard errors are far too small: tariff cells look
-    ``significantly'' different when they are not, and the tariff fragments into noise.
-    Actuarial practice therefore fits quasi-Poisson or negative binomial by default.
-  \end{readme}
-  \begin{takeaway}
-    Every ingredient of this module --- log link, rate ratios, offsets, overdispersion,
-    spline smooths, edf --- appears in one production pricing model.
+  \begin{takeaway}[All three need a count model whose every term can be shown to a reviewer]
+    Whenever the response is a \textbf{count} or a \textbf{rate}, this is the stack: a GLM
+    for interpretability and valid uncertainty, smooth terms for the shapes nobody wants
+    to guess, offsets for unequal exposure. A gradient-boosted model would forecast the
+    counts too --- but no actuary signs off a tariff, and no system operator schedules a
+    plant, on a curve they cannot see.
   \end{takeaway}
 \end{frame}
 
@@ -285,11 +261,10 @@
     A model whose \textbf{mean respects the data type}, whose \textbf{variance is tied
     to the mean}, and which keeps a \textbf{linear predictor} $x^{\top}\beta$ we know
     how to estimate and interpret. That is precisely a \emph{generalized linear model}.
+    The cost of not having one is concrete: a fleet-rebalancing optimiser fed
+    ``$-105$ rides expected'' will happily truck bikes \emph{away} from a station that
+    will see riders at dawn.
   \end{takeaway}
-  \begin{industry}[Mobility platforms: why negative forecasts hurt]
-    A fleet-rebalancing optimiser fed ``$-105$ rides expected'' will happily truck
-    bikes \emph{away} from a station that will see riders at dawn.
-  \end{industry}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -542,13 +517,10 @@
   \end{numexample}
   \begin{takeaway}
     Nothing about logistic regression was ad hoc: sigmoid, log-odds reading, ML
-    fitting --- all forced by ``Bernoulli $+$ canonical link''.
+    fitting --- all forced by ``Bernoulli $+$ canonical link''. Bank default models are
+    exactly this GLM, and every $e^{\beta_j}$ carries a documented odds-ratio meaning ---
+    a key reason GLMs survive in the deep-learning era.
   \end{takeaway}
-  \begin{industry}[Credit scoring: the regulated GLM]
-    Default models in banking are Bernoulli GLMs: every $e^{\beta_j}$ has a
-    documented odds-ratio meaning --- a key reason GLMs survive in the
-    deep-learning era.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Poisson regression: the model for \texttt{Bikeshare}}
@@ -662,13 +634,10 @@ print(np.exp(pois.params['temp']))                   # rate ratio 4.79
   \begin{takeaway}
     An offset is a covariate with $\beta$ \textbf{frozen at 1}:
     \texttt{smf.glm(..., offset=np.log(t))}. (\texttt{Bikeshare} needs none ---
-    every row is exactly one hour.)
+    every row is exactly one hour.) Claim counts per policy-year and disease counts per
+    $100\,000$ population are \emph{always} fitted this way: without the offset, big
+    portfolios and big cities dominate for size alone.
   \end{takeaway}
-  \begin{industry}[Insurance and epidemiology: the offset is the law of the land]
-    Claim counts per policy-year and disease counts per $100\,000$ population are
-    \emph{always} fitted with exposure offsets --- otherwise big portfolios and big
-    cities dominate for size alone.
-  \end{industry}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -958,11 +927,11 @@ print(np.exp(pois.params['temp']))                   # rate ratio 4.79
     across hours (positive at commuter peaks, negative at night) and the two
     likelihoods average that heterogeneity with different weights.
   \end{readme}
-  \begin{industry}[Retail demand: the dispersion audit]
-    Demand-forecasting teams sanity-check $\hat\varphi$ per store cluster. A jump of
-    $\hat\varphi$ from 3 to 30 after a promotion week is a red flag that the mean model
-    is missing a driver --- not a licence for tighter intervals.
-  \end{industry}
+  \begin{takeaway}
+    Treat $\hat\varphi$ as a diagnostic, not a nuisance: a jump from 3 to 30 after a
+    promotion week says the \emph{mean} model is missing a driver. Inflating the standard
+    errors then papers over a specification problem.
+  \end{takeaway}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -1344,12 +1313,12 @@ print(res.deviance)                                # 259 650 vs 269 006
     patterns (timetables, opening hours), factors or more basis df beat a heavily
     penalized smooth --- check edf and residuals by hour before trusting the curve.
   \end{mistake}
-  \begin{industry}[Energy: GAMs run the grid]
-    European system operators forecast national electricity load with exactly this
-    structure --- smooth(hour), smooth(temperature), calendar dummies --- because
-    engineers must \emph{see and sign off} each curve. The hot-weather bend
-    (air conditioning) is the industry's textbook example of why temp must be a smooth.
-  \end{industry}
+  \begin{takeaway}
+    This readability is why system operators forecast national electricity load with
+    exactly this structure: engineers must \emph{see and sign off} each curve, and the
+    hot-weather bend caused by air conditioning is the standard argument for letting
+    temperature be a smooth.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Pitfalls when GLMs meet splines}

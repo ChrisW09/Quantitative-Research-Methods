@@ -92,10 +92,6 @@ editing only the chapter number/title in the comment header and in `\title`/`\su
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 ```
@@ -136,10 +132,12 @@ Every deck opens with exactly this slide sequence, in this order:
 7. **"Roadmap of this chapter"** — a `takeaway` box (with a custom title) containing an
    enumerated 4–6 item plan of the chapter.
 8. **"Where this chapter is used in industry"** — `\scriptsize` booktabs table with
-   columns Sector / Concrete application / Which decision it drives (5–6 rows), often
-   followed by one `industry` box drawing the common thread.
-9. **"Industry case in depth: …"** — one full slide narrating a single realistic case,
-   built from 2–3 boxes (`industry`, `readme`, `takeaway`).
+   columns Sector / Concrete application / Which decision it drives, **exactly 3 rows**.
+   Each row must be genuinely *this chapter's* method (not a generic ML use), something a
+   named industry really does, and tied to a decision that actually changes when the number
+   changes — an actual lever ("pull the unit off the line", "which variants are reported as
+   hits"), never "informs strategy". No row restates another. The frame closes with a
+   `takeaway` box titled with what the three rows have in common.
 
 Larger chapters (e.g. 5) insert a motivating section (`\section{Why this chapter matters}`
 with 2–3 hook slides: the key question, why the naive answer fails, "Two big ideas in this
@@ -176,12 +174,16 @@ chapter" in `columns`) between front matter and the first content section.
 | `solutionbox` | teal | the full worked solution |
 | `longexercise` | violet, default title "Extended exercise (15 min)" | multi-part integrative exercise |
 | `labnote` | cyan, default title "Run this live in the lab notebook" | pointer to the companion notebook |
-| `industry` | slate grey, title prints "In industry --- #1" (always pass a title) | real business application of the concept just taught |
 | standard beamer `block` | theme blue | formal rule / algorithm / definition |
 | standard `alertblock` | red, usually titled "Don't" | lists of prohibitions (p-hacking, pitfalls) |
 
-Sprinkle `industry` boxes throughout content slides (roughly one every 3–5 slides), each
-with a concrete sector title like `[Quantitative finance: backtest overfitting]`.
+Real-world applications are not a box of their own. Where a sector's practice makes the
+point sharper, fold it into the slide's `takeaway` or `readme` in a sentence — it has to
+earn its place against the statistics on the slide, not sit beside them.
+
+Box titles containing a comma must be double-braced — `\begin{takeaway}[{{Many features,
+few samples, one call}}]` — or `tcolorbox` reads the text after the comma as a key and the
+compile fails.
 
 ### Figures
 

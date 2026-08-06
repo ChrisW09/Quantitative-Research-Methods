@@ -73,10 +73,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -198,49 +194,21 @@
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Energy & Intervals around day-ahead load and wind forecasts & How much reserve
-      capacity to buy \\
+    Energy & Intervals around day-ahead load and wind forecasts, recalibrated on recent
+      residuals & How many MW of reserve capacity to buy \\
     E-commerce, logistics & Delivery-time windows behind the checkout promise &
-      Which arrival dates to display and guarantee \\
-    Healthcare & Prediction sets over diagnoses in triage support & Which cases are
-      routed to a human specialist \\
-    Banking & Intervals on loss and prepayment forecasts & Capital buffers; which cases
-      go to manual review \\
+      Which arrival date is displayed and guaranteed \\
     Pharma R\&D & Conformal sets in virtual screening of compounds & Which molecules
       advance to the wet lab \\
-    Manufacturing & Set-valued defect classification on the line & Which parts get
-      pulled for manual inspection \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    In every row the model's \emph{point} prediction was already available --- the money
-    is in the \textbf{width of the interval} or the \textbf{size of the set}, because
-    that is what sizes the buffer, the promise, or the manual-review queue.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: the delivery promise at an online retailer}
-  \footnotesize
-  \begin{industry}[The problem: a point ETA is a promise you will break]
-    The checkout page must commit to an arrival date. A gradient-boosted model predicts
-    delivery time from warehouse, carrier, destination and weekday --- but showing its
-    point estimate (``arrives Wednesday'') is wrong for a large share of parcels, and
-    every miss costs a support ticket or a refund. What the business needs is a
-    \textbf{window} (``Tuesday--Thursday'') that holds, say, 90\% of the time.
-  \end{industry}
-  \begin{readme}[How conformal prediction is wired in]
-    Last month's delivered parcels are split: most \textbf{retrain} the model, a held-out
-    slice becomes the \textbf{calibration set}. Absolute errors on that slice give
-    $\hat q$; the site displays $\hat f(x) \pm \hat q$ rounded to days. Recalibration
-    runs \emph{weekly}, so carrier disruptions feed into $\hat q$ within days; a
-    dashboard tracks realised coverage and median window width.
-  \end{readme}
-  \begin{takeaway}[Two honest caveats]
-    Delivery times \emph{drift} (peak season, strikes) --- exchangeability between
-    calibration and next week is an approximation, hence the weekly recalibration.
-    And the guarantee is \emph{marginal}: remote postcodes can be undercovered while
-    city centres are overcovered, unless calibration is done per group.
+  \begin{takeaway}[All three are paid for the width of the interval rather than the point forecast]
+    In every row the model's \emph{point} prediction was already available and already
+    good; what was missing is a number that sizes the buffer, the promise or the
+    shortlist. Conformal prediction supplies it \textbf{without trusting the model}: the
+    coverage holds in finite samples for any $\hat f$, which is why a desk is willing to
+    commit money to the width.
   \end{takeaway}
 \end{frame}
 
@@ -264,11 +232,11 @@
     \item We want a recipe that works for \textbf{any} $\hat f$, on \textbf{finite}
           samples, \textbf{without} trusting the model.
   \end{itemize}
-  \begin{industry}[Pricing and planning: the interval is the product]
+  \begin{takeaway}
     A buyer sizing stock, a hospital planning beds, a grid operator buying reserve ---
     none of them can act on ``the forecast is 120''. They act on ``between 80 and 160,
     9 times out of 10''.
-  \end{industry}
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{What Chapter 3 gave us --- and what it silently assumed}
@@ -410,12 +378,11 @@
     blocked or online variants for dependence. This module sticks to the exchangeable
     case --- the pitfalls section returns here.
   \end{readme}
-  \begin{industry}[Model monitoring: coverage as an alarm]
-    Production ML teams track \emph{realised coverage} weekly. Coverage sliding from
-    90\% to 80\% is a drift detector that needs no labels beyond the ones you already
-    collect --- often the first sign that the world has moved away from the training
-    distribution.
-  \end{industry}
+  \begin{takeaway}
+    Realised coverage is therefore also a \emph{drift alarm}: sliding from 90\% to 80\%
+    says the world has moved away from the calibration set, and it needs no labels
+    beyond the ones you already collect.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Split conformal --- the pipeline (native diagram)}
@@ -1010,13 +977,9 @@ print(round(qhat, 2), ((y[te] >= L) & (y[te] <= U)).mean())  # 0.66, cov 0.896
     When the Gaussian linear model is \emph{true}, conformal costs essentially
     nothing: both intervals reproduce the theoretical $\pm 3.29$. Conformal is not a
     better interval --- it is the same interval with a \emph{weaker warranty
-    requirement}.
+    requirement}. That makes the pair a cheap diagnostic: run both, and if they disagree
+    materially, the \emph{model assumptions} are the prime suspect.
   \end{takeaway}
-  \begin{industry}[Model risk management: two numbers as one sanity check]
-    Validation teams in banking run both: if the parametric and the conformal interval
-    disagree materially, the \emph{model assumptions} are the prime suspect --- a
-    cheap, assumption-free diagnostic.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Heteroskedastic truth: where the 90\% quietly stops being 90\%}
@@ -1188,13 +1151,10 @@ marginal coverage first, then the two conditional ones.\par}
     or use online/adaptive conformal that tunes $\alpha$ from realised coverage.
     Known covariate shift: \emph{weighted} conformal with likelihood-ratio weights
     $w(x) = p_{\text{new}}(x)/p_{\text{cal}}(x)$. Always: monitor realised coverage
-    --- the guarantee you can check is the one you keep.
+    --- the guarantee you can check is the one you keep. A wind-power desk does exactly
+    this, recalibrating on the trailing 30 days: a fixed calibration set from spring
+    undercovers in autumn storms --- same model, dead guarantee.
   \end{readme}
-  \begin{industry}[Energy trading: recalibrate with the seasons]
-    A wind-power desk recalibrates its forecast intervals \emph{daily} on the trailing
-    30 days. A fixed calibration set from spring undercovers in autumn storms ---
-    same model, dead guarantee.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Pitfall 2: leakage between fitting and calibration}
@@ -1236,14 +1196,13 @@ marginal coverage first, then the two conditional ones.\par}
             misreadings.
     \end{itemize}
   \end{readme}
-  \begin{industry}[Tooling: MAPIE and friends]
-    In production, teams reach for \textbf{MAPIE} (\emph{Model Agnostic Prediction
-    Interval Estimator}, scikit-learn compatible): split/cross conformal,
-    CQR and classification sets behind one API, plus jackknife+ variants that recycle
-    training folds. It is not installed here --- deliberately: everything in this
-    module was ten lines from scratch, and those ten lines are the audit trail you
-    will be asked for.
-  \end{industry}
+  \begin{takeaway}[The production tool]
+    Teams reach for \textbf{MAPIE} (\emph{Model Agnostic Prediction Interval
+    Estimator}, scikit-learn compatible): split/cross conformal, CQR and classification
+    sets behind one API, plus jackknife+ variants that recycle training folds. It is not
+    installed here --- deliberately: everything in this module was ten lines from
+    scratch, and those ten lines are the audit trail you will be asked for.
+  \end{takeaway}
 \end{frame}
 
 % ============================================================

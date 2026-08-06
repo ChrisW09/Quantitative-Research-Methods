@@ -78,10 +78,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][Where this shows up]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -108,12 +104,11 @@
     \rowcolor{black!3} {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
      {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
     \rowcolor{black!3} {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-     {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize The precourse is taught in one 180-minute session drawing on both decks, before Chapter 1; the ten chapter decks follow. It assumes nothing beyond an introductory undergraduate course. Today's session is highlighted.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize The precourse is taught in one 180-minute session drawing on both decks, before Chapter 1; the nine chapter decks follow. It assumes nothing beyond an introductory undergraduate course. Today's session is highlighted.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 \begin{frame}{Contents}
@@ -254,53 +249,19 @@
     Manufacturing & Statistical process control: a chart on a critical
       dimension, limits at $\pm 3\sigma$ &
       Stop the line, or let it keep running \\
-    Insurance & Claim severity is strongly right-skewed, so the mean sits
-      above the typical claim &
-      Where reinsurance attaches, and the reserve booked \\
-    E-commerce & Online A/B test of a checkout or ranking change &
+    E-commerce & Online A/B test of a checkout or ranking change, sized in
+      advance for the smallest lift worth having &
       Ship the variant, or roll it back \\
-    Market research & Brand and satisfaction trackers on a sample of a few
-      thousand &
-      Act on a movement in the tracker, or treat it as noise \\
     Supplier quality & Acceptance sampling of an incoming lot against an
       agreed plan &
       Accept the lot, or reject it on the sample \\
-    Logistics, operations & Delivery-time distributions summarised by the
-      median and the 95th percentile &
-      The service-level promise quoted to customers \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Every row is the same two-step move: \emph{describe} what the data show,
-    then quantify \emph{how much of it could be noise}.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: an online A/B test}
-  \footnotesize
-  A retailer wants to know whether a redesigned checkout page raises the
-  purchase rate. This is a hypothesis test, run as an experiment.
-  \begin{industry}[The set-up]
-    \textbf{Response} $y_i$: did session $i$ end in a purchase (0/1)?
-    \textbf{Unit of randomisation}: the visitor, not the session --- otherwise
-    the same person sees both designs. \textbf{Fixed before launch}: the
-    primary metric, the segments to be reported (device, new vs.\ returning,
-    market), the run length, and the smallest effect worth acting on.
-  \end{industry}
-  \begin{numexample}[Illustrative sizing]
-    The rule of thumb for $80\%$ power at $\alpha = 0.05$ is
-    $n \approx 16\,\pi(1-\pi)/\delta^2$ per arm. At a baseline of $\pi=2.5\%$,
-    detecting a relative lift of $10\%$ ($\delta = 0.0025$) needs tens of
-    thousands of visitors per arm --- which is why small sites cannot test
-    small effects.
-  \end{numexample}
-  \begin{takeaway}[Who signs off --- and the honest caveat]
-    The product owner, plus a central experimentation platform that enforces
-    the pre-registration. Its consumer is the launch reviewer who ships it.
-    Caveat: stopping the test the first time it looks
-    significant (``peeking''), or reporting whichever of twenty metrics moved,
-    breaks the $5\%$ guarantee --- the problem of Chapter~13.
+  \begin{takeaway}[All three turn a sample into a yes/no call]
+    Every row is the same two-step move: \emph{describe} what the sample
+    shows, then quantify \emph{how much of it could be noise}. The decision
+    hangs on the second step --- the first one alone never settles it.
   \end{takeaway}
 \end{frame}
 
@@ -762,10 +723,9 @@
   closely ($r = 0.78$), newspaper spend barely ($r = 0.23$). The fourth is
   simulated data with an obvious, \emph{strong} relationship
   $y = x^2 + \varepsilon$ --- and $r = 0.08$. \textbf{Always plot the data.}
-  \begin{industry}[KPI dashboards: the correlation-matrix trap]\scriptsize
-    A threshold or curved effect reads as $r \approx 0$, and a shared driver ---
-    season, a price change, a campaign --- makes unrelated KPIs move together.
-  \end{industry}
+  A correlation matrix over a dashboard of KPIs fails in both directions: a
+  threshold or curved effect reads as $r \approx 0$, while a shared driver ---
+  season, a price change, a campaign --- makes unrelated series move together.
 \end{frame}
 
 \begin{frame}{Anscombe's quartet: four data sets, one set of statistics}
@@ -1218,10 +1178,8 @@
   from the mean is unusual (about 1 in 20), and ``estimate
   $\pm\,1.96\,\mathrm{SE}$'' is a 95\% interval. That same $1.96$ appears in
   every confidence interval and every two-sided 5\% test in this course.
-  \begin{industry}[Manufacturing: the arithmetic behind Six Sigma]\scriptsize
-    Process-control charts set limits at $\pm 3\sigma$: an in-control process
-    rarely trips the alarm, while a real shift in the process trips it fast.
-  \end{industry}
+  It is the same arithmetic that puts process-control limits at $\pm 3\sigma$:
+  an in-control process rarely trips the alarm, a real shift trips it fast.
 \end{frame}
 
 
@@ -1631,11 +1589,9 @@
   Left: the fit on \texttt{Advertising}; the vertical segments are the residuals
   $e_i = y_i - \hat y_i$ that least squares squares and adds up. Right: a
   residual plot --- structure here (curvature, a funnel) means the model is
-  missing something. Both plots return in Chapter 3.
-  \begin{industry}[Marketing: the first-pass driver analysis]\scriptsize
-    Sales on advertising spend starts most marketing-mix conversations --- and
-    is not causal: spend rises in strong seasons, so the slope absorbs the season.
-  \end{industry}
+  missing something. Both plots return in Chapter 3. A fit like this one starts
+  most marketing conversations --- and is not causal: spend rises in strong
+  seasons, so the slope quietly absorbs the season.
 \end{frame}
 
 
@@ -2315,7 +2271,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     Residual plots & Ch.\ 3 (diagnostics), Ch.\ 7 (non-linearity) \\
     Matrix algebra, inverses & Ch.\ 3 (normal equations), Ch.\ 6 (singularity) \\
     $\ell_1$ / $\ell_2$ norms & Ch.\ 6 (lasso vs.\ ridge geometry) \\
-    Eigenvectors & Ch.\ 6 (PCR), Ch.\ 12 (PCA) \\
+    Eigenvectors & The unsupervised-learning module (PCA) in \texttt{Advanced/} \\
     Derivatives, gradients, convexity & Ch.\ 10 (backpropagation, training) \\
     \texttt{pandas} / \texttt{sklearn} & every lab notebook \\
     \bottomrule
@@ -2596,14 +2552,15 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
   \end{block}
   \begin{block}{Euclidean distance}
     $d(\mathbf{a},\mathbf{b}) = \sqrt{\sum_j (a_j-b_j)^2}$.
-    \emph{Where:} KNN (Ch.\ 2, 4) and clustering (Ch.\ 12) are built on it ---
-    and it is why unstandardised variables wreck both.
+    \emph{Where:} KNN (Ch.\ 2, 4) and clustering (Ch.\ 12, the optional
+    unsupervised-learning module) are built on it --- and it is why
+    unstandardised variables wreck both.
   \end{block}
   \begin{block}{Eigenvectors and eigenvalues}
     $\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$: directions the matrix only
-    stretches. \emph{Where:} principal components (Ch.\ 6, 12) are the
-    eigenvectors of the covariance matrix --- the directions of greatest
-    variance in the data.
+    stretches. \emph{Where:} principal components (Ch.\ 12, the optional
+    unsupervised-learning module) are the eigenvectors of the covariance
+    matrix --- the directions of greatest variance in the data.
   \end{block}
 \end{frame}
 

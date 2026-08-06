@@ -1,21 +1,21 @@
 ---
 myst:
   html_meta:
-    description: "Twelve Beamer lecture decks for the course — one per taught chapter, with optional appendices, every exercise carrying a worked solution, and ~110 purpose-built figures. All PDFs downloadable."
+    description: "Eleven Beamer lecture decks for the course — one per taught chapter, with optional appendices, every exercise carrying a worked solution, and ~110 purpose-built figures. All PDFs downloadable."
 ---
 
 # Lecture slides
 
 {.qrm-lead}
-Twelve Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
+Eleven Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
 `chapter_NN.tex`, its `images/`, the compiled `chapter_NN.pdf` — and the
 [companion lab](labs.md) for that chapter, so everything for one week sits
 together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
-[**1049** slides in the main flow]{.qrm-chip}
-[**+160** in optional appendices]{.qrm-chip}
-[**87** short + **41** extended exercises]{.qrm-chip}
+[**958** slides in the main flow]{.qrm-chip}
+[**+150** in optional appendices]{.qrm-chip}
+[**81** short + **38** extended exercises]{.qrm-chip}
 [**~110** purpose-built figures]{.qrm-chip}
 :::
 
@@ -48,12 +48,12 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+8) | <a href="slides/chapter_07.pdf">Open</a> |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 82 (+9) | <a href="slides/chapter_08.pdf">Open</a> |
 | 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 6 + 3 | 75 (+9) | <a href="slides/chapter_10.pdf">Open</a> |
-| 12 | Unsupervised Learning | Principal components and the variance explained, *K*-means, hierarchical clustering and linkage, scaling decisions | 6 + 3 | 91 (+10) | <a href="slides/chapter_12.pdf">Open</a> |
-| **Total** | | | **87 + 41** | **1049 (+160)** | |
+| **Total** | | | **81 + 38** | **958 (+150)** | |
 
-Chapters 9 (support vector machines), 11 (survival analysis) and 13 (multiple
-testing) are no longer part of the taught sequence — their decks and labs now
-live as self-study [advanced modules](advanced.md) A5, A6 and A7.
+Chapters 9 (support vector machines), 11 (survival analysis), 12 (unsupervised
+learning) and 13 (multiple testing) are no longer part of the taught sequence —
+their decks and labs now live as self-study [advanced modules](advanced.md)
+A5, A6, A8 and A7.
 
 ## How a deck is built
 
@@ -126,12 +126,11 @@ optional.
 | 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) · the four-models panel | 8 |
 | 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART · ISLP Figs 8.1 and 8.2 (the Hitters tree) | 9 |
 | 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent · the gradient-descent loss surface | 9 |
-| 12 | the two forms of the *K*-means objective · PCA as the best low-rank approximation · matrix completion for missing values · the silhouette width · Extended Exercise 12.3 (a full workflow on gene expression) · the same tree, drawn two ways | 10 |
 
 ## The two precourse decks
 
 Both are **taught**, in the single precourse session that opens the semester,
-and both exist because the thirteen chapter decks assume their content silently.
+and both exist because the chapter decks assume their content silently.
 One session cannot cover 157 slides, so it draws a selection from the two and the
 decks remain the full reference — see
 [the course at a glance](course.md) and [For students](for-students.md).

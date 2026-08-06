@@ -73,10 +73,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -195,48 +191,21 @@
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
     Bioinformatics & Tumour classification from gene expression, $p$ in the
-      thousands, $n$ in the dozens & Which tissue class a sample is reported as \\
-    Text and search & Spam filters, ticket routing, sentiment on
-      bag-of-words features & Which queue or folder a message lands in \\
+      thousands, $n$ in the dozens & Which tissue class the pathology report
+      states \\
     Manufacturing & One-class SVMs on sensor traces for novelty detection &
       Whether a unit is pulled off the line \\
-    Finance, credit & Small-sample scorecards where a hard margin is
-      auditable & Approve, decline or refer to a human \\
-    Medical imaging & Lesion / no-lesion calls on engineered image
-      features & Whether a scan is escalated to a radiologist \\
     Chemistry, materials & Property prediction from molecular descriptors with
-      custom kernels & Which candidates get synthesised \\
+      custom kernels & Which candidates get synthesised next quarter \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    SVMs are the tool of choice when $p$ is large relative to $n$, when the
-    signal is a \emph{boundary} rather than a probability, and when a custom
-    similarity (a kernel) is more natural than a list of engineered features.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: a small-sample diagnostic assay}
-  \scriptsize
-  \begin{industry}[{{Why the widest street, and not maximum likelihood}}]
-    A diagnostics firm has $n=180$ patients and $p=1\,200$ assay features. A
-    logistic regression separates the training data perfectly and its
-    maximum-likelihood coefficients diverge. An SVM instead asks for the
-    \emph{widest} separating street --- well posed even here, with one finite,
-    reproducible answer.
-  \end{industry}
-  \begin{readme}[{{The rule the team enforces, and who signs off}}]
-    Predictors are standardised \emph{inside} the cross-validation pipeline;
-    $C$ and $\gamma$ come from nested CV, never from the test fold. The
-    reported number is the ROC AUC from \texttt{decision\_function}, because
-    the operating threshold is set later by the clinical team. The lab director
-    signs the validation report and defends the threshold to the notified body.
-  \end{readme}
-  \begin{takeaway}[Two honest caveats]
-    The model returns no probability, so it cannot feed an expected-cost
-    calculation without extra calibration; and with $p \gg n$ most of the
-    sample ends up a support vector, which weakens the ``only a few points
-    matter'' story.
+  \begin{takeaway}[{{Many features, few samples, one hard call}}]
+    None of the three has the data for a well-calibrated probability, and all
+    three end in a \emph{yes/no} act --- report the class, pull the unit,
+    synthesise the compound. That is exactly the regime in which maximising the
+    margin beats maximising a likelihood, and in which a bespoke kernel is more
+    natural than a list of engineered features.
   \end{takeaway}
 \end{frame}
 
@@ -278,13 +247,10 @@
     Maximising the margin is the opposite instinct: it asks for the
     \emph{smallest} $\|\beta\|$ compatible with correct classification, because
     the margin is $M=1/\|\beta\|$. On separable data that is always a finite,
-    unique answer.
+    unique answer --- which is why SVMs were first adopted in earnest on
+    gene-expression data, where $p$ in the thousands and $n$ in the dozens make
+    the classes \emph{always} separable.
   \end{takeaway}
-  \begin{industry}[Bioinformatics: the $p \gg n$ regime]
-    Gene-expression studies with $p$ in the thousands and $n$ in the dozens are
-    \emph{always} separable --- where SVMs were first adopted in earnest, and
-    where unpenalised logistic regression will not converge.
-  \end{industry}
 \end{frame}
 
 % ============================================================
@@ -648,13 +614,10 @@
   \begin{takeaway}
     Whenever you read ``increase $C$'', check \emph{whose} $C$. Every slide
     here that says ``sklearn $C$'', and every line of notebook code, uses the
-    scikit-learn convention: \textbf{big $C$, narrow street}.
+    scikit-learn convention: \textbf{big $C$, narrow street}. Write the library
+    and version next to any reported value --- ``$C=100$, a highly regularised
+    model'' is the sentence that gets a validation report sent back.
   \end{takeaway}
-  \begin{industry}[{Model risk: put the convention in the documentation}]
-    Validation teams routinely reject SVM documentation that reports ``$C=100$,
-    a highly regularised model''. Naming the library and version next to the
-    hyperparameter is the cheapest possible fix, and reviewers look for it.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{$C$ is the bias--variance dial (bridge to Chapter 2)}
@@ -954,13 +917,10 @@
   \end{readme}
   \begin{takeaway}
     They interact, so they must be tuned \textbf{jointly} on a grid, never one
-    after the other.
+    after the other. And because $\gamma$ is tied to the \emph{scale} of the
+    features, a fitted pair $(C,\gamma)$ is only valid alongside the scaler it
+    was tuned with: freeze the two together and re-tune on a schedule.
   \end{takeaway}
-  \begin{industry}[{Manufacturing: a tuned $\gamma$ is a maintenance liability}]
-    A fault detector tuned to $\gamma$ on last quarter's sensor scale degrades
-    silently once a sensor is replaced and the feature scale shifts. Freeze the
-    scaler with the model, and re-tune $(C,\gamma)$ on a schedule.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Scaling is not optional}
@@ -1429,6 +1389,7 @@ prints the distance the radial kernel sees.}
 \end{frame}
 
 \begin{frame}{When to reach for an SVM}
+  \footnotesize
   \begin{readme}[Decision guidance]
     \begin{itemize}
       \item \textbf{Reach for it} when $p$ is large relative to $n$, when the
@@ -1441,13 +1402,13 @@ prints the distance the radial kernel sees.}
             when a stakeholder must read coefficients.
     \end{itemize}
   \end{readme}
-  \begin{industry}[{Credit and insurance: why SVMs lost the mainstream}]
-    Scorecards must give a monotone, explainable probability of default and
-    survive a regulator asking ``why was this applicant declined?''. Penalised
-    logistic regression and boosted trees with SHAP answer that; a
-    radial-kernel SVM does not. SVMs stayed where explanation matters less and
-    $p/n$ is brutal --- assays, spectra, text, novelty detection.
-  \end{industry}
+  \begin{takeaway}[Why the SVM never became the default]
+    Credit scorecards must give a monotone, explainable probability of default
+    and survive a regulator asking ``why was this applicant declined?'';
+    penalised logistic regression and boosted trees with SHAP answer that, a
+    radial-kernel SVM does not. The method stayed where explanation matters
+    less and $p/n$ is brutal --- assays, spectra, text, novelty detection.
+  \end{takeaway}
 \end{frame}
 
 % ------------------------------------------------------------

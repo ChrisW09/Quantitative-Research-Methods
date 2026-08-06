@@ -73,10 +73,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -190,43 +186,18 @@
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Tech, e-commerce & A/B tests on features, ranking, pricing UX & Ship or roll back the change \\
-    Pharma & Phase-III randomised, double-blind trials & Whether the drug is approved \\
-    Development, policy & Cash-transfer and nudge experiments & Which programme is scaled up \\
-    Marketing & Incrementality / uplift tests with holdout groups & Where the ad budget goes \\
-    Banking, insurance & Randomised pricing, CRM and collection pilots & Which policy is rolled out \\
-    Marketplaces, mobility & Switchback and geo experiments & Pricing and matching algorithms \\
+    Tech, e-commerce & A/B tests on ranking, checkout and pricing UX & Ship the variant or roll it back \\
+    Pharma & Phase-III double-blind trials on a pre-registered endpoint & Whether the regulator approves the drug \\
+    Marketing & Incrementality tests against a randomised holdout & Whether the channel keeps its budget \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Whenever the decision is \emph{causal} --- ship it, approve it, scale it --- the gold
-    standard is the same design: create the counterfactual by \textbf{randomisation}
-    instead of assuming it away. Tech simply industrialised what agriculture and medicine
-    invented: Fisher's randomised plots became feature flags.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: a phase-III drug trial}
-  \footnotesize
-  \begin{industry}[The most regulated RCT there is]
-    A candidate drug reaches phase III: two arms, \textbf{randomised 1:1} and
-    \textbf{double-blind}, one \textbf{pre-registered primary endpoint} (say, 12-month
-    survival), and a sample size from a power calculation --- large enough to detect the
-    smallest clinically relevant effect with $80$--$90\%$ power. The protocol and the
-    statistical analysis plan are frozen \emph{before} the first patient is enrolled.
-  \end{industry}
-  \begin{readme}[The rules the regulator enforces]
-    Analysis is by \textbf{intention to treat}: every randomised patient counts in the arm
-    they were assigned to, whether or not they took the drug --- anything else re-opens the
-    door to self-selection. Interim looks are allowed only through pre-specified
-    group-sequential boundaries (a Chapter~13 idea). Secondary endpoints need a
-    multiplicity strategy before they can support a claim.
-  \end{readme}
-  \begin{takeaway}[Two honest caveats]
-    ITT estimates the effect of \emph{offering} the drug, not of taking it; and the trial
-    population (consenting, screened patients) is not the treated population --- internal
-    validity is bought first, external validity argued second.
+  \begin{takeaway}[All three manufacture the counterfactual instead of assuming it]
+    Ship it, approve it, keep funding it --- each is a \emph{causal} decision, and none of
+    them can be read off a correlation. The counterfactual is created by
+    \textbf{randomisation} rather than argued from a model, which is why the same design
+    settles a drug approval and a checkout button. Tech industrialised what agriculture
+    and medicine invented: Fisher's randomised plots became feature flags.
   \end{takeaway}
 \end{frame}
 
@@ -283,13 +254,10 @@
     The naive comparison measures \emph{both} arrows into $Y$: the causal path
     $D\to Y$ \textbf{plus} the backdoor path $D \leftarrow X \to Y$. Comparing within
     skill strata closes the backdoor --- but only for confounders you \emph{observe};
-    motivation, health or ability would confound invisibly.
+    motivation, health or ability would confound invisibly. The same diagram explains ad
+    attribution: ``customers who saw the ad bought $30\%$ more'' is the backdoor path,
+    because the ad was targeted at likely buyers.
   \end{readme}
-  \begin{industry}[Marketing: attribution]
-    ``Customers who saw the ad bought $30\%$ more'' --- but the ad was targeted at likely
-    buyers. Until a randomised holdout (ghost ads) says otherwise, that lift is
-    selection, not persuasion.
-  \end{industry}
 \end{frame}
 
 % ============================================================
@@ -349,13 +317,10 @@
     \end{itemize}
     SUTVA is a claim about the \emph{world}, not a modelling choice --- and randomisation
     does \textbf{not} buy it. When it fails, redefine the unit (clusters, regions,
-    time slices) so that it holds.
+    time slices) so that it holds. Ride-hailing platforms do exactly this: rider discounts
+    are tested with \emph{switchback} designs, whole city--hour blocks treated or not,
+    because rider-level randomisation leaks through the shared driver pool.
   \end{readme}
-  \begin{industry}[Two-sided marketplaces]
-    Ride-hailing platforms test rider discounts with \emph{switchback} designs ---
-    whole city--hour blocks are treated or not --- precisely because rider-level
-    randomisation violates no-interference through the shared driver pool.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Why the naive comparison lies: the selection-bias decomposition}
@@ -507,14 +472,10 @@
   \begin{takeaway}
     ``In expectation'' is doing real work: any \emph{single} randomisation can be
     unlucky. The standard error on the next slide quantifies exactly that design noise
-    --- bias is gone, variance remains.
+    --- bias is gone, variance remains. Hashing a user id into variant A or B \emph{is}
+    that coin flip: every feature flag and holdout on a modern platform is this one
+    identity, run $10^4$ times a year.
   \end{takeaway}
-  \begin{industry}[A/B testing is the RCT of tech]
-    \fontsize{7}{8.4}\selectfont
-    Hashing a user id into variant A or B \emph{is} the coin flip. The multi-billion
-    experimentation industry --- feature flags, holdouts, ramp-ups --- is this one
-    identity, run at the scale of $10^4$ experiments a year per platform.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{The difference in means, its standard error --- and Ch.\ 0}
@@ -747,14 +708,10 @@ print(m0.params["D"], m0.bse["D"])                # tau-hat 4.122, SE 1.523
     Adjustment buys \textbf{precision, not truth}: both estimates are unbiased and both
     CIs cover the built-in $+5$; the adjusted one is simply less noisy. The estimates
     differ ($4.12$ vs $3.73$) only through sampling noise --- with one finite
-    randomisation, that is expected, not alarming.
+    randomisation, that is expected, not alarming. Run at scale, this is CUPED: adjust for
+    the \emph{same metric measured pre-experiment} and variance reductions around $50\%$
+    are routine --- halving every experiment's duration.
   \end{takeaway}
-  \begin{industry}[CUPED: the same idea at scale]
-    \scriptsize
-    Tech platforms adjust for the \emph{same metric measured pre-experiment}
-    (CUPED). Variance reductions around $50\%$ are routine --- halving every
-    experiment's duration is worth more than any modelling refinement.
-  \end{industry}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -894,13 +851,10 @@ the pre-treatment covariates; each \texttt{print} pairs $\hat\tau$ with its HC2 
     $200$ schools $\times$ $50$ pupils, $\rho = 0.05$:
     $\mathrm{DE} = 1 + 49 \times 0.05 = \mathbf{3.45}$ --- the $10\,000$ pupils carry the
     information of $10\,000/3.45 \approx \mathbf{2899}$ independent ones.
+    Geo experiments sit at the harsh end of the same formula --- a brand campaign can only
+    randomise regions, and few large clusters make $\mathrm{DE}$ brutal, which is why geo
+    tests run for months and user-level tests for weeks.
   \end{numexample}
-  \begin{industry}[Geo experiments]
-    \fontsize{7}{8.4}\selectfont
-    Brand and TV campaigns cannot randomise users, so platforms randomise \emph{regions}.
-    Few, large, heterogeneous clusters make the design effect brutal --- which is why geo
-    tests run for months while user-level A/B tests run for weeks.
-  \end{industry}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -1102,13 +1056,10 @@ the pre-treatment covariates; each \texttt{print} pairs $\hat\tau$ with its HC2 
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[A/B testing is the RCT of tech]
-    Large platforms run tens of thousands of experiments a year; the experiment config
-    \emph{is} the pre-registration, guardrail metrics are the safety endpoints, and the
-    ramp-up plan is the dose escalation. Every hard problem in this section ---
-    interference, peeking, multiplicity --- is a live engineering concern, not a
-    textbook footnote.
-  \end{industry}
+  The vocabulary changes, the design does not: the experiment config \emph{is} the
+  pre-registration, guardrail metrics are the safety endpoints, and the ramp-up plan is
+  the dose escalation. Every hard problem in this section --- interference, peeking,
+  multiplicity --- is a live engineering concern, not a textbook footnote.
 \end{frame}
 
 % ------------------------------------------------------------

@@ -32,6 +32,10 @@ except ImportError:  # pragma: no cover - guidance, not logic
     )
 
 # Deck -> (display name, how many 180-minute sessions it is taught over).
+# Course chapters sit in Chapters/chapter_NN/; the optional self-study modules
+# one level deeper, in Chapters/Advanced/advanced_NN_topic/ (see deck_dir).
+# A module's "sessions" is not a timetable slot — it is how long working
+# through it takes, which is what the time budget below is useful for.
 DECKS = {
     "chapter_00":  ("Precourse (a) — Statistics Refresher", 1),
     "chapter_00b": ("Precourse (b) — Toolkit", 1),
@@ -44,7 +48,7 @@ DECKS = {
     "chapter_07":  ("Ch. 7 — Moving Beyond Linearity", 1),
     "chapter_08":  ("Ch. 8 — Tree-Based Methods", 1),
     "chapter_10":  ("Ch. 10 — Deep Learning", 1),
-    "chapter_12":  ("Ch. 12 — Unsupervised Learning", 1),
+    "advanced_08_unsupervised": ("A8 — Unsupervised Learning (self-study)", 1),
 }
 
 SESSION_MINUTES = 180
@@ -85,12 +89,20 @@ def classify(title: str) -> str | None:
     return None
 
 
+def deck_dir(folder: str) -> Path:
+    """Where a deck lives. Advanced modules are one level deeper than chapters."""
+    base = SLIDES / "Advanced" if folder.startswith("advanced_") else SLIDES
+    return base / folder
+
+
 def deck_block(folder: str, name: str, sessions: float) -> list[str]:
-    pdf = SLIDES / folder / f"{folder}.pdf"
-    toc = SLIDES / folder / f"{folder}.toc"
-    tex = SLIDES / folder / f"{folder}.tex"
+    here = deck_dir(folder)
+    pdf = here / f"{folder}.pdf"
+    toc = here / f"{folder}.toc"
+    tex = here / f"{folder}.tex"
     if not pdf.exists():
-        return [f"### {name}\n", f"*Not compiled — run `pdflatex` in `Chapters/{folder}/`.*\n"]
+        rel = here.relative_to(ROOT)
+        return [f"### {name}\n", f"*Not compiled — run `pdflatex` in `{rel}/`.*\n"]
 
     titles = frame_titles(pdf)
     total = len(titles)
@@ -191,7 +203,7 @@ def main() -> None:
     # tracked index with a gutted version, and say what to run instead.
     stale = [
         f for f in DECKS
-        if (SLIDES / f / f"{f}.pdf").exists() and not (SLIDES / f / f"{f}.toc").exists()
+        if (deck_dir(f) / f"{f}.pdf").exists() and not (deck_dir(f) / f"{f}.toc").exists()
     ]
     if stale:
         sys.exit(

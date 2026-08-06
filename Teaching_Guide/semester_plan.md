@@ -1,10 +1,11 @@
 # Semester plan
 
-Thirteen sessions of 180 minutes: a **taught precourse session** drawing on both
-precourse decks, then **ten ISLP chapters** in book order. The plan is keyed to
+Twelve sessions of 180 minutes: a **taught precourse session** drawing on both
+precourse decks, then **nine ISLP chapters** in book order. The plan is keyed to
 chapter numbers, not session numbers. Chapters 9 (support vector machines),
-11 (survival analysis) and 13 (multiple testing) are no longer taught in the
-sequence — they keep their decks and labs as self-study modules A5, A6 and A7
+11 (survival analysis), 12 (unsupervised learning) and 13 (multiple testing) are
+no longer taught in the sequence — they keep their decks and labs as self-study
+modules A5, A6, A8 and A7
 under [`../Chapters/Advanced/`](../Chapters/Advanced/). The module is 6 ECTS,
 graded by one 120-minute written exam at the end of the semester; every paper in
 the calendar below is practice.
@@ -23,7 +24,7 @@ advanced material (formal derivations, the heaviest worked exercises, side
 topics); the timed plans in the runsheets cover the main flow only, so the
 appendix pages are extra material to assign, not to teach.
 
-## The thirteen sessions
+## The twelve sessions
 
 | Chapter | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
@@ -38,13 +39,15 @@ appendix pages are extra material to assign, not to teach.
 | **6** | Model Selection & Regularisation | `chapter_06` | 78 + 15 | 7 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
 | **7** | Beyond Linearity | `chapter_07` | 85 + 8 | 6 + 3 | Polynomials, splines, GAMs |
 | **8** | Tree-Based Methods | `chapter_08` | 82 + 9 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
-| **10** | Deep Learning | `chapter_10` | 75 + 9 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) |
-| **12** | Unsupervised Learning | `chapter_12` | 91 + 10 | 6 + 3 | PCA, K-means, hierarchical clustering · **final mock exam after this week** · **release Short Exam E** |
+| **10** | Deep Learning | `chapter_10` | 75 + 9 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) · last taught session · **final mock exam after this week** · **release Short Exam E** |
 
-Ten ISLP chapters are taught, in book order. Chapters 9, 11 and 13 keep their
-full decks and labs but sit outside the plan as advanced modules A5, A6 and A7.
-Short Exam E and the final mock still carry a multiple-testing problem, which
-now draws on module A7 rather than on a taught session.
+Nine ISLP chapters are taught, in book order. Chapters 9, 11, 12 and 13 keep
+their full decks and labs but sit outside the plan as advanced modules A5, A6,
+A8 and A7. Short Exam E and the final mock still carry a multiple-testing
+problem, which now draws on module A7 rather than on a taught session; any
+unsupervised-learning question in the final mock likewise draws on module A8.
+Deep learning is now the last taught session, so both the final mock exam and
+the release of Short Exam E hang off it.
 
 ## The three splits, and where to break them
 
@@ -90,8 +93,8 @@ handed out one at a time as the material each needs is taught.
 | after Ch 6 | Mock Exam 2 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
 | after Ch 6 | Short Exam C | Ch 0 + 0b · Ch 3 · **Ch 6** | 60 min · 60 pts |
 | after Ch 8 | Short Exam D | Ch 2 + 5 · Ch 2 + 4 · **Ch 8** | 60 min · 60 pts |
-| end of course | Final Mock Exam | All, weighted to Ch 7/8/10 and module A7 | 120 min · 120 pts |
-| end of course | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** *(module A7)* | 60 min · 60 pts |
+| after Ch 10 | Final Mock Exam | All, weighted to Ch 7/8/10 and modules A7 and A8 | 120 min · 120 pts |
+| after Ch 10 | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** *(module A7)* | 60 min · 60 pts |
 
 Every paper exists as questions, worked solutions, and a review deck for going
 through it in class; the final also comes in three parallel variants
@@ -107,8 +110,10 @@ the student's to keep. The review deck is what the session itself runs on.
 
 Each is three problems × 20 points, increasing in difficulty. The bold chapter
 above is where the third and hardest problem sits — so **A cannot be set before
-Chapter 4, B before Chapter 5, C before Chapter 6, D before Chapter 8, or E
-before Chapter 13.** The first two problems deliberately reach back to earlier
+Chapter 4, B before Chapter 5, C before Chapter 6, D before Chapter 8, and E
+not until module A7 (ISLP Chapter 13) has been assigned as self-study** — which
+is why E goes out at the end, with the final mock. The first two problems
+deliberately reach back to earlier
 chapters, which makes each paper cumulative-to-date rather than a
 single-chapter test. They are also the only papers that assess the **precourse**
 material at all: A, C and E each open on Chapter 0 / 0b, whereas no problem in
@@ -121,7 +126,7 @@ allocations and marking tables** in the whole assessment set, so they are the
 easiest papers to mark consistently — and the review decks add a "common
 mistake" box per problem. The *Before you walk in* checklist in
 `runsheets/lecture_04.md`, `lecture_05.md`, `lecture_06.md`, `lecture_08.md` and
-`lecture_13.md` names the paper released after that session, and
+`lecture_10.md` names the paper released after that session, and
 `Mock_Exams/Short_Exams_60min/README.md` lists what is in each.
 
 `make exams` rebuilds all 18 of the mock-exam PDFs on a machine that has them —

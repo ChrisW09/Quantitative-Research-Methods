@@ -67,10 +67,6 @@
 
 \newtcolorbox{labnote}[1][Run this live in the lab notebook]{enhanced, fontupper=\footnotesize, colback=cyan!7, colframe=cyan!45!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
-% Industry application callout box --- slate grey, for real business/industry use
-\definecolor{industryC}{RGB}{88,98,116}
-\newtcolorbox{industry}[1][In industry]{enhanced, fontupper=\footnotesize, colback=industryC!7, colframe=industryC, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title={In industry --- #1}, left=2mm, right=2mm, top=1mm, bottom=1mm}
-
 % Common-mistake callout --- crimson, for the error to pre-empt
 \newtcolorbox{mistake}[1][Common mistake]{enhanced, fontupper=\footnotesize, colback=red!4, colframe=red!60!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
@@ -96,12 +92,11 @@
      {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
     \rowcolor{accent!18} \textbf{Ch.\ 8} & \textbf{Tree-based methods}\,{\color{accent!75!black}--- trees, forests, boosting} \\
      {\color{accent}Ch.\ 10} & Deep learning\,{\color{black!45}--- MLPs, CNNs, training} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 12} & Unsupervised learning\,{\color{black!45}--- PCA, clustering} \\
     \bottomrule
   \end{tabular}
   \end{center}
   \vspace{1mm}
-  {\scriptsize Ten chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11) and multiple testing (Ch.\ 13) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
 \end{frame}
 
 
@@ -210,34 +205,18 @@
 \begin{frame}{Where this chapter is used in industry}
   \scriptsize
   \begin{center}
-  \begin{tabular}{@{}p{2.5cm}p{5.6cm}p{4.6cm}@{}}
+  \begin{tabular}{@{}p{3.0cm}p{5.2cm}p{4.5cm}@{}}
     \toprule
     \textbf{Sector} & \textbf{Concrete application} & \textbf{Which decision it drives} \\
     \midrule
-    Retail, supply chain & Demand forecast per article, store and week from price, promotion and calendar features & Replenishment orders, safety stock, promotion planning \\
-    Banking & Credit scoring, early-warning and collections prioritisation & Approve / decline, limit and risk-based pricing \\
-    Payments, e-commerce & Card-fraud and account-takeover scoring at transaction speed & Let through, challenge, or block --- in milliseconds \\
-    Advertising, platforms & Click-through and conversion prediction, search and feed ranking & Which item to show, and what to bid \\
-    Insurance & Claim triage and fraud referral from claim, policy and text-derived features & Straight-through settlement or human adjuster \\
-    Manufacturing, telco & Predictive maintenance from sensor and service logs; churn propensity & Maintenance windows and retention offers \\
+    Retail, supply chain & Demand per article, store and week from lagged sales, price, promotion and calendar features (LightGBM won the M5 competition) & The reorder quantity and safety stock released for next week \\
+    Payments, e-commerce & Card-fraud and account-takeover scoring at transaction speed & Let through, challenge, or block --- decided in milliseconds \\
+    Insurance & Claim triage and fraud referral from claim, policy and text-derived features & Straight-through settlement, or routed to a human adjuster \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \begin{industry}[The common thread]
-    Wide, mixed-type tabular data with missing values and interactions --- the setting where boosted trees beat both linear models and neural networks, and where they are today the default choice.
-  \end{industry}
-\end{frame}
-
-\begin{frame}{Industry case in depth: retail demand forecasting}
-  \footnotesize
-  \begin{industry}[The model]
-    \textbf{Response:} units sold per article $\times$ store $\times$ week (or day). \textbf{Predictors:} lagged and rolling sales, own and relative price, promotion and display flags, holidays and seasonality, article hierarchy and store attributes. Gradient boosting handles the mix natively --- LightGBM-based solutions dominated the M5 forecasting competition.
-  \end{industry}
-  \begin{readme}[What comes out --- and who uses it]
-    Not one number but a forecast \emph{distribution} per article--store--week: the replenishment system orders against a service-level quantile, while the same forecasts feed the sales and operations planning round that finance and supply chain sign off. A store or category planner then releases or overrides each proposed order, with attributions (e.g.\ SHAP) explaining the unusual ones.
-  \end{readme}
-  \begin{takeaway}[The honest caveat]
-    Trees predict step functions, so they \emph{cannot extrapolate}: a price point or a trend outside the training range gets clipped to the nearest observed level. Practitioners keep an explicit trend or price term, model in logs, and retrain on a cadence with drift monitoring.
+  \begin{takeaway}[The common thread: wide mixed-type tabular data]
+    All three feed hundreds of columns of mixed types, with missing values and interactions, into a model that must score fast and be retrained often. That is exactly the setting where boosted trees beat both linear models and neural networks --- and why they are the default choice there today.
   \end{takeaway}
 \end{frame}
 
@@ -405,9 +384,11 @@
       \end{itemize}
     \end{column}
   \end{columns}
-  \begin{industry}[Governance: the tree that fits on one page]
-    A small pruned tree survives in governance-heavy settings precisely because it is weak but printable: underwriting triage, call-centre routing and credit policy overlays are often shipped as a tree a committee can read and sign. Grow it too deep and it stops being a rule set --- and starts being unstable.
-  \end{industry}
+  \begin{takeaway}
+    A small pruned tree survives precisely because it is weak but
+    \emph{printable} --- a rule set you can read off one page. Grow it
+    deep and you lose that without gaining much accuracy.
+  \end{takeaway}
 \end{frame}
 
 % ====================== EXERCISES: Trees ======================
@@ -734,11 +715,10 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
   \end{block}
   \begin{alertblock}{Caveat}
     Correlated predictors share importance --- you may need to
-    interpret pairs together.
+    interpret pairs together. Impurity importance is also biased
+    towards high-cardinality variables (customer ID, postcode), so
+    prefer permutation importance when the ranking will be quoted.
   \end{alertblock}
-  \begin{industry}[Model risk: an importance ranking is not an explanation]
-    Impurity importance is biased towards high-cardinality variables (customer ID, postcode) and correlated predictors split the credit, so risk teams report permutation importance or SHAP instead --- the same attributions that produce the reason codes a declined applicant must be given.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Variable importance on the Boston data}
@@ -861,9 +841,11 @@ Expecting small $m$ to reduce \emph{bias}. Restricting candidates slightly \emph
         \end{enumerate}
     \end{enumerate}
   \end{block}
-  \begin{industry}[Banking: champion and challenger]
-    Many lenders keep an interpretable logistic scorecard as the model of record for the regulated decision and run a boosted model alongside it as a challenger, on discrimination and stability. The boosted model usually wins on accuracy; whether it may take the decision is a model-governance question, not a statistical one.
-  \end{industry}
+  \begin{takeaway}
+    Nothing here fits the response directly after the first step: every
+    tree after it fits the \emph{residual} left by the ones before, and
+    $\nu$ decides how much of each correction is kept.
+  \end{takeaway}
 \end{frame}
 
 \begin{frame}{Boosting: each tree fits what the last one missed}
@@ -909,11 +891,10 @@ Expecting small $m$ to reduce \emph{bias}. Restricting candidates slightly \emph
   \begin{takeaway}[Trade-off]
     Smaller $\nu$ usually wins but requires larger $B$. The product
     $\nu \cdot B$ controls effective fitting effort. Choose all three
-    by CV.
+    by CV --- but on time-ordered data, hold out \emph{later} periods
+    rather than random folds (Chapter~5), or the future leaks into
+    training and flatters every one of the three.
   \end{takeaway}
-  \begin{industry}[Forecasting and fraud: validate by time --- never at random]
-    In production, $B$ is fixed by early stopping on a held-out period. The random $K$-fold CV of Chapter~5 leaks the future into training on transaction or sales data and flatters the model; teams validate on later weeks than they train on.
-  \end{industry}
 \end{frame}
 
 \begin{frame}{Boosting vs.\ random forest: head-to-head}
@@ -934,9 +915,12 @@ Expecting small $m$ to reduce \emph{bias}. Restricting candidates slightly \emph
     regularisation on leaf weights, GPU support, native categorical
     handling, histogram-based splits.
   \end{readme}
-  \begin{industry}[Production: why these libraries are the default]
-    Native handling of missing values and categorical variables removes most feature engineering, and histogram splits make millions of rows routine --- which is why the same three libraries sit behind demand forecasts, fraud scores and ad ranking. Cost of ownership: scoring latency, retraining cadence, drift monitoring.
-  \end{industry}
+  \begin{takeaway}
+    Native handling of missing values and categorical variables removes
+    most of the feature engineering, and histogram splits make millions
+    of rows routine --- which is why these three, not \texttt{sklearn}'s
+    textbook implementation, are what actually ships.
+  \end{takeaway}
 \end{frame}
 
 

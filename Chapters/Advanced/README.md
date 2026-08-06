@@ -1,10 +1,11 @@
 # Advanced modules
 
-Seven optional, self-study modules. Four extend the taught course beyond ISLP —
+Eight optional, self-study modules. Four extend the taught course beyond ISLP —
 causal inference, model explanation, distribution-free uncertainty, and the
-GLM/spline machinery behind Chapters 4 and 7 — and three are ISLP chapters
+GLM/spline machinery behind Chapters 4 and 7 — and four are ISLP chapters
 lifted out of the taught sequence: support vector machines (Ch 9), survival
-analysis (Ch 11) and multiple testing (Ch 13). Each module is a full Beamer
+analysis (Ch 11), multiple testing (Ch 13) and unsupervised learning (Ch 12).
+Each module is a full Beamer
 deck in the course's house style — same box grammar, every exercise followed
 immediately by its worked solution, closing summary block, optional appendix —
 paired with a companion Jupyter notebook whose numbers match the slides
@@ -20,6 +21,7 @@ multiple-testing problem, which now draws on module A7.
 | A5 | Support Vector Machines *(ISLP Ch 9)* | Maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by CV | 94 pages | 7 + 3 | `advanced_05_svm_lab.ipynb` |
 | A6 | Survival Analysis *(ISLP Ch 11)* | Censoring, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 94 pages | 7 + 3 | `advanced_06_survival_lab.ipynb` |
 | A7 | Multiple Testing *(ISLP Ch 13)* | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 70 pages | 5 + 3 | `advanced_07_multiple_testing_lab.ipynb` |
+| A8 | Unsupervised Learning *(ISLP Ch 12)* | No test error to validate against, PCA (loadings, scores, PVE, biplot), scaling, *K*-means and its local optima, dendrograms, linkage and dissimilarity, clusters in pure noise | 100 pages | 6 + 3 | `advanced_08_unsupervised_lab.ipynb` |
 
 ## Prerequisites
 
@@ -32,6 +34,7 @@ Each module assumes the course chapters it extends:
 - **A5** — Ch 4 (classification, ROC/AUC), Ch 5 (cross-validation).
 - **A6** — Ch 0 (distributions, tests), Ch 3 (regression), Ch 4 (logistic regression).
 - **A7** — Ch 0 (hypothesis testing, *p*-values), Ch 5 (resampling).
+- **A8** — Ch 2 (what a test error buys you), Ch 5 (resampling, stability).
 
 ## Layout
 

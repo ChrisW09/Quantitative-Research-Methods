@@ -1,21 +1,21 @@
 ---
 myst:
   html_meta:
-    description: "The thirteen-session semester plan — a taught precourse session plus ten ISLP chapters — with the recommended split points and the assessment calendar."
+    description: "The twelve-session semester plan — a taught precourse session plus nine ISLP chapters — with the recommended split points and the assessment calendar."
 ---
 
 # The course at a glance
 
 {.qrm-lead}
-A 13-session semester (13 × 180 min), worth **6 ECTS**: one taught precourse
-session covering both precourse decks, then ten ISLP chapters taught in book
+A 12-session semester (12 × 180 min), worth **6 ECTS**: one taught precourse
+session covering both precourse decks, then nine ISLP chapters taught in book
 order.
 
 :::{container} qrm-chips
-[**13** sessions × **180 min**]{.qrm-chip}
+[**12** sessions × **180 min**]{.qrm-chip}
 [**6** ECTS]{.qrm-chip}
 [**1** taught precourse session]{.qrm-chip}
-[**10** ISLP chapters]{.qrm-chip}
+[**9** ISLP chapters]{.qrm-chip}
 [**3 + 5** practice exams]{.qrm-chip}
 :::
 
@@ -38,8 +38,7 @@ that is what the decks, the labs, the exercise numbering and the
 | **Ch 6** | 1 | Subset selection; Cₚ/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
 | **Ch 7** | 1 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | **Ch 8** | 1 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
-| **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization (PyTorch) | 10.1–10.6 |
-| **Ch 12** | 1 | Principal components; *K*-means; hierarchical clustering and linkage | 12.x |
+| **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization (PyTorch) — the last taught session | 10.1–10.6 |
 
 Chapter 1 is short and opens the same session as the first half of Chapter 2.
 
@@ -67,18 +66,19 @@ twelve-question self-check on page 7 of `chapter_00.pdf` and the notation table
 on page 5 of `chapter_00b.pdf` — see [For students](for-students.md).
 ```
 
-```{admonition} Three chapters sit outside the taught plan
+```{admonition} Four chapters sit outside the taught plan
 :class: note
 
-Chapters **9 (Support Vector Machines)**, **11 (Survival Analysis)** and
-**13 (Multiple Testing)** are no longer taught in the sequence. Each keeps its
-full deck and its lab, now as a self-study [advanced module](advanced.md) — A5,
-A6 and A7 respectively — under `Chapters/Advanced/`. The remaining ten chapters
-run in book order, so nothing else moved.
+Chapters **9 (Support Vector Machines)**, **11 (Survival Analysis)**,
+**12 (Unsupervised Learning)** and **13 (Multiple Testing)** are no longer
+taught in the sequence. Each keeps its full deck and its lab, now as a
+self-study [advanced module](advanced.md) — A5, A6, A8 and A7 respectively —
+under `Chapters/Advanced/`. The remaining nine chapters run in book order, so
+nothing else moved.
 
 The mock exams were **not** rewritten: the final papers and Short Exam E still
 carry a multiple-testing problem, which now draws on module A7 rather than on a
-taught session.
+taught session, and any unsupervised-learning question now draws on module A8.
 ```
 
 ## Assessment
@@ -87,7 +87,8 @@ The module is worth **6 ECTS** and is graded by a **single written exam at the
 end of the semester — 120 minutes, 100% of the mark**. The
 [Final Mock Exam](exams.md) is built as the rehearsal for that paper: same
 length, same structure, weighted to Chapters 7, 8, 10 and 13 — the last of which
-is now the self-study module [A7](advanced.md).
+is now the self-study module [A7](advanced.md). Any unsupervised-learning
+question draws on module [A8](advanced.md), for the same reason.
 
 ## Practice rhythm
 
@@ -108,8 +109,8 @@ as homework.
 | Mock Exam 2 | after Ch 6 | Chapters 4–6 (+ light cumulative) | 90 min · 90 pts |
 | Short Exam C | after Ch 6 | Ch 0 + 0b, Ch 3, **Ch 6** | 60 min · 60 pts |
 | Short Exam D | after Ch 8 | Ch 2 + 5, Ch 2 + 4, **Ch 8** | 60 min · 60 pts |
-| Final Mock Exam | end of course | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
-| Short Exam E | end of course | Ch 0, Ch 5 + 7, **Ch 13** *(module A7)* | 60 min · 60 pts |
+| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and modules A7 and A8) | 120 min · 120 pts |
+| Short Exam E | after Ch 10 | Ch 0, Ch 5 + 7, **Ch 13** *(module A7)* | 60 min · 60 pts |
 
 The three mock exams are the full-length rehearsals; the five 60-minute short
 exams are the formative layer, and the bold chapter is where each one's hardest
