@@ -21,7 +21,7 @@ TOLERANCE_PT = 12.0
 
 def main() -> None:
     rows = []
-    for folder in sorted(SLIDES.glob("chapter_*")):
+    for folder in sorted(SLIDES.glob("chapter_*")) + sorted((SLIDES / "Advanced").glob("advanced_*")):
         log = folder / f"{folder.name}.log"
         pdf = folder / f"{folder.name}.pdf"
         # A folder with no .tex holds no deck at all, so there is nothing that
