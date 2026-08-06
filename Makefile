@@ -3,7 +3,8 @@
 #   make            rebuild anything out of date (figures, decks, index)
 #   make decks      rebuild every lecture deck that changed
 #   make deck-03    rebuild one deck
-#   make figures    regenerate the precourse figures from the datasets
+#   make figures    regenerate every taught deck's figures from the datasets
+#   make adv-figures  the same for the advanced modules (not part of "all")
 #   make handouts   printable 2-up handouts for every deck
 #   make index      refresh Teaching_Guide/slide_index.md
 #   make docs       build the documentation site locally
@@ -40,7 +41,7 @@ LATEX     := pdflatex -interaction=nonstopmode -halt-on-error
 DECK_PDFS := $(foreach c,$(CHAPTERS),$(SLIDEDIR)/chapter_$(c)/chapter_$(c).pdf)
 HANDOUT_PDFS := $(foreach c,$(CHAPTERS),$(HANDOUTS)/chapter_$(c)_handout.pdf)
 
-.PHONY: all decks figures handouts index docs exams clean check runsheets notebooks advanced help
+.PHONY: all decks figures adv-figures handouts index docs exams clean check runsheets notebooks advanced help
 .DEFAULT_GOAL := all
 
 all: figures decks index
@@ -86,37 +87,48 @@ $(foreach a,$(ADVANCED),$(eval $(call ADV_RULE,$(a))))
 advanced: $(ADV_PDFS)
 
 # ------------------------------------------------------------- generated figures
-# Only the two precourse decks generate their figures from the datasets. Each
-# script writes a whole directory of PNGs at once, so a stamp file stands in for
-# them: it keeps the run incremental, and it lets the two decks declare a real
-# dependency on their figures. Without that dependency an edited script never
-# triggers a rebuild, and `make -j` can compile a deck while a PNG is still
-# half-written. (The datasets themselves are not listed: make cannot handle the
-# spaces in "ALL CSV FILES - 2nd Edition", and they never change.)
-FIG_STAMPS := $(SLIDEDIR)/chapter_00/.figures.stamp \
-              $(SLIDEDIR)/chapter_00b/.figures.stamp
-
-$(SLIDEDIR)/chapter_00/.figures.stamp: $(SLIDEDIR)/chapter_00/make_figures.py
-	@echo "  [figures]  chapter_00"
-	@$(PYTHON) $(SLIDEDIR)/chapter_00/make_figures.py >/dev/null
-	@touch $@
-
-$(SLIDEDIR)/chapter_00b/.figures.stamp: $(SLIDEDIR)/chapter_00b/make_figures.py
-	@echo "  [figures]  chapter_00b"
-	@$(PYTHON) $(SLIDEDIR)/chapter_00b/make_figures.py >/dev/null
-	@touch $@
-
-figures: $(FIG_STAMPS)
-
-# Extra prerequisites for the two decks that use generated figures. A rule with
-# no recipe only adds prerequisites; the build commands stay in DECK_RULE above.
-# The stamp alone is not enough: it only tracks the *script*, so a figure that
+# Every deck, taught or advanced, computes its own figures from the datasets with
+# a make_figures.py in its directory. Each script writes a whole directory of
+# PNGs at once, so a stamp file stands in for them: it keeps the run incremental,
+# and it lets each deck declare a real dependency on its figures. Without that
+# dependency an edited script never triggers a rebuild, and `make -j` can compile
+# a deck while a PNG is still half-written. (The datasets themselves are not
+# listed: make cannot handle the spaces in "ALL CSV FILES - 2nd Edition", and
+# they never change.)
+#
+# Generated per deck rather than written out one deck at a time, so a new deck's
+# figures are wired in by adding it to CHAPTERS or ADVANCED and nothing else —
+# which is how chapter_07's figures went unbuilt for as long as they did.
+#
+# The second rule in the template has no recipe: a rule with no recipe only adds
+# prerequisites, leaving the build commands in DECK_RULE / ADV_RULE above. The
+# stamp alone is not enough — it only tracks the *script*, so a figure that
 # changed by any other route (a hand-tweaked PNG, a half-restored file) would not
 # rebuild the deck that includes it. Listing the images as well covers that.
-$(SLIDEDIR)/chapter_00/chapter_00.pdf:   $(SLIDEDIR)/chapter_00/.figures.stamp \
-                                         $(wildcard $(SLIDEDIR)/chapter_00/images/*)
-$(SLIDEDIR)/chapter_00b/chapter_00b.pdf: $(SLIDEDIR)/chapter_00b/.figures.stamp \
-                                         $(wildcard $(SLIDEDIR)/chapter_00b/images/*)
+#
+#   $(1)  the deck's directory        $(2)  the deck's base name
+define FIG_RULE
+$(1)/.figures.stamp: $(1)/make_figures.py
+	@echo "  [figures]  $(2)"
+	@$$(PYTHON) $(1)/make_figures.py >/dev/null
+	@touch $$@
+
+$(1)/$(2).pdf: $(1)/.figures.stamp $$(wildcard $(1)/images/*)
+endef
+
+$(foreach c,$(CHAPTERS),$(eval $(call FIG_RULE,$(SLIDEDIR)/chapter_$(c),chapter_$(c))))
+$(foreach a,$(ADVANCED),$(eval $(call FIG_RULE,$(ADV_DIR)/$(a),$(a))))
+
+FIG_STAMPS     := $(foreach c,$(CHAPTERS),$(SLIDEDIR)/chapter_$(c)/.figures.stamp)
+ADV_FIG_STAMPS := $(foreach a,$(ADVANCED),$(ADV_DIR)/$(a)/.figures.stamp)
+
+# "figures" covers the taught decks, so "all" regenerates exactly what "all"
+# compiles. The advanced modules pull their figures in through the deck
+# dependency above when "make advanced" runs, which keeps them out of the
+# default build exactly as their PDFs are; "make adv-figures" forces just those.
+figures: $(FIG_STAMPS)
+
+adv-figures: $(ADV_FIG_STAMPS)
 
 # -------------------------------------------------------------------- handouts
 define HANDOUT_RULE
