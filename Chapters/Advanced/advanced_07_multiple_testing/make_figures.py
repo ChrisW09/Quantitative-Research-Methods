@@ -206,6 +206,73 @@ def fig_bh():
         save(fig, "ch13_bh.png")
 
 
+# The 15 sorted p-values of the Bonferroni-vs-Holm panel, recovered from the
+# published figure (the draft script that simulated them is lost): every marker
+# centre was read off the log axis of images/ch13_x_holm_bonf.png, which is
+# calibrated to better than a fifth of a pixel by its decade ticks.  p_(4) is
+# the one value the slide quotes, so it is carried at the slide's precision.
+P_HOLM = np.array([0.000268, 0.00177, 0.00189, 0.0041, 0.0136, 0.0198,
+                   0.191, 0.204, 0.208, 0.337, 0.472, 0.524, 0.703, 0.814,
+                   0.963])
+
+
+def fig_x_holm_bonf():
+    """Bonferroni's flat bar against Holm's rising thresholds, m = 15.
+
+    Bonferroni rejects every p below alpha/m = 0.05/15 ~ 0.0033, i.e. the three
+    smallest.  Holm walks down the sorted list against alpha/(m-j+1) and stops
+    at the first failure: it clears rank 4 as well, because
+    p_(4) = 0.0041 < 0.05/12 ~ 0.0042, and fails at rank 5
+    (0.0136 > 0.05/11 ~ 0.0045).  So Holm rejects 4, Bonferroni 3.
+    """
+    p = P_HOLM
+    m, alpha = len(p), 0.05
+    j = np.arange(1, m + 1)
+    holm = alpha / (m - j + 1)
+    bonf = alpha / m
+    n_bonf = int((p <= bonf).sum())
+    failed = np.flatnonzero(p > holm)
+    n_holm = int(failed[0]) if failed.size else m
+    both = j <= n_bonf
+    holm_only = (j > n_bonf) & (j <= n_holm)
+    kept = j > n_holm
+
+    style = dict(DRAFT_STYLE)
+    style.update({"axes.titlesize": 13, "axes.labelsize": 13})
+    with plt.rc_context(style):
+        fig, ax = plt.subplots(figsize=(7.1, 4.0))
+        ax.set_yscale("log")
+        ax.step(j, holm, where="mid", color=ACCENT, lw=2.0)
+        ax.axhline(bonf, color=ORANGE_D, ls="--", lw=2.0)
+        ax.scatter(j[kept], p[kept], s=70, facecolors="none",
+                   edgecolors=GREY_M, lw=1.0, label="not rejected")
+        ax.scatter(j[both], p[both], s=82, color=GREEN_D,
+                   label=f"rejected by both ({n_bonf})")
+        ax.scatter(j[holm_only], p[holm_only], s=82, marker="D",
+                   color=ORANGE_D,
+                   label=f"rejected by Holm only ({n_holm - n_bonf})")
+        # Both captions sit in the empty band left of / below their own line:
+        # the Holm caption is parked between rank 6's circle and the staircase,
+        # the Bonferroni caption just under its dashed bar and above the legend.
+        ax.text(6.74, 0.01673, r"Holm: $\alpha/(m-j+1)$", color=ACCENT,
+                fontsize=12)
+        ax.text(10.25, 0.00213,
+                rf"Bonferroni: $\alpha/m \approx {bonf:.4f}$",
+                color=ORANGE_D, fontsize=12)
+        ax.set_title(rf"$m = {m}$ tests, $\alpha = {alpha}$: "
+                     f"Holm rejects {n_holm}, Bonferroni {n_bonf}")
+        ax.set_xlabel("rank $j$")
+        ax.set_ylabel(r"sorted $p$-value $p_{(j)}$ (log scale)")
+        ax.set_xticks(j)
+        handles, labels = ax.get_legend_handles_labels()
+        order = [1, 2, 0]
+        ax.legend([handles[i] for i in order], [labels[i] for i in order],
+                  loc="lower right", frameon=False, fontsize=10)
+        save(fig, "ch13_x_holm_bonf.png")
+    print(f"ch13_x_holm_bonf: Bonferroni {n_bonf}, Holm {n_holm}, "
+          f"alpha/m = {bonf:.4f}, p_(4) = {p[3]:.4f} < {alpha / 12:.4f}")
+
+
 # Bin counts of the p-value histogram panel, recovered from the published
 # figure: 20 equal bins on [0, 1], 3000 tests, 2400 of them true nulls.
 COUNTS_PVAL = np.array([664, 170, 124, 122, 134, 142, 111, 96, 142, 111,
@@ -240,4 +307,5 @@ if __name__ == "__main__":
     fig_fwer()
     fig_thresholds()
     fig_bh()
+    fig_x_holm_bonf()
     fig_pval_hist()

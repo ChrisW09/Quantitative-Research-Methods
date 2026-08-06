@@ -54,7 +54,7 @@ APPENDIX_RC = {"font.size": 13, "axes.titlesize": 13, "axes.grid": False}
 APPENDIX_SIZE = (10.01, 3.61)
 # Scatter style shared by panels (a) and (b) of the Wage overview: 3000 points
 # in a third of the figure, so small and faint enough to read as a cloud.
-DOTS = {"s": 9, "color": GREY, "alpha": 0.21, "linewidths": 0}
+DOTS = {"s": 7.5, "color": GREY, "alpha": 0.23, "linewidths": 0}
 
 
 def save(fig, name):

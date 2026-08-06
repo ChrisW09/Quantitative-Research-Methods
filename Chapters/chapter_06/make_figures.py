@@ -221,19 +221,19 @@ def fig_ridge_cv():
     ])
     i = mse.argmin()
 
-    with plt.rc_context({"font.size": 11, "axes.titlesize": 12, "axes.grid": False}):
-        fig, ax = plt.subplots(figsize=(6.94, 3.94))
+    with plt.rc_context({"font.size": 13, "axes.titlesize": 13, "axes.grid": False}):
+        fig, ax = plt.subplots(figsize=(7.0, 4.0))
         ax.axvline(np.log10(alphas[i]), color=PATH_ORANGE, ls="--", lw=1.8, zorder=2)
         ax.plot(np.log10(alphas), mse / 1e3, color=PATH_BLUE, lw=2.4, zorder=3)
         ax.plot(np.log10(alphas[i]), mse[i] / 1e3, "o", color=PATH_ORANGE, ms=9,
                 zorder=4)
-        # the flat left arm of the curve leaves this pocket empty, so the
-        # label sits clear of both the dashed line and the curve
+        # the flat left arm of the curve leaves this pocket empty, so the label
+        # sits clear of the dashed line, the curve and the axis labels
         ax.text(
-            0.78, 127.5,
+            0.762, 127.2,
             f"$\\lambda^{{*}} \\approx {alphas[i]:.1f}$\n"
-            f"CV MSE $\\approx$ {mse[i] / 1e3:.0f}k",
-            fontsize=11, color="#333333", ha="left", va="center",
+            f"CV MSE $\\approx {mse[i] / 1e3:.0f}$k",
+            fontsize=12, color="#333333", ha="left", va="center",
         )
         ax.set_title(r"Ridge on Hitters: cross-validation picks $\lambda$")
         ax.set_xlabel(r"$\log_{10}(\lambda)$")

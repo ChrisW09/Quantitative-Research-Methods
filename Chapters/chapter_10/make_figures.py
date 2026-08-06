@@ -9,6 +9,7 @@ Output: Chapters/chapter_10/images/ch10_*.png at 150 dpi, matching the other dec
 touched.
 """
 
+import functools
 from pathlib import Path
 
 import matplotlib
@@ -47,6 +48,23 @@ plt.rcParams.update(
         "grid.linewidth": 0.6,
     }
 )
+
+
+# The activation / training / descent figures are wide two-panel plots that sit on a
+# slide at 0.88--0.92\textwidth, so they were authored one step up from the module's
+# label sizes; this context reproduces the committed PNGs' typography exactly.
+BIG_LABELS = {"font.size": 12.8, "axes.titlesize": 14.0, "legend.fontsize": 10.0}
+
+
+def big_labels(fn):
+    """Run *fn* under BIG_LABELS instead of the module's default label sizes."""
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        with plt.rc_context(BIG_LABELS):
+            return fn(*args, **kwargs)
+
+    return wrapper
 
 
 def save(fig, name):
@@ -93,6 +111,7 @@ def fig_conv_vs_dense():
           f"ratio {dense[i32]/1216:,.0f}x")
 
 
+@big_labels
 def fig_activations():
     """The three activation functions and their derivatives, in closed form.
 
@@ -112,7 +131,7 @@ def fig_activations():
     d_tanh = 1.0 - tanh ** 2
     d_relu = (z > 0).astype(float)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.86, 3.44))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.0, 3.60))
 
     for ax in (ax1, ax2):
         ax.grid(False)
@@ -126,7 +145,7 @@ def fig_activations():
     ax1.set_ylim(-1.4, 3.0)          # clips ReLU at z = 3 so the S-curves stay readable
     ax1.set_ylabel("$g(z)$")
     ax1.set_title("Activation functions")
-    ax1.legend(loc="upper left", frameon=False, fontsize=8.5)
+    ax1.legend(loc="upper left", frameon=False)
 
     ax2.plot(z, d_sig, color=ACCENT, lw=2, label="sigmoid$'$  ($\\leq 0.25$)")
     ax2.plot(z, d_tanh, color=AMBER, lw=2, label="tanh$'$")
@@ -134,13 +153,14 @@ def fig_activations():
     ax2.set_ylim(-0.1, 1.1)
     ax2.set_ylabel("$g'(z)$")
     ax2.set_title("Derivatives (gradient flow)")
-    ax2.legend(loc="upper left", frameon=False, fontsize=8.5)
+    ax2.legend(loc="upper left", frameon=False)
 
     save(fig, "ch10_activations.png")
     print("wrote ch10_activations.png:  max sigmoid' =", round(d_sig.max(), 4),
           " ReLU' on the active region =", round(d_relu[z > 0].min(), 4))
 
 
+@big_labels
 def fig_training():
     """Gradient descent on a convex loss (left) and an overfitting run (right).
 
@@ -172,7 +192,7 @@ def fig_training():
         path.append(path[-1] - eta * dL(path[-1]))
     path = np.array(path)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.86, 3.44))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.0, 3.60))
     ax1.grid(False)
     ax2.grid(False)
 
@@ -220,7 +240,7 @@ def fig_training():
     ax2.set_xlabel("epoch")
     ax2.set_ylabel("loss")
     ax2.set_title("Training vs. validation loss")
-    ax2.legend(loc="upper right", frameon=False, fontsize=9)
+    ax2.legend(loc="upper right", frameon=False)
 
     save(fig, "ch10_training.png")
     print("wrote ch10_training.png:  left L(-3) =", L(path[0]),
@@ -229,6 +249,7 @@ def fig_training():
           "val-final", round(val[-1], 3), "train-final", round(train[-1], 3))
 
 
+@big_labels
 def fig_x_gradient_descent():
     """Gradient descent on the anisotropic quadratic $(1.5-w_1)^2 + 8(w_2-1)^2$.
 
@@ -262,7 +283,7 @@ def fig_x_gradient_descent():
     slow = descend(0.05)
     fast = descend(0.115)
 
-    fig, ax = plt.subplots(figsize=(6.72, 3.90))
+    fig, ax = plt.subplots(figsize=(6.82, 4.00))
     ax.grid(False)
 
     g1 = np.linspace(-2.3, 3.4, 400)
@@ -279,12 +300,13 @@ def fig_x_gradient_descent():
     ax.plot(*w_star, "*", color=GREEN, ms=16, zorder=5,
             label="minimum $(1.5,\\,1)$")
     ax.plot(-1.5, -0.5, "s", color="black", ms=6, zorder=5)
-    ax.text(-1.5, -0.72, "start", color="#2A2A2A", ha="center", va="top", fontsize=9)
+    ax.text(-1.85, -1.02, "start", color="#2A2A2A", ha="center", va="center")
 
+    ax.set_yticks([-1, 0, 1, 2])
     ax.set_xlabel("$w_1$")
     ax.set_ylabel("$w_2$")
     ax.set_title("Gradient descent on $(1.5-w_1)^2 + 8(w_2-1)^2$")
-    ax.legend(loc="upper left", frameon=False, fontsize=8.5,
+    ax.legend(loc="upper left", frameon=False,
               handlelength=1.6, borderaxespad=0.2)
 
     save(fig, "ch10_x_gradient_descent.png")

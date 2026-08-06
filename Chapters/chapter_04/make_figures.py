@@ -268,8 +268,9 @@ def fig_sigmoid():
         ax2.axvline(0.5, color=GREY, ls=":", lw=1.1, zorder=1)
         ax2.plot(p, lo, color=GREEN, lw=2.8, zorder=3)
         ax2.plot([0.5], [0.0], "o", color=GREEN, ms=9, zorder=4)
-        ax2.text(0.045, 3.55, r"$\mathrm{logit}(p) = \log\dfrac{p}{1 - p}$",
-                 color=GREEN, fontsize=15)
+        # sized and placed to finish left of the dotted p = 0.5 rule
+        ax2.text(0.030, 3.45, r"$\mathrm{logit}(p) = \log\dfrac{p}{1 - p}$",
+                 color=GREEN, fontsize=13)
         ax2.text(0.60, 4.35, r"$\rightarrow +\infty$", color=GREY, fontsize=11)
         ax2.text(0.035, -5.05, r"$\rightarrow -\infty$", color=GREY, fontsize=11)
         ax2.set_title("Log-odds scale is linear & unbounded", color=GREEN)
@@ -315,8 +316,12 @@ def fig_roc():
                 label="random (AUC=0.50)")
         ax.plot(fpr, tpr, color=ACCENT, lw=2.8, label=f"logistic ROC (AUC={auc:.3f})")
         ax.plot([fpr50], [sens], "o", color=RED, ms=11, label="threshold = 0.5")
-        ax.text(0.028, 0.295, f"0.5 cutoff\nsens={sens:.2f}, 1-spec={fpr50:.2f}",
-                color=RED, fontsize=11.5, va="top")
+        # the caption sits above the 45-degree chance line, which would
+        # otherwise run straight through "1-spec=0.00"
+        ax.annotate(f"0.5 cutoff\nsens={sens:.2f}, 1-spec={fpr50:.2f}",
+                    xy=(fpr50 + 0.012, sens + 0.015), xytext=(0.032, 0.405),
+                    color=RED, fontsize=11.5, va="bottom",
+                    arrowprops=dict(arrowstyle="-", color=RED, lw=0.9))
         ax.set_title(r"ROC curve: default $\sim$ balance + income + student")
         ax.set_xlabel("1 - specificity (false positive rate)")
         ax.set_ylabel("sensitivity (true positive rate)")
@@ -482,10 +487,12 @@ def fig_lda_qda():
              draw([2.4, 0.7], rotated(1.80, 0.40, -0.50)))
 
     # explicit windows: the legend corner has to stay clear of the QDA conic
+    # windows leave an empty band at the bottom left for the legend: both
+    # boundaries sweep across the top left, so a legend there gets struck through
     panels = ((r"Equal covariance $\rightarrow$ LDA optimal", left,
-               (-5.0, 5.2), (-5.2, 4.7)),
+               (-5.0, 5.2), (-6.2, 4.7)),
               (r"Unequal covariance $\rightarrow$ QDA optimal", right,
-               (-4.6, 7.3), (-4.7, 5.4)))
+               (-4.6, 7.3), (-6.0, 5.4)))
 
     with plt.rc_context(LARGE):
         fig, axes = plt.subplots(1, 2, figsize=(10.1, 3.91))
@@ -515,7 +522,7 @@ def fig_lda_qda():
             ax.legend(handles=[Line2D([], [], color=RED, lw=2.6, label="LDA (linear)"),
                                Line2D([], [], color=GREEN, lw=2.6, ls="--",
                                       label="QDA (curved)")],
-                      loc="upper left", frameon=False, fontsize=12,
+                      loc="lower left", frameon=False, fontsize=12,
                       handlelength=2.0, borderaxespad=0.3)
         axes[0].set_ylabel(r"$X_2$")
 
