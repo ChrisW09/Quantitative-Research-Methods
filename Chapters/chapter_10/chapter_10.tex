@@ -286,19 +286,19 @@
 \begin{frame}{Feed-forward network as a labelled graph}
   \begin{center}
   \begin{tikzpicture}[
-      x=1.7cm,y=0.9cm,>={Stealth[length=2mm]},
-      inp/.style={circle,draw=accent,fill=accent!12,minimum size=7.5mm,inner sep=0pt,font=\small},
-      hid/.style={circle,draw=orange!70!black,fill=orange!15,minimum size=7.5mm,inner sep=0pt,font=\small},
-      onode/.style={circle,draw=green!55!black,fill=green!15,minimum size=7.5mm,inner sep=0pt,font=\small},
+      x=1.7cm,y=0.8cm,>={Stealth[length=2mm]},
+      inp/.style={circle,draw=accent,fill=accent!12,minimum size=7mm,inner sep=0pt,font=\small},
+      hid/.style={circle,draw=orange!70!black,fill=orange!15,minimum size=7mm,inner sep=0pt,font=\small},
+      onode/.style={circle,draw=green!55!black,fill=green!15,minimum size=7mm,inner sep=0pt,font=\small},
       edge/.style={draw=black!22,line width=0.4pt}]
     \foreach \i in {1,...,4} \node[inp] (I\i) at (0,{2.5-(\i-1)}) {$X_{\i}$};
     \foreach \j in {1,...,5} \node[hid] (H\j) at (2,{3-(\j-1)}) {$A_{\j}$};
     \node[onode] (O) at (4,1) {$\hat Y$};
     \foreach \i in {1,...,4}\foreach \j in {1,...,5} \draw[edge] (I\i) -- (H\j);
     \foreach \j in {1,...,5} \draw[edge,->] (H\j) -- (O);
-    \node[font=\footnotesize\bfseries,text=accent] at (0,-1.35) {Input layer ($p=4$)};
-    \node[font=\footnotesize\bfseries,text=orange!70!black] at (2,-1.35) {Hidden layer ($K=5$)};
-    \node[font=\footnotesize\bfseries,text=green!45!black] at (4,-1.35) {Output};
+    \node[font=\footnotesize\bfseries,text=accent] at (0,-1.9) {Input layer ($p=4$)};
+    \node[font=\footnotesize\bfseries,text=orange!70!black] at (2,-1.9) {Hidden layer ($K=5$)};
+    \node[font=\footnotesize\bfseries,text=green!45!black] at (4,-1.9) {Output};
   \end{tikzpicture}
   \end{center}
   \begin{takeaway}
@@ -776,7 +776,7 @@
 
 \begin{frame}{The convolution operation}
   \begin{center}
-  \begin{tikzpicture}[x=0.62cm,y=0.58cm,>={Stealth[length=2mm]},font=\small]
+  \begin{tikzpicture}[x=0.60cm,y=0.56cm,>={Stealth[length=2mm]},font=\small]
     \foreach \r in {0,...,4}\foreach \c in {0,...,4}
       \draw[fill=accent!6,draw=accent!40] (\c,-\r) rectangle ++(1,-1);
     \draw[draw=orange!80!black,line width=1.4pt,fill=orange!18,fill opacity=0.5]
@@ -791,7 +791,7 @@
     \end{scope}
     \draw[->,line width=1pt,orange!70!black] (3.05,-1.5) .. controls (5.6,0.3) .. (8.2,-1.5);
     \node[font=\scriptsize] at (5.6,0.9) {$\sum(\text{filter}\odot\text{patch})+b$};
-    \node[font=\scriptsize,text=gray] at (5.6,-3.2) {stride $=1$, valid $\Rightarrow 5-3+1=3$};
+    \node[font=\scriptsize,text=gray] at (5.6,-6.4) {stride $=1$, valid $\Rightarrow 5-3+1=3$};
   \end{tikzpicture}
   \end{center}
   \begin{takeaway}
@@ -1211,23 +1211,23 @@
 
 \begin{frame}[fragile]{An MLP in PyTorch}
   \begin{lstlisting}
-import torch
-from torch import nn, optim
+import torch                    # tensors + autograd (the gradients)
+from torch import nn, optim     # layer library, optimisers
 
-class MLP(nn.Module):              # a model = a subclass of nn.Module
-    def __init__(self, p, k=32, K=2):   # p inputs, k hidden units, K classes
-        super().__init__()
-        self.net = nn.Sequential(       # layers applied in order:
-            nn.Linear(p, k),            #   affine map  W x + b   (p -> k)
-            nn.ReLU(),                  #   nonlinearity  max(0, z)
-            nn.Dropout(0.2),            #   randomly zero 20% of units (regularises)
-            nn.Linear(k, k), nn.ReLU(), nn.Dropout(0.2),   # second hidden layer
-            nn.Linear(k, K))            #   output layer: K logits (no softmax here)
-    def forward(self, x):               # forward pass: how inputs become outputs
-        return self.net(x)
+class MLP(nn.Module):        # a model = a subclass of nn.Module
+    def __init__(self, p, k=32, K=2):  # p inputs, k hidden units, K classes
+        super().__init__()      # register the module; must come first
+        self.net = nn.Sequential(   # __init__ DECLARES layers + weights
+            nn.Linear(p, k),        #   affine map  W x + b   (p -> k)
+            nn.ReLU(),              #   nonlinearity max(0, z) (Exercise 10.2)
+            nn.Dropout(0.2),        #   zero 20% of units while training
+            nn.Linear(k, k), nn.ReLU(), nn.Dropout(0.2),   # 2nd hidden layer
+            nn.Linear(k, K))        #   K logits, no softmax (the loss adds it)
+    def forward(self, x):      # forward() RUNS those layers on a batch x
+        return self.net(x)     # model(x) calls this; autograd records each op
 
-model = MLP(p=Xtr.shape[1])             # build the network for our p predictors
-opt = optim.Adam(model.parameters(), lr=1e-3)   # optimiser: Adam, learning rate 0.001
+model = MLP(p=Xtr.shape[1])   # p predictors in, k=32 hidden units per layer
+opt = optim.Adam(model.parameters(), lr=1e-3)   # Adam owns the weights it moves
   \end{lstlisting}
 \end{frame}
 
@@ -1287,15 +1287,20 @@ opt = optim.Adam(model.parameters(), lr=1e-3)   # optimiser: Adam, learning rate
 \begin{lstlisting}
 import numpy as np                # numerics library
 
-z = np.array([2.0, 1.0, 0.1])     # logits from the network
-p = np.exp(z) / np.exp(z).sum()   # softmax: exponentiate, normalise
-print("probs:", np.round(p, 3))   # [0.659 0.242 0.099]
+z = np.array([2.0, 1.0, 0.1])     # the raw scores (logits) a net emits
+p = np.exp(z) / np.exp(z).sum()   # softmax: make positive, rescale to sum 1
+print("probs:", np.round(p, 3))   # [0.659 0.242 0.099] -- sums to 1
 
-y = 0                             # true class label
-loss = -np.log(p[y])              # cross-entropy = -log(true-class prob)
-print("loss:", round(float(loss), 3))   # 0.417
+y = 0                             # index of the TRUE class
+loss = -np.log(p[y])              # cross-entropy reads off p[y] only
+print("loss:", round(float(loss), 3))   # 0.417 = -log(0.659)
 \end{lstlisting}
 \end{solutionbox}
+\begin{readme}{\scriptsize
+  Line 3 holds \emph{logits} --- unbounded scores, not probabilities; line 4 turns them
+  into a probability vector, line 8 keeps only \texttt{p[0]}. PyTorch fuses both into
+  \texttt{nn.CrossEntropyLoss}.}
+\end{readme}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 10.6 (3/3)}
@@ -1357,14 +1362,14 @@ from torch import nn, optim
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-df = pd.read_csv("Default.csv")
+df = pd.read_csv("Default.csv")   # 10,000 credit-card customers
 df["y"]       = (df["default"] == "Yes").astype(int)  # response -> 0/1
-df["student"] = (df["student"] == "Yes").astype(int)  # dummy-code student
-X = df[["balance", "income", "student"]].astype(float).values
+df["student"] = (df["student"] == "Yes").astype(int)  # a net cannot multiply "Yes"
+X = df[["balance", "income", "student"]].astype(float).values  # 3 predictors
 Xtr, Xte, ytr, yte = train_test_split(X, df["y"].values,
-    train_size=200, random_state=0, stratify=df["y"])  # tiny train set!
-sc = StandardScaler().fit(Xtr)          # scale using TRAIN stats only
-Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)
+    train_size=200, random_state=0, stratify=df["y"])  # only 200 rows: easy to memorise
+sc = StandardScaler().fit(Xtr)          # scale on TRAIN stats only (no leakage)
+Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)   # same shift/scale applied to test
 # PyTorch works on tensors: features float32, labels int64
 Xtr, Xte = map(lambda a: torch.tensor(a, dtype=torch.float32), (Xtr, Xte))
 ytr, yte = map(lambda a: torch.tensor(a, dtype=torch.int64), (ytr, yte))
@@ -1376,22 +1381,22 @@ ytr, yte = map(lambda a: torch.tensor(a, dtype=torch.int64), (ytr, yte))
 \begin{solutionbox}[Solution --- code: train and record the loss after every epoch]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize\linespread{0.88}\selectfont]
 def curve(weight_decay, epochs=400):
-    torch.manual_seed(1)                       # reproducible weights
-    net = nn.Sequential(nn.Linear(3,128), nn.ReLU(),    # wide MLP
-        nn.Linear(128,128), nn.ReLU(), nn.Linear(128,2))
-    loss_fn = nn.CrossEntropyLoss()            # softmax + log-loss in one
-    opt = optim.Adam(net.parameters(), lr=1e-2,
-                     weight_decay=weight_decay)  # L2 penalty lives here
-    tr, va = [], []
-    for _ in range(epochs):              # 1 epoch = 1 full-batch step here
-        opt.zero_grad()                          # reset gradients
-        loss = loss_fn(net(Xtr), ytr)            # forward pass on TRAIN
-        loss.backward(); opt.step()              # backprop + update
-        with torch.no_grad():                    # eval: no gradients
+    torch.manual_seed(1)                    # same starting weights each call
+    net = nn.Sequential(nn.Linear(3,128), nn.ReLU(),    # wide MLP: 3 -> 128
+        nn.Linear(128,128), nn.ReLU(), nn.Linear(128,2))  # -> 128 -> 2 logits
+    loss_fn = nn.CrossEntropyLoss()         # softmax + log-loss in one call
+    opt = optim.Adam(net.parameters(), lr=1e-2,   # Adam is handed the weights
+                     weight_decay=weight_decay)   # L2 penalty lives here
+    tr, va = [], []                    # one loss value per epoch, for the plot
+    for _ in range(epochs):            # 1 epoch = 1 full-batch step here
+        opt.zero_grad()                # 1. wipe .grad: PyTorch ADDS to it
+        loss = loss_fn(net(Xtr), ytr)  # 2. forward: predict, then score
+        loss.backward(); opt.step()    # 3. fill every .grad  4. move weights
+        with torch.no_grad():          # scoring only -- build no graph
             tr.append(loss.item()); va.append(loss_fn(net(Xte), yte).item())
     return tr, va
-tr0, va0 = curve(0.0)    # unregularised -> memorises the 200 points
-tr1, va1 = curve(0.1)    # strong weight decay (L2)
+tr0, va0 = curve(0.0)    # no penalty -> memorises the 200 training points
+tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}

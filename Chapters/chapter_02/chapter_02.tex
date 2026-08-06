@@ -636,7 +636,7 @@ before seeing the data.
     % typical trade-off diagonal
     \draw[dashed,gray,-{Stealth[length=2.5mm]},thick]
           (0.9,4.70) -- (10.35,0.12)
-          node[pos=0.44,above,sloped,font=\scriptsize\itshape,
+          node[pos=0.44,above=4mm,sloped,font=\scriptsize\itshape,
                fill=white,inner sep=1pt]{typical trade-off};
     % methods (high interpretability / low flexibility -> the reverse)
     \node[meth] at (2.10,4.35) {Subset selection / Lasso};
@@ -1025,11 +1025,11 @@ data counts.
    \draw[gray,dashed,line width=1pt] (4.29,0)--(4.29,2.99);
    \fill[red!75!black] (4.29,2.99) circle (2.6pt);
    \node[font=\scriptsize,text=gray,below] at (4.29,-0.05) {optimal flexibility};
-   \begin{scope}[shift={(4.7,7.9)}]
+   \begin{scope}[shift={(2.3,7.9)}]
      \draw[draw=accent,line width=1.3pt] (0,0)--(0.55,0); \node[right,font=\scriptsize] at (0.55,0){Bias$^2$};
-     \draw[draw=orange!85!black,line width=1.3pt] (2.4,0)--(2.95,0); \node[right,font=\scriptsize] at (2.95,0){Variance};
+     \draw[draw=orange!85!black,line width=1.3pt] (2.9,0)--(3.45,0); \node[right,font=\scriptsize] at (3.45,0){Variance};
      \draw[draw=green!55!black,line width=1.2pt,dashed] (0,-1.0)--(0.55,-1.0); \node[right,font=\scriptsize] at (0.55,-1.0){Irreducible $\sigma^2$};
-     \draw[draw=red!75!black,line width=1.7pt] (2.4,-1.0)--(2.95,-1.0); \node[right,font=\scriptsize] at (2.95,-1.0){Test MSE (sum)};
+     \draw[draw=red!75!black,line width=1.7pt] (2.9,-1.0)--(3.45,-1.0); \node[right,font=\scriptsize] at (3.45,-1.0){Test MSE (sum)};
    \end{scope}
   \end{tikzpicture}
   \end{center}
@@ -1555,21 +1555,23 @@ Provide runnable code and state the expected qualitative result.
 \begin{frame}[fragile]{Solution --- Extended Exercise 2.2 (1/2)}
 \begin{solutionbox}
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
+import numpy as np                                   # arrays + the RNG
+from sklearn.neighbors import KNeighborsClassifier   # the vote-based model
 rng = np.random.default_rng(1)                       # seeded RNG (reproducible)
 def sample(n):                                       # draw n points, half per class
-    n0 = n // 2
+    n0 = n // 2                                      # class 0 gets half of n
     X = np.vstack([rng.normal([0,0], 1, (n0, 2)),    # class 0: centre (0,0)
                    rng.normal([2,2], 1, (n-n0, 2))]) # class 1: centre (2,2)
     return X, np.r_[np.zeros(n0), np.ones(n-n0)]     # features, labels 0/1
 Xtr, ytr = sample(200); Xte, yte = sample(2000)      # training and test sets
-tr, te = [], []
+tr, te = [], []                                      # one error rate per K
 for K in range(1, 51):                               # fit KNN for K = 1..50
-    m = KNeighborsClassifier(K).fit(Xtr, ytr)
+    m = KNeighborsClassifier(K).fit(Xtr, ytr)        # .fit() just stores rows
     tr.append(1 - m.score(Xtr, ytr)); te.append(1 - m.score(Xte, yte))  # err = 1 - acc
 print("best K =", int(np.argmin(te)) + 1, "min test err =", round(min(te), 3))
 \end{lstlisting}
+\smallskip
+{\scriptsize KNN never really ``fits'': each prediction re-scans the stored rows, keeps the $K$ nearest, and votes.}
 \end{solutionbox}
 \end{frame}
 
@@ -1578,9 +1580,9 @@ print("best K =", int(np.argmin(te)) + 1, "min test err =", round(min(te), 3))
 \scriptsize
 Plot the two error curves against flexibility $1/K$:
 \begin{lstlisting}
-import matplotlib.pyplot as plt
-inv = [1/K for K in range(1, 51)]   # x-axis: flexibility = 1/K
-# draw the training and test error curves on one plot
+import matplotlib.pyplot as plt     # the plotting library
+inv = [1/K for K in range(1, 51)]   # flexibility axis: K=1 lands far right
+# plotted this way the U-shape opens up: rigid left, overfit right
 plt.plot(inv, tr, label="train"); plt.plot(inv, te, label="test")
 plt.xlabel("1/K"); plt.ylabel("error rate"); plt.legend(); plt.show()
 \end{lstlisting}
@@ -1622,25 +1624,40 @@ Small $K$ $=$ flexible $=$ low bias, high variance; large $K$ $=$ rigid $=$ high
 \begin{frame}[fragile]{Python lab: setup}
   \begin{lstlisting}
 import numpy as np                 # arrays and linear algebra
-import pandas as pd                # data frames (tables)
-import matplotlib.pyplot as plt    # plotting
-from ISLP import load_data         # the book's datasets
+import pandas as pd                # tables: one row per observation
+import matplotlib.pyplot as plt    # every figure in this chapter
+from ISLP import load_data         # fetches a book data set by name
 
-rng = np.random.default_rng(2024)  # seeded random generator
+rng = np.random.default_rng(2024)  # seed 2024: same draws every run
 plt.rcParams['figure.dpi'] = 110   # sharper inline figures
   \end{lstlisting}
-  Always seed your RNG for reproducible plots.
+  \begin{readme}
+    These six lines open every code slide that follows. \texttt{np}
+    supplies arrays and the random-number generator, \texttt{pd}
+    supplies data frames, \texttt{plt} draws. \texttt{load\_data}
+    pulls a book data set by name (\texttt{"Auto"}, \texttt{"Default"}).
+    The \texttt{rng} object is the \emph{only} source of randomness:
+    seeding it is what makes your numbers match the slide's.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{NumPy basics}
   \begin{lstlisting}
-x = np.array([3, 4, 5])           # 1-D array (a vector)
-y = np.array([4, 9, 7])
+x = np.array([3, 4, 5])           # 1-D array: three measurements
+y = np.array([4, 9, 7])           # a second variable, same length
 
 x.sum(), x.mean(), x.std(ddof=1)  # basic stats (sample sd)
-A = np.array([[1, 2], [3, 4]])    # 2 x 2 matrix
+A = np.array([[1, 2], [3, 4]])    # nested list -> 2 x 2 matrix
 A.shape, A.T, np.linalg.inv(A), A @ A  # shape, transpose, inverse, product
   \end{lstlisting}
+  \begin{readme}
+    \footnotesize An \emph{array} is a block of numbers you compute
+    with all at once; a nested list becomes a matrix and
+    \texttt{.shape} gives (rows, columns). \texttt{@} multiplies
+    matrices, \texttt{*} works element by element. Every data set
+    ahead is such a matrix: one row per observation, one column per
+    predictor.
+  \end{readme}
   \begin{labnote}[{{Live demo --- \S1 of the notebook}}]
     Switch to \texttt{chapter\_02\_lab.ipynb} \S1 and run these cells live: note
     \texttt{std(ddof=1)} returns the \emph{sample} sd ($1.0$ here) --- NumPy's default
@@ -1650,18 +1667,18 @@ A.shape, A.T, np.linalg.inv(A), A @ A  # shape, transpose, inverse, product
 
 \begin{frame}[fragile]{KNN classification}
   \begin{lstlisting}
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier  # majority vote of K
+from sklearn.model_selection import train_test_split  # holds rows back
+from sklearn.preprocessing import StandardScaler  # puts X on one scale
 Default = load_data("Default")             # credit-card default data
 y = (Default["default"] == "Yes").astype(int).values  # 1 = default
 X = Default[["balance", "income"]].values  # two numeric predictors
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3,
-                                       random_state=0)  # 70/30 split
-scaler = StandardScaler().fit(Xtr)         # KNN needs scaled features
-# fit 10-NN on the standardised training data:
+                                       random_state=0)  # 70/30, fixed
+scaler = StandardScaler().fit(Xtr)         # means/sds from TRAIN only
+# 10-NN: fitting only memorises the scaled training rows
 knn = KNeighborsClassifier(n_neighbors=10).fit(scaler.transform(Xtr), ytr)
-print(knn.score(scaler.transform(Xte), yte))  # test-set accuracy
+print(knn.score(scaler.transform(Xte), yte))  # accuracy on unseen rows
   \end{lstlisting}
   \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
     Run \S5 of \texttt{chapter\_02\_lab.ipynb}: the same code, looped over $K$ from $1$ to $200$,
@@ -1688,18 +1705,18 @@ entries you must handle.
 \begin{frame}[fragile]{Solution --- Exercise 2.8 (1/2)}
 \begin{solutionbox}
 \begin{lstlisting}
-import pandas as pd
-import matplotlib.pyplot as plt
+import pandas as pd                 # read and clean the table
+import matplotlib.pyplot as plt     # draw the scatter plot
 
-Auto = pd.read_csv("../ALL CSV FILES - 2nd Edition/Auto.csv")
-Auto = Auto[Auto["horsepower"] != "?"].copy()   # drop 5 missing
-Auto["horsepower"] = Auto["horsepower"].astype(float)  # str -> num
+Auto = pd.read_csv("../ALL CSV FILES - 2nd Edition/Auto.csv")  # raw file
+Auto = Auto[Auto["horsepower"] != "?"].copy()   # drop the 5 "?" rows
+Auto["horsepower"] = Auto["horsepower"].astype(float)  # text -> number
 
-plt.scatter(Auto["horsepower"], Auto["mpg"], s=10)  # small dots
-plt.xlabel("horsepower"); plt.ylabel("mpg")
-plt.show()
+plt.scatter(Auto["horsepower"], Auto["mpg"], s=10)  # one dot per car
+plt.xlabel("horsepower"); plt.ylabel("mpg")         # always label axes
+plt.show()                                          # render the figure
 
-print(Auto.shape[0])                              # 392
+print(Auto.shape[0])                              # 392 rows survive
 print(Auto["horsepower"].corr(Auto["mpg"]))       # about -0.78
 \end{lstlisting}
 \end{solutionbox}

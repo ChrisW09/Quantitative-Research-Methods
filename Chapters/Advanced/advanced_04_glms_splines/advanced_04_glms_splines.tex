@@ -577,19 +577,21 @@
 
 \begin{frame}[fragile]{Fitting it in \texttt{statsmodels}}
 \begin{lstlisting}
-import numpy as np, pandas as pd
+import numpy as np, pandas as pd                     # arrays, data frames
 import statsmodels.api as sm, statsmodels.formula.api as smf
 
 bike = pd.read_csv('Bikeshare.csv', index_col=0)     # 8 645 hourly rows
 bike['hr'] = bike['hr'].astype(int)                  # hour 0..23
-form = 'bikers ~ C(hr) + temp + workingday + C(weathersit)'
-pois = smf.glm(form, data=bike,
+form = 'bikers ~ C(hr) + temp + workingday + C(weathersit)'  # C(): dummies
+pois = smf.glm(form, data=bike,                      # ML fit, IRLS inside
                family=sm.families.Poisson()).fit()   # log link = canonical
 print(pois.deviance, pois.df_resid)                  # 269 006 on 8 616 df
 print(np.exp(pois.params['temp']))                   # rate ratio 4.79
 \end{lstlisting}
   \begin{labnote}
-    Notebook \texttt{advanced\_04\_glms\_splines\_lab.ipynb}, \S 3 \emph{Poisson
+    \textbf{Reading the print-outs:} the deviance is this GLM's residual sum of
+    squares; \texttt{exp} of a coefficient is a rate ratio. Notebook
+    \texttt{advanced\_04\_glms\_splines\_lab.ipynb}, \S 3 \emph{Poisson
     regression on Bikeshare}: runs this fit, prints the coefficient table and
     reproduces every rate ratio quoted on the next slide.
   \end{labnote}
@@ -1275,21 +1277,22 @@ print(np.exp(pois.params['temp']))                   # rate ratio 4.79
 \begin{lstlisting}
 from statsmodels.gam.api import GLMGam, BSplines
 
-xs = bike[['hr', 'temp']].astype(float)
+xs = bike[['hr', 'temp']].astype(float)            # the two smooth terms
 bs = BSplines(xs, df=[12, 6], degree=[3, 3])       # rich bases for hr, temp
 Xpar = ...   # intercept, workingday, 3 weather dummies (parametric part)
 
-gam = GLMGam(bike.bikers, exog=Xpar, smoother=bs,
+gam = GLMGam(bike.bikers, exog=Xpar, smoother=bs,  # alpha = one lambda each
              family=sm.families.Poisson(), alpha=[0.319, 0.00423])
-res = gam.fit()
+res = gam.fit()                                    # penalized IRLS fit
 # the two penalty weights above were chosen by the built-in criterion:
 #   gam.select_penweight()[0]   ->  [0.319, 0.00423]
-print(res.deviance)                                 # 259 650
+print(res.deviance)                                # 259 650 vs 269 006
 \end{lstlisting}
   \begin{labnote}
-    Notebook \S 7 \emph{A penalized-spline GAM for Bikeshare} builds \texttt{Xpar},
-    runs \texttt{select\_penweight}, and draws the partial-effect plots on the next
-    slide with confidence bands.
+    \textbf{How to read it:} \texttt{alpha} shrinks the over-rich 12 and 6 df
+    bases to $\approx 11$ and $\approx 5$ edf. Notebook \S 7 \emph{A penalized-spline GAM for
+    Bikeshare} builds \texttt{Xpar}, runs \texttt{select\_penweight}, and draws the
+    partial-effect plots on the next slide with confidence bands.
   \end{labnote}
 \end{frame}
 

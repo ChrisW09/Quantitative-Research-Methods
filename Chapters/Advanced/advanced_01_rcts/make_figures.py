@@ -107,7 +107,10 @@ def fig_simpson():
     ax.set_ylim(0, 78)
     ax.set_title("Training looks harmful overall, helpful in every skill stratum "
                  "(simulated, true ATE $=+4.1$)")
-    ax.legend(frameon=False, loc="upper left")
+    # Upper-left would run into the "diff = ..." label above the first pair;
+    # the empty band above the low-skill bars is the only clear space.
+    ax.legend(frameon=False, loc="upper center", ncol=2,
+              bbox_to_anchor=(0.5, 0.86))
     save(fig, "cha1_simpson.png")
 
 

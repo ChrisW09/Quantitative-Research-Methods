@@ -163,7 +163,7 @@ def fig_subgroup():
     ax.set_ylim(0.75, 1.03)
     ax.set_ylabel("empirical coverage")
     ax.set_title("Same interval, one split: coverage by age group vs overall (marginal)")
-    ax.legend(frameon=False, fontsize=8, loc="lower left")
+    ax.legend(frameon=False, fontsize=8, loc="upper right")
     save(fig, "a3_subgroup.png")
 
 
@@ -397,7 +397,7 @@ def fig_staircase():
                 xy=(19, 19/20), xytext=(31, 0.905), fontsize=8.5, color="#333333",
                 arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
     ax.text(150, 0.9445, "guarantee $1-\\alpha$", color=GREY, fontsize=8.5)
-    ax.text(150, 0.968, "upper bound $1-\\alpha+\\frac{1}{n+1}$", color=ORANGE, fontsize=8.5)
+    ax.text(112, 0.9845, "upper bound $1-\\alpha+\\frac{1}{n+1}$", color=ORANGE, fontsize=8.5)
     ax.text(97, 0.9655, "achieved level $k/(n+1)$", color=ACCENT, fontsize=8.5)
 
     ax.set_xlabel("calibration set size $n$")

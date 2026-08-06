@@ -310,8 +310,9 @@ def fig_rate_ratios():
         txt = f"{r:.3f}" if abs(r - 1) < 0.1 else f"{r:.3g}"
         ax.annotate(txt, (r, yi), xytext=(0, 7), textcoords="offset points",
                     ha="center", fontsize=8, color=col)
-    ax.annotate("one observation wide \u2014 the deck's warning, visible",
-                xy=(np.exp(est[4] - 1.96 * se[4]), y[4]), xytext=(0.16, y[4] - 1.05),
+    ax.annotate("one observation wide \u2014\nthe deck's warning, visible",
+                xy=(np.exp(est[4] - 1.96 * se[4]), y[4]),
+                xytext=(0.145, y[4] - 0.95), va="bottom",
                 fontsize=8, color="#8A4513",
                 arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
     ax.set_yticks(y, labels, fontsize=8.5)

@@ -138,9 +138,13 @@ def fig_hyperplane():
                 arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.8))
     ax.text(*(p + 0.95 * n + np.array([0.06, 0.02])), r"$\beta=(2,3)$",
             color=GREEN, fontsize=9)
-    for pt, lab in [((0, 0), "(0,0)"), ((-1, 1), "(-1,1)"), ((2, -2), "(2,-2)")]:
+    # label each point on the side that is free of the line and the arrow
+    for pt, lab, off, ha in [((0, 0), "(0,0)", (-6, 7), "center"),
+                             ((-1, 1), "(-1,1)", (7, -3), "left"),
+                             ((2, -2), "(2,-2)", (-7, -3), "right")]:
         ax.scatter(*pt, c="k", s=26, zorder=4)
-        ax.annotate(lab, pt, textcoords="offset points", xytext=(7, -3), fontsize=8)
+        ax.annotate(lab, pt, textcoords="offset points", xytext=off,
+                    ha=ha, fontsize=8)
     ax.set(xlabel="$X_1$", ylabel="$X_2$",
            title=r"The hyperplane $1+2X_1+3X_2=0$ splits the plane in two")
     ax.set_xlim(-2.6, 2.6)
@@ -193,7 +197,9 @@ def fig_maxmargin():
     foot = -b * n / np.linalg.norm(w)
     ax.annotate("", xy=foot + n * width / 2, xytext=foot - n * width / 2,
                 arrowprops=dict(arrowstyle="<|-|>", color=RED, lw=1.6))
-    ax.annotate("$2M$", xy=foot, xytext=(-24, 4), textcoords="offset points",
+    # label below the lower end of the arrow, clear of the support-vector rings
+    ax.annotate("$2M$", xy=foot - n * width / 2, xytext=(-8, -14),
+                textcoords="offset points", ha="right",
                 color=RED, fontsize=9)
     ax.legend(loc="upper left", fontsize=7, framealpha=0.92)
     ax.set_aspect("equal")
@@ -246,7 +252,8 @@ def fig_instability():
     axes[1].annotate("", xy=(1.9, -1.0), xytext=(3.40, 1.02),
                      arrowprops=dict(arrowstyle="-|>", color=RED, lw=1.5, ls="--",
                                      shrinkA=3, shrinkB=11))
-    axes[1].text(2.65, 0.35, "moved", color=RED, fontsize=8, rotation=-35)
+    # sit the label beside the arrow, not across it
+    axes[1].text(2.40, 0.34, "moved", color=RED, fontsize=8, rotation=-35)
     axes[0].set_ylabel("$X_2$")
     fig.suptitle("Moving ONE observation swings the maximal margin hyperplane",
                  fontsize=10)
@@ -439,9 +446,10 @@ def fig_heart_gamma_auc():
     ax.semilogx(gammas, te, "s--", color=ACCENT, label="test AUC")
     j = int(np.argmax(te))
     ax.axvline(gammas[j], color=GREY, ls=":", lw=1.2)
+    # label to the lower left: the test curve falls away to the right of the peak
     ax.annotate(f"best test AUC {te[j]:.3f}\nat $\\gamma={gammas[j]:.2g}$",
-                xy=(gammas[j], te[j]), xytext=(8, -30), textcoords="offset points",
-                fontsize=8, color=ACCENT)
+                xy=(gammas[j], te[j]), xytext=(-10, -34), textcoords="offset points",
+                ha="right", fontsize=8, color=ACCENT)
     ax.legend(fontsize=8)
     ax.set(xlabel=r"radial kernel $\gamma$ (log scale)", ylabel="ROC AUC",
            title="Heart data, radial SVM at $C=1$: training AUC rises to 1, test AUC falls")
@@ -520,8 +528,11 @@ def fig_x_margin_geometry():
     ax.plot([x0[0], foot[0]], [x0[1], foot[1]], color=RED, lw=1.6)
     ax.annotate("", xy=foot + 0.8 * n, xytext=foot,
                 arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.6))
-    ax.text(*(foot + 0.85 * n), r"$\beta/\|\beta\|$", color=GREEN, fontsize=9)
-    ax.text(*((x0 + foot) / 2 + np.array([0.12, -0.05])),
+    # the unit normal shares its line with the red distance, so label it sideways
+    perp = np.array([-n[1], n[0]])
+    ax.text(*(foot + 0.85 * n + 0.12 * perp), r"$\beta/\|\beta\|$",
+            color=GREEN, fontsize=9, ha="right", va="center")
+    ax.text(*((x0 + foot) / 2 + np.array([0.22, -0.05])),
             r"$\dfrac{|\beta_0+\beta^\top x_0|}{\|\beta\|}=%.3f$" % abs(d),
             color=RED, fontsize=9)
     ax.set(xlabel="$X_1$", ylabel="$X_2$", xlim=(-1, 4.2), ylim=(-0.6, 3.2),

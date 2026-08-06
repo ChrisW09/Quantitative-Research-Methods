@@ -1103,60 +1103,74 @@
 
 \begin{frame}[fragile]{Best subset and stepwise (manual)}
   \begin{lstlisting}
-import statsmodels.api as sm, itertools
+import statsmodels.api as sm, itertools  # OLS fits + subset lists
 from ISLP import load_data
-Hitters = load_data("Hitters").dropna()      # drop rows with NA salary
-y = Hitters["Salary"]                         # response
-preds = [c for c in Hitters.columns if c not in ("Salary",)]
+Hitters = load_data("Hitters").dropna()      # NA salaries out: n=263
+y = Hitters["Salary"]                         # response we predict
+preds = [c for c in Hitters.columns if c not in ("Salary",)] # 19 preds
 
 best = {}
 for k in range(1, 6):                         # model sizes k = 1..5
     best_rss = None
     for combo in itertools.combinations(preds, k):  # all C(p,k) subsets
-        X = sm.add_constant(Hitters[list(combo)])
+        X = sm.add_constant(Hitters[list(combo)])   # subset + intercept
         rss = sm.OLS(y, X).fit().ssr          # training RSS of subset
-        if best_rss is None or rss < best_rss:
+        if best_rss is None or rss < best_rss:      # lower RSS wins
             best_rss, best_combo = rss, combo  # keep best model per size
     best[k] = (best_combo, best_rss)
+# RSS only ranks equal-size models; Cp/BIC/CV then pick k. k<=5 with
+# p=19 is already 16,663 OLS fits -- and 2^19 is the full search.
   \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]{Ridge regression}
   \begin{lstlisting}
-from sklearn.linear_model import Ridge
-from sklearn.model_selection import GridSearchCV
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge      # L2 penalty: sum beta_j^2
+from sklearn.model_selection import GridSearchCV  # sweeps the grid
+from sklearn.pipeline import make_pipeline  # scaler + model as one unit
+from sklearn.preprocessing import StandardScaler  # z-score each column
 import numpy as np
 
-X, y = Hitters[preds], Hitters["Salary"].values
+X, y = Hitters[preds], Hitters["Salary"].values   # n=263, p=19
 # Scale INSIDE the search, so the scaler is re-fit on each training fold.
 # Scaling first lets every fold help standardise itself: CV then over-shrinks.
-ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),
+ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),  # 50 alphas
                      {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10).fit(X, y)
-print("best alpha:", ridge.best_params_["ridge__alpha"])
+print("best alpha:", ridge.best_params_["ridge__alpha"])  # 2.81 here
 print(dict(zip(preds, ridge.best_estimator_[-1].coef_)))  # all stay nonzero
   \end{lstlisting}
+  \begin{readme}
+    The penalty is not scale-invariant, so standardising is mandatory.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{The lasso}
   \begin{lstlisting}
-from sklearn.linear_model import Lasso
+from sklearn.linear_model import Lasso   # L1 penalty: sum |beta_j|
 
 # same discipline: the scaler belongs inside the cross-validated search
+# 50 log-spaced alphas, 1e-3 to 10: from near-OLS to the all-zero model
 lasso = GridSearchCV(make_pipeline(StandardScaler(), Lasso(max_iter=10000)),
                      {"lasso__alpha": np.logspace(-3, 1, 50)}, cv=10).fit(X, y)
-print("best alpha:", lasso.best_params_["lasso__alpha"])
-coefs = lasso.best_estimator_[-1].coef_
+print("best alpha:", lasso.best_params_["lasso__alpha"])  # CV winner
+coefs = lasso.best_estimator_[-1].coef_   # [-1] = the fitted Lasso step
 print([(p, c) for p, c in zip(preds, coefs) if c != 0])  # only the survivors
   \end{lstlisting}
+  \begin{readme}
+    Only the penalty changed: $\sum|\beta_j|$ replaces $\sum\beta_j^2$.
+    The $\ell_1$ ball has \emph{corners} on the axes, so the CV-chosen
+    $\alpha$ sets weak coefficients to \emph{exactly} zero instead of
+    merely small, so the printed list is shorter than \texttt{preds};
+    ridge on the same columns leaves all $19$ nonzero. Standardise for
+    the same reason --- the penalty compares raw coefficients.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Principal components regression}
   \begin{lstlisting}
-from sklearn.decomposition import PCA
-from sklearn.linear_model  import LinearRegression
-from sklearn.pipeline      import Pipeline
+from sklearn.decomposition import PCA  # max-variance directions of X
+from sklearn.linear_model  import LinearRegression  # unpenalised fit
+from sklearn.pipeline      import Pipeline  # PCA and OLS as one model
 from sklearn.model_selection import cross_val_score
 
 scores = []
@@ -1166,7 +1180,11 @@ for M in range(1, len(preds) + 1):           # try every component count
     s = -cross_val_score(pcr, X, y, cv=10,   # 10-fold CV MSE
                           scoring="neg_mean_squared_error").mean()
     scores.append(s)                         # CV curve over M
+# M, not lambda, is the knob: M=19 reproduces OLS, small M shrinks hard.
   \end{lstlisting}
+  \begin{readme}
+    PCA never sees \texttt{y}: nothing makes the top components predict it.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Exercise 6.7 --- CV Ridge and Lasso on Hitters [Python]}
@@ -1187,22 +1205,22 @@ for M in range(1, len(preds) + 1):           # try every component count
 \begin{frame}[fragile]{Solution --- Exercise 6.7 (1/2)}
   \begin{lstlisting}
 import numpy as np, pandas as pd
-from sklearn.linear_model    import Lasso, Ridge
+from sklearn.linear_model    import Lasso, Ridge  # L1 and L2 penalty
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline        import make_pipeline
-from sklearn.preprocessing   import StandardScaler
+from sklearn.preprocessing   import StandardScaler  # z-score columns
 # path as seen from Chapters/, where you run the notebook
 df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Hitters.csv").dropna()
-y = df["Salary"].values
-X = pd.get_dummies(df.drop(columns=["Salary"]), drop_first=True)
+y = df["Salary"].values                      # response, n=263 rows
+X = pd.get_dummies(df.drop(columns=["Salary"]), drop_first=True)  # p=19
 preds = X.columns                            # scale inside the CV, not here
 
 lasso = GridSearchCV(make_pipeline(StandardScaler(), Lasso(max_iter=10000)),
                      {"lasso__alpha": np.logspace(-3, 2, 50)}, cv=10).fit(X, y)
 print("lasso alpha:", round(lasso.best_params_["lasso__alpha"], 3))
-coefs   = lasso.best_estimator_[-1].coef_
-kept    = [p for p, c in zip(preds, coefs) if abs(c) > 1e-8]
-dropped = [p for p, c in zip(preds, coefs) if abs(c) <= 1e-8]
+coefs   = lasso.best_estimator_[-1].coef_  # [-1] = the fitted Lasso
+kept    = [p for p, c in zip(preds, coefs) if abs(c) > 1e-8]  # 14 of 19
+dropped = [p for p, c in zip(preds, coefs) if abs(c) <= 1e-8]  # 5 zeros
 print("kept   :", kept, "\ndropped:", dropped)  # retained vs zeroed exactly
   \end{lstlisting}
 \end{frame}
@@ -1211,9 +1229,9 @@ print("kept   :", kept, "\ndropped:", dropped)  # retained vs zeroed exactly
   \begin{lstlisting}
 ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),   # scale in CV
                      {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10).fit(X, y)
-rc = ridge.best_estimator_[-1].coef_
+rc = ridge.best_estimator_[-1].coef_       # [-1] = the fitted Ridge
 print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
-      "-- nonzero coefs:", int(np.sum(np.abs(rc) > 1e-8)))          # all p
+      "-- nonzero coefs:", int(np.sum(np.abs(rc) > 1e-8)))  # all 19
   \end{lstlisting}
   \begin{solutionbox}[Solution --- expected result and interpretation]
     The lasso selects a moderate $\lambda$ and \emph{drives several
@@ -1262,16 +1280,18 @@ print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
 import numpy as np, pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing  import StandardScaler
-from sklearn.linear_model   import RidgeCV, LassoCV
-from sklearn.metrics        import mean_squared_error
+from sklearn.linear_model   import RidgeCV, LassoCV  # built-in CV
+from sklearn.metrics        import mean_squared_error  # test score
 
 D  = "../ALL CSV FILES - 2nd Edition/"   # path from Chapters/
-df = pd.read_csv(D+"Hitters.csv").dropna(subset=["Salary"])  # drop NA y
-y  = df["Salary"].values
+df = pd.read_csv(D+"Hitters.csv").dropna(subset=["Salary"])  # n=263
+y  = df["Salary"].values                 # response: the 263 salaries
 X  = pd.get_dummies(df.drop(columns=["Salary"]),
-                    drop_first=True).astype(float)  # encode factors
+                    drop_first=True).astype(float)  # -> 19 predictors
 Xtr, Xte, ytr, yte = train_test_split(X.values, y,
                         test_size=0.33, random_state=1)  # 2/3-1/3 split
+# The penalty acts on raw coefficients, so units decide who gets shrunk:
+# standardise, but learn the means and sds from training rows only.
 sc = StandardScaler().fit(Xtr)      # fit on TRAIN only: no leakage
 Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)  # apply to both sets
   \end{lstlisting}
@@ -1279,20 +1299,23 @@ Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)  # apply to both sets
 
 \begin{frame}[fragile]{Solution --- Extended Exercise 6.3 (2/3)}
   \begin{lstlisting}
-ridge = RidgeCV(alphas=np.logspace(-2, 4, 50)).fit(Xtr, ytr)  # CV grid
+ridge = RidgeCV(alphas=np.logspace(-2, 4, 50)).fit(Xtr, ytr)  # CV on Xtr
 lasso = LassoCV(cv=10, max_iter=100000,
                 random_state=0).fit(Xtr, ytr)   # 10-fold CV for lambda
 
-for name, m in [("ridge", ridge), ("lasso", lasso)]:
-    mse = mean_squared_error(yte, m.predict(Xte))   # TEST-set MSE
-    nz  = int(np.sum(np.abs(m.coef_) > 1e-8))       # nonzero coefs
+for name, m in [("ridge", ridge), ("lasso", lasso)]:  # same report
+    mse = mean_squared_error(yte, m.predict(Xte))  # MSE on held-out
+    nz  = int(np.sum(np.abs(m.coef_) > 1e-8))   # 19 ridge vs 16 lasso
     print(name, "lambda=", round(m.alpha_, 3),
           "testMSE=", round(mse, 0), "nonzero=", nz)
 
 dropped = [c for c, w in zip(X.columns, lasso.coef_)
-           if abs(w) <= 1e-8]                       # zeroed by lasso
+           if abs(w) <= 1e-8]            # Years, CRBI, Errors here
 print("lasso drops:", dropped)
   \end{lstlisting}
+  \begin{readme}
+    $\lambda$ comes from CV on the training rows; the MSE is on the test third.
+  \end{readme}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 6.3 (3/3)}
@@ -1597,7 +1620,7 @@ print("lasso drops:", dropped)
         \foreach \r in {0.55,1.35,2.15}{\draw[red!70!black,rotate around={22:(2.3,1.75)}] (2.3,1.75) ellipse [x radius=\r, y radius=0.64*\r];}
         \fill (2.3,1.75) circle (1.6pt) node[right,font=\scriptsize]{$\hat\beta$};
         \fill[green!55!black] (1.0,0.83) circle (2.2pt);
-        \node[font=\scriptsize,align=center] at (1.95,0.35) {both\\$\ne 0$};
+        \node[font=\scriptsize,align=center] at (1.95,-0.6) {both\\$\ne 0$};
       \end{tikzpicture}
     \end{column}
   \end{columns}

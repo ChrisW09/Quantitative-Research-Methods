@@ -134,7 +134,7 @@ def fig_biplot():
     ax.set(xlabel="PC1 score  (62.0% of variance)", ylabel="PC2 score  (24.7%)",
            title="USArrests biplot: standardised data, PC1--PC2")
     ax.set_xlim(-3.6, 3.9)
-    ax.set_ylim(-3.0, 2.6)
+    ax.set_ylim(-3.0, 3.1)          # room for the UrbanPop label, clear of the title
     save(fig, "ch12_biplot.png")
 
 
@@ -316,7 +316,8 @@ def fig_dendro_cut():
         ax.axhline(h, color=col, ls="--", lw=1.4)
         sizes = np.bincount(fcluster(Z, k, "maxclust"))[1:]
         ax.text(0.4, h + 0.08, f"cut at {h} -> {k} clusters, sizes {sizes.tolist()}",
-                color=col, fontsize=8)
+                color=col, fontsize=8,
+                bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=0.8))
     ax.set(ylabel="merge height (Euclidean)",
            title="Complete linkage on standardised USArrests: the cut chooses $K$")
     ax.grid(False)

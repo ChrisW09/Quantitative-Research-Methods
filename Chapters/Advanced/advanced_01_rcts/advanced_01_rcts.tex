@@ -620,24 +620,24 @@
 \begin{lstlisting}[basicstyle=\ttfamily\fontsize{6.5}{7.6}\selectfont]
 import numpy as np
 rng = np.random.default_rng(2024)                    # module seed
-n = 1000
+n = 1000                                             # one fixed population
 high = rng.random(n) < 0.5                           # skill stratum
 p_sel = np.where(high, 0.2, 0.8)                     # self-selection propensities
-_ = rng.random(n) < p_sel                            # the observational draw
+_ = rng.random(n) < p_sel                            # unused: keeps rng in step
 y0 = 40 + 20*high + rng.normal(0, 5, n)              # potential outcome untreated
 tau = 4 + rng.normal(0, 2, n)                        # heterogeneous ITEs, mean 4
 y1 = y0 + tau                                        # potential outcome treated
 
-est_r, est_s, cover = [], [], 0
-for _ in range(2000):                                # 2000 replications
-    Dr = np.zeros(n, bool); Dr[rng.permutation(n)[:500]] = True   # randomised
-    yr = np.where(Dr, y1, y0)
-    d = yr[Dr].mean() - yr[~Dr].mean(); est_r.append(d)
-    se = np.sqrt(yr[Dr].var(ddof=1)/500 + yr[~Dr].var(ddof=1)/500)
-    cover += abs(d - tau.mean()) <= 1.96*se          # CI covers truth?
+est_r, est_s, cover = [], [], 0                      # collectors; CI hit count
+for _ in range(2000):                                # 2000 re-randomisations
+    Dr = np.zeros(n, bool); Dr[rng.permutation(n)[:500]] = True   # 500/500 split
+    yr = np.where(Dr, y1, y0)                        # reveal one PO per unit
+    d = yr[Dr].mean() - yr[~Dr].mean(); est_r.append(d)  # difference in means
+    se = np.sqrt(yr[Dr].var(ddof=1)/500 + yr[~Dr].var(ddof=1)/500)  # Neyman SE
+    cover += abs(d - tau.mean()) <= 1.96*se          # does the CI catch SATE?
     Ds = rng.random(n) < p_sel                       # self-selected uptake
-    ys = np.where(Ds, y1, y0)
-    est_s.append(ys[Ds].mean() - ys[~Ds].mean())
+    ys = np.where(Ds, y1, y0)                        # same reveal, other design
+    est_s.append(ys[Ds].mean() - ys[~Ds].mean())     # the biased estimate
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}
@@ -709,18 +709,20 @@ for _ in range(2000):                                # 2000 replications
 import numpy as np, pandas as pd
 import statsmodels.formula.api as smf
 wage = pd.read_csv("Wage.csv")                    # course data, n = 3000
-rng = np.random.default_rng(2024)
+rng = np.random.default_rng(2024)                 # fixed seed: same split twice
 wage["D"] = (rng.random(len(wage)) < 0.5).astype(int)  # coin flip: 1475 vs 1525
 wage["y"] = wage["wage"] + 5.0 * wage["D"]        # truth by construction: tau = 5
 
 m0 = smf.ols("y ~ D", data=wage).fit(cov_type="HC2")   # robust (HC2) SEs
-print(m0.params["D"], m0.bse["D"])                # 4.122  1.523
+print(m0.params["D"], m0.bse["D"])                # tau-hat 4.122, SE 1.523
   \end{lstlisting}
   \begin{readme}[Why \texttt{cov\_type="HC2"}]
     Treatment may change the \emph{variance} of $Y$, not just its mean; classical OLS
     SEs assume equal error variance across arms. Heteroskedasticity-consistent (HC)
     errors drop that assumption --- HC2 exactly reproduces the Neyman variance in a
-    two-arm experiment, so it is the natural default for RCTs.
+    two-arm experiment, so it is the natural default for RCTs. The \texttt{print}
+    reports the coefficient on $D$ and its SE: $4.122$ with SE $1.523$, within one
+    SE of the $+5$ we built in.
   \end{readme}
 \end{frame}
 
@@ -783,14 +785,19 @@ import numpy as np, pandas as pd
 import statsmodels.formula.api as smf
 wage = pd.read_csv("Wage.csv")                     # n = 3000
 rng = np.random.default_rng(2024)                  # lecture seed
-wage["D"] = (rng.random(len(wage)) < 0.5).astype(int)
+wage["D"] = (rng.random(len(wage)) < 0.5).astype(int)  # fair coin flip
 wage["y"] = wage["wage"] + 5.0 * wage["D"]         # true effect +5
 
-m0 = smf.ols("y ~ D", data=wage).fit(cov_type="HC2")
-m1 = smf.ols("y ~ D + age + education", data=wage).fit(cov_type="HC2")
-print(round(m0.params["D"], 3), round(m0.bse["D"], 3))   # 4.122 1.523
-print(round(m1.params["D"], 3), round(m1.bse["D"], 3))   # 3.732 1.315
+m0 = smf.ols("y ~ D", data=wage).fit(cov_type="HC2")  # unadjusted
+m1 = smf.ols("y ~ D + age + education", data=wage).fit(cov_type="HC2")  # adjusted
+print(round(m0.params["D"], 3), round(m0.bse["D"], 3))   # tau-hat, SE 4.122 1.523
+print(round(m1.params["D"], 3), round(m1.bse["D"], 3))   # tau-hat, SE 3.732 1.315
 \end{lstlisting}
+\vspace{1pt}
+{\fontsize{7}{8.4}\selectfont
+\textbf{How to read this:} \texttt{m0} regresses $y$ on $D$ alone, \texttt{m1} adds
+the pre-treatment covariates; each \texttt{print} pairs $\hat\tau$ with its HC2 SE
+--- $4.122/1.523$ against $3.732/1.315$, same estimand and a smaller SE.\par}
 \end{solutionbox}
 \end{frame}
 

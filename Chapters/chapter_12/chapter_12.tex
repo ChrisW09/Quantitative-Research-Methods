@@ -744,19 +744,24 @@
 \begin{solutionbox}[{{Solution --- code}}]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 import numpy as np, pandas as pd                       # arrays and frames
-from sklearn.decomposition import PCA                  # PCA
-from sklearn.preprocessing import StandardScaler       # z-scoring
+from sklearn.decomposition import PCA                  # the PCA estimator
+from sklearn.preprocessing import StandardScaler       # mean 0, sd 1 per column
 
 USA = load('USArrests', index_col=0)                   # 50 states x 4 features
-print(USA.var().round(1).to_dict())                    # raw variances: Assault huge
+print(USA.var().round(1).to_dict())                    # Assault 6945, Murder 19
 
 for tag, X in [('scaled',   StandardScaler().fit_transform(USA)),
-               ('unscaled', (USA - USA.mean()).values)]:  # centred only
-    p = PCA().fit(X)                                   # all 4 components
+               ('unscaled', (USA - USA.mean()).values)]:  # centred, NOT scaled
+    p = PCA().fit(X)                                   # same estimator both ways
     print(tag, 'PVE', np.round(p.explained_variance_ratio_, 4))
     print(tag, 'PC1', dict(zip(USA.columns, p.components_[0].round(3))))
 \end{lstlisting}
 \end{solutionbox}
+\vspace{-10pt}\footnotesize
+\begin{readme}
+  One loop, one estimator, two preprocessings --- so any difference in the printout is
+  the scaling and nothing else.
+\end{readme}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 12.3 (2/2)}
@@ -1070,21 +1075,21 @@ for tag, X in [('scaled',   StandardScaler().fit_transform(USA)),
 \begin{frame}[fragile]{Solution --- Extended Exercise 12.1 (1/2)}
 \begin{solutionbox}[{{Solution --- code}}]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans                # Lloyd's algorithm
+from sklearn.preprocessing import StandardScaler  # W depends on the scaling
 
 Xs = StandardScaler().fit_transform(load('USArrests', index_col=0))
 
-for K in (4, 8):
+for K in (4, 8):                                 # rougher surface at K=8
     runs = [KMeans(n_clusters=K, n_init=1, random_state=s).fit(Xs)
-            for s in range(20)]                  # 20 single-start runs
+            for s in range(20)]                  # 20 seeds, one start each
     w = np.array([r.inertia_ for r in runs])     # the objective, once per seed
     best = KMeans(n_clusters=K, n_init=50, random_state=0).fit(Xs).inertia_
     print(f'K={K}: {len(np.unique(w.round(3)))} optima  min={w.min():.3f}  '
           f'max={w.max():.3f}  gap={100*(w.max()/w.min()-1):.1f}%  '
-          f'n_init=50 -> {best:.3f}')
+          f'n_init=50 -> {best:.3f}')            # the value 50 starts reach
     print('  best / worst sizes', sorted(np.bincount(runs[w.argmin()].labels_)),
-          sorted(np.bincount(runs[w.argmax()].labels_)))
+          sorted(np.bincount(runs[w.argmax()].labels_)))   # a bad W is a bad split
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}
@@ -1574,22 +1579,22 @@ for K in (4, 8):
 \begin{frame}[fragile]{Solution --- Extended Exercise 12.2 (1/2)}
 \begin{solutionbox}[{{Solution --- code}}]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+from sklearn.cluster import KMeans           # same tool on both data sets
+from sklearn.metrics import silhouette_score # separation, per point
 
 rng   = np.random.default_rng(2024)         # same seed as the slide figure
 noise = rng.normal(size=(200, 2))           # ONE Gaussian: no clusters at all
-mu    = np.array([[-2.5, 0.], [2.5, 0.], [0., 2.5]])
+mu    = np.array([[-2.5, 0.], [2.5, 0.], [0., 2.5]])   # 3 true centres
 lab   = rng.integers(0, 3, 200)             # true group of each point
 real  = mu[lab] + rng.normal(size=(200, 2))    # three separated clusters
 km    = lambda X, K: KMeans(n_clusters=K, n_init=50, random_state=0).fit(X)
 
-for name, X in [('noise', noise), ('real ', real)]:
-    W    = {K: km(X, K).inertia_ for K in range(1, 9)}
+for name, X in [('noise', noise), ('real ', real)]:   # identical recipe
+    W    = {K: km(X, K).inertia_ for K in range(1, 9)}   # W falls either way
     sil  = {K: silhouette_score(X, km(X, K).labels_) for K in range(2, 9)}
-    peak = max(sil, key=sil.get)            # K with the best silhouette
+    peak = max(sil, key=sil.get)            # the K a scree/sil rule would pick
     print(f'{name} W(3)/W(1)={W[3]/W[1]:.3f} sil(3)={sil[3]:.3f} '
-          f'peak K={peak} ({sil[peak]:.3f})')
+          f'peak K={peak} ({sil[peak]:.3f})')   # noise answers too
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}
@@ -1663,20 +1668,26 @@ for name, X in [('noise', noise), ('real ', real)]:
 \begin{frame}[fragile]{PCA in scikit-learn}
   \begin{lstlisting}
 import numpy as np, pandas as pd                     # arrays and frames
-from sklearn.decomposition import PCA                # PCA
-from sklearn.preprocessing import StandardScaler     # z-scoring
+from sklearn.decomposition import PCA                # the PCA estimator
+from sklearn.preprocessing import StandardScaler     # mean 0, sd 1 per column
 
 USA = load('USArrests', index_col=0)                 # 50 states x 4 features
-Xs  = StandardScaler().fit_transform(USA)            # ALWAYS decide this on purpose
-pca = PCA().fit(Xs)                                  # all min(n-1, p) components
+Xs  = StandardScaler().fit_transform(USA)            # unscaled, PC1 = Assault
+pca = PCA().fit(Xs)                                  # all min(n-1, p) directions
 
 print(np.round(pca.explained_variance_ratio_, 4))    # [0.6201 0.2474 0.0891 0.0434]
-print(np.round(np.cumsum(pca.explained_variance_ratio_), 4))   # cumulative PVE
+print(np.round(np.cumsum(pca.explained_variance_ratio_), 4))   # 2 PCs = 86.8%
 loadings = pd.DataFrame(pca.components_.T, index=USA.columns,
-                        columns=[f'PC{i+1}' for i in range(4)])
+                        columns=[f'PC{i+1}' for i in range(4)])   # rows = variables
 print(loadings.round(3))                             # signs may be flipped: fine
-Z = pca.transform(Xs)                                # the scores, n x p
+Z = pca.transform(Xs)                                # scores: states in PC space
   \end{lstlisting}
+  \vspace{-10pt}\footnotesize
+  \begin{readme}
+    \texttt{components\_} holds the loadings, one \emph{row} per PC (hence \texttt{.T});
+    \texttt{explained\_variance\_ratio\_} is the PVE. Without the scaler PC1 would be
+    \texttt{Assault} alone at $96.6\%$.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{$K$-means, and proving the local-optimum problem}
@@ -1684,31 +1695,47 @@ Z = pca.transform(Xs)                                # the scores, n x p
 from sklearn.cluster import KMeans                    # Lloyd's algorithm
 
 km = KMeans(n_clusters=3, n_init=50, random_state=0).fit(Xs)   # 50 restarts
-print(round(km.inertia_, 3))                          # 79.922 (sum of sq. dists)
+print(round(km.inertia_, 3))                          # W = 79.922, the objective
 print(USA.assign(cluster=km.labels_)                  # profiles in RAW units
-         .groupby('cluster').mean().round(1))
+         .groupby('cluster').mean().round(1))         # cluster means per variable
 
 w = [KMeans(n_clusters=4, n_init=1, random_state=s).fit(Xs).inertia_
      for s in range(20)]                              # twenty single-start runs
-print(np.round(sorted(w), 3))                         # 57.554 ... 77.856
-print('distinct local optima:', len(set(np.round(w, 3))))       # 9
+print(np.round(sorted(w), 3))                         # 57.554 best, 77.856 worst
+print('distinct local optima:', len(set(np.round(w, 3))))  # 9 different answers
   \end{lstlisting}
+  \footnotesize
+  \begin{readme}[{{What \texttt{n\_init} is buying}}]
+    Lloyd's algorithm only ever reaches a \emph{local} minimum of $W$, and which one is
+    fixed by the random starting centroids. With \texttt{n\_init=1} the twenty seeds land
+    on \textbf{nine} different values, $57.554$ up to $77.856$ --- $35\%$ apart on one data
+    set. \texttt{n\_init=50} keeps the smallest $W$ of $50$ starts, and
+    \texttt{random\_state} makes that choice reproducible; report both.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Hierarchical clustering with scipy}
   \begin{lstlisting}
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
-from scipy.spatial.distance import squareform
+from scipy.spatial.distance import squareform         # square D -> condensed
 
 for method in ['complete', 'average', 'single', 'centroid']:
-    Zl = linkage(Xs, method=method)                   # Euclidean by default
-    lab = fcluster(Zl, 3, criterion='maxclust')       # cut into 3 clusters
+    Zl = linkage(Xs, method=method)                # n-1 merges: i, j, height, size
+    lab = fcluster(Zl, 3, criterion='maxclust')    # slice the tree, 3 branches left
     print(f'{method:9s} sizes {np.bincount(lab)[1:]}  top fusion {Zl[-1,2]:.2f}')
 
-Dcorr = 1 - np.corrcoef(Xs)                           # correlation-based distance
+Dcorr = 1 - np.corrcoef(Xs)                           # 1-r: shape, not level
 Zc = linkage(squareform(Dcorr, checks=False), 'complete')   # needs condensed form
 dendrogram(Zl, labels=USA.index.tolist(), leaf_font_size=6) # HEIGHT is the message
   \end{lstlisting}
+  \footnotesize
+  \begin{readme}[{{What \texttt{linkage} returns, and what the cut does}}]
+    \texttt{Zl} is the $(n-1)\times4$ \emph{linkage matrix}: one row per fusion --- the two
+    things joined, the \textbf{height} at which they joined, the size of the new group. On
+    raw data it assumes Euclidean distance, so any other dissimilarity must arrive
+    condensed (\texttt{Zc}). \texttt{fcluster} re-fits nothing; it slices that same tree
+    low enough to leave $3$ branches: $(31,11,8)$, $(30,19,1)$, $(48,1,1)$, $(30,19,1)$.
+  \end{readme}
 \end{frame}
 
 % ============================================================
@@ -2061,17 +2088,17 @@ dendrogram(Zl, labels=USA.index.tolist(), leaf_font_size=6) # HEIGHT is the mess
 \begin{solutionbox}[{{Solution --- code: clustering under two dissimilarities}}]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 import numpy as np
-from scipy.cluster.hierarchy import linkage, fcluster
-from scipy.spatial.distance import squareform
-from sklearn.metrics import adjusted_rand_score
+from scipy.cluster.hierarchy import linkage, fcluster   # build, then cut
+from scipy.spatial.distance import squareform   # linkage wants D condensed
+from sklearn.metrics import adjusted_rand_score # 1 = exact, 0 = chance
 
 G = load('Ch12Ex13', header=None).values   # 1000 genes x 40 samples
 X = G.T                                    # cluster the SAMPLES: 40 x 1000
 truth = np.array([0]*20 + [1]*20)          # for SCORING only, never for fitting
 
 for nm, arg in [('eucl', X), ('1-r', squareform(1-np.corrcoef(X), checks=False))]:
-    for m in ('complete', 'average', 'single'):
-        lab = fcluster(linkage(arg, method=m), 2, criterion='maxclust')
+    for m in ('complete', 'average', 'single'):   # 3 linkages x 2 distances
+        lab = fcluster(linkage(arg, method=m), 2, criterion='maxclust')  # cut in 2
         print(nm, m, np.bincount(lab)[1:], round(adjusted_rand_score(truth, lab), 3))
 \end{lstlisting}
 \end{solutionbox}
@@ -2081,11 +2108,11 @@ for nm, arg in [('eucl', X), ('1-r', squareform(1-np.corrcoef(X), checks=False))
   \footnotesize
 \begin{solutionbox}[{{Solution --- code: PCA and the per-gene tests, and the printout}}]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-from scipy import stats
-from sklearn.decomposition import PCA
+from scipy import stats                     # one t-test per gene
+from sklearn.decomposition import PCA       # centred, not standardised
 
 p = PCA().fit(X - X.mean(0)); Z = p.transform(X - X.mean(0))   # PCA on the samples
-print('PVE1', round(p.explained_variance_ratio_[0], 3),
+print('PVE1', round(p.explained_variance_ratio_[0], 3),   # 0.127: small, not useless
       ' PC1 group means', round(Z[:20, 0].mean(), 2), round(Z[20:, 0].mean(), 2))
 t, pv = stats.ttest_ind(G[:, 20:], G[:, :20], axis=1)   # 1000 two-sample t-tests
 print((pv < 0.05).sum(), (pv < 0.05/1000).sum())        # nominal, then Bonferroni
@@ -2097,6 +2124,12 @@ print((pv < 0.05).sum(), (pv < 0.05/1000).sum())        # nominal, then Bonferro
   PVE1 0.127\ \ PC1 group means -11.75 11.75\qquad 159 105
   \end{center}
 \end{solutionbox}
+\vspace{-8pt}
+\begin{readme}
+  PCA runs on \emph{centred}, not standardised, data --- the genes already share one
+  scale. \texttt{G} is genes\,$\times$\,samples, so \texttt{axis=1} tests each gene across
+  the $40$ columns.
+\end{readme}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 12.3 (3/3)}

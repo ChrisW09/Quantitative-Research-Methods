@@ -80,8 +80,9 @@ def fig_exp_log():
         ax2.plot([a, a], [0, np.log(a)], color=ORANGE, ls=":", lw=1.2)
         ax2.plot([b, b], [0, np.log(b)], color=ORANGE, ls=":", lw=1.2)
         ax2.plot([a * b, a * b], [0, np.log(a * b)], color=GREEN, ls=":", lw=1.2)
-        ax2.text(a * b + 0.4, np.log(a * b) - 0.1,
-                 r"$\log 8 = \log 2 + \log 4$", fontsize=8.5, color=GREEN)
+        ax2.text(a * b + 0.4, np.log(a * b) - 0.35,
+                 r"$\log 8 = \log 2 + \log 4$", fontsize=8.5, color=GREEN,
+                 va="top")
     ax2.set_ylim(-3.2, 3.6)
     ax2.set_title(r"$\log u$: turns $\times$ into $+$", fontsize=9.5)
     ax2.legend(frameon=False, loc="lower right")
@@ -231,16 +232,20 @@ def fig_subset_growth():
     ax.semilogy(p, 2.0**p, color=ACCENT, lw=2, label=r"$2^{p}$ subsets")
     ax.semilogy(p, p * (p + 1) / 2 + 1, color=GREEN, lw=2, ls="--",
                 label=r"$\approx p^{2}/2$ models (stepwise)")
-    for pp, dx, dy in ((10, 1.5, 0.02), (20, 1.5, 0.02), (40, -12, 0.02)):
+    # va="top" on the p=10 label hangs it below its anchor: the stepwise curve
+    # passes just overhead there, and a baseline-anchored label collides with it.
+    for pp, dx, dy, ha, va in ((10, 1.5, 0.02, "left", "top"),
+                               (20, 1.5, 0.02, "left", "baseline"),
+                               (40, -0.5, 9.0, "right", "baseline")):
         ax.plot(pp, 2.0**pp, "o", color=ORANGE, ms=6)
         ax.annotate(f"$p={pp}$: {2**pp:,} models".replace(",", " "),
                     xy=(pp, 2.0**pp), xytext=(pp + dx, 2.0**pp * dy),
-                    fontsize=8.5, color=ORANGE)
+                    fontsize=8.5, color=ORANGE, ha=ha, va=va)
     ax.set_ylim(1, 1e14)
     ax.set_xlabel("number of predictors $p$")
     ax.set_ylabel("models to fit (log scale)")
     ax.set_title("Best-subset selection is impossible; stepwise is merely expensive")
-    ax.legend(frameon=False, loc="lower right")
+    ax.legend(frameon=False, loc="upper left")
     save(fig, "ch00b_subset_growth.png")
 
 

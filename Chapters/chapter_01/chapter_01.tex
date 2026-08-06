@@ -888,47 +888,59 @@ type of $Y$ matters.
 
 \begin{frame}[fragile]{Standard imports}
   \begin{lstlisting}
-import numpy as np                 # arrays and linear algebra
-import pandas as pd                # data frames (tables)
-import matplotlib.pyplot as plt    # plotting
+import numpy as np                 # arrays/linear algebra: maths layer
+import pandas as pd                # labelled tables: the data layer
+import matplotlib.pyplot as plt    # plots: look before you model
 
-# models, data splitting / CV, and error metrics:
+# scikit-learn, in the order you use it: model, split, score
 from sklearn.linear_model    import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics         import mean_squared_error, accuracy_score
 
-from ISLP import load_data         # the book's datasets
+from ISLP import load_data         # book datasets, loaded by name
   \end{lstlisting}
-  Adopt these as the default first cell of every notebook.
+  \begin{readme}
+    Adopt these as the default first cell of every notebook. Nothing is
+    computed here --- the cell only makes tools available, so it prints
+    nothing. The \texttt{sklearn} lines supply, in the order you use them, the
+    \emph{model}, the \emph{split} that keeps a score honest, and the
+    \emph{metric}.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{30-second tour: NumPy}
   \begin{lstlisting}
-import numpy as np
+import numpy as np              # np is the universal alias
 x = np.array([1, 2, 3, 4])      # 1-D array (a vector)
 A = np.array([[1, 2], [3, 4]])  # 2-D array (a matrix)
 
 x.shape       # (4,)   -- one axis of length 4
 A.shape       # (2, 2) -- 2 rows, 2 columns
-A @ A         # matrix product
-np.linalg.inv(A)                # matrix inverse
-np.mean(x), np.std(x)           # mean and standard deviation
+A @ A         # @ is the matrix product, not elementwise
+np.linalg.inv(A)                # inverse -- appears in least squares
+np.mean(x), np.std(x)           # summaries: centre and spread
   \end{lstlisting}
+  \begin{readme}
+    Shapes are what you check first: \texttt{(4,)} is a vector of four numbers,
+    \texttt{(2, 2)} is two rows by two columns. Every design matrix in this
+    course is $n \times p$ (rows = observations, columns = predictors), so an
+    unexpected shape means a transposed matrix, not a broken formula.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{30-second tour: pandas}
   \begin{lstlisting}
-import pandas as pd
-df = pd.read_csv("Wage.csv")    # load CSV into a DataFrame
+import pandas as pd              # pd is the universal alias
+df = pd.read_csv("Wage.csv")    # CSV on disk -> a table in memory
 
-df.shape           # (3000, 11) -- 3000 rows, 11 columns
-df.head()          # show the first 5 rows
-df["wage"].mean()  # mean of a single column
-df.groupby("education")["wage"].mean()  # mean wage per group
-df.describe()      # summary statistics for every column
+df.shape           # (3000, 11) -- n = 3000 rows, 11 columns
+df.head()          # eyeball the first 5 rows before anything
+df["wage"].mean()  # a column behaves like a vector
+df.groupby("education")["wage"].mean()  # does wage differ by group?
+df.describe()      # count/mean/std/quartiles, all columns
   \end{lstlisting}
   \begin{labnote}[{{Live demo --- \S1 of the notebook}}]
-    These calls run for real in \texttt{chapter\_01\_lab.ipynb} \S1: \texttt{Wage.describe(include='all').T} shows which columns are numeric and which categorical --- e.g.\ mean age $42.4$, top education level \emph{2.\ HS Grad} (971 of $3\,000$).
+    Read \texttt{.shape} first: those two numbers are the $n$ and (almost) the $p$ of the problem. These calls run for real in \texttt{chapter\_01\_lab.ipynb} \S1: \texttt{Wage.describe(include='all').T} shows which columns are numeric and which categorical --- e.g.\ mean age $42.4$, top education level \emph{2.\ HS Grad} (971 of $3\,000$).
   \end{labnote}
 \end{frame}
 
@@ -936,16 +948,22 @@ df.describe()      # summary statistics for every column
   \begin{lstlisting}
 from sklearn.linear_model import LinearRegression
 
-X = df[["age", "year"]].values  # predictor matrix (n x 2)
-y = df["wage"].values           # response vector (n,)
-model = LinearRegression()      # choose the model...
-model.fit(X, y)                 # ...and estimate it from data
+X = df[["age", "year"]].values  # design matrix X: n rows, p = 2
+y = df["wage"].values           # response y: one number per row
+model = LinearRegression()      # pick the model class (not fitted yet)
+model.fit(X, y)                 # estimate f-hat from the data
 
-print(model.coef_, model.intercept_)  # fitted slopes, intercept
-yhat = model.predict(X)         # predicted wage for each row
+print(model.coef_, model.intercept_)  # the fitted f-hat, in numbers
+yhat = model.predict(X)         # apply f-hat: y-hat for every row
   \end{lstlisting}
   Every scikit-learn model follows the same \texttt{fit / predict}
   API.
+  \begin{readme}
+    \texttt{fit} is the estimation step, and it prints nothing: it
+    \emph{changes the model object}, storing the estimates in \texttt{coef\_}
+    and \texttt{intercept\_} --- the underscore marks `learned from data'.
+    \texttt{predict} reuses them on any \texttt{X} with the same $p$ columns.
+  \end{readme}
 \end{frame}
 
 

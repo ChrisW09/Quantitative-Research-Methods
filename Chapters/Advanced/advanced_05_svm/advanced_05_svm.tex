@@ -1065,26 +1065,28 @@
 \begin{solutionbox}[Solution --- code]
 \begin{lstlisting}[basicstyle=\ttfamily\tiny]
 import numpy as np
-from sklearn.datasets import make_circles
-from sklearn.model_selection import GridSearchCV, cross_val_score
+from sklearn.datasets import make_circles        # rings: no line works
+from sklearn.model_selection import GridSearchCV, cross_val_score  # tune / score
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler  # kernels need one scale
 from sklearn.svm import SVC
 
 X, y = make_circles(n_samples=300, factor=0.4, noise=0.15, random_state=0)
 pipe = lambda **kw: make_pipeline(StandardScaler(), SVC(**kw))  # scale, then fit
 
 lin = GridSearchCV(pipe(kernel='linear'),                        # (1) linear
-                   {'svc__C': np.logspace(-2, 2, 9)}, cv=5).fit(X, y)
+                   {'svc__C': np.logspace(-2, 2, 9)}, cv=5).fit(X, y)  # 9 C values
 rbf = GridSearchCV(pipe(kernel='rbf'),                           # (2) radial
                    {'svc__C': np.logspace(-2, 2, 5),
-                    'svc__gamma': np.logspace(-3, 1, 5)}, cv=5).fit(X, y)
+                    'svc__gamma': np.logspace(-3, 1, 5)}, cv=5).fit(X, y)  # 25 cells
 pol = cross_val_score(pipe(kernel='poly', degree=2, coef0=1, C=1), X, y, cv=5)
 
-print('linear', lin.best_params_, round(lin.best_score_, 3))
-print('radial', rbf.best_params_, round(rbf.best_score_, 3))
-print('poly d=2  CV', round(pol.mean(), 3))
+print('linear', lin.best_params_, round(lin.best_score_, 3))   # 0.583: coin flip
+print('radial', rbf.best_params_, round(rbf.best_score_, 3))   # 0.980: shape fixed
+print('poly d=2  CV', round(pol.mean(), 3))   # 0.963: a circle is degree 2
 \end{lstlisting}
+{\scriptsize\textbf{Reading it:} one \texttt{Pipeline} per kernel, one 5-fold
+CV --- each line prints the winning cell and its CV accuracy.}
 \end{solutionbox}
 \end{frame}
 
@@ -1142,14 +1144,14 @@ print('poly d=2  CV', round(pol.mean(), 3))
 \begin{solutionbox}[Solution --- code]
 \begin{lstlisting}[basicstyle=\ttfamily\tiny]
 import numpy as np, pandas as pd
-from scipy.spatial.distance import pdist
+from scipy.spatial.distance import pdist    # pairwise squared distances
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler  # the whole point of (2)
 from sklearn.svm import SVC
 
 H = load('Heart', index_col=0).dropna().reset_index(drop=True)   # 297 rows
-y = (H['AHD'] == 'Yes').astype(int).values
+y = (H['AHD'] == 'Yes').astype(int).values   # 1 = heart disease
 X = pd.get_dummies(H.drop(columns='AHD'), drop_first=True).astype(float).values
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)
 
@@ -1157,11 +1159,13 @@ raw = SVC(kernel='rbf', C=1, gamma=0.05).fit(Xtr, ytr)            # (1) unscaled
 sc  = make_pipeline(StandardScaler(),                             # (2) scaled
                     SVC(kernel='rbf', C=1, gamma=0.05)).fit(Xtr, ytr)
 print('unscaled', round(raw.score(Xte, yte), 3), np.bincount(raw.predict(Xte)))
-print('scaled  ', round(sc.score(Xte, yte), 3))
+print('scaled  ', round(sc.score(Xte, yte), 3))   # 0.822: +27 points
 print('median d^2: raw %.0f  scaled %.1f'                         # (3) why
-      % (np.median(pdist(X, 'sqeuclidean')),
+      % (np.median(pdist(X, 'sqeuclidean')),          # raw: 4294
          np.median(pdist(StandardScaler().fit_transform(X), 'sqeuclidean'))))
 \end{lstlisting}
+{\scriptsize\textbf{Reading it:} (1) and (2) differ only by the scaler; (3)
+prints the distance the radial kernel sees.}
 \end{solutionbox}
 \end{frame}
 
@@ -1476,24 +1480,26 @@ print('median d^2: raw %.0f  scaled %.1f'                         # (3) why
 \begin{lstlisting}[basicstyle=\ttfamily\tiny]
 Cs = np.array([0.01, 0.1, 1.0, 10.0, 100.0])            # log grid, 5 values
 Gs = np.array([1e-4, 1e-3, 1e-2, 1e-1, 1.0])            # log grid, 5 values
-pipe = lambda **kw: make_pipeline(StandardScaler(), SVC(**kw))
+pipe = lambda **kw: make_pipeline(StandardScaler(), SVC(**kw))  # scale in-fold
 rbf = GridSearchCV(pipe(kernel='rbf'),
-                   {'svc__C': Cs, 'svc__gamma': Gs}, cv=5).fit(Xtr, ytr)
+                   {'svc__C': Cs, 'svc__gamma': Gs}, cv=5).fit(Xtr, ytr)  # 25 cells
 lin = GridSearchCV(pipe(kernel='linear'), {'svc__C': Cs}, cv=5).fit(Xtr, ytr)
-for nm, gs in [('radial', rbf), ('linear', lin)]:
+for nm, gs in [('radial', rbf), ('linear', lin)]:   # report both fits
     print(nm, gs.best_params_, 'CV', round(gs.best_score_, 3),
           'test', round(gs.score(Xte, yte), 3),
-          'nSV', gs.best_estimator_[-1].n_support_.sum())
+          'nSV', gs.best_estimator_[-1].n_support_.sum())  # 80 vs 72
 
 lg = make_pipeline(StandardScaler(), LogisticRegression(max_iter=5000)).fit(Xtr, ytr)
 rf = RandomForestClassifier(n_estimators=500, random_state=0).fit(Xtr, ytr)
 scores = {'radial SVM': rbf.best_estimator_.decision_function(Xte),  # NOT proba
           'linear SVM': lin.best_estimator_.decision_function(Xte),
-          'logistic':   lg.predict_proba(Xte)[:, 1],
-          'forest':     rf.predict_proba(Xte)[:, 1]}
+          'logistic':   lg.predict_proba(Xte)[:, 1],  # a real probability
+          'forest':     rf.predict_proba(Xte)[:, 1]}  # vote share, 500 trees
 for nm, sc in scores.items():                            # roc_auc_score
-    print('%-11s AUC=%.3f' % (nm, roc_auc_score(yte, sc)))
+    print('%-11s AUC=%.3f' % (nm, roc_auc_score(yte, sc)))  # order is all it needs
 \end{lstlisting}
+{\scriptsize\textbf{Reading it:} both SVMs are tuned on the training split;
+all four are then compared by AUC on the test split.}
 \end{solutionbox}
 \end{frame}
 
@@ -1555,15 +1561,15 @@ for nm, sc in scores.items():                            # roc_auc_score
 import numpy as np
 from sklearn.pipeline import make_pipeline           # scaler + model as one
 from sklearn.preprocessing import StandardScaler     # SVMs NEED this
-from sklearn.svm import SVC
+from sklearn.svm import SVC                          # large C = narrow street
 
 rng = np.random.default_rng(2024)                    # seeded: reproducible
 X = rng.normal(size=(20, 2))                         # 20 points in the plane
-y = np.repeat([-1, 1], 10)                           # labels coded +-1
-X[y == 1] += 2.5                                     # shift one class apart
+y = np.repeat([-1, 1], 10)                           # +-1 labels, 10 each
+X[y == 1] += 2.5                                     # now separable by a line
 
 hard = SVC(kernel='linear', C=1e6).fit(X, y)         # huge C ~ hard margin
-print('n support vectors:', hard.n_support_.sum())   # 3
+print('n support vectors:', hard.n_support_.sum())   # 3 of 20 shape the fit
 print('margin 1/||beta|| :', round(1 / np.linalg.norm(hard.coef_), 3))  # 0.369
   \end{lstlisting}
   \begin{takeaway}
@@ -1574,9 +1580,9 @@ print('margin 1/||beta|| :', round(1 / np.linalg.norm(hard.coef_), 3))  # 0.369
 
 \begin{frame}[fragile]{A radial-kernel SVM, tuned, and its ROC score}
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-from sklearn.datasets import make_circles
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import GridSearchCV
+from sklearn.datasets import make_circles            # rings, not separable
+from sklearn.metrics import roc_auc_score            # ranks, not labels
+from sklearn.model_selection import GridSearchCV     # refits on the best cell
 
 X, y = make_circles(n_samples=300, factor=0.4, noise=0.15, random_state=0)
 grid = {'svc__C': np.logspace(-2, 2, 5),             # log grid, 5 x 5 cells

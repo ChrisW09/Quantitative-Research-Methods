@@ -804,14 +804,14 @@ import pandas as pd, numpy as np                     # data and arithmetic
 from lifelines import KaplanMeierFitter              # product-limit estimator
 
 BC = load('BrainCancer', index_col=0)                # 88 x 8; status 1 = death
-km = KaplanMeierFitter().fit(BC['time'], BC['status'])   # censoring handled here
-print('S(20) = %.4f' % km.survival_function_at_times(20).iloc[0])
+km = KaplanMeierFitter().fit(BC['time'], BC['status'])   # censored rows lower r_k, not S
+print('S(20) = %.4f' % km.survival_function_at_times(20).iloc[0])   # S(20) = 0.7132
 print('95%% CI  ', np.round(km.confidence_interval_.loc[:20].iloc[-1].values, 4))
 print('median  ', km.median_survival_time_)          # first t with S(t) <= 0.5
 
 for s in ['Female', 'Male']:                         # one curve per group
-    m = BC['sex'] == s
-    k = KaplanMeierFitter().fit(BC.loc[m, 'time'], BC.loc[m, 'status'])
+    m = BC['sex'] == s                               # boolean mask for this group
+    k = KaplanMeierFitter().fit(BC.loc[m, 'time'], BC.loc[m, 'status'])  # separate KM fit
     print(s, 'n=%d deaths=%d median=%.2f'
           % (m.sum(), BC.loc[m, 'status'].sum(), k.median_survival_time_))
 
@@ -1495,18 +1495,18 @@ print(et.head(7)[['at_risk', 'observed', 'censored']])   # check the hand arithm
 \begin{frame}[fragile]{Solution --- Extended Exercise 11.2 (1/2)}
 \begin{solutionbox}[Solution --- code]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-import numpy as np, pandas as pd
-from lifelines import CoxPHFitter
-from lifelines.statistics import proportional_hazard_test
-BC = load('BrainCancer', index_col=0).dropna()        # 87 complete cases
+import numpy as np, pandas as pd                      # arrays and data frames
+from lifelines import CoxPHFitter                     # partial-likelihood fit
+from lifelines.statistics import proportional_hazard_test   # Schoenfeld PH check
+BC = load('BrainCancer', index_col=0).dropna()        # drops 1 NA row -> n=87
 BC['diagnosis'] = pd.Categorical(BC['diagnosis'],     # Meningioma = reference
-        categories=['Meningioma', 'HG glioma', 'LG glioma', 'Other'])
+        categories=['Meningioma', 'HG glioma', 'LG glioma', 'Other'])  # HRs are vs. this
 X = pd.get_dummies(BC, drop_first=True).astype(float) # drop the reference level
-cph = CoxPHFitter().fit(X, duration_col='time', event_col='status')
+cph = CoxPHFitter().fit(X, duration_col='time', event_col='status')  # h_0 never estimated
 print(cph.summary[['coef', 'exp(coef)', 'p']].round(4))  # log HR, HR, p-value
-print('HR per 10 ki : %.3f' % np.exp(10 * cph.params_['ki']))   # rescaled HR
-print('C-index      : %.3f' % cph.concordance_index_)           # discrimination
-print(proportional_hazard_test(cph, X, time_transform='rank').summary['p'])
+print('HR per 10 ki : %.3f' % np.exp(10 * cph.params_['ki']))   # 10 ki points: 0.577
+print('C-index      : %.3f' % cph.concordance_index_)           # discrimination: 0.794
+print(proportional_hazard_test(cph, X, time_transform='rank').summary['p'])  # PH p-values
 med = X.drop(columns=['time','status']).median().to_frame().T   # median profile
 prof = pd.concat([med] * 3, ignore_index=True)        # three copies of it
 prof['ki'] = [60., 80., 100.]                         # vary one covariate only
@@ -1647,9 +1647,9 @@ km = KaplanMeierFitter().fit(BC['time'], BC['status']) # status: 1 = death
 print('median survival :', km.median_survival_time_)   # 47.8 months
 
 male = BC['sex'] == 'Male'                             # the two groups
-res = logrank_test(BC.loc[male, 'time'],   BC.loc[~male, 'time'],
-                   BC.loc[male, 'status'], BC.loc[~male, 'status'])
-print('chi2 = %.4f  p = %.4f' % (res.test_statistic, res.p_value))
+res = logrank_test(BC.loc[male, 'time'],   BC.loc[~male, 'time'],   # men vs women times
+                   BC.loc[male, 'status'], BC.loc[~male, 'status']) # their event flags
+print('chi2 = %.4f  p = %.4f' % (res.test_statistic, res.p_value))  # chi2 1.4405, p 0.23
   \end{lstlisting}
   \begin{takeaway}
     Prints \texttt{median survival : 47.8} and \texttt{chi2 = 1.4405\ \ p = 0.2301} ---
@@ -1659,20 +1659,20 @@ print('chi2 = %.4f  p = %.4f' % (res.test_statistic, res.p_value))
 
 \begin{frame}[fragile]{The Cox model and its diagnostics}
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-import numpy as np, pandas as pd
+import numpy as np, pandas as pd                        # arrays and data frames
 from lifelines import CoxPHFitter                       # partial-likelihood fit
-from lifelines.statistics import proportional_hazard_test
+from lifelines.statistics import proportional_hazard_test  # Schoenfeld PH check
 
 BC = pd.read_csv('BrainCancer.csv', index_col=0).dropna()   # 87 complete cases
 BC['diagnosis'] = pd.Categorical(BC['diagnosis'],           # set the reference
-        categories=['Meningioma', 'HG glioma', 'LG glioma', 'Other'])
+        categories=['Meningioma', 'HG glioma', 'LG glioma', 'Other'])  # HRs vs. this
 X = pd.get_dummies(BC, drop_first=True).astype(float)       # design matrix
 
-cph = CoxPHFitter().fit(X, duration_col='time', event_col='status')
+cph = CoxPHFitter().fit(X, duration_col='time', event_col='status')  # h_0 never estimated
 cph.print_summary(columns=['coef', 'exp(coef)', 'p'])       # log HR and HR
 print('HR per 10 ki : %.3f' % np.exp(10 * cph.params_['ki']))    # 0.577
 print('C-index      : %.3f' % cph.concordance_index_)            # 0.794
-proportional_hazard_test(cph, X, time_transform='rank').print_summary()
+proportional_hazard_test(cph, X, time_transform='rank').print_summary()  # p per covariate
   \end{lstlisting}
   \begin{takeaway}
     \texttt{print\_summary} gives $\hat\beta$, $e^{\hat\beta}$, its interval and $p$;

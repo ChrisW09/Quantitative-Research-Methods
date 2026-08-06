@@ -1001,47 +1001,71 @@ Tuning $B$ by training error --- it decreases monotonically in $B$, so it never 
 
 \begin{frame}[fragile]{Decision tree on Carseats}
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-from sklearn.tree import DecisionTreeRegressor, plot_tree
-from sklearn.model_selection import train_test_split
-from ISLP import load_data
+from sklearn.tree import DecisionTreeRegressor, plot_tree  # fit and draw
+from sklearn.model_selection import train_test_split  # honest test error
+from ISLP import load_data  # the book's data loader
 
-Carseats = load_data("Carseats")  # load data
-X = pd.get_dummies(Carseats.drop(columns="Sales"), drop_first=True)  # dummy-code factors
-y = Carseats["Sales"]  # response
+Carseats = load_data("Carseats")  # 400 stores, Sales in 1000s
+X = pd.get_dummies(Carseats.drop(columns="Sales"), drop_first=True)  # factors -> 0/1
+y = Carseats["Sales"]  # response: unit sales per store
 
-Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)  # 70/30 split
-tree = DecisionTreeRegressor(max_depth=4).fit(Xtr, ytr)  # grow a depth-4 tree
-plot_tree(tree, feature_names=X.columns, filled=True, fontsize=7)  # draw fitted tree
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)  # seeded 70/30
+tree = DecisionTreeRegressor(max_depth=4).fit(Xtr, ytr)  # depth cap = the regulariser
+plot_tree(tree, feature_names=X.columns, filled=True, fontsize=7)  # read rules top-down
   \end{lstlisting}
+  \begin{readme}
+    \texttt{max\_depth=4} is the only regulariser here: splitting stops after
+    four levels, so the tree stays readable instead of growing one leaf per
+    store. Each leaf predicts the mean \texttt{Sales} of its training cases
+    --- test MSE $3.612$. The alternative, \texttt{ccp\_alpha}$\,=\alpha$,
+    charges $\alpha$ per leaf and prunes a deep tree back: CV picks
+    $\alpha\approx0.013$ and scores a \emph{worse} $4.62$.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Random forest}
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor  # B bootstrap trees
 import numpy as np
 
-rf = RandomForestRegressor(n_estimators=500, max_features="sqrt",  # B=500, m=sqrt(p)
+rf = RandomForestRegressor(n_estimators=500, max_features="sqrt",  # sqrt(p) per split
                             random_state=0, oob_score=True).fit(Xtr, ytr)  # keep OOB score
-print("OOB R^2:", rf.oob_score_)  # OOB error: free validation
-print("Test MSE:", ((yte - rf.predict(Xte))**2).mean())  # held-out test error
+print("OOB R^2:", rf.oob_score_)  # 0.629: validation without a test set
+print("Test MSE:", ((yte - rf.predict(Xte))**2).mean())  # 2.312 vs 3.612 one tree
 
-imp = pd.Series(rf.feature_importances_, index=X.columns)  # impurity importances
-imp.sort_values().plot.barh()  # importance plot
+imp = pd.Series(rf.feature_importances_, index=X.columns)  # total RSS drop per variable
+imp.sort_values().plot.barh()  # which predictors the forest leans on
   \end{lstlisting}
+  \begin{readme}
+    \texttt{max\_features="sqrt"} is what makes this a \emph{forest} rather
+    than bagging: each split may use only $\sqrt p$ of the $p$ predictors, so
+    no single strong variable heads all $500$ trees --- less correlated trees
+    average better. \texttt{oob\_score=True} scores each store with the
+    ${\approx}37\,\%$ of trees that never drew it, so $R^2=0.629$ costs no
+    test data. Test MSE $2.312$ beats the single tree's $3.612$.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Gradient boosting and XGBoost}
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-from sklearn.ensemble import GradientBoostingRegressor
-gb = GradientBoostingRegressor(n_estimators=2000, learning_rate=0.01,  # B=2000, lambda=0.01
-                               max_depth=3, random_state=0).fit(Xtr, ytr)  # depth d=3
-print("Test MSE:", ((yte - gb.predict(Xte))**2).mean())  # boosted test error
+from sklearn.ensemble import GradientBoostingRegressor  # trees in sequence
+gb = GradientBoostingRegressor(n_estimators=2000, learning_rate=0.01,  # B=2000, step 0.01
+                               max_depth=3, random_state=0).fit(Xtr, ytr)  # d=3, weak
+print("Test MSE:", ((yte - gb.predict(Xte))**2).mean())  # 2.195, best of the four
 
-# Optional XGBoost
-import xgboost as xgb
-bst = xgb.XGBRegressor(n_estimators=2000, learning_rate=0.05,  # more trees, larger step
-                       max_depth=4, subsample=0.8).fit(Xtr, ytr)  # row subsampling
+# Optional: XGBoost, the production-grade implementation
+import xgboost as xgb  # same idea, much faster
+bst = xgb.XGBRegressor(n_estimators=2000, learning_rate=0.05,  # bigger step, same B
+                       max_depth=4, subsample=0.8).fit(Xtr, ytr)  # 80% of rows per tree
   \end{lstlisting}
+  \begin{readme}
+    Boosting is sequential: each of the $B=2000$ trees fits what the ensemble
+    still gets wrong, and only \texttt{learning\_rate} $\lambda=0.01$ of it is
+    added. Small $\lambda$ learns cautiously and so needs large $B$: the
+    product $\lambda B$ is the effective fitting effort, so lowering one means
+    raising the other. \texttt{max\_depth=3} keeps each tree a weak learner.
+    Test MSE $2.195$, just ahead of the forest's $2.312$.
+  \end{readme}
 \end{frame}
 
 % ====================== EXERCISE: Python (Boston) ======================
@@ -1062,18 +1086,18 @@ The worked solution sits in \texttt{chapter\_08\_lab.ipynb} under \emph{Lecture 
 \begin{frame}[fragile]{Solution --- Exercise 8.7 (1/3)}
 \begin{solutionbox}
 \begin{lstlisting}
-import pandas as pd
-from sklearn.ensemble import (RandomForestRegressor,
-                              GradientBoostingRegressor)
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
+import pandas as pd  # CSV in, DataFrame out
+from sklearn.ensemble import (RandomForestRegressor,  # the two ensembles
+                              GradientBoostingRegressor)  # to compare
+from sklearn.model_selection import train_test_split  # one fixed split
+from sklearn.metrics import mean_squared_error  # the scoring rule
 
-Boston = pd.read_csv('../ALL CSV FILES - 2nd Edition/Boston.csv')
-Boston = Boston.drop(columns=[c for c in ['Unnamed: 0']  # drop index col
-                              if c in Boston.columns])
-X = Boston.drop(columns='medv'); y = Boston['medv']  # target: medv
+Boston = pd.read_csv('../ALL CSV FILES - 2nd Edition/Boston.csv')  # 506 tracts
+Boston = Boston.drop(columns=[c for c in ['Unnamed: 0']  # stray index column
+                              if c in Boston.columns])  # only if present
+X = Boston.drop(columns='medv'); y = Boston['medv']  # target: median value
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3,  # 70/30 split
-                                      random_state=0)
+                                      random_state=0)  # same split each run
 \end{lstlisting}
 \emph{Set-up:} we hold out $30\,\%$ as a test set; fixing \texttt{random\_state} makes the split (and every number below) reproducible.
 \end{solutionbox}
@@ -1082,17 +1106,17 @@ Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3,  # 70/30 split
 \begin{frame}[fragile]{Solution --- Exercise 8.7 (2/3)}
 \begin{solutionbox}
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-rf = RandomForestRegressor(n_estimators=500, max_features='sqrt',  # 500 trees, m=sqrt(p)
-                           random_state=0).fit(Xtr, ytr)  # fit on training set
-print('RF  test MSE:', mean_squared_error(yte, rf.predict(Xte)))  # held-out error
+rf = RandomForestRegressor(n_estimators=500, max_features='sqrt',  # sqrt(p) per split
+                           random_state=0).fit(Xtr, ytr)  # train only; test held back
+print('RF  test MSE:', mean_squared_error(yte, rf.predict(Xte)))  # ~19.6 here
 
-gb = GradientBoostingRegressor(n_estimators=1000, learning_rate=0.01,  # slow learning
-                               max_depth=3, random_state=0).fit(Xtr, ytr)  # depth 3
-print('GBM test MSE:', mean_squared_error(yte, gb.predict(Xte)))  # compare with RF
+gb = GradientBoostingRegressor(n_estimators=1000, learning_rate=0.01,  # small steps
+                               max_depth=3, random_state=0).fit(Xtr, ytr)  # weak learners
+print('GBM test MSE:', mean_squared_error(yte, gb.predict(Xte)))  # ~13.5: beats the RF
 
-imp = pd.Series(rf.feature_importances_,  # impurity importances
-                index=X.columns).sort_values(ascending=False)  # largest first
-print(imp.head())  # top predictors
+imp = pd.Series(rf.feature_importances_,  # RSS drop credited per variable
+                index=X.columns).sort_values(ascending=False)  # biggest first
+print(imp.head())  # lstat and rm lead
 \end{lstlisting}
 \emph{What it prints (this seed):} RF test MSE $\approx19.6$, boosting $\approx13.5$ --- versus $\approx27$ for a single unpruned tree on the same split. The importance list is headed by \texttt{lstat} ($\approx0.28$) and \texttt{rm} ($\approx0.27$).
 \end{solutionbox}
@@ -1130,20 +1154,20 @@ The worked solution sits in \texttt{chapter\_08\_lab.ipynb} under \emph{Lecture 
 \begin{solutionbox}
 \textbf{Load the data; fit a single tree and bagging} (\texttt{max\_features=p} $=$ bagging).
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeRegressor
+import pandas as pd  # CSV loading
+from sklearn.model_selection import train_test_split  # one split, reused
+from sklearn.tree import DecisionTreeRegressor  # the baseline
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error as mse
-B = pd.read_csv('../ALL CSV FILES - 2nd Edition/Boston.csv')  # load
-B = B.drop(columns=[c for c in ['Unnamed: 0', ''] if c in B.columns])
-X, y = B.drop(columns='medv'), B['medv']; p = X.shape[1]   # p=12
-Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=.3, random_state=1)
-tree = DecisionTreeRegressor(random_state=1).fit(Xtr, ytr)  # deep tree
-bag  = RandomForestRegressor(n_estimators=500, max_features=p,  # m=p
-                             random_state=1).fit(Xtr, ytr)  # bagging
-print('tree', round(mse(yte, tree.predict(Xte)), 2),  # compare test MSE
-      'bag', round(mse(yte, bag.predict(Xte)), 2))
+from sklearn.metrics import mean_squared_error as mse  # scoring rule
+B = pd.read_csv('../ALL CSV FILES - 2nd Edition/Boston.csv')  # 506 tracts
+B = B.drop(columns=[c for c in ['Unnamed: 0', ''] if c in B.columns])  # tidy
+X, y = B.drop(columns='medv'), B['medv']; p = X.shape[1]   # p=12 predictors
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=.3, random_state=1)  # fixed
+tree = DecisionTreeRegressor(random_state=1).fit(Xtr, ytr)  # unpruned baseline
+bag  = RandomForestRegressor(n_estimators=500, max_features=p,  # m=p -> bagging
+                             random_state=1).fit(Xtr, ytr)  # all p vars per split
+print('tree', round(mse(yte, tree.predict(Xte)), 2),  # 26.7 against 8.6
+      'bag', round(mse(yte, bag.predict(Xte)), 2))  # averaging kills variance
 \end{lstlisting}
 \emph{What it prints (seed 1):} tree $\approx26.7$, bagging $\approx8.6$ --- averaging $500$ bootstrap trees alone cuts the single tree's test error to a third.
 \end{solutionbox}
@@ -1153,19 +1177,19 @@ print('tree', round(mse(yte, tree.predict(Xte)), 2),  # compare test MSE
 \begin{solutionbox}
 \textbf{Tune the forest's $m$ and boosting's $(B,\lambda,d)$; read importances.}
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-for m in ['sqrt', 4, 6]:                          # tune random-forest m
-    rf = RandomForestRegressor(n_estimators=500, max_features=m,
-                               random_state=1).fit(Xtr, ytr)
-    print('RF  m=', m, round(mse(yte, rf.predict(Xte)), 2))  # error per m
+for m in ['sqrt', 4, 6]:                          # vars tried per split
+    rf = RandomForestRegressor(n_estimators=500, max_features=m,  # the m dial
+                               random_state=1).fit(Xtr, ytr)  # only m varies
+    print('RF  m=', m, round(mse(yte, rf.predict(Xte)), 2))  # 9.81, 9.43, 8.73
 
-for lr, Bn, d in [(0.1, 1000, 2), (0.01, 2000, 3)]:   # tune B, lambda, d
-    gb = GradientBoostingRegressor(learning_rate=lr, n_estimators=Bn,
-                                   max_depth=d, random_state=1).fit(Xtr, ytr)
-    print('GBM', lr, Bn, d, round(mse(yte, gb.predict(Xte)), 2))  # error
+for lr, Bn, d in [(0.1, 1000, 2), (0.01, 2000, 3)]:   # big step/few vs small/many
+    gb = GradientBoostingRegressor(learning_rate=lr, n_estimators=Bn,  # lambda*B
+                                   max_depth=d, random_state=1).fit(Xtr, ytr)  # depth d
+    print('GBM', lr, Bn, d, round(mse(yte, gb.predict(Xte)), 2))  # 10.24 vs 7.34
 
-imp = pd.Series(rf.feature_importances_,  # last RF's importances
-                index=X.columns).sort_values(ascending=False)
-print(imp.round(3).head())  # top predictors
+imp = pd.Series(rf.feature_importances_,  # from the last (m=6) forest
+                index=X.columns).sort_values(ascending=False)  # biggest first
+print(imp.round(3).head())  # lstat and rm dominate
 \end{lstlisting}
 \emph{What it prints (seed 1):} RF $m{=}\sqrt p$: $9.81$, $m{=}4$: $9.43$, $m{=}6$: $8.73$; GBM $(0.1,1000,2)$: $10.24$, $(0.01,2000,3)$: $7.34$ --- slow learning with more trees wins.
 \end{solutionbox}

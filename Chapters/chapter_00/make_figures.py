@@ -469,10 +469,11 @@ def fig_pvalue():
     )
     ax.annotate(
         f"the two shaded tails\nare the $p$-value: {p:.3f}",
-        xy=(2.6, 0.012),
-        xytext=(1.2, 0.14),
-        fontsize=8.5,
+        xy=(-2.6, 0.012),
+        xytext=(-3.97, 0.20),
+        fontsize=8,
         color=ORANGE,
+        ha="left",
         arrowprops={"arrowstyle": "->", "color": ORANGE, "lw": 0.8},
     )
     ax.set_yticks([])

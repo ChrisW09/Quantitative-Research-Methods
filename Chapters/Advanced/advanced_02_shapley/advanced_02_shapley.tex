@@ -426,9 +426,11 @@
     \draw[ln] (C)--(AC); \draw[ln] (C)--(BC);
     \draw[ln] (AB)--(ABC); \draw[ln] (AC)--(ABC); \draw[ln] (BC)--(ABC);
     \draw[-{Stealth},accent,thick] (B.north west) -- (AB.south east)
-      node[midway,right=1pt,font=\scriptsize\color{accent}] {A joins: $+210$};
+      node[midway,above=1pt,fill=white,inner sep=1pt,align=center,
+           font=\scriptsize\color{accent}] {A joins:\\$+210$};
     \draw[-{Stealth},orange!70!black,thick] (E.west) to[bend left=18]
-      node[midway,left=1pt,font=\scriptsize] {A joins: $+120$} (A.south);
+      node[midway,below=2pt,fill=white,inner sep=1pt,
+           font=\scriptsize] {A joins: $+120$} (A.south);
   \end{tikzpicture}
   \end{center}
   \begin{takeaway}
@@ -844,53 +846,54 @@
 
 \begin{frame}[fragile]{Exact Shapley by hand (1): model and value function}
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-import itertools, numpy as np, pandas as pd          # std stack
-from math import factorial
-from sklearn.ensemble import GradientBoostingRegressor
+import itertools, numpy as np, pandas as pd  # coalitions, arrays
+from math import factorial                   # the |S|! weights
+from sklearn.ensemble import GradientBoostingRegressor  # black box f
 
 df = pd.read_csv("Hitters.csv").dropna().reset_index(drop=True)
 feats = ["Years", "CHits", "CRBI", "Walks", "Hits", "PutOuts"]
-X = df[feats].to_numpy(float)                        # (263, 6)
-y = np.log(df["Salary"]).to_numpy()                  # log $1000s
-f = GradientBoostingRegressor(random_state=2024).fit(X, y)
-print(round(f.score(X, y), 3))                       # train R^2: 0.965
+X = df[feats].to_numpy(float)                # (263, 6): p=6 players
+y = np.log(df["Salary"]).to_numpy()          # log $1000s: adds=ratios
+f = GradientBoostingRegressor(random_state=2024).fit(X, y)  # 100 trees
+print(round(f.score(X, y), 3))               # train R^2 0.965: accurate
 
-rng = np.random.default_rng(2024)                    # house seed
-bg = X[rng.choice(len(X), 100, replace=False)]       # background, B=100
-base = f.predict(bg).mean()                          # phi_0 = E[f]: 5.854
+rng = np.random.default_rng(2024)            # house seed, reproducible
+bg = X[rng.choice(len(X), 100, replace=False)]   # B=100 stand-in rows
+base = f.predict(bg).mean()                  # phi_0 = E[f(X)] = 5.854
 
-def v(S, x):                                # marginal value function
-    Z = bg.copy()                           # B background rows
-    if S: Z[:, list(S)] = x[list(S)]        # pin known features to x
-    return f.predict(Z).mean() - base       # average prediction - phi_0
+def v(S, x):                                # worth of coalition S
+    Z = bg.copy()                           # B rows: all p unknown
+    if S: Z[:, list(S)] = x[list(S)]        # pin S to x = "S is known"
+    return f.predict(Z).mean() - base       # E[f(x_S, X_-S)] - phi_0
   \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]{Exact Shapley by hand (2): the sum over all coalitions}
   \begin{lstlisting}[basicstyle=\ttfamily\fontsize{7}{8}\selectfont,aboveskip=2pt,belowskip=2pt]
-p = len(feats)                                       # p = 6
+p = len(feats)                                       # p = 6 players
 w = {s: factorial(s) * factorial(p - s - 1) / factorial(p)
-     for s in range(p)}                              # weight by |S|
+     for s in range(p)}                             # weight by size |S|
 
 def exact_shapley(x):                       # x: one row, shape (6,)
-    phi = np.zeros(p)
+    phi = np.zeros(p)                       # one value per player
     for j in range(p):                      # one player at a time
-        rest = [k for k in range(p) if k != j]
+        rest = [k for k in range(p) if k != j]   # the other p-1
         for r in range(p):                  # coalition sizes 0..p-1
-            for S in itertools.combinations(rest, r):
-                phi[j] += w[r] * (v(S + (j,), x) - v(S, x))
+            for S in itertools.combinations(rest, r):   # every such S
+                phi[j] += w[r] * (v(S + (j,), x) - v(S, x))  # margin
     return phi
 
 x_star = X[188]                             # the 24-season veteran
-phi = exact_shapley(x_star)
+phi = exact_shapley(x_star)                 # 64 coalitions -> 6 values
 print(dict(zip(feats, np.round(phi, 4))))   # one number per feature
 fx = f.predict(x_star.reshape(1, -1))[0]    # f(x*) = 6.6102
-print(round(phi.sum(), 4), round(fx - base, 4))   # efficiency check
+print(round(phi.sum(), 4), round(fx - base, 4))   # 0.7564 both ways
   \end{lstlisting}
   \begin{labnote}
     \scriptsize
     Notebook \S3 runs exactly this code --- \texttt{itertools.combinations} over all
     $64$ coalitions --- and times it, so you see the $2^p$ cost with your own clock.
+    The dictionary \texttt{w} is built once because the weight depends only on $|S|$.
   \end{labnote}
 \end{frame}
 
@@ -1017,19 +1020,19 @@ print(round(phi.sum(), 4), round(fx - base, 4))   # efficiency check
 \begin{solutionbox}[Solution --- code: sampling arrival orders]
   \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 def mc_shapley(x, m, rng):                  # estimate all p values
-    est = np.zeros(p)
+    est = np.zeros(p)                       # running sum per player
     for _ in range(m):                      # m random arrival orders
-        perm = rng.permutation(p)           # e.g. [3 0 5 1 4 2]
+        perm = rng.permutation(p)           # order, e.g. [3 0 5 1 4 2]
         S, v_prev = [], 0.0                 # empty room: v = 0
-        for j in perm:                      # features walk in
-            v_new = v(tuple(S) + (int(j),), x)   # value after j joins
-            est[j] += v_new - v_prev        # j's marginal contribution
-            v_prev = v_new                  # room now includes j
-            S.append(int(j))
-    return est / m                          # average over orders
+        for j in perm:                      # features arrive one by one
+            v_new = v(tuple(S) + (int(j),), x)   # worth once j joins
+            est[j] += v_new - v_prev        # credit j the jump in v
+            v_prev = v_new                  # this order's new baseline
+            S.append(int(j))                # j now counts as "known"
+    return est / m                          # mean = unbiased phi-hat
 
 rng = np.random.default_rng(2024)           # fresh seeded generator
-est = mc_shapley(x_star, 100, rng)          # m = 100 orders
+est = mc_shapley(x_star, 100, rng)          # 100 orders = 600 v-calls
   \end{lstlisting}
   \textbf{Method.} One pass through an ordering costs $p$ evaluations of $v$ and
   awards every feature exactly once --- so each pass is one telescoping sample of

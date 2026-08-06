@@ -460,10 +460,10 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
     \definecolor{cL}{RGB}{38,70,140}\definecolor{cR}{RGB}{224,130,20}
     % ---------- LEFT: no constraints ----------
     \begin{scope}
-      \node[font=\bfseries] at (3,4.7) {No constraints};
+      \node[font=\bfseries] at (3,4.9) {No constraints};
       \draw[->,thick] (-0.2,0)--(6.6,0) node[right]{$x$};
       \draw[->,thick] (0,-0.2)--(0,4.3);
-      \draw[gray,dashed] (3,-0.1)--(3,4.0) node[above,black,font=\footnotesize]{$\xi$};
+      \draw[gray,dashed] (3,-0.1)--(3,3.85) node[above,black,font=\footnotesize]{$\xi$};
       \draw[cL,very thick,domain=0.2:3,smooth,samples=50] plot(\x,{0.8+0.7*\x-0.06*\x*\x});
       \draw[cR,very thick,domain=3:6,smooth,samples=50] plot(\x,{3.5-0.15*(\x-3)-0.05*(\x-3)*(\x-3)});
       \fill[cL] (3,2.36) circle(2.2pt);
@@ -474,10 +474,10 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
     \end{scope}
     % ---------- RIGHT: cubic-spline constraints ----------
     \begin{scope}[xshift=8.4cm]
-      \node[font=\bfseries] at (3,4.7) {Cubic-spline constraints};
+      \node[font=\bfseries] at (3,4.9) {Cubic-spline constraints};
       \draw[->,thick] (-0.2,0)--(6.6,0) node[right]{$x$};
       \draw[->,thick] (0,-0.2)--(0,4.3);
-      \draw[gray,dashed] (3,-0.1)--(3,4.0) node[above,black,font=\footnotesize]{$\xi$};
+      \draw[gray,dashed] (3,-0.1)--(3,3.85) node[above,black,font=\footnotesize]{$\xi$};
       \draw[cL,very thick,domain=0.2:3,smooth,samples=50] plot(\x,{0.8+0.7*\x-0.06*\x*\x});
       \draw[cR,very thick,domain=3:6,smooth,samples=50] plot(\x,{2.36+0.34*(\x-3)-0.06*(\x-3)*(\x-3)});
       \fill[black] (3,2.36) circle(2.2pt);
@@ -491,7 +491,7 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
 
 \begin{frame}{How a cubic spline is built: continuity at the knots}
   \begin{center}
-  \begin{tikzpicture}[scale=0.58,>=Stealth]
+  \begin{tikzpicture}[scale=0.55,>=Stealth]
     \definecolor{cA}{RGB}{38,70,140}\definecolor{cB}{RGB}{224,130,20}
     \definecolor{cC}{RGB}{46,125,50}\definecolor{cD}{RGB}{198,40,40}
     % axes
@@ -509,7 +509,7 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
        \fill[black] (\k,\yk) circle (2.4pt);
        \node[below,font=\small] at (\k,-0.08) {\lab};
     }
-    \node[font=\footnotesize] at (5,-0.95) {three knots = piece boundaries};
+    \node[font=\footnotesize] at (5,-1.45) {three knots = piece boundaries};
     % annotation to middle join
     \pgfmathsetmacro{\yb}{3+1.4*sin((0.9*5) r)+0.1*5}
     \node[align=center,fill=green!6,draw=green!50!black,rounded corners,inner sep=3pt,font=\footnotesize]
@@ -914,11 +914,11 @@ import pandas as pd
 from pygam import LinearGAM, s, l, f
 
 W = pd.read_csv('../ALL CSV FILES - 2nd Edition/Wage.csv')  # load Wage
-W['edu'] = W['education'].astype('category').cat.codes  # factor -> codes
-X = W[['age', 'year', 'edu']].values  # predictor matrix
+W['edu'] = W['education'].astype('category').cat.codes  # levels -> 0..4
+X = W[['age', 'year', 'edu']].values  # cols 0, 1, 2 in that order
 y = W['wage'].values                  # response
-gam = LinearGAM(s(0) + l(1) + f(2)).fit(X, y)  # s=spline, l=linear, f=factor
-gam.summary()   # effective DoF and p-value per term
+gam = LinearGAM(s(0) + l(1) + f(2)).fit(X, y)  # smooth, linear, factor
+gam.summary()   # EDF per term: age ~15, year ~1, edu 4
 \end{lstlisting}
 A GAM is fit by \emph{backfitting}: cycle through the terms, repeatedly re-estimating each $f_j$ on the partial residual $y-\beta_0-\sum_{k\neq j}f_k(X_k)$ until the fit stabilises --- each smooth is refitted to whatever the other terms leave unexplained.
 \end{solutionbox}
@@ -978,35 +978,56 @@ import statsmodels.api as sm
 from ISLP import load_data
 from ISLP.models import poly, ModelSpec as MS
 
-Wage = load_data("Wage")  # load the Wage data
-design = MS([poly("age", degree=4)]).fit_transform(Wage)  # degree-4 basis
-res = sm.OLS(Wage["wage"], design).fit()  # OLS on expanded design
-print(res.summary())  # coefficient table
+Wage = load_data("Wage")  # 3000 workers: wage, age, year
+design = MS([poly("age", degree=4)]).fit_transform(Wage)  # 4 age cols
+res = sm.OLS(Wage["wage"], design).fit()  # plain OLS on that design
+print(res.summary())  # one coefficient per basis column
   \end{lstlisting}
+  \begin{readme}[What the design matrix actually holds]
+    \texttt{fit\_transform} is what builds the columns OLS sees: an
+    intercept plus \emph{four} columns for \texttt{age}. \texttt{poly}
+    returns \emph{orthogonal} polynomials --- rotated combinations of
+    $\texttt{age},\texttt{age}^2,\texttt{age}^3,\texttt{age}^4$ that span
+    the same space, so the fitted curve and $R^2\approx0.086$ match raw
+    powers exactly, but the columns are uncorrelated. Judge the term by
+    the fitted curve, never by one column's $t$-statistic.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Regression splines}
   \begin{lstlisting}
 from ISLP.models import bs, ns
 
-design  = MS([bs("age", df=6)]).fit_transform(Wage)  # cubic spline, 6 df
-design2 = MS([ns("age", df=4)]).fit_transform(Wage)  # natural spline, 4 df
-res = sm.OLS(Wage["wage"], design2).fit()  # OLS on the spline basis
-print(res.summary())  # per-basis coefficients
+design  = MS([bs("age", df=6)]).fit_transform(Wage)  # 6 cubic cols
+design2 = MS([ns("age", df=4)]).fit_transform(Wage)  # 4 cols, linear tails
+res = sm.OLS(Wage["wage"], design2).fit()  # still ordinary least squares
+print(res.summary())  # one weight per basis function
   \end{lstlisting}
+  \begin{readme}[\texttt{df} and knots are two ways to say the same thing]
+    Each call returns a matrix whose columns are the basis functions
+    $b_j(\texttt{age})$ of the slide before. \texttt{df} says \emph{how
+    many columns}; the knots are then placed for you at quantiles of
+    \texttt{age}. Naming the knots instead gives the identical fit,
+    because cubic-spline df $=K+4$ and natural-spline df $=K$ --- which
+    is why \texttt{ns} at the same df, spending nothing on the tails,
+    can afford more knots where the data actually are.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Local regression with statsmodels}
   \begin{lstlisting}
 import statsmodels.nonparametric.api as nps
 
-l = nps.lowess(endog=Wage["wage"], exog=Wage["age"],  # local regression
-               frac=0.2, return_sorted=True)  # span: 20% nearest points
+l = nps.lowess(endog=Wage["wage"], exog=Wage["age"],  # y first, then x
+               frac=0.2, return_sorted=True)  # span: 20% of the points
 import matplotlib.pyplot as plt
 plt.scatter(Wage["age"], Wage["wage"], s=4, alpha=0.3)  # raw data
-plt.plot(l[:, 0], l[:, 1], color="orange")  # fitted LOESS curve
+plt.plot(l[:, 0], l[:, 1], color="orange")  # col 0 = age, col 1 = fit
 plt.show()
   \end{lstlisting}
+  \begin{readme}[No coefficients come back --- just the curve]
+    One $(x,\hat y)$ row per point, sorted by $x$ so it can be plotted.
+  \end{readme}
   \begin{labnote}[{{Live demo --- \S4 of the notebook}}]
     Switch to \texttt{chapter\_07\_lab.ipynb} \S4 and run the \texttt{lowess} cell: with span $0.2$ each local fit uses $20\%$ of the $3\,000$ workers, and the curve traces the same rise--plateau--fall as the splines.
   \end{labnote}
@@ -1016,11 +1037,17 @@ plt.show()
   \begin{lstlisting}
 from pygam import LinearGAM, s
 
-X = Wage[["year", "age"]].values  # two predictors
+X = Wage[["year", "age"]].values  # col 0 = year, col 1 = age
 y = Wage["wage"].values           # response
-gam = LinearGAM(s(0) + s(1)).fit(X, y)  # smooth terms in year and age
+gam = LinearGAM(s(0) + s(1)).fit(X, y)  # s(j): smooth of column j
 gam.summary()  # EDF per term: year ~7, age ~14
   \end{lstlisting}
+  \begin{readme}[Reading the EDF column]
+    \texttt{s(0)} and \texttt{s(1)} index \emph{columns} of \texttt{X}.
+    A term's effective df says how much flexibility the penalty let it
+    use: $1$ is a straight line, year~$\approx7$ a gentle drift,
+    age~$\approx14$ the pronounced hump.
+  \end{readme}
   \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
     Switch to \texttt{chapter\_07\_lab.ipynb} \S5 and run the two GAM cells: the summary reports $\approx21.2$ total effective df (age's smooth alone spends $\approx14$), and the partial-dependence panels show the age hump next to the gentle year drift.
   \end{labnote}
@@ -1049,10 +1076,10 @@ import pandas as pd
 import statsmodels.formula.api as smf
 
 Wage = pd.read_csv('../ALL CSV FILES - 2nd Edition/Wage.csv')  # load
-fit = smf.ols('wage ~ cr(age, df=5)', data=Wage).fit()  # natural spline
-print(fit.summary())  # coefficient table
+fit = smf.ols('wage ~ cr(age, df=5)', data=Wage).fit()  # 5 ns columns
+print(fit.summary())  # read the joint F, not single t's
 \end{lstlisting}
-\emph{What the output shows:} $6$ coefficients (intercept $+$ $5$ basis columns), $R^2\approx0.087$, and an overall $F$-test with $p\approx6\times10^{-58}$ --- the spline terms are jointly highly significant, even though \texttt{age} alone explains only a modest share of wage variance.
+\emph{What the output shows:} $6$ coefficients (intercept $+$ $5$ basis columns), $R^2\approx0.087$, and an overall $F$-test with $p\approx6\times10^{-58}$ --- the spline terms are jointly highly significant, even though \texttt{age} alone explains only a modest share of wage variance. \texttt{df=5} is the \emph{entire} complexity choice: it fixes how many basis columns are built, and the knots then go at quantiles of \texttt{age}.
 \end{solutionbox}
 \end{frame}
 
@@ -1063,12 +1090,12 @@ print(fit.summary())  # coefficient table
 import numpy as np
 from pygam import LinearGAM, s
 
-X = Wage[['age', 'year']].values  # predictor matrix
+X = Wage[['age', 'year']].values  # col 0 = age, col 1 = year
 y = Wage['wage'].values           # response
-gam = LinearGAM(s(0) + s(1)).fit(X, y)  # smooth terms in age and year
-gam.summary()  # EDF per smooth term
+gam = LinearGAM(s(0) + s(1)).fit(X, y)  # a penalised spline per column
+gam.summary()  # EDF per term: how wiggly each one got
 \end{lstlisting}
-\emph{What the output shows:} with pyGAM's default penalty the \texttt{age} smooth uses $\approx15$ EDF and \texttt{year} $\approx6$ --- both flexible; tuning $\lambda$ by \texttt{gam.gridsearch(X, y)} shrinks the smooths toward simpler shapes. Both terms are reported significant.
+\emph{What the output shows:} with pyGAM's default penalty the \texttt{age} smooth uses $\approx15$ EDF and \texttt{year} $\approx6$ --- both flexible; tuning $\lambda$ by \texttt{gam.gridsearch(X, y)} shrinks the smooths toward simpler shapes. Note the contrast with (a): there \emph{you} fixed df $=5$; here $\lambda$ decides, and the EDF merely \emph{reports} the flexibility it granted.
 \end{solutionbox}
 \end{frame}
 
@@ -1109,9 +1136,9 @@ import statsmodels.formula.api as smf
 from statsmodels.stats.anova import anova_lm
 
 W = pd.read_csv('../ALL CSV FILES - 2nd Edition/Wage.csv')  # load Wage
-terms = lambda d: '+'.join(f'np.power(age,{k})' for k in range(1, d+1))  # power basis
-models = [smf.ols('wage ~ '+terms(d), data=W).fit() for d in range(1, 6)]  # degrees 1..5
-print(anova_lm(*models)[['df_diff', 'F', 'Pr(>F)']].round(4))  # nested F-tests
+terms = lambda d: '+'.join(f'np.power(age,{k})' for k in range(1, d+1))  # age..age^d
+models = [smf.ols('wage ~ '+terms(d), data=W).fit() for d in range(1, 6)]  # nested: +1 term each
+print(anova_lm(*models)[['df_diff', 'F', 'Pr(>F)']].round(4))  # row d: is degree d+1 worth it?
 \end{lstlisting}
 Each row of \texttt{anova\_lm} tests degree $d$ against $d{+}1$ --- valid because the models are \emph{nested}. The $F$-tests are highly significant up to degree $3$ ($2\!\to\!3$: $p\approx0.002$), \emph{borderline} for $3\!\to\!4$ ($p\approx0.05$) and clearly insignificant for $4\!\to\!5$ ($p\approx0.37$). $5$-fold CV of test MSE is essentially flat over degrees $3$--$4$. \textbf{Chosen degree: $3$ (cubic).}
 \end{solutionbox}
@@ -1122,16 +1149,16 @@ Each row of \texttt{anova\_lm} tests degree $d$ against $d{+}1$ --- valid becaus
 \textbf{Step function, natural spline, and the overlay.}
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 import matplotlib.pyplot as plt
-poly = smf.ols('wage ~ '+terms(3), data=W).fit()  # cubic polynomial
-W['bin'] = pd.cut(W['age'], [17,25,35,45,55,65,81])  # six age bins
-step = smf.ols('wage ~ C(bin)', data=W).fit()  # step function
-ns   = smf.ols('wage ~ cr(age, df=5)', data=W).fit()   # natural spline
+poly = smf.ols('wage ~ '+terms(3), data=W).fit()  # the degree chosen above
+W['bin'] = pd.cut(W['age'], [17,25,35,45,55,65,81])  # 6 bins -> 5 dummies
+step = smf.ols('wage ~ C(bin)', data=W).fit()  # a constant inside each bin
+ns   = smf.ols('wage ~ cr(age, df=5)', data=W).fit()   # 5 cols, linear tails
 
-g = pd.DataFrame({'age': np.arange(18, 81)})  # prediction grid
-g['bin'] = pd.cut(g['age'], [17,25,35,45,55,65,81])  # bin grid too
+g = pd.DataFrame({'age': np.arange(18, 81)})  # one row per age to plot
+g['bin'] = pd.cut(g['age'], [17,25,35,45,55,65,81])  # SAME cutpoints
 plt.scatter(W['age'], W['wage'], s=4, alpha=.15, color='grey')  # data
 for m, lab in [(poly,'poly (d=3)'), (step,'step'), (ns,'natural spline')]:
-    plt.plot(g['age'], m.predict(g), label=lab)  # overlay each fit
+    plt.plot(g['age'], m.predict(g), label=lab)  # three curves, one grid
 plt.legend(); plt.xlabel('age'); plt.ylabel('wage'); plt.show()
 \end{lstlisting}
 \emph{Why the grid carries both columns:} \texttt{predict} re-applies each formula, so \texttt{g} must contain \texttt{age} (for \texttt{poly}, \texttt{ns}) \emph{and} the matching \texttt{bin} labels (for \texttt{step}), built with the \emph{same} cutpoints as in training.
@@ -1344,7 +1371,7 @@ Picking the degree that maximises training $R^2$ --- it rises mechanically with 
       \node[below,font=\footnotesize] at (2,-0.12) {$\xi$};
       \fill[cP] (2,0) circle(2pt);
       \node[cP,font=\scriptsize] at (1.0,0.3) {$\equiv 0$};
-      \node[cP,font=\scriptsize] at (3.5,2.3) {cubic rise};
+      \node[cP,font=\scriptsize] at (3.0,2.55) {cubic rise};
     \end{tikzpicture}
     \end{center}
     \end{column}

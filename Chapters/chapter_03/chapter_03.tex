@@ -562,7 +562,7 @@
       }
       \pgfmathsetmacro\yhfour{0.55+0.45*4}
       \node[red,right,font=\small] at (4.08,{(2.0+\yhfour)/2}) {$e_i$};
-      \node[accent,above,font=\small] at (5,3.5) {$(x_i,y_i)$};
+      \node[accent,right,font=\small] at (5.25,3.9) {$(x_i,y_i)$};
       \node[draw=green!50!black,fill=green!6,rounded corners,align=center,
             font=\small] at (2.5,4.15)
             {minimise $\displaystyle\sum_{i} e_i^{2}=\sum_{i}(y_i-\hat y_i)^2$};
@@ -835,8 +835,9 @@
     \node[below,green!45!black,font=\footnotesize] at (\muL,-0.32) {$\hat\beta_1-2\,\mathrm{SE}$};
     \node[below,green!45!black,font=\footnotesize] at (\muR,-0.32) {$\hat\beta_1+2\,\mathrm{SE}$};
     \draw[decorate,decoration={brace,amplitude=5pt},green!45!black]
-      (\muR,{\amp*0.52}) -- (\muL,{\amp*0.52})
-      node[midway,above=5pt,green!45!black,font=\small]{95\% confidence interval};
+      (\muR,{\amp*0.52}) -- (\muL,{\amp*0.52});
+    \node[above,green!45!black,font=\small] at (\ctr,{\amp+0.10})
+      {95\% confidence interval};
   \end{tikzpicture}
   \end{center}
   \begin{takeaway}[Reading the picture]
@@ -1286,18 +1287,22 @@
   \begin{solutionbox}
     \textbf{(1) Code.}
 \begin{lstlisting}
-import pandas as pd                  # data handling
-import statsmodels.api as sm         # OLS with full inference output
+import pandas as pd                  # tables of data
+import statsmodels.api as sm         # OLS reporting SEs and p-values
 
 ad = pd.read_csv("../ALL CSV FILES - 2nd Edition/Advertising.csv",
-                 index_col=0)        # load data; column 0 = row labels
-X = sm.add_constant(ad[["TV", "radio", "newspaper"]])  # + intercept col
-res = sm.OLS(ad["sales"], X).fit()   # fit sales on all three media
-print(res.summary())                 # coef table: SE, t, p, R2, F
+                 index_col=0)        # col 0 = market ID, not an input
+X = sm.add_constant(ad[["TV", "radio", "newspaper"]])  # 3 media + b0
+res = sm.OLS(ad["sales"], X).fit()   # .fit() = solve for the 4 betas
+print(res.summary())                 # SE, t, p, 95% CI per coef; R2, F
 # TV ~ 0.0458, radio ~ 0.189, newspaper ~ -0.001 (p ~ 0.86)
 # R-squared ~ 0.897
 \end{lstlisting}
   \end{solutionbox}
+  \begin{readme}\footnotesize
+    \texttt{add\_constant} makes $\beta_0$ estimable; \texttt{.fit()}
+    returns what \texttt{.summary()} prints.
+  \end{readme}
 \end{frame}
 
 \begin{frame}{Solution --- Exercise 3.4 (2/2)}
@@ -1603,15 +1608,21 @@ print(res.summary())                 # coef table: SE, t, p, R2, F
 \begin{lstlisting}
 import pandas as pd, numpy as np, statsmodels.api as sm  # libraries
 ad = pd.read_csv("../ALL CSV FILES - 2nd Edition/Advertising.csv",
-                 index_col=0)          # load data; col 0 = row labels
-X   = sm.add_constant(ad[["TV", "radio", "newspaper"]])  # design + const
-res = sm.OLS(ad["sales"], X).fit()     # least-squares fit
-print(res.summary())                   # full inference table
+                 index_col=0)          # col 0 = market ID, not an input
+X   = sm.add_constant(ad[["TV", "radio", "newspaper"]])  # 3 media + b0
+res = sm.OLS(ad["sales"], X).fit()     # solve for the 4 coefficients
+print(res.summary())                   # the whole inference table
 # const 2.939 | TV 0.0458 (p<.001) | radio 0.189 (p<.001)
 # newspaper -0.0010 (p=0.86, 95% CI [-0.013, 0.010])
 # R2 = 0.897 | adj-R2 = 0.896 | F = 570.3 (p = 1.6e-96) | RSE = 1.686
 \end{lstlisting}
   \end{solutionbox}
+  \begin{readme}\footnotesize
+    The coefficient block holds one row per column of \texttt{X}:
+    \texttt{coef} is $\hat\beta_j$, \texttt{std err} its standard error,
+    \texttt{t} their ratio, \texttt{P>|t|} the two-sided $p$-value, the
+    last pair the $95\%$ CI. $R^2$, adjusted $R^2$ and $F$ sit above it.
+  \end{readme}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 3.L3 (2/3)}
@@ -1638,8 +1649,8 @@ print(res.summary())                   # full inference table
   \begin{solutionbox}
     \textbf{(3) Drop newspaper and refit.}
 \begin{lstlisting}
-X2   = sm.add_constant(ad[["TV", "radio"]])  # drop newspaper column
-res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
+X2   = sm.add_constant(ad[["TV", "radio"]])  # same X, no newspaper
+res2 = sm.OLS(ad["sales"], X2).fit()         # refit; did slopes move?
 # const 2.921 | TV 0.0458 | radio 0.188
 # R2 = 0.897 (unchanged) | adj-R2 0.896 -> 0.896 | RSE 1.686 -> 1.681
 \end{lstlisting}
@@ -2000,22 +2011,22 @@ res2 = sm.OLS(ad["sales"], X2).fit()         # refit the smaller model
     \textbf{(1) Code.}
     \vspace{-2mm}
 \begin{lstlisting}
-import pandas as pd, numpy as np
-import statsmodels.api as sm
+import pandas as pd, numpy as np            # tables and arrays
+import statsmodels.api as sm                # OLS with inference
 
 auto = pd.read_csv("../ALL CSV FILES - 2nd Edition/Auto.csv",
-                   na_values="?").dropna()  # "?" -> NaN, then drop
-hp = auto["horsepower"].astype(float)       # ensure numeric predictor
+                   na_values="?").dropna()  # "?" marks missing hp
+hp = auto["horsepower"].astype(float)       # it was read in as text
 
-# Linear model
-X1 = sm.add_constant(hp)                    # intercept + hp
-m1 = sm.OLS(auto["mpg"], X1).fit()          # fit mpg ~ hp
+# Linear model: a single straight line
+X1 = sm.add_constant(hp)                    # design: 1s and hp
+m1 = sm.OLS(auto["mpg"], X1).fit()          # the straight-line fit
 
-# Quadratic model
-X2 = sm.add_constant(np.column_stack([hp, hp**2]))  # cols: hp, hp^2
-m2 = sm.OLS(auto["mpg"], X2).fit()          # fit mpg ~ hp + hp^2
+# Quadratic model: hp^2 is just one more column
+X2 = sm.add_constant(np.column_stack([hp, hp**2]))  # now 1s, hp, hp^2
+m2 = sm.OLS(auto["mpg"], X2).fit()          # same OLS, one more x
 
-print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
+print(m1.rsquared, m2.rsquared)   # 0.606 -> 0.688: curved
 \end{lstlisting}
   \end{solutionbox}
 \end{frame}
@@ -2347,16 +2358,16 @@ print(m1.rsquared, m2.rsquared)   # ~ 0.606 , ~ 0.688
     \textbf{(1)--(2) Code.}
     \vspace{-2mm}
 \begin{lstlisting}
-import pandas as pd, numpy as np
-import statsmodels.api as sm
+import pandas as pd, numpy as np        # tables and arrays
+import statsmodels.api as sm            # OLS + diagnostics
 
 boston = pd.read_csv("../ALL CSV FILES - 2nd Edition/Boston.csv")
-X = sm.add_constant(boston["lstat"])    # intercept + lstat
+X = sm.add_constant(boston["lstat"])    # 1s column + lstat
 res = sm.OLS(boston["medv"], X).fit()   # fit medv ~ lstat
 
-infl = res.get_influence()              # influence diagnostics object
-lev  = infl.hat_matrix_diag             # leverage h_ii
-stud = infl.resid_studentized_external  # studentized residuals
+infl = res.get_influence()              # all per-point diagnostics
+lev  = infl.hat_matrix_diag             # h_ii: unusual x, not y
+stud = infl.resid_studentized_external  # unusual y, on a t scale
 
 n, p = X.shape[0], X.shape[1] - 1       # n obs, p predictors
 high_lev = np.where(lev > 2*(p+1)/n)[0]   # rule: h_ii > 2(p+1)/n
@@ -2488,10 +2499,11 @@ from statsmodels.stats.outliers_influence \
 
 credit = pd.read_csv("../ALL CSV FILES - 2nd Edition/Credit.csv")
 cols = ["Limit", "Rating", "Age"]   # CSV column names are capitalised
-X = sm.add_constant(credit[cols])   # design matrix + intercept column
-# VIF_j = 1/(1 - R2 of X_j regressed on the other columns)
+X = sm.add_constant(credit[cols])   # the const row's VIF is ignored
+# vif_(X, i) regresses column i of X on all the *other* columns
+# and returns 1/(1 - R2_i); loop over i to get one VIF per predictor
 vifs = {col: vif_(X.values, i) for i, col in enumerate(X.columns)}
-print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
+print(vifs)   # Limit 160.59, Rating 160.67, Age 1.01
 \end{lstlisting}
   \end{solutionbox}
 \end{frame}
@@ -2668,33 +2680,46 @@ print(vifs)   # Limit ~ 160, Rating ~ 161, Age ~ 1.0
 
 \begin{frame}[fragile]{Simple regression with statsmodels}
   \begin{lstlisting}
-import pandas as pd, numpy as np
-import statsmodels.api as sm
-from ISLP import load_data             # textbook data sets
+import pandas as pd, numpy as np       # tables and array maths
+import statsmodels.api as sm           # OLS with full inference
+from ISLP import load_data             # the textbook's data sets
 
-Boston = load_data("Boston")           # Boston housing data
-X = sm.add_constant(Boston["lstat"])   # predictor + intercept column
+Boston = load_data("Boston")           # 506 census tracts
+X = sm.add_constant(Boston["lstat"])   # lstat + a column of 1s (b0)
 y = Boston["medv"]                     # response: median home value
-res = sm.OLS(y, X).fit()               # least-squares fit medv ~ lstat
-print(res.summary())                   # coef, SE, t, p, CI, R2, F
+res = sm.OLS(y, X).fit()               # .fit() runs least squares
+print(res.summary())                   # coef | std err | t | P>|t| | CI
   \end{lstlisting}
-  \texttt{statsmodels} produces a comprehensive output table with
-  coefficients, standard errors, $t$-statistics, $p$-values, and
-  confidence intervals --- everything we need for inference.
+  \begin{readme}\footnotesize
+    \textbf{In:} the response \texttt{y} and a design matrix \texttt{X}
+    whose columns are the predictors plus a column of ones ---
+    \texttt{add\_constant} is what makes the intercept $\beta_0$ estimable.
+    \textbf{Key call:} \texttt{.fit()} solves the least-squares problem and
+    hands back a \emph{results} object; nothing prints until you ask.
+    \textbf{Out:} \texttt{.summary()} gives one row per column of
+    \texttt{X} --- \texttt{coef} $=\hat\beta_j$, \texttt{std err}
+    $=\mathrm{SE}(\hat\beta_j)$, \texttt{t} $=$ their ratio,
+    \texttt{P>|t|} the two-sided $p$-value, then the $95\%$ CI --- with
+    $R^2$ and the $F$-statistic in the header block above.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Confidence and prediction intervals}
   \begin{lstlisting}
-xnew = pd.DataFrame({"const": 1.0, "lstat": [5, 10, 15]})  # new x
-pred = res.get_prediction(xnew)   # predictions with uncertainty
-pred.summary_frame(alpha=0.05)    # 95% intervals of both kinds
-# columns: mean, mean_se,
-#   mean_ci_lower / upper,        <- CI
-#   obs_ci_lower  / upper         <- prediction interval
+xnew = pd.DataFrame({"const": 1.0, "lstat": [5, 10, 15]})  # 3 new x
+pred = res.get_prediction(xnew)   # plug them into the fitted line
+pred.summary_frame(alpha=0.05)    # alpha=.05 -> 95% intervals
+# columns: mean (the fitted y), mean_se,
+#   mean_ci_lower / upper,        <- CI: the average y at this x
+#   obs_ci_lower  / upper         <- PI: one new tract at this x
   \end{lstlisting}
-  Both intervals come from the same fit but answer different
-  questions. Always use \emph{prediction} intervals when communicating
-  uncertainty about an individual outcome.
+  \begin{readme}\footnotesize
+    Same fit, two questions. \texttt{mean\_ci} brackets the \emph{average}
+    response at that $x$ and shrinks as $n$ grows; \texttt{obs\_ci} brackets
+    \emph{one new observation}, so it also carries the irreducible noise
+    $\sigma$ and stays wide however large $n$ is. Quote the wider one to a
+    client asking about a single case.
+  \end{readme}
   \begin{labnote}[{{Live demo --- \S1 of the notebook}}]
     Switch to \texttt{chapter\_03\_lab.ipynb} \S1 and run the
     \emph{Confidence and prediction intervals} cell: at $\texttt{lstat}=5$
@@ -2706,42 +2731,66 @@ pred.summary_frame(alpha=0.05)    # 95% intervals of both kinds
 \begin{frame}[fragile]{Multiple regression}
   \begin{lstlisting}
 predictors = ["lstat", "age", "rm", "ptratio", "tax"]  # five inputs
-X = sm.add_constant(Boston[predictors])  # design matrix + intercept
-res = sm.OLS(Boston["medv"], X).fit()    # fit multiple regression
-print(res.summary())                     # one t-test per coefficient
+X = sm.add_constant(Boston[predictors])  # 5 columns + a column of 1s
+res = sm.OLS(Boston["medv"], X).fit()    # one intercept + five slopes
+print(res.summary())                     # each t: this x, others fixed
   \end{lstlisting}
   Adding more predictors typically increases $R^2$ and shrinks the
   per-coefficient standard errors --- as long as the new variables are
   not collinear.
+  \begin{readme}\footnotesize
+    Nothing about the call changes --- only \texttt{X} gets wider, so the
+    coefficient block now has six rows. Each \texttt{t} and
+    \texttt{P>|t|} tests $H_0:\beta_j=0$ \emph{with the other four
+    predictors held fixed}, which is why a predictor can be significant on
+    its own and insignificant here. The header's $F$-statistic tests all
+    five slopes at once.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Polynomials and interactions via ISLP}
   \begin{lstlisting}
 from ISLP.models import ModelSpec as MS, poly
 
-terms = [poly("lstat", degree=2), "age",   # lstat + lstat^2, age
-         ("lstat", "age")]                 # tuple = interaction term
-design = MS(terms).fit_transform(Boston)   # build the design matrix
+terms = [poly("lstat", degree=2), "age",   # lstat, lstat^2 and age
+         ("lstat", "age")]                 # tuple = the product term
+design = MS(terms).fit_transform(Boston)   # builds the X columns
 res2 = sm.OLS(Boston["medv"], design).fit()  # then fit as usual
-print(res2.summary())
+print(res2.summary())                      # intercept + 4 term rows
   \end{lstlisting}
-  \texttt{ModelSpec} produces a \texttt{statsmodels}-ready design
-  matrix and handles dummies, interactions, polynomials, and splines
-  cleanly.
+  \begin{readme}[Reading a model specification]\footnotesize
+    \texttt{ModelSpec} is ISLP's model \emph{formula}: it turns a list of
+    terms into the numeric design matrix \texttt{statsmodels} expects.
+    A bare column name is a main effect; \texttt{poly} of degree $2$
+    expands to \texttt{lstat} \emph{and} \texttt{lstat}$^2$; a
+    \emph{tuple} of two names is their product --- what an R-style formula
+    writes as \texttt{lstat:age}. Listing both names \emph{and} the tuple
+    gives main effects plus interaction (the formula shorthand
+    \texttt{lstat*age}), exactly what the hierarchy principle demands; a
+    categorical column is expanded into $K-1$ dummies for you.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Diagnostic plots}
   \begin{lstlisting}
-import matplotlib.pyplot as plt
-fig, axes = plt.subplots(1, 2, figsize=(10, 4))    # two panels
-axes[0].scatter(res.fittedvalues, res.resid, s=8)  # resid vs fitted
-axes[0].axhline(0, color="grey", linewidth=0.8)    # zero line
+import matplotlib.pyplot as plt                    # plotting library
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))    # side-by-side panels
+axes[0].scatter(res.fittedvalues, res.resid, s=8)  # e_i against yhat_i
+axes[0].axhline(0, color="grey", linewidth=0.8)    # e = 0: no pattern
 axes[0].set_xlabel("Fitted"); axes[0].set_ylabel("Residual")
-sm.qqplot(res.resid, line="45", ax=axes[1])        # normality check
-plt.tight_layout(); plt.show()                     # render figure
+sm.qqplot(res.resid, line="45", ax=axes[1])        # are errors normal?
+plt.tight_layout(); plt.show()                     # draw both panels
   \end{lstlisting}
   Two diagnostic plots that should be made for every regression: the
   residual-vs.-fitted plot and the Q-Q plot.
+  \begin{readme}\footnotesize
+    \texttt{res.fittedvalues} are the $\hat y_i$ and \texttt{res.resid}
+    the $e_i=y_i-\hat y_i$. \textbf{Left:} a shapeless band around $0$ is
+    what we want; a U-shape says the mean is mis-specified (add a
+    nonlinear term), a widening funnel says the variance is not constant.
+    \textbf{Right:} points on the $45^\circ$ line mean the errors are
+    close to normal, so the $t$- and $F$-based $p$-values can be trusted.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{Leverage and VIF}
@@ -2749,15 +2798,17 @@ plt.tight_layout(); plt.show()                     # render figure
 from statsmodels.stats.outliers_influence \
     import variance_inflation_factor as vif_
 
-infl = res.get_influence()   # influence diagnostics object
-lev = infl.hat_matrix_diag   # leverage values h_ii
+infl = res.get_influence()   # per-observation diagnostics
+lev = infl.hat_matrix_diag   # h_ii: how unusual x_i is
 high_lev = np.where(lev > 2*X.shape[1]/X.shape[0])[0]  # h > 2(p+1)/n
 
-vifs = [vif_(X.values, j) for j in range(X.shape[1])]  # VIF per column
+vifs = [vif_(X.values, j) for j in range(X.shape[1])]  # j on the others
 print(dict(zip(X.columns, vifs)))  # VIF near 1 fine; > 5 problematic
   \end{lstlisting}
   Always inspect leverage and VIF before declaring an analysis
-  complete.
+  complete. \texttt{vif\_(X, j)} regresses column $j$ of \texttt{X} on
+  all the \emph{other} columns and returns $1/(1-R_j^2)$: the factor by
+  which collinearity inflates $\mathrm{Var}(\hat\beta_j)$.
   \begin{labnote}[{{Live demo --- \S4 of the notebook}}]
     Switch to \texttt{chapter\_03\_lab.ipynb} \S4 and run the VIF cell: on
     the full Boston fit only \texttt{rad} ($7.5$) and \texttt{tax} ($9.0$)
@@ -3160,11 +3211,11 @@ print(dict(zip(X.columns, vifs)))  # VIF near 1 fine; > 5 problematic
     \textbf{Load, clean and split.}
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split   # hold-out split
+from sklearn.linear_model import LinearRegression      # the OLS baseline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.pipeline import make_pipeline             # chain the steps
+from sklearn.neighbors import KNeighborsRegressor      # flexible rival
 from sklearn.metrics import mean_squared_error as mse   # test-error metric
 
 a = pd.read_csv("../ALL CSV FILES - 2nd Edition/Auto.csv")  # load Auto data
@@ -3183,10 +3234,18 @@ lin = LinearRegression().fit(Xtr, ytr)                    # straight-line fit
 pol = make_pipeline(PolynomialFeatures(2), LinearRegression()).fit(Xtr, ytr)  # adds hp^2
 knn = make_pipeline(StandardScaler(), KNeighborsRegressor(10)).fit(Xtr, ytr)  # scale, K=10
 for name, m in [("linear", lin), ("poly-2", pol), ("KNN10", knn)]:
-    print(name, round(mse(yte, m.predict(Xte)), 1))       # test-set MSE
+    print(name, round(mse(yte, m.predict(Xte)), 1))  # MSE on unseen cars
 # linear 26.2 | poly-2 19.8 | KNN(K=10) 21.1
 \end{lstlisting}
   \end{solutionbox}
+  \begin{readme}\footnotesize
+    \texttt{make\_pipeline} glues the preprocessing to the model, so the
+    squaring and the standardising are learned on the \emph{training} rows
+    only and then replayed on \texttt{Xte} --- no leakage. KNN needs the
+    scaler because it measures distances; OLS does not. All three are then
+    scored on the same held-out $30\%$, which is what makes $26.2$, $19.8$
+    and $21.1$ comparable.
+  \end{readme}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 3.L6 (3/3)}

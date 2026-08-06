@@ -76,8 +76,10 @@ def fig_spline_basis():
         ax.axvline(xi, color=ORANGE, lw=0.9, ls=":")
         ax.annotate(rf"$\xi_{k+1}$", (xi, 1.03), color=ORANGE,
                     fontsize=9.5, ha="center")
-    ax.text(64, 0.28, r"$(x-\xi_k)_+^3$", color=ACCENT, fontsize=10)
-    ax.text(20, 0.86, "zero left of its knot ---\neach term acts locally", color="#333333", fontsize=8)
+    clear = dict(facecolor="white", edgecolor="none", pad=1.5)   # keep labels off the curves/knot lines
+    ax.text(56, 0.52, r"$(x-\xi_k)_+^3$", color=ACCENT, fontsize=10, bbox=clear)
+    ax.text(20, 0.86, "zero left of its knot ---\neach term acts locally", color="#333333",
+            fontsize=8, bbox=clear)
     ax.set_title("one truncated cubic per knot", fontsize=9, color=ACCENT)
     ax.set_xlabel("age"); ax.set_xlim(18, 82); ax.set_ylim(-0.05, 1.12)
     ax.set_yticks([0, 0.5, 1])

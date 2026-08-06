@@ -793,16 +793,16 @@
 \begin{frame}[fragile]{Functions and loops --- used in all fifteen labs}
 \begin{lstlisting}
 def rmse(y, y_hat):                     # define once, reuse everywhere
-    """Root mean squared error."""
-    return np.sqrt(np.mean((y - y_hat) ** 2))
+    """Root mean squared error."""      # what help(rmse) shows
+    return np.sqrt(np.mean((y - y_hat) ** 2))   # the value handed back
 
 scores = []                             # accumulate results in a list
 for degree in range(1, 6):              # range(1, 6) -> 1, 2, 3, 4, 5
-    fit = np.polyfit(x_train, y_train, degree)
-    scores.append(rmse(y_test, np.polyval(fit, x_test)))
+    fit = np.polyfit(x_train, y_train, degree)  # fit on train data only
+    scores.append(rmse(y_test, np.polyval(fit, x_test)))  # test error
 
-best = int(np.argmin(scores)) + 1       # argmin gives the POSITION
-print(f"best degree: {best}  (RMSE {min(scores):.3f})")
+best = int(np.argmin(scores)) + 1       # argmin: position 0 -> degree 1
+print(f"best degree: {best}  (RMSE {min(scores):.3f})")   # {} filled in
 \end{lstlisting}
   \begin{takeaway}[The pattern behind every tuning experiment]
     Define a scoring function; loop over candidate settings; store each score;
@@ -813,22 +813,23 @@ print(f"best degree: {best}  (RMSE {min(scores):.3f})")
 
 \begin{frame}[fragile]{Four idioms worth ten minutes each}
 \begin{lstlisting}
-squares = [d ** 2 for d in range(5)]          # list comprehension
-mask = df["balance"] > 1000                   # a boolean Series...
-df.loc[mask, "income"].mean()                 # ...used to select rows
+squares = [d ** 2 for d in range(5)]          # a loop that fills a list
+mask = df["balance"] > 1000                   # True/False for each row
+df.loc[mask, "income"].mean()                 # mean income where True
 
-for name, group in df.groupby("education"):   # iterate over groups
-    print(name, group["wage"].median())
+for name, group in df.groupby("education"):   # one loop pass per level
+    print(name, group["wage"].median())       # median wage per group
 
-for ax, col in zip(axes.ravel(), columns):    # zip pairs things up
-    ax.hist(df[col])
+for ax, col in zip(axes.ravel(), columns):    # pairs panel with column
+    ax.hist(df[col])                          # one histogram per panel
 \end{lstlisting}
   \begin{alertblock}{Two things that will bite you}
     \begin{enumerate}
       \item \textbf{Indexing starts at 0}, and \texttt{range(1, 6)} \emph{excludes}
             6. Off-by-one errors are the most common lab bug.
       \item \textbf{Chained assignment}: \texttt{df[df.x > 1]["y"] = 0} silently
-            does nothing. Use \texttt{df.loc[df.x > 1, "y"] = 0}.
+            does nothing. Use \mbox{\texttt{df.loc[df.x > 1, "y"] = 0}} ---
+            the \texttt{.loc} above: rows and column in one bracket.
     \end{enumerate}
   \end{alertblock}
 \end{frame}
@@ -836,11 +837,11 @@ for ax, col in zip(axes.ravel(), columns):    # zip pairs things up
 \begin{frame}[fragile]{Randomness, seeds and reproducibility}
 \begin{lstlisting}
 rng = np.random.default_rng(2024)        # ONE generator, seeded once
-sample = rng.choice(data, size=100)
+sample = rng.choice(data, size=100)      # same 100 draws on every run
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split   # the split helper
 X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3,
-                                          random_state=42)
+                                          random_state=42)  # same split
 \end{lstlisting}
   \begin{center}
     \includegraphics[width=0.90\textwidth,height=0.31\textheight,keepaspectratio]{ch00b_split.png}
@@ -850,18 +851,19 @@ X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3,
   starts, so the same seed replays the same draws --- which is why your numbers
   match the slides. Change the seed and the third decimal moves: not a bug, but
   sampling variability, which Chapter 5 is about measuring.
+  \texttt{test\_size=0.3} sets aside $30\%$ of the rows as the test set.
 \end{frame}
 
 \begin{frame}[fragile]{The scikit-learn contract: fit, predict, score}
 \begin{lstlisting}
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import LinearRegression     # the model class
+from sklearn.metrics import mean_squared_error        # a scoring rule
 
-model = LinearRegression()               # 1. choose a model
+model = LinearRegression()               # 1. choose a model (empty)
 model.fit(X_train, y_train)              # 2. learn from TRAINING data only
 pred  = model.predict(X_test)            # 3. predict on unseen data
 mean_squared_error(y_test, pred)         # 4. score honestly
-model.coef_, model.intercept_            # fitted values carry a trailing _
+model.coef_, model.intercept_            # what fit() stored; note the _
 \end{lstlisting}
   \begin{takeaway}[Learn it once and you know every model in the course]
     Trees, forests, boosting, SVMs and neural nets use the same three methods:
@@ -923,9 +925,9 @@ print("best degree:", best)
     \textbf{(4)} Split first, fit on training data, score on test data:
 \begin{lstlisting}
 X_tr, X_te, y_tr, y_te = train_test_split(x, y, test_size=.3, random_state=42)
-for degree in range(1, 6):
-    fit = np.polyfit(X_tr, y_tr, degree)
-    scores.append(rmse(y_te, np.polyval(fit, X_te)))
+for degree in range(1, 6):                  # now all five degrees
+    fit = np.polyfit(X_tr, y_tr, degree)    # learn on the training half
+    scores.append(rmse(y_te, np.polyval(fit, X_te)))   # score on test
 \end{lstlisting}
     The function is \texttt{sklearn.model\_selection.train\_test\_split}
     (Chapter 5 replaces it with cross-validation).

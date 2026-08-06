@@ -33,6 +33,8 @@ OUT.mkdir(parents=True, exist_ok=True)
 ACCENT = "#26468C"   # matches \definecolor{accent}{RGB}{38,70,140}
 ORANGE = "#C8641E"
 GREY = "#7A7A7A"
+RED = "#C0392B"
+GREEN = "#2E7D32"
 
 plt.rcParams.update(
     {
@@ -53,6 +55,74 @@ def save(fig, name):
     fig.tight_layout()
     fig.savefig(OUT / name, bbox_inches="tight")
     plt.close(fig)
+
+
+def fig_threshold_picture():
+    """Schematic of the two score distributions cut by a moving threshold.
+
+    Two equal-sized classes whose predicted scores are Gaussian; everything
+    right of the threshold is predicted positive, so the four confusion-matrix
+    cells appear as the four areas TN / FN / FP / TP. The label row (``actual
+    -`` / ``actual +``) is kept clear of the arrow row above it, so the arrows
+    never strike through the text.
+    """
+    mu_neg, mu_pos, sd, t = 0.0, 2.6, 1.05, 1.55
+    x = np.union1d(np.linspace(-4.2, 6.8, 1101), [t])
+    dens = lambda m: np.exp(-0.5 * ((x - m) / sd) ** 2) / (sd * np.sqrt(2 * np.pi))
+    neg, pos = dens(mu_neg), dens(mu_pos)
+    lo, hi = x <= t, x >= t
+
+    fig, ax = plt.subplots(figsize=(9.0, 4.2))
+    ax.grid(False)
+    ax.fill_between(x, 0, neg, where=lo, color=ACCENT, alpha=0.10, lw=0)
+    ax.fill_between(x, 0, pos, where=hi, color=GREEN, alpha=0.28, lw=0)
+    ax.fill_between(x, 0, pos, where=lo, facecolor=ORANGE, edgecolor=ORANGE,
+                    alpha=0.33, hatch="//", lw=0)
+    ax.fill_between(x, 0, neg, where=hi, facecolor=RED, edgecolor=RED,
+                    alpha=0.30, hatch="xx", lw=0)
+    ax.plot(x, neg, color=ACCENT, lw=2.0, zorder=3)
+    ax.plot(x, pos, color=RED, lw=2.0, zorder=3)
+    ax.axvline(t, color="black", ls=(0, (4, 3)), lw=2.2, zorder=4)
+
+    # three well-separated horizontal bands: decision row, arrow row, curve row
+    y_top, y_arrow, y_curve = 0.484, 0.452, 0.4065
+
+    ax.text(-3.87, y_top, "predict $-$", color=GREY, fontsize=10)
+    ax.text(t + 0.09, y_top, "threshold $t$", fontsize=10)
+    ax.text(6.0, y_top, "predict $+$", color=GREY, fontsize=10, ha="right")
+
+    ax.annotate("", xy=(-0.25, y_arrow), xytext=(1.41, y_arrow),
+                arrowprops=dict(arrowstyle="-|>", color=ACCENT, lw=2.0,
+                                mutation_scale=16))
+    ax.text(-0.40, y_arrow, r"lower $t$: sensitivity $\uparrow$", color=ACCENT,
+            fontsize=9, ha="right", va="center")
+    ax.annotate("", xy=(3.37, y_arrow), xytext=(1.70, y_arrow),
+                arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=2.0,
+                                mutation_scale=16))
+    ax.text(3.52, y_arrow, r"raise $t$: specificity $\uparrow$", color=GREEN,
+            fontsize=9, ha="left", va="center")
+
+    ax.text(mu_neg, y_curve, "actual $-$", color=ACCENT, fontsize=10, ha="center")
+    ax.text(mu_pos, y_curve, "actual $+$", color=RED, fontsize=10, ha="center")
+
+    ax.text(-1.35, 0.058, "TN", color=ACCENT, fontsize=11, fontweight="bold",
+            ha="center")
+    ax.text(0.87, 0.029, "FN", color=ORANGE, fontsize=11, fontweight="bold",
+            ha="center")
+    ax.text(3.57, 0.079, "TP", color=GREEN, fontsize=11, fontweight="bold",
+            ha="center")
+    ax.annotate("FP", xy=(2.30, 0.052), xytext=(2.90, 0.139), color=RED,
+                fontsize=11, fontweight="bold", ha="center",
+                arrowprops=dict(arrowstyle="-", color=RED, lw=0.8))
+
+    ax.set_title("Sliding the threshold trades sensitivity against specificity")
+    ax.set_xlabel(r"predicted score  $\hat p$  (higher $\Rightarrow$ more positive)")
+    ax.set_yticks([])
+    ax.set_ylim(0, 0.52)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_visible(False)
+
+    save(fig, "ch04_x_threshold.png")
 
 
 def fig_threshold_tradeoff():
@@ -125,4 +195,5 @@ def fig_threshold_tradeoff():
 
 
 if __name__ == "__main__":
+    fig_threshold_picture()
     fig_threshold_tradeoff()

@@ -65,11 +65,13 @@ def fig_impurity_measures():
     ax.text(0.5, 0.525, "Gini $2\\hat p(1-\\hat p)$", color=ACCENT,
             fontsize=9.5, ha="center")
     ax.text(0.185, 0.44, "cross-entropy\n(scaled)", color=ORANGE, fontsize=9, ha="center")
-    ax.text(0.62, 0.155, "classification error", color=GREY, fontsize=9.5)
+    # both labels sit inside the triangle under the error curve, clear of the grey line
+    ax.text(0.5, 0.285, "classification error", color=GREY, fontsize=9.5, ha="center")
 
     # the region where error is blind: moving p-hat toward 0 or 1 changes G but not E's slope
     ax.annotate("error has the same slope everywhere on each side ---\nit cannot prefer the split that creates a pure node",
-                xy=(0.25, 0.25), xytext=(0.31, 0.075), fontsize=8, color="#333333",
+                xy=(0.20, 0.20), xytext=(0.5, 0.055), fontsize=8, color="#333333",
+                ha="center", va="bottom",
                 arrowprops=dict(arrowstyle="-", color=GREY, lw=0.8))
 
     ax.set_xlabel(r"$\hat p$  (proportion of class 1 in the node)")

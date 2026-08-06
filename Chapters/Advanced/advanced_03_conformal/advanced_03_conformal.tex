@@ -727,13 +727,15 @@
     Undershooting costs $\tau$ per unit, overshooting costs $1 - \tau$: the optimal
     $q(x)$ sits where a fraction $\tau$ of the mass lies below --- exactly the
     quantile. At $\tau = 0.5$ it is the absolute loss, and we recover the median.
+    Below, \texttt{alpha} \emph{is} $\tau$: the two fits trace the $5\%$ and
+    $95\%$ edges of $Y \mid X$ --- the raw band that CQR then calibrates.
   \end{readme}
   \begin{lstlisting}
 from sklearn.ensemble import GradientBoostingRegressor   # Ch. 8 engine
 lo = GradientBoostingRegressor(loss="quantile", alpha=0.05,   # 5% curve
-        n_estimators=200, max_depth=2, learning_rate=0.05)
+        n_estimators=200, max_depth=2, learning_rate=0.05)  # Ch. 8 knobs
 hi = GradientBoostingRegressor(loss="quantile", alpha=0.95,   # 95% curve
-        n_estimators=200, max_depth=2, learning_rate=0.05)
+        n_estimators=200, max_depth=2, learning_rate=0.05)  # same knobs
   \end{lstlisting}
 \end{frame}
 
@@ -815,21 +817,21 @@ hi = GradientBoostingRegressor(loss="quantile", alpha=0.95,   # 95% curve
 \begin{solutionbox}[Solution --- code: fit / score / calibrate]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 import numpy as np, pandas as pd                     # data handling
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor   # the CQR engine
 
 wage = pd.read_csv("Wage.csv")                       # lab: via load()
-x, y = wage["age"].to_numpy(float), wage["wage"].to_numpy()
+x, y = wage["age"].to_numpy(float), wage["wage"].to_numpy()  # x = age
 rng = np.random.default_rng(2024)                    # the deck's split
 i = rng.permutation(len(y)); tr, ca, te = i[:2000], i[2000:2500], i[2500:]
-X = x.reshape(-1, 1)
+X = x.reshape(-1, 1)                                 # sklearn wants 2-D
 gb = dict(n_estimators=200, max_depth=2, learning_rate=0.05, random_state=0)
 lo = GradientBoostingRegressor(loss="quantile", alpha=0.05, **gb).fit(X[tr], y[tr])
 hi = GradientBoostingRegressor(loss="quantile", alpha=0.95, **gb).fit(X[tr], y[tr])
 s = np.maximum(lo.predict(X[ca]) - y[ca], y[ca] - hi.predict(X[ca]))  # CQR score
-k = int(np.ceil((len(ca) + 1) * 0.9))                # k = 451
+k = int(np.ceil((len(ca) + 1) * 0.9))                # k = 451 of 500
 qhat = np.sort(s)[k - 1]                             # 0.66: tiny correction
-L, U = lo.predict(X[te]) - qhat, hi.predict(X[te]) + qhat
-print(round(qhat, 2), ((y[te] >= L) & (y[te] <= U)).mean())  # 0.66 0.896
+L, U = lo.predict(X[te]) - qhat, hi.predict(X[te]) + qhat  # pad both edges
+print(round(qhat, 2), ((y[te] >= L) & (y[te] <= U)).mean())  # 0.66, cov 0.896
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}
@@ -1118,14 +1120,14 @@ print(round(qhat, 2), ((y[te] >= L) & (y[te] <= U)).mean())  # 0.66 0.896
 \begin{frame}[fragile]{Solution --- Extended Exercise A3.2 (1/2)}
 \begin{solutionbox}[Solution --- code: the three intervals]
 \begin{lstlisting}[basicstyle=\ttfamily\fontsize{7}{8.2}\selectfont]
-import numpy as np, statsmodels.api as sm
-from sklearn.ensemble import GradientBoostingRegressor
-rng = np.random.default_rng(2024)
+import numpy as np, statsmodels.api as sm               # OLS and arrays
+from sklearn.ensemble import GradientBoostingRegressor  # the flexible fit
+rng = np.random.default_rng(2024)                      # the deck's seed
 N = 4000; x = rng.uniform(0, 10, N); y = 1 + 2*x + x*rng.normal(0, 1, N)
 tr, ca, te = np.arange(2000), np.arange(2000, 3000), np.arange(3000, 4000)
 ols = sm.OLS(y[tr], sm.add_constant(x[tr])).fit()      # 1. classical PI
 half = 1.645 * np.sqrt(ols.scale)                      # pooled sigma: 5.87
-pred = ols.params[0] + ols.params[1] * x[te]
+pred = ols.params[0] + ols.params[1] * x[te]           # test fitted values
 cov = lambda hit: [hit.mean(), hit[x[te] < 2].mean(), hit[x[te] > 8].mean()]
 print(cov(np.abs(y[te] - pred) <= half))               # [0.906, 1.000, 0.735]
 k = int(np.ceil(1001 * 0.9))                           # 2. conformal: k = 901
@@ -1137,6 +1139,8 @@ print(cov(np.abs(y[te] - f.predict(x[te, None])) <= 1.645 * sig))  # [0.776, ...
 qg = np.sort(np.abs(y[ca] - f.predict(x[ca, None])))[k-1]          # 10.81
 print(cov(np.abs(y[te] - f.predict(x[te, None])) <= qg))           # [0.907, ...]
 \end{lstlisting}
+{\scriptsize \textbf{Output:} \texttt{cov} returns [all, $x<2$, $x>8$] ---
+marginal coverage first, then the two conditional ones.\par}
 \end{solutionbox}
 \end{frame}
 
@@ -1269,11 +1273,11 @@ print(cov(np.abs(y[te] - f.predict(x[te, None])) <= qg))           # [0.907, ...
 
 \begin{frame}[fragile]{Split conformal in ten lines}
   \begin{lstlisting}
-import numpy as np, pandas as pd
-from sklearn.linear_model import LinearRegression
+import numpy as np, pandas as pd                      # arrays + CSV
+from sklearn.linear_model import LinearRegression     # any model works
 
 wage = pd.read_csv("Wage.csv")                       # lab: via load()
-x, y = wage["age"].to_numpy(float), wage["wage"].to_numpy()
+x, y = wage["age"].to_numpy(float), wage["wage"].to_numpy()  # x = age
 rng = np.random.default_rng(2024)                    # reproducible split
 i = rng.permutation(len(y)); tr, ca, te = i[:2000], i[2000:2500], i[2500:]
 P = lambda a: np.column_stack([a, a**2])             # quadratic in age
@@ -1281,9 +1285,15 @@ f = LinearRegression().fit(P(x[tr]), y[tr])          # 1. fit on TRAIN only
 s = np.abs(y[ca] - f.predict(P(x[ca])))              # 2. calibration scores
 k = int(np.ceil((len(ca) + 1) * (1 - 0.1)))          # 3. k = ceil((n+1)(1-a))
 qhat = np.sort(s)[k - 1]                             #    k-th smallest score
-cov = (np.abs(y[te] - f.predict(P(x[te]))) <= qhat).mean()  # 4. check
+cov = (np.abs(y[te] - f.predict(P(x[te]))) <= qhat).mean()  # 4. coverage
 print(k, qhat.round(2), cov)                         # 451 56.14 0.926
   \end{lstlisting}
+  \vspace{-1mm}
+  \begin{readme}
+    \scriptsize
+    \textbf{Key call:} \texttt{np.sort(s)[k-1]}, the $451$st smallest held-out
+    residual: $\hat q = 56.14$, so $\hat f(x) \pm 56.14$ covers $92.6\%$.
+  \end{readme}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -1311,20 +1321,20 @@ print(k, qhat.round(2), cov)                         # 451 56.14 0.926
 \scriptsize
 \begin{solutionbox}[Solution --- code and expected numbers]
 \begin{lstlisting}[basicstyle=\ttfamily\fontsize{6.5}{7.2}\selectfont,aboveskip=2pt,belowskip=0pt]
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-rng = np.random.default_rng(2024)
+import numpy as np                                        # arrays only
+from sklearn.linear_model import LogisticRegression       # Ch. 4 model
+rng = np.random.default_rng(2024)                         # deck's seed
 mu = np.array([[0, 0], [2.2, 0], [1.1, 1.9]])            # class centres
-X = np.vstack([rng.normal(m, 1.0, (1000, 2)) for m in mu])
-y = np.repeat([0, 1, 2], 1000)
+X = np.vstack([rng.normal(m, 1.0, (1000, 2)) for m in mu]) # 1000 each
+y = np.repeat([0, 1, 2], 1000)                            # labels, in order
 p = rng.permutation(3000); X, y = X[p], y[p]              # shuffle once
-clf = LogisticRegression(max_iter=1000).fit(X[:1500], y[:1500])
+clf = LogisticRegression(max_iter=1000).fit(X[:1500], y[:1500])  # TRAIN
 pc = clf.predict_proba(X[1500:2250])                      # calibration probs
-s = 1 - pc[np.arange(750), y[1500:2250]]                  # 1 - p_true
-k = int(np.ceil(751 * 0.9))                               # k = 676
-qhat = np.sort(s)[k - 1]                                  # 0.7685
-sets = clf.predict_proba(X[2250:]) >= 1 - qhat            # threshold 0.2315
-cov = sets[np.arange(750), y[2250:]].mean()               # 0.9013
+s = 1 - pc[np.arange(750), y[1500:2250]]                  # score: 1 - p_true
+k = int(np.ceil(751 * 0.9))                               # k = 676 of 750
+qhat = np.sort(s)[k - 1]                                  # qhat = 0.7685
+sets = clf.predict_proba(X[2250:]) >= 1 - qhat            # keep p >= 0.2315
+cov = sets[np.arange(750), y[2250:]].mean()               # truth in the set?
 print(qhat.round(4), cov, sets.sum(1).mean().round(3))    # 0.7685 0.9013 1.296
 \end{lstlisting}
   {\scriptsize \textbf{Parts 3--4.} Coverage $0.9013$, average size $1.30$, singletons $71.3\%$.

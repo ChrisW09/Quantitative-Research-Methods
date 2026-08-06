@@ -59,20 +59,25 @@ def fig_knn_by_hand():
     d = np.sqrt(((P - x0) ** 2).sum(axis=1))
 
     fig, ax = plt.subplots(figsize=(5.4, 3.6))
-    for r, ls, lab, lxy in [(d.min(), "-", "$K=1$: only $P_1$", (3.35, 2.52)),
+    for r, ls, lab, lxy in [(d.min(), "-", "$K=1$: only $P_1$", (3.62, 2.52)),
                             (np.sort(d)[2], "--", "$K=3$: adds $P_2,P_3$", (2.1, 4.68))]:
         circ = plt.Circle(x0, r + 0.02, fill=False, color=GREY, lw=1.1, ls=ls)
         ax.add_patch(circ)
         ax.annotate(lab, lxy, fontsize=8.5, color=GREY)
 
+    # per-point label offsets: P_2 and P_3 sit exactly on the K=3 circle, so
+    # their labels are pushed outwards instead of onto the dashed line
+    offs = [(0.13, 0.13), (-0.10, -0.45), (0.16, -0.45),
+            (0.13, 0.13), (0.13, 0.13), (0.13, 0.13)]
     for i, (pt, lab) in enumerate(zip(P, labels)):
         c = ACCENT if lab == "Blue" else CRIMSON
         m = "o" if lab == "Blue" else "s"      # shape doubles the colour coding
         ax.plot(*pt, m, color=c, ms=9, mec="white", mew=1.0, zorder=4)
-        ax.annotate(f"$P_{i+1}$", pt, xytext=(pt[0] + 0.13, pt[1] + 0.13),
+        ax.annotate(f"$P_{i+1}$", pt,
+                    xytext=(pt[0] + offs[i][0], pt[1] + offs[i][1]),
                     fontsize=9, color=c)
     ax.plot(*x0, "*", color=ORANGE, ms=15, mec="white", mew=0.8, zorder=5)
-    ax.annotate("$x_0=(2,3)$", x0, xytext=(x0[0] + 0.15, x0[1] - 0.32),
+    ax.annotate("$x_0=(2,3)$", x0, xytext=(x0[0] - 0.80, x0[1] - 0.50),
                 fontsize=9, color=ORANGE)
 
     ax.set_xlim(0.2, 5.4); ax.set_ylim(0.4, 5.6)

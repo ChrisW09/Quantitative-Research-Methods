@@ -1103,17 +1103,17 @@
   \begin{lstlisting}
 import numpy as np, pandas as pd
 D = "../ALL CSV FILES - 2nd Edition/"
-Port = pd.read_csv(D+"Portfolio.csv")        # load Portfolio data
+Port = pd.read_csv(D+"Portfolio.csv")    # paired X,Y returns
 X, Y = Port["X"].values, Port["Y"].values    # two asset returns
 def alpha(x, y):                             # min-variance allocation
     sx, sy = np.var(x, ddof=1), np.var(y, ddof=1)  # sample variances
     sxy = np.cov(x, y, ddof=1)[0, 1]         # sample covariance
-    return (sy - sxy) / (sx + sy - 2*sxy)
+    return (sy - sxy) / (sx + sy - 2*sxy)    # the statistic alpha
 
 rng = np.random.default_rng(0)               # reproducible RNG
 n, B = len(X), 1000                          # B bootstrap replications
-reps = np.empty(B)
-for b in range(B):
+reps = np.empty(B)                           # one alpha per replicate
+for b in range(B):                           # one pass = one replicate
     idx = rng.integers(0, n, n)         # sample WITH replacement
     reps[b] = alpha(X[idx], Y[idx])     # recompute alpha on resample
 print(round(alpha(X, Y), 4), round(reps.std(ddof=1), 4),
@@ -1129,11 +1129,11 @@ hp  = Auto["horsepower"].values.astype(float)  # predictor
 mpg = Auto["mpg"].values                       # response
 
 ols = sm.OLS(mpg, sm.add_constant(hp)).fit()   # formula-based SE
-print(round(ols.params[1], 4), round(ols.bse[1], 5))
+print(round(ols.params[1], 4), round(ols.bse[1], 5))  # slope, its SE
 
 m = len(hp); slopes = np.empty(1000)           # B = 1000 replications
-for b in range(1000):
-    idx = rng.integers(0, m, m)                # resample rows w/ replacement
+for b in range(1000):                          # resample, refit, store
+    idx = rng.integers(0, m, m)                # rows with replacement
     fit = sm.OLS(mpg[idx], sm.add_constant(hp[idx])).fit()  # refit OLS
     slopes[b] = fit.params[1]                  # store bootstrap slope
 print(round(slopes.std(ddof=1), 5),            # bootstrap SE of slope
@@ -1198,15 +1198,17 @@ from sklearn.linear_model    import LinearRegression
 from sklearn.metrics         import mean_squared_error
 from ISLP import load_data
 
-Auto = load_data("Auto")                     # load the Auto data
-X = Auto[["horsepower"]].values; y = Auto["mpg"].values
-Xtr,Xte,ytr,yte = train_test_split(X, y, test_size=0.5,
-                                   random_state=1)  # one 50/50 split
+Auto = load_data("Auto")             # mpg and horsepower, n = 392
+X = Auto[["horsepower"]].values; y = Auto["mpg"].values  # 392 rows
+Xtr,Xte,ytr,yte = train_test_split(X, y, test_size=0.5,  # 50% held out
+                                   random_state=1)   # reproducible
 mdl = LinearRegression().fit(Xtr, ytr)       # fit on training half only
-mean_squared_error(yte, mdl.predict(Xte))    # validation-set MSE
+mean_squared_error(yte, mdl.predict(Xte))    # MSE on the unseen half
   \end{lstlisting}
-  Try changing \texttt{random\_state} and re-running --- the
-  validation MSE will jump around noticeably.
+  \begin{readme}
+    Four arrays out: one half to fit on, one held out and scored. Lab MSE:
+    $24.8$ at degree~1, $18.8$ at degree~2; reseed and both numbers move.
+  \end{readme}
 \end{frame}
 
 \begin{frame}[fragile]{$k$-fold cross-validation}
@@ -1214,14 +1216,21 @@ mean_squared_error(yte, mdl.predict(Xte))    # validation-set MSE
 from sklearn.model_selection import KFold, cross_val_score
 import numpy as np
 
-cv = KFold(n_splits=10, shuffle=True, random_state=0)  # 10 folds
-mse = -cross_val_score(LinearRegression(), X, y,  # 10 fits, one per fold
+cv = KFold(n_splits=10, shuffle=True, random_state=0)  # 10 splits
+mse = -cross_val_score(LinearRegression(), X, y,  # refits once per fold
                        cv=cv, scoring="neg_mean_squared_error")
-print(mse.mean(), mse.std())                 # CV estimate and spread
+print(mse.mean(), mse.std())        # CV_(10) = mean of 10 fold MSEs
   \end{lstlisting}
+  \begin{readme}
+    \texttt{KFold} does not split the data --- it yields ten
+    \emph{index pairs}. \texttt{cross\_val\_score} walks them and
+    \emph{refits} the model on each nine-fold training part before scoring
+    the held-out tenth, so no fold ever scores a model that saw it. The ten
+    scores are then averaged. On Auto: $\approx 24.2$ at degree~1,
+    $\approx 19.2$ at degree~2.
+  \end{readme}
   Always shuffle (unless time-ordered). The \texttt{neg\_} sign is a
-  scikit-learn quirk: scores are always ``larger is better'', so MSE
-  is negated.
+  scikit-learn quirk: scores are ``larger is better'', so MSE is negated.
 \end{frame}
 
 \begin{frame}[fragile]{Bootstrap of a regression coefficient}
@@ -1229,20 +1238,20 @@ print(mse.mean(), mse.std())                 # CV estimate and spread
 import numpy as np
 rng = np.random.default_rng(0)               # reproducible RNG
 
-def boot_one(rng):
-    idx = rng.integers(0, len(X), size=len(X))  # rows w/ replacement
+def boot_one(rng):                     # one bootstrap replicate:
+    idx = rng.integers(0, len(X), size=len(X))  # n rows, repeats OK
     return LinearRegression().fit(X[idx], y[idx]).coef_[0]  # refit slope
 
 B = 1000                                     # bootstrap replications
-boots = np.array([boot_one(rng) for _ in range(B)])  # B slope replicates
-print("SE:",  boots.std(ddof=1))             # bootstrap SE
+boots = np.array([boot_one(rng) for _ in range(B)])  # 1000 refit slopes
+print("SE:",  boots.std(ddof=1))             # SD of replicates = SE
 print("95%:", np.quantile(boots, [0.025, 0.975]))  # percentile CI
   \end{lstlisting}
   \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
-    Run the bootstrap cells in \S5: $B = 1000$ resampled slopes of
-    \texttt{mpg}$\sim$\texttt{horsepower} give $\widehat{\mathrm{SE}} = 0.0075$
-    against the OLS formula's $0.0064$, and the histogram cell shows the whole
-    sampling distribution.
+    One call to \texttt{boot\_one} is one replicate: draw $n$ row indices with
+    replacement, \emph{refit} the regression on those rows, keep the slope.
+    Run \S5: the $1000$ slopes give $\widehat{\mathrm{SE}} = 0.0075$ against
+    the OLS formula's $0.0064$, with $95\%$ interval $[-0.173,\,-0.144]$.
   \end{labnote}
 \end{frame}
 
@@ -1283,9 +1292,9 @@ X = Port["X"].values; Y = Port["Y"].values   # two asset returns
 def alpha(x, y):                             # min-variance allocation
     sx, sy = np.var(x, ddof=1), np.var(y, ddof=1)  # sample variances
     sxy = np.cov(x, y, ddof=1)[0, 1]         # sample covariance
-    return (sy - sxy) / (sx + sy - 2*sxy)
+    return (sy - sxy) / (sx + sy - 2*sxy)    # the statistic alpha
 
-a_hat = alpha(X, Y)              # point estimate
+a_hat = alpha(X, Y)              # point estimate on the full sample
   \end{lstlisting}
 \end{frame}
 
@@ -1293,13 +1302,13 @@ a_hat = alpha(X, Y)              # point estimate
   \begin{lstlisting}
 rng = np.random.default_rng(0)               # reproducible RNG
 n, B = len(X), 1000                          # B bootstrap replications
-reps = np.empty(B)
-for b in range(B):
-    idx = rng.integers(0, n, size=n)   # sample with replacement
+reps = np.empty(B)                           # holds the B replicates
+for b in range(B):                           # one pass = one replicate
+    idx = rng.integers(0, n, size=n)   # one shared idx: keeps pairs
     reps[b] = alpha(X[idx], Y[idx])    # recompute alpha on resample
 
-print("alpha_hat:", round(a_hat, 4))
-print("bootstrap SE:", round(reps.std(ddof=1), 4))  # SD of replicates
+print("alpha_hat:", round(a_hat, 4))                # 0.5758
+print("bootstrap SE:", round(reps.std(ddof=1), 4))  # 0.0912
   \end{lstlisting}
   \begin{solutionbox}[Solution --- Expected result]
     You should obtain $\hat\alpha \approx 0.58$ and a bootstrap standard
@@ -1357,7 +1366,8 @@ print("bootstrap SE:", round(reps.std(ddof=1), 4))  # SD of replicates
     Fit \emph{all} data-dependent steps --- scaling, feature selection,
     and the $d$/$K$ choice --- \emph{inside} each training fold only. A
     \texttt{Pipeline} makes this automatic: the search re-fits every step
-    on each fold's training part.
+    on each fold's training part, so the scaler's mean and SD never see
+    the fold being scored.
   \end{solutionbox}
   \begin{lstlisting}
 from sklearn.pipeline import Pipeline
@@ -1367,7 +1377,7 @@ from sklearn.model_selection import GridSearchCV, KFold
 
 pipe = Pipeline([("scale", StandardScaler()),  # scaling INSIDE each fold
                  ("poly",  PolynomialFeatures()),  # degree = tuning param
-                 ("lm",    LinearRegression())])
+                 ("lm",    LinearRegression())])  # fitted last
 inner  = KFold(10, shuffle=True, random_state=0)  # inner tuning loop
 search = GridSearchCV(pipe, {"poly__degree": [1, 2, 3, 4, 5]},  # d grid
                       cv=inner, scoring="neg_mean_squared_error")
@@ -1378,7 +1388,7 @@ search = GridSearchCV(pipe, {"poly__degree": [1, 2, 3, 4, 5]},  # d grid
   \begin{lstlisting}
 from sklearn.model_selection import cross_val_score
 outer = KFold(5, shuffle=True, random_state=1)  # outer evaluation loop
-test_err = -cross_val_score(search, X, y, cv=outer,  # nested CV
+test_err = -cross_val_score(search, X, y, cv=outer,  # refits the search
                             scoring="neg_mean_squared_error")
 print("chosen degree:", search.fit(X, y).best_params_)  # tuned d
 print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())

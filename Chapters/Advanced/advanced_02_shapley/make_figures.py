@@ -154,9 +154,13 @@ def fig_convergence():
               label="mean $|\\hat\\varphi_j - \\varphi_j|$ (10 repeats)")
     ref = mean_err[0] * np.sqrt(ms[0] / np.asarray(ms, float))
     ax.loglog(ms, ref, "--", color=GREY, lw=1.2, label="$c/\\sqrt{m}$ reference")
+    # labels sit BELOW the markers: the c/sqrt(m) reference runs just above
+    # the data curve, so labels placed above would be struck through by it
     for m, e in zip(ms, mean_err):
         ax.annotate(f"{e:.4f}", (m, e), textcoords="offset points",
-                    xytext=(0, 7), ha="center", fontsize=7, color=ACCENT)
+                    xytext=(0, -8), ha="center", va="top",
+                    fontsize=7, color=ACCENT)
+    ax.set_ylim(bottom=min(mean_err) * 0.72)
     ax.set_xlabel("number of sampled permutations $m$ (log scale)")
     ax.set_ylabel("mean abs. error (log)")
     ax.set_title("Permutation sampling converges to the exact Shapley values at rate $1/\\sqrt{m}$")
@@ -311,8 +315,10 @@ def fig_orders():
     fig, ax = plt.subplots(figsize=(6.0, 3.2))
     ax.bar(range(6), contribs, color=ACCENT, width=0.62, zorder=3)
     ax.axhline(phi_A, color=ORANGE, lw=2, zorder=4)
-    ax.text(5.42, phi_A + 6, rf"mean $= \varphi_A = {phi_A:.0f}$", color=ORANGE,
-            fontsize=10, ha="right")
+    # label parked over the two short bars on the left: on the right it sat
+    # on top of the 210 bar and the mean line ran through the glyphs
+    ax.text(-0.42, phi_A + 8, rf"mean $= \varphi_A = {phi_A:.0f}$", color=ORANGE,
+            fontsize=9, ha="left", va="bottom")
     for i, cv in enumerate(contribs):
         ax.text(i, cv + 5, str(cv), ha="center", fontsize=9, color=ACCENT)
     ax.set_xticks(range(6), orders)

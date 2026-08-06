@@ -885,13 +885,25 @@
 from statsmodels.stats.multitest import multipletests  # corrections
 import numpy as np                                     # arrays
 
-p = np.array([1e-6, 0.01, 0.04, 0.05, 0.30, 0.45, 0.80])  # raw p-values
+p = np.array([1e-6, 0.01, 0.04, 0.05, 0.30, 0.45, 0.80])  # m = 7 tests
 
 for method in ["bonferroni", "holm", "fdr_bh"]:  # FWER, FWER, FDR control
     rej, p_corr, *_ = multipletests(p, alpha=0.05, method=method)  # adjust
-    print(f"{method:12s}", rej)                   # rejection flags (bool)
-    print(f"{'p_adj':12s}", np.round(p_corr, 4))  # adjusted p-values
+    print(f"{method:12s}", rej)                   # True = reject H_j
+    print(f"{'p_adj':12s}", np.round(p_corr, 4))  # compare with 0.05
   \end{lstlisting}
+  \begin{readme}
+    \scriptsize
+    \begin{itemize}
+      \item \textbf{In:} the raw $p$-values of the \emph{whole} family ($m=7$ here)
+            and the level $\alpha=0.05$; \texttt{fdr\_bh} reads it as the FDR target $q$.
+      \item \textbf{Out:} \texttt{rej}, the reject flags, and \texttt{p\_corr}, the
+            \emph{adjusted} $p$-values --- pre-scaled (Bonferroni: $\min(1, m p_j)$) so
+            you compare them with $\alpha$ itself, never with $\alpha/m$.
+      \item The printouts rank as the chapter predicts: Bonferroni fewest, Holm
+            at least as many, BH most.
+    \end{itemize}
+  \end{readme}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -923,15 +935,15 @@ from scipy import stats            # normal cdf for p-values
 rng = np.random.default_rng(0)     # seeded generator: reproducible
 m, m1, mu = 1000, 100, 3.0         # 100 true effects, mean shift mu
 q, alpha  = 0.10, 0.05             # FDR target q, FWER target alpha
-truth = np.arange(m) < m1          # first m1 tests are non-null
+truth = np.arange(m) < m1          # ground truth: V and S need it
 
 def bh_reject(p, q):               # Benjamini--Hochberg step-up
-    order = np.argsort(p); ps = p[order]      # sort p-values ascending
-    thr = (np.arange(1, m + 1) / m) * q       # BH line: (j/m) * q
-    hit = np.where(ps <= thr)[0]              # ranks below the line
+    order = np.argsort(p); ps = p[order]      # rank 1 = smallest p
+    thr = (np.arange(1, m + 1) / m) * q       # rising bar: (j/m) * q
+    hit = np.where(ps <= thr)[0]              # every rank under its bar
     rej = np.zeros(m, bool)                   # start: reject nothing
-    if len(hit): rej[order[:hit.max() + 1]] = True  # up to largest hit
-    return rej                                # boolean rejection mask
+    if len(hit): rej[order[:hit.max() + 1]] = True  # step up to largest
+    return rej                                # mask in original order
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}
@@ -941,17 +953,17 @@ def bh_reject(p, q):               # Benjamini--Hochberg step-up
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 def simulate(method, reps=2000):                   # average FDR / power over reps
     fdr = pw = 0.0                                 # running totals
-    for _ in range(reps):
+    for _ in range(reps):                          # one repeat = one study
         z = rng.normal(0, 1, m); z[:m1] = rng.normal(mu, 1, m1)  # effects: mean mu
         p = 1 - stats.norm.cdf(z)                  # one-sided p-values
         rej = bh_reject(p, q) if method == "bh" else (p <= alpha / m)  # BH or Bonf.
-        V = (rej & ~truth).sum(); S = (rej & truth).sum(); R = rej.sum()  # V, S, R
-        fdr += V / max(R, 1); pw += S / m1         # realised FDP and power
-    return fdr / reps, pw / reps                   # averages over the repeats
+        V = (rej & ~truth).sum(); S = (rej & truth).sum(); R = rej.sum()  # decision table
+        fdr += V / max(R, 1); pw += S / m1         # FDP of this study; max avoids 0/0
+    return fdr / reps, pw / reps                   # FDR = mean FDP over studies
 
 for meth in ["bh", "bonferroni"]:                  # compare both procedures
     f, pw = simulate(meth)                         # run the experiment
-    print("%-11s FDR=%.3f power=%.3f" % (meth, f, pw))  # summary line
+    print("%-11s FDR=%.3f power=%.3f" % (meth, f, pw))  # read on the next slide
 \end{lstlisting}
 \end{solutionbox}
 \end{frame}

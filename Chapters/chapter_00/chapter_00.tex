@@ -1460,8 +1460,8 @@
   \end{takeaway}
   \begin{labnote}[{{Live demo --- \S7 of the notebook}}]
     Switch to \texttt{chapter\_00\_lab.ipynb} \S7 and run the $t$-test cell:
-    \texttt{scipy} reproduces $t = 2.00$ and $p = 0.048$, and the next cell shades
-    the $p$-value as an area under the null distribution.
+    \texttt{ttest\_1samp} returns a \emph{pair} --- statistic first,
+    $p$-value second: $(2.00,\ 0.048)$. The next cell shades that $p$ as an area.
   \end{labnote}
 \end{frame}
 
@@ -1854,15 +1854,19 @@ R-squared: 0.51    n = 36
 
 \begin{frame}[fragile]{\texttt{numpy}: arrays and vectorised arithmetic}
 \begin{lstlisting}
-import numpy as np
+import numpy as np                     # arrays + fast vector maths
 
-x = np.array([2, 4, 4, 5, 7, 8, 12])   # a 1-D array
+x = np.array([2, 4, 4, 5, 7, 8, 12])   # our n = 7 sample
 x.mean(), np.median(x), x.std(ddof=1)  # 6.0, 5.0, 3.317
 
-z = (x - x.mean()) / x.std(ddof=1)     # vectorised: no loop needed
-A = np.array([[1, 1], [1, 2], [1, 3]]) # a 3x2 matrix
-A.T @ A                                # matrix product: 2x2
+z = (x - x.mean()) / x.std(ddof=1)     # z-scores: SDs from the mean
+A = np.array([[1, 1], [1, 2], [1, 3]]) # 3 cases, 2 columns
+A.T @ A                                # the matrix behind every OLS fit
 \end{lstlisting}
+  \begin{readme}
+    \footnotesize \texttt{.std(ddof=1)} divides by $n-1 = 6$ --- one degree of
+    freedom is spent on $\bar x = 6$ --- and returns $s = 3.317$.
+  \end{readme}
   \begin{alertblock}{The one trap}
     \texttt{np.std()} divides by $n$ by default, not $n-1$. Pass
     \texttt{ddof=1} for the \emph{sample} standard deviation. (\texttt{pandas}
@@ -1873,71 +1877,74 @@ A.T @ A                                # matrix product: 2x2
 
 \begin{frame}[fragile]{\texttt{pandas}: the data frame is your data set}
 \begin{lstlisting}
-import pandas as pd
+import pandas as pd                    # tables with named columns
 
-df = pd.read_csv("Wage.csv")           # no index column in this file
-df.shape          # (3000, 11) -- that's (n, p)
-df.head()         # first rows
+df = pd.read_csv("Wage.csv")           # each row is one person
+df.shape          # (3000, 11) -- n = 3000 rows, p = 11 columns
+df.head()         # eyeball the data before trusting any number
 df.describe()     # count, mean, std, min, quartiles, max
-df["wage"].median()
-df["education"].value_counts()          # categorical: counts
-df.groupby("education")["wage"].mean()  # a summary per group
-df[["age", "wage"]].corr()              # correlation matrix
-df[df["wage"] > 200].shape[0]           # filtering rows
+df["wage"].median()                     # robust centre of pay
+df["education"].value_counts()          # how many people per level
+df.groupby("education")["wage"].mean()  # mean wage within each level
+df[["age", "wage"]].corr()              # r for every pair of columns
+df[df["wage"] > 200].shape[0]           # how many earn above 200
 \end{lstlisting}
   \begin{takeaway}[The four verbs of the labs]
     \textbf{select} columns, \textbf{filter} rows, \textbf{group} and
     \textbf{summarise}. Almost every data-preparation step in the fifteen
-    labs is a combination of these.
+    labs is a combination of these. None of them changes \texttt{df}.
   \end{takeaway}
 \end{frame}
 
 \begin{frame}[fragile]{\texttt{matplotlib}: four plots cover most needs}
 \begin{lstlisting}
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt            # the plotting library
 
-fig, ax = plt.subplots(figsize=(6, 4))
-ax.hist(df["wage"], bins=40)              # one quantitative variable
-ax.boxplot(df["wage"])                    # centre, spread, outliers
-ax.scatter(df["age"], df["wage"], s=8)    # two quantitative variables
-ax.bar(counts.index, counts.values)       # one categorical variable
-ax.set_xlabel("age"); ax.set_ylabel("wage")
-plt.show()
+fig, ax = plt.subplots(figsize=(6, 4))     # one blank canvas
+ax.hist(df["wage"], bins=40)               # shape: skew and gaps
+ax.boxplot(df["wage"])                     # centre, spread, outliers
+ax.scatter(df["age"], df["wage"], s=8)     # does y move with x?
+ax.bar(counts.index, counts.values)        # counts per category
+ax.set_xlabel("age"); ax.set_ylabel("wage")  # label both axes, always
+plt.show()                                 # draw the figure
 \end{lstlisting}
   \begin{takeaway}[Plot first --- model second]
     Anscombe's quartet: four data sets with identical means, variances,
     correlations and regression lines --- and completely different shapes.
-    No summary statistic replaces looking at the data.
+    No summary statistic replaces looking at the data. Each
+    \texttt{ax.\dots()} call draws one more layer onto the same axes.
   \end{takeaway}
 \end{frame}
 
 \begin{frame}[fragile]{The two modelling interfaces you will use}
 \begin{lstlisting}
 # statsmodels: inference -- coefficients, SEs, t, p, CIs
-import statsmodels.formula.api as smf
-fit = smf.ols("sales ~ TV", data=adv).fit()
-print(fit.summary())        # the table Chapter 3 teaches you to read
+import statsmodels.formula.api as smf  # formula interface, alias smf
+fit = smf.ols("sales ~ TV", data=adv).fit()  # estimate the line y ~ x
+print(fit.summary())        # slope 0.0475, R^2 = 0.612 on Advertising
 
 # scikit-learn: prediction -- one API for every model
-from sklearn.linear_model import LinearRegression
-model = LinearRegression().fit(X_train, y_train)
-model.predict(X_test)       # .fit / .predict everywhere
+from sklearn.linear_model import LinearRegression  # estimator class
+model = LinearRegression().fit(X_train, y_train)  # learn on train only
+model.predict(X_test)       # same two verbs for every model
 \end{lstlisting}
   \begin{takeaway}[Which to reach for]
     \texttt{statsmodels} when you want to \emph{understand} (inference:
     standard errors and $p$-values); \texttt{scikit-learn} when you want to
     \emph{predict} (a uniform \texttt{fit}/\texttt{predict} interface and
     cross-validation tooling). Chapters 3--4 lean on the first,
-    Chapters 5--10 on the second.
+    Chapters 5--10 on the second. \texttt{.fit()} hands back a
+    \emph{result object}: \texttt{fit.params}, \texttt{fit.bse},
+    \texttt{fit.rsquared}.
   \end{takeaway}
 \end{frame}
 
 \begin{frame}[fragile]{Missing values and other everyday nuisances}
 \begin{lstlisting}
-df.isna().sum()                    # how many missing, per column
+df.isna().sum()                    # count gaps before anything else
 df["horsepower"].unique()[:5]      # '?' hides in Auto.csv as a string!
-auto = pd.read_csv("Auto.csv", na_values="?").dropna()
-df["education"] = df["education"].astype("category")   # not a number
+auto = pd.read_csv("Auto.csv", na_values="?").dropna()  # '?' -> NaN
+df["education"] = df["education"].astype("category")   # a label
 pd.get_dummies(df["education"], drop_first=True)       # -> 0/1 columns
 \end{lstlisting}
   \begin{alertblock}{Three traps that bite every semester}
@@ -1959,12 +1966,12 @@ pd.get_dummies(df["education"], drop_first=True)       # -> 0/1 columns
 \begin{lstlisting}
 import pandas as pd, matplotlib.pyplot as plt, statsmodels.formula.api as smf
 
-adv = pd.read_csv("Advertising.csv", index_col=0)   # 1. load
+adv = pd.read_csv("Advertising.csv", index_col=0)   # 1. load, n = 200
 adv.describe()                                      # 2. summarise
 adv.plot.scatter(x="TV", y="sales")                 # 3. LOOK at it
-fit = smf.ols("sales ~ TV", data=adv).fit()         # 4. fit
-print(fit.params, fit.bse, fit.rsquared)            # 5. estimate, SE, R^2
-print(fit.conf_int())                               # 6. uncertainty
+fit = smf.ols("sales ~ TV", data=adv).fit()         # 4. fit the line
+print(fit.params, fit.bse, fit.rsquared)            # 5. 0.0475, SE, 0.612
+print(fit.conf_int())                               # 6. the CI for b
 plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
 \end{lstlisting}
   \vspace{-4pt}
@@ -2475,7 +2482,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     $F_{d_1,d_2}$ & ratio of two scaled $\chi^2$ & the $F$-test for several coefficients (Ch.\ 3) \\
     \bottomrule
   \end{tabular}
-  \vspace{2pt}
+  \par\vspace{2pt}
   As the degrees of freedom grow, $t_\nu \to N(0,1)$: with $\nu > 30$ the
   difference is negligible, which is why large-sample rules of thumb use
   $1.96$.
