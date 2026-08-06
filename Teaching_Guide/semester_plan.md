@@ -28,18 +28,18 @@ appendix pages are extra material to assign, not to teach.
 
 | Chapter | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
-| **0 + 0b** | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 106 + 17, 51 + 10 | 10 + 4, 6 + 2 | 157 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
-| **1 + 2** | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 70, then pp. 1–42 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
-| **2** | Statistical Learning II | `chapter_02` | pp. 43–107 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
-| **3** | Linear Regression I | `chapter_03` | pp. 1–75 | 3.1–3.6 | Stop after multiple regression and the four questions |
-| **3** | Linear Regression II | `chapter_03` | pp. 76–143 | 3.7–3.12 | **Mock Exam 1 after this week** |
-| **4** | Classification I | `chapter_04` | pp. 1–41 | 4.1–4.4 | Logistic regression end to end; stop after the section, before evaluation |
-| **4** | Classification II | `chapter_04` | pp. 42–82 | 4.8–4.10 | Confusion matrix, ROC/AUC, lab (LDA/QDA and naive Bayes are appendix material) · **release Short Exam A** |
-| **5** | Resampling | `chapter_05` | 79 + 8 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap · **release Short Exam B** |
-| **6** | Model Selection & Regularisation | `chapter_06` | 78 + 15 | 7 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
-| **7** | Beyond Linearity | `chapter_07` | 85 + 8 | 6 + 3 | Polynomials, splines, GAMs |
-| **8** | Tree-Based Methods | `chapter_08` | 82 + 9 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
-| **10** | Deep Learning | `chapter_10` | 75 + 9 | 6 + 3 | MLPs, backprop, CNNs (PyTorch) · last taught session · **final mock exam after this week** · **release Short Exam E** |
+| **0 + 0b** | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 105 + 17, 50 + 10 | 10 + 4, 6 + 2 | 155 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
+| **1 + 2** | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 71, then pp. 1–41 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
+| **2** | Statistical Learning II | `chapter_02` | pp. 42–106 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
+| **3** | Linear Regression I | `chapter_03` | pp. 1–74 | 3.1–3.6 | Stop after multiple regression and the four questions |
+| **3** | Linear Regression II | `chapter_03` | pp. 75–142 | 3.7–3.12 | **Mock Exam 1 after this week** |
+| **4** | Classification I | `chapter_04` | pp. 1–40 | 4.1–4.4 | Logistic regression end to end; stop after the section, before evaluation |
+| **4** | Classification II | `chapter_04` | pp. 41–81 | 4.8–4.10 | Confusion matrix, ROC/AUC, lab (LDA/QDA and naive Bayes are appendix material) · **release Short Exam A** |
+| **5** | Resampling | `chapter_05` | 78 + 8 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap · **release Short Exam B** |
+| **6** | Model Selection & Regularisation | `chapter_06` | 70 + 12 | 6 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
+| **7** | Beyond Linearity | `chapter_07` | 84 + 8 | 6 + 3 | Polynomials, splines, GAMs |
+| **8** | Tree-Based Methods | `chapter_08` | 81 + 9 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
+| **10** | Deep Learning | `chapter_10` | 62 + 18 | 6 + 3 | MLPs, backprop, sequence models (PyTorch); CNNs are appendix self-study · last taught session · **final mock exam after this week** · **release Short Exam E** |
 
 Nine ISLP chapters are taught, in book order. Chapters 9, 11, 12 and 13 keep
 their full decks and labs but sit outside the plan as advanced modules A5, A6,
