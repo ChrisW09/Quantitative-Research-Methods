@@ -40,7 +40,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 0.8 | short | Math | p. 115 | p. 116 |
 | Extended Exercise 0.3 | extended | — | p. 121 | p. 122 |
 
-**Notebook cues:** 3 in this deck.
+**Notebook cues:** 8 in this deck.
 
 ### Precourse (b) — Toolkit
 
@@ -68,7 +68,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 0b.1 | extended | Math | p. 55 | p. 56 |
 | Exercise 0b.5 | short | Math | p. 60 | p. 61 |
 
-**Notebook cues:** 1 in this deck (near pp. 35).
+**Notebook cues:** 8 in this deck (near pp. 35).
 
 ### Ch. 1 — Introduction
 
@@ -94,7 +94,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 1.3 | short | Math | p. 52 | p. 53 |
 | Extended Exercise 1.1 | extended | Integrative | p. 58 | p. 59 |
 
-**Notebook cues:** 1 in this deck (near pp. 64).
+**Notebook cues:** 7 in this deck (near pp. 64).
 
 ### Ch. 2 — Statistical Learning
 
@@ -132,7 +132,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 2.1 | extended | Math | p. 110 | p. 111 |
 | Extended Exercise 2.3 | extended | Math | p. 114 | p. 115 |
 
-**Notebook cues:** 1 in this deck (near pp. 89, 90).
+**Notebook cues:** 9 in this deck (near pp. 89, 90).
 
 ### Ch. 3 — Linear Regression
 
@@ -172,7 +172,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 3.L2 | extended | Math | p. 148 | p. 149 |
 | Extended Exercise 3.L6 | extended | Python | p. 153 | p. 154 |
 
-**Notebook cues:** 1 in this deck (near pp. 128).
+**Notebook cues:** 13 in this deck (near pp. 128).
 
 ### Ch. 4 — Classification
 
@@ -207,7 +207,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 4.3 | extended | Math | p. 113 | p. 114 |
 | Extended Exercise 4.4 | extended | Integrative | p. 119 | p. 120 |
 
-**Notebook cues:** 1 in this deck (near pp. 62).
+**Notebook cues:** 10 in this deck (near pp. 62).
 
 ### Ch. 5 — Resampling Methods
 
@@ -237,7 +237,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 5.2 | short | Math | p. 82 | p. 83 |
 | Extended Exercise 5.1 | extended | Math | p. 85 | p. 86 |
 
-**Notebook cues:** 2 in this deck (near pp. 58).
+**Notebook cues:** 8 in this deck (near pp. 58).
 
 ### Ch. 6 — Model Selection & Regularisation
 
@@ -269,7 +269,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 6.2 | extended | Math | p. 88 | p. 89 |
 | Exercise 6.6 | short | Concept | p. 92 | p. 93 |
 
-**Notebook cues:** 2 in this deck (near pp. 57).
+**Notebook cues:** 9 in this deck (near pp. 57).
 
 ### Ch. 7 — Moving Beyond Linearity
 
@@ -299,7 +299,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 7.3 | extended | Python | p. 71 | p. 72 |
 | Extended Exercise 7.1 | extended | Math | p. 90 | p. 91 |
 
-**Notebook cues:** 2 in this deck (near pp. 62).
+**Notebook cues:** 9 in this deck (near pp. 62).
 
 ### Ch. 8 — Tree-Based Methods
 
@@ -329,7 +329,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 8.3 | extended | Python | p. 70 | p. 71 |
 | Extended Exercise 8.2 | extended | Math | p. 87 | p. 88 |
 
-**Notebook cues:** 2 in this deck (near pp. 62).
+**Notebook cues:** 8 in this deck (near pp. 62).
 
 ### Ch. 10 — Deep Learning
 
@@ -360,7 +360,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 10.3 | extended | Python | p. 65 | p. 66 |
 | Extended Exercise 10.2 | extended | Math | p. 78 | p. 79 |
 
-**Notebook cues:** 2 in this deck (near pp. 15, 59).
+**Notebook cues:** 7 in this deck (near pp. 15, 59).
 
 ### Ch. 12 — Unsupervised Learning
 
@@ -390,4 +390,4 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 12.2 | extended | Python | p. 74 | p. 75 |
 | Extended Exercise 12.3 | extended | Python | p. 98 | p. 99 |
 
-**Notebook cues:** 7 in this deck (near pp. 79).
+**Notebook cues:** 11 in this deck (near pp. 79).
