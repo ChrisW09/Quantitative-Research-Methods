@@ -13,7 +13,7 @@ Eleven Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
 together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
-[**958** slides in the main flow]{.qrm-chip}
+[**930** slides in the main flow]{.qrm-chip}
 [**+150** in optional appendices]{.qrm-chip}
 [**81** short + **38** extended exercises]{.qrm-chip}
 [**~110** purpose-built figures]{.qrm-chip}
@@ -37,18 +37,18 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+17) | <a href="slides/chapter_00.pdf">Open</a> |
-| 0b | Precourse (b) — Toolkit | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+10) | <a href="slides/chapter_00b.pdf">Open</a> |
-| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 70 (+8) | <a href="slides/chapter_01.pdf">Open</a> |
-| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, the Bayes classifier and KNN | 8 + 4 | 107 (+9) | <a href="slides/chapter_02.pdf">Open</a> |
-| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics, KNN regression | 12 + 6 | 143 (+13) | <a href="slides/chapter_03.pdf">Open</a> |
-| 4 | Classification | Logistic regression and the odds scale, multiple predictors and confounding, the confusion matrix, ROC and AUC — the generative models (LDA, QDA, naive Bayes) now sit in the appendix | 10 + 6 | 82 (+44) | <a href="slides/chapter_04.pdf">Open</a> |
-| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 79 (+8) | <a href="slides/chapter_05.pdf">Open</a> |
-| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 78 (+15) | <a href="slides/chapter_06.pdf">Open</a> |
-| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+8) | <a href="slides/chapter_07.pdf">Open</a> |
-| 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 82 (+9) | <a href="slides/chapter_08.pdf">Open</a> |
-| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 6 + 3 | 75 (+9) | <a href="slides/chapter_10.pdf">Open</a> |
-| **Total** | | | **81 + 38** | **958 (+150)** | |
+| 0 | Precourse (a) — Statistics refresher | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 105 (+17) | <a href="slides/chapter_00.pdf">Open</a> |
+| 0b | Precourse (b) — Toolkit | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 50 (+10) | <a href="slides/chapter_00b.pdf">Open</a> |
+| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+8) | <a href="slides/chapter_01.pdf">Open</a> |
+| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, the Bayes classifier and KNN | 8 + 4 | 106 (+9) | <a href="slides/chapter_02.pdf">Open</a> |
+| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics, KNN regression | 12 + 6 | 142 (+13) | <a href="slides/chapter_03.pdf">Open</a> |
+| 4 | Classification | Logistic regression and the odds scale, multiple predictors and confounding, the confusion matrix, ROC and AUC — the generative models (LDA, QDA, naive Bayes) now sit in the appendix | 10 + 6 | 81 (+44) | <a href="slides/chapter_04.pdf">Open</a> |
+| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 78 (+8) | <a href="slides/chapter_05.pdf">Open</a> |
+| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 70 (+12) | <a href="slides/chapter_06.pdf">Open</a> |
+| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 84 (+8) | <a href="slides/chapter_07.pdf">Open</a> |
+| 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 81 (+9) | <a href="slides/chapter_08.pdf">Open</a> |
+| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 6 + 3 | 62 (+18) | <a href="slides/chapter_10.pdf">Open</a> |
+| **Total** | | | **81 + 38** | **930 (+156)** | |
 
 Chapters 9 (support vector machines), 11 (survival analysis), 12 (unsupervised
 learning) and 13 (multiple testing) are no longer part of the taught sequence —
@@ -131,7 +131,7 @@ optional.
 
 Both are **taught**, in the single precourse session that opens the semester,
 and both exist because the chapter decks assume their content silently.
-One session cannot cover 157 slides, so it draws a selection from the two and the
+One session cannot cover 155 slides, so it draws a selection from the two and the
 decks remain the full reference — see
 [the course at a glance](course.md) and [For students](for-students.md).
 

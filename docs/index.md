@@ -13,7 +13,7 @@ datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
 [**11** decks]{.qrm-chip}
-[**958** core slides *(+150 optional)*]{.qrm-chip}
+[**930** core slides *(+156 optional)*]{.qrm-chip}
 [**119** exercises with solutions]{.qrm-chip}
 [**11** labs *(with solutions)*]{.qrm-chip}
 [**8** advanced modules]{.qrm-chip}
@@ -101,7 +101,7 @@ course is graded.
 :link: slides
 :link-type: doc
 
-Eleven decks: 958 core slides, 150 more in optional appendices, every exercise
+Eleven decks: 930 core slides, 156 more in optional appendices, every exercise
 with a worked solution.
 :::
 

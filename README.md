@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>958 core slides</b> (+150 in optional appendices) ·
+  <b>930 core slides</b> (+156 in optional appendices) ·
   <b>156 exercises</b> with worked solutions ·
   <b>11 labs</b> with worked solutions, all running locally &amp; on Colab ·
   <b>3 + 5 mock exams</b> · <b>22 datasets</b>
@@ -47,7 +47,7 @@ Prepared by **Prof. Dr. Christoph Weisser**.
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 958 slides, plus 150 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 930 slides, plus 156 in per-deck appendices |
 | Exercises | 106 short + 50 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 11 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
 | [Mock exams](#-mock-exams) | 3 | Each as questions, worked solutions and an in-class review deck — kept out of git |
@@ -107,7 +107,7 @@ refer to.
 
 | Chapter | Sessions | Topic |
 |:--:|:--:|--|
-| **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 157 slides across the two, so the session is a selection and the decks stay the reference |
+| **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 155 slides across the two, so the session is a selection and the decks stay the reference |
 | **1** | ½ | Introduction; prediction vs. inference |
 | **2** | 1½ | What is statistical learning; model accuracy; bias–variance trade-off; Bayes classifier; KNN |
 | **3** | 2 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
@@ -151,18 +151,18 @@ advanced material that the main thread never depends on.
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 106 (+17) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
-| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 51 (+10) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
-| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 70 (+8) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
-| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 107 (+9) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
-| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 143 (+13) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
-| 4 | Classification | Logistic regression and the odds scale, confounding, confusion matrices, ROC and AUC — LDA, QDA and naive Bayes moved to the appendix | 10 + 6 | 82 (+44) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
-| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 79 (+8) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
-| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 78 (+15) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
-| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 85 (+8) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
-| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 82 (+9) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
-| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 75 (+9) | [PDF](./Chapters/chapter_10/chapter_10.pdf) |
-| **Total** | | | **81 + 38** | **958 (+150)** | |
+| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 105 (+17) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 50 (+10) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
+| 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+8) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
+| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 106 (+9) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
+| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 142 (+13) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
+| 4 | Classification | Logistic regression and the odds scale, confounding, confusion matrices, ROC and AUC — LDA, QDA and naive Bayes moved to the appendix | 10 + 6 | 81 (+44) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
+| 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 78 (+8) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
+| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 70 (+12) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
+| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 84 (+8) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
+| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 81 (+9) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
+| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 62 (+18) | [PDF](./Chapters/chapter_10/chapter_10.pdf) |
+| **Total** | | | **81 + 38** | **930 (+156)** | |
 
 <details>
 <summary><b>How a deck is built</b></summary>
@@ -212,7 +212,7 @@ solution, so it works as homework.
 <details>
 <summary><b>The two precourse decks</b></summary>
 
-**Chapter 0 — the statistics refresher.** An optional session (106 slides plus a
+**Chapter 0 — the statistics refresher.** An optional session (105 slides plus a
 16-slide appendix) revisiting what the course assumes: descriptive statistics,
 probability and Bayes, the standard distributions, sampling and confidence
 intervals, hypothesis testing, simple linear regression, and the
@@ -355,13 +355,13 @@ notebook whose numbers match the slides seed-for-seed:
 
 | Module | Title | Deck | Notebook | Open in Colab |
 |:--:|---|:--:|:--:|:--:|
-| A1 | Randomised Controlled Trials — potential outcomes, selection bias, power, peeking | 72 slides | [`advanced_01_rcts_lab.ipynb`](./Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) |
-| A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 74 slides | [`advanced_02_shapley_lab.ipynb`](./Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) |
-| A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 75 slides | [`advanced_03_conformal_lab.ipynb`](./Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) |
-| A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 83 slides | [`advanced_04_glms_splines_lab.ipynb`](./Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) |
-| A5 | Support Vector Machines *(ISLP Ch 9)* — margins, the soft margin and *C*, kernels, tuning by CV | 94 slides | [`advanced_05_svm_lab.ipynb`](./Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) |
-| A6 | Survival Analysis *(ISLP Ch 11)* — censoring, Kaplan–Meier, the log-rank test, Cox regression | 94 slides | [`advanced_06_survival_lab.ipynb`](./Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) |
-| A7 | Multiple Testing *(ISLP Ch 13)* — FWER, Bonferroni and Holm, FDR, Benjamini–Hochberg | 70 slides | [`advanced_07_multiple_testing_lab.ipynb`](./Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) |
+| A1 | Randomised Controlled Trials — potential outcomes, selection bias, power, peeking | 71 slides | [`advanced_01_rcts_lab.ipynb`](./Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) |
+| A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 73 slides | [`advanced_02_shapley_lab.ipynb`](./Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) |
+| A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 74 slides | [`advanced_03_conformal_lab.ipynb`](./Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) |
+| A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 82 slides | [`advanced_04_glms_splines_lab.ipynb`](./Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) |
+| A5 | Support Vector Machines *(ISLP Ch 9)* — margins, the soft margin and *C*, kernels, tuning by CV | 93 slides | [`advanced_05_svm_lab.ipynb`](./Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) |
+| A6 | Survival Analysis *(ISLP Ch 11)* — censoring, Kaplan–Meier, the log-rank test, Cox regression | 93 slides | [`advanced_06_survival_lab.ipynb`](./Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) |
+| A7 | Multiple Testing *(ISLP Ch 13)* — FWER, Bonferroni and Holm, FDR, Benjamini–Hochberg | 69 slides | [`advanced_07_multiple_testing_lab.ipynb`](./Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) |
 | A8 | Unsupervised Learning *(ISLP Ch 12)* — PCA, scaling, *K*-means and its local optima, dendrograms and linkage | 100 slides | [`advanced_08_unsupervised_lab.ipynb`](./Chapters/Advanced/advanced_08_unsupervised/advanced_08_unsupervised_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_08_unsupervised/advanced_08_unsupervised_lab.ipynb) |
 
 Nothing in the taught plan depends on them — but the mock exams still carry a

@@ -57,7 +57,7 @@ you stop and resume cleanly:
 ```{admonition} One session, two decks — so it is a selection
 :class: important
 
-The two precourse decks carry **157 slides** in their main flow (106 + 51). A
+The two precourse decks carry **155 slides** in their main flow (105 + 50). A
 single 180-minute session cannot cover them, and is not meant to: the session
 sets up the notation, the standard-error material and the Python patterns the
 chapters lean on hardest, and both decks stay available in full as the
