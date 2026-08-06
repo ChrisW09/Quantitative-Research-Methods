@@ -5,7 +5,7 @@ a 120-slide deck first.
 
 | File | What it is |
 |---|---|
-| [`semester_plan.md`](./semester_plan.md) | The thirteen sessions on one page: what to teach when, what the assessment rhythm is, what to do if you fall behind |
+| [`semester_plan.md`](./semester_plan.md) | The twelve sessions on one page: what to teach when, what the assessment rhythm is, what to do if you fall behind |
 | [`runsheets/`](./runsheets/) | One page per session (`lecture_NN.md`), plus one per self-study module (`module_aN_*.md`): timing blocks, what to cut first, which exercises to run live, the misconceptions to pre-empt. **Not published** — git-ignored, because they map exercises onto exam problems; instructors request them from the author |
 | [`slide_index.md`](./slide_index.md) | Every deck's sections with page ranges, every exercise with its page, generated from the compiled PDFs; each deck's appendix is listed but marked *optional* rather than given a time budget |
 | [`before_class.md`](./before_class.md) | The ten-minute checklist for the morning of a lecture |

@@ -9,11 +9,11 @@ Each chapter folder (`chapter_NN/`) is self-contained and holds **everything for
 that chapter**: the deck source `chapter_NN.tex`, its `images/`, the compiled
 `chapter_NN.pdf`, and the companion lab `chapter_NN_lab.ipynb`.
 
-Every chapter carries both — twelve decks and twelve notebooks, counting the two
-precourse sessions. Support vector machines (Ch 9), survival analysis (Ch 11)
-and multiple testing (Ch 13) are no longer part of the taught sequence: their
-decks and labs live on in [`Advanced/`](./Advanced/) as self-study modules A5,
-A6 and A7.
+Every chapter carries both — eleven decks and eleven notebooks, counting the two
+precourse sessions. Support vector machines (Ch 9), survival analysis (Ch 11),
+unsupervised learning (Ch 12) and multiple testing (Ch 13) are no longer part of
+the taught sequence: their decks and labs live on in [`Advanced/`](./Advanced/)
+as self-study modules A5, A6, A8 and A7.
 
 `chapter_00/` is the **first half of the taught precourse session**, a refresher of the undergraduate
 material the course assumes. It is not an ISLP chapter: it revisits descriptive
@@ -105,16 +105,16 @@ works as homework.
 | 7  | Moving Beyond Linearity | 6 | 3 | 85 + 8 |
 | 8  | Tree-Based Methods | 7 | 3 | 82 + 9 |
 | 10 | Deep Learning | 6 | 3 | 75 + 9 |
-| 12 | Unsupervised Learning | 6 | 3 | 91 + 10 |
-| **Total** | | **87** | **41** | **1049 + 160** |
+| **Total** | | **81** | **38** | **958 + 150** |
 
-Support vector machines (Ch 9), survival analysis (Ch 11) and multiple testing
-(Ch 13) are no longer part of the taught sequence — their decks, labs and
-appendices moved to [`Advanced/`](./Advanced/) as self-study modules A5, A6 and A7.
+Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
+(Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —
+their decks, labs and appendices moved to [`Advanced/`](./Advanced/) as
+self-study modules A5, A6, A8 and A7.
 
-## Suggested plan (13 sessions of 180 min)
+## Suggested plan (12 sessions of 180 min)
 
-Ten ISLP chapters in book order, preceded by the taught precourse session — 13
+Nine ISLP chapters in book order, preceded by the taught precourse session — 12
 sessions in all. The plan is keyed to **chapter numbers**, not session numbers,
 because that is what the decks, labs and exercise numbering all use. The three
 heaviest chapters (2, 3, 4) each span two sessions, splitting at a natural
@@ -132,7 +132,6 @@ section boundary so you can stop and resume cleanly.
 | **Ch 7** | 1 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | **Ch 8** | 1 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
 | **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization | 10.1–10.6 |
-| **Ch 12** | 1 | Principal components; K-means; hierarchical clustering and linkage | 12.x |
 
 Chapter 1 is short and opens the same session as the first half of Chapter 2.
 
