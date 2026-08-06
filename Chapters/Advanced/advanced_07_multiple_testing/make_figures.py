@@ -39,6 +39,7 @@ GREEN_D = "#2E7D32"
 ORANGE_D = "#E08214"
 RED_D = "#C62828"
 GREY_D = "#999999"
+GREY_M = "#808080"   # open "not rejected" markers
 INK = "#2A2A2A"
 
 DRAFT_STYLE = {

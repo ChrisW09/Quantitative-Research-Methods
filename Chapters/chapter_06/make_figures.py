@@ -194,6 +194,102 @@ def fig_ridge_path():
     print("ch06_ridge_path.png:", ", ".join(X.columns[j] for j in top))
 
 
+def fig_ridge_cv():
+    """10-fold CV curve for ridge on standardised Hitters, with the dip marked.
+
+    The slide quotes lambda* ~ 1.6 and CV MSE ~ 114,000. Note this is a
+    *10-fold* CV curve over a log grid; the companion notebook's LOO search
+    over its own grid lands on alpha ~ 2.8 instead. Both are correct for the
+    procedure they run --- the divergence is deliberate, so the fold split
+    here is pinned (KFold(10, shuffle=True, random_state=1)) and must not be
+    changed without re-checking the number on the slide.
+    """
+    from sklearn.linear_model import Ridge
+    from sklearn.model_selection import KFold, cross_val_score
+    from sklearn.preprocessing import StandardScaler
+
+    X, y = hitters()
+    Xs = StandardScaler().fit_transform(X)
+    alphas = np.logspace(-2, 5, 141)
+    cv = KFold(n_splits=10, shuffle=True, random_state=1)
+    mse = np.array([
+        -cross_val_score(
+            Ridge(alpha=a, solver="cholesky"), Xs, y, cv=cv,
+            scoring="neg_mean_squared_error",
+        ).mean()
+        for a in alphas
+    ])
+    i = mse.argmin()
+
+    with plt.rc_context({"font.size": 11, "axes.titlesize": 12, "axes.grid": False}):
+        fig, ax = plt.subplots(figsize=(6.94, 3.94))
+        ax.axvline(np.log10(alphas[i]), color=PATH_ORANGE, ls="--", lw=1.8, zorder=2)
+        ax.plot(np.log10(alphas), mse / 1e3, color=PATH_BLUE, lw=2.4, zorder=3)
+        ax.plot(np.log10(alphas[i]), mse[i] / 1e3, "o", color=PATH_ORANGE, ms=9,
+                zorder=4)
+        # the flat left arm of the curve leaves this pocket empty, so the
+        # label sits clear of both the dashed line and the curve
+        ax.text(
+            0.78, 127.5,
+            f"$\\lambda^{{*}} \\approx {alphas[i]:.1f}$\n"
+            f"CV MSE $\\approx$ {mse[i] / 1e3:.0f}k",
+            fontsize=11, color="#333333", ha="left", va="center",
+        )
+        ax.set_title(r"Ridge on Hitters: cross-validation picks $\lambda$")
+        ax.set_xlabel(r"$\log_{10}(\lambda)$")
+        ax.set_ylabel(r"10-fold CV MSE ($\times 10^{3}$)")
+        save(fig, "ch06_x_ridge_cv.png")
+
+    print("ch06_x_ridge_cv.png:",
+          f"lambda* = {alphas[i]:.3f} (log10 = {np.log10(alphas[i]):.2f}),",
+          f"CV MSE = {mse[i]:,.0f}")
+
+
+def fig_lasso_path():
+    """Lasso coefficient paths on standardised Hitters, five largest highlighted.
+
+    Companion to fig_ridge_path: same data, same standardisation, same
+    'highlight the five largest coefficients at the weakest penalty' rule, so
+    the two slides can be read side by side. The grid stops at the smallest
+    alpha that zeroes everything, max_j |x_j'(y - ybar)| / n.
+    """
+    from sklearn.linear_model import Lasso
+    from sklearn.preprocessing import StandardScaler
+
+    X, y = hitters()
+    Xs = StandardScaler().fit_transform(X)
+    alphas = np.logspace(-0.6, 2.4, 120)
+    # the coordinate-descent default tol=1e-4 stops short here and leaves the
+    # weakest-penalty end visibly off; tighten it so the path is the converged one
+    coefs = np.array(
+        [Lasso(alpha=a, max_iter=200000, tol=1e-7).fit(Xs, y).coef_ for a in alphas]
+    )
+    top = np.argsort(-np.abs(coefs[0]))[:5]
+
+    with plt.rc_context({"font.size": 13, "axes.titlesize": 14, "axes.grid": False}):
+        fig, ax = plt.subplots(figsize=(7.0, 4.2))
+        # the zero line is the point of the figure here: paths land on it
+        ax.axhline(0, color="black", lw=0.8, zorder=2)
+        for j in range(coefs.shape[1]):
+            if j not in top:
+                ax.plot(np.log10(alphas), coefs[:, j], color=PATH_GREY, lw=0.9, zorder=1)
+        colours = [PATH_BLUE, PATH_ORANGE, PATH_GREEN, PATH_RED, PATH_PURPLE]
+        for colour, j in zip(colours, top):
+            ax.plot(np.log10(alphas), coefs[:, j], color=colour, lw=2, zorder=3,
+                    label=X.columns[j])
+        ax.set_title("Lasso coefficient paths (Hitters)")
+        ax.set_xlabel(r"$\log_{10}(\alpha)$")
+        ax.set_ylabel("Standardized coefficient")
+        # upper right is the one corner every path has left empty
+        ax.legend(fontsize=10, frameon=False, loc="upper right")
+        save(fig, "ch06_lasso_path.png")
+
+    nz = (coefs != 0).sum(axis=1)
+    print("ch06_lasso_path.png:", ", ".join(X.columns[j] for j in top),
+          f"| nonzero coefficients: {nz[0]} at alpha={alphas[0]:.2f}",
+          f"-> {nz[-1]} at alpha={alphas[-1]:.0f}")
+
+
 def fig_ridge_bias_variance():
     """Schematic: variance falls and squared bias rises as the penalty grows."""
     x = np.linspace(-2, 4, 600)
@@ -238,4 +334,6 @@ if __name__ == "__main__":
     fig_search_space()
     fig_selection_criteria()
     fig_ridge_path()
+    fig_ridge_cv()
+    fig_lasso_path()
     fig_ridge_bias_variance()
