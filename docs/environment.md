@@ -14,8 +14,8 @@ examples printed on the slides.
 |---|---|
 | Core scientific stack | `numpy>=1.24` · `pandas>=2.0` · `matplotlib>=3.7` · `seaborn>=0.12` · `scipy>=1.10` |
 | Statistics & machine learning | `statsmodels>=0.14` · `scikit-learn>=1.3` |
-| Book companion (datasets + helpers) | `ISLP>=0.3` |
-| Chapter-specific | `pygam>=0.9` (Ch 7) · `xgboost>=2.0` (Ch 8, genuinely optional) · `torch>=2.1` (Ch 10) · `lifelines>=0.27` (Ch 11) |
+| Book companion (datasets + helpers) | `ISLP==0.4.0` |
+| Chapter-specific | `pygam==0.10.1` (Ch 7) · `xgboost>=2.0` (Ch 8, genuinely optional) · `torch>=2.1` (Ch 10) · `lifelines>=0.27` (module A6) |
 | Notebook environment | `jupyter>=1.0` |
 
 Only `xgboost` is optional in practice. `pygam`, `torch` and `lifelines` are
@@ -57,9 +57,9 @@ megabytes — see [Why the install is large](#why-the-install-is-large) below.
   support. Note that it arrives whether you ask for it or not — see below.
 
 `lifelines`
-: Chapter 11 (survival analysis). Required, not optional: Chapter 11 is a taught
-  lecture with its own deck and lab, and the Kaplan–Meier and Cox fits in that
-  lab run on `lifelines`. It arrives with `ISLP` in any case.
+: Advanced module A6 (survival analysis, ISLP Chapter 11), which is self-study
+  rather than taught. The Kaplan–Meier and Cox fits in that lab run on
+  `lifelines`, and it arrives with `ISLP` in any case.
 
 ## Why the install is large
 

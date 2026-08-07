@@ -77,7 +77,11 @@ B = len(BG)
 BASE = gbr.predict(BG).mean()                   # v(emptyset) = E_b f(b)
 PRED = gbr.predict(X)
 
-I_STAR = 188          # the 24-season career-hits record holder (Pete Rose's 1986 line)
+# The 24-season career-hits record holder (Pete Rose's 1986 line). Derived
+# rather than hard-coded: a positional index into a dropna()d frame silently
+# points at a different player if the CSV or pandas' row order ever changes,
+# while the figure title would still say "24-season veteran".
+I_STAR = int(hitters["Years"].idxmax())
 WEIGHT = {s: factorial(s) * factorial(P - s - 1) / factorial(P) for s in range(P)}
 
 

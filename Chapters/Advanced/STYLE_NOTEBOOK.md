@@ -1,8 +1,10 @@
 # STYLE_NOTEBOOK.md — How to author a lab notebook in this course's house style
 
 This brief lets you write a Jupyter notebook indistinguishable from the existing
-`Chapters/chapter_XX_lab.ipynb` files (canonical short example: chapter 13,
-18 cells; richer example: chapter 7, 29 cells). Follow it exactly.
+`Chapters/chapter_XX/chapter_XX_lab.ipynb` files (canonical short example:
+`Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb`,
+18 cells; richer example: `Chapters/chapter_07/chapter_07_lab.ipynb`, 33 cells).
+Follow it exactly.
 
 ---
 
@@ -24,7 +26,7 @@ This brief lets you write a Jupyter notebook indistinguishable from the existing
 ```
 
 For a notebook living in **`Chapters/Advanced/`**, the badge URL path must be
-`.../blob/main/Chapters/Advanced/chapter_XX_lab.ipynb` (only the path segment
+`.../blob/main/Chapters/Advanced/advanced_NN_topic/advanced_NN_topic_lab.ipynb` (only the path segment
 changes; repo stays `ChrisW09/Quantitative-Research-Methods`).
 
 **Cell 1 — markdown, header:**
@@ -213,17 +215,21 @@ self-study; numbered as the next section, e.g. `## 5. Exercises` / `## 6. Exerci
 
 ## 5. Environment constraints on THIS machine (critical)
 
-- **`ISLP` is NOT installed locally.** The setup cell's CSV fallback must carry the
-  whole notebook: every dataset you use must exist as
+- **`ISLP` IS installed locally** (pinned to `ISLP==0.4.0` in `requirements.txt`),
+  so a fresh run does *not* print `ISLP not installed; using CSV / URL fallbacks.`
+  Do not paste that line into stored output. The CSV fallback must still carry the
+  whole notebook for Colab and offline use: every dataset you use must exist as
   `ALL CSV FILES - 2nd Edition/<Name>.csv` at the repo root (reachable via the
   `'../../ALL CSV FILES - 2nd Edition'` candidate from `Chapters/Advanced/`), or be
-  simulated. Expect and keep the printed line `ISLP not installed; using CSV / URL
-  fallbacks.` in the stored setup-cell output.
-- **`seaborn` is NOT installed.** matplotlib (plus pandas plotting) only.
+  simulated. Note the two paths do not agree on everything -- `load()` differs in
+  index base and dtypes -- so execute every notebook against the same branch.
+- **`seaborn` IS installed** (`seaborn>=0.12`), but keep new figures on matplotlib
+  (plus pandas plotting) for consistency with the decks; `chapter_02`'s pairplot is
+  the one deliberate exception.
 - **`nbconvert` is NOT installed; `nbclient` IS** (0.10.2). Execute notebooks with
   nbclient, e.g.:
   ```bash
-  cd "Advanced/Chapters" && python3 - <<'EOF'
+  cd "Chapters/Advanced" && python3 - <<'EOF'
   import nbformat
   from nbclient import NotebookClient
   nb = nbformat.read('chapter_XX_lab.ipynb', as_version=4)

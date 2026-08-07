@@ -210,9 +210,21 @@ def fig_km_sex():
         ax.plot(cens, k.survival_function_at_times(cens).values, "|",
                 color=col, ms=8, mew=1.5)
 
+    # Read off `res` and the risk sets rather than typed in: the literals were
+    # correct, but nothing tied them to the data any more, so a change to the
+    # dataset would have left the annotation quietly stating the old result.
+    o_male = float(bc.loc[male, "status"].sum())
+    e_male = 0.0
+    for t in np.sort(bc.loc[bc["status"] == 1, "time"].unique()):
+        at_risk = bc["time"] >= t
+        n_risk = int(at_risk.sum())
+        if n_risk:
+            d_t = int(((bc["time"] == t) & (bc["status"] == 1)).sum())
+            e_male += d_t * int((at_risk & male).sum()) / n_risk
+
     ax.text(0.98, 0.96,
-            "log-rank: $\\chi^2_1=1.44$, $p=0.230$\n"
-            "$O_{\\mathrm{male}}=20$ vs $E_{\\mathrm{male}}=16.46$",
+            f"log-rank: $\\chi^2_1={res.test_statistic:.2f}$, $p={res.p_value:.3f}$\n"
+            f"$O_{{\\mathrm{{male}}}}={o_male:.0f}$ vs $E_{{\\mathrm{{male}}}}={e_male:.2f}$",
             transform=ax.transAxes, ha="right", va="top", fontsize=8.5,
             bbox=dict(boxstyle="round,pad=0.35", fc="white", ec=GREY, lw=0.8))
     ax.set(xlabel="months since treatment", ylabel="$\\hat S(t)$",

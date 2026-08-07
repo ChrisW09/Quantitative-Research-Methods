@@ -14,8 +14,8 @@ together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
 [**930** slides in the main flow]{.qrm-chip}
-[**+150** in optional appendices]{.qrm-chip}
-[**81** short + **38** extended exercises]{.qrm-chip}
+[**+156** in optional appendices]{.qrm-chip}
+[**80** short + **38** extended exercises]{.qrm-chip}
 [**~110** purpose-built figures]{.qrm-chip}
 :::
 
@@ -44,11 +44,11 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 | 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics, KNN regression | 12 + 6 | 142 (+13) | <a href="slides/chapter_03.pdf">Open</a> |
 | 4 | Classification | Logistic regression and the odds scale, multiple predictors and confounding, the confusion matrix, ROC and AUC — the generative models (LDA, QDA, naive Bayes) now sit in the appendix | 10 + 6 | 81 (+44) | <a href="slides/chapter_04.pdf">Open</a> |
 | 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 78 (+8) | <a href="slides/chapter_05.pdf">Open</a> |
-| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 70 (+12) | <a href="slides/chapter_06.pdf">Open</a> |
+| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 6 + 3 | 70 (+12) | <a href="slides/chapter_06.pdf">Open</a> |
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 84 (+8) | <a href="slides/chapter_07.pdf">Open</a> |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 81 (+9) | <a href="slides/chapter_08.pdf">Open</a> |
 | 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 6 + 3 | 62 (+18) | <a href="slides/chapter_10.pdf">Open</a> |
-| **Total** | | | **81 + 38** | **930 (+156)** | |
+| **Total** | | | **80 + 38** | **930 (+156)** | |
 
 Chapters 9 (support vector machines), 11 (survival analysis), 12 (unsupervised
 learning) and 13 (multiple testing) are no longer part of the taught sequence —
@@ -86,13 +86,13 @@ Every deck follows the same rhythm, so students always know where they are.
 
 Two things hold throughout:
 
-- **~110 purpose-built visuals** — 77 matplotlib plots generated from the
-  bundled datasets plus 39 native TikZ concept diagrams. Among them: the
+- **~110 purpose-built visuals** — 71 matplotlib plots generated from the
+  bundled datasets plus 38 native TikZ concept diagrams. Among them: the
   bias–variance trade-off, the logistic S-curve, ROC and a confusion-matrix
   schematic, *k*-fold and bootstrap diagrams, ridge & lasso coefficient paths
   with the $\ell_1$-vs-$\ell_2$ constraint geometry, spline/GAM fits, a decision
-  tree beside its feature-space partition, a neural-network architecture, a
-  convolution diagram, and the Benjamini–Hochberg staircase.
+  tree beside its feature-space partition, a neural-network architecture, and a
+  convolution diagram.
 - **Verified numbers** — Python listings are commented and runnable against the
   bundled datasets, and every numeric answer was reproduced against the real
   data.
@@ -122,10 +122,10 @@ optional.
 | 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · the RSS surface and ISLP Fig 3.1 recreated | 13 |
 | 4 | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · **the generative models in full — Bayes refresher, LDA, QDA, naive Bayes, with Exercises 4.5–4.7** · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · **comparing the classifiers, with Extended Exercise 4.4** · GLMs and Poisson regression · ISLP Fig 4.2 recreated on Default | 44 |
 | 5 | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills · ISLP Fig 5.5 (5-fold CV) | 8 |
-| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 · Extended Exercise 6.1 (all criteria across sizes) | 15 |
+| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 · Extended Exercise 6.1 (all criteria across sizes) | 12 |
 | 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) · the four-models panel | 8 |
 | 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART · ISLP Figs 8.1 and 8.2 (the Hitters tree) | 9 |
-| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent · the gradient-descent loss surface | 9 |
+| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent · the gradient-descent loss surface | 18 |
 
 ## The two precourse decks
 
@@ -155,7 +155,7 @@ cohort with mixed backgrounds. It covers:
 The linear algebra and the calculus/gradient-descent strands sit in its
 appendix, for the cohorts that need them. It opens with a twelve-question
 self-check so students can decide whether they need the session at all, and
-closes with a table mapping every topic to the chapter that uses it. Eighteen
+closes with a table mapping every topic to the chapter that uses it. Nineteen
 figures — the boxplot anatomy, a gallery of shapes, Anscombe's quartet,
 Simpson's paradox, the CLT, confidence-interval coverage, $p$-values as areas,
 power, leverage, and gradient descent on a real loss surface — are computed from
@@ -178,7 +178,7 @@ guessed — it comes from counting usage across the decks:
 It adds a sixth strand the labs depend on and the decks never teach: the Python
 patterns themselves — writing a function, looping over candidate settings,
 seeding randomness, the `fit`/`predict` contract, and the discipline of scoring
-on data the model has not seen. Eight figures, six short and two extended
+on data the model has not seen. Nine figures, six short and two extended
 exercises, and a companion notebook. The maximum-likelihood derivation and the
 counting strand live in its appendix.
 

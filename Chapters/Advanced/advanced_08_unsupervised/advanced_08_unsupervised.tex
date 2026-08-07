@@ -397,8 +397,8 @@
   \begin{takeaway}
     Murder and Rape (standardised, $r=0.564$) are stretched along the $45^\circ$ line. PC1
     points there and its scores have variance $1.60$; PC2 is forced perpendicular and gets
-    only $0.45$. The grey stubs are the projections PC1 keeps --- the shortest possible
-    ones, which is the same thing as the widest possible spread.
+    only $0.45$. The grey stubs are the residuals PC1 \emph{discards} --- the shortest
+    possible ones, which is the same thing as the widest possible spread.
   \end{takeaway}
 \end{frame}
 
@@ -805,8 +805,8 @@ for tag, X in [('scaled',   StandardScaler().fit_transform(USA)),
   \end{block}
   \begin{readme}
     \begin{itemize}
-      \item $W(C_k)$ is the average squared Euclidean distance between all pairs inside
-            cluster $k$ --- small means tight.
+      \item $W(C_k)$ sums the squared Euclidean distances over all pairs inside
+            cluster $k$ and divides by $|C_k|$ --- small means tight.
       \item The second equality is an algebraic identity (derived in the appendix): the
             \emph{centroid form}, with $\bar x_{kj}=\frac{1}{|C_k|}\sum_{i\in C_k}x_{ij}$.
             Software reports it without the factor $2$ --- \texttt{sklearn}'s
@@ -1619,7 +1619,7 @@ from sklearn.decomposition import PCA                # the PCA estimator
 from sklearn.preprocessing import StandardScaler     # mean 0, sd 1 per column
 
 USA = load('USArrests', index_col=0)                 # 50 states x 4 features
-Xs  = StandardScaler().fit_transform(USA)            # unscaled, PC1 = Assault
+Xs  = StandardScaler().fit_transform(USA)            # standardise: mean 0, sd 1 per column
 pca = PCA().fit(Xs)                                  # all min(n-1, p) directions
 
 print(np.round(pca.explained_variance_ratio_, 4))    # [0.6201 0.2474 0.0891 0.0434]

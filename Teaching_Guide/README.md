@@ -21,7 +21,7 @@ make            # regenerate figures, rebuild any deck whose source changed, ref
 make check      # page counts, slides that overrun the frame, and stale runsheet page references
 make runsheets  # every runsheet page reference with the slide title it lands on
 make handouts   # printable 2-up PDFs for every deck
-make advanced   # the seven self-study module decks (kept out of `make all`)
+make advanced   # the eight self-study module decks (kept out of `make all`)
 make notebooks  # re-execute all 25 notebooks and diff against their stored outputs
 make docs       # build the documentation site locally
 ```
@@ -42,7 +42,7 @@ Chapters/chapter_NN/chapter_NN.tex   the deck you project
 Chapters/chapter_NN/chapter_NN_lab.ipynb    what students run
         └─ make notebooks ► re-executed and diffed against its stored outputs
 
-Chapters/Advanced/advanced_NN_topic/        seven self-study modules (make advanced)
+Chapters/Advanced/advanced_NN_topic/        eight self-study modules (make advanced)
 Mock_Exams/                                 assessment (kept out of git)
 ```
 

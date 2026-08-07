@@ -41,7 +41,7 @@ LATEX     := pdflatex -interaction=nonstopmode -halt-on-error
 DECK_PDFS := $(foreach c,$(CHAPTERS),$(SLIDEDIR)/chapter_$(c)/chapter_$(c).pdf)
 HANDOUT_PDFS := $(foreach c,$(CHAPTERS),$(HANDOUTS)/chapter_$(c)_handout.pdf)
 
-.PHONY: all decks figures adv-figures handouts index docs exams clean check runsheets notebooks advanced help
+.PHONY: all decks figures adv-figures handouts index docs deploy exams clean check runsheets notebooks advanced help
 .DEFAULT_GOAL := all
 
 all: figures decks index
@@ -165,6 +165,11 @@ deploy: docs
 	@git rev-parse --abbrev-ref HEAD | grep -qx main \
 	  || { echo "deploy from main, not $$(git rev-parse --abbrev-ref HEAD)"; exit 1; }
 	@rm -rf $(WORKTREE)
+	@# rm alone leaves the worktree registered in .git/worktrees, and the next
+	@# "worktree add" then aborts with "missing but already registered". One
+	@# interrupted deploy would otherwise break every later one until someone
+	@# ran this by hand.
+	@git worktree prune
 	@if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then \
 	   git fetch -q origin gh-pages && \
 	   git worktree add -q -B gh-pages $(WORKTREE) origin/gh-pages; \
@@ -310,9 +315,14 @@ notebooks:
 # .pdf is already current will not recompile on its own, so both need a forced
 # rebuild after a clean.
 clean:
-	@find $(SLIDEDIR) $(HANDOUTS) -type f \
-	  \( -name '*.aux' -o -name '*.log' -o -name '*.nav' -o -name '*.out' \
-	  -o -name '*.snm' -o -name '*.toc' -o -name '*.vrb' -o -name '*.fls' \
-	  -o -name '*.fdb_latexmk' \) -delete 2>/dev/null || true
+	@# $(HANDOUTS) and $(EXAMDIR) are git-ignored, so a fresh clone has neither;
+	@# skip what is absent rather than hiding every find error behind 2>/dev/null.
+	@for d in $(SLIDEDIR) $(HANDOUTS) $(EXAMDIR); do \
+	   [ -d "$$d" ] || continue; \
+	   find "$$d" -type f \
+	     \( -name '*.aux' -o -name '*.log' -o -name '*.nav' -o -name '*.out' \
+	     -o -name '*.snm' -o -name '*.toc' -o -name '*.vrb' -o -name '*.fls' \
+	     -o -name '*.synctex.gz' -o -name '*.fdb_latexmk' \) -delete; \
+	 done
 	@echo "  [clean]    LaTeX artefacts removed"
-	@echo "             run 'make -B decks' before 'make check' or 'make index'"
+	@echo "             run 'make -B decks advanced' before 'make check' or 'make index'"

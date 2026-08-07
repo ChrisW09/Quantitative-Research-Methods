@@ -985,10 +985,10 @@ from sklearn.preprocessing import StandardScaler  # z-score each column
 import numpy as np
 
 X, y = Hitters[preds], Hitters["Salary"].values   # n=263, p=19
-# Scale INSIDE the search, so the scaler is re-fit on each training fold.
-# Scaling first lets every fold help standardise itself: CV then over-shrinks.
+# Scale INSIDE the search: re-fit per fold, else CV flatters itself.
 ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),  # 50 alphas
-                     {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10).fit(X, y)
+                     {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10,
+                     scoring="neg_mean_squared_error").fit(X, y)  # not R^2
 print("best alpha:", ridge.best_params_["ridge__alpha"])  # 2.81 here
 print(dict(zip(preds, ridge.best_estimator_[-1].coef_)))  # all stay nonzero
   \end{lstlisting}
@@ -1001,10 +1001,10 @@ print(dict(zip(preds, ridge.best_estimator_[-1].coef_)))  # all stay nonzero
   \begin{lstlisting}
 from sklearn.linear_model import Lasso   # L1 penalty: sum |beta_j|
 
-# same discipline: the scaler belongs inside the cross-validated search
-# 50 log-spaced alphas, 1e-3 to 10: from near-OLS to the all-zero model
+# same discipline; 50 alphas, 1e-3 to 10: near-OLS -> heavily sparse
 lasso = GridSearchCV(make_pipeline(StandardScaler(), Lasso(max_iter=10000)),
-                     {"lasso__alpha": np.logspace(-3, 1, 50)}, cv=10).fit(X, y)
+                     {"lasso__alpha": np.logspace(-3, 1, 50)}, cv=10,
+                     scoring="neg_mean_squared_error").fit(X, y)
 print("best alpha:", lasso.best_params_["lasso__alpha"])  # CV winner
 coefs = lasso.best_estimator_[-1].coef_   # [-1] = the fitted Lasso step
 print([(p, c) for p, c in zip(preds, coefs) if c != 0])  # only the survivors
@@ -1046,9 +1046,9 @@ df = pd.read_csv("../ALL CSV FILES - 2nd Edition/Hitters.csv").dropna()
 y = df["Salary"].values                      # response, n=263 rows
 X = pd.get_dummies(df.drop(columns=["Salary"]), drop_first=True)  # p=19
 preds = X.columns                            # scale inside the CV, not here
-
 lasso = GridSearchCV(make_pipeline(StandardScaler(), Lasso(max_iter=10000)),
-                     {"lasso__alpha": np.logspace(-3, 2, 50)}, cv=10).fit(X, y)
+                     {"lasso__alpha": np.logspace(-3, 2, 50)}, cv=10,
+                     scoring="neg_mean_squared_error").fit(X, y)
 print("lasso alpha:", round(lasso.best_params_["lasso__alpha"], 3))
 coefs   = lasso.best_estimator_[-1].coef_  # [-1] = the fitted Lasso
 kept    = [p for p, c in zip(preds, coefs) if abs(c) > 1e-8]  # 14 of 19
@@ -1060,22 +1060,20 @@ print("kept   :", kept, "\ndropped:", dropped)  # retained vs zeroed exactly
 \begin{frame}[fragile]{Solution --- Exercise 6.6 (2/2)}
   \begin{lstlisting}
 ridge = GridSearchCV(make_pipeline(StandardScaler(), Ridge()),   # scale in CV
-                     {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10).fit(X, y)
+                     {"ridge__alpha": np.logspace(-2, 4, 50)}, cv=10,
+                     scoring="neg_mean_squared_error").fit(X, y)
 rc = ridge.best_estimator_[-1].coef_       # [-1] = the fitted Ridge
 print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
       "-- nonzero coefs:", int(np.sum(np.abs(rc) > 1e-8)))  # all 19
   \end{lstlisting}
   \begin{solutionbox}[Solution --- expected result and interpretation]
     The lasso selects a moderate $\lambda$ and \emph{drives several
-    coefficients to exactly zero} --- typically it keeps strong career
-    and recent-performance predictors (e.g.\ \texttt{CRBI},
-    \texttt{Hits}, \texttt{Walks}, \texttt{PutOuts},
-    \texttt{DivisionW}) and drops weak, redundant ones. Ridge, by
-    contrast, keeps \emph{all} predictors nonzero (only shrinks them).
-    Takeaway: lasso yields a sparse, more interpretable model performing
-    automatic variable selection, whereas ridge stabilises the fit while
-    retaining every predictor. Choose based on whether sparsity or
-    keeping all predictors is preferred.
+    coefficients to exactly zero} --- typically keeping strong career and
+    recent-performance predictors (\texttt{CRBI}, \texttt{Hits},
+    \texttt{Walks}, \texttt{PutOuts}, \texttt{DivisionW}) and dropping the
+    weak, redundant ones. Ridge keeps \emph{all} predictors nonzero, only
+    shrinking them: lasso buys a sparse, interpretable model by doing
+    variable selection; ridge stabilises the fit and keeps every predictor.
   \end{solutionbox}
   \begin{mistake}
     Comparing the printed \texttt{alpha} with a textbook $\lambda$ ---
@@ -1470,7 +1468,7 @@ print("lasso drops:", dropped)
     \end{enumerate}
   \end{exercise}
   \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
-    Switch to \texttt{chapter\_06\_lab.ipynb} \S6 and run the counting cell: it prints
+    Switch to \texttt{chapter\_06\_lab.ipynb} \S5 and run the counting cell: it prints
     $2^{19} = 524\,288$ best-subset fits against $191$ for forward stepwise on Hitters,
     plus this slide's $p=10$ case ($1\,024$ vs.\ $56$).
   \end{labnote}

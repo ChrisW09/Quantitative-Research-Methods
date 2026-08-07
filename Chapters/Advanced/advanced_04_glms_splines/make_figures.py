@@ -26,11 +26,15 @@ DATA = ROOT / "ALL CSV FILES - 2nd Edition"
 OUT = HERE / "images"
 OUT.mkdir(parents=True, exist_ok=True)
 
+# Apple's Accelerate BLAS raises spurious overflow/divide/invalid flags on
+# matmuls whose operands and results are entirely finite, printing dozens of
+# meaningless RuntimeWarnings per rebuild. Same guard as chapter_07.
+np.seterr(all="ignore")
+
 ACCENT = "#26468C"
 ORANGE = "#C8641E"
 GREY = "#7A7A7A"
 GREEN = "#2E7D5B"
-RNG = np.random.default_rng(2024)
 
 plt.rcParams.update({
     "figure.dpi": 150, "savefig.dpi": 150,
@@ -141,7 +145,10 @@ def fig_meanvar():
 def bspline_design(x, xl, xr, nseg, deg=3):
     """P-spline design: equally spaced knots, cubic B-splines."""
     dx = (xr - xl) / nseg
-    knots = np.arange(xl - deg * dx, xr + (deg + 1) * dx, dx)
+    # linspace, not arange: an arange with a float step lands exactly on the
+    # endpoint here, so one ULP either way adds or drops a knot and silently
+    # changes K -- and with it every P-spline fit and GCV number in the deck.
+    knots = np.linspace(xl - deg * dx, xr + deg * dx, nseg + 2 * deg + 1)
     K = len(knots) - deg - 1
     B = np.empty((len(x), K))
     for j in range(K):
@@ -199,14 +206,15 @@ def fig_pspline_lambda():
             (261.0, ACCENT, "-", None),
             (1e7, GREEN, "--", None)]:
         beta, edf, _ = fit(lam)
-        lab = (rf"$\lambda=10^{{{int(np.log10(lam)) if lam != 261 else 0}}}$"
-               if lam != 261 else r"$\lambda_{\rm GCV}=261$")
+        # edf is interpolated, not typed: it was unpacked here and then ignored
+        # while the labels carried hand-copied numbers, one of which (6.3) had
+        # already drifted from what this code computes (6.2).
         if lam == 1e-4:
-            lab = r"$\lambda=10^{-4}$, edf $=22.7$ (wiggly)"
+            lab = rf"$\lambda=10^{{-4}}$, edf $={edf:.1f}$ (wiggly)"
         elif lam == 261.0:
-            lab = r"$\lambda_{\rm GCV}=261$, edf $=6.3$"
+            lab = rf"$\lambda_{{\rm GCV}}=261$, edf $={edf:.1f}$"
         else:
-            lab = r"$\lambda=10^{7}$, edf $=2.0$ (linear)"
+            lab = rf"$\lambda=10^{{7}}$, edf $={edf:.1f}$ (linear)"
         ax1.plot(xg, Bg @ beta, color=col, lw=2, ls=ls, label=lab)
     ax1.set_xlabel("age"); ax1.set_ylabel("wage (\\$1 000)")
     ax1.set_title("(a) Penalized-spline fits, Wage data ($n=3\\,000$)")

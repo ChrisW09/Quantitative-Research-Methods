@@ -73,7 +73,9 @@ def frame_titles(pdf: Path) -> dict[int, str]:
     reader = PdfReader(str(pdf))
     titles = {}
     for i, page in enumerate(reader.pages, start=1):
-        lines = [l.strip() for l in page.extract_text().split("\n") if l.strip()]
+        # pypdf returns None for a page it cannot extract text from (an image-only
+        # slide, say); without the fallback the whole index build dies on it.
+        lines = [l.strip() for l in (page.extract_text() or "").split("\n") if l.strip()]
         titles[i] = lines[1] if len(lines) > 1 else ""
     return titles
 
@@ -212,7 +214,7 @@ def main() -> None:
             "not in git (a fresh clone has none, and `make clean` deletes them). A\n"
             "deck whose .pdf is already current will not recompile on its own, so\n"
             "force it:\n"
-            "    make -B decks"
+            "    make -B decks advanced"
         )
 
     doc = [

@@ -42,7 +42,7 @@ make            # figures, decks whose source changed, and the slide index
 make check      # page counts, and any slide that overruns its frame
 make handouts   # printable 2-up PDFs of every deck
 make index      # refresh Teaching_Guide/slide_index.md from the PDFs
-make advanced   # the seven self-study module decks (not part of `make all`)
+make advanced   # the eight self-study module decks (not part of `make all`)
 make notebooks  # re-execute all 25 notebooks, diff against their stored outputs
 make docs       # build this documentation locally
 make help       # the rest
@@ -113,6 +113,6 @@ Do **not** cut the motivation slide that opens a topic, the pitfall
 ## Where to go next
 
 - [Lecture slides](slides.md) — deck-by-deck contents, and what is in each appendix.
-- [The course at a glance](course.md) — the ten-chapter plan and the split points.
+- [The course at a glance](course.md) — the nine-chapter plan and the split points.
 - [Mock exams](exams.md) — the assessment rhythm, the release order of the five 60-minute short exams, and how the papers are built.
 - [For students](for-students.md) — the page to point a cohort at in week one.

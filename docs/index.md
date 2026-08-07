@@ -14,11 +14,11 @@ datasets, sharing one notation and one semester rhythm.
 :::{container} qrm-chips
 [**11** decks]{.qrm-chip}
 [**930** core slides *(+156 optional)*]{.qrm-chip}
-[**119** exercises with solutions]{.qrm-chip}
+[**118** exercises with solutions]{.qrm-chip}
 [**11** labs *(with solutions)*]{.qrm-chip}
 [**8** advanced modules]{.qrm-chip}
 [**3 + 5** mock exams]{.qrm-chip}
-[**22** datasets]{.qrm-chip}
+[**23** datasets]{.qrm-chip}
 :::
 
 ::::{container} qrm-cta
@@ -93,7 +93,7 @@ Repository layout →
 :link: course
 :link-type: doc
 
-The 16-session plan, the chapter map, the three split points — and how the
+The 12-session plan, the chapter map, the three split points — and how the
 course is graded.
 :::
 
@@ -132,7 +132,7 @@ Run a lab in Colab with zero setup; install locally from week two.
 :link: datasets
 :link-type: doc
 
-The 22 ISLP datasets bundled with the course, with sizes and where each is used.
+The 23 ISLP datasets bundled with the course, with sizes and where each is used.
 :::
 
 :::{grid-item-card} 🐍 Environment
@@ -167,13 +167,13 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 **Slides built for the room.**
 : Every deck moves motivation → intuition → formal definition → worked example,
-  with colour-coded callout boxes and 87 short + 41 extended exercises, each
+  with colour-coded callout boxes and 80 short + 38 extended exercises, each
   followed by a full solution. The hardest, optional material sits in a per-deck
   [appendix](slides.md), so the main thread fits the sessions it has.
 
 **Numbers you can trust.**
-: 77 purpose-built figures are computed from the real course datasets (not
-  sketched), 39 more are drawn natively in TikZ, and every mock-exam answer was
+: 71 purpose-built figures are computed from the real course datasets (not
+  sketched), 38 more are drawn natively in TikZ, and every mock-exam answer was
   verified programmatically.
 
 **Ready to walk into a room.**
@@ -189,14 +189,14 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 | | |
 |---|---|
-| Lecture decks | 10 taught ISLP chapters + two precourse decks · 1049 slides, plus 160 in optional appendices |
-| Exercises | 87 short (~5 min) + 41 extended (~15 min), all with worked solutions |
-| Lab notebooks | 12 labs, one per deck (2 precourse + 10 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
+| Lecture decks | 9 taught ISLP chapters + two precourse decks · 930 slides, plus 156 in optional appendices |
+| Exercises | 80 short (~5 min) + 38 extended (~15 min), all with worked solutions |
+| Lab notebooks | 11 labs, one per deck (2 precourse + 9 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
-| Datasets | 22 CSVs from [statlearning.com](https://www.statlearning.com) |
-| Advanced modules | 4 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines) · 300 slides + 4 notebooks |
+| Datasets | 23 CSVs from [statlearning.com](https://www.statlearning.com) |
+| Advanced modules | 8 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning) · 655 slides + 8 notebooks |
 | Short projects | 6 challenges on real data, 3–5 h each, each with a fixed held-out set, a baseline to beat and a memo as the deliverable |
-| Semester shape | 16 × 180 min: a taught precourse session + 15 chapter lectures · **6 ECTS** |
+| Semester shape | 12 × 180 min: a taught precourse session + 11 chapter sessions · **6 ECTS** |
 | Assessment | One written exam at the end of the semester (120 min, 100% of the grade); the eight practice papers do not count |
 | Sources | LaTeX (Beamer) · Jupyter · Python 3.9+ · one `make` build |
 

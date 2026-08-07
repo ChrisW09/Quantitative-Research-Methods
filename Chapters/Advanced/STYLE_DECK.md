@@ -1,8 +1,10 @@
 # STYLE_DECK.md — How to author a lecture deck in this course's house style
 
 This brief lets you write a Beamer deck that is indistinguishable from the existing
-`Chapters/chapter_XX/chapter_XX.tex` decks (canonical short example: chapter 13,
-1246 lines; canonical mid-size example: chapter 5, 1693 lines). Follow it exactly.
+`Chapters/chapter_XX/chapter_XX.tex` decks (canonical short example:
+`Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing.tex`,
+1239 lines; canonical mid-size example: `Chapters/chapter_05/chapter_05.tex`,
+1706 lines). Follow it exactly.
 
 ---
 
@@ -275,7 +277,7 @@ compile fails.
 
 Model: `Chapters/chapter_00/make_figures.py`. Rules:
 
-- **matplotlib only — seaborn is NOT installed on this machine.** `matplotlib.use("Agg")`
+- **matplotlib only.** seaborn is installed but deliberately unused in deck figures. `matplotlib.use("Agg")`
   before importing pyplot. numpy/pandas/scipy allowed.
 - Module docstring states figures are computed from the bundled course datasets or
   clearly labelled simulations, and gives the run command.

@@ -12,10 +12,10 @@ work it is, how the labs fit around the lectures, what to do when your output
 does not match the slides, and how to revise.
 
 :::{container} qrm-chips
-[**16** sessions × **180 min**]{.qrm-chip}
+[**12** sessions × **180 min**]{.qrm-chip}
 [**6** ECTS]{.qrm-chip}
 [graded by **one 120-min exam**]{.qrm-chip}
-[**12** labs *(with solutions)*]{.qrm-chip}
+[**11** labs *(with solutions)*]{.qrm-chip}
 [**Colab** on day one]{.qrm-chip}
 :::
 
@@ -50,12 +50,12 @@ your reference. The skip rule below is what tells you which parts you still
 need to read on your own.
 
 **Precourse (a) — statistics refresher** (`chapter_00`, 105 slides plus a
-16-slide appendix). Descriptive statistics, probability and Bayes,
+17-slide appendix). Descriptive statistics, probability and Bayes,
 distributions, sampling and confidence intervals, hypothesis testing and power,
 simple regression, and the `numpy`/`pandas` toolkit; matrix algebra and
 calculus/gradient descent sit in its appendix.
 
-**Precourse (b) — the toolkit** (`chapter_00b`, 51 slides plus a 9-slide
+**Precourse (b) — the toolkit** (`chapter_00b`, 50 slides plus a 10-slide
 appendix). Reading mathematical notation (Σ, Π, arg max, indicators, sets), logs
 and exponentials, odds and the logit, likelihood and maximum likelihood,
 counting and computational cost, and the Python patterns every lab relies on.
@@ -266,7 +266,7 @@ papers themselves come from your lecturer.
 ## Where to go next
 
 - [Quick start](quickstart.md) — Colab in one click, and the local install for later.
-- [The course at a glance](course.md) — the ten-chapter plan and the assessment calendar.
+- [The course at a glance](course.md) — the nine-chapter plan and the assessment calendar.
 - [Lecture slides](slides.md) — every deck, what it covers, and what is in its appendix.
 - [Lab notebooks](labs.md) — all eleven notebooks, rendered in full.
 - [Mock exams](exams.md) — the eight practice papers and what each covers.

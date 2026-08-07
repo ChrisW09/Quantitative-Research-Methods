@@ -1,8 +1,8 @@
 """Execute the lab notebooks and compare their output against what is stored.
 
-    python3 .github/scripts/check_notebooks.py                 all 15 notebooks
-    python3 .github/scripts/check_notebooks.py Chapters/chapter_03/chapter_03_lab.ipynb
-    python3 .github/scripts/check_notebooks.py --no-compare    run only
+    python3 Teaching_Guide/check_notebooks.py                 all 25 notebooks
+    python3 Teaching_Guide/check_notebooks.py Chapters/chapter_03/chapter_03_lab.ipynb
+    python3 Teaching_Guide/check_notebooks.py --no-compare    run only
 
 Two different failures are reported, and either one exits 1:
 
@@ -156,7 +156,13 @@ def check(path: Path, compare: bool) -> tuple[int, int, list[str]]:
         allow_errors=True,
         resources={"metadata": {"path": str(path.parent)}},
     )
-    client.execute()
+    # allow_errors covers a cell that raises, but not a cell that runs past
+    # CELL_TIMEOUT_S and not a missing "python3" kernelspec. Either used to abort
+    # the whole 25-notebook run with a raw traceback instead of naming the file.
+    try:
+        client.execute()
+    except Exception as exc:  # noqa: BLE001 -- report, never abort the sweep
+        return (1, 0, [f"{path.name}  —  could not run: {type(exc).__name__}: {exc}"])
     elapsed = time.monotonic() - started
 
     lines: list[str] = []

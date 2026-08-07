@@ -23,14 +23,14 @@ confidence intervals, hypothesis testing, simple linear regression and the
 in the course. The matrix algebra and the derivatives/gradient-descent strands
 sit in its appendix, to be taken only by the cohorts that need them. It opens
 with a twelve-question self-check so students can judge whether they need it. Its
-eighteen figures are regenerated from the bundled data by
+nineteen figures are regenerated from the bundled data by
 [`chapter_00/make_figures.py`](./chapter_00/make_figures.py), and it has a
 companion notebook, [`chapter_00_lab.ipynb`](./chapter_00/chapter_00_lab.ipynb), which rebuilds every
 one of them in code.
 
 `chapter_00b/` is the **second half of that session**, covering what the later
 chapters use but never explain. Its scope was chosen by counting usage across
-the ten lecture decks: reading notation (Σ, Π, argmin, indicators, sets — 180
+the nine chapter decks: reading notation (Σ, Π, argmin, indicators, sets — 180
 uses), logs and exponentials (176), odds and the logit (108), likelihood and
 maximum likelihood (37), counting and the 2ᵖ cost (13), plus the Python
 patterns every lab relies on. The maximum-likelihood derivation and the counting
@@ -42,23 +42,22 @@ strand are in its appendix. Companion notebook:
 Every deck follows the same flow — motivation → intuition → formal definition →
 worked example — in the course house style, with:
 
-- **106 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
+- **80 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
   slide immediately followed by a teal worked-solution slide; long solutions run
   across a clean `(1/2)` / `(2/2)` pair.
-- **50 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
+- **38 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
   "Extended exercise" box — integrative, multi-part problems with detailed
   multi-slide solutions.
 - Every exercise is tagged **[Concept]/[Math]/[Python]** (short) or
   **[Math]/[Python]/[Integrative]** (extended), so you can pick the right mix.
   Python solutions carry runnable snippets against the bundled datasets, and all
   numeric answers were reproduced against the real data.
-- **~40 purpose-built visuals** (≈22 matplotlib plots generated from the bundled
-  datasets + ≈18 native TikZ concept diagrams) — for example the bias–variance
+- **~110 purpose-built visuals** (71 matplotlib plots generated from the bundled
+  datasets + 38 native TikZ concept diagrams) — for example the bias–variance
   trade-off, the logistic S-curve, ROC and a confusion-matrix schematic,
   k-fold / bootstrap diagrams, ridge & lasso coefficient paths with the ℓ1-vs-ℓ2
   constraint geometry, spline/GAM fits, a decision tree with its feature-space
-  partition, a neural-network architecture and a convolution diagram, and the
-  Benjamini–Hochberg staircase.
+  partition, and a neural-network architecture with a convolution diagram.
 - A **5–10 slide summary block** closing every deck, including a dedicated
   **"Key formulas at a glance"** slide plus "chapter in one slide", vocabulary,
   decision rules and common pitfalls.
@@ -77,18 +76,17 @@ works as homework.
 
 | Chapter | In its appendix | Pages |
 |---|---|:--:|
-| 0  | χ²/t/F and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 16 |
-| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 9 |
-| 1  | the design matrix entry by entry · the two dataset lookup tables | 6 |
-| 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 8 |
-| 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 11 |
-| 4  | **the generative models in full — Bayes refresher, LDA, QDA, naive Bayes, with Exercises 4.5–4.7** · how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · **comparing the classifiers, with Extended Exercise 4.4** · GLMs and Poisson regression | 43 |
-| 5  | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 7 |
-| 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 11 |
-| 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 7 |
-| 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 7 |
-| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 8 |
-| 12 | the two forms of the *K*-means objective · PCA as the best low-rank approximation · matrix completion for missing values · the silhouette width · Extended Exercise 12.3 (a full workflow on gene expression) | 9 |
+| 0  | χ²/t/F and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 17 |
+| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 10 |
+| 1  | the design matrix entry by entry · the two dataset lookup tables | 8 |
+| 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 9 |
+| 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 13 |
+| 4  | **the generative models in full — Bayes refresher, LDA, QDA, naive Bayes, with Exercises 4.5–4.7** · how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · **comparing the classifiers, with Extended Exercise 4.4** · GLMs and Poisson regression | 44 |
+| 5  | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 8 |
+| 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 12 |
+| 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 8 |
+| 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 9 |
+| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 18 |
 
 ## Exercises per chapter
 
@@ -97,7 +95,7 @@ works as homework.
 | 0  | Precourse (a) — statistics refresher | 10 | 4 | 105 + 17 |
 | 0b | Precourse (b) — toolkit | 6 | 2 | 50 + 10 |
 | 1  | Introduction | 3 | 1 | 71 + 8 |
-| 2  | Statistical Learning | 9 | 4 | 106 + 9 |
+| 2  | Statistical Learning | 8 | 4 | 106 + 9 |
 | 3  | Linear Regression | 12 | 6 | 142 + 13 |
 | 4  | Classification | 10 | 6 | 81 + 44 |
 | 5  | Resampling Methods | 6 | 3 | 78 + 8 |
@@ -105,7 +103,7 @@ works as homework.
 | 7  | Moving Beyond Linearity | 6 | 3 | 84 + 8 |
 | 8  | Tree-Based Methods | 7 | 3 | 81 + 9 |
 | 10 | Deep Learning | 6 | 3 | 62 + 18 |
-| **Total** | | **81** | **38** | **930 + 156** |
+| **Total** | | **80** | **38** | **930 + 156** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
 (Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —
@@ -128,7 +126,7 @@ section boundary so you can stop and resume cleanly.
 | **Ch 3** | 2 | Simple & multiple linear regression; estimation; inference (SE, t, F); qualitative predictors; interactions; diagnostics; KNN vs OLS; lab | 3.1–3.12 |
 | **Ch 4** | 2 | Logistic regression; odds; confounding; the confusion matrix; ROC/AUC; lab — generative models are appendix material | 4.1–4.10 |
 | **Ch 5** | 1 | Validation set, LOOCV, k-fold CV, the bootstrap | 5.1–5.6 |
-| **Ch 6** | 1 | Subset selection; Cp/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
+| **Ch 6** | 1 | Subset selection; Cp/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.6 |
 | **Ch 7** | 1 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | **Ch 8** | 1 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
 | **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization | 10.1–10.6 |

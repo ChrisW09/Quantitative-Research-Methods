@@ -28,7 +28,11 @@ OUT.mkdir(parents=True, exist_ok=True)
 ACCENT = "#26468C"   # matches \definecolor{accent}{RGB}{38,70,140}
 ORANGE = "#C8641E"
 GREY = "#7A7A7A"
-RNG = np.random.default_rng(0)
+# Each simulated figure builds its own generator from this seed, so regenerating
+# one panel on its own -- or reordering the calls in __main__ -- cannot change
+# what the others draw. A single module-level generator shared by three figures
+# made the shipped slides depend on call order.
+SEED = 0
 
 plt.rcParams.update(
     {
@@ -110,12 +114,18 @@ def fig_boxplot_anatomy():
     )
 
     # Labels sit above the box on two staggered rows so nothing collides.
+    #
+    # The whisker is drawn at the most extreme observation still *inside* the
+    # fence, not at the fence itself, so the label has to say so: on Wage the
+    # lower fence is 20.4 while the whisker sits at 20.9. Labelling the whisker
+    # "$Q_1 - 1.5$ IQR" made the slide contradict its own formula for any
+    # student who worked the fence out by hand.
     ann = [
-        (lo, f"lower whisker\n$Q_1 - 1.5\\,\\mathrm{{IQR}}$ = {lo:.0f}", 1.42),
+        (lo, f"lower whisker\nlast point above $Q_1 - 1.5\\,\\mathrm{{IQR}}$ = {lo:.0f}", 1.42),
         (q1, f"$Q_1$ = {q1:.0f}", 1.24),
         (med, f"median = {med:.0f}", 1.42),
         (q3, f"$Q_3$ = {q3:.0f}", 1.24),
-        (hi, f"upper whisker\n$Q_3 + 1.5\\,\\mathrm{{IQR}}$ = {hi:.0f}", 1.42),
+        (hi, f"upper whisker\nlast point below $Q_3 + 1.5\\,\\mathrm{{IQR}}$ = {hi:.0f}", 1.42),
     ]
     for xv, label, ytext in ann:
         ax.annotate(
@@ -175,8 +185,9 @@ def fig_correlation():
         ax.set_ylabel("sales" if ax is axes[0] else "")
 
     # A strong but non-linear relationship that r cannot see.
-    xq = RNG.uniform(-3, 3, 200)
-    yq = xq**2 + RNG.normal(0, 0.8, 200)
+    rng = np.random.default_rng(SEED)
+    xq = rng.uniform(-3, 3, 200)
+    yq = xq**2 + rng.normal(0, 0.8, 200)
     r = np.corrcoef(xq, yq)[0, 1]
     axes[3].scatter(xq, yq, s=8, color=GREY, alpha=0.7, edgecolors="none")
     axes[3].axhline(yq.mean(), color=ORANGE, lw=1.6)
@@ -197,8 +208,9 @@ def fig_clt():
     axes[0].set_title(f"population\n(Wage, $\\mu$ = {mu:.0f})", fontsize=9)
     axes[0].set_ylabel("frequency")
 
+    rng = np.random.default_rng(SEED)
     for ax, n in zip(axes[1:], (2, 10, 50)):
-        means = RNG.choice(pop, size=(4000, n), replace=True).mean(axis=1)
+        means = rng.choice(pop, size=(4000, n), replace=True).mean(axis=1)
         ax.hist(means, bins=40, color=ACCENT, alpha=0.8, edgecolor="white", linewidth=0.3)
         ax.axvline(mu, color=ORANGE, lw=1.8)
         ax.set_title(
@@ -675,7 +687,8 @@ def fig_se_shrinks():
     theory = sigma / np.sqrt(n_grid)
 
     n_sim = np.array([2, 5, 10, 25, 60, 150, 400, 1000])
-    sim = [RNG.normal(50, sigma, size=(4000, n)).mean(axis=1).std(ddof=1)
+    rng = np.random.default_rng(SEED)
+    sim = [rng.normal(50, sigma, size=(4000, n)).mean(axis=1).std(ddof=1)
            for n in n_sim]
 
     fig, ax = plt.subplots(figsize=(6.2, 3.3))

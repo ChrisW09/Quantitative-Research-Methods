@@ -107,8 +107,8 @@ def stage_materials(app=None, config=None) -> None:
     if missing:
         # A Sphinx warning, not a print: the site links to every deck, so a deck
         # that failed to compile ships a broken download link. `sphinx-build -W`
-        # (used by the Makefile and by .github/workflows/docs.yml) turns this
-        # into a build failure, which a print could never do.
+        # (the root Makefile's `docs` target -- this repository has no CI) turns
+        # this into a build failure, which a print could never do.
         #
         # Only from the event handler: stage_materials() also runs at import
         # time, and warning from both would report every missing deck twice.
@@ -165,7 +165,7 @@ myst_enable_extensions = [
 myst_heading_anchors = 3
 
 # Notebooks are shipped with their outputs; never execute them at build time
-# (Chapter 10 needs torch, Chapter 11 lifelines, and several download data).
+# (Chapter 10 needs torch, advanced module A6 lifelines, and several download data).
 nb_execution_mode = "off"
 nb_merge_streams = True
 

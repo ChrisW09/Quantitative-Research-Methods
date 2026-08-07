@@ -11,7 +11,6 @@ size and resolution used by the other decks. The textbook scans (images/6_*.pdf)
 are not touched.
 """
 
-from math import comb
 from pathlib import Path
 
 import matplotlib
@@ -206,16 +205,21 @@ def fig_ridge_cv():
     """
     from sklearn.linear_model import Ridge
     from sklearn.model_selection import KFold, cross_val_score
+    from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler
 
     X, y = hitters()
-    Xs = StandardScaler().fit_transform(X)
     alphas = np.logspace(-2, 5, 141)
     cv = KFold(n_splits=10, shuffle=True, random_state=1)
+    # The scaler goes *inside* the pipeline so it is re-fitted on each training
+    # fold. Scaling X once up front lets every validation fold contribute its
+    # mean and standard deviation to the transform -- the exact leak this
+    # chapter's own CV-pitfalls slide warns about. (It moves the curve by well
+    # under the precision the slide quotes, so the numbers are unchanged.)
     mse = np.array([
         -cross_val_score(
-            Ridge(alpha=a, solver="cholesky"), Xs, y, cv=cv,
-            scoring="neg_mean_squared_error",
+            make_pipeline(StandardScaler(), Ridge(alpha=a, solver="cholesky")),
+            X, y, cv=cv, scoring="neg_mean_squared_error",
         ).mean()
         for a in alphas
     ])

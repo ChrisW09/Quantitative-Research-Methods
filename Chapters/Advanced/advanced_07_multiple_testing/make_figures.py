@@ -274,7 +274,9 @@ def fig_x_holm_bonf():
 
 
 # Bin counts of the p-value histogram panel, recovered from the published
-# figure: 20 equal bins on [0, 1], 3000 tests, 2400 of them true nulls.
+# figure: 20 equal bins on [0, 1], about 2400 of them true nulls. The heights are
+# read off the figure, so they sum to 2953 rather than a round 3000 -- the title
+# is computed from them so the caption and the bars can never disagree.
 COUNTS_PVAL = np.array([664, 170, 124, 122, 134, 142, 111, 96, 142, 111,
                         131, 105, 102, 111, 113, 119, 120, 124, 104, 108])
 
@@ -296,7 +298,7 @@ def fig_pval_hist():
                 fontsize=11.5, ha="center")
         ax.text(0.47, 180, r"uniform null level $m_0$/bins", color=RED_D,
                 fontsize=11.5)
-        ax.set_title("Distribution of $p$-values across 3000 tests")
+        ax.set_title(f"Distribution of $p$-values across {COUNTS_PVAL.sum():,} tests")
         ax.set_xlabel("$p$-value")
         ax.set_ylabel("count")
         save(fig, "ch13_pval_hist.png")

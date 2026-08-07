@@ -17,7 +17,7 @@ live:
 # Also drop the directories staged by conf.py
 clean:
 	@$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-	rm -rf labs _extra
+	rm -rf labs advanced_labs _extra
 
 # Catch-all: route anything else to sphinx-build's -M mode.
 %: Makefile

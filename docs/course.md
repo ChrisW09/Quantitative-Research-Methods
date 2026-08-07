@@ -35,7 +35,7 @@ that is what the decks, the labs, the exercise numbering and the
 | **Ch 3** | 2 | Simple & multiple linear regression; estimation; inference (SE, *t*, *F*); qualitative predictors; interactions; diagnostics; KNN vs. OLS; lab | 3.1–3.12 |
 | **Ch 4** | 2 | Logistic regression; odds; multiple logistic regression; confounding; the confusion matrix; ROC/AUC; lab — the generative models (LDA, QDA, naive Bayes) are appendix material | 4.1–4.10 |
 | **Ch 5** | 1 | Validation set, LOOCV, *k*-fold CV, the bootstrap | 5.1–5.6 |
-| **Ch 6** | 1 | Subset selection; Cₚ/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.7 |
+| **Ch 6** | 1 | Subset selection; Cₚ/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.6 |
 | **Ch 7** | 1 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | **Ch 8** | 1 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
 | **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization (PyTorch) — the last taught session | 10.1–10.6 |

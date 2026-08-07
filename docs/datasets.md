@@ -1,7 +1,7 @@
 ---
 myst:
   html_meta:
-    description: "The 22 ISLP datasets bundled with the course — sizes, contents, which chapter uses each, and how the notebooks resolve them automatically."
+    description: "The 23 ISLP datasets bundled with the course — sizes, contents, which chapter uses each, and how the notebooks resolve them automatically."
 ---
 
 # Datasets
@@ -28,22 +28,23 @@ offline fallback. You should never have to download anything by hand.
 | `Auto.csv` | 397 | 9 | Fuel economy and specs of 1970s–80s cars | Ch 3, 5, 8 |
 | `Bikeshare.csv` | 8 645 | 16 | Hourly bike rentals in Washington DC (counts) | Ch 4 (Poisson) |
 | `Boston.csv` | 506 | 14 | Housing values in Boston suburbs | Ch 3, 8 |
-| `BrainCancer.csv` | 88 | 9 | Survival times of brain-cancer patients | Ch 11 |
+| `BrainCancer.csv` | 88 | 9 | Survival times of brain-cancer patients | A6 (Ch 11) |
 | `Caravan.csv` | 5 822 | 86 | Caravan-insurance purchases (highly imbalanced) | Ch 4 |
 | `Carseats.csv` | 400 | 11 | Child car-seat sales at 400 stores | Ch 3, 8 |
-| `Ch12Ex13.csv` | 999 | 40 | Gene-expression data for the Ch 12 exercise | Ch 12 |
+| `Ch12Ex13.csv` | 999 | 40 | Gene-expression data for the Ch 12 exercise | A8 (Ch 12) |
 | `College.csv` | 777 | 19 | Statistics for 777 US colleges | Ch 6 |
 | `Credit.csv` | 400 | 11 | Credit-card balances and customer attributes | Ch 3, 6 |
 | `Default.csv` | 10 000 | 4 | Credit-card default (the classification workhorse) | Ch 4 |
-| `Fund.csv` | 50 | 2 001 | Monthly excess returns of 2 000 fund managers | Ch 13 |
+| `Fund.csv` | 50 | 2 001 | Monthly excess returns of 2 000 fund managers | A7 (Ch 13) |
 | `Heart.csv` | 303 | 15 | Heart-disease diagnosis | Ch 8 |
 | `Hitters.csv` | 322 | 20 | Baseball salaries and career statistics | Ch 6 |
 | `Income1.csv` | 30 | 3 | Income vs. years of education (simulated) | Ch 2 |
 | `Income2.csv` | 30 | 4 | Income vs. education and seniority (simulated) | Ch 2 |
-| `OJ.csv` | 1 070 | 18 | Orange-juice brand purchases | Ch 8–9 |
+| `OJ.csv` | 1 070 | 18 | Orange-juice brand purchases | Ch 8, A5 (Ch 9) |
 | `Portfolio.csv` | 100 | 2 | Two asset returns — the bootstrap example | Ch 5 |
-| `Publication.csv` | 244 | 10 | Time to publication of clinical trials | Ch 11 |
+| `Publication.csv` | 244 | 10 | Time to publication of clinical trials | A6 (Ch 11) |
 | `Smarket.csv` | 1 250 | 9 | Daily S&P 500 returns, 2001–2005 | Ch 4 |
+| `USArrests.csv` | 50 | 5 | Violent-crime rates by US state | A8 (Ch 12) |
 | `Wage.csv` | 3 000 | 11 | Wages of Mid-Atlantic male workers | Ch 1, 7 |
 | `Weekly.csv` | 1 089 | 9 | Weekly S&P 500 returns, 1990–2010 | Ch 4 |
 

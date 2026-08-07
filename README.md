@@ -16,9 +16,9 @@
 
 <p align="center">
   <b>930 core slides</b> (+156 in optional appendices) ·
-  <b>156 exercises</b> with worked solutions ·
+  <b>118 exercises</b> with worked solutions ·
   <b>11 labs</b> with worked solutions, all running locally &amp; on Colab ·
-  <b>3 + 5 mock exams</b> · <b>22 datasets</b>
+  <b>3 + 5 mock exams</b> · <b>23 datasets</b>
 </p>
 
 <p align="center">
@@ -48,10 +48,10 @@ Prepared by **Prof. Dr. Christoph Weisser**.
 | Material | Count | Notes |
 |---|---|---|
 | [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 930 slides, plus 156 in per-deck appendices |
-| Exercises | 106 short + 50 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
+| Exercises | 80 short + 38 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 11 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
-| [Mock exams](#-mock-exams) | 3 | Each as questions, worked solutions and an in-class review deck — kept out of git |
-| [Datasets](#-python-environment--datasets) | 22 CSVs | From [statlearning.com](https://www.statlearning.com), resolved automatically via `ISLP` |
+| [Mock exams](#-mock-exams) | 3 + 5 | Three full papers plus five 60-minute short exams — each as questions, worked solutions and an in-class review deck, kept out of git |
+| [Datasets](#-python-environment--datasets) | 23 CSVs | From [statlearning.com](https://www.statlearning.com), resolved automatically via `ISLP` |
 | [Teaching guide](#-teaching-it) | 1 kit | Semester plan, runsheets, slide index, before-class checklist, printable handouts |
 
 ---
@@ -151,18 +151,18 @@ advanced material that the main thread never depends on.
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(optional)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 105 (+17) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
-| 0b | Precourse (b) — Toolkit *(optional)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 50 (+10) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
+| 0 | Precourse (a) — Statistics refresher *(taught in session 1)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 105 (+17) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(taught in session 1)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 50 (+10) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
 | 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 71 (+8) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
 | 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 106 (+9) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
 | 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 142 (+13) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
 | 4 | Classification | Logistic regression and the odds scale, confounding, confusion matrices, ROC and AUC — LDA, QDA and naive Bayes moved to the appendix | 10 + 6 | 81 (+44) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
 | 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 78 (+8) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
-| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 7 + 3 | 70 (+12) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
+| 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 6 + 3 | 70 (+12) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 84 (+8) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 81 (+9) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
 | 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation | 6 + 3 | 62 (+18) | [PDF](./Chapters/chapter_10/chapter_10.pdf) |
-| **Total** | | | **81 + 38** | **930 (+156)** | |
+| **Total** | | | **80 + 38** | **930 (+156)** | |
 
 <details>
 <summary><b>How a deck is built</b></summary>
@@ -182,8 +182,8 @@ advanced material that the main thread never depends on.
 5. **Appendix** — the optional, advanced material, opened by a slide that says
    what is in it and why each item is optional.
 
-Throughout: **~110 purpose-built visuals** (77 matplotlib plots computed from
-the real course datasets + 39 native TikZ diagrams), commented Python on every
+Throughout: **~110 purpose-built visuals** (71 matplotlib plots computed from
+the real course datasets + 38 native TikZ diagrams), commented Python on every
 listing, and numeric answers reproduced against the real data.
 </details>
 
@@ -203,31 +203,32 @@ solution, so it works as homework.
 | 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · the RSS surface and ISLP Fig 3.1 recreated | 13 |
 | 4 | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression · ISLP Fig 4.2 recreated on Default | 44 |
 | 5 | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills · ISLP Fig 5.5 (5-fold CV) | 8 |
-| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 · Extended Exercise 6.1 (all criteria across sizes) | 15 |
+| 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 · Extended Exercise 6.1 (all criteria across sizes) | 12 |
 | 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) · the four-models panel | 8 |
 | 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART · ISLP Figs 8.1 and 8.2 (the Hitters tree) | 9 |
-| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent · the gradient-descent loss surface | 9 |
+| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent · the gradient-descent loss surface | 18 |
 </details>
 
 <details>
 <summary><b>The two precourse decks</b></summary>
 
-**Chapter 0 — the statistics refresher.** An optional session (105 slides plus a
-16-slide appendix) revisiting what the course assumes: descriptive statistics,
+**Chapter 0 — the statistics refresher.** The first of the two decks the opening
+session draws on (105 slides plus a 17-slide appendix), revisiting what the
+course assumes: descriptive statistics,
 probability and Bayes, the standard distributions, sampling and confidence
 intervals, hypothesis testing, simple linear regression, and the
 `numpy`/`pandas` toolkit; the matrix algebra and the calculus/gradient-descent
 strands sit in its appendix. It opens with a twelve-question self-check so
 students can decide whether they need it, and closes with a table mapping every
-topic to the chapter that uses it. Eighteen figures — Anscombe's quartet,
+topic to the chapter that uses it. Nineteen figures — Anscombe's quartet,
 Simpson's paradox, the CLT, CI coverage, power, gradient descent — are computed
 from the course data by
 [`make_figures.py`](./Chapters/chapter_00/make_figures.py); the companion
 notebook is [`chapter_00_lab.ipynb`](./Chapters/chapter_00/chapter_00_lab.ipynb).
 
-**Chapter 0b — the toolkit.** A second optional session covering what the later
-chapters use but never explain, chosen by counting actual usage across the ten
-lecture decks: reading notation (Σ, Π, arg max, indicators, sets — 180 uses),
+**Chapter 0b — the toolkit.** The second deck of that session, covering what the
+later chapters use but never explain, chosen by counting actual usage across the nine
+chapter decks: reading notation (Σ, Π, arg max, indicators, sets — 180 uses),
 logs and exponentials (176), odds and the logit (108), likelihood and maximum
 likelihood (37), counting and the 2ᵖ cost (13), and the Python patterns every
 lab relies on (functions, loops, seeds, `fit`/`predict`, train/test discipline).
@@ -419,10 +420,10 @@ and the in-slide code examples:
 
 | Purpose | Packages |
 |---|---|
-| Core scientific stack | `numpy` · `pandas` · `matplotlib` · `scipy` |
+| Core scientific stack | `numpy` · `pandas` · `matplotlib` · `seaborn` · `scipy` |
 | Statistics & ML | `statsmodels` · `scikit-learn` |
 | Book companion (datasets + helpers) | `ISLP` |
-| Chapter-specific | `pygam` (Ch 7) · `xgboost` (Ch 8, optional) · `torch` (Ch 10) · `lifelines` (Ch 11) |
+| Chapter-specific | `pygam` (Ch 7) · `xgboost` (Ch 8, optional) · `torch` (Ch 10) · `lifelines` (module A6) |
 | Notebook environment | `jupyter` |
 
 The datasets live in
@@ -441,7 +442,7 @@ figure to its source.
 
 **📖 <https://chrisw09.github.io/Quantitative-Research-Methods/>**
 
-Everything above — the course plan, the decks, all twelve labs rendered in
+Everything above — the course plan, the decks, all eleven labs rendered in
 full, the teaching guide, the exams and the datasets — is published as a
 browsable site. It is **built and published by hand** — the repository carries
 no CI — so after changing the materials, rebuild and deploy it (see
