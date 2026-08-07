@@ -45,7 +45,8 @@ Nine ISLP chapters are taught, in book order. Chapters 9, 11, 12 and 13 keep
 their full decks and labs but sit outside the plan as advanced modules A5, A6,
 A8 and A7. Short Exam E and the final mock still carry a multiple-testing
 problem, which now draws on module A7 rather than on a taught session; any
-unsupervised-learning question in the final mock likewise draws on module A8.
+unsupervised-learning question in the final mock would likewise draw on module A8
+(the current papers do not carry one).
 Deep learning is now the last taught session, so both the final mock exam and
 the release of Short Exam E hang off it.
 
@@ -93,7 +94,7 @@ handed out one at a time as the material each needs is taught.
 | after Ch 6 | Mock Exam 2 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
 | after Ch 6 | Short Exam C | Ch 0 + 0b · Ch 3 · **Ch 6** | 60 min · 60 pts |
 | after Ch 8 | Short Exam D | Ch 2 + 5 · Ch 2 + 4 · **Ch 8** | 60 min · 60 pts |
-| after Ch 10 | Final Mock Exam | All, weighted to Ch 7/8/10 and modules A7 and A8 | 120 min · 120 pts |
+| after Ch 10 | Final Mock Exam | All, weighted to Ch 7/8/10 and module A7 | 120 min · 120 pts |
 | after Ch 10 | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** *(module A7)* | 60 min · 60 pts |
 
 Every paper exists as questions, worked solutions, and a review deck for going

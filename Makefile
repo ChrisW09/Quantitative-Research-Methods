@@ -13,6 +13,9 @@
 #                   run this
 #   make exams      rebuild the mock exam papers, solutions and review decks
 #                   (kept out of git; the 60-min set has its own build.sh)
+#   make exam-check verify the papers: points add up, the answer keys match,
+#                   no solution escapes the \withsolutions guard, and no two
+#                   final variants share a computed answer
 #   make clean      delete LaTeX build artefacts
 #   make check      report page counts, overfull slides, and any runsheet whose
 #                   slide numbers no longer match its deck
@@ -41,7 +44,7 @@ LATEX     := pdflatex -interaction=nonstopmode -halt-on-error
 DECK_PDFS := $(foreach c,$(CHAPTERS),$(SLIDEDIR)/chapter_$(c)/chapter_$(c).pdf)
 HANDOUT_PDFS := $(foreach c,$(CHAPTERS),$(HANDOUTS)/chapter_$(c)_handout.pdf)
 
-.PHONY: all decks figures adv-figures handouts index docs deploy exams clean check runsheets notebooks advanced help
+.PHONY: all decks figures adv-figures handouts index docs deploy exams exam-check clean check runsheets notebooks advanced help
 .DEFAULT_GOAL := all
 
 all: figures decks index
@@ -261,11 +264,18 @@ EXAM_PDFS := \
 # The PDFs cannot be prerequisites of "exams" directly: on a fresh clone their
 # .tex prerequisites are missing too, and make would abort with "No rule to make
 # target" instead of saying why. Guard first, then hand the list to a sub-make.
-exams:
-	@test -d $(EXAMDIR) || { echo "$(EXAMDIR)/ not present (git-ignored)"; exit 1; }
+exams: exam-check
 	@$(MAKE) --no-print-directory $(EXAM_PDFS)
 	@echo "  [exams]    $(words $(EXAM_PDFS)) PDFs up to date"
 	@echo "             Short_Exams_60min: run its own ./build.sh"
+
+# Reads the .tex sources only, so it is cheap and runs before every exam build:
+# points that do not add up, an answer key that disagrees with the paper, a
+# solution box outside the \withsolutions guard, or two final variants sharing a
+# computed answer are all things you must not discover while marking.
+exam-check:
+	@test -d $(EXAMDIR) || { echo "$(EXAMDIR)/ not present (git-ignored)"; exit 1; }
+	@$(PYTHON) $(EXAMDIR)/check_exams.py
 
 # ------------------------------------------------------------------------ checks
 # Two different questions. check_decks.py reads the .log files and asks whether

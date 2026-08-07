@@ -44,11 +44,37 @@ Every paper exists in three formats:
 |---|:--:|---|:--:|
 | Mock Exam 1 | after Ch 3 | Ch 1–3 | 90 min · 90 pts |
 | Mock Exam 2 | after Ch 6 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and modules A7 and A8) | 120 min · 120 pts |
+| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
 
 The final exam also exists in three parallel versions (**A / B / C**) — same
 structure and difficulty, different numbers — for seating variants or for a
 second attempt.
+
+## Marking
+
+Each paper is built to be corrected quickly and consistently:
+
+- a **marking table** on the front page — per-problem maxima with a box for the
+  awarded marks;
+- an **"Answer key at a glance"** page opening every *solutions* PDF: one row per
+  sub-part with its expected result and its credit, so most scripts can be marked
+  from that single page and the prose consulted only for partial credit;
+- a **grading key** after each problem, splitting the credit sub-part by sub-part
+  and stating what earns partial marks and where error-carried-forward applies.
+
+The answer-key page and the review deck's "Marking at a glance" frame are both
+generated from one file per paper in `keys/`, so the two can never disagree.
+
+```bash
+make exam-check   # points add up, keys match, nothing leaks, variants differ
+make exams        # rebuild the papers (runs exam-check first)
+```
+
+`exam-check` reads the LaTeX sources only. It fails if the sub-part points do not
+add up to the problem header or to the stated total, if the answer key misses a
+sub-part or awards different credit from the paper, if a solution or grading box
+sits outside the `\withsolutions` guard (which would print the answers on the
+student paper), or if two versions of the final exam share a computed answer.
 
 ## The five 60-minute short exams
 

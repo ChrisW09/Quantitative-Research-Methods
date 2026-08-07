@@ -326,16 +326,37 @@ exam in class.
 |--|:--:|--|:--:|
 | Mock Exam 1 | after Ch 3 | Ch 1–3 | 90 min · 90 pts |
 | Mock Exam 2 | after Ch 6 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and modules A7 and A8) | 120 min · 120 pts |
+| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
 
 The final exam also exists in three parallel versions (A / B / C) — same
 structure and difficulty, different numbers.
+
+**Marking a stack of scripts.** Every paper is built for fast, consistent
+correction:
+
+- a **marking table** on the front page (per-problem maxima and a box for the
+  awarded marks);
+- an **"Answer key at a glance"** page opening every *solutions* PDF — one row
+  per sub-part with its expected result and its credit, so most scripts can be
+  marked from a single page;
+- a **grading key** box after each problem, splitting the credit sub-part by
+  sub-part and naming what earns partial marks and where error-carried-forward
+  applies;
+- the answer-key page and the review deck's "Marking at a glance" frame are
+  generated from the *same* file in `keys/`, so paper and deck cannot drift
+  apart.
+
+`make exam-check` verifies all of it without compiling anything: that the
+sub-part points add up to each problem header and to the stated total, that the
+answer key covers every sub-part with the same credit the paper awards, that no
+solution or grading box escapes the `\withsolutions` guard into the student
+paper, and that no two versions of the final share a computed answer.
 
 Alongside them, **five 60-minute short exams** (A–E, three problems × 20 points)
 form the formative layer, released one at a time as the material each needs is
 taught — A after Ch 4, B after Ch 5, C after Ch 6, D after Ch 8, and E at the
 end of the course, once module A7 (Ch 13) has been assigned as self-study. They are the papers to give a student who has fallen
-behind, and the only ones carrying grading keys and marking tables. They live in
+behind. They live in
 `Mock_Exams/Short_Exams_60min/` and build with their own `./build.sh`, not
 `make exams`.
 

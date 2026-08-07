@@ -109,7 +109,7 @@ as homework.
 | Mock Exam 2 | after Ch 6 | Chapters 4–6 (+ light cumulative) | 90 min · 90 pts |
 | Short Exam C | after Ch 6 | Ch 0 + 0b, Ch 3, **Ch 6** | 60 min · 60 pts |
 | Short Exam D | after Ch 8 | Ch 2 + 5, Ch 2 + 4, **Ch 8** | 60 min · 60 pts |
-| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and modules A7 and A8) | 120 min · 120 pts |
+| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
 | Short Exam E | after Ch 10 | Ch 0, Ch 5 + 7, **Ch 13** *(module A7)* | 60 min · 60 pts |
 
 The three mock exams are the full-length rehearsals; the five 60-minute short
