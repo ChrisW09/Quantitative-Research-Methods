@@ -85,12 +85,13 @@ make them useless as assessment.
   `chapter_04/chapter_04_lab.ipynb`. The build scripts rely on this — they find
   decks with `Chapters/chapter_*/chapter_*.tex` and labs with
   `Chapters/chapter_*/chapter_*_lab.ipynb`.
-- Exam folders are named for the session they follow
-  (`Exam_2_after_Lecture_08`), not for a date, so the calendar can shift without
-  renaming anything. Those folder names predate the switch to chapter-keyed
-  numbering and were deliberately left alone; the calendars in
-  [The course at a glance](course.md) and [Mock exams](exams.md) give the
-  chapter checkpoint for each paper.
+- Exam folders carry **`Mock`** in the name and are keyed to the **chapter** they
+  follow (`Mock_Exam_2_after_Chapter_06`), never to a date or a session number:
+  the calendar can shift, and two of the three chapters span two sessions, so a
+  session number would be ambiguous. This matches the checkpoints in
+  [The course at a glance](course.md) and [Mock exams](exams.md). Every paper
+  also repeats `MOCK EXAM` in a footer on **every** page and in its PDF title, so
+  a single loose sheet cannot be mistaken for the real examination.
 - Exam PDFs use `Title_Case`, their LaTeX sources `snake_case` — the `-jobname`
   argument in the build command is what maps one to the other.
 

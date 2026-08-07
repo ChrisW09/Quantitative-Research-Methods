@@ -83,7 +83,7 @@ Do **not** cut: the motivation slide that opens a topic, the pitfalls
 
 Two layers. The **three mock exams** are the full-length rehearsals, matched to
 the shape of the real paper. The **five 60-minute short exams** in
-`Mock_Exams/Short_Exams_60min/` are the formative layer: shorter, sequenced, and
+`Mock_Exams/Short_Mock_Exams_60min/` are the formative layer: shorter, sequenced, and
 handed out one at a time as the material each needs is taught.
 
 | After | Paper | Covers | Length |
@@ -128,7 +128,7 @@ easiest papers to mark consistently — and the review decks add a "common
 mistake" box per problem. The *Before you walk in* checklist in
 `runsheets/lecture_04.md`, `lecture_05.md`, `lecture_06.md`, `lecture_08.md` and
 `lecture_10.md` names the paper released after that session, and
-`Mock_Exams/Short_Exams_60min/README.md` lists what is in each.
+`Mock_Exams/Short_Mock_Exams_60min/README.md` lists what is in each.
 
 `make exams` rebuilds all 18 of the mock-exam PDFs on a machine that has them —
 the three papers and the three final variants, each as questions and as

@@ -128,7 +128,7 @@ One source file produces both the paper and the solutions; the `\withsolutions`
 flag switches between them.
 
 ```bash
-cd Mock_Exams/Exam_1_after_Lecture_04     # only if you have the folder
+cd Mock_Exams/Mock_Exam_1_after_Chapter_03     # only if you have the folder
 pdflatex -jobname=Mock_Exam_1 mock_exam_1.tex
 pdflatex -jobname=Mock_Exam_1_Solutions "\def\withsolutions{1}\input{mock_exam_1.tex}"
 ```
@@ -150,12 +150,12 @@ machine without `Mock_Exams/` — a fresh clone, for instance — it stops with 
 one-line message rather than a confusing LaTeX error.
 
 The **five 60-minute exams** are the one exception. They live in
-`Mock_Exams/Short_Exams_60min/` and are built by the `build.sh` that ships next
+`Mock_Exams/Short_Mock_Exams_60min/` and are built by the `build.sh` that ships next
 to their sources (15 further PDFs: paper, solutions and review deck for each),
 deliberately kept out of the Makefile so that folder stays self-contained:
 
 ```bash
-cd Mock_Exams/Short_Exams_60min
+cd Mock_Exams/Short_Mock_Exams_60min
 ./build.sh
 ```
 

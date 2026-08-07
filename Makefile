@@ -200,12 +200,12 @@ deploy: docs
 # A *review deck* is a separate beamer source and needs the same two passes as a
 # lecture deck, for the navigation bar.
 #
-# Short_Exams_60min/ is deliberately absent: it ships its own build.sh next to
+# Short_Mock_Exams_60min/ is deliberately absent: it ships its own build.sh next to
 # its sources (see that folder's README) and stays out of this Makefile.
 EXAMDIR := Mock_Exams
-EXAM_1  := $(EXAMDIR)/Exam_1_after_Lecture_04
-EXAM_2  := $(EXAMDIR)/Exam_2_after_Lecture_08
-EXAM_F  := $(EXAMDIR)/Final_Exam_after_Lecture_12
+EXAM_1  := $(EXAMDIR)/Mock_Exam_1_after_Chapter_03
+EXAM_2  := $(EXAMDIR)/Mock_Exam_2_after_Chapter_06
+EXAM_F  := $(EXAMDIR)/Final_Mock_Exam_after_Chapter_10
 
 # One entry per source, written "directory|source stem|output stem". The output
 # stems are the established -jobname values, so no PDF changes its name. A bar
@@ -267,7 +267,7 @@ EXAM_PDFS := \
 exams: exam-check
 	@$(MAKE) --no-print-directory $(EXAM_PDFS)
 	@echo "  [exams]    $(words $(EXAM_PDFS)) PDFs up to date"
-	@echo "             Short_Exams_60min: run its own ./build.sh"
+	@echo "             Short_Mock_Exams_60min: run its own ./build.sh"
 
 # Reads the .tex sources only, so it is cheap and runs before every exam build:
 # points that do not add up, an answer key that disagrees with the paper, a

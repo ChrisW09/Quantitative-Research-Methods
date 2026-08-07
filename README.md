@@ -357,7 +357,7 @@ form the formative layer, released one at a time as the material each needs is
 taught — A after Ch 4, B after Ch 5, C after Ch 6, D after Ch 8, and E at the
 end of the course, once module A7 (Ch 13) has been assigned as self-study. They are the papers to give a student who has fallen
 behind. They live in
-`Mock_Exams/Short_Exams_60min/` and build with their own `./build.sh`, not
+`Mock_Exams/Short_Mock_Exams_60min/` and build with their own `./build.sh`, not
 `make exams`.
 
 > 🔒 **Not distributed here.** The exams, their solutions and their LaTeX
@@ -429,7 +429,7 @@ formative — the module is graded by the written exam — and each folder carri
 | [`Makefile`](./Makefile) | One-command rebuild of figures, decks, handouts and the index |
 | [`docs/`](./docs/) | Sphinx documentation for the whole course — see [Documentation](#-documentation) |
 | [`requirements.txt`](./requirements.txt) | Pinned Python environment for the notebooks |
-| `Mock_Exams/` | Three exams plus three parallel variants of the final, and five 60-min exams (questions, solutions, review decks) — **excluded from git**: assessment material. `make exams` builds the first group; `Short_Exams_60min/build.sh` the second |
+| `Mock_Exams/` | Three exams plus three parallel variants of the final, and five 60-min exams (questions, solutions, review decks) — **excluded from git**: assessment material. `make exams` builds the first group; `Short_Mock_Exams_60min/build.sh` the second |
 | `Source_Material/` | Copyrighted textbook PDF & figure banks — **excluded from git** (see [`.gitignore`](./.gitignore)) |
 
 ---
