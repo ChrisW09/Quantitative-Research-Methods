@@ -10,7 +10,7 @@ under [`../Chapters/Advanced/`](../Chapters/Advanced/). The module is 6 ECTS,
 graded by one 120-minute written exam at the end of the semester; every paper in
 the calendar below is practice.
 
-The precourse decks run to 155 slides in their main flow (105 + 50), so the one
+The precourse decks run to 153 slides in their main flow (104 + 49), so the one
 session is a selection — set up notation, standard errors and the lab Python
 patterns, and leave both decks with the cohort as the reference.
 

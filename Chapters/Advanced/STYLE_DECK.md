@@ -133,13 +133,6 @@ Every deck opens with exactly this slide sequence, in this order:
    opening each item (Explain / Apply / Use / Avoid / …).
 7. **"Roadmap of this chapter"** — a `takeaway` box (with a custom title) containing an
    enumerated 4–6 item plan of the chapter.
-8. **"Where this chapter is used in industry"** — `\scriptsize` booktabs table with
-   columns Sector / Concrete application / Which decision it drives, **exactly 3 rows**.
-   Each row must be genuinely *this chapter's* method (not a generic ML use), something a
-   named industry really does, and tied to a decision that actually changes when the number
-   changes — an actual lever ("pull the unit off the line", "which variants are reported as
-   hits"), never "informs strategy". No row restates another. The frame closes with a
-   `takeaway` box titled with what the three rows have in common.
 
 Larger chapters (e.g. 5) insert a motivating section (`\section{Why this chapter matters}`
 with 2–3 hook slides: the key question, why the naive answer fails, "Two big ideas in this

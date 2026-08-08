@@ -44,18 +44,18 @@ precourse.
 session drawing on both precourse decks, because the eleven chapter decks use
 all of this material and explain none of it.
 
-One session cannot cover both decks — together they run to 155 slides — so the
+One session cannot cover both decks — together they run to 153 slides — so the
 session is a **guided selection**, and the two decks stay available in full as
 your reference. The skip rule below is what tells you which parts you still
 need to read on your own.
 
-**Precourse (a) — statistics refresher** (`chapter_00`, 105 slides plus a
+**Precourse (a) — statistics refresher** (`chapter_00`, 104 slides plus a
 17-slide appendix). Descriptive statistics, probability and Bayes,
 distributions, sampling and confidence intervals, hypothesis testing and power,
 simple regression, and the `numpy`/`pandas` toolkit; matrix algebra and
 calculus/gradient descent sit in its appendix.
 
-**Precourse (b) — the toolkit** (`chapter_00b`, 50 slides plus a 10-slide
+**Precourse (b) — the toolkit** (`chapter_00b`, 49 slides plus a 10-slide
 appendix). Reading mathematical notation (Σ, Π, arg max, indicators, sets), logs
 and exponentials, odds and the logit, likelihood and maximum likelihood,
 counting and computational cost, and the Python patterns every lab relies on.

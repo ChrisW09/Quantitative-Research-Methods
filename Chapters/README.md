@@ -92,18 +92,18 @@ works as homework.
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher | 10 | 4 | 105 + 17 |
-| 0b | Precourse (b) — toolkit | 6 | 2 | 50 + 10 |
-| 1  | Introduction | 3 | 1 | 71 + 8 |
-| 2  | Statistical Learning | 8 | 4 | 106 + 9 |
-| 3  | Linear Regression | 12 | 6 | 142 + 13 |
-| 4  | Classification | 10 | 6 | 81 + 44 |
-| 5  | Resampling Methods | 6 | 3 | 78 + 8 |
-| 6  | Linear Model Selection & Regularization | 6 | 3 | 70 + 12 |
-| 7  | Moving Beyond Linearity | 6 | 3 | 84 + 8 |
-| 8  | Tree-Based Methods | 7 | 3 | 81 + 9 |
-| 10 | Deep Learning | 6 | 3 | 62 + 18 |
-| **Total** | | **80** | **38** | **930 + 156** |
+| 0  | Precourse (a) — statistics refresher | 10 | 4 | 104 + 17 |
+| 0b | Precourse (b) — toolkit | 6 | 2 | 49 + 10 |
+| 1  | Introduction | 3 | 1 | 70 + 8 |
+| 2  | Statistical Learning | 8 | 4 | 105 + 9 |
+| 3  | Linear Regression | 12 | 6 | 141 + 13 |
+| 4  | Classification | 10 | 6 | 80 + 44 |
+| 5  | Resampling Methods | 6 | 3 | 77 + 8 |
+| 6  | Linear Model Selection & Regularization | 6 | 3 | 69 + 12 |
+| 7  | Moving Beyond Linearity | 6 | 3 | 83 + 8 |
+| 8  | Tree-Based Methods | 7 | 3 | 80 + 9 |
+| 10 | Deep Learning | 6 | 3 | 61 + 18 |
+| **Total** | | **80** | **38** | **919 + 156** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
 (Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —
