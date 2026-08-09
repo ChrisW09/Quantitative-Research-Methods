@@ -64,7 +64,7 @@
 \date{}\graphicspath{{images/}}
 
 \newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
-\newtcolorbox{solutionbox}[1][Solution]{enhanced, fontupper=\footnotesize, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{solutionbox}[1][Solution]{enhanced, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 \newtcolorbox{longexercise}[1][Extended exercise (15 min)]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 % Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
@@ -480,7 +480,7 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 6.3 (1/2)}
+\begin{frame}{Solution --- Exercise 6.3 (1/3)}
   \begin{solutionbox}
     Here $n = 100$, $\hat\sigma^2 = 4$, and $\log(100) \approx 4.605$.
     Both criteria share the shape $\tfrac1n(\mathrm{RSS} +
@@ -500,7 +500,7 @@
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 6.3 (2/2)}
+\begin{frame}{Solution --- Exercise 6.3 (2/3)}
   \begin{solutionbox}
     \textbf{BIC} (price $\log(100) \approx 4.605$ per predictor).
     \begin{align*}
@@ -512,7 +512,11 @@
     BIC is smaller for \textbf{Model A} ($5.353 < 5.605$), so BIC
     selects A: the same RSS saving of $30$ must now beat an extra
     penalty of $110.5 - 55.3 = 55.2$ --- and fails.
+  \end{solutionbox}
+\end{frame}
 
+\begin{frame}{Solution --- Exercise 6.3 (3/3)}
+  \begin{solutionbox}
     \textbf{Interpretation.}
     The two criteria disagree: BIC's heavier $\log(n)$ penalty punishes
     the three extra predictors of Model B more than they reduce RSS, so
@@ -650,7 +654,7 @@
   \end{exercise}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 6.4}
+\begin{frame}{Solution --- Exercise 6.4 (1/2)}
   \begin{solutionbox}
     \textbf{(1) Effect of $\lambda$.}
     At $\lambda = 0$ ridge equals OLS. As $\lambda$ grows the $\ell_2$
@@ -671,7 +675,11 @@
     predictor to unit variance (typically $\tilde x_{ij} = x_{ij}/
     \hat\sigma_j$) puts them on a common footing so the penalty treats
     them comparably.
+  \end{solutionbox}
+\end{frame}
 
+\begin{frame}{Solution --- Exercise 6.4 (2/2)}
+  \begin{solutionbox}
     \textbf{(3) No exact zeros.}
     Ridge shrinks coefficients toward zero but essentially never sets
     them \emph{exactly} to zero (the $\ell_2$ penalty is smooth at the
@@ -1078,7 +1086,7 @@ print("ridge alpha:", round(ridge.best_params_["ridge__alpha"], 3),
   \end{labnote}
 \end{frame}
 
-\begin{frame}[fragile]{Solution --- Extended Exercise 6.3 (1/3)}
+\begin{frame}[fragile]{Solution --- Extended Exercise 6.3 (1/4)}
   \begin{lstlisting}
 import numpy as np, pandas as pd
 from sklearn.model_selection import train_test_split
@@ -1100,7 +1108,7 @@ Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)  # apply to both sets
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Solution --- Extended Exercise 6.3 (2/3)}
+\begin{frame}[fragile]{Solution --- Extended Exercise 6.3 (2/4)}
   \begin{lstlisting}
 ridge = RidgeCV(alphas=np.logspace(-2, 4, 50)).fit(Xtr, ytr)  # CV on Xtr
 lasso = LassoCV(cv=10, max_iter=100000,
@@ -1121,13 +1129,20 @@ print("lasso drops:", dropped)
   \end{readme}
 \end{frame}
 
-\begin{frame}{Solution --- Extended Exercise 6.3 (3/3)}
+\begin{frame}{Solution --- Extended Exercise 6.3 (3/4)}
   \begin{solutionbox}[Solution --- expected result and interpretation]
     With $n=263$, $p=19$ and this split you should see roughly:
     \begin{itemize}
       \item \textbf{Ridge}: $\lambda\approx0.1$, test MSE
             $\approx1.2\times10^5$, \emph{all $19$ coefficients
             non-zero}.
+  \end{itemize}
+  \end{solutionbox}
+\end{frame}
+
+\begin{frame}{Solution --- Extended Exercise 6.3 (4/4)}
+  \begin{solutionbox}[Solution --- expected result and interpretation]
+  \begin{itemize}
       \item \textbf{Lasso}: $\lambda\approx0.8$, test MSE
             $\approx1.2\times10^5$, about $16$ non-zero --- it drops
             \texttt{Years}, \texttt{CRBI}, \texttt{Errors} (weak or
@@ -1447,7 +1462,7 @@ print("lasso drops:", dropped)
   \end{labnote}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 6.1 (1/2)}
+\begin{frame}{Solution --- Exercise 6.1 (1/3)}
   \begin{solutionbox}
     \textbf{(1) Best subset.}
     For each size $k$ there are $\binom{p}{k}$ models, and summing over
@@ -1456,7 +1471,11 @@ print("lasso drops:", dropped)
       \sum_{k=0}^{p}\binom{p}{k} = 2^{p} .
     \]
     For $p = 10$: $\;2^{10} = 1024$ models.
+  \end{solutionbox}
+\end{frame}
 
+\begin{frame}{Solution --- Exercise 6.1 (2/3)}
+  \begin{solutionbox}
     \textbf{(2) Forward stepwise.}
     Start from the null model, then at step $k$ (for
     $k = 0,\dots,p-1$) fit the $p - k$ models that add one predictor to
@@ -1469,7 +1488,7 @@ print("lasso drops:", dropped)
   \end{solutionbox}
 \end{frame}
 
-\begin{frame}{Solution --- Exercise 6.1 (2/2)}
+\begin{frame}{Solution --- Exercise 6.1 (3/3)}
   \begin{solutionbox}
     \textbf{(3) The gap.}
     Here $1024 / 56 \approx 18\times$. Best subset grows

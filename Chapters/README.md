@@ -76,32 +76,32 @@ works as homework.
 
 | Chapter | In its appendix | Pages |
 |---|---|:--:|
-| 0  | χ²/t/F and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 17 |
-| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 10 |
-| 1  | the design matrix entry by entry · the two dataset lookup tables | 8 |
-| 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) · **the Bayes classifier and KNN in full, with Exercises 2.6, 2.7, E2.2 and E2.4** | 34 |
-| 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · **linear vs. KNN regression** | 16 |
-| 4  | **the generative models in full — Bayes refresher, LDA, QDA, naive Bayes, with Exercises 4.5–4.7** · how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · **comparing the classifiers, with Extended Exercise 4.4** · GLMs and Poisson regression | 44 |
-| 5  | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 8 |
-| 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 12 |
-| 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 8 |
-| 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 9 |
+| 0  | χ²/t/F and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 20 |
+| 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 13 |
+| 1  | the design matrix entry by entry · the two dataset lookup tables | 11 |
+| 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) · **the Bayes classifier and KNN in full, with Exercises 2.6, 2.7, E2.2 and E2.4** | 39 |
+| 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · **linear vs. KNN regression** | 18 |
+| 4  | **the generative models in full — Bayes refresher, LDA, QDA, naive Bayes, with Exercises 4.5–4.7** · how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · **comparing the classifiers, with Extended Exercise 4.4** · GLMs and Poisson regression | 52 |
+| 5  | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 11 |
+| 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 13 |
+| 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 11 |
+| 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 10 |
 
 ## Exercises per chapter
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher | 10 | 4 | 104 + 17 |
-| 0b | Precourse (b) — toolkit | 6 | 2 | 49 + 10 |
-| 1  | Introduction | 3 | 1 | 70 + 8 |
-| 2  | Statistical Learning | 8 | 4 | 79 + 34 |
-| 3  | Linear Regression | 12 | 6 | 137 + 16 |
-| 4  | Classification | 10 | 6 | 80 + 44 |
-| 5  | Resampling Methods | 6 | 3 | 77 + 8 |
-| 6  | Linear Model Selection & Regularization | 6 | 3 | 69 + 12 |
-| 7  | Moving Beyond Linearity | 6 | 3 | 83 + 8 |
-| 8  | Tree-Based Methods | 7 | 3 | 80 + 9 |
-| **Total** | | **80** | **38** | **828 + 156** |
+| 0  | Precourse (a) — statistics refresher | 13 | 4 | 111 + 20 |
+| 0b | Precourse (b) — toolkit | 6 | 2 | 52 + 13 |
+| 1  | Introduction | 3 | 1 | 74 + 8 |
+| 2  | Statistical Learning | 11 | 4 | 81 + 39 |
+| 3  | Linear Regression | 13 | 6 | 149 + 18 |
+| 4  | Classification | 13 | 6 | 91 + 52 |
+| 5  | Resampling Methods | 6 | 3 | 84 + 11 |
+| 6  | Linear Model Selection & Regularization | 6 | 3 | 72 + 13 |
+| 7  | Moving Beyond Linearity | 6 | 3 | 91 + 8 |
+| 8  | Tree-Based Methods | 7 | 3 | 86 + 10 |
+| **Total** | | **80** | **38** | **891 + 156** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
 (Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —

@@ -17,7 +17,7 @@ testing (Ch 13).
 
 :::{container} qrm-chips
 [**9** modules]{.qrm-chip}
-[**722** slides]{.qrm-chip}
+[**767** slides]{.qrm-chip}
 [**56 + 23** exercises with solutions]{.qrm-chip}
 [**9** companion notebooks]{.qrm-chip}
 [optional **self-study**]{.qrm-chip}
