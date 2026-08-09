@@ -251,7 +251,7 @@ released once the material it needs has been taught:
 | B | after Ch 5 | Cross-validation and the bootstrap (Ch 5) |
 | C | after Ch 6 | Ridge and the lasso (Ch 6) |
 | D | after Ch 8 | Trees: Gini, splitting, pruning, forests (Ch 8) |
-| E | after Ch 10 | Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md)) |
+| E | after Ch 8 | Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md)) |
 
 The first two problems of each paper reach back to earlier chapters, so a short
 exam is a cumulative check on everything up to that point rather than a test of

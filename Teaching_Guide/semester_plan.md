@@ -93,8 +93,8 @@ handed out one at a time as the material each needs is taught.
 | after Ch 6 | Mock Exam 2 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
 | after Ch 6 | Short Exam C | Ch 0 + 0b · Ch 3 · **Ch 6** | 60 min · 60 pts |
 | after Ch 8 | Short Exam D | Ch 2 + 5 · Ch 2 + 4 · **Ch 8** | 60 min · 60 pts |
-| after Ch 10 | Final Mock Exam | All, weighted to Ch 7/8/10 and module A7 | 120 min · 120 pts |
-| after Ch 10 | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** *(module A7)* | 60 min · 60 pts |
+| after Ch 8 | Final Mock Exam | All, weighted to Ch 7/8 and modules A9 and A7 | 120 min · 120 pts |
+| after Ch 8 | Short Exam E | Ch 0 · Ch 5 + 7 · **Ch 13** *(module A7)* | 60 min · 60 pts |
 
 Every paper exists as questions, worked solutions, and a review deck for going
 through it in class; the final also comes in three parallel variants

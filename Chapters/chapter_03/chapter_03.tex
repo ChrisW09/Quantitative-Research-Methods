@@ -215,7 +215,7 @@
     \item \textbf{Encode} qualitative predictors and \textbf{add}
           interaction terms following the hierarchy principle.
     \item \textbf{Compare} linear regression with nonparametric
-          alternatives (KNN regression).
+          alternatives (KNN regression, in the appendix).
   \end{itemize}
 \end{frame}
 
@@ -229,7 +229,7 @@
       \item Extensions: dummies, interactions, polynomials.
       \item Diagnostics: nonlinearity, heteroscedasticity, leverage,
             collinearity.
-      \item Comparison with KNN regression.
+      \item Comparison with KNN regression --- in the \textbf{appendix}.
     \end{enumerate}
   \end{takeaway}
 \end{frame}
@@ -2527,63 +2527,6 @@ print(vifs)   # Limit 160.59, Rating 160.67, Age 1.01
 \end{frame}
 
 % ============================================================
-\section{vs.\ KNN}
-% ============================================================
-
-\begin{frame}{Linear regression vs.\ KNN regression}
-  KNN regression is the simplest nonparametric alternative: predict
-  $Y$ at $x_0$ as the average of the $K$ nearest neighbours' responses.
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Linear regression}
-      \begin{itemize}
-        \item Assumes a global functional form.
-        \item Few parameters $\Rightarrow$ low variance.
-        \item Interpretable coefficients.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{KNN regression}
-      \begin{itemize}
-        \item No functional form.
-        \item Many ``effective'' parameters $\Rightarrow$ low bias if
-              $f$ is nonlinear.
-        \item Hard to interpret.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \begin{takeaway}
-    Rule of thumb: with few observations, many predictors, or a roughly
-    linear truth, prefer regression. KNN wins only when the truth is
-    strongly nonlinear \emph{and} $n$ is large enough to fill the space.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{Linear vs.\ KNN: simulation}
-  \begin{center}
-    \includegraphics[width=0.85\textwidth,height=0.66\textheight,keepaspectratio]{3_18.pdf}
-  \end{center}
-  The truth here \emph{is} linear (left), so least squares (blue dashed) nails
-  it. Right: KNN's test MSE (green) against $1/K$ stays above the
-  least-squares MSE (dashed).
-  \islpsource{Figure 3.18}
-\end{frame}
-
-\begin{frame}{The curse of dimensionality strikes KNN}
-  \begin{center}
-    \includegraphics[width=0.82\textwidth,height=0.55\textheight,keepaspectratio]{3_20.pdf}
-  \end{center}
-  As $p$ grows, KNN performance deteriorates rapidly: in high
-  dimensions there are no truly ``near'' neighbours. Linear methods
-  are more robust because they impose structure.
-  \islpsource{Figure 3.20}
-\end{frame}
-
-
-
-
-
-% ============================================================
 \section{Python Lab}
 
 \begin{frame}{Python lab --- run it live in the notebook}
@@ -2592,7 +2535,7 @@ print(vifs)   # Limit 160.59, Rating 160.67, Age 1.01
     \begin{itemize}
       \item \S1 \emph{Simple linear regression} and \S2 \emph{Multiple linear regression}, with \texttt{statsmodels};
       \item \S3 \emph{Polynomials and interactions via the ISLP} \texttt{ModelSpec};
-      \item \S4 \emph{Diagnostics}, then \S5 \emph{Comparison with KNN}.
+      \item \S4 \emph{Diagnostics}; \S5 \emph{Comparison with KNN} goes with the appendix block.
     \end{itemize}
     Data loads via the \texttt{ISLP} package or the bundled CSV files; the notebook ends with hands-on exercises.
   \end{labnote}
@@ -2756,7 +2699,7 @@ print(dict(zip(X.columns, vifs)))  # VIF near 1 fine; > 5 problematic
     \item Encoded qualitative predictors and added interaction terms.
     \item Diagnosed nonlinearity, heteroscedasticity, outliers,
           leverage, and collinearity.
-    \item Compared linear regression with KNN regression.
+    \item Compared linear regression with KNN regression (appendix).
   \end{itemize}
 \end{frame}
 
@@ -2925,6 +2868,7 @@ print(dict(zip(X.columns, vifs)))  # VIF near 1 fine; > 5 problematic
       \item \textbf{Deriving least squares (Extended Exercise 3.L2)} --- the full calculus derivation of $\hat\beta_0$ and $\hat\beta_1$. The main deck derives the two normal equations already; this is the same argument done slowly, as homework.
       \item \textbf{Matrix form of multiple regression} --- $\hat{\boldsymbol\beta}=(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$. You never compute it by hand; it reappears in Chapter 6 for ridge.
       \item \textbf{Linear vs.\ polynomial vs.\ KNN (Extended Exercise 3.L6)} --- a full simulation study in Python. Excellent practice, and a natural bridge to Chapter 5 --- but it needs a machine, not a lecture slot.
+      \item \textbf{Linear regression vs.\ KNN regression} --- the parametric/nonparametric comparison and the curse of dimensionality. It needs KNN, which Chapter 2 also carries in its appendix, so the two blocks are self-study together.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -3199,6 +3143,61 @@ for name, m in [("linear", lin), ("poly-2", pol), ("KNN10", knn)]:
     monotonically to zero at $K=1$. Only test or CV error reveals the
     U-shape that picks the right $K$.
   \end{mistake}
+\end{frame}
+
+
+% ------------------------------------------------------------
+% Linear regression vs KNN regression --- moved out of the main flow.
+% The comparison needs KNN, which Chapter 2 now also carries in its appendix,
+% so the two blocks are self-study together.
+% ------------------------------------------------------------
+\begin{frame}{Linear regression vs.\ KNN regression}
+  KNN regression is the simplest nonparametric alternative: predict
+  $Y$ at $x_0$ as the average of the $K$ nearest neighbours' responses.
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Linear regression}
+      \begin{itemize}
+        \item Assumes a global functional form.
+        \item Few parameters $\Rightarrow$ low variance.
+        \item Interpretable coefficients.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{KNN regression}
+      \begin{itemize}
+        \item No functional form.
+        \item Many ``effective'' parameters $\Rightarrow$ low bias if
+              $f$ is nonlinear.
+        \item Hard to interpret.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \begin{takeaway}
+    Rule of thumb: with few observations, many predictors, or a roughly
+    linear truth, prefer regression. KNN wins only when the truth is
+    strongly nonlinear \emph{and} $n$ is large enough to fill the space.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{Linear vs.\ KNN: simulation}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth,height=0.66\textheight,keepaspectratio]{3_18.pdf}
+  \end{center}
+  The truth here \emph{is} linear (left), so least squares (blue dashed) nails
+  it. Right: KNN's test MSE (green) against $1/K$ stays above the
+  least-squares MSE (dashed).
+  \islpsource{Figure 3.18}
+\end{frame}
+
+\begin{frame}{The curse of dimensionality strikes KNN}
+  \begin{center}
+    \includegraphics[width=0.82\textwidth,height=0.55\textheight,keepaspectratio]{3_20.pdf}
+  \end{center}
+  As $p$ grows, KNN performance deteriorates rapidly: in high
+  dimensions there are no truly ``near'' neighbours. Linear methods
+  are more robust because they impose structure.
+  \islpsource{Figure 3.20}
 \end{frame}
 
 \end{document}

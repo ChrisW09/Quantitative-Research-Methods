@@ -205,7 +205,7 @@ deploy: docs
 EXAMDIR := Mock_Exams
 EXAM_1  := $(EXAMDIR)/Mock_Exam_1_after_Chapter_03
 EXAM_2  := $(EXAMDIR)/Mock_Exam_2_after_Chapter_06
-EXAM_F  := $(EXAMDIR)/Final_Mock_Exam_after_Chapter_10
+EXAM_F  := $(EXAMDIR)/Final_Mock_Exam_after_Chapter_08
 
 # One entry per source, written "directory|source stem|output stem". The output
 # stems are the established -jobname values, so no PDF changes its name. A bar

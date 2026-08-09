@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>858 core slides</b> (+138 in optional appendices) ·
+  <b>828 core slides</b> (+166 in optional appendices) ·
   <b>109 exercises</b> with worked solutions ·
   <b>11 labs</b> with worked solutions, all running locally &amp; on Colab ·
   <b>3 + 5 mock exams</b> · <b>23 datasets</b>
@@ -47,7 +47,7 @@ Prepared by **Prof. Dr. Christoph Weisser**.
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 858 slides, plus 138 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 828 slides, plus 166 in per-deck appendices |
 | Exercises | 74 short + 35 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 11 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
 | [Mock exams](#-mock-exams) | 3 + 5 | Three full papers plus five 60-minute short exams — each as questions, worked solutions and an in-class review deck, kept out of git |
@@ -109,7 +109,7 @@ refer to.
 |:--:|:--:|--|
 | **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 153 slides across the two, so the session is a selection and the decks stay the reference |
 | **1** | ½ | Introduction; prediction vs. inference |
-| **2** | 1½ | What is statistical learning; model accuracy; bias–variance trade-off; Bayes classifier; KNN |
+| **2** | 1½ | What is statistical learning; model accuracy; bias–variance trade-off |
 | **3** | 2 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
 | **4** | 2 | Classification: logistic regression, the confusion matrix, ROC/AUC (LDA/QDA, naive Bayes and Poisson are in the appendix) |
 | **5** | 1 | Resampling: validation set, k-fold CV, LOOCV, bootstrap |
@@ -153,14 +153,14 @@ advanced material that the main thread never depends on.
 | 0 | Precourse (a) — Statistics refresher *(taught in session 1)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 104 (+17) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
 | 0b | Precourse (b) — Toolkit *(taught in session 1)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 49 (+10) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
 | 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 70 (+8) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
-| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance, Bayes classifier and KNN | 8 + 4 | 105 (+9) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
-| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 141 (+13) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
+| 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance (the Bayes classifier and KNN moved to the appendix) | 8 + 4 | 79 (+34) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
+| 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 137 (+16) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
 | 4 | Classification | Logistic regression and the odds scale, confounding, confusion matrices, ROC and AUC — LDA, QDA and naive Bayes moved to the appendix | 10 + 6 | 80 (+44) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
 | 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 77 (+8) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
 | 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 6 + 3 | 69 (+12) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 83 (+8) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 80 (+9) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
-| **Total** | | | **74 + 35** | **858 (+138)** | |
+| **Total** | | | **74 + 35** | **828 (+166)** | |
 
 <details>
 <summary><b>How a deck is built</b></summary>
@@ -197,8 +197,8 @@ solution, so it works as homework.
 | 0 | χ²/*t*/*F* and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) · the four-shapes gallery | 17 |
 | 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) · the three scales, drawn | 10 |
 | 1 | the design matrix entry by entry · the two dataset lookup tables · the two recreated overview figures | 8 |
-| 2 | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) · the third U-curve rendering | 9 |
-| 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · the RSS surface and ISLP Fig 3.1 recreated | 13 |
+| 2 | the third U-curve rendering · Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) · **the whole classification thread: the Bayes classifier and its error rate, KNN, and Exercises 2.6, 2.7, E2.2 and E2.4** | 34 |
+| 3 | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · the RSS surface and ISLP Fig 3.1 recreated · **linear vs. KNN regression and the curse of dimensionality** | 16 |
 | 4 | how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · GLMs and Poisson regression · ISLP Fig 4.2 recreated on Default | 44 |
 | 5 | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills · ISLP Fig 5.5 (5-fold CV) | 8 |
 | 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 · Extended Exercise 6.1 (all criteria across sizes) | 12 |
@@ -322,7 +322,7 @@ exam in class.
 |--|:--:|--|:--:|
 | Mock Exam 1 | after Ch 3 | Ch 1–3 | 90 min · 90 pts |
 | Mock Exam 2 | after Ch 6 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
+| Final Mock Exam | after Ch 8 | All chapters (weighted to Ch 7/8 and modules A9 and A7) | 120 min · 120 pts |
 
 The final exam also exists in three parallel versions (A / B / C) — same
 structure and difficulty, different numbers.

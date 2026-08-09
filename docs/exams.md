@@ -44,7 +44,7 @@ Every paper exists in three formats:
 |---|:--:|---|:--:|
 | Mock Exam 1 | after Ch 3 | Ch 1–3 | 90 min · 90 pts |
 | Mock Exam 2 | after Ch 6 | Ch 4–6 (+ light cumulative) | 90 min · 90 pts |
-| Final Mock Exam | after Ch 10 | All chapters (weighted to Ch 7/8/10 and module A7) | 120 min · 120 pts |
+| Final Mock Exam | after Ch 8 | All chapters (weighted to Ch 7/8 and modules A9 and A7) | 120 min · 120 pts |
 
 The final exam also exists in three parallel versions (**A / B / C**) — same
 structure and difficulty, different numbers — for seating variants or for a
@@ -90,7 +90,7 @@ needs is taught.
 | B | after Ch 5 | Bias–variance, KNN regression (Ch 2) | Reading multiple regression output (Ch 3) | **Cross-validation and the bootstrap (Ch 5)** |
 | C | after Ch 6 | Conditional probability, Bayes, odds (Ch 0 + 0b) | Dummies and interactions (Ch 3) | **Ridge and lasso (Ch 6)** |
 | D | after Ch 8 | Honest model evaluation — leakage, splits (Ch 2 + 5) | KNN classification by hand (Ch 2 + 4) | **Trees: Gini, splitting, pruning, forests (Ch 8)** |
-| E | after Ch 10 | Reading `describe()` output, SE vs SD (Ch 0) | Polynomial regression, model choice (Ch 5 + 7) | **Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md))** |
+| E | after Ch 8 | Reading `describe()` output, SE vs SD (Ch 0) | Polynomial regression, model choice (Ch 5 + 7) | **Multiple testing: Bonferroni, Holm, BH (Ch 13 — now module [A7](advanced.md))** |
 
 The bold chapter is where each paper's hardest problem sits, so the five are
 **sequenced, not interchangeable**: A needs Chapter 4, B Chapter 5, C

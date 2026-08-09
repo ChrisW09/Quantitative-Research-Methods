@@ -79,8 +79,8 @@ works as homework.
 | 0  | χ²/t/F and LLN vs. CLT · the ANOVA decomposition · linear algebra (with Exercise 0.8) · calculus and gradient descent (with Extended Exercise 0.3) | 17 |
 | 0b | least squares as maximum likelihood (with Extended Exercise 0b.1) · counting and the 2ᵖ cost (with Exercise 0b.5) | 10 |
 | 1  | the design matrix entry by entry · the two dataset lookup tables | 8 |
-| 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) | 9 |
-| 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) | 13 |
+| 2  | Extended Exercise 2.1 (bias–variance from first principles) · Extended Exercise 2.3 (the Bayes boundary for two Gaussians) · **the Bayes classifier and KNN in full, with Exercises 2.6, 2.7, E2.2 and E2.4** | 34 |
+| 3  | squared vs. absolute loss · Extended Exercise 3.L2 (deriving least squares) · the matrix form of multiple regression · Extended Exercise 3.L6 (linear vs. polynomial vs. KNN) · **linear vs. KNN regression** | 16 |
 | 4  | **the generative models in full — Bayes refresher, LDA, QDA, naive Bayes, with Exercises 4.5–4.7** · how logistic regression is actually fitted (deviance, IRLS) · the multinomial softmax · Extended Exercise 4.2 (LDA from Bayes' theorem) · Extended Exercise 4.3 (naive Bayes by hand) · **comparing the classifiers, with Extended Exercise 4.4** · GLMs and Poisson regression | 44 |
 | 5  | Exercise 5.2 and Extended Exercise 5.1 — the LOOCV leverage-shortcut drills | 8 |
 | 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 12 |
@@ -94,14 +94,14 @@ works as homework.
 | 0  | Precourse (a) — statistics refresher | 10 | 4 | 104 + 17 |
 | 0b | Precourse (b) — toolkit | 6 | 2 | 49 + 10 |
 | 1  | Introduction | 3 | 1 | 70 + 8 |
-| 2  | Statistical Learning | 8 | 4 | 105 + 9 |
-| 3  | Linear Regression | 12 | 6 | 141 + 13 |
+| 2  | Statistical Learning | 8 | 4 | 79 + 34 |
+| 3  | Linear Regression | 12 | 6 | 137 + 16 |
 | 4  | Classification | 10 | 6 | 80 + 44 |
 | 5  | Resampling Methods | 6 | 3 | 77 + 8 |
 | 6  | Linear Model Selection & Regularization | 6 | 3 | 69 + 12 |
 | 7  | Moving Beyond Linearity | 6 | 3 | 83 + 8 |
 | 8  | Tree-Based Methods | 7 | 3 | 80 + 9 |
-| **Total** | | **80** | **38** | **858 + 156** |
+| **Total** | | **80** | **38** | **828 + 156** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
 (Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —
