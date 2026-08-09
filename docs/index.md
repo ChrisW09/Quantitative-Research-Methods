@@ -13,7 +13,7 @@ datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
 [**11** decks]{.qrm-chip}
-[**891** core slides *(+192 optional)*]{.qrm-chip}
+[**897** core slides *(+199 optional)*]{.qrm-chip}
 [**109** exercises with solutions]{.qrm-chip}
 [**11** labs *(with solutions)*]{.qrm-chip}
 [**8** advanced modules]{.qrm-chip}
@@ -101,7 +101,7 @@ course is graded.
 :link: slides
 :link-type: doc
 
-Ten decks: 891 core slides, 192 more in optional appendices, every exercise
+Ten decks: 897 core slides, 199 more in optional appendices, every exercise
 with a worked solution.
 :::
 
@@ -189,12 +189,12 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 | | |
 |---|---|
-| Lecture decks | 9 taught ISLP chapters + two precourse decks · 891 slides, plus 192 in optional appendices |
+| Lecture decks | 9 taught ISLP chapters + two precourse decks · 897 slides, plus 199 in optional appendices |
 | Exercises | 74 short (~5 min) + 35 extended (~15 min), all with worked solutions |
 | Lab notebooks | 11 labs, one per deck (2 precourse + 9 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 23 CSVs from [statlearning.com](https://www.statlearning.com) |
-| Advanced modules | 8 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning) · 767 slides + 8 notebooks |
+| Advanced modules | 8 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning) · 777 slides + 8 notebooks |
 | Short projects | 6 challenges on real data, 3–5 h each, each with a fixed held-out set, a baseline to beat and a memo as the deliverable |
 | Semester shape | 11 × 180 min: a taught precourse session + 11 chapter sessions · **6 ECTS** |
 | Assessment | One written exam at the end of the semester (120 min, 100% of the grade); the eight practice papers do not count |
