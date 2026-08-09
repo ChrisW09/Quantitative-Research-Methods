@@ -1,6 +1,6 @@
 % ============================================================
 % Beamer — ISLP Lecture Series — IMPROVED EDITION
-% Chapter 10: Deep Learning
+% Advanced Module A9: Deep Learning
 % ============================================================
 \documentclass[aspectratio=169,11pt]{beamer}
 \usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}\usepackage[english]{babel}
@@ -54,7 +54,7 @@
   left=2mm,right=2mm,top=1mm,bottom=1mm}
 
 \title{Quantitative Research Methods}
-\subtitle{Chapter 10: Deep Learning}
+\subtitle{Advanced Module A9: Deep Learning}
 \author{Prof.\ Dr.\ Christoph Weisser}
 \date{}\graphicspath{{images/}}
 
@@ -73,30 +73,32 @@
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
-\begin{frame}{The course at a glance}
+\begin{frame}{The advanced modules}
   \vspace{-1.5mm}
   \begin{center}
   \scriptsize
   \setlength{\tabcolsep}{5pt}
   \renewcommand{\arraystretch}{1.30}
-  \begin{tabular}{@{\hspace{2pt}}l >{\raggedright\arraybackslash}p{0.66\textwidth}@{\hspace{2pt}}}
+  \begin{tabular}{@{\hspace{2pt}}l >{\raggedright\arraybackslash}p{0.72\textwidth}@{\hspace{2pt}}}
     \toprule
-    \textbf{Chapter} & \textbf{Topic} \\
+    \textbf{Module} & \textbf{Topic} \\
     \midrule
-     {\color{accent}Ch.\ 1} & Introduction \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 2} & Statistical learning\,{\color{black!45}--- accuracy, bias--variance, Bayes classifier, KNN} \\
-     {\color{accent}Ch.\ 3} & Linear regression\,{\color{black!45}--- estimation, inference, diagnostics} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 4} & Classification\,{\color{black!45}--- logistic regression, confusion matrix, ROC} \\
-     {\color{accent}Ch.\ 5} & Resampling\,{\color{black!45}--- validation, CV, bootstrap} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 6} & Model selection and regularisation\,{\color{black!45}--- ridge, lasso} \\
-     {\color{accent}Ch.\ 7} & Moving beyond linearity\,{\color{black!45}--- splines, GAMs} \\
-    \rowcolor{black!3} {\color{accent}Ch.\ 8} & Tree-based methods\,{\color{black!45}--- trees, forests, boosting} \\
-    \rowcolor{accent!18} \textbf{Ch.\ 10} & \textbf{Deep learning}\,{\color{accent!75!black}--- MLPs, CNNs, training} \\
+     {\color{accent}A1} & Randomised Controlled Trials\,{\color{black!45}--- potential outcomes, randomisation, power} \\
+    \rowcolor{black!3} {\color{accent}A2} & Explainable AI with Shapley Values\,{\color{black!45}--- axioms, exact and Monte-Carlo Shapley} \\
+     {\color{accent}A3} & Conformal Prediction\,{\color{black!45}--- split conformal, CQR, prediction sets} \\
+    \rowcolor{black!3} {\color{accent}A4} & GLMs and Splines\,{\color{black!45}--- exponential family, overdispersion, P-splines} \\
+     {\color{accent}A5} & Support Vector Machines\,{\color{black!45}--- margins, the cost $C$, kernels} \\
+    \rowcolor{black!3} {\color{accent}A6} & Survival Analysis\,{\color{black!45}--- censoring, Kaplan--Meier, Cox} \\
+     {\color{accent}A7} & Multiple Testing\,{\color{black!45}--- FWER, Bonferroni and Holm, FDR} \\
+    \rowcolor{black!3} {\color{accent}A8} & Unsupervised Learning\,{\color{black!45}--- PCA, $K$-means, hierarchical clustering} \\
+    \rowcolor{accent!18} \textbf{A9} & \textbf{Deep Learning}\,{\color{accent!75!black}--- MLPs, convolutions, training, regularisation} \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \vspace{1mm}
-  {\scriptsize Nine chapter decks of 180 minutes each, after a taught precourse session; Chapters 2, 3 and 4 run over two sessions apiece. Today's chapter is highlighted. Short exercises every $\sim$20 min; extended exercises every $\sim$45 min; each chapter has a companion lab notebook.\par\medskip Support vector machines (Ch.\ 9), survival analysis (Ch.\ 11), multiple testing (Ch.\ 13) and unsupervised learning (Ch.\ 12) are optional self-study modules in \texttt{Chapters/Advanced/}.}
+  \vspace{2mm}
+  {\scriptsize Nine optional, self-study modules that sit outside the taught
+  chapter plan; today's module is highlighted. Each is a full deck in the course
+  house style with a companion lab notebook.\par\medskip This module assumes Chapter 3 (least squares and the linear predictor) and Chapter 5 (validation and overfitting). It was ISLP Chapter 10 and a taught session in earlier editions of this course.}
 \end{frame}
 
 
@@ -105,7 +107,7 @@
   {\tiny Optional and advanced material is collected in the \textbf{appendix} at the end of the deck.}
 \end{frame}
 
-\begin{frame}{Notation in this chapter}
+\begin{frame}{Notation in this module}
   \footnotesize
   \begin{center}
   \begin{tabular}{@{}ll@{}}
@@ -140,8 +142,6 @@
   By the end of this chapter you will be able to:
   \begin{itemize}
     \item \textbf{Define} a single-layer and multilayer perceptron.
-    \item \textbf{Outline} recurrent networks and the basic
-          transformer idea.
     \item \textbf{Recognise} where convolutional networks belong ---
           the appendix develops them as optional self-study.
     \item \textbf{Train} a small network with stochastic gradient
@@ -156,7 +156,6 @@
     \begin{enumerate}
       \item Single-layer networks (logistic regression in disguise).
       \item Multilayer perceptrons.
-      \item Recurrent networks and transformers for sequences.
       \item How they are trained (SGD, backprop) and regularised.
     \end{enumerate}
     Convolutional networks for images sit in the \textbf{appendix}: the same
@@ -676,42 +675,6 @@
 \end{frame}
 
 % ============================================================
-\section{Sequences}
-% ============================================================
-
-\begin{frame}{Recurrent neural networks (RNNs)}
-  Process sequences $x_1, \ldots, x_T$ by carrying a hidden state forward:
-  \[
-    \boxed{\,h_t = g\!\left(W_x\, x_t + W_h\, h_{t-1} + b\right).\,}
-  \]
-  \begin{readme}[Reading the recurrence]
-    \begin{itemize}
-      \item $x_t$: input at step $t$; \ $h_t$: hidden state (``memory'') at step $t$.
-      \item $W_x$: weights on the new input; \ $W_h$: weights on the previous state
-            $h_{t-1}$; \ $b$: bias.
-      \item The \emph{same} $W_x,W_h,b$ are reused at every step --- weight sharing
-            across time (convolutions share weights across space; see the appendix).
-    \end{itemize}
-  \end{readme}
-  \begin{takeaway}
-    Suitable for time series, text, audio. Plain RNNs suffer from
-    vanishing/exploding gradients; LSTM and GRU add gating to carry long-range
-    information.
-  \end{takeaway}
-\end{frame}
-
-\begin{frame}{An RNN unrolled in time}
-  \begin{center}
-    \includegraphics[width=0.85\textwidth,height=0.50\textheight,keepaspectratio]{10_12.pdf}
-  \end{center}
-  \begin{takeaway}
-    Unrolling shows the recurrence as a deep feed-forward net that reuses the same
-    weights at every step; training uses backpropagation ``through time''.
-  \end{takeaway}
-  \islpsource{Figure 10.12}
-\end{frame}
-
-% ============================================================
 \section{Fitting}
 % ============================================================
 
@@ -1119,14 +1082,13 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
 \section{Summary}
 % ============================================================
 
-\begin{frame}{Chapter 10 in one slide}
+\begin{frame}{Module A9 in one slide}
   \begin{block}{What we accomplished}
     Surveyed the modern deep-learning landscape and connected it to
     the classical methods of the earlier chapters.
   \end{block}
   \begin{itemize}
     \item Single- and multilayer perceptrons.
-    \item Recurrent networks and transformers.
     \item Optimisation: SGD, momentum, Adam, backpropagation.
     \item Regularisation: dropout, weight decay, early stopping.
     \item Convolutional networks for images --- in the \textbf{appendix},
@@ -1162,8 +1124,6 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
     Dropout & Random unit muting during training \\
     Weight decay & $\ell_2$ penalty on weights \\
     CNN & Conv + pool + dense layers for images (appendix) \\
-    RNN / LSTM & Sequential models with hidden state \\
-    Transformer & Self-attention based sequence model \\
     Double descent & Test-error second dip \\
     \bottomrule
   \end{tabular}
@@ -1175,8 +1135,6 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
           boosting first.
     \item Images: pretrained CNN (ResNet, EfficientNet) and
           fine-tune.
-    \item Text: pretrained transformer; fine-tune only the head when
-          $n$ is small.
     \item Always normalise inputs and labels.
     \item Track training and validation loss together.
     \item Save the best-validation checkpoint.
@@ -1229,7 +1187,6 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
       \item \textbf{Gradient descent on a loss surface: the real path} --- the seeded 2-D descent figure; the learning-rate trade-off it illustrates is proved in Exercise 10.5.
       \item \textbf{Convolutional networks (CNNs)} --- convolution, pooling, a full architecture, and Exercise 10.4 on layer arithmetic. The ideas carry over from the MLP, so the taught session spends its time on training instead; read this block when you work with images.
       \item \textbf{CNN architecture arithmetic (Extended Exercise 10.2)} --- shapes and parameter counts through a whole network; Exercise 10.4 above does the same for a single layer.
-      \item \textbf{Transformers} --- self-attention in one slide. Outside the scope of ISLP Chapter 10; here so that the word is not a mystery.
       \item \textbf{Backpropagation} --- the chain rule that computes the gradients. Every framework does this for you; the main deck keeps what you must know --- that training is gradient descent on a loss.
       \item \textbf{Double descent} --- why very over-parameterised models can improve again past the interpolation point. A genuinely advanced topic.
     \end{itemize}
@@ -1529,20 +1486,6 @@ tr1, va1 = curve(0.1)    # strong weight decay: L2 on every weight
   --- about $89\%$ of the model. (ii) Depth plus pooling grow the receptive field, letting
   deep units assemble local edges into global shapes.
 \end{solutionbox}
-\end{frame}
-
-\begin{frame}{Transformers (briefly)}
-  \begin{takeaway}
-    ``Attention is all you need'' (Vaswani et al., 2017). Self-attention
-    computes weighted combinations of all positions in a sequence.
-    Beats RNNs on most NLP tasks; foundation of modern LLMs.
-  \end{takeaway}
-  \begin{readme}[Self-attention in one line]
-    Each position forms a \emph{query} and compares it against every position's
-    \emph{key}; the resulting weights average the \emph{values}. So every output
-    token can look directly at every input token --- no matter how far apart, and
-    all positions are processed in parallel (unlike an RNN's step-by-step loop).
-  \end{readme}
 \end{frame}
 
 \begin{frame}{Backpropagation in one slide}

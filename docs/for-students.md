@@ -12,7 +12,7 @@ work it is, how the labs fit around the lectures, what to do when your output
 does not match the slides, and how to revise.
 
 :::{container} qrm-chips
-[**12** sessions × **180 min**]{.qrm-chip}
+[**11** sessions × **180 min**]{.qrm-chip}
 [**6** ECTS]{.qrm-chip}
 [graded by **one 120-min exam**]{.qrm-chip}
 [**11** labs *(with solutions)*]{.qrm-chip}

@@ -7,15 +7,15 @@ myst:
 # Lecture slides
 
 {.qrm-lead}
-Eleven Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
+Ten Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
 `chapter_NN.tex`, its `images/`, the compiled `chapter_NN.pdf` — and the
 [companion lab](labs.md) for that chapter, so everything for one week sits
 together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
-[**919** slides in the main flow]{.qrm-chip}
-[**+156** in optional appendices]{.qrm-chip}
-[**80** short + **38** extended exercises]{.qrm-chip}
+[**858** slides in the main flow]{.qrm-chip}
+[**+138** in optional appendices]{.qrm-chip}
+[**74** short + **35** extended exercises]{.qrm-chip}
 [**~110** purpose-built figures]{.qrm-chip}
 :::
 
@@ -47,8 +47,7 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 | 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 6 + 3 | 69 (+12) | <a href="slides/chapter_06.pdf">Open</a> |
 | 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 83 (+8) | <a href="slides/chapter_07.pdf">Open</a> |
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 80 (+9) | <a href="slides/chapter_08.pdf">Open</a> |
-| 10 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 6 + 3 | 61 (+18) | <a href="slides/chapter_10.pdf">Open</a> |
-| **Total** | | | **80 + 38** | **919 (+156)** | |
+| **Total** | | | **74 + 35** | **858 (+138)** | |
 
 Chapters 9 (support vector machines), 11 (survival analysis), 12 (unsupervised
 learning) and 13 (multiple testing) are no longer part of the taught sequence —
@@ -125,7 +124,6 @@ optional.
 | 6 | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 · Extended Exercise 6.1 (all criteria across sizes) | 12 |
 | 7 | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) · the four-models panel | 8 |
 | 8 | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART · ISLP Figs 8.1 and 8.2 (the Hitters tree) | 9 |
-| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent · the gradient-descent loss surface | 18 |
 
 ## The two precourse decks
 

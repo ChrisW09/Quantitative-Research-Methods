@@ -9,7 +9,7 @@ Each chapter folder (`chapter_NN/`) is self-contained and holds **everything for
 that chapter**: the deck source `chapter_NN.tex`, its `images/`, the compiled
 `chapter_NN.pdf`, and the companion lab `chapter_NN_lab.ipynb`.
 
-Every chapter carries both — eleven decks and eleven notebooks, counting the two
+Every chapter carries both — ten decks and eleven notebooks, counting the two
 precourse sessions. Support vector machines (Ch 9), survival analysis (Ch 11),
 unsupervised learning (Ch 12) and multiple testing (Ch 13) are no longer part of
 the taught sequence: their decks and labs live on in [`Advanced/`](./Advanced/)
@@ -42,10 +42,10 @@ strand are in its appendix. Companion notebook:
 Every deck follows the same flow — motivation → intuition → formal definition →
 worked example — in the course house style, with:
 
-- **80 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
+- **74 short exercises** (~5 min, roughly one every 20 minutes): a purple prompt
   slide immediately followed by a teal worked-solution slide; long solutions run
   across a clean `(1/2)` / `(2/2)` pair.
-- **38 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
+- **35 extended exercises** (~15 min, roughly one every 45 minutes) in a violet
   "Extended exercise" box — integrative, multi-part problems with detailed
   multi-slide solutions.
 - Every exercise is tagged **[Concept]/[Math]/[Python]** (short) or
@@ -86,7 +86,6 @@ works as homework.
 | 6  | the constraint geometry redrawn · Exercise 6.1 (counting models) · Extended Exercise 6.2 (orthonormal design, soft thresholding) · partial least squares with Exercise 6.6 | 12 |
 | 7  | the truncated-power basis and the constraint count · Extended Exercise 7.1 (regression splines by hand) | 8 |
 | 8  | the partition picture redrawn · Extended Exercise 8.2 (impurity measures and pruning) · BART | 9 |
-| 10 | Extended Exercise 10.2 (CNN architecture arithmetic) · transformers · backpropagation · double descent | 18 |
 
 ## Exercises per chapter
 
@@ -102,15 +101,14 @@ works as homework.
 | 6  | Linear Model Selection & Regularization | 6 | 3 | 69 + 12 |
 | 7  | Moving Beyond Linearity | 6 | 3 | 83 + 8 |
 | 8  | Tree-Based Methods | 7 | 3 | 80 + 9 |
-| 10 | Deep Learning | 6 | 3 | 61 + 18 |
-| **Total** | | **80** | **38** | **919 + 156** |
+| **Total** | | **80** | **38** | **858 + 156** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
 (Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —
 their decks, labs and appendices moved to [`Advanced/`](./Advanced/) as
 self-study modules A5, A6, A8 and A7.
 
-## Suggested plan (12 sessions of 180 min)
+## Suggested plan (11 sessions of 180 min)
 
 Nine ISLP chapters in book order, preceded by the taught precourse session — 12
 sessions in all. The plan is keyed to **chapter numbers**, not session numbers,

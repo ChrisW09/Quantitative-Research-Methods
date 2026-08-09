@@ -1,6 +1,6 @@
 # Advanced modules
 
-Eight optional, self-study modules. Four extend the taught course beyond ISLP —
+Nine optional, self-study modules. Four extend the taught course beyond ISLP —
 causal inference, model explanation, distribution-free uncertainty, and the
 GLM/spline machinery behind Chapters 4 and 7 — and four are ISLP chapters
 lifted out of the taught sequence: support vector machines (Ch 9), survival

@@ -47,8 +47,8 @@ DECKS = {
     "chapter_06":  ("Ch. 6 — Model Selection & Regularisation", 1),
     "chapter_07":  ("Ch. 7 — Moving Beyond Linearity", 1),
     "chapter_08":  ("Ch. 8 — Tree-Based Methods", 1),
-    "chapter_10":  ("Ch. 10 — Deep Learning", 1),
     "advanced_08_unsupervised": ("A8 — Unsupervised Learning (self-study)", 1),
+    "advanced_09_deep_learning": ("A9 — Deep Learning (self-study)", 1),
 }
 
 SESSION_MINUTES = 180

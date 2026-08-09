@@ -22,11 +22,11 @@
 #   make runsheets  the full runsheet report: every page reference in
 #                   Teaching_Guide/runsheets/ resolved to its frame title
 #                   (kept out of git; skipped if the folder is absent)
-#   make notebooks  run every notebook (11 course + 8 advanced + 6 project
+#   make notebooks  run every notebook (10 course + 9 advanced + 6 project
 #                   starters) and diff its output against the outputs stored in
 #                   it — the repository has no CI, so run this yourself before
 #                   publishing (needs nbclient)
-#   make advanced   rebuild the eight advanced-module decks (Chapters/Advanced/)
+#   make advanced   rebuild the nine advanced-module decks (Chapters/Advanced/)
 #
 # Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages,
 # enumitem and mathtools — the last two for the exam papers and review decks)
@@ -34,7 +34,7 @@
 # "runsheets" also need Teaching_Guide/requirements.txt (pypdf); "docs" needs
 # docs/requirements.txt; "notebooks" needs nbclient, nbformat and ipykernel.
 
-CHAPTERS  := 00 00b 01 02 03 04 05 06 07 08 10
+CHAPTERS  := 00 00b 01 02 03 04 05 06 07 08
 SLIDEDIR  := Chapters
 GUIDE     := Teaching_Guide
 HANDOUTS  := $(GUIDE)/handouts
@@ -71,11 +71,11 @@ deck-%:
 	@$(MAKE) --no-print-directory $(SLIDEDIR)/chapter_$*/chapter_$*.pdf
 
 # --------------------------------------------------------------- advanced decks
-# Eight optional self-study modules in Advanced/ — same two-pass LaTeX build,
+# Nine optional self-study modules in Advanced/ — same two-pass LaTeX build,
 # kept out of `all` because they are not part of the taught deliverable.
 ADVANCED := advanced_01_rcts advanced_02_shapley advanced_03_conformal advanced_04_glms_splines \
             advanced_05_svm advanced_06_survival advanced_07_multiple_testing \
-            advanced_08_unsupervised
+            advanced_08_unsupervised advanced_09_deep_learning
 ADV_DIR  := Chapters/Advanced
 ADV_PDFS := $(foreach a,$(ADVANCED),$(ADV_DIR)/$(a)/$(a).pdf)
 
@@ -148,9 +148,9 @@ handouts: $(HANDOUT_PDFS)
 # ----------------------------------------------------------------- teaching index
 # The index also covers advanced_08_unsupervised (it was a taught chapter until
 # it became a self-study module, and the index entry moved with it), so that one
-# advanced deck is a prerequisite. The other seven are not indexed and stay out
-# of `all`; listing $(ADV_PDFS) here would drag all eight into every build.
-ADV_INDEXED := advanced_08_unsupervised
+# advanced deck is a prerequisite. The other eight are not indexed and stay out
+# of `all`; listing $(ADV_PDFS) here would drag all nine into every build.
+ADV_INDEXED := advanced_08_unsupervised advanced_09_deep_learning
 
 index: $(DECK_PDFS) $(foreach a,$(ADV_INDEXED),$(ADV_DIR)/$(a)/$(a).pdf)
 	@$(PYTHON) $(GUIDE)/make_index.py

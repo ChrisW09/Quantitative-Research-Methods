@@ -22,7 +22,7 @@ shape.
 │   │   ├── chapter_NN_lab.ipynb     #   companion lab, with stored outputs
 │   │   ├── images/                  #   matplotlib figures used by the deck
 │   │   └── make_figures.py          #   regenerates them, where a deck ships one
-│   └── Advanced/                    #   eight optional self-study modules, same shape
+│   └── Advanced/                    #   nine optional self-study modules, same shape
 │       ├── README.md
 │       ├── STYLE_DECK.md            #   the house style, distilled, for a new module
 │       ├── STYLE_NOTEBOOK.md
@@ -39,7 +39,7 @@ shape.
 │       ├── project_N_starter.ipynb  #   Colab-ready scaffolding
 │       └── SOLUTION_NOTES.md        #   expected findings, the trap, marking guide
 ├── Teaching_Guide/                  # instructor kit: plan, index, checklist, handouts
-│   ├── semester_plan.md             #   the twelve sessions on one page
+│   ├── semester_plan.md             #   the eleven sessions on one page
 │   ├── slide_index.md               #   generated: sections, exercises, page numbers
 │   ├── before_class.md              #   the ten-minute pre-lecture checklist
 │   ├── runsheets/                   #   lecture_NN.md + module_aN_*.md — git-ignored (assessment)
@@ -75,10 +75,10 @@ make them useless as assessment.
 
 - Chapter numbers always follow **ISLP**, zero-padded to two digits
   (`chapter_04`), so slides, labs and datasets line up. `chapter_00` /
-  `chapter_00b` hold the two precourse decks. The sequence has **gaps at 09, 11
-  and 13**: those chapters keep their decks and labs but live under
-  [`Advanced/`](advanced.md) as self-study modules A5, A6 and A7, so
-  `Chapters/chapter_*` globs to the ten taught chapters plus the two precourse
+  `chapter_00b` hold the two precourse decks. The sequence stops after 08 and has
+  **gaps at 09 and 10**: chapters 09–13 keep their decks and labs but live under
+  [`Advanced/`](advanced.md) as self-study modules A5, A9, A6, A8 and A7, so
+  `Chapters/chapter_*` globs to the eight taught chapters plus the two precourse
   decks and nothing else.
 - Every file in a chapter folder is named for that folder, so a path is
   self-describing and a glob is unambiguous: `chapter_04/chapter_04.tex`,
@@ -99,6 +99,6 @@ make them useless as assessment.
 
 - [`Chapters/README.md`](https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/README.md)
   — the deck guide, with per-chapter exercise counts, the contents of each
-  deck's appendix, and the full 12-session plan.
+  deck's appendix, and the full 11-session plan.
 - [Teaching it](teaching.md) — the instructor kit and the `make` targets.
 - [Building the docs](building-docs.md) — how this site is assembled.

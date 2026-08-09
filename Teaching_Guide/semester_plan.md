@@ -24,7 +24,7 @@ advanced material (formal derivations, the heaviest worked exercises, side
 topics); the timed plans in the runsheets cover the main flow only, so the
 appendix pages are extra material to assign, not to teach.
 
-## The twelve sessions
+## The eleven sessions
 
 | Chapter | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
@@ -39,7 +39,6 @@ appendix pages are extra material to assign, not to teach.
 | **6** | Model Selection & Regularisation | `chapter_06` | 70 + 12 | 6 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
 | **7** | Beyond Linearity | `chapter_07` | 84 + 8 | 6 + 3 | Polynomials, splines, GAMs |
 | **8** | Tree-Based Methods | `chapter_08` | 81 + 9 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
-| **10** | Deep Learning | `chapter_10` | 62 + 18 | 6 + 3 | MLPs, backprop, sequence models (PyTorch); CNNs are appendix self-study · last taught session · **final mock exam after this week** · **release Short Exam E** |
 
 Nine ISLP chapters are taught, in book order. Chapters 9, 11, 12 and 13 keep
 their full decks and labs but sit outside the plan as advanced modules A5, A6,

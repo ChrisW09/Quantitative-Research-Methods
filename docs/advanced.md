@@ -1,13 +1,13 @@
 ---
 myst:
   html_meta:
-    description: "Eight optional advanced modules extending the course — randomised controlled trials, Shapley-value explanations, conformal prediction, GLMs with penalized splines, support vector machines, survival analysis, multiple testing and unsupervised learning — each with a full lecture deck and a companion notebook."
+    description: "Nine optional advanced modules extending the course — randomised controlled trials, Shapley-value explanations, conformal prediction, GLMs with penalized splines, support vector machines, survival analysis, multiple testing and unsupervised learning — each with a full lecture deck and a companion notebook."
 ---
 
 # Advanced modules
 
 {.qrm-lead}
-Eight optional, self-study modules. Four take the course beyond ISLP: causal
+Nine optional, self-study modules. Four take the course beyond ISLP: causal
 inference with randomised experiments, explaining black-box models with Shapley
 values, distribution-free uncertainty with conformal prediction, and the
 exponential-family machinery that unifies GLMs and penalized splines. Four more
@@ -16,10 +16,10 @@ are ISLP chapters lifted out of the taught sequence — support vector machines
 testing (Ch 13).
 
 :::{container} qrm-chips
-[**8** modules]{.qrm-chip}
-[**647** slides]{.qrm-chip}
-[**50 + 20** exercises with solutions]{.qrm-chip}
-[**8** companion notebooks]{.qrm-chip}
+[**9** modules]{.qrm-chip}
+[**722** slides]{.qrm-chip}
+[**56 + 23** exercises with solutions]{.qrm-chip}
+[**9** companion notebooks]{.qrm-chip}
 [optional **self-study**]{.qrm-chip}
 :::
 
@@ -44,6 +44,7 @@ unsupervised-learning question now draws on module A8.
 | A6 | Survival Analysis | Censoring and why it breaks ordinary regression, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 92 | <a href="slides/advanced_06_survival.pdf">Open</a> | [Rendered](advanced_labs/advanced_06_survival_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) |
 | A7 | Multiple Testing | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 68 | <a href="slides/advanced_07_multiple_testing.pdf">Open</a> | [Rendered](advanced_labs/advanced_07_multiple_testing_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) |
 | A8 | Unsupervised Learning | No test error to validate against, principal components (loadings, scores, PVE, the biplot), the scaling decision, *K*-means and its local optima, dendrograms, linkage and dissimilarity, clusters in pure noise | 99 | <a href="slides/advanced_08_unsupervised.pdf">Open</a> | [Rendered](advanced_labs/advanced_08_unsupervised_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_08_unsupervised/advanced_08_unsupervised_lab.ipynb) |
+| A9 | Deep Learning | Single-layer networks and activations, MLPs and parameter counts, convolutions and pooling, loss and SGD, regularisation and dropout | 75 | <a href="slides/advanced_09_deep_learning.pdf">Open</a> | [Rendered](advanced_labs/advanced_09_deep_learning_lab) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_09_deep_learning/advanced_09_deep_learning_lab.ipynb) |
 
 ```{tip}
 Everything is implemented **from scratch** — exact Shapley values, split

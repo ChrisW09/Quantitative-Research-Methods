@@ -328,36 +328,6 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 
 **Notebook cues:** 8 in this deck (near pp. 60).
 
-### Ch. 10 — Deep Learning
-
-`chapter_10.pdf` — **61 slides** in the main flow plus **18** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 2.4 min per slide).
-
-| Section | Pages | Slides | Time budget |
-|---|:--:|:--:|:--:|
-| *front matter* | 1–7 | 7 | 17 min |
-| Why now? | 8–9 | 2 | 4 min |
-| Single Layer | 10–26 | 17 | 41 min |
-| Multilayer | 27–32 | 6 | 14 min |
-| Sequences | 33–35 | 3 | 7 min |
-| Fitting | 36–43 | 8 | 19 min |
-| Python Lab | 44–54 | 11 | 26 min |
-| Summary | 55–61 | 7 | 17 min |
-| Appendix: optional and advanced material | 62–79 | 18 | optional |
-
-| Exercise | Type | Tag | Prompt | Solution |
-|---|:--:|:--:|:--:|:--:|
-| Exercise 10.1 | short | Math | p. 17 | p. 18 |
-| Exercise 10.2 | short | Concept | p. 20 | p. 21 |
-| Extended Exercise 10.1 | extended | Math | p. 23 | p. 24 |
-| Exercise 10.3 | short | Math | p. 30 | p. 31 |
-| Exercise 10.5 | short | Math | p. 41 | p. 42 |
-| Exercise 10.6 | short | Python | p. 47 | p. 48 |
-| Extended Exercise 10.3 | extended | Python | p. 51 | p. 52 |
-| Exercise 10.4 | short | Math | p. 69 | p. 70 |
-| Extended Exercise 10.2 | extended | Math | p. 73 | p. 74 |
-
-**Notebook cues:** 7 in this deck (near pp. 13, 45).
-
 ### A8 — Unsupervised Learning (self-study)
 
 `advanced_08_unsupervised.pdf` — **89 slides** in the main flow plus **10** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.6 min per slide).
@@ -387,3 +357,32 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Extended Exercise 12.3 | extended | Python | p. 96 | p. 97 |
 
 **Notebook cues:** 11 in this deck (near pp. 77).
+
+### A9 — Deep Learning (self-study)
+
+`advanced_09_deep_learning.pdf` — **58 slides** in the main flow plus **17** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 2.5 min per slide).
+
+| Section | Pages | Slides | Time budget |
+|---|:--:|:--:|:--:|
+| *front matter* | 1–7 | 7 | 18 min |
+| Why now? | 8–9 | 2 | 4 min |
+| Single Layer | 10–26 | 17 | 43 min |
+| Multilayer | 27–32 | 6 | 15 min |
+| Fitting | 33–40 | 8 | 20 min |
+| Python Lab | 41–51 | 11 | 28 min |
+| Summary | 52–58 | 7 | 17 min |
+| Appendix: optional and advanced material | 59–75 | 17 | optional |
+
+| Exercise | Type | Tag | Prompt | Solution |
+|---|:--:|:--:|:--:|:--:|
+| Exercise 10.1 | short | Math | p. 17 | p. 18 |
+| Exercise 10.2 | short | Concept | p. 20 | p. 21 |
+| Extended Exercise 10.1 | extended | Math | p. 23 | p. 24 |
+| Exercise 10.3 | short | Math | p. 30 | p. 31 |
+| Exercise 10.5 | short | Math | p. 38 | p. 39 |
+| Exercise 10.6 | short | Python | p. 44 | p. 45 |
+| Extended Exercise 10.3 | extended | Python | p. 48 | p. 49 |
+| Exercise 10.4 | short | Math | p. 66 | p. 67 |
+| Extended Exercise 10.2 | extended | Math | p. 70 | p. 71 |
+
+**Notebook cues:** 7 in this deck (near pp. 13, 42).

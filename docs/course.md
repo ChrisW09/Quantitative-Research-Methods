@@ -1,18 +1,18 @@
 ---
 myst:
   html_meta:
-    description: "The twelve-session semester plan — a taught precourse session plus nine ISLP chapters — with the recommended split points and the assessment calendar."
+    description: "The eleven-session semester plan — a taught precourse session plus nine ISLP chapters — with the recommended split points and the assessment calendar."
 ---
 
 # The course at a glance
 
 {.qrm-lead}
-A 12-session semester (12 × 180 min), worth **6 ECTS**: one taught precourse
+A 11-session semester (11 × 180 min), worth **6 ECTS**: one taught precourse
 session covering both precourse decks, then nine ISLP chapters taught in book
 order.
 
 :::{container} qrm-chips
-[**12** sessions × **180 min**]{.qrm-chip}
+[**11** sessions × **180 min**]{.qrm-chip}
 [**6** ECTS]{.qrm-chip}
 [**1** taught precourse session]{.qrm-chip}
 [**9** ISLP chapters]{.qrm-chip}
@@ -38,7 +38,6 @@ that is what the decks, the labs, the exercise numbering and the
 | **Ch 6** | 1 | Subset selection; Cₚ/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.6 |
 | **Ch 7** | 1 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | **Ch 8** | 1 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
-| **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization (PyTorch) — the last taught session | 10.1–10.6 |
 
 Chapter 1 is short and opens the same session as the first half of Chapter 2.
 
