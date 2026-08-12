@@ -65,9 +65,9 @@
 \author{Prof.\ Dr.\ Christoph Weisser}
 \date{}\graphicspath{{images/}}
 
-\newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{exercise}[1][Exercise ($\approx$5 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 \newtcolorbox{solutionbox}[1][Solution]{enhanced, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
-\newtcolorbox{longexercise}[1][Extended exercise (15 min)]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{longexercise}[1][Extended exercise ($\approx$15 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 % Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
 \addtobeamertemplate{frametitle}{}{\vspace{-2pt}}
@@ -146,6 +146,7 @@
 \end{frame}
 
 \begin{frame}{Learning objectives for this chapter}
+  \small
   By the end of this chapter you will be able to:
   \begin{itemize}
     \item \textbf{Apply} the validation-set approach and articulate
@@ -159,6 +160,12 @@
     \item \textbf{Avoid} the common resampling pitfalls (information
           leakage, naive time-series folds, group-ignoring splits).
   \end{itemize}
+  \begin{readme}[{{How to use this deck --- self-study and revision}}]
+    \footnotesize Attempt each exercise \emph{before} its solution; run
+    \texttt{chapter\_05\_lab.ipynb} alongside the lab section. Revise from the
+    back --- key formulas, vocabulary, self-check (each question names its
+    page) --- then redo the exercises; the appendix is fully solved.
+  \end{readme}
 \end{frame}
 
 
@@ -263,7 +270,7 @@
   \end{readme}
 \end{frame}
 
-\begin{frame}{Validation set: pros and cons}
+\begin{frame}{Validation set: pros and cons}\label{frm:valprocon}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{Pros}
@@ -289,7 +296,7 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Validation across splits: how erratic is it?}
+\begin{frame}{Validation across splits: how erratic is it?}\label{frm:valerratic}
   \begin{center}
     \includegraphics[width=0.92\textwidth,height=0.62\textheight,keepaspectratio]{5_2.pdf}
   \end{center}
@@ -453,7 +460,7 @@
 
 
 
-\begin{frame}{The OLS LOOCV shortcut}
+\begin{frame}{The OLS LOOCV shortcut}\label{frm:shortcut}
   For OLS regression specifically:
   \begin{block}{LOOCV formula for OLS}
     \[
@@ -521,7 +528,7 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{LOOCV vs.\ $k$-fold: the bias-variance trade-off}
+\begin{frame}{LOOCV vs.\ $k$-fold: the bias-variance trade-off}\label{frm:loocvkfold}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \begin{block}{LOOCV}
@@ -550,7 +557,7 @@
   \end{labnote}
 \end{frame}
 
-\begin{frame}{Why $k \approx 10$ wins: visualising the trade-off}
+\begin{frame}{Why $k \approx 10$ wins: visualising the trade-off}\label{frm:k10}
   \begin{center}
     \includegraphics[width=0.84\textwidth,height=0.52\textheight,keepaspectratio]{ch05_cv_bias_variance.png}
   \end{center}
@@ -604,7 +611,7 @@
   \islpsource{Figure 5.8}
 \end{frame}
 
-\begin{frame}{Three pitfalls that quietly invalidate CV}
+\begin{frame}{Three pitfalls that quietly invalidate CV}\label{frm:cvpitfalls}
   \begin{alertblock}{The classic CV mistakes}
     \begin{enumerate}
       \item \textbf{Information leakage.} Any preprocessing fit on the
@@ -897,7 +904,7 @@
   \islpsource{Figure 5.10}
 \end{frame}
 
-\begin{frame}{When the bootstrap works --- and when it fails}
+\begin{frame}{When the bootstrap works --- and when it fails}\label{frm:bootfails}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \begin{block}{Works for}
@@ -1266,7 +1273,7 @@ print("bootstrap SE:", round(reps.std(ddof=1), 4))  # 0.0912
 \end{frame}
 
 
-\begin{frame}{Extended Exercise 5.3 --- Leak-Free CV for Tuning and Evaluation [Integrative]}
+\begin{frame}{Extended Exercise 5.3 --- Leak-Free CV for Tuning and Evaluation [Integrative]}\label{frm:ee53}
   \begin{longexercise}
     You must (a) choose a tuning parameter --- say the polynomial degree
     $d$ (or the KNN neighbourhood size $K$) --- \emph{and} (b) report an
@@ -1477,19 +1484,21 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
 \end{frame}
 
 \begin{frame}{Self-check questions}
+  Each question names the slide that answers it --- a wrong answer tells you
+  where to read.
   \begin{enumerate}
     \item Why does the validation-set estimate have such high variance?
-          (pp.~15--16)
+          (pp.~\pageref{frm:valprocon}--\pageref{frm:valerratic})
     \item Show that 5-fold CV has lower variance than LOOCV.
-          (pp.~29--30)
+          (pp.~\pageref{frm:loocvkfold}--\pageref{frm:k10})
     \item How would you cross-validate a model on a time series?
-          (p.~34, and the rules of thumb on p.~73)
+          (p.~\pageref{frm:cvpitfalls})
     \item Describe a scenario in which the bootstrap estimate of SE is
-          wrong. (p.~47)
+          wrong. (p.~\pageref{frm:bootfails})
     \item Outline a nested-CV procedure for unbiased evaluation while
-          tuning a hyperparameter. (pp.~65--67)
+          tuning a hyperparameter. (pp.~\pageref{frm:cvpitfalls} and \pageref{frm:ee53})
     \item For OLS, derive the LOOCV shortcut formula using leverage.
-          (p.~23; reasoning and practice in the appendix, pp.~81--82)
+          (p.~\pageref{frm:shortcut}; practice in the appendix, pp.~\pageref{frm:ex52} and \pageref{frm:ee51})
   \end{enumerate}
 \end{frame}
 
@@ -1548,7 +1557,7 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
 \end{frame}
 
 
-\begin{frame}{Exercise 5.2 --- LOOCV Fits and the Leverage Shortcut [Math]}
+\begin{frame}{Exercise 5.2 --- LOOCV Fits and the Leverage Shortcut [Math]}\label{frm:ex52}
   \begin{exercise}
     Consider a data set with $n = 500$ observations.
     \begin{enumerate}
@@ -1624,7 +1633,7 @@ print("unbiased test MSE:", test_err.mean(), "+/-", test_err.std())
   \end{mistake}
 \end{frame}
 
-\begin{frame}{Extended Exercise 5.1 --- LOOCV Shortcut vs.\ 5-Fold CV [Math]}
+\begin{frame}{Extended Exercise 5.1 --- LOOCV Shortcut vs.\ 5-Fold CV [Math]}\label{frm:ee51}
   \begin{longexercise}
     A simple linear regression (one predictor, so $p+1=2$ parameters) is
     fit by OLS to $n = 200$ observations, giving a training residual sum

@@ -58,9 +58,9 @@
 \author{Prof.\ Dr.\ Christoph Weisser}
 \date{}\graphicspath{{images/}}
 
-\newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{exercise}[1][Exercise ($\approx$5 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 \newtcolorbox{solutionbox}[1][Solution]{enhanced, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
-\newtcolorbox{longexercise}[1][Extended exercise (15 min)]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{longexercise}[1][Extended exercise ($\approx$15 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 % Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
 \addtobeamertemplate{frametitle}{}{\vspace{-2pt}}
@@ -139,6 +139,7 @@
 \end{frame}
 
 \begin{frame}{Learning objectives for this chapter}
+  \small
   By the end of this chapter you will be able to:
   \begin{itemize}
     \item \textbf{Fit} polynomial and step-function regressions and
@@ -154,6 +155,12 @@
     \item \textbf{Reason} about when nonlinear methods help and when
           they merely add variance.
   \end{itemize}
+  \begin{readme}[{{How to use this deck --- self-study and revision}}]
+    \footnotesize Attempt each exercise \emph{before} its solution; run
+    \texttt{chapter\_07\_lab.ipynb} alongside the lab section. Revise from the
+    back --- key formulas, vocabulary, self-check (each question names its
+    page) --- then redo the exercises; the appendix is fully solved.
+  \end{readme}
 \end{frame}
 
 
@@ -506,7 +513,7 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Choosing knots and degrees of freedom}
+\begin{frame}{Choosing knots and degrees of freedom}\label{frm:knots}
   \begin{block}{Two practical decisions}
     \begin{itemize}
       \item \textbf{How many knots?} Choose by cross-validation.
@@ -676,7 +683,7 @@ Thinking the natural spline is linear \emph{between} the boundary knots too --- 
 \section{Smoothing}
 % ============================================================
 
-\begin{frame}{Smoothing splines: let the data choose}
+\begin{frame}{Smoothing splines: let the data choose}\label{frm:smoothobj}
   Instead of choosing knots manually, place a knot at \emph{every}
   data point and let a penalty control smoothness.
   \begin{block}{Penalised RSS}
@@ -694,7 +701,7 @@ Thinking the natural spline is linear \emph{between} the boundary knots too --- 
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Reading the smoothing-spline objective}
+\begin{frame}{Reading the smoothing-spline objective}\label{frm:smoothread}
   \begin{readme}
     \begin{tabular}{@{}cl@{}}
       \toprule
@@ -734,7 +741,7 @@ Thinking the natural spline is linear \emph{between} the boundary knots too --- 
   \begin{takeaway}Same Wage data, two penalties: $\lambda=10^4$ gives a calm trend ($\approx 3.7$ effective df) while $\lambda=0.1$ ($\approx 43$ df) chases noise --- $\lambda$ is the flexibility dial, tuned by CV/LOOCV.\end{takeaway}
 \end{frame}
 
-\begin{frame}{Local regression (LOESS): a different philosophy}
+\begin{frame}{Local regression (LOESS): a different philosophy}\label{frm:loess}
   Instead of one global function, fit a small model around each point.
   \begin{block}{Recipe at each query point $x_0$}
     \begin{enumerate}
@@ -830,7 +837,7 @@ Picking $\lambda$ by minimising \emph{training} RSS --- that always selects $\la
 \section{GAMs}
 % ============================================================
 
-\begin{frame}{From one predictor to many: GAMs}
+\begin{frame}{From one predictor to many: GAMs}\label{frm:gam}
   Everything we have done so far is for one predictor at a time.
   Generalised additive models lift the techniques into the
   multivariate setting.
@@ -850,7 +857,7 @@ Picking $\lambda$ by minimising \emph{training} RSS --- that always selects $\la
   \end{readme}
 \end{frame}
 
-\begin{frame}{Why GAMs are so useful}
+\begin{frame}{Why GAMs are so useful}\label{frm:gamwhy}
   \begin{takeaway}[Three reasons]
     \begin{enumerate}
       \item Generalises linear regression: $f_j(X_j) = \beta_j X_j$ is
@@ -876,7 +883,7 @@ Picking $\lambda$ by minimising \emph{training} RSS --- that always selects $\la
   \islpsource{Figure 7.12}
 \end{frame}
 
-\begin{frame}{GAM component functions fitted on Wage}
+\begin{frame}{GAM component functions fitted on Wage}\label{frm:gamwage}
   \begin{center}
     \includegraphics[width=0.9\textwidth,height=0.53\textheight,keepaspectratio]{ch07_gam_components.png}
   \end{center}
@@ -1319,17 +1326,17 @@ Picking the degree that maximises training $R^2$ --- it rises mechanically with 
   where to read.
   \begin{enumerate}
     \item Why is a cubic spline preferred over a quintic spline?
-          (p.~30)
+          (p.~\pageref{frm:knots})
     \item Argue intuitively why smoothing splines have a unique
-          minimiser. (p.~41)
+          minimiser. (p.~\pageref{frm:smoothobj})
     \item How does the smoothing-spline penalty $\lambda$ relate to df?
-          (p.~43)
+          (p.~\pageref{frm:smoothread})
     \item Sketch a GAM with two predictors. Where would you add an
-          interaction? (p.~52)
+          interaction? (pp.~\pageref{frm:gam}--\pageref{frm:gamwhy})
     \item For LOESS, what happens to bias and variance as the span
-          shrinks? (p.~46)
+          shrinks? (p.~\pageref{frm:loess})
     \item In the Wage data, would you expect a linear or a spline term
-          in \texttt{age} to win? Why? (p.~32)
+          in \texttt{age} to win? Why? (p.~\pageref{frm:gamwage})
   \end{enumerate}
 \end{frame}
 

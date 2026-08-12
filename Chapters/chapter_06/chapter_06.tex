@@ -63,9 +63,9 @@
 \author{Prof.\ Dr.\ Christoph Weisser}
 \date{}\graphicspath{{images/}}
 
-\newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{exercise}[1][Exercise ($\approx$5 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 \newtcolorbox{solutionbox}[1][Solution]{enhanced, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
-\newtcolorbox{longexercise}[1][Extended exercise (15 min)]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{longexercise}[1][Extended exercise ($\approx$15 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 % Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
 \addtobeamertemplate{frametitle}{}{\vspace{-2pt}}
@@ -142,6 +142,7 @@
 \end{frame}
 
 \begin{frame}{Learning objectives for this chapter}
+  \small
   By the end of this chapter you will be able to:
   \begin{itemize}
     \item \textbf{Apply} best-subset and stepwise selection;
@@ -154,6 +155,12 @@
     \item \textbf{Tune} $\lambda$ by cross-validation and \textbf{avoid}
           the leakage that comes from standardising outside the CV loop.
   \end{itemize}
+  \begin{readme}[{{How to use this deck --- self-study and revision}}]
+    \footnotesize Attempt each exercise \emph{before} its solution; run
+    \texttt{chapter\_06\_lab.ipynb} alongside the lab section. Revise from the
+    back --- key formulas, vocabulary, self-check (each question names its
+    page) --- then redo the exercises; the appendix is fully solved.
+  \end{readme}
 \end{frame}
 
 
@@ -574,7 +581,7 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Reading the ridge objective}
+\begin{frame}{Reading the ridge objective}\label{frm:ridgeobj}
   \begin{readme}
     \begin{tabular}{@{}cl@{}}
       \toprule
@@ -741,7 +748,7 @@
   \islpsource{Figure 6.6}
 \end{frame}
 
-\begin{frame}{Why does lasso produce zeros? --- the geometry}
+\begin{frame}{Why does lasso produce zeros? --- the geometry}\label{frm:lassogeom}
   \begin{columns}[T]
     \begin{column}{0.55\textwidth}
       \begin{block}{The unit balls}
@@ -765,7 +772,7 @@
   \islpsource{Figure 6.7}
 \end{frame}
 
-\begin{frame}{Choose $\lambda$ by cross-validation}
+\begin{frame}{Choose $\lambda$ by cross-validation}\label{frm:cvlambda}
   Both ridge and lasso introduce a single tuning parameter.
   \begin{block}{The procedure}
     \begin{enumerate}
@@ -786,7 +793,7 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Ridge vs.\ lasso vs.\ elastic net: when each wins}
+\begin{frame}{Ridge vs.\ lasso vs.\ elastic net: when each wins}\label{frm:elastic}
   \begin{columns}[T]
     \begin{column}{0.32\textwidth}
       \begin{block}{Ridge}
@@ -954,7 +961,7 @@ for k in range(1, 6):                         # model sizes k = 1..5
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Ridge regression}
+\begin{frame}[fragile]{Ridge regression}\label{frm:labridge}
   \begin{lstlisting}
 from sklearn.linear_model import Ridge      # L2 penalty: sum beta_j^2
 from sklearn.model_selection import GridSearchCV  # sweeps the grid
@@ -1262,16 +1269,16 @@ print("lasso drops:", dropped)
   where to read.
   \begin{enumerate}
     \item Why does ridge regression always have a unique solution?
-          (p.~30)
+          (p.~\pageref{frm:ridgeobj})
     \item Why can lasso set coefficients to exactly zero, but ridge
-          cannot? Sketch the unit balls. (p.~40)
+          cannot? Sketch the unit balls. (p.~\pageref{frm:lassogeom})
     \item For two perfectly correlated predictors, what does ridge do?
-          What does lasso do? What does elastic net do? (p.~42)
+          What does lasso do? What does elastic net do? (p.~\pageref{frm:elastic})
     \item Compute the ridge estimate when $\mathbf{X}^\top\mathbf{X} = I$
-          --- a clean special case. (appendix, p.~80)
+          --- a clean special case. (appendix, p.~\pageref{frm:ee62})
     \item Why must the scaler be re-fit inside every cross-validation
-          fold rather than once on the full data? (p.~51)
-    \item Outline the one-standard-error rule. (p.~41)
+          fold rather than once on the full data? (p.~\pageref{frm:labridge})
+    \item Outline the one-standard-error rule. (p.~\pageref{frm:cvlambda})
   \end{enumerate}
 \end{frame}
 
@@ -1512,7 +1519,7 @@ print("lasso drops:", dropped)
   \end{mistake}
 \end{frame}
 
-\begin{frame}{Extended Exercise 6.2 --- Orthonormal Design: Ridge vs.\ Lasso [Math]}
+\begin{frame}{Extended Exercise 6.2 --- Orthonormal Design: Ridge vs.\ Lasso [Math]}\label{frm:ee62}
   \begin{longexercise}
     Assume an \emph{orthonormal} design, $\mathbf{X}^\top\mathbf{X}=I$,
     so the OLS estimates are $\hat\beta_j^{\mathrm{OLS}}

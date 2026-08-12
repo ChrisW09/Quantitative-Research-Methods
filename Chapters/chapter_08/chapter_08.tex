@@ -58,9 +58,9 @@
 \author{Prof.\ Dr.\ Christoph Weisser}
 \date{}\graphicspath{{images/}}
 
-\newtcolorbox{exercise}[1][Exercise]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{exercise}[1][Exercise ($\approx$5 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=purple!4, colframe=purple!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 \newtcolorbox{solutionbox}[1][Solution]{enhanced, colback=teal!5, colframe=teal!55!black, boxrule=0pt, leftrule=2.5pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
-\newtcolorbox{longexercise}[1][Extended exercise (15 min)]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
+\newtcolorbox{longexercise}[1][Extended exercise ($\approx$15 min) --- try it before the solution]{enhanced, fontupper=\footnotesize, colback=violet!6, colframe=violet!55!black, boxrule=0pt, leftrule=3pt, arc=2pt, fonttitle=\bfseries, title=#1, left=2mm, right=2mm, top=1mm, bottom=1mm}
 
 % Reclaim ~2pt of body height (custom nav headline makes full slides tip over by ~1.83pt)
 \addtobeamertemplate{frametitle}{}{\vspace{-2pt}}
@@ -140,6 +140,7 @@
 \end{frame}
 
 \begin{frame}{Learning objectives for this chapter}
+  \small
   By the end of this chapter you will be able to:
   \begin{itemize}
     \item \textbf{Build} regression and classification trees by
@@ -154,6 +155,12 @@
     \item \textbf{Choose} between trees, random forests, and boosting
           for a given tabular problem.
   \end{itemize}
+  \begin{readme}[{{How to use this deck --- self-study and revision}}]
+    \footnotesize Attempt each exercise \emph{before} its solution; run
+    \texttt{chapter\_08\_lab.ipynb} alongside the lab section. Revise from the
+    back --- key formulas, vocabulary, self-check (each question names its
+    page) --- then redo the exercises; the appendix is fully solved.
+  \end{readme}
 \end{frame}
 
 
@@ -243,7 +250,7 @@
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Recursive binary splitting: one step}
+\begin{frame}{Recursive binary splitting: one step}\label{frm:greedy}
   \begin{block}{The greedy step}
     At each node:
     \begin{enumerate}
@@ -302,7 +309,7 @@
   \end{readme}
 \end{frame}
 
-\begin{frame}{Classification trees: splitting rules}
+\begin{frame}{Classification trees: splitting rules}\label{frm:gini}
   \footnotesize
   Same recursive splitting; predict the majority class in each leaf. RSS no
   longer applies, so we score a node by its \emph{impurity}:
@@ -649,7 +656,7 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{How much does averaging actually buy?}
+\begin{frame}{How much does averaging actually buy?}\label{frm:avggain}
   \footnotesize
   Each tree has variance $\sigma^2$; because they are grown on overlapping
   bootstrap samples, any two are correlated, $\mathrm{Cor}(\hat f_b, \hat
@@ -699,7 +706,7 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
   \begin{takeaway}On simulated $y=\sin(2x)+\varepsilon$ a single deep tree is a jagged step function (MSE vs.\ truth $0.15$); averaging $100$ bootstrap trees smooths it to MSE $0.07$ --- bagging averages away single-tree variance while the bias stays put.\end{takeaway}
 \end{frame}
 
-\begin{frame}{Random forests: the de-correlation trick}
+\begin{frame}{Random forests: the de-correlation trick}\label{frm:rf}
   Bagging averages \emph{correlated} trees because the same strong
   predictor tends to dominate the top split.
   \begin{block}{Key idea}
@@ -861,7 +868,7 @@ Expecting small $m$ to reduce \emph{bias}. Restricting candidates slightly \emph
 \section{Boosting}
 % ============================================================
 
-\begin{frame}{Boosting: idea}
+\begin{frame}{Boosting: idea}\label{frm:boost}
   Boosting builds a sequence of weak trees, each fitted to the
   residuals of the previous fit. Slow, careful adaptation.
   \begin{block}{Gradient-boosting algorithm}
@@ -932,7 +939,7 @@ Expecting small $m$ to reduce \emph{bias}. Restricting candidates slightly \emph
   \end{takeaway}
 \end{frame}
 
-\begin{frame}{Boosting vs.\ random forest: head-to-head}
+\begin{frame}{Boosting vs.\ random forest: head-to-head}\label{frm:headtohead}
   \begin{center}
     \includegraphics[width=0.85\textwidth,height=0.50\textheight,keepaspectratio]{8_11.pdf}
   \end{center}
@@ -1300,7 +1307,7 @@ Reading importances as causal effects. They measure how much the ensemble \emph{
   \end{tabular}
 \end{frame}
 
-\begin{frame}{Decision rules of thumb}
+\begin{frame}{Decision rules of thumb}\label{frm:rules}
   \begin{itemize}
     \item Single tree: only as a baseline or for max interpretability.
     \item Random forest: an excellent default with very little tuning.
@@ -1334,17 +1341,17 @@ Reading importances as causal effects. They measure how much the ensemble \emph{
   where to read.
   \begin{enumerate}
     \item Why is recursive binary splitting greedy? When does this
-          hurt? (p.~15)
+          hurt? (p.~\pageref{frm:greedy})
     \item Why use cross-entropy or Gini, not the misclassification
-          rate, to grow classification trees? (p.~20)
+          rate, to grow classification trees? (p.~\pageref{frm:gini})
     \item Explain why random forests reduce variance more than plain
-          bagging. (p.~40)
+          bagging. (pp.~\pageref{frm:avggain} and \pageref{frm:rf})
     \item Walk through the gradient-boosting algorithm in pseudocode.
-          (p.~53)
+          (p.~\pageref{frm:boost})
     \item In what sense is BART a Bayesian boosting algorithm?
-          (appendix, p.~89)
+          (appendix, p.~\pageref{frm:bart})
     \item Rank baseline methods (logistic, RF, gradient boosting) for
-          tabular data with $p = 100$, $n = 1000$. (p.~76)
+          tabular data with $p = 100$, $n = 1000$. (pp.~\pageref{frm:headtohead} and \pageref{frm:rules})
   \end{enumerate}
 \end{frame}
 
@@ -1532,7 +1539,7 @@ that software uses to build the pruning sequence.
 \end{solutionbox}
 \end{frame}
 
-\begin{frame}{BART: Bayesian Additive Regression Trees}
+\begin{frame}{BART: Bayesian Additive Regression Trees}\label{frm:bart}
   \footnotesize
   A sum of $K$ small trees, $\hat f(x)=\sum_{k=1}^{K}\hat f_k(x)$, updated
   over $B$ sweeps --- but unlike boosting, a sweep does not fit a fresh
