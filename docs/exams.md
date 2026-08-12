@@ -94,7 +94,7 @@ needs is taught.
 
 The bold chapter is where each paper's hardest problem sits, so the five are
 **sequenced, not interchangeable**: A needs Chapter 4, B Chapter 5, C
-Chapter 6, D Chapter 8, E Chapter 13. Because P1 and P2 reach back to earlier
+Chapter 6, D Chapter 8, E module A7 (ISLP Ch 13). Because P1 and P2 reach back to earlier
 material, each paper is cumulative-to-date rather than a single-chapter test.
 They are also the only papers that touch the **precourse** material: A, C and E
 each open on Chapter 0 / 0b, while no problem in the three full-length papers

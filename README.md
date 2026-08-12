@@ -125,12 +125,13 @@ bias–variance and KNN open the second; Ch 3 after multiple regression and the
 four questions (p. 79); Ch 4 after the logistic-regression section (p. 46), so
 evaluation and the lab open the second.
 
-> Chapters **9 (SVM), 11 (Survival), 12 (Unsupervised) and 13 (Multiple
-> Testing)** are no longer taught in the sequence. Each keeps its full deck and
-> its lab as a self-study [advanced module](./Chapters/Advanced/) — A5, A6, A8
-> and A7. The mock exams were not rewritten: the final papers and Short Exam E
-> still carry a multiple-testing problem, which now draws on module A7, and any
-> unsupervised-learning question now draws on module A8.
+> Chapters **9 (SVM), 10 (Deep Learning), 11 (Survival), 12 (Unsupervised) and
+> 13 (Multiple Testing)** are no longer taught in the sequence. Each keeps its
+> full deck and its lab as a self-study [advanced module](./Chapters/Advanced/)
+> — A5, A9, A6, A8 and A7. The mock exams were not rewritten: the final papers
+> are weighted toward modules A9 and A7, Short Exam E still carries a
+> multiple-testing problem drawing on module A7, and any unsupervised-learning
+> question draws on module A8.
 
 ---
 
@@ -366,22 +367,22 @@ behind. They live in
 ## 🧭 Advanced modules
 
 Nine **optional, self-study** modules: four extend the course beyond ISLP and
-four are ISLP chapters lifted out of the taught sequence — same
+five are ISLP chapters lifted out of the taught sequence — same
 house style as the chapter decks (every exercise followed by its worked
 solution, closing summary, optional appendix), each paired with a companion
 notebook whose numbers match the slides seed-for-seed:
 
 | Module | Title | Deck | Notebook | Open in Colab |
 |:--:|---|:--:|:--:|:--:|
-| A1 | Randomised Controlled Trials — potential outcomes, selection bias, power, peeking | 70 slides | [`advanced_01_rcts_lab.ipynb`](./Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) |
-| A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 72 slides | [`advanced_02_shapley_lab.ipynb`](./Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) |
-| A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 73 slides | [`advanced_03_conformal_lab.ipynb`](./Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) |
-| A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 81 slides | [`advanced_04_glms_splines_lab.ipynb`](./Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) |
-| A5 | Support Vector Machines *(ISLP Ch 9)* — margins, the soft margin and *C*, kernels, tuning by CV | 92 slides | [`advanced_05_svm_lab.ipynb`](./Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) |
-| A6 | Survival Analysis *(ISLP Ch 11)* — censoring, Kaplan–Meier, the log-rank test, Cox regression | 92 slides | [`advanced_06_survival_lab.ipynb`](./Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) |
-| A7 | Multiple Testing *(ISLP Ch 13)* — FWER, Bonferroni and Holm, FDR, Benjamini–Hochberg | 68 slides | [`advanced_07_multiple_testing_lab.ipynb`](./Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) |
-| A8 | Unsupervised Learning *(ISLP Ch 12)* — PCA, scaling, *K*-means and its local optima, dendrograms and linkage | 99 slides | [`advanced_08_unsupervised_lab.ipynb`](./Chapters/Advanced/advanced_08_unsupervised/advanced_08_unsupervised_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_08_unsupervised/advanced_08_unsupervised_lab.ipynb) |
-| A9 | Deep Learning *(ISLP Ch 10)* — single-layer networks, MLPs and parameter counts, convolutions, loss and SGD, regularisation | 75 slides | [`advanced_09_deep_learning_lab.ipynb`](./Chapters/Advanced/advanced_09_deep_learning/advanced_09_deep_learning_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_09_deep_learning/advanced_09_deep_learning_lab.ipynb) |
+| A1 | Randomised Controlled Trials — potential outcomes, selection bias, power, peeking | 69 (+6) slides | [`advanced_01_rcts_lab.ipynb`](./Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_01_rcts/advanced_01_rcts_lab.ipynb) |
+| A2 | Explainable AI with Shapley Values — axioms, exact and Monte-Carlo Shapley, pitfalls | 71 (+8) slides | [`advanced_02_shapley_lab.ipynb`](./Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_02_shapley/advanced_02_shapley_lab.ipynb) |
+| A3 | Conformal Prediction — split conformal, CQR, prediction sets, the OLS stress test | 70 (+7) slides | [`advanced_03_conformal_lab.ipynb`](./Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb) |
+| A4 | GLMs and Splines — exponential family, overdispersion, penalized splines, a count GAM | 82 (+8) slides | [`advanced_04_glms_splines_lab.ipynb`](./Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb) |
+| A5 | Support Vector Machines *(ISLP Ch 9)* — margins, the soft margin and *C*, kernels, tuning by CV | 84 (+10) slides | [`advanced_05_svm_lab.ipynb`](./Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_05_svm/advanced_05_svm_lab.ipynb) |
+| A6 | Survival Analysis *(ISLP Ch 11)* — censoring, Kaplan–Meier, the log-rank test, Cox regression | 86 (+10) slides | [`advanced_06_survival_lab.ipynb`](./Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb) |
+| A7 | Multiple Testing *(ISLP Ch 13)* — FWER, Bonferroni and Holm, FDR, Benjamini–Hochberg | 63 (+11) slides | [`advanced_07_multiple_testing_lab.ipynb`](./Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_07_multiple_testing/advanced_07_multiple_testing_lab.ipynb) |
+| A8 | Unsupervised Learning *(ISLP Ch 12)* — PCA, scaling, *K*-means and its local optima, dendrograms and linkage | 91 (+10) slides | [`advanced_08_unsupervised_lab.ipynb`](./Chapters/Advanced/advanced_08_unsupervised/advanced_08_unsupervised_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_08_unsupervised/advanced_08_unsupervised_lab.ipynb) |
+| A9 | Deep Learning *(ISLP Ch 10)* — single-layer networks, MLPs and parameter counts, convolutions, loss and SGD, regularisation | 72 (+19) slides | [`advanced_09_deep_learning_lab.ipynb`](./Chapters/Advanced/advanced_09_deep_learning/advanced_09_deep_learning_lab.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_09_deep_learning/advanced_09_deep_learning_lab.ipynb) |
 
 Nothing in the taught plan depends on them — but the mock exams still carry a
 multiple-testing problem, which now draws on module A7, and any

@@ -10,10 +10,10 @@ that chapter**: the deck source `chapter_NN.tex`, its `images/`, the compiled
 `chapter_NN.pdf`, and the companion lab `chapter_NN_lab.ipynb`.
 
 Every chapter carries both — ten decks and ten notebooks, counting the two
-precourse sessions. Support vector machines (Ch 9), survival analysis (Ch 11),
-unsupervised learning (Ch 12) and multiple testing (Ch 13) are no longer part of
-the taught sequence: their decks and labs live on in [`Advanced/`](./Advanced/)
-as self-study modules A5, A6, A8 and A7.
+precourse sessions. Support vector machines (Ch 9), deep learning (Ch 10),
+survival analysis (Ch 11), unsupervised learning (Ch 12) and multiple testing
+(Ch 13) are no longer part of the taught sequence: their decks and labs live on
+in [`Advanced/`](./Advanced/) as self-study modules A5, A9, A6, A8 and A7.
 
 `chapter_00/` is the **first half of the taught precourse session**, a refresher of the undergraduate
 material the course assumes. It is not an ISLP chapter: it revisits descriptive
@@ -103,10 +103,10 @@ works as homework.
 | 8  | Tree-Based Methods | 7 | 3 | 90 + 10 |
 | **Total** | | **74** | **35** | **901 + 199** |
 
-Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
-(Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —
-their decks, labs and appendices moved to [`Advanced/`](./Advanced/) as
-self-study modules A5, A6, A8 and A7.
+Support vector machines (Ch 9), deep learning (Ch 10), survival analysis
+(Ch 11), unsupervised learning (Ch 12) and multiple testing (Ch 13) are no
+longer part of the taught sequence — their decks, labs and appendices moved to
+[`Advanced/`](./Advanced/) as self-study modules A5, A9, A6, A8 and A7.
 
 ## Suggested plan (11 sessions of 180 min)
 

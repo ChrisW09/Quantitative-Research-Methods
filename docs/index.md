@@ -147,7 +147,8 @@ What is pinned, why, and which chapter needs which extra package.
 :link-type: doc
 
 Nine optional self-study modules: RCTs, Shapley values, conformal prediction,
-GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning.
+GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised
+learning, deep learning.
 :::
 
 :::{grid-item-card} 🎯 Short projects
@@ -194,7 +195,7 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 | Lab notebooks | 10 labs, one per deck (2 precourse + 8 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 23 CSVs from [statlearning.com](https://www.statlearning.com) |
-| Advanced modules | 8 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning) · 777 slides + 8 notebooks |
+| Advanced modules | 9 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning, deep learning) · 688 core slides (+89 in appendices) + 9 notebooks |
 | Short projects | 6 challenges on real data, 3–5 h each, each with a fixed held-out set, a baseline to beat and a memo as the deliverable |
 | Semester shape | 11 × 180 min: a taught precourse session + 11 chapter sessions · **6 ECTS** |
 | Assessment | One written exam at the end of the semester (120 min, 100% of the grade); the eight practice papers do not count |

@@ -65,15 +65,15 @@ twelve-question self-check on page 7 of `chapter_00.pdf` and the notation table
 on page 5 of `chapter_00b.pdf` — see [For students](for-students.md).
 ```
 
-```{admonition} Four chapters sit outside the taught plan
+```{admonition} Five chapters sit outside the taught plan
 :class: note
 
-Chapters **9 (Support Vector Machines)**, **11 (Survival Analysis)**,
-**12 (Unsupervised Learning)** and **13 (Multiple Testing)** are no longer
-taught in the sequence. Each keeps its full deck and its lab, now as a
-self-study [advanced module](advanced.md) — A5, A6, A8 and A7 respectively —
-under `Chapters/Advanced/`. The remaining eight chapters run in book order, so
-nothing else moved.
+Chapters **9 (Support Vector Machines)**, **10 (Deep Learning)**,
+**11 (Survival Analysis)**, **12 (Unsupervised Learning)** and
+**13 (Multiple Testing)** are no longer taught in the sequence. Each keeps its
+full deck and its lab, now as a self-study [advanced module](advanced.md) —
+A5, A9, A6, A8 and A7 respectively — under `Chapters/Advanced/`. The remaining
+eight chapters run in book order, so nothing else moved.
 
 The mock exams were **not** rewritten: the final papers and Short Exam E still
 carry a multiple-testing problem, which now draws on module A7 rather than on a

@@ -49,10 +49,10 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 | 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 90 (+10) | <a href="slides/chapter_08.pdf">Open</a> |
 | **Total** | | | **74 + 35** | **901 (+199)** | |
 
-Chapters 9 (support vector machines), 11 (survival analysis), 12 (unsupervised
-learning) and 13 (multiple testing) are no longer part of the taught sequence —
-their decks and labs now live as self-study [advanced modules](advanced.md)
-A5, A6, A8 and A7.
+Chapters 9 (support vector machines), 10 (deep learning), 11 (survival
+analysis), 12 (unsupervised learning) and 13 (multiple testing) are no longer
+part of the taught sequence — their decks and labs now live as self-study
+[advanced modules](advanced.md) A5, A9, A6, A8 and A7.
 
 ## How a deck is built
 
