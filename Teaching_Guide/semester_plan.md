@@ -58,9 +58,9 @@ resume without a dangling thread:
 
 | Deck | Break after | Because |
 |---|---|---|
-| `chapter_02` | "regression vs. classification" (p. 42) | Part 1 is the framing — what *f* is, and how flexible to make it; assessing accuracy, bias–variance and KNN open part 2 |
-| `chapter_03` | multiple regression and the four questions (p. 75) | Part 1 is estimation and inference; part 2 is everything that complicates it |
-| `chapter_04` | the end of the logistic-regression section (p. 41) | Part 1 is the model itself — fitting, interpreting, confounding; part 2 is judging any classifier: confusion matrix, ROC/AUC, and the lab |
+| `chapter_02` | "regression vs. classification" (p. 41) | Part 1 is the framing — what *f* is, and how flexible to make it; assessing accuracy and bias–variance open part 2 (the Bayes classifier and KNN are appendix material) |
+| `chapter_03` | multiple regression and the four questions (p. 79) | Part 1 is estimation and inference; part 2 is everything that complicates it |
+| `chapter_04` | the end of the logistic-regression section (p. 46) | Part 1 is the model itself — fitting, interpreting, confounding; part 2 is judging any classifier: confusion matrix, ROC/AUC, and the lab |
 
 ## If you are behind
 
