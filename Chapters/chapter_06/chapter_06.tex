@@ -1233,7 +1233,7 @@ print("lasso drops:", dropped)
   \begin{alertblock}{Don't}
     \begin{enumerate}
       \item Apply lasso / ridge without standardising.
-      \item Treat post-selection $p$-values as valid (Ch.~13).
+      \item Treat post-selection $p$-values as valid (module A7).
       \item Use AIC / BIC once $p$ approaches $n$ --- they assume
             $n \gg p$.
       \item Tune $\lambda$ on the same data you evaluate on.
@@ -1252,8 +1252,8 @@ print("lasso drops:", dropped)
     \item Ch.~7: GAMs are an additive ridge-like extension.
     \item Ch.~8: trees and boosting tame many correlated predictors in a
           quite different way.
-    \item Ch.~10: deep nets use weight decay (ridge in disguise).
-    \item Ch.~13: post-selection inference and the lasso.
+    \item Module A9: deep nets use weight decay (ridge in disguise).
+    \item Module A7: post-selection inference and the lasso.
   \end{itemize}
 \end{frame}
 
@@ -1401,8 +1401,8 @@ print("lasso drops:", dropped)
     they tolerate the small RSS drop $340\!\to\!322$ and pick $d=3$.
     Adjusted $R^2$ penalises size only mildly and keeps improving to
     $d=4$. Ordering by aggressiveness of shrinkage in model size,
-    $\mathrm{BIC}\le C_p\le\mathrm{adj}\,R^2$ --- exactly the pattern in
-    Figure~6.2.
+    $\mathrm{BIC}\le C_p\le\mathrm{adj}\,R^2$ --- exactly the pattern of
+    ISLP Figure~6.2 on the Credit data.
 
     \textbf{(3) Search cost.} Best subset examines $2^p=2^4=16$ models;
     forward stepwise fits $1+\tfrac{p(p+1)}2=1+10=11$. The gap is tiny
@@ -1439,7 +1439,7 @@ print("lasso drops:", dropped)
       \end{tikzpicture}
     \end{column}
   \end{columns}
-  \begin{takeaway}RSS contours first touch the $\ell_1$ diamond at a \emph{corner} ($\hat\beta_j=0$); the smooth $\ell_2$ circle almost never does.\end{takeaway}
+  \begin{takeaway}RSS contours first touch the $\ell_1$ diamond at a \emph{corner} ($\hat\beta_j=0$); the smooth $\ell_2$ circle almost never does. \hfill{\tiny\itshape\color{gray}ISLP Figure 6.7, redrawn}\end{takeaway}
 \end{frame}
 
 \begin{frame}{Exercise 6.1 --- Counting Models in Subset Selection [Math]}
@@ -1565,8 +1565,20 @@ print("lasso drops:", dropped)
 
 \begin{frame}{Solution --- Extended Exercise 6.2 (2/3)}
   \begin{solutionbox}
-    \textbf{(3) Apply with $\lambda=1$} (ridge factor $1/(1+\lambda)=0.5$,
-    lasso threshold $\lambda/2=0.5$):
+    \textbf{Why the clamp at zero?} The penalty $\lambda|\beta_j|$ has a
+    \emph{kink} at $\beta_j=0$. Away from zero calculus applies and gives
+    $\beta_j=\hat\beta_j^{\mathrm{OLS}}\mp\lambda/2$; but when
+    $|\hat\beta_j^{\mathrm{OLS}}|\le\lambda/2$ each branch overshoots past
+    zero and contradicts its own sign assumption, so the minimum sits
+    \emph{at the kink}: $\hat\beta_j^{\mathrm L}=0$ exactly. A whole
+    \emph{interval} of OLS values, $[-\lambda/2,\lambda/2]$, maps to zero
+    --- that is why lasso solutions are sparse, while ridge's smooth
+    penalty maps only the single point $0$ to $0$.
+    (These are ISLP equations (6.14)--(6.15).)
+
+    \smallskip
+    \textbf{(3) Apply with $\lambda=1$} (ridge factor
+    $1/(1+\lambda)=0.5$, lasso threshold $\lambda/2=0.5$) --- next slide.
   \end{solutionbox}
 \end{frame}
 

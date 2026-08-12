@@ -41,10 +41,10 @@ precourse.
 ## The precourse session, and the skip rule
 
 **The precourse is taught.** It opens the semester as a single 180-minute
-session drawing on both precourse decks, because the eleven chapter decks use
+session drawing on both precourse decks, because the chapter decks use
 all of this material and explain none of it.
 
-One session cannot cover both decks — together they run to 153 slides — so the
+One session cannot cover both decks — together they run to 165 slides — so the
 session is a **guided selection**, and the two decks stay available in full as
 your reference. The skip rule below is what tells you which parts you still
 need to read on your own.
@@ -86,11 +86,11 @@ session gets you started on it, and the decks are there to finish the job.
 ## Running the labs
 
 **Day one: use [Google Colab](quickstart.md).** Every notebook has a Colab badge
-in its first cell, and one-click links for all eleven are on the
+in its first cell, and one-click links for all ten are on the
 [Lab notebooks](labs.md) page. There is nothing to install: the first cell
 detects Colab, adds the few packages that are missing, and loads the data for
 you. A Google account is all you need. Colab runs every lab in the course,
-including the Chapter 10 deep learning lab.
+including module A9's deep-learning lab.
 
 **From about week two, a local install is worth it** — faster, works offline,
 and it keeps your own edits. Do it in your own time, not in a session: it pulls
@@ -101,7 +101,7 @@ what is pinned and why the download is so large.
 
 ## How the labs relate to the lectures
 
-Every chapter has **one deck and one notebook** — eleven of each, the two
+Every chapter has **one deck and one notebook** — ten of each, the two
 precourse sessions included — and they are written as a pair:
 
 - the deck moves motivation → intuition → definition → worked example, and drops
@@ -163,7 +163,7 @@ worked solution behind it.
 | Material | Solutions |
 |---|---|
 | Exercises inside a deck | **Yes, immediately** — the next slide is always the worked solution, including in the appendices |
-| The eleven lab notebooks | **Yes, every one** — each ends in a *Lecture exercises — worked Python solutions* section |
+| The ten lab notebooks | **Yes, every one** — each ends in a *Lecture exercises — worked Python solutions* section |
 | Mock exams and short exams | **Yes — handed out together with the paper**; the papers themselves are not published here, see below |
 
 The practice papers come **with their worked solutions**, distributed at the
@@ -194,7 +194,7 @@ Small differences are expected because:
   convergence tolerance) amplify that into the third or fourth decimal;
 - **not every source of randomness can be seeded away.** The notebooks are
   careful about this — splits use an explicit `random_state`, bootstrap draws use
-  a seeded generator, and the Chapter 10 network calls `torch.manual_seed` — but
+  a seeded generator, and the module A9 network calls `torch.manual_seed` — but
   a seeded draw is only reproducible against *the same library version*.
 
 So the question is never "do the digits match?" but **"does the conclusion
@@ -268,5 +268,5 @@ papers themselves come from your lecturer.
 - [Quick start](quickstart.md) — Colab in one click, and the local install for later.
 - [The course at a glance](course.md) — the nine-chapter plan and the assessment calendar.
 - [Lecture slides](slides.md) — every deck, what it covers, and what is in its appendix.
-- [Lab notebooks](labs.md) — all eleven notebooks, rendered in full.
+- [Lab notebooks](labs.md) — all ten notebooks, rendered in full.
 - [Mock exams](exams.md) — the eight practice papers and what each covers.

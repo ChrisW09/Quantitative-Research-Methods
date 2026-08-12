@@ -1362,11 +1362,18 @@ Reading importances as causal effects. They measure how much the ensemble \emph{
 \end{frame}
 
 \begin{frame}{What's next}
-  Chapter 10: \emph{Deep Learning}.
+  This was the last taught chapter --- from here the semester turns to
+  revision and the final exam.
   \begin{itemize}
-    \item Multilayer perceptrons (MLPs).
-    \item Convolutional networks (CNNs) for images.
-    \item Training: backpropagation, SGD, regularisation.
+    \item \textbf{Module A9 --- Deep Learning} (ISLP Ch.\ 10): MLPs,
+          convolutional networks, backpropagation, SGD, regularisation.
+          Self-study, with its own deck and lab; the final mock exam
+          draws on it.
+    \item \textbf{Module A7 --- Multiple Testing} (ISLP Ch.\ 13): also
+          assigned as self-study; Short Exam E and the final papers carry
+          a problem from it.
+    \item The remaining modules (A1--A6, A8) are optional depth ---
+          SVMs, survival analysis, unsupervised learning, and more.
   \end{itemize}
 \end{frame}
 
@@ -1507,27 +1514,51 @@ Winners: $\alpha{=}0\!\to\!4$ leaves, $\alpha{=}5\!\to\!3$ leaves, $\alpha{=}20\
 
 \begin{frame}{Solution --- Extended Exercise 8.2 (4/4)}
 \begin{solutionbox}
-\medskip
 \emph{Sample entry:} for $\alpha=5$ and the $3$-leaf tree, $R_\alpha=R+\alpha|T|=4+5\cdot3=19$ --- the smallest value in its row, so $3$ leaves win at that price.
 
+\medskip
+\emph{Where the breakpoints come from.} Two neighbouring subtrees swap
+places where their $R_\alpha$ values tie: pruning one leaf pays when the
+per-leaf price exceeds the training error it costs,
+$\alpha > \Delta R/\Delta|T|$. Here the trade-offs are
+$(4-0)/1 = 4$ leaves$\,4\to3$, $(10-4)/1 = 6$ for $3\to2$ and
+$(40-10)/1 = 30$ for $2\to1$ --- the breakpoints $\alpha = 4, 6, 30$ of
+the table. This ``price per leaf'' is exactly the weakest-link ordering
+that software uses to build the pruning sequence.
+
 \smallskip
-% Kept as italic text: lifting this into a mistake box overflows the slide
-% by ~28pt (the solutionbox is already full).
+% Kept as italic text: lifting this into a mistake box overflows the slide.
 \textit{Common mistake:} choosing $\alpha$ by training error --- $\alpha=0$ (the full tree) always wins there, by construction. $\alpha$ is chosen by cross-validating over the pruning sequence.
 \end{solutionbox}
 \end{frame}
 
 \begin{frame}{BART: Bayesian Additive Regression Trees}
-  \begin{block}{Idea}
-    A sum of $K$ small trees (each a ``weak learner''), updated one
-    tree at a time using a Bayesian posterior-style move.
+  \footnotesize
+  A sum of $K$ small trees, $\hat f(x)=\sum_{k=1}^{K}\hat f_k(x)$, updated
+  over $B$ sweeps --- but unlike boosting, a sweep does not fit a fresh
+  tree:
+  \begin{block}{One update of tree $k$ in sweep $b$ (Algorithm 8.3)}
+    \begin{enumerate}
+      \item Form the \textbf{partial residual} --- what the \emph{other}
+            $K-1$ trees currently leave unexplained:
+            $r_i = y_i - \sum_{k'<k}\hat f^{\,b}_{k'}(x_i)
+                       - \sum_{k'>k}\hat f^{\,b-1}_{k'}(x_i)$.
+      \item Randomly \textbf{perturb} the previous version of tree $k$ ---
+            grow or prune a branch, or change its leaf values --- favouring
+            perturbations that fit $r_i$ better.
+    \end{enumerate}
   \end{block}
-  \begin{takeaway}
-    Combines flavours of bagging (averaging) and boosting (sequential
-    update). Out-of-the-box hyperparameters often work; the Bayesian
-    framework gives credible intervals for free. Implementations:
-    \texttt{ISLP.bart}, \texttt{PyMC}.
+  \begin{takeaway}[Why perturb instead of refit --- and what you get]
+    Refitting greedily would chase the residual hard and overfit; small
+    random perturbations keep every tree weak, so BART regularises the way
+    slow learning does in boosting. The final prediction \emph{averages}
+    the sweeps after a burn-in of $L$:
+    $\hat f(x)=\frac{1}{B-L}\sum_{b=L+1}^{B}\hat f^{\,b}(x)$ --- bagging's
+    trick, applied across iterations, and the spread of those sweeps gives
+    uncertainty bands for free. Defaults ($K=200$, $B=1000$, $L=100$) work
+    well out of the box. Implementations: \texttt{ISLP.bart}, \texttt{PyMC}.
   \end{takeaway}
+  \islpsource{Section 8.2.4, Algorithm 8.3}
 \end{frame}
 
 \end{document}

@@ -129,7 +129,7 @@ optional.
 
 Both are **taught**, in the single precourse session that opens the semester,
 and both exist because the chapter decks assume their content silently.
-One session cannot cover 153 slides, so it draws a selection from the two and the
+One session cannot cover 165 slides, so it draws a selection from the two and the
 decks remain the full reference — see
 [the course at a glance](course.md) and [For students](for-students.md).
 
@@ -163,7 +163,8 @@ rebuilt in code in the [companion notebook](labs.md).
 ### Chapter 0b — the toolkit
 
 Covering what the chapter decks *use* but never *explain*. Its scope was not
-guessed — it comes from counting usage across the decks:
+guessed — it comes from counting usage across the decks (Ch. 10 counts are
+from the deep-learning deck, now module A9):
 
 | Topic | Where it bites | Uses |
 |---|---|--:|

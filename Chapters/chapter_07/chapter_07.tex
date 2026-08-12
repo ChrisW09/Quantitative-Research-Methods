@@ -1310,7 +1310,7 @@ Picking the degree that maximises training $R^2$ --- it rises mechanically with 
           expansions.
     \item Ch.~8 trees are the nonparametric alternative when
           interactions dominate.
-    \item Ch.~10 deep nets generalise GAMs by learning the basis.
+    \item Module A9's deep nets generalise GAMs by learning the basis.
   \end{itemize}
 \end{frame}
 
@@ -1453,7 +1453,20 @@ so a fitted spline is $\hat g(x)=\beta_0+\beta_1x+\beta_2x^2+\beta_3x^3+\sum_{k=
 
 \begin{frame}{Solution --- Extended Exercise 7.1 (2/4)}
 \begin{solutionbox}
-\textbf{(b) Evaluate $\hat g(50)$.} Here the quadratic and cubic \emph{base} coefficients happen to be zero, so only the linear base term and the \emph{active} truncated terms contribute. At $x=50$ the knots $25$ and $40$ are exceeded but $60$ is not:
+\textbf{(b) Evaluate $\hat g(50)$.} Here the quadratic and cubic \emph{base} coefficients happen to be zero, so only the linear base term and the \emph{active} truncated terms contribute.
+
+\medskip
+\textbf{The general rule:} before any arithmetic, compare $x$ with each knot --- a truncated term is switched \emph{on} only where $x>\xi_k$:
+\begin{center}\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Term & $(x-25)^3_+$ & $(x-40)^3_+$ & $(x-60)^3_+$ \\
+\midrule
+At $x=50$ & on ($50>25$) & on ($50>40$) & \textbf{off} ($50\le 60$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+So $\hat g(50)$ is a sum of the base terms plus \emph{two} truncated contributions --- the third knot has not been reached yet. This bookkeeping step is where the marks are lost; the arithmetic on the next slide is routine.
 \end{solutionbox}
 \end{frame}
 

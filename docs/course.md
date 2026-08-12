@@ -1,14 +1,14 @@
 ---
 myst:
   html_meta:
-    description: "The eleven-session semester plan — a taught precourse session plus nine ISLP chapters — with the recommended split points and the assessment calendar."
+    description: "The eleven-session semester plan — a taught precourse session plus eight ISLP chapters — with the recommended split points and the assessment calendar."
 ---
 
 # The course at a glance
 
 {.qrm-lead}
 A 11-session semester (11 × 180 min), worth **6 ECTS**: one taught precourse
-session covering both precourse decks, then nine ISLP chapters taught in book
+session covering both precourse decks, then eight ISLP chapters taught in book
 order.
 
 :::{container} qrm-chips
@@ -47,16 +47,16 @@ Chapter 1 is short and opens the same session as the first half of Chapter 2.
 Chapters 2, 3 and 4 each span two sessions. The recommended stopping points let
 you stop and resume cleanly:
 
-- **Ch 2** — after "regression vs. classification" (p. 42); assessing accuracy,
+- **Ch 2** — after "regression vs. classification" (p. 41); assessing accuracy,
   bias–variance and KNN open the second session
-- **Ch 3** — after multiple regression and the four questions (p. 75)
-- **Ch 4** — after the logistic-regression section (p. 41); the confusion matrix, ROC/AUC and the lab open the second session
+- **Ch 3** — after multiple regression and the four questions (p. 79)
+- **Ch 4** — after the logistic-regression section (p. 46); the confusion matrix, ROC/AUC and the lab open the second session
 ```
 
 ```{admonition} One session, two decks — so it is a selection
 :class: important
 
-The two precourse decks carry **153 slides** in their main flow (104 + 49). A
+The two precourse decks carry **165 slides** in their main flow (112 + 53). A
 single 180-minute session cannot cover them, and is not meant to: the session
 sets up the notation, the standard-error material and the Python patterns the
 chapters lean on hardest, and both decks stay available in full as the
@@ -72,7 +72,7 @@ Chapters **9 (Support Vector Machines)**, **11 (Survival Analysis)**,
 **12 (Unsupervised Learning)** and **13 (Multiple Testing)** are no longer
 taught in the sequence. Each keeps its full deck and its lab, now as a
 self-study [advanced module](advanced.md) — A5, A6, A8 and A7 respectively —
-under `Chapters/Advanced/`. The remaining nine chapters run in book order, so
+under `Chapters/Advanced/`. The remaining eight chapters run in book order, so
 nothing else moved.
 
 The mock exams were **not** rewritten: the final papers and Short Exam E still

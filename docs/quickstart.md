@@ -24,7 +24,7 @@ them; `torch` is preinstalled on Colab), and resolves the data automatically —
 four the package does not ship (`Advertising`, `Heart`, `Income1`, `Income2`)
 stream from the book's official site.
 
-One-click links for all eleven notebooks are on the
+One-click links for all ten notebooks are on the
 [Lab notebooks](labs.md) page.
 
 ```{tip}
@@ -32,7 +32,7 @@ The Colab links open straight from the public GitHub repository — you only nee
 a Google account to *run* a notebook, not any access to this repository.
 ```
 
-Colab is enough for every lab in the course, including the Chapter 10 deep
+Colab is enough for every lab in the course, including module A9's deep
 learning lab.
 
 ## ⌥ Week two: a local virtual environment

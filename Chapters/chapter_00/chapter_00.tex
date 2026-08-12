@@ -548,7 +548,7 @@
             depends on whether you measured in euros or thousands of euros;
       \item \textbf{Ch.\ 2, 12} --- KNN and PCA use distances, which are
             dominated by whichever variable has the largest scale;
-      \item \textbf{Ch.\ 10} --- neural networks train far better on
+      \item \textbf{Module A9} (deep learning) --- neural networks train far better on
             standardised inputs.
     \end{itemize}
   \end{takeaway}
@@ -1138,9 +1138,20 @@
 \end{frame}
 
 \begin{frame}{The normal distribution}
+  \footnotesize
   \begin{block}{$X \sim N(\mu, \sigma^2)$}
-    Symmetric and bell-shaped, fully determined by $\mu$ and $\sigma$.
-    Standardising gives $Z = (X-\mu)/\sigma \sim N(0,1)$.
+    Symmetric and bell-shaped, fully determined by $\mu$ and $\sigma$:
+    \[
+      f(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\,
+             e^{-\frac{(x-\mu)^2}{2\sigma^2}},
+      \qquad
+      \Phi(z) = \Pr(Z \le z) \ \text{for } Z = \frac{X-\mu}{\sigma} \sim N(0,1),
+    \]
+    with $\Phi$ the standard-normal CDF --- the ``area to the left'' that
+    tables and \texttt{scipy.stats.norm.cdf} return. The exponent is a
+    \emph{squared distance} from $\mu$, the reason this density recurs:
+    maximising its likelihood minimises squared error (Ch.\ 0b appendix),
+    and Chapters 2 and 4 build classifiers directly from it.
   \end{block}
   \begin{takeaway}[The 68--95--99.7 rule]
     About $68\%$ of the mass lies within $1\sigma$ of $\mu$, $95\%$ within
@@ -1148,10 +1159,9 @@
     Memorising $1.96$ saves you a table lookup for the rest of the course.
   \end{takeaway}
   \begin{readme}[What is and is not assumed]
-    Regression does \emph{not} require $X$ or $y$ to be normal. Normality
-    is assumed for the \emph{errors} --- and even then mainly to justify
-    $t$- and $F$-tests in small samples. With large $n$ the CLT does the
-    work instead.
+    Regression does \emph{not} require $X$ or $y$ to be normal --- only the
+    \emph{errors}, and even then mainly for $t$- and $F$-tests in small
+    samples; with large $n$ the CLT does the work instead.
   \end{readme}
 \end{frame}
 
@@ -1325,7 +1335,7 @@
   \end{itemize}
   \begin{takeaway}[The same table under different names]
     In Chapter 4 this becomes the confusion matrix (false positive / false
-    negative); in Chapter 13 the columns are relabelled to define the family-wise
+    negative); in module A7 (ISLP Ch.\ 13) the columns are relabelled to define the family-wise
     error rate and the false discovery rate. It is one idea wearing three
     costumes.
   \end{takeaway}
@@ -1342,7 +1352,7 @@
       \item \emph{``$p = 0.001$ means a big effect.''} No: with huge $n$,
             trivial effects get tiny $p$-values. Significance $\neq$ importance.
       \item \emph{``I tested 20 things and one was significant at 5\%.''}
-            Expected by chance alone --- see Chapter 13.
+            Expected by chance alone --- see module A7 (ISLP Ch.\ 13).
     \end{enumerate}
   \end{alertblock}
   \begin{takeaway}[The professional habit]
@@ -1453,8 +1463,8 @@
     \textbf{(4)} With $40$ true nulls and $\alpha = 0.05$, we expect
     $40 \times 0.05 = \textbf{2}$ false positives, and $P(\text{at least
     one}) = 1 - 0.95^{40} \approx 0.87$. Three ``discoveries'' is therefore
-    unremarkable. Correcting for this is the entire content of Chapter 13
-    (Bonferroni, Holm, Benjamini--Hochberg).
+    unremarkable. Correcting for this is the entire content of ISLP Chapter 13
+    --- self-study module A7 (Bonferroni, Holm, Benjamini--Hochberg).
   \end{solutionbox}
   \begin{mistake}
     Expecting double the data to halve the SE ---
@@ -1877,7 +1887,7 @@ df[df["wage"] > 200].shape[0]           # how many earn above 200
 \end{lstlisting}
   \begin{takeaway}[The four verbs of the labs]
     \textbf{select} columns, \textbf{filter} rows, \textbf{group} and
-    \textbf{summarise}. Almost every data-preparation step in the fifteen
+    \textbf{summarise}. Almost every data-preparation step in the course's
     labs is a combination of these. None of them changes \texttt{df}.
   \end{takeaway}
 \end{frame}
@@ -2286,7 +2296,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     \midrule
     Variable types, tidy data & Ch.\ 1--2 (notation), Ch.\ 3 (dummy variables) \\
     Mean, variance, expectation rules & Ch.\ 2 (bias--variance decomposition) \\
-    Standardisation ($z$-scores) & Ch.\ 2 (KNN), Ch.\ 6 (ridge/lasso), Ch.\ 10 \\
+    Standardisation ($z$-scores) & Ch.\ 2 (KNN), Ch.\ 6 (ridge/lasso), module A9 \\
     Correlation, confounding & Ch.\ 3 (multiple regression, collinearity) \\
     Anscombe, Simpson's paradox & Ch.\ 3 (why we plot and adjust) \\
     Log transforms, skew & Ch.\ 3, 7 (transformed responses, splines) \\
@@ -2294,15 +2304,15 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     Bernoulli / binomial / Poisson & Ch.\ 4 (logistic, Poisson regression) \\
     Normal, $t$, $\chi^2$, $F$ & Ch.\ 3 ($t$- and $F$-tests on coefficients) \\
     Standard errors, CIs & Ch.\ 3 (coefficient inference), Ch.\ 5 (bootstrap) \\
-    Type I/II errors, $p$-values & Ch.\ 4 (confusion matrix), Ch.\ 13 (FWER, FDR) \\
-    Power, sample size & Ch.\ 5 (how much data is enough), Ch.\ 13 \\
+    Type I/II errors, $p$-values & Ch.\ 4 (confusion matrix), module A7 (FWER, FDR) \\
+    Power, sample size & Ch.\ 5 (how much data is enough), module A7 \\
     Outliers and leverage & Ch.\ 3 (diagnostics), Ch.\ 8 (trees are robust) \\
     Simple linear regression, $R^2$ & Ch.\ 3 (all of it), Ch.\ 6 (model selection) \\
     Residual plots & Ch.\ 3 (diagnostics), Ch.\ 7 (non-linearity) \\
     Matrix algebra, inverses & Ch.\ 3 (normal equations), Ch.\ 6 (singularity) \\
     $\ell_1$ / $\ell_2$ norms & Ch.\ 6 (lasso vs.\ ridge geometry) \\
     Eigenvectors & The unsupervised-learning module (PCA) in \texttt{Advanced/} \\
-    Derivatives, gradients, convexity & Ch.\ 10 (backpropagation, training) \\
+    Derivatives, gradients, convexity & module A9 (backpropagation, training) \\
     \texttt{pandas} / \texttt{sklearn} & every lab notebook \\
     \bottomrule
   \end{tabular}
@@ -2430,7 +2440,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
       \item \textbf{$\chi^2$, $t$, $F$, and LLN vs.\ CLT} --- the distributions derived from the normal, and the two asymptotic promises. You only need to recognise the names when they appear in Chapters 3--6.
       \item \textbf{The ANOVA decomposition} --- $\mathrm{TSS}=\mathrm{ESS}+\mathrm{RSS}$ written out. Useful, but $R^2$ is the version you will actually quote.
       \item \textbf{Linear algebra} --- vectors, matrices, matrix multiplication, norms and eigenvectors (with Exercise 0.8). Needed to \emph{read} the compact formulas, never to compute anything by hand in this course.
-      \item \textbf{Calculus and optimisation} --- derivatives, minimising a loss, gradient descent (with Extended Exercise 0.3). Software does this for you; come back here when Chapter 10 trains a network.
+      \item \textbf{Calculus and optimisation} --- derivatives, minimising a loss, gradient descent (with Extended Exercise 0.3). Software does this for you; come back here when the deep-learning module (A9) trains a network.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -2505,10 +2515,14 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
       R^2 = 1 - \frac{\mathrm{RSS}}{\mathrm{TSS}} .
     \]
   \end{block}
-  \begin{readme}[How to read $R^2$]
-    The fraction of the variation in $y$ that the model accounts for.
-    $R^2 = 0.61$ means ``61\% of the variability in sales is accounted for by
-    TV spend''. In simple regression $R^2 = r^2$ exactly.
+  \begin{readme}[Why the split is exact --- the cross term vanishes]
+    Write $y_i - \bar y = (\hat y_i - \bar y) + (y_i - \hat y_i)$ and square.
+    The cross term $2\sum_i (\hat y_i - \bar y)(y_i - \hat y_i)$ is
+    \emph{zero}, because least squares makes the residuals sum to zero and
+    makes them orthogonal to the fitted values --- the two normal equations
+    again. So ``explained $+$ unexplained'' is an identity of the fitting
+    method, not an approximation, and $R^2$ (main deck, ``How good is the
+    fit?'') is just this identity divided through by TSS.
   \end{readme}
   \begin{alertblock}{Do not over-read it}
     A high $R^2$ does not make a model correct, useful or causal, and a low
@@ -2731,13 +2745,13 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     Stand on a hillside in fog. The gradient points uphill, so step the
     opposite way, and repeat. $\alpha$ too small $\Rightarrow$ crawling;
     $\alpha$ too large $\Rightarrow$ overshooting and divergence. Choosing
-    it well is a recurring practical theme of Chapter 10.
+    it well is a recurring practical theme of the deep-learning module (A9).
   \end{readme}
   \begin{takeaway}[Convexity decides whether this is safe]
     For a convex loss (least squares, logistic regression) every local
     minimum is global, so descent finds the answer. Neural networks are
     \emph{not} convex --- which is why initialisation, learning-rate
-    schedules and early stopping matter so much in Chapter 10.
+    schedules and early stopping matter so much in the deep-learning module (A9).
   \end{takeaway}
 \end{frame}
 
@@ -2847,7 +2861,7 @@ plt.scatter(fit.fittedvalues, fit.resid)            # 7. residuals
     to about $3.9\times10^{4}$, far worse than the starting $38$, and the next
     step is larger still --- \textbf{divergence}. The step size must respect
     the curvature of the loss, so in practice one standardises the predictors
-    and tunes $\alpha$: the workflow of Chapter 10.
+    and tunes $\alpha$: the workflow of the deep-learning module (A9).
 
     \smallskip
     \textit{Common mistake:} blaming the model when descent diverges. The

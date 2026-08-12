@@ -1,16 +1,16 @@
 # Semester plan
 
-Twelve sessions of 180 minutes: a **taught precourse session** drawing on both
-precourse decks, then **nine ISLP chapters** in book order. The plan is keyed to
+Eleven sessions of 180 minutes: a **taught precourse session** drawing on both
+precourse decks, then **eight ISLP chapters** in book order. The plan is keyed to
 chapter numbers, not session numbers. Chapters 9 (support vector machines),
-11 (survival analysis), 12 (unsupervised learning) and 13 (multiple testing) are
-no longer taught in the sequence — they keep their decks and labs as self-study
-modules A5, A6, A8 and A7
+10 (deep learning), 11 (survival analysis), 12 (unsupervised learning) and 13
+(multiple testing) are no longer taught in the sequence — they keep their decks
+and labs as self-study modules A5, A9, A6, A8 and A7
 under [`../Chapters/Advanced/`](../Chapters/Advanced/). The module is 6 ECTS,
 graded by one 120-minute written exam at the end of the semester; every paper in
 the calendar below is practice.
 
-The precourse decks run to 153 slides in their main flow (104 + 49), so the one
+The precourse decks run to 165 slides in their main flow (112 + 53), so the one
 session is a selection — set up notation, standard errors and the lab Python
 patterns, and leave both decks with the cohort as the reference.
 
@@ -18,7 +18,7 @@ Slide counts below are live figures from the compiled decks, written
 **main flow + appendix**; the per-session detail is in
 [`runsheets/`](./runsheets/). For the three decks that span
 two sessions the column gives the pages taught in that session instead; their
-appendices (`chapter_02` +9, `chapter_03` +13, `chapter_04` +44) sit outside
+appendices (`chapter_02` +42, `chapter_03` +19, `chapter_04` +52) sit outside
 both halves. Every deck ends with an appendix holding the optional, more
 advanced material (formal derivations, the heaviest worked exercises, side
 topics); the timed plans in the runsheets cover the main flow only, so the
@@ -28,26 +28,28 @@ appendix pages are extra material to assign, not to teach.
 
 | Chapter | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
-| **0 + 0b** | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 105 + 17, 50 + 10 | 10 + 4, 6 + 2 | 155 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
-| **1 + 2** | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 71, then pp. 1–41 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
-| **2** | Statistical Learning II | `chapter_02` | pp. 42–106 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
-| **3** | Linear Regression I | `chapter_03` | pp. 1–74 | 3.1–3.6 | Stop after multiple regression and the four questions |
-| **3** | Linear Regression II | `chapter_03` | pp. 75–142 | 3.7–3.12 | **Mock Exam 1 after this week** |
-| **4** | Classification I | `chapter_04` | pp. 1–40 | 4.1–4.4 | Logistic regression end to end; stop after the section, before evaluation |
-| **4** | Classification II | `chapter_04` | pp. 41–81 | 4.8–4.10 | Confusion matrix, ROC/AUC, lab (LDA/QDA and naive Bayes are appendix material) · **release Short Exam A** |
-| **5** | Resampling | `chapter_05` | 78 + 8 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap · **release Short Exam B** |
-| **6** | Model Selection & Regularisation | `chapter_06` | 70 + 12 | 6 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
-| **7** | Beyond Linearity | `chapter_07` | 84 + 8 | 6 + 3 | Polynomials, splines, GAMs |
-| **8** | Tree-Based Methods | `chapter_08` | 81 + 9 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
+| **0 + 0b** | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 112 + 20, 53 + 14 | 10 + 4, 6 + 2 | 165 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
+| **1 + 2** | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 74, then pp. 1–41 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
+| **2** | Statistical Learning II | `chapter_02` | pp. 42–81 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
+| **3** | Linear Regression I | `chapter_03` | pp. 1–79 | 3.1–3.6 | Stop after multiple regression and the four questions |
+| **3** | Linear Regression II | `chapter_03` | pp. 80–149 | 3.7–3.12 | **Mock Exam 1 after this week** |
+| **4** | Classification I | `chapter_04` | pp. 1–46 | 4.1–4.4 | Logistic regression end to end; stop after the section, before evaluation |
+| **4** | Classification II | `chapter_04` | pp. 47–91 | 4.8–4.10 | Confusion matrix, ROC/AUC, lab (LDA/QDA and naive Bayes are appendix material) · **release Short Exam A** |
+| **5** | Resampling | `chapter_05` | 85 + 11 | 6 + 3 | Validation set, LOOCV, k-fold, bootstrap · **release Short Exam B** |
+| **6** | Model Selection & Regularisation | `chapter_06` | 73 + 14 | 6 + 3 | **Mock Exam 2 after this week** · **release Short Exam C** |
+| **7** | Beyond Linearity | `chapter_07` | 93 + 9 | 6 + 3 | Polynomials, splines, GAMs |
+| **8** | Tree-Based Methods | `chapter_08` | 90 + 10 | 7 + 3 | Trees, bagging, forests, boosting · **release Short Exam D** |
 
-Nine ISLP chapters are taught, in book order. Chapters 9, 11, 12 and 13 keep
-their full decks and labs but sit outside the plan as advanced modules A5, A6,
-A8 and A7. Short Exam E and the final mock still carry a multiple-testing
+Eight ISLP chapters are taught, in book order. Chapters 9, 10, 11, 12 and 13
+keep their full decks and labs but sit outside the plan as advanced modules
+A5, A9, A6, A8 and A7. Short Exam E and the final mock still carry a multiple-testing
 problem, which now draws on module A7 rather than on a taught session; any
 unsupervised-learning question in the final mock would likewise draw on module A8
 (the current papers do not carry one).
-Deep learning is now the last taught session, so both the final mock exam and
-the release of Short Exam E hang off it.
+Deep learning is module A9: assign it (with A7) as self-study after the
+Chapter 8 session — the final mock exam is weighted toward both modules, and
+the hand-over of Short Exam E and the final mock lives in
+`runsheets/module_a7_multiple_testing.md`.
 
 ## The three splits, and where to break them
 
@@ -126,7 +128,7 @@ allocations and marking tables** in the whole assessment set, so they are the
 easiest papers to mark consistently — and the review decks add a "common
 mistake" box per problem. The *Before you walk in* checklist in
 `runsheets/lecture_04.md`, `lecture_05.md`, `lecture_06.md`, `lecture_08.md` and
-`lecture_10.md` names the paper released after that session, and
+`module_a7_multiple_testing.md` names the paper released after that session, and
 `Mock_Exams/Short_Mock_Exams_60min/README.md` lists what is in each.
 
 `make exams` rebuilds all 18 of the mock-exam PDFs on a machine that has them —

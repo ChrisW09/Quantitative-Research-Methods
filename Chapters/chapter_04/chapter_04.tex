@@ -1716,7 +1716,7 @@ no basis for trading once transaction costs are included.
     \item Interpret coefficients on the odds scale, and only ever
           \emph{holding the other predictors fixed}.
     \item Highly nonlinear boundary, plenty of data $\Rightarrow$ trees and
-          ensembles (Ch.~8), KNN or kernel SVM (Ch.~9).
+          ensembles (Ch.~8), KNN or kernel SVM (module A5).
   \end{itemize}
   \vspace{1mm}
   {\footnotesize \textbf{Appendix rules of thumb.} Small $n$ with roughly
@@ -1758,8 +1758,8 @@ no basis for trading once transaction costs are included.
           regression.
     \item Ch.~8: tree ensembles often beat logistic regression on
           tabular data --- but are harder to explain to a regulator.
-    \item Ch.~9: SVMs as another linear / kernelised classifier.
-    \item Ch.~10: deep learning is logistic regression with
+    \item Module A5 (ISLP Ch.~9): SVMs as another linear / kernelised classifier.
+    \item Module A9 (ISLP Ch.~10): deep learning is logistic regression with
           representation learning baked in (the softmax output layer is
           the multinomial logit of the appendix).
   \end{itemize}
@@ -1874,7 +1874,8 @@ no basis for trading once transaction costs are included.
 \end{frame}
 
 \begin{frame}{Three equivalent ways to think about the optimisation}
-  \begin{itemize}
+  \footnotesize
+  \begin{itemize}\itemsep1pt
     \item \textbf{Maximum likelihood}: find $\hat\beta$ that makes the
           observed data most probable under the model.
     \item \textbf{Cross-entropy minimisation}: $-\log L$ is exactly the
@@ -1883,10 +1884,16 @@ no basis for trading once transaction costs are included.
           sequence of weighted regressions. Equivalent to Newton's
           method on the log-likelihood.
   \end{itemize}
+  \begin{readme}[The number the software prints: deviance]
+    \texttt{statsmodels} reports the fit as the \textbf{deviance}
+    $=-2\log L(\hat\beta)$ (up to a constant): smaller is better. It is
+    the GLM generalisation of RSS --- for normal errors it \emph{is} the
+    RSS --- and the drop from the null deviance (intercept only) to the
+    residual deviance plays $R^2$'s role from Chapter 3.
+  \end{readme}
   \begin{takeaway}
-    All three give the same $\hat\beta$. Which view to take is a matter
-    of taste; deep-learning courses prefer cross-entropy, statistics
-    courses prefer maximum likelihood.
+    All four are one object: maximise $\log L$, minimise cross-entropy,
+    minimise deviance, iterate IRLS --- the same $\hat\beta$ every way.
   \end{takeaway}
 \end{frame}
 
@@ -1915,6 +1922,7 @@ no basis for trading once transaction costs are included.
     they are genuine probabilities. Predict the class with the largest
     numerator.
   \end{takeaway}
+  \islpsource{Section 4.3.5, equations (4.10)--(4.13)}
 \end{frame}
 
 % ---------------- Generative models (moved to appendix) ----------------
@@ -1970,6 +1978,7 @@ no basis for trading once transaction costs are included.
     \end{tabular}
   \end{readme}
   Generative methods differ in \emph{how} they estimate $f_k$.
+  \islpsource{Section 4.4, equation (4.15)}
 \end{frame}
 
 \begin{frame}{Bayes' theorem as a flow: prior $\times$ likelihood $\to$ posterior}
@@ -2038,6 +2047,7 @@ no basis for trading once transaction costs are included.
   class $k$. Because $\delta_k(x)$ is \emph{linear} in $x$, the boundary
   between any two classes is a straight line (hyperplane) --- the
   ``linear'' in LDA.
+  \islpsource{Section 4.4.2, equation (4.24); one predictor: (4.18)}
 \end{frame}
 
 \begin{frame}{Reading the LDA discriminant}
@@ -2181,7 +2191,7 @@ moves toward $\mu_1$ and class $0$ wins more of the axis.}
   \end{readme}
   Since each $\Sigma_k$ differs, the $x^\top \Sigma_k^{-1} x$ term no
   longer cancels --- boundaries become \emph{ellipses or hyperbolas},
-  not lines.
+  not lines. {\tiny\itshape\color{gray}(ISLP \S4.4.3, eq.\ (4.28).)}
 \end{frame}
 
 \begin{frame}{LDA vs.\ QDA: a bias-variance choice}
@@ -2312,21 +2322,30 @@ worst case.
 \subsection{Naive Bayes}
 
 \begin{frame}{Naive Bayes: extreme simplification}
-  \begin{block}{The independence assumption}
+  \footnotesize
+  \begin{block}{The independence assumption (ISLP eq.\ (4.29))}
     Within each class, the features are independent:
     $f_k(x) = \prod_{j=1}^p f_{kj}(x_j)$.
   \end{block}
+  \begin{readme}[How each 1-D marginal $f_{kj}$ is actually estimated]
+    \begin{itemize}\itemsep1pt
+      \item \textbf{Quantitative $X_j$, parametric:} fit a univariate
+            normal, $X_j \mid Y{=}k \sim N(\mu_{jk},\sigma_{jk}^2)$ ---
+            this is \texttt{GaussianNB}, and equals QDA with all
+            covariance matrices forced \emph{diagonal}.
+      \item \textbf{Quantitative $X_j$, nonparametric:} a histogram or
+            kernel density estimate of the class-$k$ values.
+      \item \textbf{Qualitative $X_j$:} simply the class-$k$ category
+            proportions --- the spam-filter case of Exercise 4.7.
+    \end{itemize}
+  \end{readme}
   \begin{takeaway}
     The assumption is almost always wrong --- features are usually
-    correlated. But the simplification massively reduces variance:
-    each $f_{kj}$ is just a one-dimensional density.
+    correlated. But it reduces a $p$-dimensional density problem to $p$
+    one-dimensional ones, slashing variance; and even a miscalibrated
+    posterior often \emph{ranks} cases well enough to classify, which is
+    why naive Bayes stays competitive when $n$ is small and $p$ large.
   \end{takeaway}
-  \begin{exampleblock}{Why it works in practice}
-    Even when independence fails, naive Bayes often \emph{ranks}
-    observations correctly --- which is all a classifier needs. It
-    routinely beats more sophisticated methods when $n$ is small and
-    $p$ is large.
-  \end{exampleblock}
 \end{frame}
 
 
@@ -2366,7 +2385,22 @@ $\pi_k f_k(x)$; naive Bayes factorises the likelihood as
 $f_k(x)=\prod_j\Pr(F_j\mid k)$. The denominator is common to both
 classes, so we compare numerators first and normalise at the end.
 
-\vspace{1mm}
+\medskip
+\textbf{Set up the ingredients before any arithmetic.} Each class needs
+its prior and its two feature likelihoods, read straight off the table:
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+ & prior $\pi_k$ & $\Pr(F_1{=}1\mid k)$ & $\Pr(F_2{=}1\mid k)$ \\
+\midrule
+Spam & 0.4 & 0.6 & 0.7 \\
+Ham  & 0.6 & 0.1 & 0.2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Because \emph{both} features are present, each class's score is the
+product of its whole row --- three numbers, nothing more. That is the
+entire parameter budget the naive assumption leaves.
 \end{solutionbox}
 \end{frame}
 
@@ -2468,20 +2502,26 @@ is a line.
 \begin{frame}{Solution \textemdash{} Extended Exercise 4.2 (2/5)}
 \begin{solutionbox}
 \scriptsize
-\textbf{(2) Boundary.} Set $\delta_0(x)=\delta_1(x)$ and solve;
-substituting $\mu_0=1$, $\mu_1=5$, $\sigma^2=4$ and
-$\log\frac{\pi_1}{\pi_0}=\log\frac{0.3}{0.7}=-0.847$:
+\textbf{(2) Boundary.} Set $\delta_0(x)=\delta_1(x)$ and solve for $x$:
+\[
+  x\frac{\mu_0}{\sigma^2}-\frac{\mu_0^2}{2\sigma^2}+\log\pi_0
+  = x\frac{\mu_1}{\sigma^2}-\frac{\mu_1^2}{2\sigma^2}+\log\pi_1
+  \;\Longrightarrow\;
+  x\,\frac{\mu_1-\mu_0}{\sigma^2}
+  = \frac{\mu_1^2-\mu_0^2}{2\sigma^2}+\log\frac{\pi_0}{\pi_1}.
+\]
+Dividing by $(\mu_1-\mu_0)/\sigma^2$ and using
+$\mu_1^2-\mu_0^2=(\mu_1-\mu_0)(\mu_1+\mu_0)$,
 \[
   x^\star=\frac{\mu_0+\mu_1}{2}
           -\frac{\sigma^2}{\mu_1-\mu_0}\log\frac{\pi_1}{\pi_0}
-        =\frac{1+5}{2}-\frac{4}{4}(-0.847)
-        =3+0.847=3.85 .
+        =\frac{1+5}{2}-\frac{4}{4}\,(-0.847)
+        =3+0.847=3.85 ,
 \]
-Assign class $1$ if $x>3.85$. The prior tilt moves the boundary
-$0.85$ units from the midpoint $3$ \emph{toward} the rarer class, which
-needs stronger evidence.
-
-\vspace{1mm}
+with $\log\frac{\pi_1}{\pi_0}=\log\frac{0.3}{0.7}=-0.847$. Assign class
+$1$ if $x>3.85$. The prior tilt moves the boundary $0.85$ units from the
+midpoint $3$ \emph{toward} the rarer class, which needs stronger
+evidence.
 \end{solutionbox}
 \end{frame}
 
@@ -2669,12 +2709,18 @@ Connection: Gaussian naive Bayes is exactly discriminant analysis with a
     KNN & nonparametric & truth is highly nonlinear \\
     \bottomrule
   \end{tabular}
-  \vspace{0.5em}
+  \vspace{0.3em}
+  \begin{readme}[Logistic regression vs.\ LDA: closer than they look]
+    Both boundaries are linear in $x$ --- the same form on the log-odds
+    scale. They differ only in \emph{estimation}: logistic maximises the
+    likelihood of $\Pr(Y\mid X)$ alone; LDA plugs Gaussian estimates of
+    $\Pr(X\mid Y)$ into Bayes' rule --- assumptions that buy efficiency
+    when true, cost robustness when false (ISLP \S4.5.1).
+  \end{readme}
   \begin{takeaway}[In practice]
-    No method dominates universally. Treat all five as candidates;
-    pick by held-out AUC. With one line of scikit-learn each, the
-    comparison is essentially free. Boosted trees (Chapter~8) often beat all
-    five on raw AUC --- which is why the choice is rarely accuracy alone.
+    No method dominates universally: try all five, pick by held-out AUC
+    --- one scikit-learn line each. Boosted trees (Ch.~8) often beat them
+    all on raw AUC, so the choice is rarely accuracy alone.
   \end{takeaway}
 \end{frame}
 

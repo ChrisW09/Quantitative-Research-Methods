@@ -7,7 +7,7 @@ myst:
 # Quantitative Research Methods
 
 {.qrm-lead}
-A complete, ready-to-teach university course in statistical learning — eleven
+A complete, ready-to-teach university course in statistical learning — ten
 Beamer decks, ten Jupyter notebooks, nine advanced modules, eight mock exams and the course
 datasets, sharing one notation and one semester rhythm.
 
@@ -189,9 +189,9 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 | | |
 |---|---|
-| Lecture decks | 9 taught ISLP chapters + two precourse decks · 901 slides, plus 199 in optional appendices |
+| Lecture decks | 8 taught ISLP chapters + two precourse decks · 901 slides, plus 199 in optional appendices |
 | Exercises | 74 short (~5 min) + 35 extended (~15 min), all with worked solutions |
-| Lab notebooks | 11 labs, one per deck (2 precourse + 9 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
+| Lab notebooks | 10 labs, one per deck (2 precourse + 8 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |
 | Datasets | 23 CSVs from [statlearning.com](https://www.statlearning.com) |
 | Advanced modules | 8 optional self-study modules (RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning) · 777 slides + 8 notebooks |

@@ -9,7 +9,7 @@ Each chapter folder (`chapter_NN/`) is self-contained and holds **everything for
 that chapter**: the deck source `chapter_NN.tex`, its `images/`, the compiled
 `chapter_NN.pdf`, and the companion lab `chapter_NN_lab.ipynb`.
 
-Every chapter carries both — ten decks and eleven notebooks, counting the two
+Every chapter carries both — ten decks and ten notebooks, counting the two
 precourse sessions. Support vector machines (Ch 9), survival analysis (Ch 11),
 unsupervised learning (Ch 12) and multiple testing (Ch 13) are no longer part of
 the taught sequence: their decks and labs live on in [`Advanced/`](./Advanced/)
@@ -30,7 +30,7 @@ one of them in code.
 
 `chapter_00b/` is the **second half of that session**, covering what the later
 chapters use but never explain. Its scope was chosen by counting usage across
-the nine chapter decks: reading notation (Σ, Π, argmin, indicators, sets — 180
+the chapter decks (deep learning included, then still a taught chapter): reading notation (Σ, Π, argmin, indicators, sets — 180
 uses), logs and exponentials (176), odds and the logit (108), likelihood and
 maximum likelihood (37), counting and the 2ᵖ cost (13), plus the Python
 patterns every lab relies on. The maximum-likelihood derivation and the counting
@@ -91,17 +91,17 @@ works as homework.
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher | 13 | 4 | 112 + 20 |
+| 0  | Precourse (a) — statistics refresher | 10 | 4 | 112 + 20 |
 | 0b | Precourse (b) — toolkit | 6 | 2 | 53 + 14 |
 | 1  | Introduction | 3 | 1 | 74 + 8 |
-| 2  | Statistical Learning | 11 | 4 | 81 + 42 |
-| 3  | Linear Regression | 13 | 6 | 149 + 19 |
-| 4  | Classification | 13 | 6 | 91 + 52 |
+| 2  | Statistical Learning | 8 | 4 | 81 + 42 |
+| 3  | Linear Regression | 12 | 6 | 149 + 19 |
+| 4  | Classification | 10 | 6 | 91 + 52 |
 | 5  | Resampling Methods | 6 | 3 | 85 + 11 |
 | 6  | Linear Model Selection & Regularization | 6 | 3 | 73 + 14 |
 | 7  | Moving Beyond Linearity | 6 | 3 | 93 + 9 |
 | 8  | Tree-Based Methods | 7 | 3 | 90 + 10 |
-| **Total** | | **80** | **38** | **901 + 199** |
+| **Total** | | **74** | **35** | **901 + 199** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
 (Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —
@@ -110,7 +110,7 @@ self-study modules A5, A6, A8 and A7.
 
 ## Suggested plan (11 sessions of 180 min)
 
-Nine ISLP chapters in book order, preceded by the taught precourse session — 12
+Eight ISLP chapters in book order, preceded by the taught precourse session — 11
 sessions in all. The plan is keyed to **chapter numbers**, not session numbers,
 because that is what the decks, labs and exercise numbering all use. The three
 heaviest chapters (2, 3, 4) each span two sessions, splitting at a natural
@@ -127,14 +127,13 @@ section boundary so you can stop and resume cleanly.
 | **Ch 6** | 1 | Subset selection; Cp/AIC/BIC; ridge; lasso; PCR/PLS | 6.1–6.6 |
 | **Ch 7** | 1 | Polynomials, step functions, splines, smoothing splines, GAMs | 7.1–7.6 |
 | **Ch 8** | 1 | Decision trees; bagging & OOB; random forests; boosting | 8.1–8.7 |
-| **Ch 10** | 1 | Neural nets; forward pass; backprop/GD; CNNs; regularization | 10.1–10.6 |
 
 Chapter 1 is short and opens the same session as the first half of Chapter 2.
 
-For the split chapters, the recommended stopping points are: **Ch 2** after the
-KNN / bias–variance material; **Ch 3** after "Goodness of fit / the four
-questions" (p. 75); **Ch 4** after the logistic-regression section (p. 41), so evaluation
-and the lab open the second session.
+For the split chapters, the recommended stopping points are: **Ch 2** after
+"regression vs. classification" (p. 41); **Ch 3** after multiple regression and
+the four questions (p. 79); **Ch 4** after the logistic-regression section
+(p. 46), so evaluation and the lab open the second session.
 
 The plan above covers the main flow of each deck. Appendix pages sit outside it
 — assign them, or reach for them when a room wants the derivation.

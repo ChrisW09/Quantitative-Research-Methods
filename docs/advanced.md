@@ -60,7 +60,7 @@ Each module bridges back to the course chapters it extends, and assumes them:
 | Module | Builds on |
 |:--:|---|
 | A1 | Ch 0 (standard errors, tests) · Ch 3 (regression) · Ch 5 (simulation) · A7 (multiple testing — the peeking problem) |
-| A2 | Ch 0b (counting and the 2ᵖ cost) · Ch 8 (boosting, variable importance) · Ch 10 (black-box models) |
+| A2 | Ch 0b (counting and the 2ᵖ cost) · Ch 8 (boosting, variable importance) · A9 (black-box models) |
 | A3 | Ch 3 (prediction intervals) · Ch 5 (train/validation splits) |
 | A4 | Ch 3–4 (linear and logistic regression) · Ch 5–6 (CV, AIC) · Ch 7 (splines and GAMs) |
 | A5 | Ch 4 (classification, ROC/AUC) · Ch 5 (cross-validation) |
@@ -92,7 +92,7 @@ advanced_labs/advanced_*_lab
 
 ## Where to go next
 
-- [Lecture slides](slides.md) — the eleven course decks these modules extend.
+- [Lecture slides](slides.md) — the ten course decks these modules extend.
 - [Lab notebooks](labs.md) — the course labs, built to the same pattern.
 - [The course at a glance](course.md) — where the taught plan ends and these begin.
 - [Repository layout](repository.md) — where everything lives.

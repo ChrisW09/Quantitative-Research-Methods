@@ -15,7 +15,7 @@ examples printed on the slides.
 | Core scientific stack | `numpy>=1.24` · `pandas>=2.0` · `matplotlib>=3.7` · `seaborn>=0.12` · `scipy>=1.10` |
 | Statistics & machine learning | `statsmodels>=0.14` · `scikit-learn>=1.3` |
 | Book companion (datasets + helpers) | `ISLP==0.4.0` |
-| Chapter-specific | `pygam==0.10.1` (Ch 7) · `xgboost>=2.0` (Ch 8, genuinely optional) · `torch>=2.1` (Ch 10) · `lifelines>=0.27` (module A6) |
+| Chapter-specific | `pygam==0.10.1` (Ch 7) · `xgboost>=2.0` (Ch 8, genuinely optional) · `torch>=2.1` (module A9) · `lifelines>=0.27` (module A6) |
 | Notebook environment | `jupyter>=1.0` |
 
 Only `xgboost` is optional in practice. `pygam`, `torch` and `lifelines` are
@@ -52,7 +52,7 @@ megabytes — see [Why the install is large](#why-the-install-is-large) below.
   comparison.
 
 `torch`
-: Chapter 10 (deep learning). Preinstalled on Colab, so the Colab path needs no
+: module A9 (deep learning). Preinstalled on Colab, so the Colab path needs no
   install; locally, install the build that matches your platform if you want GPU
   support. Note that it arrives whether you ask for it or not — see below.
 
@@ -70,7 +70,7 @@ dependencies include `torch`, `pytorch_lightning`, `torchmetrics`, `lifelines`
 and `pygam` alongside the core scientific stack.
 
 So asking for the datasets and helpers used from Chapter 1 onwards also installs
-the deep-learning stack you will not touch until Chapter 10:
+the deep-learning stack you will not touch until module A9:
 
 - resolving `requirements.txt` pulls in roughly **150 packages**;
 - on Windows that is several hundred megabytes of downloads, `torch` alone over

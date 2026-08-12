@@ -136,6 +136,7 @@
     Bayes error & $1-E\big[\max_j \Pr(Y=j\mid X)\big]$: optimal error rate \\
     $K$, $\mathcal N_0$ & KNN: neighbour count; $K$ nearest points to $x_0$ \\
     $I(\cdot)$ & indicator: $1$ if the condition holds, else $0$ \\
+    $\Phi(z)$ & standard-normal CDF, $\Pr(Z\le z)$ --- appendix exercises \\
     \bottomrule
   \end{tabular}
   \end{center}
@@ -710,8 +711,8 @@ depends on the data and the goal --- ``more flexible'' is not
   \end{columns}
   \begin{takeaway}
     This course is supervised learning throughout. The unsupervised case
-    --- principal components and clustering --- is the optional Chapter 12
-    module in \texttt{Chapters/Advanced/}.
+    --- principal components and clustering --- is the optional module A8
+    (ISLP Ch.\ 12) in \texttt{Chapters/Advanced/}.
   \end{takeaway}
 \end{frame}
 
@@ -1519,8 +1520,23 @@ now derived rather than asserted.
 
 \begin{frame}{Solution --- Extended Exercise 2.1 (4/5)}
 \begin{solutionbox}
-\textbf{4. Apply.} Test MSE $=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$:
+\textbf{4. Apply.} Test MSE $=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$.
+The table gives the \emph{bias}, so square it first --- for model A,
+\[
+  \underbrace{2.0^2}_{\mathrm{Bias}^2 = 4.00}
+  + \underbrace{0.5}_{\mathrm{Var}}
+  + \underbrace{1.0}_{\sigma^2}
+  = 5.50 ,
+\]
+and likewise for B and C (next slide). Note the three ingredients are on
+different scales: bias in $y$-units, variance and $\sigma^2$ in squared
+units --- only after squaring the bias do they add.
 \end{solutionbox}
+\begin{mistake}
+Adding the raw bias ($2.0$) instead of its square ($4.00$) --- model A
+would wrongly score $3.5$ and \emph{win}. The decomposition holds for
+$\mathrm{Bias}^2$; the table's column is deliberately labelled Bias.
+\end{mistake}
 \end{frame}
 
 \begin{frame}{Solution --- Extended Exercise 2.1 (5/5)}
@@ -1563,7 +1579,20 @@ priors $\pi_0=\Pr(Y{=}0)$ and $\pi_1=1-\pi_0$. Use $\mu_0=0$, $\mu_1=2$, $\sigma
 
 \begin{frame}{Solution --- Extended Exercise 2.3 (1/4)}
 \begin{solutionbox}
-\textbf{1. Bayes rule.} The posterior is $\Pr(Y{=}k\mid x)\propto\pi_k f_k(x)$ with $f_k(x)=\frac{1}{\sqrt{2\pi}\,\sigma}\exp\!\big(-\frac{(x-\mu_k)^2}{2\sigma^2}\big)$. Predict class~1 iff $\pi_1 f_1(x)>\pi_0 f_0(x)$.
+\textbf{1. Bayes rule.} By Bayes' theorem the posterior is
+\[
+  \Pr(Y{=}k\mid x)
+  = \frac{\pi_k f_k(x)}{\pi_0 f_0(x) + \pi_1 f_1(x)},
+  \qquad
+  f_k(x)=\frac{1}{\sqrt{2\pi}\,\sigma}
+         \exp\!\Bigl(-\frac{(x-\mu_k)^2}{2\sigma^2}\Bigr).
+\]
+The denominator is the \emph{same} for both classes --- it only renormalises
+--- so comparing posteriors is comparing numerators:
+$\Pr(Y{=}k\mid x)\propto\pi_k f_k(x)$, and the Bayes classifier predicts
+class~1 iff $\pi_1 f_1(x)>\pi_0 f_0(x)$. This ``compare the numerators''
+step is the engine of every generative classifier in Chapter 4's appendix
+(LDA, QDA, naive Bayes).
 \end{solutionbox}
 \end{frame}
 
@@ -1656,6 +1685,7 @@ Averaging the two tail probabilities without the priors --- $(0.115+0.212)/2 = 0
     which we never do. So the Bayes classifier is a \emph{benchmark},
     not an algorithm.
   \end{takeaway}
+  \islpsource{Section 2.2.3, equation (2.10)}
 \end{frame}
 
 \begin{frame}{The Bayes error rate}
@@ -1670,6 +1700,7 @@ Averaging the two tail probabilities without the priors --- $(0.115+0.212)/2 = 0
     classes the Bayes error is near zero; in heavily overlapping
     classes it can be near $50\,\%$ for two roughly balanced classes.
   \end{readme}
+  \islpsource{Section 2.2.3, equation (2.11)}
 \end{frame}
 
 \begin{frame}{$K$-nearest neighbours: definition}
@@ -1691,6 +1722,7 @@ Averaging the two tail probabilities without the priors --- $(0.115+0.212)/2 = 0
     in a few lines and checked against \texttt{KNeighborsClassifier} --- watch the prediction
     flip when $K$ widens from $1$ to $3$.
   \end{labnote}
+  \islpsource{Section 2.2.3, equation (2.12)}
 \end{frame}
 
 \begin{frame}{How KNN votes: the neighbourhood of a query point}
@@ -2093,6 +2125,22 @@ $K=3$: nearest are $x=3,4,2$ with $y=3.3,3.9,1.8$, so $\hat y(x_0)=\tfrac{3.3+3.
 
 \begin{frame}{Solution --- Extended Exercise 2.4 (4/4)}
 \begin{solutionbox}
+\textbf{The three cases at a glance.}
+\begin{center}\footnotesize
+\begin{tabular}{llll}
+\toprule
+Case & Winner & Deciding force & Chapter that revisits it \\
+\midrule
+(a) linear truth & linear & zero bias at lower variance & Ch.\ 3 (Fig.\ 3.18) \\
+(b) curved truth, big $n$ & KNN & misspecification bias & Ch.\ 3, 7 \\
+(c) $p$ large, $n$ modest & linear & curse of dimensionality & Ch.\ 3 (Fig.\ 3.20), 6 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The same trade-off is re-run with real estimates in Chapter 3's appendix
+(linear vs.\ KNN regression, ISLP \S3.5) --- same conclusions, drawn from
+simulations instead of reasoning.
+
 \smallskip
 \textit{Common mistake:} judging KNN by its training error --- with $K=1$ that is exactly zero on \emph{every} data set. Only the test error can compare these models.
 \end{solutionbox}

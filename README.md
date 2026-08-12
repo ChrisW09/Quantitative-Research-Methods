@@ -17,7 +17,7 @@
 <p align="center">
   <b>901 core slides</b> (+199 in optional appendices) ·
   <b>109 exercises</b> with worked solutions ·
-  <b>11 labs</b> with worked solutions, all running locally &amp; on Colab ·
+  <b>10 labs</b> with worked solutions, all running locally &amp; on Colab ·
   <b>3 + 5 mock exams</b> · <b>23 datasets</b>
 </p>
 
@@ -40,16 +40,16 @@ Prepared by **Prof. Dr. Christoph Weisser**.
 | | Where to go | What you get |
 |:--:|---|---|
 | 🎓 | **Learning it** — [read a deck](#-lecture-slides), then [run its lab](#-lab-notebooks) | The compiled PDFs need no toolchain; every notebook opens in Colab with one click and resolves its own data. |
-| 👩‍🏫 | **Teaching it** — [the teaching guide](#-teaching-it) | A eleven-session plan, per-session runsheets with timings and cut lists, a generated slide index, and one `make` command that keeps them in sync with the decks. |
+| 👩‍🏫 | **Teaching it** — [the teaching guide](#-teaching-it) | An eleven-session plan, per-session runsheets with timings and cut lists, a generated slide index, and one `make` command that keeps them in sync with the decks. |
 | 🛠️ | **Adapting it** — [repository layout](#-repository-layout) | LaTeX sources for every deck and exam, figures regenerated from the datasets by script, and a pinned Python environment. |
 
 ### What's inside
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 901 slides, plus 199 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 10 | Eight ISLP chapters + a two-part precourse · 901 slides, plus 199 in per-deck appendices |
 | Exercises | 74 short + 35 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
-| [Lab notebooks](#-lab-notebooks) | 11 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
+| [Lab notebooks](#-lab-notebooks) | 10 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
 | [Mock exams](#-mock-exams) | 3 + 5 | Three full papers plus five 60-minute short exams — each as questions, worked solutions and an in-class review deck, kept out of git |
 | [Datasets](#-python-environment--datasets) | 23 CSVs | From [statlearning.com](https://www.statlearning.com), resolved automatically via `ISLP` |
 | [Teaching guide](#-teaching-it) | 1 kit | Semester plan, runsheets, slide index, before-class checklist, printable handouts |
@@ -70,7 +70,7 @@ to install and nothing to debug on a projector. The first cell detects Colab,
 installs the few missing packages (`ISLP`, plus `pygam`/`xgboost`/`lifelines`
 where a chapter needs them; `torch` is preinstalled), and resolves the data
 automatically. A Google account is enough — no account on this repository is
-needed, and Colab runs every lab in the course, including the Chapter 10 deep
+needed, and Colab runs every lab in the course, including module A9's deep-
 learning lab.
 
 ### ⌥ Week two: a local virtual environment
@@ -99,15 +99,15 @@ works offline.
 
 ## 📚 The course at a glance
 
-A 11-session semester (11 × 180 min), **6 ECTS**, graded by a single 120-minute
+An 11-session semester (11 × 180 min), **6 ECTS**, graded by a single 120-minute
 written exam at the end. The precourse is **taught** in the session that opens
-the semester; the nine chapters follow in ISLP book order. The plan is keyed to
+the semester; the eight chapters follow in ISLP book order. The plan is keyed to
 **chapter numbers** — that is what the decks, labs, exercises and runsheets all
 refer to.
 
 | Chapter | Sessions | Topic |
 |:--:|:--:|--|
-| **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 153 slides across the two, so the session is a selection and the decks stay the reference |
+| **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 165 slides across the two, so the session is a selection and the decks stay the reference |
 | **1** | ½ | Introduction; prediction vs. inference |
 | **2** | 1½ | What is statistical learning; model accuracy; bias–variance trade-off |
 | **3** | 2 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
@@ -120,9 +120,9 @@ refer to.
 Chapter 1 is short and opens the same session as the first half of Chapter 2.
 
 Chapters 2, 3 and 4 each span two sessions, breaking where a session can end
-cleanly: Ch 2 after "regression vs. classification" (p. 42), so accuracy,
+cleanly: Ch 2 after "regression vs. classification" (p. 41), so accuracy,
 bias–variance and KNN open the second; Ch 3 after multiple regression and the
-four questions (p. 75); Ch 4 after the logistic-regression section (p. 41), so
+four questions (p. 79); Ch 4 after the logistic-regression section (p. 46), so
 evaluation and the lab open the second.
 
 > Chapters **9 (SVM), 11 (Survival), 12 (Unsupervised) and 13 (Multiple
@@ -418,7 +418,7 @@ formative — the module is graded by the written exam — and each folder carri
 
 | Path | Contents |
 |---|---|
-| [`Chapters/`](./Chapters/) | **One folder per chapter, holding its deck and its lab together**: `chapter_NN/` contains `chapter_NN.tex`, the compiled `.pdf`, `images/`, and `chapter_NN_lab.ipynb`. Ten decks and eleven notebooks, one pair per chapter. See its [deck guide](./Chapters/README.md). |
+| [`Chapters/`](./Chapters/) | **One folder per chapter, holding its deck and its lab together**: `chapter_NN/` contains `chapter_NN.tex`, the compiled `.pdf`, `images/`, and `chapter_NN_lab.ipynb`. Ten decks and ten notebooks, one pair per chapter. See its [deck guide](./Chapters/README.md). |
 | [`Chapters/Advanced/`](./Chapters/Advanced/) | Nine optional self-study modules — RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning — each a full deck plus companion notebook. See its [module guide](./Chapters/Advanced/README.md). |
 | [`Projects/`](./Projects/) | Six short projects (3–5 h): a real decision on real data, with a fixed held-out set, a baseline to beat and a one-page memo as the deliverable. See its [project guide](./Projects/README.md). |
 | [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, runsheets, slide index, before-class checklist, printable handouts |
@@ -441,7 +441,7 @@ and the in-slide code examples:
 | Core scientific stack | `numpy` · `pandas` · `matplotlib` · `seaborn` · `scipy` |
 | Statistics & ML | `statsmodels` · `scikit-learn` |
 | Book companion (datasets + helpers) | `ISLP` |
-| Chapter-specific | `pygam` (Ch 7) · `xgboost` (Ch 8, optional) · `torch` (Ch 10) · `lifelines` (module A6) |
+| Chapter-specific | `pygam` (Ch 7) · `xgboost` (Ch 8, optional) · `torch` (module A9) · `lifelines` (module A6) |
 | Notebook environment | `jupyter` |
 
 The datasets live in

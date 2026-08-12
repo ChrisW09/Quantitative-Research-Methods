@@ -681,7 +681,7 @@
     Maximising the log-likelihood means paying $-\log \hat p$ for the
     probability you gave what actually happened: hedging at $0.5$ costs
     $0.69$, confident-and-wrong costs without bound. This curve is the loss
-    of logistic regression (Ch.~4) and of cross-entropy (Ch.~10).
+    of logistic regression (Ch.~4) and of cross-entropy (module A9).
   \end{takeaway}
 \end{frame}
 
@@ -755,7 +755,7 @@
 \section[Python in practice]{The Python you will actually write}
 % ============================================================
 
-\begin{frame}[fragile]{Functions and loops --- used in all fifteen labs}
+\begin{frame}[fragile]{Functions and loops --- used in every lab}
 \begin{lstlisting}
 def rmse(y, y_hat):                     # define once, reuse everywhere
     """Root mean squared error."""      # what help(rmse) shows
@@ -1053,7 +1053,7 @@ for degree in range(1, 6):                  # now all five degrees
     Likelihood & probability of the observed data, as a function of the parameter \\
     Log-likelihood & its log: sums instead of products, no underflow \\
     Maximum likelihood & the parameter that makes the observed data most probable \\
-    Cross-entropy & $-\ell$ for a classifier; the loss of Chapter 10 \\
+    Cross-entropy & $-\ell$ for a classifier; the loss of module A9 \\
     Binomial coefficient & $\binom{p}{k}$: the number of subsets of size $k$ \\
     Data leakage & letting test information reach the training pipeline \\
     Seed & fixes the random draw so results are reproducible \\
@@ -1071,10 +1071,10 @@ for degree in range(1, 6):                  # now all five degrees
     \midrule
     $\sum$, $\prod$, $\arg\min$, $I(\cdot)$ & every chapter; RSS and error rates from Ch.\ 2 \\
     Sets and $|\mathcal{S}|$ & Ch.\ 8 (tree regions), Ch.\ 12 clusters (Advanced) \\
-    Logs and exponentials & Ch.\ 3 (logged responses), Ch.\ 4, Ch.\ 10 \\
-    Odds, logits, the sigmoid & Ch.\ 4 (logistic regression), Ch.\ 10 (activations) \\
+    Logs and exponentials & Ch.\ 3 (logged responses), Ch.\ 4, module A9 \\
+    Odds, logits, the sigmoid & Ch.\ 4 (logistic regression), module A9 (activations) \\
     Likelihood and log-likelihood & Ch.\ 4 (fitting), Ch.\ 6 (AIC, BIC) \\
-    Maximum likelihood & Ch.\ 4, Ch.\ 6, Ch.\ 10 (cross-entropy) \\
+    Maximum likelihood & Ch.\ 4, Ch.\ 6, module A9 (cross-entropy) \\
     $2^p$ and counting & Ch.\ 6 (subset selection) \\
     Loops, functions, \texttt{argmin} & every lab; tuning loops in Ch.\ 5--8 \\
     Seeds and splits & Ch.\ 2 onwards; formalised in Ch.\ 5 \\
@@ -1205,9 +1205,10 @@ for degree in range(1, 6):                  # now all five degrees
     \arg\max_\mu \ell(\mu) = \arg\min_\mu \sum_i (y_i-\mu)^2 .
   \]
   \begin{takeaway}[One principle under two names]
-    Maximising the likelihood \emph{is} minimising squared error whenever the
-    errors are normal. Chapter 4 keeps the principle and drops the normal
-    assumption --- that is all logistic regression does.
+    Maximising the likelihood \emph{is} minimising squared error whenever
+    the errors are normal --- and with $\mu_i = \beta_0+\beta_1 x_i$ the
+    same algebra makes Chapter 3's least squares maximum likelihood too.
+    Chapter 4 keeps the principle and drops the normal assumption.
   \end{takeaway}
 \end{frame}
 
@@ -1290,6 +1291,12 @@ for degree in range(1, 6):                  # now all five degrees
       \ell(\beta_0,\beta_1) = \sum_{i=1}^{n}
         \Bigl[\,y_i \log \pi_i + (1-y_i)\log(1-\pi_i)\Bigr].
     \]
+    \emph{Read it against part (2):} the same Bernoulli log-likelihood,
+    except each customer now has their \emph{own} $\pi_i$, tied to $x_i$
+    through the sigmoid. Each $y_i=1$ contributes $\log\pi_i$, each
+    $y_i=0$ contributes $\log(1-\pi_i)$ --- the sum rewards coefficients
+    that assign high probability to what actually happened, case by case.
+    This is exactly what Chapter 4's \texttt{statsmodels} call maximises.
   \end{solutionbox}
 \end{frame}
 
@@ -1300,7 +1307,7 @@ for degree in range(1, 6):                  # now all five degrees
     a closed form as the normal equations were. Software maximises $\ell$
     numerically --- by walking uphill, exactly the gradient method of
     Part (a). Note also that $-\ell$ is the ``binary cross-entropy'' loss of
-    Chapter 10: the same quantity under a different name.
+    module A9 (deep learning): the same quantity under a different name.
   \end{solutionbox}
   \begin{mistake}
     Treating $\hat\pi = k/n$ as exact. With $k=0$
@@ -1357,7 +1364,7 @@ for degree in range(1, 6):                  # now all five degrees
             for $p = 6$, and for $p = 30$?
       \item Testing every model against the data and keeping the best
             $R^2$ has a statistical cost as well as a computational one. What
-            is it? (One sentence; Chapter 13 gives it a name.)
+            is it? (One sentence; module A7 gives it a name.)
     \end{enumerate}
   \end{exercise}
   \begin{labnote}[{{Live demo --- \S5 of the notebook}}]
@@ -1389,7 +1396,7 @@ for degree in range(1, 6):                  # now all five degrees
     \textbf{(5)} Picking the winner from a huge number of models is
     \emph{selection on noise}: with enough candidates, some model fits the
     sample well by luck, so its $R^2$ is optimistic and it may not generalise.
-    That is \textbf{multiple testing} (Chapter 13), and it is also why model
+    That is \textbf{multiple testing} (module A7, ISLP Ch.\ 13), and it is also why model
     choice must be judged on held-out data (Chapter 5).
   \end{solutionbox}
   \begin{mistake}
