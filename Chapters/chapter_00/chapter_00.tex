@@ -968,20 +968,22 @@
       \mathrm{E}[aX + b] = a\,\mathrm{E}[X] + b,
       \qquad
       \mathrm{Var}(aX + b) = a^2\,\mathrm{Var}(X),
+      \qquad
+      \mathrm{E}[X + Y] = \mathrm{E}[X] + \mathrm{E}[Y] ,
     \]
     \[
-      \mathrm{E}[X + Y] = \mathrm{E}[X] + \mathrm{E}[Y] \ \text{(always)},
-      \qquad
       \mathrm{Var}(X + Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)
-      \ \text{\emph{only if} } X \perp Y .
+        + 2\,\mathrm{Cov}(X, Y)
+      \qquad (\text{the last term is } 0 \text{ iff } X \perp Y) .
     \]
   \end{block}
   \begin{takeaway}[Read the rules carefully]
-    Expectation is linear \emph{without conditions}. Variance is not:
-    adding a constant does not change spread ($b$ vanishes), scaling squares
-    it ($a^2$), and variances add only under independence. The
-    bias--variance decomposition in Chapter 2 is these rules applied to
-    $\hat f(x)$.
+    Expectation is linear \emph{without conditions}; variance is not ---
+    variances add only when the covariances vanish, and a sum of $n$ terms
+    carries one covariance per pair. \textbf{Positive correlation makes an
+    average less precise than $n$ independent terms would}: the rule behind
+    $\sigma/\sqrt n$, correlated CV folds (Ch.\ 5) and random-forest
+    decorrelation (Ch.\ 8).
   \end{takeaway}
 \end{frame}
 
@@ -1584,6 +1586,33 @@
   missing something. Both plots return in Chapter 3. A fit like this one starts
   most marketing conversations --- and is not causal: spend rises in strong
   seasons, so the slope quietly absorbs the season.
+\end{frame}
+
+\begin{frame}{How good is the fit? RSS, TSS and $R^2$}
+  \footnotesize
+  \begin{block}{Two sums of squares, and their ratio}
+    \[
+      \mathrm{RSS} = \sum_i (y_i - \hat y_i)^2,
+      \qquad
+      \mathrm{TSS} = \sum_i (y_i - \bar y)^2 = S_{yy},
+      \qquad
+      R^2 = 1 - \frac{\mathrm{RSS}}{\mathrm{TSS}} .
+    \]
+  \end{block}
+  \begin{readme}[Reading it]
+    TSS is the variation in $y$ \emph{before} the model (predict $\bar y$ for
+    everyone); RSS is what is \emph{left over} after it. So $R^2$ is the
+    fraction of the variation the model accounts for: $0 \le R^2 \le 1$, and
+    $R^2 = 0.61$ reads ``$61\%$ of the variability in sales is accounted for
+    by TV spend''. In \emph{simple} regression $R^2 = r^2$ exactly --- the
+    same number you already met as the correlation, squared.
+  \end{readme}
+  \begin{takeaway}[What a high $R^2$ does not buy you]
+    Not correctness, not causality, and not accurate predictions on new data.
+    $R^2$ never falls when a predictor is added, so it cannot compare models
+    of different sizes --- which is why Chapter 6 needs adjusted $R^2$, $C_p$,
+    AIC and BIC.
+  \end{takeaway}
 \end{frame}
 
 

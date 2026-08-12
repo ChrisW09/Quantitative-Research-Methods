@@ -91,17 +91,17 @@ works as homework.
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher | 13 | 4 | 111 + 20 |
-| 0b | Precourse (b) — toolkit | 6 | 2 | 52 + 14 |
+| 0  | Precourse (a) — statistics refresher | 13 | 4 | 112 + 20 |
+| 0b | Precourse (b) — toolkit | 6 | 2 | 53 + 14 |
 | 1  | Introduction | 3 | 1 | 74 + 8 |
 | 2  | Statistical Learning | 11 | 4 | 81 + 42 |
 | 3  | Linear Regression | 13 | 6 | 149 + 19 |
 | 4  | Classification | 13 | 6 | 91 + 52 |
 | 5  | Resampling Methods | 6 | 3 | 85 + 11 |
 | 6  | Linear Model Selection & Regularization | 6 | 3 | 73 + 14 |
-| 7  | Moving Beyond Linearity | 6 | 3 | 92 + 9 |
-| 8  | Tree-Based Methods | 7 | 3 | 89 + 10 |
-| **Total** | | **80** | **38** | **897 + 156** |
+| 7  | Moving Beyond Linearity | 6 | 3 | 93 + 9 |
+| 8  | Tree-Based Methods | 7 | 3 | 90 + 10 |
+| **Total** | | **80** | **38** | **901 + 199** |
 
 Support vector machines (Ch 9), survival analysis (Ch 11), unsupervised learning
 (Ch 12) and multiple testing (Ch 13) are no longer part of the taught sequence —

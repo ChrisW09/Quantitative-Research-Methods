@@ -6,7 +6,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 
 ### Precourse (a) — Statistics Refresher
 
-`chapter_00.pdf` — **111 slides** in the main flow plus **20** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.3 min per slide).
+`chapter_00.pdf` — **112 slides** in the main flow plus **20** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.3 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
@@ -14,14 +14,14 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Data, variables and notation | 9–16 | 8 | 11 min |
 | Describing one variable | 17–29 | 13 | 17 min |
 | Describing two variables | 30–40 | 11 | 14 min |
-| Probability essentials | 41–51 | 11 | 15 min |
+| Probability essentials | 41–51 | 11 | 14 min |
 | Distributions you will meet | 52–56 | 5 | 6 min |
 | Sampling, estimation and confidence intervals | 57–61 | 5 | 7 min |
 | Hypothesis testing | 62–75 | 14 | 18 min |
-| Simple linear regression: the bridge | 76–87 | 12 | 16 min |
-| The Python toolkit | 88–101 | 14 | 18 min |
-| Summary | 102–111 | 10 | 13 min |
-| Appendix: optional and advanced material | 112–131 | 20 | optional |
+| Simple linear regression: the bridge | 76–88 | 13 | 17 min |
+| The Python toolkit | 89–102 | 14 | 18 min |
+| Summary | 103–112 | 10 | 13 min |
+| Appendix: optional and advanced material | 113–132 | 20 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
@@ -32,43 +32,43 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 0.5 | short | Math | p. 49 | p. 50 |
 | Exercise 0.6 | short | Concept | p. 69 | p. 70 |
 | Extended Exercise 0.1 | extended | Math | p. 72 | p. 73 |
-| Extended Exercise 0.2 | extended | Math | p. 81 | p. 82 |
-| Exercise 0.7 | short | Python | p. 86 | p. 87 |
-| Exercise 0.9 | short | Python | p. 95 | p. 96 |
-| Exercise 0.10 | short | Concept | p. 97 | p. 98 |
-| Extended Exercise 0.4 | extended | Integrative | p. 99 | p. 100 |
-| Exercise 0.8 | short | Math | p. 120 | p. 121 |
-| Extended Exercise 0.3 | extended | — | p. 127 | p. 128 |
+| Extended Exercise 0.2 | extended | Math | p. 82 | p. 83 |
+| Exercise 0.7 | short | Python | p. 87 | p. 88 |
+| Exercise 0.9 | short | Python | p. 96 | p. 97 |
+| Exercise 0.10 | short | Concept | p. 98 | p. 99 |
+| Extended Exercise 0.4 | extended | Integrative | p. 100 | p. 101 |
+| Exercise 0.8 | short | Math | p. 121 | p. 122 |
+| Extended Exercise 0.3 | extended | — | p. 128 | p. 129 |
 
 **Notebook cues:** 8 in this deck.
 
 ### Precourse (b) — Toolkit
 
-`chapter_00b.pdf` — **52 slides** in the main flow plus **14** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 2.8 min per slide).
+`chapter_00b.pdf` — **53 slides** in the main flow plus **14** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 2.7 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
-| *front matter* | 1–6 | 6 | 17 min |
+| *front matter* | 1–6 | 6 | 16 min |
 | Reading mathematical notation | 7–14 | 8 | 22 min |
-| Logs, exponentials and growth | 15–21 | 7 | 20 min |
-| Probability, odds and the logit | 22–27 | 6 | 16 min |
-| Likelihood and maximum likelihood | 28–34 | 7 | 20 min |
-| The Python you will actually write | 35–43 | 9 | 25 min |
-| Summary | 44–52 | 9 | 25 min |
-| Appendix: optional and advanced material | 53–66 | 14 | optional |
+| Logs, exponentials and growth | 15–21 | 7 | 19 min |
+| Probability, odds and the logit | 22–28 | 7 | 20 min |
+| Likelihood and maximum likelihood | 29–35 | 7 | 19 min |
+| The Python you will actually write | 36–44 | 9 | 24 min |
+| Summary | 45–53 | 9 | 25 min |
+| Appendix: optional and advanced material | 54–67 | 14 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
 | Exercise 0b.1 | short | Math | p. 12 | p. 13 |
 | Exercise 0b.2 | short | Math | p. 19 | p. 20 |
-| Exercise 0b.3 | short | Math | p. 25 | p. 26 |
-| Exercise 0b.4 | short | Concept | p. 33 | p. 34 |
-| Exercise 0b.6 | short | Python | p. 40 | p. 41 |
-| Extended Exercise 0b.2 | extended | Python | p. 42 | p. 43 |
-| Extended Exercise 0b.1 | extended | Math | p. 56 | p. 57 |
-| Exercise 0b.5 | short | Math | p. 64 | p. 65 |
+| Exercise 0b.3 | short | Math | p. 26 | p. 27 |
+| Exercise 0b.4 | short | Concept | p. 34 | p. 35 |
+| Exercise 0b.6 | short | Python | p. 41 | p. 42 |
+| Extended Exercise 0b.2 | extended | Python | p. 43 | p. 44 |
+| Extended Exercise 0b.1 | extended | Math | p. 57 | p. 58 |
+| Exercise 0b.5 | short | Math | p. 65 | p. 66 |
 
-**Notebook cues:** 8 in this deck (near pp. 36).
+**Notebook cues:** 8 in this deck (near pp. 37).
 
 ### Ch. 1 — Introduction
 
@@ -268,48 +268,48 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 
 ### Ch. 7 — Moving Beyond Linearity
 
-`chapter_07.pdf` — **92 slides** in the main flow plus **9** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.6 min per slide).
+`chapter_07.pdf` — **93 slides** in the main flow plus **9** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.6 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 11 min |
 | Why this chapter matters | 8–10 | 3 | 5 min |
 | Polynomials | 11–25 | 15 | 23 min |
-| Splines | 26–42 | 17 | 27 min |
-| Smoothing | 43–54 | 12 | 19 min |
-| GAMs | 55–65 | 11 | 17 min |
-| Python Lab | 66–81 | 16 | 26 min |
-| Summary | 82–92 | 11 | 17 min |
-| Appendix: optional and advanced material | 93–101 | 9 | optional |
+| Splines | 26–43 | 18 | 28 min |
+| Smoothing | 44–55 | 12 | 19 min |
+| GAMs | 56–66 | 11 | 17 min |
+| Python Lab | 67–82 | 16 | 25 min |
+| Summary | 83–93 | 11 | 17 min |
+| Appendix: optional and advanced material | 94–102 | 9 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
 | Exercise 7.1 | short | Math | p. 17 | p. 18 |
 | Exercise 7.2 | short | Concept | p. 22 | p. 23 |
-| Exercise 7.3 | short | Math | p. 34 | p. 35 |
-| Exercise 7.4 | short | Concept | p. 39 | p. 40 |
-| Exercise 7.5 | short | Concept | p. 51 | p. 52 |
-| Extended Exercise 7.2 | extended | Integrative | p. 61 | p. 62 |
-| Exercise 7.6 | short | Python | p. 72 | p. 73 |
-| Extended Exercise 7.3 | extended | Python | p. 76 | p. 77 |
-| Extended Exercise 7.1 | extended | Math | p. 97 | p. 98 |
+| Exercise 7.3 | short | Math | p. 36 | p. 37 |
+| Exercise 7.4 | short | Concept | p. 40 | p. 41 |
+| Exercise 7.5 | short | Concept | p. 52 | p. 53 |
+| Extended Exercise 7.2 | extended | Integrative | p. 62 | p. 63 |
+| Exercise 7.6 | short | Python | p. 73 | p. 74 |
+| Extended Exercise 7.3 | extended | Python | p. 77 | p. 78 |
+| Extended Exercise 7.1 | extended | Math | p. 98 | p. 99 |
 
-**Notebook cues:** 9 in this deck (near pp. 67).
+**Notebook cues:** 9 in this deck (near pp. 68).
 
 ### Ch. 8 — Tree-Based Methods
 
-`chapter_08.pdf` — **89 slides** in the main flow plus **10** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.6 min per slide).
+`chapter_08.pdf` — **90 slides** in the main flow plus **10** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.6 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 11 min |
 | Why this chapter matters | 8–10 | 3 | 5 min |
-| Trees | 11–38 | 28 | 46 min |
-| Bagging / RF | 39–55 | 17 | 28 min |
-| Boosting | 56–64 | 9 | 14 min |
-| Python Lab | 65–80 | 16 | 26 min |
-| Summary | 81–89 | 9 | 15 min |
-| Appendix: optional and advanced material | 90–99 | 10 | optional |
+| Trees | 11–38 | 28 | 45 min |
+| Bagging / RF | 39–56 | 18 | 29 min |
+| Boosting | 57–65 | 9 | 15 min |
+| Python Lab | 66–81 | 16 | 25 min |
+| Summary | 82–90 | 9 | 15 min |
+| Appendix: optional and advanced material | 91–100 | 10 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
@@ -317,14 +317,14 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 8.2 | short | Math | p. 24 | p. 25 |
 | Exercise 8.3 | short | Concept | p. 29 | p. 30 |
 | Extended Exercise 8.1 | extended | Math | p. 32 | p. 33 |
-| Exercise 8.4 | short | Concept | p. 49 | p. 50 |
-| Exercise 8.5 | short | — | p. 53 | p. 54 |
-| Exercise 8.6 | short | Concept | p. 62 | p. 63 |
-| Exercise 8.7 | short | Python | p. 70 | p. 71 |
-| Extended Exercise 8.3 | extended | Python | p. 74 | p. 75 |
-| Extended Exercise 8.2 | extended | Math | p. 94 | p. 95 |
+| Exercise 8.4 | short | Concept | p. 50 | p. 51 |
+| Exercise 8.5 | short | — | p. 54 | p. 55 |
+| Exercise 8.6 | short | Concept | p. 63 | p. 64 |
+| Exercise 8.7 | short | Python | p. 71 | p. 72 |
+| Extended Exercise 8.3 | extended | Python | p. 75 | p. 76 |
+| Extended Exercise 8.2 | extended | Math | p. 95 | p. 96 |
 
-**Notebook cues:** 8 in this deck (near pp. 66).
+**Notebook cues:** 8 in this deck (near pp. 67).
 
 ### A8 — Unsupervised Learning (self-study)
 

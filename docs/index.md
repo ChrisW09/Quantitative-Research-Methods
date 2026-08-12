@@ -13,7 +13,7 @@ datasets, sharing one notation and one semester rhythm.
 
 :::{container} qrm-chips
 [**11** decks]{.qrm-chip}
-[**897** core slides *(+199 optional)*]{.qrm-chip}
+[**901** core slides *(+199 optional)*]{.qrm-chip}
 [**109** exercises with solutions]{.qrm-chip}
 [**11** labs *(with solutions)*]{.qrm-chip}
 [**8** advanced modules]{.qrm-chip}
@@ -101,7 +101,7 @@ course is graded.
 :link: slides
 :link-type: doc
 
-Ten decks: 897 core slides, 199 more in optional appendices, every exercise
+Ten decks: 901 core slides, 199 more in optional appendices, every exercise
 with a worked solution.
 :::
 
@@ -189,7 +189,7 @@ Six 3–5 hour challenges: a real decision on real data, ending in a memo.
 
 | | |
 |---|---|
-| Lecture decks | 9 taught ISLP chapters + two precourse decks · 897 slides, plus 199 in optional appendices |
+| Lecture decks | 9 taught ISLP chapters + two precourse decks · 901 slides, plus 199 in optional appendices |
 | Exercises | 74 short (~5 min) + 35 extended (~15 min), all with worked solutions |
 | Lab notebooks | 11 labs, one per deck (2 precourse + 9 chapters), each closing with worked Python solutions; several also verify the deck's by-hand arithmetic in code |
 | Mock exams | 3 full-length papers, each in 3 formats, + 5 sixty-minute short exams (not distributed publicly) |

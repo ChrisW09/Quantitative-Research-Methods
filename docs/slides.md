@@ -13,7 +13,7 @@ Ten Beamer decks live in `Chapters/chapter_NN/`, each folder self-contained:
 together. The PDFs below are served with this documentation.
 
 :::{container} qrm-chips
-[**897** slides in the main flow]{.qrm-chip}
+[**901** slides in the main flow]{.qrm-chip}
 [**+199** in optional appendices]{.qrm-chip}
 [**74** short + **35** extended exercises]{.qrm-chip}
 [**~110** purpose-built figures]{.qrm-chip}
@@ -37,17 +37,17 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 111 (+20) | <a href="slides/chapter_00.pdf">Open</a> |
-| 0b | Precourse (b) — Toolkit | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 52 (+14) | <a href="slides/chapter_00b.pdf">Open</a> |
+| 0 | Precourse (a) — Statistics refresher | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 112 (+20) | <a href="slides/chapter_00.pdf">Open</a> |
+| 0b | Precourse (b) — Toolkit | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 53 (+14) | <a href="slides/chapter_00b.pdf">Open</a> |
 | 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 74 (+8) | <a href="slides/chapter_01.pdf">Open</a> |
 | 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance — the Bayes classifier and KNN now sit in the appendix | 8 + 4 | 81 (+42) | <a href="slides/chapter_02.pdf">Open</a> |
 | 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 149 (+19) | <a href="slides/chapter_03.pdf">Open</a> |
 | 4 | Classification | Logistic regression and the odds scale, multiple predictors and confounding, the confusion matrix, ROC and AUC — the generative models (LDA, QDA, naive Bayes) now sit in the appendix | 10 + 6 | 91 (+52) | <a href="slides/chapter_04.pdf">Open</a> |
 | 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 85 (+11) | <a href="slides/chapter_05.pdf">Open</a> |
 | 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 6 + 3 | 73 (+14) | <a href="slides/chapter_06.pdf">Open</a> |
-| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 92 (+9) | <a href="slides/chapter_07.pdf">Open</a> |
-| 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 89 (+10) | <a href="slides/chapter_08.pdf">Open</a> |
-| **Total** | | | **74 + 35** | **897 (+199)** | |
+| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 93 (+9) | <a href="slides/chapter_07.pdf">Open</a> |
+| 8 | Tree-Based Methods | Recursive binary splitting, pruning, classification trees and impurity, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 90 (+10) | <a href="slides/chapter_08.pdf">Open</a> |
+| **Total** | | | **74 + 35** | **901 (+199)** | |
 
 Chapters 9 (support vector machines), 11 (survival analysis), 12 (unsupervised
 learning) and 13 (multiple testing) are no longer part of the taught sequence —

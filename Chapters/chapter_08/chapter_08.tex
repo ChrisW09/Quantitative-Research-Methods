@@ -115,6 +115,7 @@
     $J$, $|T|$ & Number of leaves of a tree $T$ (its complexity) \\
     $\alpha$ & Cost-complexity pruning parameter: price paid per leaf \\
     $\hat p_{mk}$ & Fraction of node-$m$ training points in class $k$ \\
+    $E$ & Error rate $1-\max_k \hat p_{mk}$: node impurity \\
     $G$ & Gini index $\sum_k \hat p_{mk}(1-\hat p_{mk})$: node impurity \\
     $D$ & Cross-entropy $-\sum_k \hat p_{mk}\log\hat p_{mk}$: node impurity \\
     $B$ & Number of bootstrap samples / trees in an ensemble \\
@@ -302,24 +303,28 @@
 \end{frame}
 
 \begin{frame}{Classification trees: splitting rules}
-  Same recursive splitting; predict majority class in each leaf.
-  Two natural splitting criteria:
-  \begin{block}{Gini and cross-entropy}
+  \footnotesize
+  Same recursive splitting; predict the majority class in each leaf. RSS no
+  longer applies, so we score a node by its \emph{impurity}:
+  \begin{block}{Error rate, Gini and cross-entropy in node $m$}
     \[
+      E = 1 - \max_k \hat p_{mk}, \quad
       G = \sum_k \hat p_{mk}(1 - \hat p_{mk}), \quad
       D = -\sum_k \hat p_{mk}\log \hat p_{mk}.
     \]
   \end{block}
-  \begin{readme}[Reading the impurities]
-    $\hat p_{mk}$ is the fraction of node-$m$ points in class $k$. Both
-    $G$ and $D$ are \emph{small} when one class dominates ($\hat
-    p_{mk}\!\approx\!1$) and \emph{large} at a 50/50 mix --- so a good
-    split makes the child nodes as \emph{pure} as possible.
+  \begin{readme}[{{Reading the impurities, and scoring a split}}]
+    $\hat p_{mk}$ is the fraction of node-$m$ points in class $k$; $E$ is the
+    share the majority vote gets wrong. All three are \emph{small} when one
+    class dominates ($\hat p_{mk}\!\approx\!1$) and \emph{large} at a 50/50
+    mix. A \emph{split} is scored by the \textbf{size-weighted} average of its
+    two children, $\frac{n_L}{n}Q_L + \frac{n_R}{n}Q_R$ --- a big impure child
+    must count for more than a small one.
   \end{readme}
-  \begin{takeaway}[Why not error rate?]
-    The misclassification rate has many ties on small samples --- it
-    splits poorly. Use Gini or cross-entropy for splitting; error rate
-    for pruning.
+  \begin{takeaway}[Why not the error rate?]
+    $E$ is blind to purity gains that do not flip the majority class, so it
+    ties too often to grow a tree with. Split on Gini or cross-entropy; keep
+    $E$ for pruning and for reporting accuracy. \hfill{\tiny\itshape\color{gray}ISLP \S8.1.2, (8.5)--(8.7)}
   \end{takeaway}
 \end{frame}
 
@@ -644,6 +649,31 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
   \end{takeaway}
 \end{frame}
 
+\begin{frame}{How much does averaging actually buy?}
+  \footnotesize
+  Each tree has variance $\sigma^2$; because they are grown on overlapping
+  bootstrap samples, any two are correlated, $\mathrm{Cor}(\hat f_b, \hat
+  f_{b'}) = \rho$. Expanding the variance of a sum (Ch.~0: $B$ variance terms
+  and $B(B-1)$ covariance terms) gives
+  \begin{block}{The averaging gain}
+    \[
+      \operatorname{Var}\Bigl(\tfrac1B \sum_{b=1}^{B}\hat f_b\Bigr)
+        = \frac{1}{B^2}\bigl[B\sigma^2 + B(B-1)\rho\sigma^2\bigr]
+        = \underbrace{\rho\sigma^2}_{\text{floor}}
+          + \underbrace{\frac{1-\rho}{B}\,\sigma^2}_{\to\,0}.
+    \]
+  \end{block}
+  \begin{takeaway}[{{Two levers, and only one is free}}]
+    More trees ($B\uparrow$) kills the second term --- that is why $B$ is
+    never a tuning parameter and more trees never hurt. But the first term
+    does not move: no matter how many trees you average, the variance stops
+    at $\rho\sigma^2$. Independent trees ($\rho = 0$) would leave
+    $\sigma^2/B \to 0$; identical trees ($\rho = 1$) gain nothing at all.
+    \textbf{To go below the floor you must lower $\rho$} --- which is
+    precisely what a random forest does next.
+  \end{takeaway}
+\end{frame}
+
 \begin{frame}{Out-of-bag: the leftover third is a free test set}
   \begin{center}
   \begin{tikzpicture}[>=Stealth,font=\footnotesize,
@@ -684,8 +714,9 @@ a reduction of $290.83-1.5=\mathbf{289.33}$ ($225.33$ from the first split, $64.
   \end{readme}
   \begin{takeaway}
     Forcing different trees to use different predictors lowers their
-    pairwise correlation, which makes the average more effective.
-    With $m = p$ random forests reduce to bagging.
+    pairwise correlation $\rho$ --- and so lowers the variance floor
+    $\rho\sigma^2$ that bagging alone cannot get past. With $m = p$ random
+    forests reduce to bagging.
   \end{takeaway}
 \end{frame}
 

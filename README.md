@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>897 core slides</b> (+199 in optional appendices) ·
+  <b>901 core slides</b> (+199 in optional appendices) ·
   <b>109 exercises</b> with worked solutions ·
   <b>11 labs</b> with worked solutions, all running locally &amp; on Colab ·
   <b>3 + 5 mock exams</b> · <b>23 datasets</b>
@@ -47,7 +47,7 @@ Prepared by **Prof. Dr. Christoph Weisser**.
 
 | Material | Count | Notes |
 |---|---|---|
-| [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 897 slides, plus 199 in per-deck appendices |
+| [Lecture decks](#-lecture-slides) | 11 | Nine ISLP chapters + a two-part precourse · 901 slides, plus 199 in per-deck appendices |
 | Exercises | 74 short + 35 extended | Each with a full worked solution, tagged [Concept] / [Math] / [Python] / [Integrative] |
 | [Lab notebooks](#-lab-notebooks) | 11 | One per deck, both precourse sessions included, each closing with worked Python solutions to that chapter's exercises |
 | [Mock exams](#-mock-exams) | 3 + 5 | Three full papers plus five 60-minute short exams — each as questions, worked solutions and an in-class review deck, kept out of git |
@@ -150,17 +150,17 @@ advanced material that the main thread never depends on.
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(taught in session 1)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 111 (+20) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
-| 0b | Precourse (b) — Toolkit *(taught in session 1)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 52 (+14) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
+| 0 | Precourse (a) — Statistics refresher *(taught in session 1)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 112 (+20) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
+| 0b | Precourse (b) — Toolkit *(taught in session 1)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 53 (+14) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
 | 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 74 (+8) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
 | 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance (the Bayes classifier and KNN moved to the appendix) | 8 + 4 | 81 (+42) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |
 | 3 | Linear Regression | Least squares, standard errors and *t*/*F* inference, confidence vs. prediction intervals, dummies and interactions, the four diagnostics | 12 + 6 | 149 (+19) | [PDF](./Chapters/chapter_03/chapter_03.pdf) |
 | 4 | Classification | Logistic regression and the odds scale, confounding, confusion matrices, ROC and AUC — LDA, QDA and naive Bayes moved to the appendix | 10 + 6 | 91 (+52) | [PDF](./Chapters/chapter_04/chapter_04.pdf) |
 | 5 | Resampling Methods | The validation set and why it wobbles, LOOCV, *k*-fold CV and the trade-off inside the estimate, CV pitfalls, the bootstrap | 6 + 3 | 85 (+11) | [PDF](./Chapters/chapter_05/chapter_05.pdf) |
 | 6 | Model Selection & Regularization | Best subset and stepwise selection, Cₚ/AIC/BIC/adjusted R², ridge, the lasso and its sparsity, PCR, the *p* > *n* regime | 6 + 3 | 73 (+14) | [PDF](./Chapters/chapter_06/chapter_06.pdf) |
-| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 92 (+9) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
-| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 89 (+10) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
-| **Total** | | | **74 + 35** | **897 (+199)** | |
+| 7 | Moving Beyond Linearity | Polynomials and step functions, regression splines and knots, natural splines, smoothing splines, LOESS, GAMs | 6 + 3 | 93 (+9) | [PDF](./Chapters/chapter_07/chapter_07.pdf) |
+| 8 | Tree-Based Methods | Recursive binary splitting, pruning, impurity measures, bagging and out-of-bag error, random forests, boosting | 7 + 3 | 90 (+10) | [PDF](./Chapters/chapter_08/chapter_08.pdf) |
+| **Total** | | | **74 + 35** | **901 (+199)** | |
 
 <details>
 <summary><b>How a deck is built</b></summary>

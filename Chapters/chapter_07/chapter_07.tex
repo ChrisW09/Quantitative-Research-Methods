@@ -536,6 +536,45 @@ Reading $\beta_2=25$ as the jump from bin $2$ to bin $3$. Both coefficients comp
   \islpsource{Figure 7.4}
 \end{frame}
 
+\begin{frame}{How do we actually fit one? The truncated-power basis}
+  \footnotesize
+  A cubic spline is just OLS on the right columns. Start from a cubic, then
+  add \emph{one} extra term per knot:
+  \begin{block}{The basis, with $K$ knots $\xi_1 < \cdots < \xi_K$}
+    \[
+      1,\; x,\; x^2,\; x^3,\;
+      (x-\xi_1)^3_+,\; \ldots,\; (x-\xi_K)^3_+,
+      \qquad
+      (x-\xi)^3_+ =
+      \begin{cases}
+        (x-\xi)^3 & x > \xi,\\
+        0 & \text{otherwise.}
+      \end{cases}
+    \]
+  \end{block}
+  \begin{takeaway}[{{Why this works, and what it costs}}]
+    Each truncated term is \emph{zero left of its knot}, so it switches on
+    exactly where its piece begins --- the locality a global polynomial can
+    never have. It changes only the \emph{third} derivative at $\xi$, so
+    value, slope and curvature stay continuous automatically. Count the
+    columns: $4 + K$ coefficients, i.e.\ $K+4$ degrees of freedom, matching
+    the count you are about to derive.
+  \end{takeaway}
+  \islpsource{Section 7.4.3, equations (7.9)--(7.10)}
+\end{frame}
+
+\begin{frame}{The truncated-power basis, drawn}
+  \begin{center}
+    \includegraphics[width=0.94\textwidth,height=0.52\textheight,keepaspectratio]{ch07_spline_basis.png}
+  \end{center}
+  \begin{takeaway}
+    The same basis, plotted: four global polynomial terms plus one truncated
+    cubic per knot ($K=3$ knots at the Wage age quartiles) $=$ $K+4=7$ basis
+    functions. Note where each orange curve leaves the axis --- that is its
+    knot.
+  \end{takeaway}
+\end{frame}
+
 % ====================== EXERCISES: Splines ======================
 \begin{frame}{Exercise 7.3 --- Degrees of freedom of a cubic spline [Math]}
 \begin{exercise}
@@ -586,18 +625,6 @@ which is $4+K$ functions --- one regression coefficient each, exactly matching t
 \end{solutionbox}
 \end{frame}
 
-
-\begin{frame}{The truncated-power basis, drawn}
-  \begin{center}
-    \includegraphics[width=0.94\textwidth,height=0.52\textheight,keepaspectratio]{ch07_spline_basis.png}
-  \end{center}
-  \begin{takeaway}
-    Exercise 7.3's count, drawn: four global polynomial terms plus one
-    truncated cubic per knot ($K=3$ knots at the Wage age quartiles) $=$
-    $K+4=7$ basis functions. Each truncated term is \emph{zero left of its
-    knot} --- that locality is what a polynomial can never have.
-  \end{takeaway}
-\end{frame}
 
 \begin{frame}{Exercise 7.4 --- Natural vs.\ cubic splines [Concept]}
 \begin{exercise}
@@ -684,8 +711,12 @@ Thinking the natural spline is linear \emph{between} the boundary knots too --- 
       \item The minimiser is a natural cubic spline with knots at every
             $x_i$.
       \item $\lambda = 0$: interpolation. $\lambda \to \infty$: linear fit.
-      \item ``Effective degrees of freedom'' parameterise the
-            smoothness.
+      \item The fit is linear in $y$ --- $\hat g = S_\lambda y$ --- so
+            smoothness is reported as the \textbf{effective degrees of
+            freedom} $\mathrm{df}_\lambda = \operatorname{trace}(S_\lambda)$,
+            running from $n$ (interpolation) down to $2$ (a straight line).
+            Quote $\mathrm{df}_\lambda$, not $\lambda$: it is comparable
+            across data sets.
     \end{itemize}
   \end{takeaway}
 \end{frame}
@@ -1338,7 +1369,7 @@ Picking the degree that maximises training $R^2$ --- it rises mechanically with 
   \begin{block}{Contents of the appendix}
     \begin{itemize}
       \item \textbf{Wage vs.\ age: four models side by side} --- a second illustration of the cubic-vs-natural contrast already made in the main deck.
-      \item \textbf{How the spline basis is built} --- the truncated-power term $(x-\xi)_+^3$ and the constraint counting that turns loose cubic pieces into one smooth curve. The main deck keeps the picture (``Why the continuity constraints?'') and the degrees-of-freedom rule, which is what you are asked to apply.
+      \item \textbf{How the spline basis is built} --- one truncated-power term $(x-\xi)_+^3$ drawn on its own, and the constraint counting that turns loose cubic pieces into one smooth curve. The main deck already states the basis and the degrees-of-freedom rule; this is the same argument taken slowly.
       \item \textbf{Regression splines by hand (Extended Exercise 7.1)} --- evaluating a spline basis and its fit with pencil and paper. Exercise 7.3 covers the same counting argument in five minutes.
     \end{itemize}
   \end{block}
