@@ -328,19 +328,19 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 
 ### A8 — Unsupervised Learning (self-study)
 
-`advanced_08_unsupervised.pdf` — **91 slides** in the main flow plus **10** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.6 min per slide).
+`advanced_08_unsupervised.pdf` — **92 slides** in the main flow plus **10** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.6 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 11 min |
 | No Response | 8–14 | 7 | 11 min |
-| PCA | 15–35 | 21 | 34 min |
+| PCA | 15–35 | 21 | 33 min |
 | K-means | 36–51 | 16 | 25 min |
 | Hierarchical | 52–67 | 16 | 26 min |
 | Practice | 68–76 | 9 | 14 min |
-| Python Lab | 77–82 | 6 | 10 min |
-| Summary | 83–91 | 9 | 14 min |
-| Appendix: optional and advanced material | 92–101 | 10 | optional |
+| Python Lab | 77–82 | 6 | 9 min |
+| Summary | 83–92 | 10 | 16 min |
+| Appendix: optional and advanced material | 93–102 | 10 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
@@ -352,24 +352,24 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 12.5 | short | Concept | p. 56 | p. 57 |
 | Exercise 12.6 | short | Math | p. 62 | p. 63 |
 | Extended Exercise 12.2 | extended | Python | p. 74 | p. 75 |
-| Extended Exercise 12.3 | extended | Python | p. 98 | p. 99 |
+| Extended Exercise 12.3 | extended | Python | p. 99 | p. 100 |
 
 **Notebook cues:** 11 in this deck (near pp. 79).
 
 ### A9 — Deep Learning (self-study)
 
-`advanced_09_deep_learning.pdf` — **72 slides** in the main flow plus **19** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 2.0 min per slide).
+`advanced_09_deep_learning.pdf` — **73 slides** in the main flow plus **19** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 2.0 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
 | *front matter* | 1–7 | 7 | 14 min |
 | Why now? | 8–9 | 2 | 4 min |
 | Single Layer | 10–34 | 25 | 50 min |
-| Multilayer | 35–41 | 7 | 15 min |
+| Multilayer | 35–41 | 7 | 13 min |
 | Fitting | 42–51 | 10 | 20 min |
 | Python Lab | 52–65 | 14 | 28 min |
-| Summary | 66–72 | 7 | 14 min |
-| Appendix: optional and advanced material | 73–91 | 19 | optional |
+| Summary | 66–73 | 8 | 16 min |
+| Appendix: optional and advanced material | 74–92 | 19 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
@@ -380,7 +380,7 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 | Exercise 10.5 | short | Math | p. 47 | p. 48 |
 | Exercise 10.6 | short | Python | p. 55 | p. 56 |
 | Extended Exercise 10.3 | extended | Python | p. 61 | p. 62 |
-| Exercise 10.4 | short | Math | p. 80 | p. 81 |
-| Extended Exercise 10.2 | extended | Math | p. 86 | p. 87 |
+| Exercise 10.4 | short | Math | p. 81 | p. 82 |
+| Extended Exercise 10.2 | extended | Math | p. 87 | p. 88 |
 
 **Notebook cues:** 7 in this deck (near pp. 13, 53).
