@@ -1,0 +1,1017 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Chapter 7 — Moving Beyond Linearity" href="chapter_07_lab.html"><link rel="prev" title="Chapter 5 — Resampling Methods" href="chapter_05_lab.html">
+
+    <link rel="shortcut icon" href="../_static/favicon.svg"><!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>Chapter 6 — Model Selection and Regularisation - Quantitative Research Methods</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cd1d273d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #005b7f;
+  --color-brand-content: #00618a;
+  --color-brand-visited: #00618a;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Quantitative Research Methods</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Quantitative Research Methods</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../for-students.html">For students</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course.html">The course at a glance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">Python environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Materials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../slides.html">Lecture slides</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../labs.html">Lab notebooks</a><input aria-label="Toggle navigation of Lab notebooks" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chapter_00_lab.html">Chapter 0 — Precourse Refresher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_00b_lab.html">Chapter 0b — Precourse Toolkit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_01_lab.html">Chapter 1 — Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_02_lab.html">Chapter 2 — Statistical Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_03_lab.html">Chapter 3 — Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_04_lab.html">Chapter 4 — Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_05_lab.html">Chapter 5 — Resampling Methods</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 6 — Model Selection and Regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_07_lab.html">Chapter 7 — Moving Beyond Linearity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_08_lab.html">Chapter 8 — Tree-Based Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exams.html">Mock exams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../advanced.html">Advanced modules</a><input aria-label="Toggle navigation of Advanced modules" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_01_rcts_lab.html">Advanced Module A1 — Randomised Controlled Trials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_02_shapley_lab.html">Advanced Module A2 — Explainable AI with Shapley Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_03_conformal_lab.html">Advanced Module A3 — Conformal Prediction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_04_glms_splines_lab.html">Advanced Module A4 — GLMs and Splines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_05_svm_lab.html">Chapter 9 — Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_06_survival_lab.html">Chapter 11 — Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_07_multiple_testing_lab.html">Chapter 13 — Multiple Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_08_unsupervised_lab.html">Chapter 12 — Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_09_deep_learning_lab.html">Advanced Module A9 — Deep Learning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">Short projects</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Teaching</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../teaching.html">Teaching it</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../repository.html">Repository layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../building-docs.html">Building this documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citation.html">Citation &amp; licence</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/docs/labs/chapter_06_lab.ipynb?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/edit/main/docs/labs/chapter_06_lab.ipynb" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p><a class="reference external" href="https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_06/chapter_06_lab.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><em>This notebook runs on Colab as-is. The badge link above and the <code class="docutils literal notranslate"><span class="pre">GITHUB_RAW</span></code> line in the setup cell already point to this repository, so everything installs and loads automatically.</em></p>
+<section class="tex2jax_ignore mathjax_ignore" id="chapter-6-model-selection-and-regularisation">
+<h1>Chapter 6 — Model Selection and Regularisation<a class="headerlink" href="#chapter-6-model-selection-and-regularisation" title="Link to this heading">¶</a></h1>
+<section id="lab-subset-selection-ridge-lasso">
+<h2>Lab: subset selection, ridge, lasso<a class="headerlink" href="#lab-subset-selection-ridge-lasso" title="Link to this heading">¶</a></h2>
+<p><strong>Course:</strong> Quantitative Research Methods<br />
+<strong>Instructor:</strong> Prof. Dr. Christoph Weisser<br />
+<strong>Source:</strong> James, Witten, Hastie, Tibshirani &amp; Taylor (2023), <em>An Introduction to Statistical Learning, with Applications in Python</em>, Springer. Companion code at <a class="reference external" href="https://www.statlearning.com">statlearning.com</a>.</p>
+<p><strong>Goal.</strong> On the Hitters data, fit best-subset and forward stepwise selection, ridge, and lasso, and compare them by cross-validation.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<p>Run this cell once. The <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ISLP</span></code>. As an alternative, the same data sets are available as CSVs in the workspace’s <code class="docutils literal notranslate"><span class="pre">ALL</span> <span class="pre">CSV</span> <span class="pre">FILES</span> <span class="pre">-</span> <span class="pre">2nd</span> <span class="pre">Edition</span></code> folder.</p>
+<blockquote>
+<div><p><strong>Google Colab:</strong> this notebook also runs on Colab out of the box — the setup cell below installs any missing packages and downloads the data automatically.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- Setup: runs locally AND on Google Colab --------------------------------</span>
+<span class="c1"># Silence only the spurious &#39;encountered in matmul&#39; RuntimeWarnings that the macOS</span>
+<span class="c1"># Accelerate BLAS emits; real warnings (deprecations, model caveats) stay visible.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;.*encountered in matmul&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">subprocess</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">import_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;pip-install pkg (quietly) if its import is missing.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">import_name</span> <span class="ow">or</span> <span class="n">pkg</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;pip&#39;</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;-q&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>  <span class="c1"># Colab ships numpy/pandas/sklearn/statsmodels; add course extras</span>
+    <span class="k">for</span> <span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;ISLP&#39;</span><span class="p">,</span> <span class="s1">&#39;ISLP&#39;</span><span class="p">)]:</span>
+        <span class="n">_ensure</span><span class="p">(</span><span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">110</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ISLP not installed; using CSV / URL fallbacks.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Local CSV location (repo layout first, then legacy paths, then a data/ cache).</span>
+<span class="n">_CANDIDATES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;../../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">CSV</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_CANDIDATES</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+<span class="c1"># GITHUB_RAW lets a fresh Colab runtime fetch any</span>
+<span class="c1"># CSV that is neither in ISLP nor already local (spaces in the folder -&gt; %20).</span>
+<span class="n">GITHUB_RAW</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/ChrisW09/Quantitative-Research-Methods/main/&#39;</span>
+              <span class="s1">&#39;ALL%20CSV</span><span class="si">%20F</span><span class="s1">ILES%20-%202nd</span><span class="si">%20E</span><span class="s1">dition&#39;</span><span class="p">)</span>
+
+<span class="c1"># The four datasets NOT in the ISLP package -&gt; load from the book&#39;s official</span>
+<span class="c1"># site so the notebook works on a fresh Colab even before the repo is published.</span>
+<span class="n">KNOWN_URLS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Advertising&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.statlearning.com/s/Advertising.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Heart&#39;</span><span class="p">:</span>       <span class="s1">&#39;https://www.statlearning.com/s/Heart.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income1&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income1.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income2&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income2.csv&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a course dataset. Order: ISLP package -&gt; R datasets -&gt; local CSV</span>
+<span class="sd">    -&gt; official book URL -&gt; your GitHub repo. Works locally and on Colab.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">HAVE_ISLP</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">load_data</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;USArrests&#39;</span><span class="p">:</span>                       <span class="c1"># classic R dataset, not in ISLP</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+            <span class="k">return</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;USArrests&#39;</span><span class="p">,</span> <span class="s1">&#39;datasets&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>                      <span class="c1"># running from the repo (local)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+    <span class="n">remotes</span> <span class="o">=</span> <span class="p">([</span><span class="n">KNOWN_URLS</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">KNOWN_URLS</span> <span class="k">else</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GITHUB_RAW</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">remotes</span><span class="p">:</span>                           <span class="c1"># fresh Colab: stream over https</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Could not load </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. Put the CSV in &#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s2">/&#39; or check your connection for the GITHUB_RAW fallback.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="hitters-data">
+<h2>1. Hitters data<a class="headerlink" href="#hitters-data" title="Link to this heading">¶</a></h2>
+<p>Major-league batting records with <code class="docutils literal notranslate"><span class="pre">Salary</span></code> as the response. <code class="docutils literal notranslate"><span class="pre">dropna()</span></code> removes the 59 players whose salary is missing, leaving 263 — a small <span class="math notranslate nohighlight">\(n\)</span> against 19 predictors after dummy coding, which is precisely the regime where selection and shrinkage earn their keep.</p>
+<p>Note the predictors are heavily collinear by construction: <code class="docutils literal notranslate"><span class="pre">CAtBat</span></code>, <code class="docutils literal notranslate"><span class="pre">CHits</span></code>, <code class="docutils literal notranslate"><span class="pre">CRuns</span></code>, <code class="docutils literal notranslate"><span class="pre">CRBI</span></code> and <code class="docutils literal notranslate"><span class="pre">CWalks</span></code> are all career totals of a long career. Least squares handles that badly, and how each method copes with it is the real subject of this chapter.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Hitters</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Hitters&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Hitters</span><span class="p">[</span><span class="s1">&#39;Salary&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Hitters</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Salary&#39;</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">);</span> <span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(263, 19)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>AtBat</th>
+      <th>Hits</th>
+      <th>HmRun</th>
+      <th>Runs</th>
+      <th>RBI</th>
+      <th>Walks</th>
+      <th>Years</th>
+      <th>CAtBat</th>
+      <th>CHits</th>
+      <th>CHmRun</th>
+      <th>CRuns</th>
+      <th>CRBI</th>
+      <th>CWalks</th>
+      <th>PutOuts</th>
+      <th>Assists</th>
+      <th>Errors</th>
+      <th>League_N</th>
+      <th>Division_W</th>
+      <th>NewLeague_N</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>315.0</td>
+      <td>81.0</td>
+      <td>7.0</td>
+      <td>24.0</td>
+      <td>38.0</td>
+      <td>39.0</td>
+      <td>14.0</td>
+      <td>3449.0</td>
+      <td>835.0</td>
+      <td>69.0</td>
+      <td>321.0</td>
+      <td>414.0</td>
+      <td>375.0</td>
+      <td>632.0</td>
+      <td>43.0</td>
+      <td>10.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>479.0</td>
+      <td>130.0</td>
+      <td>18.0</td>
+      <td>66.0</td>
+      <td>72.0</td>
+      <td>76.0</td>
+      <td>3.0</td>
+      <td>1624.0</td>
+      <td>457.0</td>
+      <td>63.0</td>
+      <td>224.0</td>
+      <td>266.0</td>
+      <td>263.0</td>
+      <td>880.0</td>
+      <td>82.0</td>
+      <td>14.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>496.0</td>
+      <td>141.0</td>
+      <td>20.0</td>
+      <td>65.0</td>
+      <td>78.0</td>
+      <td>37.0</td>
+      <td>11.0</td>
+      <td>5628.0</td>
+      <td>1575.0</td>
+      <td>225.0</td>
+      <td>828.0</td>
+      <td>838.0</td>
+      <td>354.0</td>
+      <td>200.0</td>
+      <td>11.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>321.0</td>
+      <td>87.0</td>
+      <td>10.0</td>
+      <td>39.0</td>
+      <td>42.0</td>
+      <td>30.0</td>
+      <td>2.0</td>
+      <td>396.0</td>
+      <td>101.0</td>
+      <td>12.0</td>
+      <td>48.0</td>
+      <td>46.0</td>
+      <td>33.0</td>
+      <td>805.0</td>
+      <td>40.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>594.0</td>
+      <td>169.0</td>
+      <td>4.0</td>
+      <td>74.0</td>
+      <td>51.0</td>
+      <td>35.0</td>
+      <td>11.0</td>
+      <td>4408.0</td>
+      <td>1133.0</td>
+      <td>19.0</td>
+      <td>501.0</td>
+      <td>336.0</td>
+      <td>194.0</td>
+      <td>282.0</td>
+      <td>421.0</td>
+      <td>25.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="best-subset-and-forward-stepwise-selection">
+<h2>2. Best-subset and forward stepwise selection<a class="headerlink" href="#best-subset-and-forward-stepwise-selection" title="Link to this heading">¶</a></h2>
+<p>Best subset asks, for each size <span class="math notranslate nohighlight">\(k\)</span>, which <span class="math notranslate nohighlight">\(k\)</span> predictors give the lowest RSS — by fitting every combination. Forward stepwise starts empty and adds whichever single predictor most reduces RSS, never revisiting an earlier choice.</p>
+<p>Note the cap at <span class="math notranslate nohighlight">\(k \le 5\)</span> below. That is not a pedagogical simplification; it is a computational necessity, and §6 measures exactly how bad it gets.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span><span class="o">,</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">best</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+    <span class="n">best_rss</span><span class="p">,</span> <span class="n">best_combo</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">combo</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="n">rss</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">combo</span><span class="p">)]))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">ssr</span>
+        <span class="k">if</span> <span class="n">best_rss</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">rss</span> <span class="o">&lt;</span> <span class="n">best_rss</span><span class="p">:</span>
+            <span class="n">best_rss</span><span class="p">,</span> <span class="n">best_combo</span> <span class="o">=</span> <span class="n">rss</span><span class="p">,</span> <span class="n">combo</span>
+    <span class="n">best</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_combo</span>
+<span class="n">best</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{1: (&#39;CRBI&#39;,),
+ 2: (&#39;Hits&#39;, &#39;CRBI&#39;),
+ 3: (&#39;Hits&#39;, &#39;CRBI&#39;, &#39;PutOuts&#39;),
+ 4: (&#39;Hits&#39;, &#39;CRBI&#39;, &#39;PutOuts&#39;, &#39;Division_W&#39;),
+ 5: (&#39;AtBat&#39;, &#39;Hits&#39;, &#39;CRBI&#39;, &#39;PutOuts&#39;, &#39;Division_W&#39;)}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Forward stepwise</span>
+<span class="n">remaining</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">copy</span><span class="p">();</span> <span class="n">selected</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+    <span class="n">best_rss</span><span class="p">,</span> <span class="n">best_v</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">remaining</span><span class="p">:</span>
+        <span class="n">rss</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">selected</span> <span class="o">+</span> <span class="p">[</span><span class="n">v</span><span class="p">]]))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">ssr</span>
+        <span class="k">if</span> <span class="n">best_rss</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">rss</span> <span class="o">&lt;</span> <span class="n">best_rss</span><span class="p">:</span>
+            <span class="n">best_rss</span><span class="p">,</span> <span class="n">best_v</span> <span class="o">=</span> <span class="n">rss</span><span class="p">,</span> <span class="n">v</span>
+    <span class="n">selected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_v</span><span class="p">);</span> <span class="n">remaining</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">best_v</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">selected</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;RSS =&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">best_rss</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1 -&gt; CRBI RSS = 36179679.3
+2 -&gt; Hits RSS = 30646559.9
+3 -&gt; PutOuts RSS = 29249296.9
+4 -&gt; Division_W RSS = 27970851.8
+5 -&gt; AtBat RSS = 27149899.4
+6 -&gt; Walks RSS = 26194903.9
+7 -&gt; CWalks RSS = 25954217.1
+8 -&gt; CRuns RSS = 25159233.9
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> RSS falls monotonically as predictors are added — it must, since adding a column can never increase the achievable RSS. That is why RSS cannot choose <span class="math notranslate nohighlight">\(k\)</span>, and why <span class="math notranslate nohighlight">\(C_p\)</span>, BIC and cross-validation exist.</p>
+<p>Compare the two searches at <span class="math notranslate nohighlight">\(k = 5\)</span>: best subset picks <code class="docutils literal notranslate"><span class="pre">AtBat,</span> <span class="pre">Hits,</span> <span class="pre">CRBI,</span> <span class="pre">PutOuts,</span> <span class="pre">Division_W</span></code>, and forward stepwise arrives at the same five in the order <code class="docutils literal notranslate"><span class="pre">CRBI,</span> <span class="pre">Hits,</span> <span class="pre">PutOuts,</span> <span class="pre">Division_W,</span> <span class="pre">AtBat</span></code>. They agree here — but they need not, and that is the point. Forward stepwise commits to <code class="docutils literal notranslate"><span class="pre">CRBI</span></code> at step 1 and can never drop it, so a pair of predictors that only works <em>together</em> is invisible to it.</p>
+</section>
+<section id="ridge-regression">
+<h2>3. Ridge regression<a class="headerlink" href="#ridge-regression" title="Link to this heading">¶</a></h2>
+<p>Here and for the lasso below, the penalty is selected with the scaler nested <em>inside</em> the search: standardising all 263 rows first and only then letting <code class="docutils literal notranslate"><span class="pre">RidgeCV</span></code>/<code class="docutils literal notranslate"><span class="pre">LassoCV</span></code> split would score every candidate <span class="math notranslate nohighlight">\(\lambda\)</span> on data whose means and standard deviations were computed with help from the very rows being held out.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ridge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridSearchCV</span><span class="p">,</span> <span class="n">LeaveOneOut</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">ridge_cv</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">Ridge</span><span class="p">()),</span>  <span class="c1"># scaler per fold</span>
+                        <span class="p">{</span><span class="s1">&#39;ridge__alpha&#39;</span><span class="p">:</span> <span class="n">alphas</span><span class="p">},</span>
+                        <span class="n">cv</span><span class="o">=</span><span class="n">LeaveOneOut</span><span class="p">(),</span>      <span class="c1"># RidgeCV&#39;s own default is leave-one-out</span>
+                        <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">ridge</span> <span class="o">=</span> <span class="n">ridge_cv</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;ridge&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;best alpha:&#39;</span><span class="p">,</span> <span class="n">ridge_cv</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;ridge__alpha&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">ridge</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>best alpha: 2.8117686979742307
+AtBat         -229.01
+Hits           245.55
+HmRun            4.61
+Runs            -5.48
+RBI              2.44
+Walks          110.78
+Years          -50.10
+CAtBat        -115.25
+CHits          123.26
+CHmRun          56.29
+CRuns          220.11
+CRBI           120.98
+CWalks        -154.21
+PutOuts         77.87
+Assists         40.90
+Errors         -24.92
+League_N        30.46
+Division_W     -61.51
+NewLeague_N    -13.75
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<section id="ridge-coefficient-paths">
+<h3>Ridge coefficient paths<a class="headerlink" href="#ridge-coefficient-paths" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ridge</span>
+<span class="n">Xs</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">])</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">paths</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;coef&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Ridge paths&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/2142a8187b9ad7ee65b1ce0003840462f18bd5584c44d56f1f399da7fe67c341.png" src="../_images/2142a8187b9ad7ee65b1ce0003840462f18bd5584c44d56f1f399da7fe67c341.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="lasso">
+<h2>4. Lasso<a class="headerlink" href="#lasso" title="Link to this heading">¶</a></h2>
+<p>Same objective as ridge with the penalty in <span class="math notranslate nohighlight">\(\ell_1\)</span> rather than <span class="math notranslate nohighlight">\(\ell_2\)</span>: <span class="math notranslate nohighlight">\(\lambda\sum_j |\beta_j|\)</span> instead of <span class="math notranslate nohighlight">\(\lambda\sum_j \beta_j^2\)</span>. That one change makes the difference between shrinking coefficients and <strong>zeroing</strong> them, so the lasso performs selection and shrinkage in a single fit.</p>
+<p>Two implementation points that matter more than they look:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code> is a step <em>inside</em> the pipeline, so it is re-fitted on each of the 10 CV folds. Scaling before the split would leak the validation folds’ means into the training data.</p></li>
+<li><p>Penalising <span class="math notranslate nohighlight">\(|\beta_j|\)</span> is only meaningful once the predictors share a scale — otherwise the penalty is a statement about units, not importance.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lasso</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">lasso_cv</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">100000</span><span class="p">)),</span>
+                        <span class="p">{</span><span class="s1">&#39;lasso__alpha&#39;</span><span class="p">:</span> <span class="n">alphas</span><span class="p">},</span>   <span class="c1"># scaler re-fit on each of the 10 folds</span>
+                        <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">lasso</span> <span class="o">=</span> <span class="n">lasso_cv</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;lasso&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;best alpha:&#39;</span><span class="p">,</span> <span class="n">lasso_cv</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;lasso__alpha&#39;</span><span class="p">])</span>
+<span class="n">coefs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">lasso</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;non-zero:&#39;</span><span class="p">,</span> <span class="n">coefs</span><span class="p">[</span><span class="n">coefs</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>best alpha: 2.329951810515372
+non-zero: AtBat        -243.56
+Hits          266.12
+HmRun           0.03
+Walks         106.57
+Years         -47.64
+CHmRun         47.06
+CRuns         230.24
+CRBI          122.30
+CWalks       -150.86
+PutOuts        76.96
+Assists        27.85
+Errors        -14.46
+League_N       16.38
+Division_W    -59.59
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<section id="lasso-paths">
+<h3>Lasso paths<a class="headerlink" href="#lasso-paths" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Xs</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">])</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">paths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">paths</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;coef&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Lasso paths&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/1b62a8d1ca9bb9e11d6b8659fec84c2629ea1faf03999d9b9d9235db2cb6ad82.png" src="../_images/1b62a8d1ca9bb9e11d6b8659fec84c2629ea1faf03999d9b9d9235db2cb6ad82.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="how-many-models-did-we-skip">
+<h2>5. How many models did we skip?<a class="headerlink" href="#how-many-models-did-we-skip" title="Link to this heading">¶</a></h2>
+<p>The deck’s Exercise 6.1 counts the search spaces. Best subset considers every subset of <span class="math notranslate nohighlight">\(p\)</span> predictors,</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\sum_{k=0}^{p} \binom{p}{k} = 2^{p},\]</div>
+</div>
+<p>while forward stepwise fits <span class="math notranslate nohighlight">\(p - k\)</span> models at step <span class="math notranslate nohighlight">\(k\)</span>, giving <span class="math notranslate nohighlight">\(1 + p(p+1)/2\)</span> in total. With <span class="math notranslate nohighlight">\(p = 19\)</span> that gap is the reason §2 stopped at <span class="math notranslate nohighlight">\(k = 5\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">comb</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">best_subset_total</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">p</span>
+<span class="n">forward_total</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+<span class="n">actually_fitted</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">comb</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>     <span class="c1"># what section 2 really ran</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;predictors p                        : </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;best subset, all sizes  (2^p)       : </span><span class="si">{</span><span class="n">best_subset_total</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;what section 2 fitted   (k &lt;= 5)    : </span><span class="si">{</span><span class="n">actually_fitted</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;forward stepwise, all sizes         : </span><span class="si">{</span><span class="n">forward_total</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;best subset / forward stepwise      : </span><span class="si">{</span><span class="n">best_subset_total</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">forward_total</span><span class="si">:</span><span class="s1">,.0f</span><span class="si">}</span><span class="s1">x more models&#39;</span><span class="p">)</span>
+
+<span class="c1"># The deck&#39;s worked case, p = 10.</span>
+<span class="n">p10</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">deck example, p = 10: best subset </span><span class="si">{</span><span class="mi">2</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="n">p10</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1"> vs forward </span><span class="si">{</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">p10</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">2</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>predictors p                        : 19
+best subset, all sizes  (2^p)       : 524,288
+what section 2 fitted   (k &lt;= 5)    : 16,663
+forward stepwise, all sizes         : 191
+
+best subset / forward stepwise      : 2,745x more models
+
+deck example, p = 10: best subset 1,024 vs forward 56
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> With <span class="math notranslate nohighlight">\(p = 19\)</span>, best subset means <strong>524,288</strong> fits against forward stepwise’s <strong>191</strong> — about 2,700 times more work — and even the truncated <span class="math notranslate nohighlight">\(k \le 5\)</span> search in §2 fitted <strong>16,663</strong> models. The deck’s <span class="math notranslate nohighlight">\(p = 10\)</span> case is the gentler illustration: 1,024 against 56.</p>
+<p>Two conclusions follow, and they are the reason the rest of the chapter exists. First, exhaustive search is not a strategy that scales; <span class="math notranslate nohighlight">\(p = 40\)</span> is already a trillion models. Second, and less obvious: searching half a million models means the winner’s training RSS is <em>optimistically biased</em> by the search itself, so the selected model must still be judged by CV on data the search never saw. Ridge and the lasso sidestep the combinatorial problem entirely by fitting one continuous path instead.</p>
+</section>
+<section id="exercises">
+<h2>6. Exercises<a class="headerlink" href="#exercises" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Run <em>backward</em> stepwise selection and compare with forward.</p></li>
+<li><p>Use the one-standard-error rule to choose a more parsimonious lasso <span class="math notranslate nohighlight">\(\lambda\)</span>.</p></li>
+<li><p>Fit elastic net on Hitters with <code class="docutils literal notranslate"><span class="pre">ElasticNetCV</span></code>. How does it compare to ridge and lasso?</p></li>
+<li><p>Standardise <code class="docutils literal notranslate"><span class="pre">X</span></code> once <em>before</em> the cross-validated search instead of inside the pipeline. How far does the chosen <span class="math notranslate nohighlight">\(\lambda\)</span> move, and why?</p></li>
+</ol>
+</section>
+<section id="lecture-exercises-worked-python-solutions">
+<h2>Lecture exercises — worked Python solutions<a class="headerlink" href="#lecture-exercises-worked-python-solutions" title="Link to this heading">¶</a></h2>
+<p>The cells below mirror the <strong>[Python]-tagged exercises</strong> from the Chapter 6 lecture slides, with fully worked, runnable solutions and the expected numeric answers (stored as inline comments). Each solution reloads <code class="docutils literal notranslate"><span class="pre">Hitters</span></code> through the <code class="docutils literal notranslate"><span class="pre">load()</span></code> helper so it stands alone and reproduces the slide numbers.</p>
+<section id="exercise-6-6-cv-ridge-and-lasso-on-hitters-python">
+<h3>Exercise 6.6 — CV Ridge and Lasso on Hitters [Python]<a class="headerlink" href="#exercise-6-6-cv-ridge-and-lasso-on-hitters-python" title="Link to this heading">¶</a></h3>
+<p>On the <code class="docutils literal notranslate"><span class="pre">Hitters</span></code> data (predict <code class="docutils literal notranslate"><span class="pre">Salary</span></code>): (i) fit the lasso with a cross-validated <span class="math notranslate nohighlight">\(\lambda\)</span> on standardised predictors, (ii) report the selected <span class="math notranslate nohighlight">\(\lambda\)</span>, and (iii) list which features the lasso keeps versus drops. Contrast with ridge, which keeps every predictor.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Exercise 6.6 -- lasso vs ridge with a cross-validated penalty on Hitters.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w">    </span><span class="kn">import</span> <span class="n">Lasso</span><span class="p">,</span> <span class="n">Ridge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w">   </span><span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w">        </span><span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="n">df</span>    <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Hitters&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>                 <span class="c1"># drop the 59 rows with NA Salary</span>
+<span class="n">yH</span>    <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Salary&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">X_raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Salary&#39;</span><span class="p">),</span>    <span class="c1"># encode League/Division/NewLeague</span>
+                       <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">X_raw</span><span class="o">.</span><span class="n">columns</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;n, p =&#39;</span><span class="p">,</span> <span class="n">X_raw</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>                     <span class="c1"># (263, 19)</span>
+
+<span class="c1"># Standardising matters (the penalty is scale-dependent), but it has to happen</span>
+<span class="c1"># INSIDE the pipeline: GridSearchCV then re-fits the scaler on each training</span>
+<span class="c1"># fold, so no validation fold ever helps set the scaling used to train.</span>
+<span class="n">lasso_cv</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">100000</span><span class="p">)),</span>
+                        <span class="p">{</span><span class="s1">&#39;lasso__alpha&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">)},</span>
+                        <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_raw</span><span class="p">,</span> <span class="n">yH</span><span class="p">)</span>
+<span class="n">lasso</span> <span class="o">=</span> <span class="n">lasso_cv</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;lasso&#39;</span><span class="p">]</span>            <span class="c1"># CV lambda</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;lasso alpha :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">lasso_cv</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;lasso__alpha&#39;</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span>   <span class="c1"># 2.33</span>
+<span class="n">kept</span>    <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">lasso</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span>  <span class="mf">1e-8</span><span class="p">]</span>
+<span class="n">dropped</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">lasso</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-8</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;kept    :&#39;</span><span class="p">,</span> <span class="n">kept</span><span class="p">)</span>      <span class="c1"># Hits, Walks, CRBI, PutOuts, Division_W, ...</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dropped :&#39;</span><span class="p">,</span> <span class="n">dropped</span><span class="p">)</span>   <span class="c1"># Runs, RBI, CAtBat, CHits, NewLeague_N</span>
+
+<span class="n">ridge_cv</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">Ridge</span><span class="p">()),</span>   <span class="c1"># same recipe</span>
+                        <span class="p">{</span><span class="s1">&#39;ridge__alpha&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">50</span><span class="p">)},</span>
+                        <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_raw</span><span class="p">,</span> <span class="n">yH</span><span class="p">)</span>
+<span class="n">ridge</span> <span class="o">=</span> <span class="n">ridge_cv</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;ridge&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ridge alpha :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">ridge_cv</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;ridge__alpha&#39;</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span>
+      <span class="s1">&#39;-- nonzero coefs:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ridge</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-8</span><span class="p">)))</span>   <span class="c1"># 2.812 -- 19</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n, p = (263, 19)
+lasso alpha : 2.33
+kept    : [&#39;AtBat&#39;, &#39;Hits&#39;, &#39;HmRun&#39;, &#39;Walks&#39;, &#39;Years&#39;, &#39;CHmRun&#39;, &#39;CRuns&#39;, &#39;CRBI&#39;, &#39;CWalks&#39;, &#39;PutOuts&#39;, &#39;Assists&#39;, &#39;Errors&#39;, &#39;League_N&#39;, &#39;Division_W&#39;]
+dropped : [&#39;Runs&#39;, &#39;RBI&#39;, &#39;CAtBat&#39;, &#39;CHits&#39;, &#39;NewLeague_N&#39;]
+ridge alpha : 2.812 -- nonzero coefs: 19
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Interpretation.</strong> The lasso selects a moderate <span class="math notranslate nohighlight">\(\lambda\approx2.33\)</span> and drives several coefficients <em>exactly</em> to zero — it keeps strong career/recent-performance predictors (e.g. <code class="docutils literal notranslate"><span class="pre">Hits</span></code>, <code class="docutils literal notranslate"><span class="pre">Walks</span></code>, <code class="docutils literal notranslate"><span class="pre">CRBI</span></code>, <code class="docutils literal notranslate"><span class="pre">PutOuts</span></code>, <code class="docutils literal notranslate"><span class="pre">Division_W</span></code>) and drops weak or redundant ones (<code class="docutils literal notranslate"><span class="pre">Runs</span></code>, <code class="docutils literal notranslate"><span class="pre">RBI</span></code>, <code class="docutils literal notranslate"><span class="pre">CAtBat</span></code>, <code class="docutils literal notranslate"><span class="pre">CHits</span></code>, <code class="docutils literal notranslate"><span class="pre">NewLeague_N</span></code>). Ridge keeps all 19 predictors nonzero (it only shrinks). Takeaway: the lasso yields a sparse, more interpretable model via automatic variable selection, whereas ridge stabilises the fit while retaining every predictor. Note where the standardisation lives: it is a pipeline step that <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> re-fits on every training fold, because a scaler fitted once on the whole matrix has already seen each validation fold — the leakage the Chapter 5 lab warns about.</p>
+</section>
+<section id="extended-exercise-6-3-cv-ridge-and-lasso-test-mse-on-hitters-python">
+<h3>Extended Exercise 6.3 — CV Ridge and Lasso Test MSE on Hitters [Python]<a class="headerlink" href="#extended-exercise-6-3-cv-ridge-and-lasso-test-mse-on-hitters-python" title="Link to this heading">¶</a></h3>
+<p>Split <code class="docutils literal notranslate"><span class="pre">Hitters</span></code> into train/test, standardise using the <strong>training set only</strong> (no leakage), and cross-validate <span class="math notranslate nohighlight">\(\lambda\)</span> for both ridge and lasso. Report each chosen <span class="math notranslate nohighlight">\(\lambda\)</span>, the <em>test</em> MSE, and how many coefficients are non-zero; list the predictors the lasso drops.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extended Exercise 6.3 -- honest test-MSE comparison with leak-free scaling.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w">   </span><span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w">    </span><span class="kn">import</span> <span class="n">RidgeCV</span><span class="p">,</span> <span class="n">LassoCV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w">         </span><span class="kn">import</span> <span class="n">mean_squared_error</span>
+
+<span class="n">df</span>  <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Hitters&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Salary&#39;</span><span class="p">])</span>  <span class="c1"># drop rows with NA response</span>
+<span class="n">yH</span>  <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Salary&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">XH</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Salary&#39;</span><span class="p">),</span>
+                     <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">,</span> <span class="n">ytr</span><span class="p">,</span> <span class="n">yte</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">XH</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">yH</span><span class="p">,</span>
+                        <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># 2/3 - 1/3 split</span>
+<span class="n">sc</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xtr</span><span class="p">)</span>                   <span class="c1"># fit scaler on TRAIN only</span>
+<span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Xtr</span><span class="p">),</span> <span class="n">sc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Xte</span><span class="p">)</span>  <span class="c1"># apply to both -&gt; no leakage</span>
+
+<span class="n">ridge</span> <span class="o">=</span> <span class="n">RidgeCV</span><span class="p">(</span><span class="n">alphas</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">ytr</span><span class="p">)</span>
+<span class="n">lasso</span> <span class="o">=</span> <span class="n">LassoCV</span><span class="p">(</span><span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">ytr</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;ridge&#39;</span><span class="p">,</span> <span class="n">ridge</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;lasso&#39;</span><span class="p">,</span> <span class="n">lasso</span><span class="p">)]:</span>
+    <span class="n">mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">yte</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xte</span><span class="p">))</span>        <span class="c1"># TEST-set MSE</span>
+    <span class="n">nz</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-8</span><span class="p">))</span>            <span class="c1"># nonzero coefficients</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: lambda=</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">alpha_</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">  testMSE=</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">mse</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s1">  nonzero=</span><span class="si">{</span><span class="n">nz</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="c1"># ridge: lambda=0.095  testMSE=122695.0  nonzero=19</span>
+    <span class="c1"># lasso: lambda=0.779  testMSE=119064.0  nonzero=16</span>
+<span class="n">dropped</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">XH</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">lasso</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-8</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;lasso drops:&#39;</span><span class="p">,</span> <span class="n">dropped</span><span class="p">)</span>                   <span class="c1"># [&#39;Years&#39;, &#39;CRBI&#39;, &#39;Errors&#39;]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ridge: lambda=0.095  testMSE=122695.0  nonzero=19
+lasso: lambda=0.779  testMSE=119064.0  nonzero=16
+lasso drops: [&#39;Years&#39;, &#39;CRBI&#39;, &#39;Errors&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Interpretation.</strong> With <span class="math notranslate nohighlight">\(n=263\)</span>, <span class="math notranslate nohighlight">\(p=19\)</span> and this split, ridge chooses <span class="math notranslate nohighlight">\(\lambda\approx0.1\)</span> (test MSE <span class="math notranslate nohighlight">\(\approx1.2\times10^5\)</span>, all 19 coefficients non-zero) while the lasso chooses <span class="math notranslate nohighlight">\(\lambda\approx0.8\)</span> (test MSE <span class="math notranslate nohighlight">\(\approx1.2\times10^5\)</span>, 16 non-zero) and drops <code class="docutils literal notranslate"><span class="pre">Years</span></code>, <code class="docutils literal notranslate"><span class="pre">CRBI</span></code>, <code class="docutils literal notranslate"><span class="pre">Errors</span></code> (weak or redundant given the correlated career totals). Both attain nearly identical test error, but the lasso reaches it with a <em>sparser, more interpretable</em> model. Exact numbers shift with the split/seed; the qualitative message — lasso selects, ridge keeps all — is stable.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="chapter_07_lab.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 7 — Moving Beyond Linearity</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="chapter_05_lab.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 5 — Resampling Methods</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Christoph Weisser. Based on ISLP (Springer, 2023)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ChrisW09/Quantitative-Research-Methods" aria-label="GitHub"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.011.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 6 — Model Selection and Regularisation</a><ul>
+<li><a class="reference internal" href="#lab-subset-selection-ridge-lasso">Lab: subset selection, ridge, lasso</a></li>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+<li><a class="reference internal" href="#hitters-data">1. Hitters data</a></li>
+<li><a class="reference internal" href="#best-subset-and-forward-stepwise-selection">2. Best-subset and forward stepwise selection</a></li>
+<li><a class="reference internal" href="#ridge-regression">3. Ridge regression</a><ul>
+<li><a class="reference internal" href="#ridge-coefficient-paths">Ridge coefficient paths</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lasso">4. Lasso</a><ul>
+<li><a class="reference internal" href="#lasso-paths">Lasso paths</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-many-models-did-we-skip">5. How many models did we skip?</a></li>
+<li><a class="reference internal" href="#exercises">6. Exercises</a></li>
+<li><a class="reference internal" href="#lecture-exercises-worked-python-solutions">Lecture exercises — worked Python solutions</a><ul>
+<li><a class="reference internal" href="#exercise-6-6-cv-ridge-and-lasso-on-hitters-python">Exercise 6.6 — CV Ridge and Lasso on Hitters [Python]</a></li>
+<li><a class="reference internal" href="#extended-exercise-6-3-cv-ridge-and-lasso-test-mse-on-hitters-python">Extended Exercise 6.3 — CV Ridge and Lasso Test MSE on Hitters [Python]</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7f41d439"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

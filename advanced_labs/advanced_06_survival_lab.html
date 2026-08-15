@@ -1,0 +1,1580 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Chapter 13 — Multiple Testing" href="advanced_07_multiple_testing_lab.html"><link rel="prev" title="Chapter 9 — Support Vector Machines" href="advanced_05_svm_lab.html">
+
+    <link rel="shortcut icon" href="../_static/favicon.svg"><!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>Chapter 11 — Survival Analysis - Quantitative Research Methods</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cd1d273d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #005b7f;
+  --color-brand-content: #00618a;
+  --color-brand-visited: #00618a;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Quantitative Research Methods</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Quantitative Research Methods</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../for-students.html">For students</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course.html">The course at a glance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">Python environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Materials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../slides.html">Lecture slides</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../labs.html">Lab notebooks</a><input aria-label="Toggle navigation of Lab notebooks" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_00_lab.html">Chapter 0 — Precourse Refresher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_00b_lab.html">Chapter 0b — Precourse Toolkit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_01_lab.html">Chapter 1 — Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_02_lab.html">Chapter 2 — Statistical Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_03_lab.html">Chapter 3 — Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_04_lab.html">Chapter 4 — Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_05_lab.html">Chapter 5 — Resampling Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_06_lab.html">Chapter 6 — Model Selection and Regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_07_lab.html">Chapter 7 — Moving Beyond Linearity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_08_lab.html">Chapter 8 — Tree-Based Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exams.html">Mock exams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../advanced.html">Advanced modules</a><input aria-label="Toggle navigation of Advanced modules" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="advanced_01_rcts_lab.html">Advanced Module A1 — Randomised Controlled Trials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_02_shapley_lab.html">Advanced Module A2 — Explainable AI with Shapley Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_03_conformal_lab.html">Advanced Module A3 — Conformal Prediction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_04_glms_splines_lab.html">Advanced Module A4 — GLMs and Splines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_05_svm_lab.html">Chapter 9 — Support Vector Machines</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 11 — Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_07_multiple_testing_lab.html">Chapter 13 — Multiple Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_08_unsupervised_lab.html">Chapter 12 — Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_09_deep_learning_lab.html">Advanced Module A9 — Deep Learning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">Short projects</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Teaching</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../teaching.html">Teaching it</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../repository.html">Repository layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../building-docs.html">Building this documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citation.html">Citation &amp; licence</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/docs/advanced_labs/advanced_06_survival_lab.ipynb?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/edit/main/docs/advanced_labs/advanced_06_survival_lab.ipynb" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p><a class="reference external" href="https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_06_survival/advanced_06_survival_lab.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><em>This notebook runs on Colab as-is. The badge link above and the <code class="docutils literal notranslate"><span class="pre">GITHUB_RAW</span></code> line in the setup cell already point to this repository, so everything installs and loads automatically.</em></p>
+<section class="tex2jax_ignore mathjax_ignore" id="chapter-11-survival-analysis">
+<h1>Chapter 11 — Survival Analysis<a class="headerlink" href="#chapter-11-survival-analysis" title="Link to this heading">¶</a></h1>
+<section id="lab-kaplanmeier-log-rank-cox-model-with-lifelines">
+<h2>Lab: Kaplan–Meier, log-rank, Cox model with lifelines<a class="headerlink" href="#lab-kaplanmeier-log-rank-cox-model-with-lifelines" title="Link to this heading">¶</a></h2>
+<p><strong>Course:</strong> Quantitative Research Methods<br />
+<strong>Instructor:</strong> Prof. Dr. Christoph Weisser<br />
+<strong>Source:</strong> James, Witten, Hastie, Tibshirani &amp; Taylor (2023), <em>An Introduction to Statistical Learning, with Applications in Python</em>, Springer. Companion code at <a class="reference external" href="https://www.statlearning.com">statlearning.com</a>.</p>
+<p><strong>Goal.</strong> Establish the censoring convention in <code class="docutils literal notranslate"><span class="pre">BrainCancer</span></code>; show why the naive analyses fail; estimate a Kaplan–Meier curve with a confidence band; run a log-rank test; fit, read and check a Cox proportional-hazards model. Requires <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">lifelines</span></code>.</p>
+<p>Every number the lecture slides quote for this chapter is reproduced below from the same data with the same methods, so the deck and this notebook can be checked against each other line by line.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<p>Run this cell once. The <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ISLP</span></code>. As an alternative, the same data sets are available as CSVs in the workspace’s <code class="docutils literal notranslate"><span class="pre">ALL</span> <span class="pre">CSV</span> <span class="pre">FILES</span> <span class="pre">-</span> <span class="pre">2nd</span> <span class="pre">Edition</span></code> folder.</p>
+<blockquote>
+<div><p><strong>Google Colab:</strong> this notebook also runs on Colab out of the box — the setup cell below installs any missing packages and downloads the data automatically.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- Setup: runs locally AND on Google Colab --------------------------------</span>
+<span class="c1"># Silence only the spurious &#39;encountered in matmul&#39; RuntimeWarnings that the macOS</span>
+<span class="c1"># Accelerate BLAS emits; real warnings (deprecations, model caveats) stay visible.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;.*encountered in matmul&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">subprocess</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">import_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;pip-install pkg (quietly) if its import is missing.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">import_name</span> <span class="ow">or</span> <span class="n">pkg</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;pip&#39;</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;-q&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>  <span class="c1"># Colab ships numpy/pandas/sklearn/statsmodels; add course extras</span>
+    <span class="k">for</span> <span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;ISLP&#39;</span><span class="p">,</span> <span class="s1">&#39;ISLP&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;lifelines&#39;</span><span class="p">,</span> <span class="s1">&#39;lifelines&#39;</span><span class="p">)]:</span>
+        <span class="n">_ensure</span><span class="p">(</span><span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">110</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ISLP not installed; using CSV / URL fallbacks.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Local CSV location (repo layout first, then legacy paths, then a data/ cache).</span>
+<span class="n">_CANDIDATES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;../../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">CSV</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_CANDIDATES</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+<span class="c1"># GITHUB_RAW lets a fresh Colab runtime fetch any</span>
+<span class="c1"># CSV that is neither in ISLP nor already local (spaces in the folder -&gt; %20).</span>
+<span class="n">GITHUB_RAW</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/ChrisW09/Quantitative-Research-Methods/main/&#39;</span>
+              <span class="s1">&#39;ALL%20CSV</span><span class="si">%20F</span><span class="s1">ILES%20-%202nd</span><span class="si">%20E</span><span class="s1">dition&#39;</span><span class="p">)</span>
+
+<span class="c1"># The four datasets NOT in the ISLP package -&gt; load from the book&#39;s official</span>
+<span class="c1"># site so the notebook works on a fresh Colab even before the repo is published.</span>
+<span class="n">KNOWN_URLS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Advertising&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.statlearning.com/s/Advertising.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Heart&#39;</span><span class="p">:</span>       <span class="s1">&#39;https://www.statlearning.com/s/Heart.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income1&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income1.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income2&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income2.csv&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a course dataset. Order: ISLP package -&gt; R datasets -&gt; local CSV</span>
+<span class="sd">    -&gt; official book URL -&gt; your GitHub repo. Works locally and on Colab.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">HAVE_ISLP</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">load_data</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;USArrests&#39;</span><span class="p">:</span>                       <span class="c1"># classic R dataset, not in ISLP</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+            <span class="k">return</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;USArrests&#39;</span><span class="p">,</span> <span class="s1">&#39;datasets&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>                      <span class="c1"># running from the repo (local)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+    <span class="n">remotes</span> <span class="o">=</span> <span class="p">([</span><span class="n">KNOWN_URLS</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">KNOWN_URLS</span> <span class="k">else</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GITHUB_RAW</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">remotes</span><span class="p">:</span>                           <span class="c1"># fresh Colab: stream over https</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Could not load </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. Put the CSV in &#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s2">/&#39; or check your connection for the GITHUB_RAW fallback.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="data-and-the-censoring-convention">
+<h2>1. Data and the censoring convention<a class="headerlink" href="#data-and-the-censoring-convention" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">BrainCancer</span></code> holds 88 patients treated with stereotactic radiation, followed for up to 82.56 months. Before anything else we must settle what <code class="docutils literal notranslate"><span class="pre">status</span></code> means: <code class="docutils literal notranslate"><span class="pre">lifelines</span></code> expects <strong>1 = the event happened</strong>, and getting this backwards silently inverts every curve in the chapter.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BC</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;BrainCancer&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># the CSV carries an unnamed row-number column</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>   <span class="c1"># how many of each code?</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;missing values:&#39;</span><span class="p">,</span> <span class="n">BC</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="s1">&#39;(one diagnosis)&#39;</span><span class="p">)</span>
+<span class="n">BC</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(88, 8)
+{0: 53, 1: 35}
+missing values: 1 (one diagnosis)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sex</th>
+      <th>diagnosis</th>
+      <th>loc</th>
+      <th>ki</th>
+      <th>gtv</th>
+      <th>stereo</th>
+      <th>status</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Female</td>
+      <td>Meningioma</td>
+      <td>Infratentorial</td>
+      <td>90</td>
+      <td>6.11</td>
+      <td>SRS</td>
+      <td>0</td>
+      <td>57.64</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Male</td>
+      <td>HG glioma</td>
+      <td>Supratentorial</td>
+      <td>90</td>
+      <td>19.35</td>
+      <td>SRT</td>
+      <td>1</td>
+      <td>8.98</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Female</td>
+      <td>Meningioma</td>
+      <td>Infratentorial</td>
+      <td>70</td>
+      <td>7.95</td>
+      <td>SRS</td>
+      <td>0</td>
+      <td>26.46</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Female</td>
+      <td>LG glioma</td>
+      <td>Supratentorial</td>
+      <td>80</td>
+      <td>7.61</td>
+      <td>SRT</td>
+      <td>1</td>
+      <td>47.80</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Male</td>
+      <td>HG glioma</td>
+      <td>Supratentorial</td>
+      <td>90</td>
+      <td>5.06</td>
+      <td>SRT</td>
+      <td>1</td>
+      <td>6.30</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Which polarity is right? Decide it from the data, not from memory.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lifelines</span><span class="w"> </span><span class="kn">import</span> <span class="n">KaplanMeierFitter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lifelines.statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">logrank_test</span>
+
+<span class="n">male</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Male&#39;</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">event</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;status = 1 is the EVENT&#39;</span><span class="p">,</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]),</span>
+                     <span class="p">(</span><span class="s1">&#39;status = 0 is the EVENT&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])]:</span>
+    <span class="n">km</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">event</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">logrank_test</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">male</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">male</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                     <span class="n">event</span><span class="p">[</span><span class="n">male</span><span class="p">],</span> <span class="n">event</span><span class="p">[</span><span class="o">~</span><span class="n">male</span><span class="p">])</span>          <span class="c1"># ISLP publishes chi2 = 1.44</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-24s</span><span class="s1"> events=</span><span class="si">%3d</span><span class="s1">  median=</span><span class="si">%7.2f</span><span class="s1">  sex log-rank chi2=</span><span class="si">%.4f</span><span class="s1">&#39;</span>
+          <span class="o">%</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">km</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">test_statistic</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>status = 1 is the EVENT  events= 35  median=  47.80  sex log-rank chi2=1.4405
+status = 0 is the EVENT  events= 53  median=  39.25  sex log-rank chi2=0.9040
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> With <code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">1</span></code> read as <strong>death</strong> there are 35 deaths and 53 censored observations (60.2% censored), the median survival is 47.8 months and the sex log-rank statistic is 1.4405 — exactly the value published in ISLP. The reversed coding gives 53 “events” and a log-rank statistic that matches nothing. <strong>Convention established for the whole notebook: <code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">1</span></code> is the event (death), <code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">0</span></code> is right-censored.</strong></p>
+</section>
+<section id="why-the-naive-analyses-fail">
+<h2>2. Why the naive analyses fail<a class="headerlink" href="#why-the-naive-analyses-fail" title="Link to this heading">¶</a></h2>
+<p>Three shortcuts suggest themselves, and all three are wrong. The deck quotes the medians 11.6, 23.7 and 47.8 months; they come from here.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">BC</span><span class="p">)</span>
+
+<span class="n">km</span>        <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>                                 <span class="c1"># honest estimate</span>
+<span class="n">km_drop</span>   <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">d</span> <span class="o">==</span> <span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">d</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>   <span class="c1"># (a) drop censored</span>
+<span class="n">km_asdead</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>                        <span class="c1"># (b) all are events</span>
+<span class="n">naive_S24</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">((</span><span class="n">t</span> <span class="o">&lt;=</span> <span class="mi">24</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">n</span>                          <span class="c1"># (c) never die</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(a) drop the </span><span class="si">%d</span><span class="s1"> censored patients : median </span><span class="si">%5.2f</span><span class="s1">&#39;</span>
+      <span class="o">%</span> <span class="p">((</span><span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">km_drop</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(b) treat censoring as death      : median </span><span class="si">%5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">km_asdead</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(c) censored patients never die   : S(24) = </span><span class="si">%.3f</span><span class="s1">, flattens at </span><span class="si">%.3f</span><span class="s1">&#39;</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">naive_S24</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">d</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    Kaplan-Meier                  : median </span><span class="si">%5.2f</span><span class="s1">, S(24) = </span><span class="si">%.3f</span><span class="s1">&#39;</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">km</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">,</span> <span class="n">km</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(a) drop the 53 censored patients : median 11.57
+(b) treat censoring as death      : median 23.67
+(c) censored patients never die   : S(24) = 0.716, flattens at 0.602
+    Kaplan-Meier                  : median 47.80, S(24) = 0.683
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">km_drop</span><span class="o">.</span><span class="n">plot_survival_function</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ci_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+                               <span class="n">label</span><span class="o">=</span><span class="s1">&#39;(a) censored dropped&#39;</span><span class="p">)</span>
+<span class="n">km_asdead</span><span class="o">.</span><span class="n">plot_survival_function</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ci_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">,</span>
+                                 <span class="n">label</span><span class="o">=</span><span class="s1">&#39;(b) censoring counted as death&#39;</span><span class="p">)</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">t</span><span class="p">]))</span>                       <span class="c1"># (c) as a step function</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([((</span><span class="n">t</span> <span class="o">&lt;=</span> <span class="n">u</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">grid</span><span class="p">])</span> <span class="o">/</span> <span class="n">n</span><span class="p">,</span>
+        <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;(c) censored never die&#39;</span><span class="p">)</span>
+<span class="n">km</span><span class="o">.</span><span class="n">plot_survival_function</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ci_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">2.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Kaplan-Meier&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;estimated S(t)&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span>
+       <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Three wrong answers and one right one&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/e902aa7d3b722df6831ba61f790e4e976dfd3487fe28edf8ce6fb6f4a4476db9.png" src="../_images/e902aa7d3b722df6831ba61f790e4e976dfd3487fe28edf8ce6fb6f4a4476db9.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> Shortcuts (a) and (b) both <em>understate</em> survival — (a) keeps only the patients who died inside the study, (b) treats a lower bound as an exact time. Shortcut (c) <em>overstates</em> it: pretending the censored never die caps the curve at <span class="math notranslate nohighlight">\(1-35/88=0.602\)</span>, so the median is never reached. The Kaplan–Meier curve is the only one of the four that uses all 88 patients for exactly what each of them proves.</p>
+</section>
+<section id="kaplanmeier">
+<h2>3. Kaplan–Meier<a class="headerlink" href="#kaplanmeier" title="Link to this heading">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(\hat S(t)=\prod_{k:\,t_k\le t}\left(1-d_k/r_k\right)\)</span>, where <span class="math notranslate nohighlight">\(d_k\)</span> counts events at the <span class="math notranslate nohighlight">\(k\)</span>-th distinct event time and <span class="math notranslate nohighlight">\(r_k=\#\{i:Y_i\ge t_k\}\)</span> counts those still at risk.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">km</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;all patients&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;S(20)  = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">km</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;95% CI  &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">km</span><span class="o">.</span><span class="n">confidence_interval_</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;median = </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">km</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;S(</span><span class="si">%2d</span><span class="s1">)  = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">km</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;still under observation after month 20:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">((</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>S(20)  = 0.7132
+95% CI   [0.5996 0.7998]
+median = 47.80
+S(10)  = 0.8206
+S(40)  = 0.5525
+S(60)  = 0.4515
+still under observation after month 20: 48
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The first three steps by hand: r_k drops for censoring as well as for deaths.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">km</span><span class="o">.</span><span class="n">event_table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">7</span><span class="p">)[[</span><span class="s1">&#39;at_risk&#39;</span><span class="p">,</span> <span class="s1">&#39;observed&#39;</span><span class="p">,</span> <span class="s1">&#39;censored&#39;</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">running product:&#39;</span><span class="p">,</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">([</span><span class="mi">87</span> <span class="o">/</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">87</span> <span class="o">/</span> <span class="mi">88</span> <span class="o">*</span> <span class="mi">85</span> <span class="o">/</span> <span class="mi">86</span><span class="p">,</span> <span class="mi">87</span> <span class="o">/</span> <span class="mi">88</span> <span class="o">*</span> <span class="mi">85</span> <span class="o">/</span> <span class="mi">86</span> <span class="o">*</span> <span class="mi">82</span> <span class="o">/</span> <span class="mi">83</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>          at_risk  observed  censored
+event_at                             
+0.00           88         0         0
+0.07           88         1         0
+1.18           87         0         1
+1.41           86         1         0
+1.54           85         0         1
+2.03           84         0         1
+3.38           83         1         0
+
+running product: [0.9886 0.9771 0.9654]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">km</span><span class="o">.</span><span class="n">plot_survival_function</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>                 <span class="c1"># the band is drawn by default</span>
+<span class="n">cens</span> <span class="o">=</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cens</span><span class="p">,</span> <span class="n">km</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="n">cens</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span>
+        <span class="n">ms</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;censoring times&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;months since treatment&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;S(t)&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span>
+       <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Kaplan-Meier with 95</span><span class="si">% c</span><span class="s1">onfidence band&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/cf1c10d4f1f6eb1385307e543537bb3b0dc2041e013db2c6d93a97cc0332ebd5.png" src="../_images/cf1c10d4f1f6eb1385307e543537bb3b0dc2041e013db2c6d93a97cc0332ebd5.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">sex</span><span class="p">,</span> <span class="n">colour</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;Female&#39;</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Male&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">)]:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sex</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">sex</span><span class="p">)</span>
+    <span class="n">k</span><span class="o">.</span><span class="n">plot_survival_function</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-6s</span><span class="s1"> n=</span><span class="si">%2d</span><span class="s1"> deaths=</span><span class="si">%2d</span><span class="s1"> median=</span><span class="si">%6.2f</span><span class="s1">  S(30)=</span><span class="si">%.4f</span><span class="s1">&#39;</span>
+          <span class="o">%</span> <span class="p">(</span><span class="n">sex</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">k</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">,</span>
+             <span class="n">k</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;S(t)&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Kaplan-Meier by sex&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Female n=45 deaths=15 median= 51.02  S(30)=0.7469
+Male   n=43 deaths=20 median= 31.25  S(30)=0.5533
+</pre></div>
+</div>
+<img alt="../_images/1fac2818dfc69545ca1802c583f86cdb0662d255064ea44ad3723a3cd49cf27b.png" src="../_images/1fac2818dfc69545ca1802c583f86cdb0662d255064ea44ad3723a3cd49cf27b.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> <span class="math notranslate nohighlight">\(\hat S(20)=0.7132\)</span> with a 95% interval of <span class="math notranslate nohighlight">\([0.600,0.800]\)</span>, and the median is 47.8 months (its lower 95% bound is 31.25 and there is no upper bound — the curve never gets far enough below 0.5). The band widens to the right because only 48 of the 88 patients are still under observation after month 20, and the curve flattens at 0.452 rather than reaching zero because the largest observation is censored. Split by sex, the male median is 31.25 months against 51.02 for women; whether that gap is more than noise is the next section’s question.</p>
+</section>
+<section id="log-rank-test">
+<h2>4. Log-rank test<a class="headerlink" href="#log-rank-test" title="Link to this heading">¶</a></h2>
+<p>At every death time, compare the deaths observed in group 1 with the number expected if the two groups were identical, then sum: <span class="math notranslate nohighlight">\(Z^2=(O_1-E_1)^2/V_1 \sim \chi^2_1\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">logrank_test</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">male</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span>   <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">male</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                   <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">male</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">male</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;log-rank chi2 = </span><span class="si">%.4f</span><span class="s1">   p = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">p_value</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>log-rank chi2 = 1.4405   p = 0.2301
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The same statistic assembled by hand, one 2x2 table per death time.</span>
+<span class="n">O</span> <span class="o">=</span> <span class="n">E</span> <span class="o">=</span> <span class="n">V</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="k">for</span> <span class="n">tk</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+    <span class="n">at_risk</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">tk</span>
+    <span class="n">r1</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">at_risk</span> <span class="o">&amp;</span> <span class="n">male</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">at_risk</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>           <span class="c1"># at risk: group 1, and total</span>
+    <span class="n">dk</span> <span class="o">=</span> <span class="p">((</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">tk</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>   <span class="c1"># deaths at this time</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="p">((</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">tk</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">male</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">O</span> <span class="o">+=</span> <span class="n">d1</span>
+    <span class="n">E</span> <span class="o">+=</span> <span class="n">dk</span> <span class="o">*</span> <span class="n">r1</span> <span class="o">/</span> <span class="n">r</span>                                        <span class="c1"># hypergeometric mean ...</span>
+    <span class="n">V</span> <span class="o">+=</span> <span class="n">dk</span> <span class="o">*</span> <span class="p">(</span><span class="n">r1</span> <span class="o">/</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r1</span> <span class="o">/</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="n">dk</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># ... and variance</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;O_male = </span><span class="si">%.0f</span><span class="s1">   E_male = </span><span class="si">%.4f</span><span class="s1">   V_male = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">V</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Z = </span><span class="si">%.4f</span><span class="s1">      Z^2 = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">((</span><span class="n">O</span> <span class="o">-</span> <span class="n">E</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">V</span><span class="p">),</span> <span class="p">(</span><span class="n">O</span> <span class="o">-</span> <span class="n">E</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">V</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>O_male = 20   E_male = 16.4605   V_male = 8.6969
+Z = 1.2002      Z^2 = 1.4405
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> Men suffered 20 deaths where the risk sets predicted 16.4605, an excess of 3.54 with standard error <span class="math notranslate nohighlight">\(\sqrt{8.6969}=2.949\)</span>, so <span class="math notranslate nohighlight">\(Z=1.200\)</span> and <span class="math notranslate nohighlight">\(\chi^2_1=1.4405\)</span>, <span class="math notranslate nohighlight">\(p=0.230\)</span>. With 88 patients and 35 events there is <strong>no evidence</strong> of a sex difference in survival: a 20-month gap between medians is entirely consistent with chance at this sample size. Note also what the test cannot see — if two curves cross, the early and late excesses cancel in <span class="math notranslate nohighlight">\(O_1-E_1\)</span> and the test reports nothing.</p>
+</section>
+<section id="cox-proportional-hazards-model">
+<h2>5. Cox proportional-hazards model<a class="headerlink" href="#cox-proportional-hazards-model" title="Link to this heading">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(h(t\mid x)=h_0(t)\exp(x^{\top}\beta)\)</span>: the baseline hazard <span class="math notranslate nohighlight">\(h_0\)</span> is never estimated, because it cancels out of the partial likelihood. The one missing <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code> leaves 87 complete cases.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lifelines</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoxPHFitter</span>
+
+<span class="n">BCc</span> <span class="o">=</span> <span class="n">BC</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>                    <span class="c1"># 87 complete cases</span>
+<span class="n">BCc</span><span class="p">[</span><span class="s1">&#39;diagnosis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">BCc</span><span class="p">[</span><span class="s1">&#39;diagnosis&#39;</span><span class="p">],</span>         <span class="c1"># Meningioma = reference,</span>
+        <span class="n">categories</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Meningioma&#39;</span><span class="p">,</span> <span class="s1">&#39;HG glioma&#39;</span><span class="p">,</span> <span class="s1">&#39;LG glioma&#39;</span><span class="p">,</span> <span class="s1">&#39;Other&#39;</span><span class="p">])</span>  <span class="c1"># as in ISLP</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">BCc</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>      <span class="c1"># drop the reference level</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(87, 10)
+[&#39;ki&#39;, &#39;gtv&#39;, &#39;status&#39;, &#39;time&#39;, &#39;sex_Male&#39;, &#39;diagnosis_HG glioma&#39;, &#39;diagnosis_LG glioma&#39;, &#39;diagnosis_Other&#39;, &#39;loc_Supratentorial&#39;, &#39;stereo_SRT&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cph</span> <span class="o">=</span> <span class="n">CoxPHFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">duration_col</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">event_col</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">)</span>
+<span class="n">cph</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">&#39;coef&#39;</span><span class="p">,</span> <span class="s1">&#39;exp(coef)&#39;</span><span class="p">,</span> <span class="s1">&#39;se(coef)&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;exp(coef) lower 95%&#39;</span><span class="p">,</span> <span class="s1">&#39;exp(coef) upper 95%&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>exp(coef)</th>
+      <th>se(coef)</th>
+      <th>exp(coef) lower 95%</th>
+      <th>exp(coef) upper 95%</th>
+      <th>z</th>
+      <th>p</th>
+    </tr>
+    <tr>
+      <th>covariate</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ki</th>
+      <td>-0.0550</td>
+      <td>0.9465</td>
+      <td>0.0183</td>
+      <td>0.9132</td>
+      <td>0.9811</td>
+      <td>-3.0008</td>
+      <td>0.0027</td>
+    </tr>
+    <tr>
+      <th>gtv</th>
+      <td>0.0343</td>
+      <td>1.0349</td>
+      <td>0.0223</td>
+      <td>0.9906</td>
+      <td>1.0812</td>
+      <td>1.5355</td>
+      <td>0.1247</td>
+    </tr>
+    <tr>
+      <th>sex_Male</th>
+      <td>0.1837</td>
+      <td>1.2017</td>
+      <td>0.3604</td>
+      <td>0.5930</td>
+      <td>2.4352</td>
+      <td>0.5099</td>
+      <td>0.6101</td>
+    </tr>
+    <tr>
+      <th>diagnosis_HG glioma</th>
+      <td>2.1546</td>
+      <td>8.6241</td>
+      <td>0.4505</td>
+      <td>3.5664</td>
+      <td>20.8547</td>
+      <td>4.7824</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <th>diagnosis_LG glioma</th>
+      <td>0.9150</td>
+      <td>2.4969</td>
+      <td>0.6382</td>
+      <td>0.7148</td>
+      <td>8.7215</td>
+      <td>1.4339</td>
+      <td>0.1516</td>
+    </tr>
+    <tr>
+      <th>diagnosis_Other</th>
+      <td>0.8857</td>
+      <td>2.4247</td>
+      <td>0.6579</td>
+      <td>0.6678</td>
+      <td>8.8031</td>
+      <td>1.3463</td>
+      <td>0.1782</td>
+    </tr>
+    <tr>
+      <th>loc_Supratentorial</th>
+      <td>0.4412</td>
+      <td>1.5546</td>
+      <td>0.7037</td>
+      <td>0.3914</td>
+      <td>6.1741</td>
+      <td>0.6270</td>
+      <td>0.5307</td>
+    </tr>
+    <tr>
+      <th>stereo_SRT</th>
+      <td>0.1778</td>
+      <td>1.1946</td>
+      <td>0.6016</td>
+      <td>0.3674</td>
+      <td>3.8839</td>
+      <td>0.2955</td>
+      <td>0.7676</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;HR per 10 Karnofsky points : </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">cph</span><span class="o">.</span><span class="n">params_</span><span class="p">[</span><span class="s1">&#39;ki&#39;</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;HR, HG glioma vs meningioma: </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">cph</span><span class="o">.</span><span class="n">params_</span><span class="p">[</span><span class="s1">&#39;diagnosis_HG glioma&#39;</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;concordance index          : </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cph</span><span class="o">.</span><span class="n">concordance_index_</span><span class="p">)</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="n">cph</span><span class="o">.</span><span class="n">log_likelihood_ratio_test</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;likelihood-ratio test      : chi2 = </span><span class="si">%.2f</span><span class="s1"> on </span><span class="si">%d</span><span class="s1"> df, p = </span><span class="si">%.2g</span><span class="s1">&#39;</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">lr</span><span class="o">.</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">lr</span><span class="o">.</span><span class="n">degrees_freedom</span><span class="p">,</span> <span class="n">lr</span><span class="o">.</span><span class="n">p_value</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>HR per 10 Karnofsky points : 0.577
+HR, HG glioma vs meningioma: 8.624
+concordance index          : 0.7943
+likelihood-ratio test      : chi2 = 41.37 on 8 df, p = 1.8e-06
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">cph</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>                       <span class="c1"># log hazard ratios with their 95% intervals</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Cox coefficients (log hazard ratios)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/9f1aebf0e619ad30d8b381175be46defdb6b17b28585beded1f634da8074b5de.png" src="../_images/9f1aebf0e619ad30d8b381175be46defdb6b17b28585beded1f634da8074b5de.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> Only two covariates separate from the null. <code class="docutils literal notranslate"><span class="pre">ki</span></code>: <span class="math notranslate nohighlight">\(\hat\beta=-0.0550\)</span>, so each Karnofsky point multiplies the death rate by <span class="math notranslate nohighlight">\(e^{-0.0550}=0.947\)</span> and ten points by <span class="math notranslate nohighlight">\(e^{-0.550}=0.577\)</span> — <em>holding tumour type, volume, site, sex and technique fixed, ten more Karnofsky points are associated with a 42% lower death rate at every follow-up time</em>. <code class="docutils literal notranslate"><span class="pre">diagnosis</span> <span class="pre">=</span> <span class="pre">HG</span> <span class="pre">glioma</span></code>: <span class="math notranslate nohighlight">\(e^{2.1546}=8.62\)</span> times the hazard of a meningioma, 95% interval <span class="math notranslate nohighlight">\([3.57,\,20.85]\)</span>. The overall likelihood-ratio test is <span class="math notranslate nohighlight">\(\chi^2_8=41.4\)</span>, <span class="math notranslate nohighlight">\(p=1.8\times10^{-6}\)</span>, and the concordance index is 0.794 — good ranking, but read on the training data, so optimistic.</p>
+<p>A hazard ratio is <strong>not</strong> a risk ratio: <span class="math notranslate nohighlight">\(\widehat{HR}=8.62\)</span> does not mean HG glioma patients are 8.6 times as likely to die by any particular date. Section 6 turns the coefficients into survival probabilities, which is the form a decision needs.</p>
+</section>
+<section id="checking-proportional-hazards-and-predicting-curves">
+<h2>6. Checking proportional hazards and predicting curves<a class="headerlink" href="#checking-proportional-hazards-and-predicting-curves" title="Link to this heading">¶</a></h2>
+<p>Proportional hazards is an <em>assumption</em>. Schoenfeld residuals test whether each hazard ratio drifts with time; a small <span class="math notranslate nohighlight">\(p\)</span>-value is evidence <strong>against</strong> proportionality.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lifelines.statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">proportional_hazard_test</span>
+
+<span class="n">ph</span> <span class="o">=</span> <span class="n">proportional_hazard_test</span><span class="p">(</span><span class="n">cph</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">time_transform</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ph</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">&#39;test_statistic&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">smallest p-value: </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ph</span><span class="o">.</span><span class="n">summary</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                     test_statistic       p
+diagnosis_HG glioma          0.0492  0.8245
+diagnosis_LG glioma          0.1148  0.7347
+diagnosis_Other              0.5632  0.4530
+gtv                          0.4928  0.4827
+ki                           0.0518  0.8199
+loc_Supratentorial           0.2390  0.6249
+sex_Male                     0.7166  0.3972
+stereo_SRT                   0.5646  0.4524
+
+smallest p-value: 0.3972
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Complementary log-log plot: parallel curves are what proportional hazards predicts.</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">sex</span><span class="p">,</span> <span class="n">colour</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;Female&#39;</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Male&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">)]:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sex</span>
+    <span class="n">sf</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                                 <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">survival_function_</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="p">(</span><span class="n">sf</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sf</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sf</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">keep</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sf</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)),</span>
+            <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">sex</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;log t&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;log(-log S(t))&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Complementary log-log plot&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/280571db55217d4add33177dd3bc437494d11035074aabdcff627ba672896056.png" src="../_images/280571db55217d4add33177dd3bc437494d11035074aabdcff627ba672896056.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># From coefficients to curves: S(t | x) = S0(t) ** exp(x&#39;beta), Breslow baseline.</span>
+<span class="n">med</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>   <span class="c1"># median covariate profile</span>
+<span class="n">prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">med</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">prof</span><span class="p">[</span><span class="s1">&#39;ki&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">60.</span><span class="p">,</span> <span class="mf">80.</span><span class="p">,</span> <span class="mf">100.</span><span class="p">]</span>                                    <span class="c1"># vary one covariate only</span>
+
+<span class="n">sf</span> <span class="o">=</span> <span class="n">cph</span><span class="o">.</span><span class="n">predict_survival_function</span><span class="p">(</span><span class="n">prof</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">colour</span><span class="p">,</span> <span class="n">lab</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;ki=60&#39;</span><span class="p">,</span> <span class="s1">&#39;ki=80&#39;</span><span class="p">,</span> <span class="s1">&#39;ki=100&#39;</span><span class="p">])):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">sf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">sf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;S(t | x)&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span>
+       <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Predicted survival, other covariates at their medians&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">idx</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">sf</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="mi">36</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;S(36 | ki=60, 80, 100) =&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">sf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;median survival        =&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">cph</span><span class="o">.</span><span class="n">predict_median</span><span class="p">(</span><span class="n">prof</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/893c09afd03183d0056b87376477a19361bb267d239675fe959f8d8bdeb685f9.png" src="../_images/893c09afd03183d0056b87376477a19361bb267d239675fe959f8d8bdeb685f9.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>S(36 | ki=60, 80, 100) = [0.514 0.801 0.929]
+median survival        = [39.54   inf   inf]
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> Every Schoenfeld <span class="math notranslate nohighlight">\(p\)</span>-value exceeds 0.39, so there is no evidence against proportional hazards — with 35 events that is weak reassurance rather than a clean bill of health, and “failing to reject” is not “accepting”. The complementary log-log curves for men and women stay roughly parallel, which is the same conclusion by eye.</p>
+<p>Turning the fit into curves: at 36 months, with the other covariates at their medians, <span class="math notranslate nohighlight">\(\hat S=0.514\)</span> for <span class="math notranslate nohighlight">\(ki=60\)</span> against <span class="math notranslate nohighlight">\(0.801\)</span> at <span class="math notranslate nohighlight">\(ki=80\)</span> and <span class="math notranslate nohighlight">\(0.929\)</span> at <span class="math notranslate nohighlight">\(ki=100\)</span>. The median is 39.5 months at <span class="math notranslate nohighlight">\(ki=60\)</span> and is never reached above that within the 82.56 months of follow-up (<code class="docutils literal notranslate"><span class="pre">inf</span></code> in the printout). These are the numbers a clinician can act on; the hazard ratio is the mechanism behind them.</p>
+</section>
+<section id="lecture-exercises-worked-python-solutions">
+<h2>Lecture exercises — worked Python solutions<a class="headerlink" href="#lecture-exercises-worked-python-solutions" title="Link to this heading">¶</a></h2>
+<p>These are the exercises from the lecture slides, solved step by step: the <code class="docutils literal notranslate"><span class="pre">[Python]</span></code>-tagged ones get runnable code reproducing the slide numbers, and the conceptual and mathematical ones get a concise answer with a numerical check. Run each cell and compare with the slide solutions. Data loads through the <code class="docutils literal notranslate"><span class="pre">load()</span></code> helper defined in the Setup cell, so every cell works locally and on Colab.</p>
+<section id="exercise-11-1-why-the-shortcuts-fail-concept">
+<h3>Exercise 11.1 — Why the shortcuts fail [Concept]<a class="headerlink" href="#exercise-11-1-why-the-shortcuts-fail-concept" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> A streaming service has 10 000 subscribers; 1 200 cancelled last year and the rest are still subscribed. (1) An analyst averages the tenure of the 1 200 cancellers — which way is that biased? (2) A colleague averages current tenure over all 10 000 — which way is <em>that</em> biased? (3) What does a still-subscribed customer contribute? (4) Why is a “cancelled within 12 months?” classifier a poor substitute?</p>
+<p><strong>Answer.</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Biased downwards.</strong> To have cancelled inside a one-year window you must have had a short subscription, so long-lived customers are systematically excluded. This is shortcut (a) of §2, which gave a median of 11.6 instead of 47.8 months on <code class="docutils literal notranslate"><span class="pre">BrainCancer</span></code>.</p></li>
+<li><p><strong>Also biased downwards.</strong> For an active customer, current tenure is a <em>lower bound</em> on the eventual subscription length, and averaging lower bounds as if they were exact understates the mean — shortcut (b).</p></li>
+<li><p>That <span class="math notranslate nohighlight">\(T_i &gt; Y_i\)</span>. An active customer of 30 months’ tenure belongs in the <strong>risk set</strong> at every time up to month 30; Kaplan–Meier and Cox both use exactly this, by shrinking the denominator <span class="math notranslate nohighlight">\(r_k\)</span> rather than deleting the row.</p></li>
+<li><p>Anyone who joined less than 12 months ago has no label at all, so the newest cohorts are silently dropped — and the target changes meaning every time the snapshot date moves.</p></li>
+</ol>
+</section>
+<section id="exercise-11-2-reading-y-delta-off-a-study-math">
+<h3>Exercise 11.2 — Reading <span class="math notranslate nohighlight">\((Y,\delta)\)</span> off a study [Math]<a class="headerlink" href="#exercise-11-2-reading-y-delta-off-a-study-math" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> A study runs for 36 months. A enrols at month 0 and has the event at 18; B enrols at 0 and is event-free at closure; C enrols at month 12 and moves abroad 9 months later; D enrols at month 24 and has the event 4 months later. Give <span class="math notranslate nohighlight">\((Y_i,\delta_i)\)</span>, classify the censoring, list <span class="math notranslate nohighlight">\(R(10)\)</span>, and say why <span class="math notranslate nohighlight">\(\sum_i Y_i/4\)</span> is not an estimate of <span class="math notranslate nohighlight">\(E[T]\)</span>.</p>
+<p><strong>Answer.</strong></p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Subject</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(C_i\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(Y_i=\min(T_i,C_i)\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\delta_i\)</span></p></th>
+<th class="head"><p>reason</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>A</p></td>
+<td><p>36</p></td>
+<td><p>18</p></td>
+<td><p>1</p></td>
+<td><p>event seen at 18</p></td>
+</tr>
+<tr class="row-odd"><td><p>B</p></td>
+<td><p>36</p></td>
+<td><p>36</p></td>
+<td><p>0</p></td>
+<td><p>still event-free at closure</p></td>
+</tr>
+<tr class="row-even"><td><p>C</p></td>
+<td><p>9</p></td>
+<td><p>9</p></td>
+<td><p>0</p></td>
+<td><p>lost to follow-up at 9</p></td>
+</tr>
+<tr class="row-odd"><td><p>D</p></td>
+<td><p>12</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>event seen at 4</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>B is <strong>administrative</strong> censoring — the calendar ran out, which cannot depend on B’s risk. C is <strong>loss to follow-up</strong>, so independence is an argument rather than a fact and must be stated out loud. The risk set is <span class="math notranslate nohighlight">\(R(10)=\{i: Y_i\ge 10\}=\{A,B\}\)</span>: C left at 9, and D’s event occurred at 4 (the clock is time since <em>enrolment</em>, not calendar time). Finally, <span class="math notranslate nohighlight">\(\tfrac14(18+36+9+4)=16.75\)</span> mixes two exact times with two lower bounds — it estimates a feature of the <em>study design</em>, and enrolling B a year earlier would change it although nothing about the disease did.</p>
+</section>
+<section id="exercise-11-3-kaplanmeier-by-hand-math">
+<h3>Exercise 11.3 — Kaplan–Meier by hand [Math]<a class="headerlink" href="#exercise-11-3-kaplanmeier-by-hand-math" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> Six patients: <span class="math notranslate nohighlight">\(4,\;6^{+},\;8,\;11^{+},\;12,\;15\)</span>. Tabulate <span class="math notranslate nohighlight">\(t_k,r_k,d_k\)</span>, compute <span class="math notranslate nohighlight">\(\hat S\)</span> at each event time, give <span class="math notranslate nohighlight">\(\hat S(10)\)</span> and the median, then redo it treating the two censored patients as deaths.</p>
+<p><strong>Answer.</strong> Event times are 4, 8, 12, 15 with <span class="math notranslate nohighlight">\(r_k = 6, 4, 2, 1\)</span> and <span class="math notranslate nohighlight">\(d_k=1\)</span> throughout, so <span class="math notranslate nohighlight">\(\hat S = 0.8333,\ 0.6250,\ 0.3125,\ 0\)</span>. At <span class="math notranslate nohighlight">\(t_2=8\)</span> the risk set is <span class="math notranslate nohighlight">\(\{8,11^{+},12,15\}\)</span>, hence <span class="math notranslate nohighlight">\(r_2=4\)</span>: the patient censored at 6 has left, but was counted at <span class="math notranslate nohighlight">\(t_1\)</span>. <span class="math notranslate nohighlight">\(\hat S\)</span> is flat between event times, so <span class="math notranslate nohighlight">\(\hat S(10)=\hat S(8)=0.625\)</span>, and the median — the first <span class="math notranslate nohighlight">\(t\)</span> with <span class="math notranslate nohighlight">\(\hat S(t)\le 0.5\)</span> — is <strong>12</strong>. Treating the censorings as deaths gives the plain empirical curve <span class="math notranslate nohighlight">\(5/6, 4/6, 3/6, \ldots\)</span> and drags the median down to 11.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">km_ex</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">km_ex</span><span class="o">.</span><span class="n">survival_function_</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;S(10) =&#39;</span><span class="p">,</span> <span class="n">km_ex</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+      <span class="s1">&#39; median =&#39;</span><span class="p">,</span> <span class="n">km_ex</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">)</span>
+
+<span class="n">km_bad</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;censoring treated as death -&gt; median =&#39;</span><span class="p">,</span> <span class="n">km_bad</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>          KM_estimate
+timeline             
+0.0            1.0000
+4.0            0.8333
+6.0            0.8333
+8.0            0.6250
+11.0           0.6250
+12.0           0.3125
+15.0           0.0000
+S(10) = 0.625  median = 12.0
+censoring treated as death -&gt; median = 11.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-11-4-the-log-rank-test-by-hand-math">
+<h3>Exercise 11.4 — The log-rank test by hand [Math]<a class="headerlink" href="#exercise-11-4-the-log-rank-test-by-hand-math" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> Arm A: <span class="math notranslate nohighlight">\(6,\;7^{+},\;10,\;15^{+}\)</span>; arm B: <span class="math notranslate nohighlight">\(3,\;5,\;9,\;12^{+}\)</span>. Build the tables, compute <span class="math notranslate nohighlight">\(O_A\)</span> and <span class="math notranslate nohighlight">\(E_A\)</span>, and with <span class="math notranslate nohighlight">\(V_A=1.1893\)</span> give the statistic and the conclusion.</p>
+<p><strong>Answer.</strong> The death times are 3, 5, 6, 9, 10 (censorings contribute no table; they only shrink later risk sets):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><span class="math notranslate nohighlight">\(t_k\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(r_{Ak}\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(r_{Bk}\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(r_k\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(d_k\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(d_{Ak}\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(E_{Ak}=d_k r_{Ak}/r_k\)</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+<td><p>8</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0.5000</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>4</p></td>
+<td><p>3</p></td>
+<td><p>7</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0.5714</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>4</p></td>
+<td><p>2</p></td>
+<td><p>6</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0.6667</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0.5000</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0.6667</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><span class="math notranslate nohighlight">\(O_A = 2\)</span> and <span class="math notranslate nohighlight">\(E_A = 2.9048\)</span>, so <span class="math notranslate nohighlight">\(Z=(2-2.9048)/\sqrt{1.1893}=-0.830\)</span>, <span class="math notranslate nohighlight">\(Z^2=0.688 &lt; 3.84\)</span> and <span class="math notranslate nohighlight">\(p=0.407\)</span>. <strong>No evidence of a difference</strong>: arm A had fewer deaths than expected, but with five events the standard error swamps the gap.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="n">logrank_test</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;chi2 = </span><span class="si">%.4f</span><span class="s1">   p = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">p_value</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>chi2 = 0.6883   p = 0.4068
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-11-5-hazard-ratio-arithmetic-math">
+<h3>Exercise 11.5 — Hazard-ratio arithmetic [Math]<a class="headerlink" href="#exercise-11-5-hazard-ratio-arithmetic-math" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> A Cox model for time to churn gives <span class="math notranslate nohighlight">\(\hat\beta_{\text{price}}=0.024\)</span> (se 0.006) per euro and <span class="math notranslate nohighlight">\(\hat\beta_{\text{onboarded}}=-0.693\)</span> (se 0.210). Give the hazard ratio for a 10-euro increase; the hazard ratio for onboarding and its interpretation; a test and 95% interval for onboarding; and the hazard ratio between two customers differing by 20 euros where the cheaper one onboarded.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+
+<span class="n">b_price</span><span class="p">,</span> <span class="n">se_price</span> <span class="o">=</span> <span class="mf">0.024</span><span class="p">,</span> <span class="mf">0.006</span>
+<span class="n">b_onb</span><span class="p">,</span>   <span class="n">se_onb</span>   <span class="o">=</span> <span class="o">-</span><span class="mf">0.693</span><span class="p">,</span> <span class="mf">0.210</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(1) HR per 10 euros   : </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">b_price</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(2) HR for onboarding : </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_onb</span><span class="p">))</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">b_onb</span> <span class="o">/</span> <span class="n">se_onb</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(3) z = </span><span class="si">%.2f</span><span class="s1">, p = </span><span class="si">%.4f</span><span class="s1">, 95</span><span class="si">%%</span><span class="s1"> CI on HR = [</span><span class="si">%.3f</span><span class="s1">, </span><span class="si">%.3f</span><span class="s1">]&#39;</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)),</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_onb</span> <span class="o">-</span> <span class="mf">1.96</span> <span class="o">*</span> <span class="n">se_onb</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_onb</span> <span class="o">+</span> <span class="mf">1.96</span> <span class="o">*</span> <span class="n">se_onb</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(4) combined HR       : </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">b_price</span> <span class="o">-</span> <span class="n">b_onb</span><span class="p">))</span>   <span class="c1"># log HRs add</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1) HR per 10 euros   : 1.271
+(2) HR for onboarding : 0.500
+(3) z = -3.30, p = 0.0010, 95% CI on HR = [0.331, 0.755]
+(4) combined HR       : 3.23
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> A 10-euro increase multiplies the churn rate by <span class="math notranslate nohighlight">\(e^{0.24}=1.271\)</span>; onboarding halves it (<span class="math notranslate nohighlight">\(e^{-0.693}=0.500\)</span>), at every tenure. The test gives <span class="math notranslate nohighlight">\(z=-3.30\)</span>, <span class="math notranslate nohighlight">\(p\approx0.001\)</span>, and the interval is built on the <span class="math notranslate nohighlight">\(\beta\)</span> scale and <em>then</em> exponentiated, which is why <span class="math notranslate nohighlight">\([0.331,0.755]\)</span> is asymmetric around 0.500. Hazards multiply, so log hazards add: the expensive, non-onboarded customer faces <span class="math notranslate nohighlight">\(e^{0.48+0.693}=e^{1.173}=3.23\)</span> times the churn rate. Never average hazard ratios, and never add standard errors on the ratio scale.</p>
+</section>
+<section id="exercise-11-6-diagnosing-and-fixing-a-ph-violation-concept">
+<h3>Exercise 11.6 — Diagnosing and fixing a PH violation [Concept]<a class="headerlink" href="#exercise-11-6-diagnosing-and-fixing-a-ph-violation-concept" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> For <code class="docutils literal notranslate"><span class="pre">annual_contract</span></code> the Schoenfeld test gives <span class="math notranslate nohighlight">\(p=0.002\)</span> and the complementary log-log curves cross at about month 14, yet the estimated hazard ratio is 0.98 with <span class="math notranslate nohighlight">\(p=0.81\)</span>. Explain the story, why the null result is an artefact, two fixes, and what single number to put in front of a board.</p>
+<p><strong>Answer.</strong></p>
+<ol class="arabic simple">
+<li><p><strong>The story.</strong> Annual contracts lock customers in, so their hazard is very low early and spikes at renewal, while monthly customers churn at a steady moderate rate. Before month 14 the annual contract is protective; afterwards it is dangerous. The crossing is not a nuisance — it <em>is</em> the finding.</p></li>
+<li><p><strong>Why <span class="math notranslate nohighlight">\(\widehat{HR}=0.98\)</span> is an artefact.</strong> A single <span class="math notranslate nohighlight">\(\beta\)</span> forces one constant hazard ratio, and the fit lands near the time-average of a protective-then-harmful effect, so the early and late excesses cancel. This is the same cancellation that makes the log-rank test blind to crossing curves; the model was asked the wrong question and answered it faithfully.</p></li>
+<li><p><strong>Two fixes.</strong> <em>Split the follow-up</em> at month 14 and fit a hazard ratio in each period — but the split point is a choice, and choosing it from these data invalidates the naive <span class="math notranslate nohighlight">\(p\)</span>-values. Or <em>stratify</em> on <code class="docutils literal notranslate"><span class="pre">annual_contract</span></code>, which keeps every other coefficient interpretable at the cost of getting no hazard ratio for contract type at all.</p></li>
+<li><p><strong>The board number.</strong> Not a hazard ratio. Report retention at a decision-relevant horizon — <span class="math notranslate nohighlight">\(\hat S(12)\)</span> and <span class="math notranslate nohighlight">\(\hat S(24)\)</span> by contract type, with intervals — or <span class="math notranslate nohighlight">\(\mathrm{RMST}(24)\)</span>. Both are well defined when hazards cross.</p></li>
+</ol>
+</section>
+<section id="extended-exercise-11-1-kaplanmeier-in-python-python">
+<h3>Extended Exercise 11.1 — Kaplan–Meier in Python [Python]<a class="headerlink" href="#extended-exercise-11-1-kaplanmeier-in-python-python" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong></p>
+<ol class="arabic simple">
+<li><p>Fit the overall Kaplan–Meier curve; report <span class="math notranslate nohighlight">\(\hat S(20)\)</span> with its 95% interval and the median.</p></li>
+<li><p>Fit separate curves for men and women; report each group’s size, deaths and median.</p></li>
+<li><p>Plot both curves with censoring marks and say what the plot suggests.</p></li>
+<li><p>Verify by direct arithmetic that the first three steps are 0.9886, 0.9771, 0.9654.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (1) the overall curve ------------------------------------------------------</span>
+<span class="n">BC</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;BrainCancer&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">km</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;S(20) = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">km</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;95% CI  &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">km</span><span class="o">.</span><span class="n">confidence_interval_</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;median  &#39;</span><span class="p">,</span> <span class="n">km</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">)</span>
+
+<span class="c1"># (2) by sex -----------------------------------------------------------------</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Female&#39;</span><span class="p">,</span> <span class="s1">&#39;Male&#39;</span><span class="p">]:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-6s</span><span class="s1"> n=</span><span class="si">%d</span><span class="s1"> deaths=</span><span class="si">%d</span><span class="s1"> median=</span><span class="si">%.2f</span><span class="s1">&#39;</span>
+          <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">k</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>S(20) = 0.7132
+95% CI   [0.5996 0.7998]
+median   47.8
+Female n=45 deaths=15 median=51.02
+Male   n=43 deaths=20 median=31.25
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (3) both curves with censoring marks ---------------------------------------</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">colour</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;Female&#39;</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Male&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">)]:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">k</span><span class="o">.</span><span class="n">plot_survival_function</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ci_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">BC</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">m</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;time&#39;</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">survival_function_at_times</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">1.4</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;S(t)&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Kaplan-Meier by sex&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># (4) the first three steps, from the at-risk table ---------------------------</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">km</span><span class="o">.</span><span class="n">event_table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">7</span><span class="p">)[[</span><span class="s1">&#39;at_risk&#39;</span><span class="p">,</span> <span class="s1">&#39;observed&#39;</span><span class="p">,</span> <span class="s1">&#39;censored&#39;</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;by hand:&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">([</span><span class="mi">87</span> <span class="o">/</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">87</span> <span class="o">/</span> <span class="mi">88</span> <span class="o">*</span> <span class="mi">85</span> <span class="o">/</span> <span class="mi">86</span><span class="p">,</span> <span class="mi">87</span> <span class="o">/</span> <span class="mi">88</span> <span class="o">*</span> <span class="mi">85</span> <span class="o">/</span> <span class="mi">86</span> <span class="o">*</span> <span class="mi">82</span> <span class="o">/</span> <span class="mi">83</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/48656d7d085e8bf99d00068923d22a5ea54e88338240bd5429723b03ebc98709.png" src="../_images/48656d7d085e8bf99d00068923d22a5ea54e88338240bd5429723b03ebc98709.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>          at_risk  observed  censored
+event_at                             
+0.00           88         0         0
+0.07           88         1         0
+1.18           87         0         1
+1.41           86         1         0
+1.54           85         0         1
+2.03           84         0         1
+3.38           83         1         0
+by hand: [0.9886 0.9771 0.9654]
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> (1) 71.3% of patients are alive at 20 months, but the interval <span class="math notranslate nohighlight">\([0.600,0.800]\)</span> is already 20 percentage points wide with 88 patients — survival curves are data-hungry. (2)–(3) The male median is 31.25 months against 51.02 for women and the male curve sits below the female curve almost everywhere, so the plot <em>suggests</em> worse male survival; with 35 deaths in total that is not much evidence, which is exactly what the log-rank test says. (4) <code class="docutils literal notranslate"><span class="pre">event_table</span></code> gives <span class="math notranslate nohighlight">\(r_k=88,86,83\)</span> and <span class="math notranslate nohighlight">\(d_k=1,1,1\)</span> at <span class="math notranslate nohighlight">\(t_k=0.07,1.41,3.38\)</span>, and the running product <span class="math notranslate nohighlight">\(\tfrac{87}{88}\cdot\tfrac{85}{86}\cdot\tfrac{82}{83}\)</span> reproduces 0.9886, 0.9771, 0.9654. Note <span class="math notranslate nohighlight">\(r_2=86\)</span> rather than 87: the censoring at 1.18 removed a subject before the second death.</p>
+</section>
+<section id="extended-exercise-11-2-the-cox-model-in-python-python">
+<h3>Extended Exercise 11.2 — The Cox model in Python [Python]<a class="headerlink" href="#extended-exercise-11-2-the-cox-model-in-python-python" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong></p>
+<ol class="arabic simple">
+<li><p>Fit a Cox model with all six covariates, coding <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code> against <strong>Meningioma</strong>; report <span class="math notranslate nohighlight">\(\hat\beta\)</span>, <span class="math notranslate nohighlight">\(e^{\hat\beta}\)</span> and <span class="math notranslate nohighlight">\(p\)</span> for <code class="docutils literal notranslate"><span class="pre">ki</span></code> and for HG glioma.</p></li>
+<li><p>Convert the <code class="docutils literal notranslate"><span class="pre">ki</span></code> coefficient into a hazard ratio for a ten-point increase and write the interpretation.</p></li>
+<li><p>Report the concordance index and the overall likelihood-ratio test.</p></li>
+<li><p>Test proportional hazards with Schoenfeld residuals.</p></li>
+<li><p>Predict and plot <span class="math notranslate nohighlight">\(\hat S(t\mid x)\)</span> for <span class="math notranslate nohighlight">\(ki\in\{60,80,100\}\)</span> with the other covariates at their medians.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (1) fit --------------------------------------------------------------------</span>
+<span class="n">BCc</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;BrainCancer&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>                  <span class="c1"># 87 complete cases</span>
+<span class="n">BCc</span><span class="p">[</span><span class="s1">&#39;diagnosis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">BCc</span><span class="p">[</span><span class="s1">&#39;diagnosis&#39;</span><span class="p">],</span>              <span class="c1"># Meningioma = reference</span>
+        <span class="n">categories</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Meningioma&#39;</span><span class="p">,</span> <span class="s1">&#39;HG glioma&#39;</span><span class="p">,</span> <span class="s1">&#39;LG glioma&#39;</span><span class="p">,</span> <span class="s1">&#39;Other&#39;</span><span class="p">])</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">BCc</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">cph</span> <span class="o">=</span> <span class="n">CoxPHFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">duration_col</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">event_col</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cph</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;ki&#39;</span><span class="p">,</span> <span class="s1">&#39;diagnosis_HG glioma&#39;</span><span class="p">],</span>
+                      <span class="p">[</span><span class="s1">&#39;coef&#39;</span><span class="p">,</span> <span class="s1">&#39;exp(coef)&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># (2)-(3) rescaled hazard ratio, discrimination, global test -------------------</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">HR per 10 ki points : </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">cph</span><span class="o">.</span><span class="n">params_</span><span class="p">[</span><span class="s1">&#39;ki&#39;</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;C-index             : </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cph</span><span class="o">.</span><span class="n">concordance_index_</span><span class="p">)</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="n">cph</span><span class="o">.</span><span class="n">log_likelihood_ratio_test</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;LR test             : chi2 = </span><span class="si">%.2f</span><span class="s1"> on </span><span class="si">%d</span><span class="s1"> df, p = </span><span class="si">%.2g</span><span class="s1">&#39;</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">lr</span><span class="o">.</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">lr</span><span class="o">.</span><span class="n">degrees_freedom</span><span class="p">,</span> <span class="n">lr</span><span class="o">.</span><span class="n">p_value</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                       coef  exp(coef)       p
+covariate                                     
+ki                  -0.0550     0.9465  0.0027
+diagnosis_HG glioma  2.1546     8.6241  0.0000
+
+HR per 10 ki points : 0.577
+C-index             : 0.7943
+LR test             : chi2 = 41.37 on 8 df, p = 1.8e-06
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (4) proportional hazards ----------------------------------------------------</span>
+<span class="n">ph</span> <span class="o">=</span> <span class="n">proportional_hazard_test</span><span class="p">(</span><span class="n">cph</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">time_transform</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ph</span><span class="o">.</span><span class="n">summary</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;range of p-values: </span><span class="si">%.2f</span><span class="s1"> to </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ph</span><span class="o">.</span><span class="n">summary</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">ph</span><span class="o">.</span><span class="n">summary</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+
+<span class="c1"># (5) predicted survival curves -----------------------------------------------</span>
+<span class="n">med</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+<span class="n">prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">med</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">prof</span><span class="p">[</span><span class="s1">&#39;ki&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">60.</span><span class="p">,</span> <span class="mf">80.</span><span class="p">,</span> <span class="mf">100.</span><span class="p">]</span>
+<span class="n">sf</span> <span class="o">=</span> <span class="n">cph</span><span class="o">.</span><span class="n">predict_survival_function</span><span class="p">(</span><span class="n">prof</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">colour</span><span class="p">,</span> <span class="n">lab</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;ki=60&#39;</span><span class="p">,</span> <span class="s1">&#39;ki=80&#39;</span><span class="p">,</span> <span class="s1">&#39;ki=100&#39;</span><span class="p">])):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">sf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">sf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;S(t | x)&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Predicted survival by ki&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">idx</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">sf</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="mi">36</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;S(36 | ki=60,80,100) =&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">sf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;median               =&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">cph</span><span class="o">.</span><span class="n">predict_median</span><span class="p">(</span><span class="n">prof</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>diagnosis_HG glioma    0.825
+diagnosis_LG glioma    0.735
+diagnosis_Other        0.453
+gtv                    0.483
+ki                     0.820
+loc_Supratentorial     0.625
+sex_Male               0.397
+stereo_SRT             0.452
+range of p-values: 0.40 to 0.82
+S(36 | ki=60,80,100) = [0.514 0.801 0.929]
+median               = [39.54   inf   inf]
+</pre></div>
+</div>
+<img alt="../_images/8a966d9757584ea20785575f51cea13cdd1828525153993b9ecab6eac1c3c2bd.png" src="../_images/8a966d9757584ea20785575f51cea13cdd1828525153993b9ecab6eac1c3c2bd.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> (1) <code class="docutils literal notranslate"><span class="pre">ki</span></code>: <span class="math notranslate nohighlight">\(\hat\beta=-0.0550\)</span>, <span class="math notranslate nohighlight">\(e^{\hat\beta}=0.947\)</span>, <span class="math notranslate nohighlight">\(p=0.003\)</span>; HG glioma: <span class="math notranslate nohighlight">\(\hat\beta=2.1546\)</span>, <span class="math notranslate nohighlight">\(e^{\hat\beta}=8.624\)</span>, <span class="math notranslate nohighlight">\(p&lt;0.001\)</span>. The other six covariates all have <span class="math notranslate nohighlight">\(p&gt;0.12\)</span>. (2) <span class="math notranslate nohighlight">\(e^{10\times(-0.0550)}=0.577\)</span>: <em>holding tumour type, volume, site, sex and technique fixed, ten more Karnofsky points are associated with a 42% lower death rate at every follow-up time</em>. (3) <span class="math notranslate nohighlight">\(C=0.794\)</span>, and the likelihood-ratio test is <span class="math notranslate nohighlight">\(\chi^2_8=41.4\)</span>, <span class="math notranslate nohighlight">\(p=1.8\times10^{-6}\)</span> — the covariate block clearly carries signal even though most single coefficients do not. (4) Schoenfeld <span class="math notranslate nohighlight">\(p\)</span>-values run from 0.40 to 0.82: no evidence against proportional hazards, which with 35 events is weak reassurance. (5) <span class="math notranslate nohighlight">\(\hat S(36)=0.514,\,0.801,\,0.929\)</span> for <span class="math notranslate nohighlight">\(ki=60,80,100\)</span>; the median is 39.5 months at <span class="math notranslate nohighlight">\(ki=60\)</span> and not reached above that.</p>
+<p>A trap worth naming: if you let <code class="docutils literal notranslate"><span class="pre">get_dummies</span></code> pick the reference level alphabetically it chooses <em>HG glioma</em>, and every <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code> coefficient changes sign and meaning while the fit stays numerically identical.</p>
+</section>
+<section id="extended-exercise-11-3-publication-bias-measured-integrative">
+<h3>Extended Exercise 11.3 — Publication bias, measured [Integrative]<a class="headerlink" href="#extended-exercise-11-3-publication-bias-measured-integrative" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> <code class="docutils literal notranslate"><span class="pre">Publication</span></code> records the time in months from completion to publication for 244 NHLBI-funded trials; <code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">1</span></code> means published and <code class="docutils literal notranslate"><span class="pre">posres</span> <span class="pre">=</span> <span class="pre">1</span></code> means a statistically significant primary result. (1) Run the log-rank test by <code class="docutils literal notranslate"><span class="pre">posres</span></code> — what does it appear to say? (2) Fit a Cox model with <code class="docutils literal notranslate"><span class="pre">posres</span></code> alone, then add <code class="docutils literal notranslate"><span class="pre">impact</span></code>, <code class="docutils literal notranslate"><span class="pre">clinend</span></code>, <code class="docutils literal notranslate"><span class="pre">multi</span></code>, <code class="docutils literal notranslate"><span class="pre">sampsize</span></code> and <code class="docutils literal notranslate"><span class="pre">budget</span></code>. (3) Which covariate does the work? (4) State the conclusion for a journal editor.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">PUB</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Publication&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">PUB</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;| published:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">PUB</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+      <span class="s1">&#39;| positive results:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">PUB</span><span class="p">[</span><span class="s1">&#39;posres&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+
+<span class="n">pos</span> <span class="o">=</span> <span class="n">PUB</span><span class="p">[</span><span class="s1">&#39;posres&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">logrank_test</span><span class="p">(</span><span class="n">PUB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pos</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span>   <span class="n">PUB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">pos</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                 <span class="n">PUB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pos</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">PUB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">pos</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(1) log-rank by posres: chi2 = </span><span class="si">%.4f</span><span class="s1">, p = </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">p_value</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">mask</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">lab</span> <span class="ow">in</span> <span class="p">[(</span><span class="o">~</span><span class="n">pos</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="s1">&#39;negative / null&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;positive&#39;</span><span class="p">)]:</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">PUB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">PUB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">)</span>
+    <span class="n">k</span><span class="o">.</span><span class="n">plot_survival_function</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ci_show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;   </span><span class="si">%-16s</span><span class="s1"> n=</span><span class="si">%3d</span><span class="s1"> published=</span><span class="si">%3d</span><span class="s1"> median=</span><span class="si">%.2f</span><span class="s1">&#39;</span>
+          <span class="o">%</span> <span class="p">(</span><span class="n">lab</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">PUB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">k</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;months since trial completion&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;still unpublished&#39;</span><span class="p">,</span>
+       <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Time to publication by result&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(244, 9) | published: 156 | positive results: 98
+(1) log-rank by posres: chi2 = 0.8440, p = 0.3583
+   negative / null  n=146 published= 87 median=25.10
+   positive         n= 98 published= 69 median=23.13
+</pre></div>
+</div>
+<img alt="../_images/93460e1727db7049c042d2d2eefa66fe045f50b2df05f15ec18a59fb34d5aba7.png" src="../_images/93460e1727db7049c042d2d2eefa66fe045f50b2df05f15ec18a59fb34d5aba7.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (2) unadjusted, then adjusted ----------------------------------------------</span>
+<span class="n">c1</span> <span class="o">=</span> <span class="n">CoxPHFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">PUB</span><span class="p">[[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;posres&#39;</span><span class="p">]],</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;posres alone : HR = </span><span class="si">%.3f</span><span class="s1">, p = </span><span class="si">%.4f</span><span class="s1">&#39;</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;posres&#39;</span><span class="p">,</span> <span class="s1">&#39;exp(coef)&#39;</span><span class="p">],</span> <span class="n">c1</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;posres&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]))</span>
+
+<span class="n">design</span> <span class="o">=</span> <span class="n">PUB</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">])</span>          <span class="c1"># &#39;mech&#39; is the funding mechanism (a factor)</span>
+<span class="n">c2</span> <span class="o">=</span> <span class="n">CoxPHFitter</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">c2</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">&#39;coef&#39;</span><span class="p">,</span> <span class="s1">&#39;exp(coef)&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>posres alone : HR = 1.160, p = 0.3596
+
+             coef  exp(coef)       z       p
+covariate                                   
+posres     0.5708     1.7696  3.2438  0.0012
+multi     -0.0409     0.9600 -0.1627  0.8708
+clinend    0.5462     1.7267  2.0847  0.0371
+sampsize   0.0000     1.0000  0.3177  0.7507
+budget     0.0044     1.0044  1.7795  0.0752
+impact     0.0583     1.0601  8.7355  0.0000
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> (1) Taken alone, <span class="math notranslate nohighlight">\(\chi^2_1=0.84\)</span>, <span class="math notranslate nohighlight">\(p=0.358\)</span>: trials with and without a positive result appear to be published at indistinguishable rates, and the two curves nearly overlie each other (medians 23.1 against 25.1 months). (2) Adding the journal-level covariates moves <code class="docutils literal notranslate"><span class="pre">posres</span></code> from <span class="math notranslate nohighlight">\(\widehat{HR}=1.16\)</span>, <span class="math notranslate nohighlight">\(p=0.360\)</span> to <span class="math notranslate nohighlight">\(\widehat{HR}=1.77\)</span>, <span class="math notranslate nohighlight">\(p=0.001\)</span> — the log-rank test is <em>marginal</em> and cannot hold anything fixed, and here the confounding runs opposite to the effect of interest, masking it. (3) The work is done by <code class="docutils literal notranslate"><span class="pre">impact</span></code>, the journal impact factor: <span class="math notranslate nohighlight">\(\hat\beta=0.0583\)</span>, <span class="math notranslate nohighlight">\(\widehat{HR}=1.060\)</span> per point, <span class="math notranslate nohighlight">\(z=8.7\)</span>. High-impact journals are slow and positive trials aim at them, so a positive result buys a faster decision but a slower venue, and the two effects cancel in the raw comparison. <code class="docutils literal notranslate"><span class="pre">clinend</span></code> also matters (<span class="math notranslate nohighlight">\(\widehat{HR}=1.73\)</span>, <span class="math notranslate nohighlight">\(p=0.037\)</span>); <code class="docutils literal notranslate"><span class="pre">multi</span></code>, <code class="docutils literal notranslate"><span class="pre">sampsize</span></code> and <code class="docutils literal notranslate"><span class="pre">budget</span></code> do not.</p>
+<p>(4) <em>“Among comparable trials — same target journal impact, same endpoint type, same size and budget — those with a positive primary result were published at 1.8 times the rate of those without (<span class="math notranslate nohighlight">\(p=0.001\)</span>), so the raw publication times understate publication bias rather than refuting it.”</em> The transferable lesson: when a log-rank test and a Cox model disagree, it is the covariates that are telling you something.</p>
+</section>
+<section id="exercise-11-7-the-exponential-model-math-appendix">
+<h3>Exercise 11.7 — The exponential model [Math] (appendix)<a class="headerlink" href="#exercise-11-7-the-exponential-model-math-appendix" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> With a constant hazard <span class="math notranslate nohighlight">\(h(t)=\lambda\)</span>: derive <span class="math notranslate nohighlight">\(H(t)\)</span> and <span class="math notranslate nohighlight">\(S(t)\)</span>, find the median, show the family satisfies proportional hazards, and evaluate <span class="math notranslate nohighlight">\(\hat\lambda=D/\sum_i Y_i\)</span> on <code class="docutils literal notranslate"><span class="pre">BrainCancer</span></code>.</p>
+<p><strong>Answer.</strong> <span class="math notranslate nohighlight">\(H(t)=\lambda t\)</span> and <span class="math notranslate nohighlight">\(S(t)=e^{-\lambda t}\)</span> — the exponential distribution, the unique memoryless survival law — so the median is <span class="math notranslate nohighlight">\(\log 2/\lambda\)</span>. With <span class="math notranslate nohighlight">\(\lambda_i=\lambda_0 e^{x_i^{\top}\beta}\)</span> the hazard is <span class="math notranslate nohighlight">\(h_0(t)e^{x_i^{\top}\beta}\)</span> with the <em>constant</em> baseline <span class="math notranslate nohighlight">\(h_0(t)\equiv\lambda_0\)</span>, and the ratio of two subjects’ hazards is free of <span class="math notranslate nohighlight">\(t\)</span>: an exponential model is a Cox model with the baseline pinned down. The estimator’s denominator must be <strong>total time at risk</strong>, which is what censored subjects contribute — not <span class="math notranslate nohighlight">\(n\)</span>, and not the event times alone.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">,</span> <span class="n">total_time</span> <span class="o">=</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">BC</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">lam</span> <span class="o">=</span> <span class="n">D</span> <span class="o">/</span> <span class="n">total_time</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;D = </span><span class="si">%d</span><span class="s1"> events, total follow-up = </span><span class="si">%.2f</span><span class="s1"> months&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">total_time</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;lambda_hat = </span><span class="si">%.6f</span><span class="s1"> per month -&gt; implied median = </span><span class="si">%.2f</span><span class="s1"> months&#39;</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">lam</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kaplan-Meier median               = </span><span class="si">%.2f</span><span class="s1"> months&#39;</span> <span class="o">%</span> <span class="n">km</span><span class="o">.</span><span class="n">median_survival_time_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>D = 35 events, total follow-up = 2416.26 months
+lambda_hat = 0.014485 per month -&gt; implied median = 47.85 months
+Kaplan-Meier median               = 47.80 months
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> <span class="math notranslate nohighlight">\(\hat\lambda = 35/2416.26 = 0.014485\)</span> deaths per month of follow-up, so the implied median is <span class="math notranslate nohighlight">\(\log 2/\hat\lambda = 47.85\)</span> months — strikingly close to the Kaplan–Meier value of 47.8. That agreement is reassuring but partly luck: the exponential model buys it by assuming a constant hazard over nearly seven years, and the two estimates diverge at other quantiles.</p>
+</section>
+</section>
+<section id="exercises">
+<h2>7. Exercises<a class="headerlink" href="#exercises" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Cross-validate the C-index (<code class="docutils literal notranslate"><span class="pre">lifelines.utils.k_fold_cross_validation</span></code> with <code class="docutils literal notranslate"><span class="pre">scoring_method='concordance_index'</span></code>). How much of the in-sample 0.794 survives?</p></li>
+<li><p>Add an interaction between <code class="docutils literal notranslate"><span class="pre">ki</span></code> and <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code> to the Cox fit and test it with a likelihood-ratio test against the model without it.</p></li>
+<li><p>Fit <code class="docutils literal notranslate"><span class="pre">lifelines.WeibullAFTFitter</span></code> to the same data. Compare its predicted median survival at <span class="math notranslate nohighlight">\(ki=60,80,100\)</span> with the Cox predictions above, and say which assumption each model buys its answer with.</p></li>
+<li><p>Repeat the analysis on <code class="docutils literal notranslate"><span class="pre">Publication</span></code>, this time keeping the <code class="docutils literal notranslate"><span class="pre">mech</span></code> factor as dummies. Does the estimated effect of <code class="docutils literal notranslate"><span class="pre">posres</span></code> change, and does the proportional-hazards assumption survive?</p></li>
+</ol>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="advanced_07_multiple_testing_lab.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 13 — Multiple Testing</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="advanced_05_svm_lab.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 9 — Support Vector Machines</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Christoph Weisser. Based on ISLP (Springer, 2023)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ChrisW09/Quantitative-Research-Methods" aria-label="GitHub"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.011.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 11 — Survival Analysis</a><ul>
+<li><a class="reference internal" href="#lab-kaplanmeier-log-rank-cox-model-with-lifelines">Lab: Kaplan–Meier, log-rank, Cox model with lifelines</a></li>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+<li><a class="reference internal" href="#data-and-the-censoring-convention">1. Data and the censoring convention</a></li>
+<li><a class="reference internal" href="#why-the-naive-analyses-fail">2. Why the naive analyses fail</a></li>
+<li><a class="reference internal" href="#kaplanmeier">3. Kaplan–Meier</a></li>
+<li><a class="reference internal" href="#log-rank-test">4. Log-rank test</a></li>
+<li><a class="reference internal" href="#cox-proportional-hazards-model">5. Cox proportional-hazards model</a></li>
+<li><a class="reference internal" href="#checking-proportional-hazards-and-predicting-curves">6. Checking proportional hazards and predicting curves</a></li>
+<li><a class="reference internal" href="#lecture-exercises-worked-python-solutions">Lecture exercises — worked Python solutions</a><ul>
+<li><a class="reference internal" href="#exercise-11-1-why-the-shortcuts-fail-concept">Exercise 11.1 — Why the shortcuts fail [Concept]</a></li>
+<li><a class="reference internal" href="#exercise-11-2-reading-y-delta-off-a-study-math">Exercise 11.2 — Reading <span class="math notranslate nohighlight">\((Y,\delta)\)</span> off a study [Math]</a></li>
+<li><a class="reference internal" href="#exercise-11-3-kaplanmeier-by-hand-math">Exercise 11.3 — Kaplan–Meier by hand [Math]</a></li>
+<li><a class="reference internal" href="#exercise-11-4-the-log-rank-test-by-hand-math">Exercise 11.4 — The log-rank test by hand [Math]</a></li>
+<li><a class="reference internal" href="#exercise-11-5-hazard-ratio-arithmetic-math">Exercise 11.5 — Hazard-ratio arithmetic [Math]</a></li>
+<li><a class="reference internal" href="#exercise-11-6-diagnosing-and-fixing-a-ph-violation-concept">Exercise 11.6 — Diagnosing and fixing a PH violation [Concept]</a></li>
+<li><a class="reference internal" href="#extended-exercise-11-1-kaplanmeier-in-python-python">Extended Exercise 11.1 — Kaplan–Meier in Python [Python]</a></li>
+<li><a class="reference internal" href="#extended-exercise-11-2-the-cox-model-in-python-python">Extended Exercise 11.2 — The Cox model in Python [Python]</a></li>
+<li><a class="reference internal" href="#extended-exercise-11-3-publication-bias-measured-integrative">Extended Exercise 11.3 — Publication bias, measured [Integrative]</a></li>
+<li><a class="reference internal" href="#exercise-11-7-the-exponential-model-math-appendix">Exercise 11.7 — The exponential model [Math] (appendix)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercises">7. Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7f41d439"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

@@ -1,0 +1,888 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Chapter 6 — Model Selection and Regularisation" href="chapter_06_lab.html"><link rel="prev" title="Chapter 4 — Classification" href="chapter_04_lab.html">
+
+    <link rel="shortcut icon" href="../_static/favicon.svg"><!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>Chapter 5 — Resampling Methods - Quantitative Research Methods</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cd1d273d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #005b7f;
+  --color-brand-content: #00618a;
+  --color-brand-visited: #00618a;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Quantitative Research Methods</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Quantitative Research Methods</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../for-students.html">For students</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course.html">The course at a glance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">Python environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Materials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../slides.html">Lecture slides</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../labs.html">Lab notebooks</a><input aria-label="Toggle navigation of Lab notebooks" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chapter_00_lab.html">Chapter 0 — Precourse Refresher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_00b_lab.html">Chapter 0b — Precourse Toolkit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_01_lab.html">Chapter 1 — Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_02_lab.html">Chapter 2 — Statistical Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_03_lab.html">Chapter 3 — Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_04_lab.html">Chapter 4 — Classification</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 5 — Resampling Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_06_lab.html">Chapter 6 — Model Selection and Regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_07_lab.html">Chapter 7 — Moving Beyond Linearity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_08_lab.html">Chapter 8 — Tree-Based Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exams.html">Mock exams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../advanced.html">Advanced modules</a><input aria-label="Toggle navigation of Advanced modules" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_01_rcts_lab.html">Advanced Module A1 — Randomised Controlled Trials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_02_shapley_lab.html">Advanced Module A2 — Explainable AI with Shapley Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_03_conformal_lab.html">Advanced Module A3 — Conformal Prediction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_04_glms_splines_lab.html">Advanced Module A4 — GLMs and Splines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_05_svm_lab.html">Chapter 9 — Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_06_survival_lab.html">Chapter 11 — Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_07_multiple_testing_lab.html">Chapter 13 — Multiple Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_08_unsupervised_lab.html">Chapter 12 — Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_labs/advanced_09_deep_learning_lab.html">Advanced Module A9 — Deep Learning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">Short projects</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Teaching</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../teaching.html">Teaching it</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../repository.html">Repository layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../building-docs.html">Building this documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citation.html">Citation &amp; licence</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/docs/labs/chapter_05_lab.ipynb?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/edit/main/docs/labs/chapter_05_lab.ipynb" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p><a class="reference external" href="https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/chapter_05/chapter_05_lab.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><em>This notebook runs on Colab as-is. The badge link above and the <code class="docutils literal notranslate"><span class="pre">GITHUB_RAW</span></code> line in the setup cell already point to this repository, so everything installs and loads automatically.</em></p>
+<section class="tex2jax_ignore mathjax_ignore" id="chapter-5-resampling-methods">
+<h1>Chapter 5 — Resampling Methods<a class="headerlink" href="#chapter-5-resampling-methods" title="Link to this heading">¶</a></h1>
+<section id="lab-validation-set-k-fold-cv-loocv-the-bootstrap">
+<h2>Lab: validation set, k-fold CV, LOOCV, the bootstrap<a class="headerlink" href="#lab-validation-set-k-fold-cv-loocv-the-bootstrap" title="Link to this heading">¶</a></h2>
+<p><strong>Course:</strong> Quantitative Research Methods<br />
+<strong>Instructor:</strong> Prof. Dr. Christoph Weisser<br />
+<strong>Source:</strong> James, Witten, Hastie, Tibshirani &amp; Taylor (2023), <em>An Introduction to Statistical Learning, with Applications in Python</em>, Springer. Companion code at <a class="reference external" href="https://www.statlearning.com">statlearning.com</a>.</p>
+<p><strong>Goal.</strong> Estimate test error of a regression in three ways and use the bootstrap to put a standard error on a regression coefficient.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<p>Run this cell once. The <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ISLP</span></code>. As an alternative, the same data sets are available as CSVs in the workspace’s <code class="docutils literal notranslate"><span class="pre">ALL</span> <span class="pre">CSV</span> <span class="pre">FILES</span> <span class="pre">-</span> <span class="pre">2nd</span> <span class="pre">Edition</span></code> folder.</p>
+<blockquote>
+<div><p><strong>Google Colab:</strong> this notebook also runs on Colab out of the box — the setup cell below installs any missing packages and downloads the data automatically.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- Setup: runs locally AND on Google Colab --------------------------------</span>
+<span class="c1"># Silence only the spurious &#39;encountered in matmul&#39; RuntimeWarnings that the macOS</span>
+<span class="c1"># Accelerate BLAS emits; real warnings (deprecations, model caveats) stay visible.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;.*encountered in matmul&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">subprocess</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">import_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;pip-install pkg (quietly) if its import is missing.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">import_name</span> <span class="ow">or</span> <span class="n">pkg</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;pip&#39;</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;-q&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>  <span class="c1"># Colab ships numpy/pandas/sklearn/statsmodels; add course extras</span>
+    <span class="k">for</span> <span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;ISLP&#39;</span><span class="p">,</span> <span class="s1">&#39;ISLP&#39;</span><span class="p">)]:</span>
+        <span class="n">_ensure</span><span class="p">(</span><span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">110</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ISLP not installed; using CSV / URL fallbacks.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Local CSV location (repo layout first, then legacy paths, then a data/ cache).</span>
+<span class="n">_CANDIDATES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;../../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">CSV</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_CANDIDATES</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+<span class="c1"># GITHUB_RAW lets a fresh Colab runtime fetch any</span>
+<span class="c1"># CSV that is neither in ISLP nor already local (spaces in the folder -&gt; %20).</span>
+<span class="n">GITHUB_RAW</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/ChrisW09/Quantitative-Research-Methods/main/&#39;</span>
+              <span class="s1">&#39;ALL%20CSV</span><span class="si">%20F</span><span class="s1">ILES%20-%202nd</span><span class="si">%20E</span><span class="s1">dition&#39;</span><span class="p">)</span>
+
+<span class="c1"># The four datasets NOT in the ISLP package -&gt; load from the book&#39;s official</span>
+<span class="c1"># site so the notebook works on a fresh Colab even before the repo is published.</span>
+<span class="n">KNOWN_URLS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Advertising&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.statlearning.com/s/Advertising.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Heart&#39;</span><span class="p">:</span>       <span class="s1">&#39;https://www.statlearning.com/s/Heart.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income1&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income1.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income2&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income2.csv&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a course dataset. Order: ISLP package -&gt; R datasets -&gt; local CSV</span>
+<span class="sd">    -&gt; official book URL -&gt; your GitHub repo. Works locally and on Colab.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">HAVE_ISLP</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">load_data</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;USArrests&#39;</span><span class="p">:</span>                       <span class="c1"># classic R dataset, not in ISLP</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+            <span class="k">return</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;USArrests&#39;</span><span class="p">,</span> <span class="s1">&#39;datasets&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>                      <span class="c1"># running from the repo (local)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+    <span class="n">remotes</span> <span class="o">=</span> <span class="p">([</span><span class="n">KNOWN_URLS</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">KNOWN_URLS</span> <span class="k">else</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GITHUB_RAW</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">remotes</span><span class="p">:</span>                           <span class="c1"># fresh Colab: stream over https</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Could not load </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. Put the CSV in &#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s2">/&#39; or check your connection for the GITHUB_RAW fallback.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-auto-data-set">
+<h2>1. The Auto data set<a class="headerlink" href="#the-auto-data-set" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">mpg</span></code> against <code class="docutils literal notranslate"><span class="pre">horsepower</span></code> for 392 cars. Two data-loading details that matter: <code class="docutils literal notranslate"><span class="pre">na_values='?'</span></code> is required because this file marks missing horsepower with a literal question mark, which pandas would otherwise read as text and turn the whole column into strings; <code class="docutils literal notranslate"><span class="pre">dropna()</span></code> then removes the five affected cars.</p>
+<p>The relationship is visibly curved, which is what makes this the right data set for the chapter — the question “which polynomial degree?” has a real answer here, and every resampling method in this notebook is a way of estimating it without touching a test set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Auto</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Auto&#39;</span><span class="p">,</span> <span class="n">na_values</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Auto</span><span class="p">[[</span><span class="s1">&#39;horsepower&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Auto</span><span class="p">[</span><span class="s1">&#39;mpg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">Auto</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mpg</th>
+      <th>cylinders</th>
+      <th>displacement</th>
+      <th>horsepower</th>
+      <th>weight</th>
+      <th>acceleration</th>
+      <th>year</th>
+      <th>origin</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>18.0</td>
+      <td>8</td>
+      <td>307.0</td>
+      <td>130</td>
+      <td>3504</td>
+      <td>12.0</td>
+      <td>70</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15.0</td>
+      <td>8</td>
+      <td>350.0</td>
+      <td>165</td>
+      <td>3693</td>
+      <td>11.5</td>
+      <td>70</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>18.0</td>
+      <td>8</td>
+      <td>318.0</td>
+      <td>150</td>
+      <td>3436</td>
+      <td>11.0</td>
+      <td>70</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>16.0</td>
+      <td>8</td>
+      <td>304.0</td>
+      <td>150</td>
+      <td>3433</td>
+      <td>12.0</td>
+      <td>70</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>17.0</td>
+      <td>8</td>
+      <td>302.0</td>
+      <td>140</td>
+      <td>3449</td>
+      <td>10.5</td>
+      <td>70</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="validation-set-approach">
+<h2>2. Validation set approach<a class="headerlink" href="#validation-set-approach" title="Link to this heading">¶</a></h2>
+<p>Note the <code class="docutils literal notranslate"><span class="pre">StandardScaler()</span></code> in front of <code class="docutils literal notranslate"><span class="pre">PolynomialFeatures</span></code>: standardising is only a reparametrisation — it changes the coefficients but not the fitted values — yet raw powers of a variable in the hundreds are so ill-conditioned that without it the least-squares solve for the higher degrees is no longer accurate, and the CV curve below becomes an artefact of whichever scikit-learn version you happen to run.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolynomialFeatures</span><span class="p">,</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean_squared_error</span>
+
+<span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">,</span> <span class="n">ytr</span><span class="p">,</span> <span class="n">yte</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">d</span><span class="p">),</span>
+                      <span class="n">LinearRegression</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">ytr</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;degree </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">: validation MSE = </span><span class="si">{</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">yte</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xte</span><span class="p">))</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>degree 1: validation MSE = 24.802
+degree 2: validation MSE = 18.848
+degree 3: validation MSE = 18.805
+degree 4: validation MSE = 18.712
+degree 5: validation MSE = 18.324
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="k-fold-cross-validation">
+<h2>3. <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation<a class="headerlink" href="#k-fold-cross-validation" title="Link to this heading">¶</a></h2>
+<p>Split the data into 10 folds; each fold is held out once while the model trains on the other nine, and the ten held-out MSEs are averaged. <code class="docutils literal notranslate"><span class="pre">shuffle=True</span></code> matters here because <code class="docutils literal notranslate"><span class="pre">Auto</span></code> is ordered by model year — without it the folds would be year blocks rather than random samples.</p>
+<p>The scoring is negated because scikit-learn maximises scores by convention, so a loss enters as its negative.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">cross_val_score</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">d</span><span class="p">),</span>
+                      <span class="n">LinearRegression</span><span class="p">())</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="o">-</span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
+                              <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;degree </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">: CV MSE = </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>degree 1: CV MSE = 24.208
+degree 2: CV MSE = 19.185
+degree 3: CV MSE = 19.276
+degree 4: CV MSE = 19.478
+degree 5: CV MSE = 19.137
+degree 6: CV MSE = 19.050
+degree 7: CV MSE = 18.822
+degree 8: CV MSE = 18.901
+degree 9: CV MSE = 19.082
+degree 10: CV MSE = 19.890
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> The drop from degree 1 to degree 2 is large — <strong>24.21 to 19.19</strong> — and everything after it is flat, wandering between 19.0 and 19.5 with no trend. That shape is the whole message: there is one real curvature in these data, a quadratic captures it, and the differences past degree 2 are smaller than the noise in the estimate itself.</p>
+<p>The practical rule this motivates is to prefer the simplest model within noise of the best, not the literal argmin. Degree 6 scores marginally lowest here, and choosing it on that basis would be reading randomness.</p>
+</section>
+<section id="loocv-leave-one-out">
+<h2>4. LOOCV (leave-one-out)<a class="headerlink" href="#loocv-leave-one-out" title="Link to this heading">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(k\)</span>-fold taken to its limit: <span class="math notranslate nohighlight">\(k = n\)</span>, so every observation is held out alone. Each training set is nearly the whole data set, which makes LOOCV almost unbiased for the test error — but the <span class="math notranslate nohighlight">\(n\)</span> fits are highly correlated with each other, so the <em>estimate</em> has higher variance than 10-fold. That is the trade-off inside the estimate, and the reason 10-fold is usually preferred.</p>
+<p>Only degrees 1–5 are run below, and even that is 392 fits per degree.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeaveOneOut</span>
+<span class="n">loo</span> <span class="o">=</span> <span class="n">LeaveOneOut</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">d</span><span class="p">),</span>
+                      <span class="n">LinearRegression</span><span class="p">())</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="o">-</span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">loo</span><span class="p">,</span>
+                              <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;degree </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">: LOOCV MSE = </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>degree 1: LOOCV MSE = 24.232
+degree 2: LOOCV MSE = 19.248
+degree 3: LOOCV MSE = 19.335
+degree 4: LOOCV MSE = 19.424
+degree 5: LOOCV MSE = 19.033
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note how 10-fold and LOOCV give similar pictures, but LOOCV runs <span class="math notranslate nohighlight">\(n = 392\)</span> fits.</p>
+</section>
+<section id="the-bootstrap">
+<h2>5. The bootstrap<a class="headerlink" href="#the-bootstrap" title="Link to this heading">¶</a></h2>
+<p>Estimate the SE of the slope of <code class="docutils literal notranslate"><span class="pre">mpg</span> <span class="pre">~</span> <span class="pre">horsepower</span></code>.</p>
+<p>Cross-validation estimates <em>prediction</em> error. The bootstrap answers a different question: how much would this <strong>estimate</strong> move if the sample were redrawn? Resample <span class="math notranslate nohighlight">\(n\)</span> rows with replacement, refit, and the spread of the 1,000 refitted slopes is the standard error — with no appeal to a formula, a normal approximation, or any assumption that the model is correctly specified.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>          <span class="c1"># re-seed as on the slide, so the printed</span>
+                                        <span class="c1"># SE matches the deck (0.0075 vs OLS 0.0064)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">boots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">boots</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bootstrap SE      :&#39;</span><span class="p">,</span> <span class="n">boots</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bootstrap 95% CI  :&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">boots</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">])</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="n">Xc</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">ols</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Xc</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;OLS SE            :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;OLS 95% CI        :&#39;</span><span class="p">,</span> <span class="n">ols</span><span class="o">.</span><span class="n">conf_int</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(),</span> <span class="s1">&#39;iloc&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">ols</span><span class="o">.</span><span class="n">conf_int</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>bootstrap SE      : 0.0075
+bootstrap 95% CI  : [-0.1732 -0.1443]
+OLS SE            : 0.0064
+OLS 95% CI        : [-0.1705, -0.1452]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Plot the bootstrap distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">boots</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">boots</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;bootstrap slope&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/dfe8d508c0c0f1f4140d892f840e622cc48d087d6f41990dfc1d09d65f9a6ede.png" src="../_images/dfe8d508c0c0f1f4140d892f840e622cc48d087d6f41990dfc1d09d65f9a6ede.png" />
+</div>
+</div>
+</section>
+<section id="what-is-actually-in-a-bootstrap-sample">
+<h2>6. What is actually in a bootstrap sample?<a class="headerlink" href="#what-is-actually-in-a-bootstrap-sample" title="Link to this heading">¶</a></h2>
+<p>Resampling <span class="math notranslate nohighlight">\(n\)</span> rows with replacement from <span class="math notranslate nohighlight">\(n\)</span> rows does not reproduce the data set — it leaves some rows out and duplicates others. The deck’s Exercise 5.5 works out how many. Each draw misses a given observation with probability <span class="math notranslate nohighlight">\(1 - 1/n\)</span>, and the <span class="math notranslate nohighlight">\(n\)</span> draws are independent, so</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[P(\text{observation is omitted}) = \Bigl(1 - \tfrac1n\Bigr)^{n}
+\;\longrightarrow\; e^{-1}, \qquad
+P(\text{included}) \longrightarrow 1 - e^{-1}.\]</div>
+</div>
+<p>Worth checking against a simulation, because the limit is approached remarkably fast.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boot_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>     <span class="c1"># a local generator: leaves `rng` untouched</span>
+                                        <span class="c1"># so the bootstrap SE above stays reproducible</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;n&#39;</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;theory: included&#39;</span><span class="si">:</span><span class="s2">&gt;17</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;simulated&#39;</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">n_</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]:</span>
+    <span class="n">theory</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">n_</span><span class="p">)</span> <span class="o">**</span> <span class="n">n_</span>
+    <span class="n">draws</span> <span class="o">=</span> <span class="n">boot_rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">20_000</span><span class="p">,</span> <span class="n">n_</span><span class="p">))</span>          <span class="c1"># 20k bootstrap samples</span>
+    <span class="n">simulated</span> <span class="o">=</span> <span class="p">(</span><span class="n">draws</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>                  <span class="c1"># is row 0 present?</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n_</span><span class="si">:</span><span class="s1">&gt;6</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">theory</span><span class="si">:</span><span class="s1">&gt;17.4f</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">simulated</span><span class="si">:</span><span class="s1">&gt;10.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">limit 1 - 1/e = </span><span class="si">{</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;so on average </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1"> of rows are left out of any one resample&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>     n   theory: included   simulated
+     5             0.6723      0.6744
+    10             0.6513      0.6490
+   100             0.6340      0.6283
+  1000             0.6323      0.6387
+
+limit 1 - 1/e = 0.6321
+so on average 36.8% of rows are left out of any one resample
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> For <span class="math notranslate nohighlight">\(n = 5\)</span> the inclusion probability is <strong>0.6723</strong>, for <span class="math notranslate nohighlight">\(n = 1000\)</span> it is <strong>0.6323</strong>, and the limit is <strong>0.6321</strong> — matching the deck, and the simulation agrees to within its own Monte-Carlo error. Convergence is essentially complete by <span class="math notranslate nohighlight">\(n = 100\)</span>.</p>
+<p>Two things follow. First, each bootstrap resample contains only about 63% of the distinct rows, with the rest duplicated — the bootstrap distribution in §5 is built from samples that are <em>less</em> diverse than the original data, which is why the method needs <span class="math notranslate nohighlight">\(n\)</span> to be reasonably large. Second, that leftover <strong>36.8%</strong> is not waste: it is exactly the out-of-bag sample that random forests in Chapter 8 use as free validation, and the reason each observation is out-of-bag for roughly a third of the trees.</p>
+</section>
+<section id="exercises">
+<h2>7. Exercises<a class="headerlink" href="#exercises" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Bootstrap the <em>intercept</em> and compare to the OLS SE.</p></li>
+<li><p>Repeat the polynomial CV using <code class="docutils literal notranslate"><span class="pre">weight</span></code> instead of <code class="docutils literal notranslate"><span class="pre">horsepower</span></code>. Which degree wins?</p></li>
+<li><p>Write a function <code class="docutils literal notranslate"><span class="pre">boot_stat(data,</span> <span class="pre">stat,</span> <span class="pre">B=1000)</span></code> that returns <span class="math notranslate nohighlight">\(B\)</span> bootstrap replications of <code class="docutils literal notranslate"><span class="pre">stat(data)</span></code>.</p></li>
+<li><p>Use the bootstrap to estimate the SE of the <em>minimum</em> of a Gaussian sample. Compare with the parametric formula.</p></li>
+</ol>
+</section>
+<section id="lecture-exercises-worked-python-solutions">
+<h2>Lecture exercises — worked Python solutions<a class="headerlink" href="#lecture-exercises-worked-python-solutions" title="Link to this heading">¶</a></h2>
+<p>The cells below mirror the <strong>[Python]-tagged exercises</strong> from the Chapter 5 lecture slides, with fully worked, runnable solutions and the expected numeric answers (stored as inline comments). Each solution uses the <code class="docutils literal notranslate"><span class="pre">load()</span></code> helper from the setup cell, so it runs locally or on Colab with no hard-coded paths.</p>
+<section id="exercise-5-6-bootstrap-se-of-the-portfolio-alpha-python">
+<h3>Exercise 5.6 — Bootstrap SE of the Portfolio <span class="math notranslate nohighlight">\(\alpha\)</span> [Python]<a class="headerlink" href="#exercise-5-6-bootstrap-se-of-the-portfolio-alpha-python" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Portfolio</span></code> data has two return series <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code>. The minimum-variance allocation to asset <code class="docutils literal notranslate"><span class="pre">X</span></code> is
+$<span class="math notranslate nohighlight">\(\hat\alpha=\frac{\hat\sigma_Y^2-\hat\sigma_{XY}}{\hat\sigma_X^2+\hat\sigma_Y^2-2\hat\sigma_{XY}}.\)</span><span class="math notranslate nohighlight">\(
+Compute \)</span>\hat\alpha<span class="math notranslate nohighlight">\( on the full sample and estimate its standard error with \)</span>B=1000<span class="math notranslate nohighlight">\( bootstrap resamples (rows drawn *with replacement*, keeping each \)</span>(X_i,Y_i)$ pair together).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Exercise 5.6 -- bootstrap standard error of the Portfolio allocation alpha.</span>
+<span class="c1"># alpha is a nonlinear ratio of variances/covariance, so no closed-form SE</span>
+<span class="c1"># exists -&gt; the bootstrap is the natural tool (ISLP Section 5.2).</span>
+<span class="n">Port</span>   <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Portfolio&#39;</span><span class="p">)</span>                       <span class="c1"># columns X, Y (asset returns)</span>
+<span class="n">Xp</span><span class="p">,</span> <span class="n">Yp</span> <span class="o">=</span> <span class="n">Port</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">Port</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">alpha_hat</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>                             <span class="c1"># minimum-variance allocation</span>
+    <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># sample variances</span>
+    <span class="n">sxy</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>              <span class="c1"># sample covariance</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">sy</span> <span class="o">-</span> <span class="n">sxy</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sx</span> <span class="o">+</span> <span class="n">sy</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sxy</span><span class="p">)</span>
+
+<span class="n">rng</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>                  <span class="c1"># reproducible (matches slide)</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Xp</span><span class="p">),</span> <span class="mi">1000</span>                             <span class="c1"># B bootstrap replications</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+    <span class="n">idx</span>     <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>         <span class="c1"># ONE shared index -&gt; keep pairs</span>
+    <span class="n">reps</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha_hat</span><span class="p">(</span><span class="n">Xp</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">Yp</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>        <span class="c1"># recompute alpha on the resample</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;alpha_hat    :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">alpha_hat</span><span class="p">(</span><span class="n">Xp</span><span class="p">,</span> <span class="n">Yp</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>   <span class="c1"># 0.5758  (~0.58)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bootstrap SE :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">reps</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>    <span class="c1"># 0.0912  (~0.09)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>alpha_hat    : 0.5758
+bootstrap SE : 0.0912
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Interpretation.</strong> The point estimate is <span class="math notranslate nohighlight">\(\hat\alpha\approx0.58\)</span> with a bootstrap standard error of <span class="math notranslate nohighlight">\(\approx0.09\)</span>, matching ISLP Section 5.2: across resamples the estimated optimal allocation to asset <code class="docutils literal notranslate"><span class="pre">X</span></code> varies by about <span class="math notranslate nohighlight">\(\pm0.09\)</span> — an uncertainty statement that no closed-form formula supplies for <span class="math notranslate nohighlight">\(\alpha\)</span>. <em>Common mistake:</em> drawing separate index vectors for <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code>, which destroys the <span class="math notranslate nohighlight">\(X\)</span>–<span class="math notranslate nohighlight">\(Y\)</span> covariance the statistic depends on; one shared <code class="docutils literal notranslate"><span class="pre">idx</span></code> keeps the pairs intact.</p>
+</section>
+<section id="extended-exercise-5-2-bootstrap-se-statistic-and-coefficient-python">
+<h3>Extended Exercise 5.2 — Bootstrap SE: Statistic and Coefficient [Python]<a class="headerlink" href="#extended-exercise-5-2-bootstrap-se-statistic-and-coefficient-python" title="Link to this heading">¶</a></h3>
+<p>Extend Exercise 5.6 in two directions: (1) report a 95% <em>percentile</em> confidence interval for the Portfolio <span class="math notranslate nohighlight">\(\hat\alpha\)</span> alongside its bootstrap SE; and (2) bootstrap the OLS slope of <code class="docutils literal notranslate"><span class="pre">mpg</span></code> on <code class="docutils literal notranslate"><span class="pre">horsepower</span></code> in the <code class="docutils literal notranslate"><span class="pre">Auto</span></code> data and compare the bootstrap SE with the textbook (formula-based) OLS standard error.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extended Exercise 5.2 -- (1) percentile CI for alpha, (2) bootstrap the OLS</span>
+<span class="c1"># slope and compare it with the formula-based SE.  Reuses alpha_hat, Xp, Yp, n</span>
+<span class="c1"># defined in Exercise 5.6 above.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+
+<span class="c1"># --- (1) Portfolio alpha: bootstrap SE + 95% percentile interval ----------</span>
+<span class="n">rng</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>                  <span class="c1"># reproducible (matches slide)</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">idx</span>     <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>         <span class="c1"># one shared index -&gt; keep pairs</span>
+    <span class="n">reps</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha_hat</span><span class="p">(</span><span class="n">Xp</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">Yp</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;alpha_hat        :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">alpha_hat</span><span class="p">(</span><span class="n">Xp</span><span class="p">,</span> <span class="n">Yp</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>                    <span class="c1"># 0.5758</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;alpha SE         :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">reps</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>                     <span class="c1"># 0.0912</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;alpha 95% pctile :&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">reps</span><span class="p">,</span> <span class="p">[</span><span class="mf">.025</span><span class="p">,</span> <span class="mf">.975</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># [0.413 0.77]</span>
+
+<span class="c1"># --- (2) Auto: bootstrap OLS slope vs formula-based SE --------------------</span>
+<span class="n">Auto</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Auto&#39;</span><span class="p">,</span> <span class="n">na_values</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">hp</span>   <span class="o">=</span> <span class="n">Auto</span><span class="p">[</span><span class="s1">&#39;horsepower&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>   <span class="c1"># predictor</span>
+<span class="n">mpg</span>  <span class="o">=</span> <span class="n">Auto</span><span class="p">[</span><span class="s1">&#39;mpg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>                        <span class="c1"># response</span>
+<span class="n">ols</span>  <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">mpg</span><span class="p">,</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">hp</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>    <span class="c1"># single fit -&gt; formula SE</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;OLS slope        :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>    <span class="c1"># -0.1578</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;OLS formula SE   :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">))</span>       <span class="c1">#  0.00645</span>
+
+<span class="n">rng</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">m</span>      <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hp</span><span class="p">)</span>
+<span class="n">slopes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">idx</span>       <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>       <span class="c1"># resample rows with replacement</span>
+    <span class="n">slopes</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">mpg</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">hp</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bootstrap SE     :&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">slopes</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="mi">5</span><span class="p">))</span>                     <span class="c1"># 0.00746</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bootstrap 95% CI :&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">slopes</span><span class="p">,</span> <span class="p">[</span><span class="mf">.025</span><span class="p">,</span> <span class="mf">.975</span><span class="p">]),</span> <span class="mi">4</span><span class="p">))</span>   <span class="c1"># [-0.1732 -0.1443]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>alpha_hat        : 0.5758
+alpha SE         : 0.0912
+alpha 95% pctile : [0.413 0.77 ]
+OLS slope        : -0.1578
+OLS formula SE   : 0.00645
+bootstrap SE     : 0.00746
+bootstrap 95% CI : [-0.1732 -0.1443]
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Interpretation.</strong> The Portfolio 95% percentile interval <span class="math notranslate nohighlight">\(\approx[0.41,\,0.77]\)</span> turns the point estimate into an honest uncertainty range. For the <code class="docutils literal notranslate"><span class="pre">Auto</span></code> slope, the bootstrap SE (<span class="math notranslate nohighlight">\(\approx0.0075\)</span>) is close to the OLS formula SE (<span class="math notranslate nohighlight">\(\approx0.0064\)</span>), which <em>validates</em> the bootstrap. Where they differ the bootstrap is often more trustworthy: the formula SE assumes a correctly specified linear model with constant-variance errors, whereas the bootstrap assumes neither and picks up the mild nonlinearity/heteroscedasticity in <code class="docutils literal notranslate"><span class="pre">Auto</span></code> — hence the slightly larger bootstrap SE.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="chapter_06_lab.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 6 — Model Selection and Regularisation</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="chapter_04_lab.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 4 — Classification</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Christoph Weisser. Based on ISLP (Springer, 2023)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ChrisW09/Quantitative-Research-Methods" aria-label="GitHub"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.011.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 5 — Resampling Methods</a><ul>
+<li><a class="reference internal" href="#lab-validation-set-k-fold-cv-loocv-the-bootstrap">Lab: validation set, k-fold CV, LOOCV, the bootstrap</a></li>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+<li><a class="reference internal" href="#the-auto-data-set">1. The Auto data set</a></li>
+<li><a class="reference internal" href="#validation-set-approach">2. Validation set approach</a></li>
+<li><a class="reference internal" href="#k-fold-cross-validation">3. <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation</a></li>
+<li><a class="reference internal" href="#loocv-leave-one-out">4. LOOCV (leave-one-out)</a></li>
+<li><a class="reference internal" href="#the-bootstrap">5. The bootstrap</a></li>
+<li><a class="reference internal" href="#what-is-actually-in-a-bootstrap-sample">6. What is actually in a bootstrap sample?</a></li>
+<li><a class="reference internal" href="#exercises">7. Exercises</a></li>
+<li><a class="reference internal" href="#lecture-exercises-worked-python-solutions">Lecture exercises — worked Python solutions</a><ul>
+<li><a class="reference internal" href="#exercise-5-6-bootstrap-se-of-the-portfolio-alpha-python">Exercise 5.6 — Bootstrap SE of the Portfolio <span class="math notranslate nohighlight">\(\alpha\)</span> [Python]</a></li>
+<li><a class="reference internal" href="#extended-exercise-5-2-bootstrap-se-statistic-and-coefficient-python">Extended Exercise 5.2 — Bootstrap SE: Statistic and Coefficient [Python]</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7f41d439"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

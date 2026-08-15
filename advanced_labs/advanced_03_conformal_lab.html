@@ -1,0 +1,903 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Advanced Module A4 — GLMs and Splines" href="advanced_04_glms_splines_lab.html"><link rel="prev" title="Advanced Module A2 — Explainable AI with Shapley Values" href="advanced_02_shapley_lab.html">
+
+    <link rel="shortcut icon" href="../_static/favicon.svg"><!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>Advanced Module A3 — Conformal Prediction - Quantitative Research Methods</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cd1d273d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #005b7f;
+  --color-brand-content: #00618a;
+  --color-brand-visited: #00618a;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Quantitative Research Methods</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Quantitative Research Methods</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../for-students.html">For students</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course.html">The course at a glance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">Python environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Materials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../slides.html">Lecture slides</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../labs.html">Lab notebooks</a><input aria-label="Toggle navigation of Lab notebooks" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_00_lab.html">Chapter 0 — Precourse Refresher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_00b_lab.html">Chapter 0b — Precourse Toolkit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_01_lab.html">Chapter 1 — Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_02_lab.html">Chapter 2 — Statistical Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_03_lab.html">Chapter 3 — Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_04_lab.html">Chapter 4 — Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_05_lab.html">Chapter 5 — Resampling Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_06_lab.html">Chapter 6 — Model Selection and Regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_07_lab.html">Chapter 7 — Moving Beyond Linearity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_08_lab.html">Chapter 8 — Tree-Based Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exams.html">Mock exams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../advanced.html">Advanced modules</a><input aria-label="Toggle navigation of Advanced modules" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="advanced_01_rcts_lab.html">Advanced Module A1 — Randomised Controlled Trials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_02_shapley_lab.html">Advanced Module A2 — Explainable AI with Shapley Values</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Advanced Module A3 — Conformal Prediction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_04_glms_splines_lab.html">Advanced Module A4 — GLMs and Splines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_05_svm_lab.html">Chapter 9 — Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_06_survival_lab.html">Chapter 11 — Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_07_multiple_testing_lab.html">Chapter 13 — Multiple Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_08_unsupervised_lab.html">Chapter 12 — Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_09_deep_learning_lab.html">Advanced Module A9 — Deep Learning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">Short projects</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Teaching</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../teaching.html">Teaching it</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../repository.html">Repository layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../building-docs.html">Building this documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citation.html">Citation &amp; licence</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/docs/advanced_labs/advanced_03_conformal_lab.ipynb?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/edit/main/docs/advanced_labs/advanced_03_conformal_lab.ipynb" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p><a class="reference external" href="https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_03_conformal/advanced_03_conformal_lab.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><em>This notebook runs on Colab as-is. The badge link above and the <code class="docutils literal notranslate"><span class="pre">GITHUB_RAW</span></code> line in the setup cell already point to this repository, so everything installs and loads automatically.</em></p>
+<section class="tex2jax_ignore mathjax_ignore" id="advanced-module-a3-conformal-prediction">
+<h1>Advanced Module A3 — Conformal Prediction<a class="headerlink" href="#advanced-module-a3-conformal-prediction" title="Link to this heading">¶</a></h1>
+<section id="lab-split-conformal-on-wage-coverage-over-splits-adaptive-intervals-cqr-prediction-sets-the-ols-stress-test">
+<h2>Lab: split conformal on Wage, coverage over splits, adaptive intervals (CQR), prediction sets, the OLS stress test<a class="headerlink" href="#lab-split-conformal-on-wage-coverage-over-splits-adaptive-intervals-cqr-prediction-sets-the-ols-stress-test" title="Link to this heading">¶</a></h2>
+<p><strong>Course:</strong> Quantitative Research Methods
+<strong>Instructor:</strong> Prof. Dr. Christoph Weisser
+<strong>Source:</strong> James, Witten, Hastie, Tibshirani &amp; Taylor (2023), <em>An Introduction to Statistical Learning, with Applications in Python</em>, Springer. Companion code at <a class="reference external" href="https://www.statlearning.com">statlearning.com</a>. This advanced module extends the book with distribution-free prediction intervals (Vovk et al. 2005; Lei et al. 2018; Romano et al. 2019).</p>
+<p><strong>Goal.</strong> Build a split-conformal 90% interval on <code class="docutils literal notranslate"><span class="pre">Wage</span></code> in ten lines and check its coverage; watch the marginal guarantee hold over 200 repeated splits; make the interval width adaptive with locally weighted scores and conformalized quantile regression; turn softmax probabilities into prediction <em>sets</em> for a 3-class problem; and stress-test Chapter 3’s OLS prediction interval against conformal under heteroskedastic truth.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<p>Run this cell once. The <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ISLP</span></code>. As an alternative, the same data sets are available as CSVs in the workspace’s <code class="docutils literal notranslate"><span class="pre">ALL</span> <span class="pre">CSV</span> <span class="pre">FILES</span> <span class="pre">-</span> <span class="pre">2nd</span> <span class="pre">Edition</span></code> folder.</p>
+<blockquote>
+<div><p><strong>Google Colab:</strong> this notebook also runs on Colab out of the box — the setup cell below installs any missing packages and downloads the data automatically.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- Setup: runs locally AND on Google Colab --------------------------------</span>
+<span class="c1"># Silence only the spurious &#39;encountered in matmul&#39; RuntimeWarnings that the macOS</span>
+<span class="c1"># Accelerate BLAS emits; real warnings (deprecations, model caveats) stay visible.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;.*encountered in matmul&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">subprocess</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">import_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;pip-install pkg (quietly) if its import is missing.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">import_name</span> <span class="ow">or</span> <span class="n">pkg</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;pip&#39;</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;-q&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>  <span class="c1"># Colab ships numpy/pandas/sklearn/statsmodels; add course extras</span>
+    <span class="k">for</span> <span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;ISLP&#39;</span><span class="p">,</span> <span class="s1">&#39;ISLP&#39;</span><span class="p">)]:</span>
+        <span class="n">_ensure</span><span class="p">(</span><span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">110</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ISLP not installed; using CSV / URL fallbacks.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Local CSV location (repo layout first, then legacy paths, then a data/ cache).</span>
+<span class="n">_CANDIDATES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;../../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;../../../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">CSV</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_CANDIDATES</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+<span class="c1"># GITHUB_RAW lets a fresh Colab runtime fetch any</span>
+<span class="c1"># CSV that is neither in ISLP nor already local (spaces in the folder -&gt; %20).</span>
+<span class="n">GITHUB_RAW</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/ChrisW09/Quantitative-Research-Methods/main/&#39;</span>
+              <span class="s1">&#39;ALL%20CSV</span><span class="si">%20F</span><span class="s1">ILES%20-%202nd</span><span class="si">%20E</span><span class="s1">dition&#39;</span><span class="p">)</span>
+
+<span class="c1"># The four datasets NOT in the ISLP package -&gt; load from the book&#39;s official</span>
+<span class="c1"># site so the notebook works on a fresh Colab even before the repo is published.</span>
+<span class="n">KNOWN_URLS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Advertising&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.statlearning.com/s/Advertising.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Heart&#39;</span><span class="p">:</span>       <span class="s1">&#39;https://www.statlearning.com/s/Heart.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income1&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income1.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income2&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income2.csv&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a course dataset. Order: ISLP package -&gt; R datasets -&gt; local CSV</span>
+<span class="sd">    -&gt; official book URL -&gt; your GitHub repo. Works locally and on Colab.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">HAVE_ISLP</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">load_data</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;USArrests&#39;</span><span class="p">:</span>                       <span class="c1"># classic R dataset, not in ISLP</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+            <span class="k">return</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;USArrests&#39;</span><span class="p">,</span> <span class="s1">&#39;datasets&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>                      <span class="c1"># running from the repo (local)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+    <span class="n">remotes</span> <span class="o">=</span> <span class="p">([</span><span class="n">KNOWN_URLS</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">KNOWN_URLS</span> <span class="k">else</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GITHUB_RAW</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">remotes</span><span class="p">:</span>                           <span class="c1"># fresh Colab: stream over https</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Could not load </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. Put the CSV in &#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s2">/&#39; or check your connection for the GITHUB_RAW fallback.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ISLP not installed; using CSV / URL fallbacks.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="split-conformal-on-wage">
+<h2>1. Split conformal on Wage<a class="headerlink" href="#split-conformal-on-wage" title="Link to this heading">¶</a></h2>
+<p>The whole recipe: fit on the training set <em>only</em>; compute absolute residuals on a held-out calibration set; take the <span class="math notranslate nohighlight">\(k\)</span>-th smallest with <span class="math notranslate nohighlight">\(k = \lceil (n+1)(1-\alpha)\rceil\)</span> — the finite-sample correction that makes the guarantee exact; report <span class="math notranslate nohighlight">\(\hat f(x) \pm \hat q\)</span>. With <span class="math notranslate nohighlight">\(n = 500\)</span>, <span class="math notranslate nohighlight">\(\alpha = 0.1\)</span>: <span class="math notranslate nohighlight">\(k = \lceil 501 \times 0.9 \rceil = 451\)</span>, the <span class="math notranslate nohighlight">\(0.902\)</span> quantile — slightly <em>above</em> the naive <span class="math notranslate nohighlight">\(0.9\)</span> quantile.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="n">Wage</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Wage&#39;</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y_w</span> <span class="o">=</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">&#39;wage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>                <span class="c1"># reproducible split</span>
+<span class="n">i</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_w</span><span class="p">))</span>
+<span class="n">tr</span><span class="p">,</span> <span class="n">ca</span><span class="p">,</span> <span class="n">te</span> <span class="o">=</span> <span class="n">i</span><span class="p">[:</span><span class="mi">2000</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">2000</span><span class="p">:</span><span class="mi">2500</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">2500</span><span class="p">:]</span>    <span class="c1"># 2000 / 500 / 500</span>
+<span class="n">P</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">])</span>         <span class="c1"># quadratic in age</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">tr</span><span class="p">]),</span> <span class="n">y_w</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>    <span class="c1"># 1. fit on TRAIN only</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">ca</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ca</span><span class="p">])))</span>        <span class="c1"># 2. calibration scores</span>
+<span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mf">0.1</span><span class="p">)))</span>      <span class="c1"># 3. k = ceil((n+1)(1-alpha))</span>
+<span class="n">qhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>                         <span class="c1">#    k-th smallest score</span>
+<span class="n">res_te</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">te</span><span class="p">])))</span>
+<span class="n">cov</span> <span class="o">=</span> <span class="p">(</span><span class="n">res_te</span> <span class="o">&lt;=</span> <span class="n">qhat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>                    <span class="c1"># 4. check on the test set</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;k = </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">,  qhat = </span><span class="si">{</span><span class="n">qhat</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">,  test coverage = </span><span class="si">{</span><span class="n">cov</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># The textbook alternative: a Gaussian band from the training residual sd.</span>
+<span class="n">sig_tr</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">tr</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">tr</span><span class="p">])))</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Gaussian band +-</span><span class="si">{</span><span class="mf">1.645</span><span class="o">*</span><span class="n">sig_tr</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> covers </span><span class="si">{</span><span class="p">(</span><span class="n">res_te</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">1.645</span><span class="o">*</span><span class="n">sig_tr</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> (claiming 0.90)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k = 451,  qhat = 56.14,  test coverage = 0.926
+Gaussian band +-66.1 covers 0.952 (claiming 0.90)
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> The 451st of 500 sorted calibration residuals gives <span class="math notranslate nohighlight">\(\hat q = 56.14\)</span>; the band <span class="math notranslate nohighlight">\(\hat f(\text{age}) \pm 56.1\)</span> covers <span class="math notranslate nohighlight">\(92.6\%\)</span> of the 500 test wages. The Gaussian band (<span class="math notranslate nohighlight">\(\pm 66.1\)</span>) <em>claims</em> 90% but delivers 95.2% — miscalibrated, because wages are right-skewed, not Gaussian. Conformal needed no distributional assumption: only exchangeability and a clean split.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Marginal is not conditional: same interval, different subgroups.</span>
+<span class="n">young</span><span class="p">,</span> <span class="n">old</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">60</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;coverage under-30s: </span><span class="si">{</span><span class="p">(</span><span class="n">res_te</span><span class="p">[</span><span class="n">young</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">qhat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">   (n = </span><span class="si">{</span><span class="n">young</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;coverage 60-plus:   </span><span class="si">{</span><span class="p">(</span><span class="n">res_te</span><span class="p">[</span><span class="n">old</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">qhat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">   (n = </span><span class="si">{</span><span class="n">old</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">fhat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">grid</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">te</span><span class="p">],</span> <span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">fhat</span> <span class="o">-</span> <span class="n">qhat</span><span class="p">,</span> <span class="n">fhat</span> <span class="o">+</span> <span class="n">qhat</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="sa">fr</span><span class="s1">&#39;split conformal $\pm$</span><span class="si">{</span><span class="n">qhat</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> (covers </span><span class="si">{</span><span class="n">cov</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">fhat</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;wage ($1000s)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;A 90</span><span class="si">% c</span><span class="s1">onformal band on Wage&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>coverage under-30s: 0.986   (n = 74)
+coverage 60-plus:   0.829   (n = 35)
+</pre></div>
+</div>
+<img alt="../_images/40656b6b4983f68a301ff70529adae051cf6a5fb276f48c67b5b973f41335f38.png" src="../_images/40656b6b4983f68a301ff70529adae051cf6a5fb276f48c67b5b973f41335f38.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> The guarantee is <strong>marginal</strong>: <span class="math notranslate nohighlight">\(98.6\%\)</span> coverage for under-30s, <span class="math notranslate nohighlight">\(82.9\%\)</span> for the 60-plus group, <span class="math notranslate nohighlight">\(92.6\%\)</span> on average. A constant-width band overcovers where wages are predictable and undercovers where they spread out. If a subgroup matters, calibrate on that subgroup (Mondrian conformal) or use adaptive scores — Section 3.</p>
+</section>
+<section id="coverage-over-repeated-splits">
+<h2>2. Coverage over repeated splits<a class="headerlink" href="#coverage-over-repeated-splits" title="Link to this heading">¶</a></h2>
+<p>What “<span class="math notranslate nohighlight">\(P(Y \in C(X)) \ge 0.9\)</span>” actually promises: an average over calibration draws <em>and</em> test points. Any single split can land at <span class="math notranslate nohighlight">\(0.87\)</span> — nothing is wrong when it does. 200 random splits make the point.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">covs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">rng2</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Wage</span><span class="p">))</span>
+    <span class="n">tr2</span><span class="p">,</span> <span class="n">ca2</span><span class="p">,</span> <span class="n">te2</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:</span><span class="mi">2000</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2000</span><span class="p">:</span><span class="mi">2500</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2500</span><span class="p">:]</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">tr2</span><span class="p">]),</span> <span class="n">y_w</span><span class="p">[</span><span class="n">tr2</span><span class="p">])</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">ca2</span><span class="p">]</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ca2</span><span class="p">]))))[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">covs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">te2</span><span class="p">]</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">te2</span><span class="p">])))</span> <span class="o">&lt;=</span> <span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="n">covs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">covs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;coverage over 200 splits: mean </span><span class="si">{</span><span class="n">covs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">   sd </span><span class="si">{</span><span class="n">covs</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span>
+      <span class="sa">f</span><span class="s1">&#39;   min </span><span class="si">{</span><span class="n">covs</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">   max </span><span class="si">{</span><span class="n">covs</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">covs</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;nominal $1-\alpha$ = 0.90&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">covs</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;mean = </span><span class="si">{</span><span class="n">covs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;empirical test coverage of one split&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;number of splits&#39;</span><span class="p">,</span>
+       <span class="n">title</span><span class="o">=</span><span class="s1">&#39;The marginal guarantee, seen over 200 random splits&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>coverage over 200 splits: mean 0.8976   sd 0.0198   min 0.826   max 0.940
+</pre></div>
+</div>
+<img alt="../_images/d1619ccb05a4f3f2630366e2eada14e9842c31dd532df2e87d8cd732bbd4a90a.png" src="../_images/d1619ccb05a4f3f2630366e2eada14e9842c31dd532df2e87d8cd732bbd4a90a.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> Per-split coverage fluctuates between <span class="math notranslate nohighlight">\(0.826\)</span> and <span class="math notranslate nohighlight">\(0.940\)</span> (sd <span class="math notranslate nohighlight">\(\approx 0.02\)</span>), but the mean is <span class="math notranslate nohighlight">\(0.898 \approx 0.9\)</span> — the guarantee in action. The deck’s appendix derives the exact law of this fluctuation (a Beta distribution); with <span class="math notranslate nohighlight">\(n = 500\)</span> calibration points its sd is <span class="math notranslate nohighlight">\(\approx 1.3\%\)</span>, which is why <span class="math notranslate nohighlight">\(n\)</span> between 500 and 1000 is the usual sweet spot.</p>
+</section>
+<section id="adaptive-intervals">
+<h2>3. Adaptive intervals<a class="headerlink" href="#adaptive-intervals" title="Link to this heading">¶</a></h2>
+<p>One width for everyone is a blunt instrument. Two repairs, same calibration machinery:</p>
+<ul class="simple">
+<li><p><strong>locally weighted</strong>: scale the score by a fitted spread model, <span class="math notranslate nohighlight">\(s_i = |y_i - \hat f(x_i)| / \hat\sigma(x_i)\)</span>;</p></li>
+<li><p><strong>CQR</strong> (conformalized quantile regression): fit quantile regressions <span class="math notranslate nohighlight">\(\hat q_{0.05}, \hat q_{0.95}\)</span>, score <span class="math notranslate nohighlight">\(s_i = \max(\hat q_{lo}(x_i) - y_i,\; y_i - \hat q_{hi}(x_i))\)</span>, and shift both ends by the conformal <span class="math notranslate nohighlight">\(\hat q\)</span>.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">GradientBoostingRegressor</span>
+
+<span class="c1"># Locally weighted: spread model = mean absolute residual, quadratic in age.</span>
+<span class="n">mad</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">tr</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">tr</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">tr</span><span class="p">]))))</span>
+<span class="n">sig_cal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mad</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ca</span><span class="p">])),</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">q_lw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="n">sig_cal</span><span class="p">)[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>               <span class="c1"># scores in sigma-units</span>
+
+<span class="c1"># CQR: gradient boosting at the 5% and 95% quantiles.</span>
+<span class="n">X1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gb</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">lo</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s1">&#39;quantile&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">**</span><span class="n">gb</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">tr</span><span class="p">],</span> <span class="n">y_w</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
+<span class="n">hi</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s1">&#39;quantile&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="o">**</span><span class="n">gb</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">tr</span><span class="p">],</span> <span class="n">y_w</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
+<span class="n">s_cqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">lo</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">ca</span><span class="p">])</span> <span class="o">-</span> <span class="n">y_w</span><span class="p">[</span><span class="n">ca</span><span class="p">],</span> <span class="n">y_w</span><span class="p">[</span><span class="n">ca</span><span class="p">]</span> <span class="o">-</span> <span class="n">hi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">ca</span><span class="p">]))</span>
+<span class="n">q_cqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">s_cqr</span><span class="p">)[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">L</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">lo</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">te</span><span class="p">])</span> <span class="o">-</span> <span class="n">q_cqr</span><span class="p">,</span> <span class="n">hi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">te</span><span class="p">])</span> <span class="o">+</span> <span class="n">q_cqr</span>
+<span class="n">cov_cqr</span> <span class="o">=</span> <span class="p">((</span><span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">L</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">U</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;q_lw = </span><span class="si">{</span><span class="n">q_lw</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> (sigma-units),  q_cqr = </span><span class="si">{</span><span class="n">q_cqr</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">,  CQR test coverage = </span><span class="si">{</span><span class="n">cov_cqr</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">width</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="n">L</span><span class="p">;</span> <span class="n">a_te</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">te</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;age &lt; 30 &#39;</span><span class="p">,</span> <span class="n">a_te</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;age 30-59&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">a_te</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a_te</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">)),</span>
+                    <span class="p">(</span><span class="s1">&#39;age &gt;= 60&#39;</span><span class="p">,</span> <span class="n">a_te</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;avg width </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">:  CQR </span><span class="si">{</span><span class="n">width</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">6.1f</span><span class="si">}</span><span class="s1">   constant </span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">qhat</span><span class="si">:</span><span class="s1">6.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>q_lw = 1.897 (sigma-units),  q_cqr = 0.66,  CQR test coverage = 0.896
+avg width age &lt; 30 :  CQR   70.5   constant  112.3
+avg width age 30-59:  CQR  120.4   constant  112.3
+avg width age &gt;= 60:  CQR  134.9   constant  112.3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">gsig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mad</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="n">grid</span><span class="p">)),</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">qhat</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;absolute residual (width </span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">qhat</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">q_lw</span><span class="o">*</span><span class="n">gsig</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;locally weighted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">hi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">q_cqr</span> <span class="o">-</span> <span class="p">(</span><span class="n">lo</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">q_cqr</span><span class="p">),</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CQR&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;interval width ($1000s)&#39;</span><span class="p">,</span>
+       <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Where each 90% band spends its width&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5bab9622982ff05042893a7ff6063fec35be47b18e4ada5f89c919464c088ae2.png" src="../_images/5bab9622982ff05042893a7ff6063fec35be47b18e4ada5f89c919464c088ae2.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> All three cover <span class="math notranslate nohighlight">\(\approx 90\%\)</span> marginally (CQR: <span class="math notranslate nohighlight">\(89.6\%\)</span>), but CQR spends its width where the data spread: average width <span class="math notranslate nohighlight">\(70.5\)</span> for under-30s against <span class="math notranslate nohighlight">\(134.9\)</span> for 60-plus, where the constant band pays <span class="math notranslate nohighlight">\(112.3\)</span> everywhere. Note the locally weighted curve <em>falls</em> after age 60 — its quadratic <span class="math notranslate nohighlight">\(\hat\sigma\)</span> extrapolates poorly: the allocation is only as good as the scale model, even though marginal coverage is untouched.</p>
+</section>
+<section id="conformal-classification">
+<h2>4. Conformal classification<a class="headerlink" href="#conformal-classification" title="Link to this heading">¶</a></h2>
+<p>For classification the interval becomes a <strong>set</strong> of labels: score <span class="math notranslate nohighlight">\(s_i = 1 - \hat p_{y_i}(x_i)\)</span> on the calibration set, then include in <span class="math notranslate nohighlight">\(C(x)\)</span> every class whose predicted probability is at least <span class="math notranslate nohighlight">\(1 - \hat q\)</span>. The set <em>size</em> is a per-point difficulty meter that the accuracy number hides.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">]])</span>    <span class="c1"># class centres</span>
+<span class="n">Xc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mu</span><span class="p">])</span>
+<span class="n">yc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span> <span class="n">Xc</span><span class="p">,</span> <span class="n">yc</span> <span class="o">=</span> <span class="n">Xc</span><span class="p">[</span><span class="n">p</span><span class="p">],</span> <span class="n">yc</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="c1"># shuffle once</span>
+<span class="n">TRc</span><span class="p">,</span> <span class="n">CAc</span><span class="p">,</span> <span class="n">TEc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1500</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="mi">2250</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2250</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span>
+
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xc</span><span class="p">[</span><span class="n">TRc</span><span class="p">],</span> <span class="n">yc</span><span class="p">[</span><span class="n">TRc</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;test accuracy of the point classifier: </span><span class="si">{</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xc</span><span class="p">[</span><span class="n">TEc</span><span class="p">])</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">yc</span><span class="p">[</span><span class="n">TEc</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">pc</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">Xc</span><span class="p">[</span><span class="n">CAc</span><span class="p">])</span>
+<span class="n">s_cls</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">pc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">750</span><span class="p">),</span> <span class="n">yc</span><span class="p">[</span><span class="n">CAc</span><span class="p">]]</span>          <span class="c1"># 1 - p_true on calibration</span>
+<span class="n">k_cls</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">751</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">))</span>                  <span class="c1"># k = 676</span>
+<span class="n">qhat_cls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">s_cls</span><span class="p">)[</span><span class="n">k_cls</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">sets</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">Xc</span><span class="p">[</span><span class="n">TEc</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">qhat_cls</span>
+<span class="n">cov_cls</span> <span class="o">=</span> <span class="n">sets</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">750</span><span class="p">),</span> <span class="n">yc</span><span class="p">[</span><span class="n">TEc</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">sizes</span> <span class="o">=</span> <span class="n">sets</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;k = </span><span class="si">{</span><span class="n">k_cls</span><span class="si">}</span><span class="s1">,  qhat = </span><span class="si">{</span><span class="n">qhat_cls</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">,  coverage = </span><span class="si">{</span><span class="n">cov_cls</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">,  avg set size = </span><span class="si">{</span><span class="n">sizes</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;set sizes:  singletons </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sizes</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">,  pairs </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sizes</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">,&#39;</span>
+      <span class="sa">f</span><span class="s1">&#39;  full </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sizes</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">,  empty </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sizes</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>test accuracy of the point classifier: 0.809
+k = 676,  qhat = 0.7685,  coverage = 0.9013,  avg set size = 1.296
+set sizes:  singletons 71.3%,  pairs 27.7%,  full 0.9%,  empty 0.0%
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> Logistic accuracy is <span class="math notranslate nohighlight">\(80.9\%\)</span>, yet the sets cover <span class="math notranslate nohighlight">\(90.1\%\)</span> — by <em>saying more than one label</em> exactly where the classes overlap: <span class="math notranslate nohighlight">\(71\%\)</span> singletons near the centres, <span class="math notranslate nohighlight">\(28\%\)</span> pairs at the boundaries. The price of certainty: demanding <span class="math notranslate nohighlight">\(99\%\)</span> coverage (<span class="math notranslate nohighlight">\(\alpha = 0.01\)</span>, <span class="math notranslate nohighlight">\(k = 744\)</span>, <span class="math notranslate nohighlight">\(\hat q = 0.9638\)</span>) inflates the average set to <span class="math notranslate nohighlight">\(2.17\)</span> of 3 classes. Pick <span class="math notranslate nohighlight">\(\alpha\)</span> by what a large set costs downstream — a manual review, a second lab test.</p>
+</section>
+<section id="ols-prediction-interval-vs-conformal">
+<h2>5. OLS prediction interval vs conformal<a class="headerlink" href="#ols-prediction-interval-vs-conformal" title="Link to this heading">¶</a></h2>
+<p>Chapter 3’s interval is exact at every <span class="math notranslate nohighlight">\(x\)</span> — <em>if</em> the linear-Gaussian-homoskedastic model is true. First the friendly case, where they should agree; the full heteroskedastic stress test is worked as Extended Exercise A3.2 below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">4000</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">xs</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>              <span class="c1"># homoskedastic truth, sigma = 2</span>
+<span class="n">tr3</span><span class="p">,</span> <span class="n">ca3</span><span class="p">,</span> <span class="n">te3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2000</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="mi">4000</span><span class="p">)</span>
+
+<span class="n">ols</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">tr3</span><span class="p">],</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="n">tr3</span><span class="p">]))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">half_ols</span> <span class="o">=</span> <span class="mf">1.645</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>            <span class="c1"># theory: 1.645 x 2 = 3.29</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">xs</span><span class="p">[</span><span class="n">te3</span><span class="p">]</span>
+<span class="n">k3</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">1001</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">))</span>
+<span class="n">q3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">ca3</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">xs</span><span class="p">[</span><span class="n">ca3</span><span class="p">])))[</span><span class="n">k3</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OLS PI        half-width </span><span class="si">{</span><span class="n">half_ols</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">   coverage </span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">te3</span><span class="p">]</span><span class="o">-</span><span class="n">pred</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">half_ols</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;split conformal half-width </span><span class="si">{</span><span class="n">q3</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">   coverage </span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">te3</span><span class="p">]</span><span class="o">-</span><span class="n">pred</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">q3</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>OLS PI        half-width 3.31   coverage 0.915
+split conformal half-width 3.24   coverage 0.909
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> When the Gaussian linear model is <em>true</em>, conformal costs essentially nothing: both intervals reproduce the theoretical <span class="math notranslate nohighlight">\(\pm 3.29\)</span> (<span class="math notranslate nohighlight">\(3.31\)</span> vs <span class="math notranslate nohighlight">\(3.24\)</span>) and both cover <span class="math notranslate nohighlight">\(\approx 90\%\)</span>. Conformal is not a better interval — it is the same interval with a <em>weaker warranty requirement</em>. Validation teams run both: if they disagree materially, the model assumptions are the prime suspect.</p>
+</section>
+<section id="lecture-exercises-worked-python-solutions">
+<h2>Lecture exercises — worked Python solutions<a class="headerlink" href="#lecture-exercises-worked-python-solutions" title="Link to this heading">¶</a></h2>
+<p>These are the <strong>[Python]-tagged exercises from the lecture slides</strong>, solved step by step; run them cell by cell and compare with the slide solutions. Data loads through the <code class="docutils literal notranslate"><span class="pre">load()</span></code> helper defined in the Setup cell, so every cell works locally and on Colab.</p>
+<section id="extended-exercise-a3-1-cqr-on-wage-end-to-end-python">
+<h3>Extended Exercise A3.1 — CQR on Wage, end to end [Python]<a class="headerlink" href="#extended-exercise-a3-1-cqr-on-wage-end-to-end-python" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> Reproduce the adaptive band using the deck’s split of <code class="docutils literal notranslate"><span class="pre">Wage</span></code> (seed 2024; <span class="math notranslate nohighlight">\(2000/500/500\)</span>):</p>
+<ol class="arabic simple">
+<li><p>fit <code class="docutils literal notranslate"><span class="pre">GradientBoostingRegressor(loss=&quot;quantile&quot;)</span></code> at levels <span class="math notranslate nohighlight">\(0.05\)</span> and <span class="math notranslate nohighlight">\(0.95\)</span> on the training set (200 trees, depth 2, learning rate 0.05, <code class="docutils literal notranslate"><span class="pre">random_state=0</span></code>);</p></li>
+<li><p>compute the CQR scores on the calibration set and <span class="math notranslate nohighlight">\(\hat q\)</span> at <span class="math notranslate nohighlight">\(\alpha = 0.1\)</span>; report test coverage;</p></li>
+<li><p>compare average interval width for ages <span class="math notranslate nohighlight">\(&lt;30\)</span>, <span class="math notranslate nohighlight">\(30\)</span>–<span class="math notranslate nohighlight">\(59\)</span> and <span class="math notranslate nohighlight">\(\ge 60\)</span> against the constant-width band (<span class="math notranslate nohighlight">\(112.3\)</span>);</p></li>
+<li><p>compare the two bands’ <em>subgroup coverage</em> for under-30s and 60-plus — which failure does CQR repair, and what does it <em>not</em> guarantee?</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (1)-(2): the models and scores were fitted in Section 3 — recompute explicitly.</span>
+<span class="n">s_cqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">lo</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">ca</span><span class="p">])</span> <span class="o">-</span> <span class="n">y_w</span><span class="p">[</span><span class="n">ca</span><span class="p">],</span> <span class="n">y_w</span><span class="p">[</span><span class="n">ca</span><span class="p">]</span> <span class="o">-</span> <span class="n">hi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">ca</span><span class="p">]))</span>  <span class="c1"># CQR score</span>
+<span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">))</span>            <span class="c1"># k = 451</span>
+<span class="n">qhat_cqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">s_cqr</span><span class="p">)[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>                 <span class="c1"># tiny correction</span>
+<span class="n">L</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">lo</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">te</span><span class="p">])</span> <span class="o">-</span> <span class="n">qhat_cqr</span><span class="p">,</span> <span class="n">hi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">te</span><span class="p">])</span> <span class="o">+</span> <span class="n">qhat_cqr</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">qhat_cqr</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">((</span><span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">L</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">U</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>   <span class="c1"># Expected: 0.66 0.896</span>
+
+<span class="c1"># (3) --------------------------------------------------------------------</span>
+<span class="n">width</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="n">L</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;age &lt; 30 &#39;</span><span class="p">,</span> <span class="n">a_te</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;age 30-59&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">a_te</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a_te</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">)),</span>
+                    <span class="p">(</span><span class="s1">&#39;age &gt;= 60&#39;</span><span class="p">,</span> <span class="n">a_te</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">:  CQR width </span><span class="si">{</span><span class="n">width</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">6.1f</span><span class="si">}</span><span class="s1">   constant </span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">qhat</span><span class="si">:</span><span class="s1">6.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># (4) --------------------------------------------------------------------</span>
+<span class="n">in_cqr</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">L</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y_w</span><span class="p">[</span><span class="n">te</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">U</span><span class="p">)</span>
+<span class="n">in_const</span> <span class="o">=</span> <span class="n">res_te</span> <span class="o">&lt;=</span> <span class="n">qhat</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;under-30&#39;</span><span class="p">,</span> <span class="n">a_te</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;60-plus &#39;</span><span class="p">,</span> <span class="n">a_te</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">:  constant </span><span class="si">{</span><span class="n">in_const</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">   CQR </span><span class="si">{</span><span class="n">in_cqr</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.66 0.896
+age &lt; 30 :  CQR width   70.5   constant  112.3
+age 30-59:  CQR width  120.4   constant  112.3
+age &gt;= 60:  CQR width  134.9   constant  112.3
+under-30:  constant 0.986   CQR 0.797
+60-plus :  constant 0.829   CQR 0.886
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> <span class="math notranslate nohighlight">\(\hat q = 0.66\)</span> — a tiny correction, because the quantile model already spans <span class="math notranslate nohighlight">\(\approx 90\%\)</span> — and test coverage <span class="math notranslate nohighlight">\(0.896\)</span>. CQR repairs the <em>width misallocation</em>: it stops wasting 40 units of width on the young (<span class="math notranslate nohighlight">\(70.5\)</span> vs <span class="math notranslate nohighlight">\(112.3\)</span>) and reinvests them in the old, whose coverage rises from <span class="math notranslate nohighlight">\(0.829\)</span> to <span class="math notranslate nohighlight">\(0.886\)</span>. What it does <strong>not</strong> guarantee: exact per-group coverage — the young bin (<span class="math notranslate nohighlight">\(n = 74\)</span>) lands at <span class="math notranslate nohighlight">\(0.797\)</span>, within sampling noise of <span class="math notranslate nohighlight">\(0.9\)</span> but not pinned to it. Only the marginal <span class="math notranslate nohighlight">\(90\%\)</span> is guaranteed; per-group guarantees need per-group calibration. And the slide’s warning stands: fit the quantile models on training data only — refitting on calibration data voids the guarantee.</p>
+</section>
+<section id="extended-exercise-a3-2-stress-testing-the-two-intervals-integrative">
+<h3>Extended Exercise A3.2 — Stress-testing the two intervals [Integrative]<a class="headerlink" href="#extended-exercise-a3-2-stress-testing-the-two-intervals-integrative" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> Simulate <span class="math notranslate nohighlight">\(y = 1 + 2x + x\,\varepsilon\)</span>, <span class="math notranslate nohighlight">\(\varepsilon \sim \mathcal N(0,1)\)</span>, <span class="math notranslate nohighlight">\(x \sim U(0,10)\)</span>, <span class="math notranslate nohighlight">\(n = 4000\)</span> (split <span class="math notranslate nohighlight">\(2000/1000/1000\)</span>, seed 2024):</p>
+<ol class="arabic simple">
+<li><p>fit OLS; build the 90% prediction interval <span class="math notranslate nohighlight">\(\hat y \pm 1.645\,\hat\sigma\)</span>; measure test coverage overall, for <span class="math notranslate nohighlight">\(x&lt;2\)</span>, and for <span class="math notranslate nohighlight">\(x&gt;8\)</span>;</p></li>
+<li><p>build the split-conformal interval (absolute residuals, <span class="math notranslate nohighlight">\(\alpha = 0.1\)</span>) and measure the same three coverages — what does conformal fix, and what not?</p></li>
+<li><p>fit a 500-tree <code class="docutils literal notranslate"><span class="pre">GradientBoostingRegressor</span></code>; report coverage of <span class="math notranslate nohighlight">\(\hat f \pm 1.645 \times \text{sd(training residuals)}\)</span>, then conformalise the same model — explain the gap;</p></li>
+<li><p>which failure modes does split conformal repair marginally, and which needs CQR?</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">4000</span>
+<span class="n">xh</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">yh</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">xh</span> <span class="o">+</span> <span class="n">xh</span><span class="o">*</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>           <span class="c1"># noise GROWS with x</span>
+<span class="n">tr4</span><span class="p">,</span> <span class="n">ca4</span><span class="p">,</span> <span class="n">te4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2000</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="mi">4000</span><span class="p">)</span>
+<span class="n">cov3</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">hit</span><span class="p">:</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="n">xh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="mi">3</span><span class="p">),</span>
+                    <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="n">xh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="mi">3</span><span class="p">)]</span>
+
+<span class="c1"># (1) OLS with a pooled sigma ---------------------------------------------</span>
+<span class="n">ols</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">tr4</span><span class="p">],</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">xh</span><span class="p">[</span><span class="n">tr4</span><span class="p">]))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">half</span> <span class="o">=</span> <span class="mf">1.645</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">xh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(1) pooled sigma </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">   [overall, x&lt;2, x&gt;8] =&#39;</span><span class="p">,</span>
+      <span class="n">cov3</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span> <span class="o">-</span> <span class="n">pred</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">half</span><span class="p">))</span>
+
+<span class="c1"># (2) conformalise the same OLS model -------------------------------------</span>
+<span class="n">kx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">1001</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">))</span>                    <span class="c1"># k = 901</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">ca4</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ols</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">xh</span><span class="p">[</span><span class="n">ca4</span><span class="p">])))[</span><span class="n">kx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(2) conformal qhat </span><span class="si">{</span><span class="n">q</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">          [overall, x&lt;2, x&gt;8] =&#39;</span><span class="p">,</span>
+      <span class="n">cov3</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span> <span class="o">-</span> <span class="n">pred</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">q</span><span class="p">))</span>
+
+<span class="c1"># (3) flexible model, optimistic plug-in sigma vs conformal ----------------</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">xh</span><span class="p">[</span><span class="n">tr4</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">yh</span><span class="p">[</span><span class="n">tr4</span><span class="p">])</span>
+<span class="n">sig_tr4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">tr4</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xh</span><span class="p">[</span><span class="n">tr4</span><span class="p">,</span> <span class="kc">None</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(3) GBR training-residual sd </span><span class="si">{</span><span class="n">sig_tr4</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">  (held-out sd </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">g</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xh</span><span class="p">[</span><span class="n">te4</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">]))</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    plug-in   [overall, x&lt;2, x&gt;8] =&#39;</span><span class="p">,</span> <span class="n">cov3</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xh</span><span class="p">[</span><span class="n">te4</span><span class="p">,</span> <span class="kc">None</span><span class="p">]))</span> <span class="o">&lt;=</span> <span class="mf">1.645</span><span class="o">*</span><span class="n">sig_tr4</span><span class="p">))</span>
+<span class="n">qg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">ca4</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xh</span><span class="p">[</span><span class="n">ca4</span><span class="p">,</span> <span class="kc">None</span><span class="p">])))[</span><span class="n">kx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    conformal (qhat </span><span class="si">{</span><span class="n">qg</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">)       =&#39;</span><span class="p">,</span> <span class="n">cov3</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">yh</span><span class="p">[</span><span class="n">te4</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xh</span><span class="p">[</span><span class="n">te4</span><span class="p">,</span> <span class="kc">None</span><span class="p">]))</span> <span class="o">&lt;=</span> <span class="n">qg</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1) pooled sigma 5.87   [overall, x&lt;2, x&gt;8] = [0.906, 1.0, 0.735]
+(2) conformal qhat 9.79          [overall, x&lt;2, x&gt;8] = [0.908, 1.0, 0.741]
+(3) GBR training-residual sd 3.92  (held-out sd 6.12)
+    plug-in   [overall, x&lt;2, x&gt;8] = [0.776, 1.0, 0.46]
+    conformal (qhat 10.81)       = [0.907, 1.0, 0.709]
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong></p>
+<ol class="arabic simple">
+<li><p>OLS: marginal <span class="math notranslate nohighlight">\(0.906\)</span>, but <span class="math notranslate nohighlight">\(100\%\)</span> for <span class="math notranslate nohighlight">\(x&lt;2\)</span> and <span class="math notranslate nohighlight">\(73.5\%\)</span> for <span class="math notranslate nohighlight">\(x&gt;8\)</span> — the pooled <span class="math notranslate nohighlight">\(\hat\sigma = 5.87\)</span> is one compromise width for noise that ranges from <span class="math notranslate nohighlight">\(\approx 0\)</span> to <span class="math notranslate nohighlight">\(10\)</span>.</p></li>
+<li><p>Conformal (<span class="math notranslate nohighlight">\(\hat q = 9.79\)</span>): marginal <span class="math notranslate nohighlight">\(0.908\)</span>, subgroups <span class="math notranslate nohighlight">\(1.00 / 0.741\)</span> — conformal <em>guarantees the marginal number</em>, but a constant-width score cannot repair the conditional imbalance; that is CQR’s job.</p></li>
+<li><p>The plug-in GBR claims 90% and delivers <span class="math notranslate nohighlight">\(77.6\%\)</span>: the training-residual sd (<span class="math notranslate nohighlight">\(3.92\)</span>) understates the held-out error sd (<span class="math notranslate nohighlight">\(6.12\)</span>) because 500 trees partly memorised the training noise. Conformalising the <em>same</em> model restores <span class="math notranslate nohighlight">\(90.7\%\)</span> by pricing the width on unseen data (<span class="math notranslate nohighlight">\(\hat q = 10.81\)</span>).</p></li>
+<li><p>Marginal repairs come free — skew, heteroskedasticity and optimism are all handled; <em>conditional</em> honesty across <span class="math notranslate nohighlight">\(x\)</span> is the one thing that needs an adaptive score. And do not conclude that conformal “failed” in part 2: expecting per-region coverage from a constant-width score is a specification error, not a method error.</p></li>
+</ol>
+</section>
+<section id="exercise-a3-5-conformal-classification-from-scratch-python">
+<h3>Exercise A3.5 — Conformal classification from scratch [Python]<a class="headerlink" href="#exercise-a3-5-conformal-classification-from-scratch-python" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> Build prediction sets for the deck’s 3-class simulation (three Gaussian classes, 1000 points each, centres <span class="math notranslate nohighlight">\((0,0)\)</span>, <span class="math notranslate nohighlight">\((2.2,0)\)</span>, <span class="math notranslate nohighlight">\((1.1,1.9)\)</span>, unit variance, seed 2024; split <span class="math notranslate nohighlight">\(1500/750/750\)</span>):</p>
+<ol class="arabic simple">
+<li><p>fit <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> on the training set;</p></li>
+<li><p>compute the calibration scores <span class="math notranslate nohighlight">\(s_i = 1 - \hat p_{y_i}(x_i)\)</span> and <span class="math notranslate nohighlight">\(\hat q\)</span> at <span class="math notranslate nohighlight">\(\alpha = 0.1\)</span> (which <span class="math notranslate nohighlight">\(k\)</span>?);</p></li>
+<li><p>build the test-set prediction sets; report coverage, average set size and the share of singletons;</p></li>
+<li><p>re-run with <span class="math notranslate nohighlight">\(\alpha = 0.01\)</span> — what happens to the average set size?</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (1)-(3): the pipeline of Section 4, condensed to the slide&#39;s ten lines.</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">]])</span>    <span class="c1"># class centres</span>
+<span class="n">Xs_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mu</span><span class="p">])</span>
+<span class="n">ys_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span> <span class="n">Xs_</span><span class="p">,</span> <span class="n">ys_</span> <span class="o">=</span> <span class="n">Xs_</span><span class="p">[</span><span class="n">p</span><span class="p">],</span> <span class="n">ys_</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xs_</span><span class="p">[:</span><span class="mi">1500</span><span class="p">],</span> <span class="n">ys_</span><span class="p">[:</span><span class="mi">1500</span><span class="p">])</span>
+<span class="n">pc</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">Xs_</span><span class="p">[</span><span class="mi">1500</span><span class="p">:</span><span class="mi">2250</span><span class="p">])</span>           <span class="c1"># calibration probs</span>
+<span class="n">s</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">pc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">750</span><span class="p">),</span> <span class="n">ys_</span><span class="p">[</span><span class="mi">1500</span><span class="p">:</span><span class="mi">2250</span><span class="p">]]</span>       <span class="c1"># 1 - p_true (NOT 1 - max p!)</span>
+<span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">751</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">))</span>                      <span class="c1"># k = 676</span>
+<span class="n">qhat_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">sets</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">Xs_</span><span class="p">[</span><span class="mi">2250</span><span class="p">:])</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">qhat_c</span>
+<span class="n">cov_c</span> <span class="o">=</span> <span class="n">sets</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">750</span><span class="p">),</span> <span class="n">ys_</span><span class="p">[</span><span class="mi">2250</span><span class="p">:]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">qhat_c</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">cov_c</span><span class="p">,</span> <span class="n">sets</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>   <span class="c1"># Expected: 0.7685 0.9013 1.296</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;singletons: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sets</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># (4) --------------------------------------------------------------------</span>
+<span class="n">k99</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">751</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">))</span>
+<span class="n">q99</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="n">k99</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">sets99</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">Xs_</span><span class="p">[</span><span class="mi">2250</span><span class="p">:])</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">q99</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;alpha = 0.01:  k = </span><span class="si">{</span><span class="n">k99</span><span class="si">}</span><span class="s1">,  qhat = </span><span class="si">{</span><span class="n">q99</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">,  &#39;</span>
+      <span class="sa">f</span><span class="s1">&#39;coverage = </span><span class="si">{</span><span class="n">sets99</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">750</span><span class="p">),</span><span class="w"> </span><span class="n">ys_</span><span class="p">[</span><span class="mi">2250</span><span class="p">:]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">,  avg size = </span><span class="si">{</span><span class="n">sets99</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7685 0.9013333333333333 1.296
+singletons: 71.3%
+alpha = 0.01:  k = 744,  qhat = 0.9638,  coverage = 0.9893,  avg size = 2.17
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> <span class="math notranslate nohighlight">\(k = 676\)</span> of 751, <span class="math notranslate nohighlight">\(\hat q = 0.7685\)</span>: a test class enters the set whenever its predicted probability exceeds <span class="math notranslate nohighlight">\(1 - \hat q = 0.2315\)</span>. Coverage <span class="math notranslate nohighlight">\(0.9013\)</span>, average size <span class="math notranslate nohighlight">\(1.30\)</span>, <span class="math notranslate nohighlight">\(71.3\%\)</span> singletons. At <span class="math notranslate nohighlight">\(\alpha = 0.01\)</span> the sets swell to <span class="math notranslate nohighlight">\(2.17\)</span> of 3 classes — certainty is bought with set size. And mind the slide’s trap: the score uses <span class="math notranslate nohighlight">\(1 - \hat p_{y_i}\)</span> for the <strong>true</strong> class, not the predicted one — the score must know the truth on the calibration set; that is what it is for.</p>
+</section>
+</section>
+<section id="exercises">
+<h2>6. Exercises<a class="headerlink" href="#exercises" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>In Section 1, replace the quadratic model with a 10th-degree polynomial. What happens to <span class="math notranslate nohighlight">\(\hat q\)</span> and to coverage — and why does overfitting <em>not</em> break the guarantee?</p></li>
+<li><p>Shrink the calibration set to <span class="math notranslate nohighlight">\(n = 50\)</span> and repeat Section 2’s 200-split experiment. How does the spread of per-split coverage react, and what does the <span class="math notranslate nohighlight">\(n \ge 1/\alpha - 1\)</span> rule say about <span class="math notranslate nohighlight">\(\alpha = 0.01\)</span> here?</p></li>
+<li><p>In Section 4, switch the score to <span class="math notranslate nohighlight">\(1 - \max_k \hat p_k\)</span> (the predicted class) and measure coverage. How badly does the wrong score miss, and why?</p></li>
+<li><p>Build a Mondrian variant of Section 1: calibrate separately for ages <span class="math notranslate nohighlight">\(&lt;40\)</span> and <span class="math notranslate nohighlight">\(\ge 40\)</span>, and compare subgroup coverage with the single-calibration band.</p></li>
+</ol>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="advanced_04_glms_splines_lab.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Advanced Module A4 — GLMs and Splines</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="advanced_02_shapley_lab.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Advanced Module A2 — Explainable AI with Shapley Values</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Christoph Weisser. Based on ISLP (Springer, 2023)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ChrisW09/Quantitative-Research-Methods" aria-label="GitHub"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.011.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Advanced Module A3 — Conformal Prediction</a><ul>
+<li><a class="reference internal" href="#lab-split-conformal-on-wage-coverage-over-splits-adaptive-intervals-cqr-prediction-sets-the-ols-stress-test">Lab: split conformal on Wage, coverage over splits, adaptive intervals (CQR), prediction sets, the OLS stress test</a></li>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+<li><a class="reference internal" href="#split-conformal-on-wage">1. Split conformal on Wage</a></li>
+<li><a class="reference internal" href="#coverage-over-repeated-splits">2. Coverage over repeated splits</a></li>
+<li><a class="reference internal" href="#adaptive-intervals">3. Adaptive intervals</a></li>
+<li><a class="reference internal" href="#conformal-classification">4. Conformal classification</a></li>
+<li><a class="reference internal" href="#ols-prediction-interval-vs-conformal">5. OLS prediction interval vs conformal</a></li>
+<li><a class="reference internal" href="#lecture-exercises-worked-python-solutions">Lecture exercises — worked Python solutions</a><ul>
+<li><a class="reference internal" href="#extended-exercise-a3-1-cqr-on-wage-end-to-end-python">Extended Exercise A3.1 — CQR on Wage, end to end [Python]</a></li>
+<li><a class="reference internal" href="#extended-exercise-a3-2-stress-testing-the-two-intervals-integrative">Extended Exercise A3.2 — Stress-testing the two intervals [Integrative]</a></li>
+<li><a class="reference internal" href="#exercise-a3-5-conformal-classification-from-scratch-python">Exercise A3.5 — Conformal classification from scratch [Python]</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercises">6. Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7f41d439"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

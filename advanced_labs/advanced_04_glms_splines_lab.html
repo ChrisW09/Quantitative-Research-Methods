@@ -1,0 +1,918 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Chapter 9 — Support Vector Machines" href="advanced_05_svm_lab.html"><link rel="prev" title="Advanced Module A3 — Conformal Prediction" href="advanced_03_conformal_lab.html">
+
+    <link rel="shortcut icon" href="../_static/favicon.svg"><!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>Advanced Module A4 — GLMs and Splines - Quantitative Research Methods</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cd1d273d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #005b7f;
+  --color-brand-content: #00618a;
+  --color-brand-visited: #00618a;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #5cb8dd;
+  --color-brand-content: #6ec3e4;
+  --color-brand-visited: #6ec3e4;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Quantitative Research Methods</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Quantitative Research Methods</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../for-students.html">For students</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course.html">The course at a glance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">Python environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Materials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../slides.html">Lecture slides</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../labs.html">Lab notebooks</a><input aria-label="Toggle navigation of Lab notebooks" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_00_lab.html">Chapter 0 — Precourse Refresher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_00b_lab.html">Chapter 0b — Precourse Toolkit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_01_lab.html">Chapter 1 — Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_02_lab.html">Chapter 2 — Statistical Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_03_lab.html">Chapter 3 — Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_04_lab.html">Chapter 4 — Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_05_lab.html">Chapter 5 — Resampling Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_06_lab.html">Chapter 6 — Model Selection and Regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_07_lab.html">Chapter 7 — Moving Beyond Linearity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/chapter_08_lab.html">Chapter 8 — Tree-Based Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exams.html">Mock exams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../advanced.html">Advanced modules</a><input aria-label="Toggle navigation of Advanced modules" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="advanced_01_rcts_lab.html">Advanced Module A1 — Randomised Controlled Trials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_02_shapley_lab.html">Advanced Module A2 — Explainable AI with Shapley Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_03_conformal_lab.html">Advanced Module A3 — Conformal Prediction</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Advanced Module A4 — GLMs and Splines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_05_svm_lab.html">Chapter 9 — Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_06_survival_lab.html">Chapter 11 — Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_07_multiple_testing_lab.html">Chapter 13 — Multiple Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_08_unsupervised_lab.html">Chapter 12 — Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_09_deep_learning_lab.html">Advanced Module A9 — Deep Learning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">Short projects</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Teaching</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../teaching.html">Teaching it</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../repository.html">Repository layout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../building-docs.html">Building this documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citation.html">Citation &amp; licence</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/blob/main/docs/advanced_labs/advanced_04_glms_splines_lab.ipynb?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ChrisW09/Quantitative-Research-Methods/edit/main/docs/advanced_labs/advanced_04_glms_splines_lab.ipynb" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p><a class="reference external" href="https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Chapters/Advanced/advanced_04_glms_splines/advanced_04_glms_splines_lab.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><em>This notebook runs on Colab as-is. The badge link above and the <code class="docutils literal notranslate"><span class="pre">GITHUB_RAW</span></code> line in the setup cell already point to this repository, so everything installs and loads automatically.</em></p>
+<section class="tex2jax_ignore mathjax_ignore" id="advanced-module-a4-glms-and-splines">
+<h1>Advanced Module A4 — GLMs and Splines<a class="headerlink" href="#advanced-module-a4-glms-and-splines" title="Link to this heading">¶</a></h1>
+<section id="lab-poisson-regression-on-bikeshare-deviance-and-lrts-overdispersion-penalized-splines-a-count-gam">
+<h2>Lab: Poisson regression on Bikeshare, deviance and LRTs, overdispersion, penalized splines, a count GAM<a class="headerlink" href="#lab-poisson-regression-on-bikeshare-deviance-and-lrts-overdispersion-penalized-splines-a-count-gam" title="Link to this heading">¶</a></h2>
+<p><strong>Course:</strong> Quantitative Research Methods
+<strong>Instructor:</strong> Prof. Dr. Christoph Weisser
+<strong>Source:</strong> James, Witten, Hastie, Tibshirani &amp; Taylor (2023), <em>An Introduction to Statistical Learning, with Applications in Python</em>, Springer. Companion code at <a class="reference external" href="https://www.statlearning.com">statlearning.com</a>. This advanced module unifies the book’s Chapter 4 (GLMs) and Chapter 7 (splines), meeting in penalized-spline GAMs.</p>
+<p><strong>Goal.</strong> Watch the Gaussian linear model fail on hourly bike counts; fit the Poisson GLM and read its coefficients as rate ratios; test terms with deviances and LRTs; diagnose overdispersion and repair it with quasi-Poisson and negative binomial; fit penalized splines on <code class="docutils literal notranslate"><span class="pre">Wage</span></code> with GCV choosing <span class="math notranslate nohighlight">\(\lambda\)</span>; and put it all together in a penalized-spline Poisson GAM on <code class="docutils literal notranslate"><span class="pre">Bikeshare</span></code>.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<p>Run this cell once. The <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ISLP</span></code>. As an alternative, the same data sets are available as CSVs in the workspace’s <code class="docutils literal notranslate"><span class="pre">ALL</span> <span class="pre">CSV</span> <span class="pre">FILES</span> <span class="pre">-</span> <span class="pre">2nd</span> <span class="pre">Edition</span></code> folder.</p>
+<blockquote>
+<div><p><strong>Google Colab:</strong> this notebook also runs on Colab out of the box — the setup cell below installs any missing packages and downloads the data automatically.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- Setup: runs locally AND on Google Colab --------------------------------</span>
+<span class="c1"># Silence only the spurious &#39;encountered in matmul&#39; RuntimeWarnings that the macOS</span>
+<span class="c1"># Accelerate BLAS emits; real warnings (deprecations, model caveats) stay visible.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;.*encountered in matmul&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">subprocess</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">import_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;pip-install pkg (quietly) if its import is missing.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">import_name</span> <span class="ow">or</span> <span class="n">pkg</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;pip&#39;</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;-q&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>  <span class="c1"># Colab ships numpy/pandas/sklearn/statsmodels; add course extras</span>
+    <span class="k">for</span> <span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;ISLP&#39;</span><span class="p">,</span> <span class="s1">&#39;ISLP&#39;</span><span class="p">)]:</span>
+        <span class="n">_ensure</span><span class="p">(</span><span class="n">_pkg</span><span class="p">,</span> <span class="n">_imp</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">110</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HAVE_ISLP</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ISLP not installed; using CSV / URL fallbacks.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Local CSV location (repo layout first, then legacy paths, then a data/ cache).</span>
+<span class="n">_CANDIDATES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;../../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;../../../ALL CSV FILES - 2nd Edition&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">CSV</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_CANDIDATES</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+<span class="c1"># GITHUB_RAW lets a fresh Colab runtime fetch any</span>
+<span class="c1"># CSV that is neither in ISLP nor already local (spaces in the folder -&gt; %20).</span>
+<span class="n">GITHUB_RAW</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/ChrisW09/Quantitative-Research-Methods/main/&#39;</span>
+              <span class="s1">&#39;ALL%20CSV</span><span class="si">%20F</span><span class="s1">ILES%20-%202nd</span><span class="si">%20E</span><span class="s1">dition&#39;</span><span class="p">)</span>
+
+<span class="c1"># The four datasets NOT in the ISLP package -&gt; load from the book&#39;s official</span>
+<span class="c1"># site so the notebook works on a fresh Colab even before the repo is published.</span>
+<span class="n">KNOWN_URLS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Advertising&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.statlearning.com/s/Advertising.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Heart&#39;</span><span class="p">:</span>       <span class="s1">&#39;https://www.statlearning.com/s/Heart.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income1&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income1.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Income2&#39;</span><span class="p">:</span>     <span class="s1">&#39;https://www.statlearning.com/s/Income2.csv&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a course dataset. Order: ISLP package -&gt; R datasets -&gt; local CSV</span>
+<span class="sd">    -&gt; official book URL -&gt; your GitHub repo. Works locally and on Colab.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">HAVE_ISLP</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">load_data</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;USArrests&#39;</span><span class="p">:</span>                       <span class="c1"># classic R dataset, not in ISLP</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+            <span class="k">return</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;USArrests&#39;</span><span class="p">,</span> <span class="s1">&#39;datasets&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>                      <span class="c1"># running from the repo (local)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+    <span class="n">remotes</span> <span class="o">=</span> <span class="p">([</span><span class="n">KNOWN_URLS</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">KNOWN_URLS</span> <span class="k">else</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">GITHUB_RAW</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">remotes</span><span class="p">:</span>                           <span class="c1"># fresh Colab: stream over https</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">read_csv_kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Could not load </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. Put the CSV in &#39;</span><span class="si">{</span><span class="n">CSV</span><span class="si">}</span><span class="s2">/&#39; or check your connection for the GITHUB_RAW fallback.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ISLP not installed; using CSV / URL fallbacks.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="bikeshare-and-the-linear-model-failing">
+<h2>1. Bikeshare, and the linear model failing<a class="headerlink" href="#bikeshare-and-the-linear-model-failing" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Bikeshare</span></code>: 8,645 hourly observations of bike rentals in Washington DC. Fit Chapter 3’s linear model to the counts and watch it do exactly what it was told — which is the problem.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
+
+<span class="n">bike</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Bikeshare&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>            <span class="c1"># 8 645 hourly rows</span>
+<span class="n">bike</span><span class="p">[</span><span class="s1">&#39;hr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bike</span><span class="p">[</span><span class="s1">&#39;hr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>              <span class="c1"># hour 0..23</span>
+<span class="n">form</span> <span class="o">=</span> <span class="s1">&#39;bikers ~ C(hr) + temp + workingday + C(weathersit)&#39;</span>
+
+<span class="n">lm</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bike</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">fv</span> <span class="o">=</span> <span class="n">lm</span><span class="o">.</span><span class="n">fittedvalues</span><span class="o">.</span><span class="n">values</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="p">(</span><span class="n">fv</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1"> of fitted counts are negative (</span><span class="si">{</span><span class="p">(</span><span class="n">fv</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fv</span><span class="p">)</span><span class="si">}</span><span class="s1"> hours)&#39;</span><span class="p">)</span>
+
+<span class="c1"># One cold, light-rain, non-working day across the 24 hours:</span>
+<span class="n">day</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;hr&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> <span class="s1">&#39;temp&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;workingday&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s1">&#39;weathersit&#39;</span><span class="p">:</span> <span class="s1">&#39;light rain/snow&#39;</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;linear model at 4 a.m.: </span><span class="si">{</span><span class="n">lm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">day</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1"> bikers&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10.0% of fitted counts are negative (861 of 8645 hours)
+linear model at 4 a.m.: -105 bikers
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> <span class="math notranslate nohighlight">\(10.0\%\)</span> of fitted values (<span class="math notranslate nohighlight">\(861\)</span> hours) are <em>negative</em>, and on a cold rainy night the model predicts <span class="math notranslate nohighlight">\(-105\)</span> riders at 4 a.m. Two distinct failures, one diagnosis: the support is wrong (a Gaussian mean can be negative, a count cannot) and the variance is wrong (quiet 4 a.m. hours vary by a few riders, busy 5 p.m. hours by hundreds). We need a model whose mean respects the data type and whose variance is tied to the mean — a <strong>generalized linear model</strong>.</p>
+</section>
+<section id="the-exponential-family-in-one-numeric-check">
+<h2>2. The exponential family in one numeric check<a class="headerlink" href="#the-exponential-family-in-one-numeric-check" title="Link to this heading">¶</a></h2>
+<p>The deck derives the Poisson as an exponential-family member with <span class="math notranslate nohighlight">\(b(\theta) = e^\theta\)</span>, so <span class="math notranslate nohighlight">\(b'(\theta) = \mu\)</span> and <span class="math notranslate nohighlight">\(b''(\theta) = \mu\)</span>: the variance <em>equals</em> the mean. A three-line simulation confirms the mean–variance law that the whole module turns on.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">mu</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">):</span>
+    <span class="n">ysim</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="mi">100_000</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Poisson(mu=</span><span class="si">{</span><span class="n">mu</span><span class="si">:</span><span class="s1">5.1f</span><span class="si">}</span><span class="s1">):  mean </span><span class="si">{</span><span class="n">ysim</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">7.3f</span><span class="si">}</span><span class="s1">   variance </span><span class="si">{</span><span class="n">ysim</span><span class="o">.</span><span class="n">var</span><span class="p">()</span><span class="si">:</span><span class="s1">7.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Poisson(mu=  2.0):  mean   2.000   variance   1.993
+Poisson(mu= 10.0):  mean   9.988   variance   9.925
+Poisson(mu= 50.0):  mean  49.989   variance  49.894
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> Mean <span class="math notranslate nohighlight">\(=\)</span> variance, at every level — the Poisson “straitjacket”. Bernoulli (<span class="math notranslate nohighlight">\(V(\mu) = \mu(1-\mu)\)</span>) and Gaussian (<span class="math notranslate nohighlight">\(V(\mu) = \sigma^2\)</span>, flat) are the other two members you already know from Chapters 4 and 3; each family <em>fixes how spread follows the mean</em>, which is exactly the second thing the linear model got wrong in Section 1.</p>
+</section>
+<section id="poisson-regression-on-bikeshare">
+<h2>3. Poisson regression on Bikeshare<a class="headerlink" href="#poisson-regression-on-bikeshare" title="Link to this heading">¶</a></h2>
+<p>The GLM: <span class="math notranslate nohighlight">\(\log \mu_i = x_i^\top\beta\)</span> with <span class="math notranslate nohighlight">\(Y_i \sim \text{Poisson}(\mu_i)\)</span> — the canonical log link keeps every fitted mean positive, and coefficients become <strong>log rate ratios</strong>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bike</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Poisson</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;deviance </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">deviance</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> on </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">df_resid</span><span class="si">}</span><span class="s1"> df,   log-lik </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">llf</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">,   AIC </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">aic</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">terms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Intercept&#39;</span><span class="p">,</span> <span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;workingday&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;C(weathersit)[T.cloudy/misty]&#39;</span><span class="p">,</span> <span class="s1">&#39;C(weathersit)[T.light rain/snow]&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;C(weathersit)[T.heavy rain/snow]&#39;</span><span class="p">,</span> <span class="s1">&#39;C(hr)[T.8]&#39;</span><span class="p">,</span> <span class="s1">&#39;C(hr)[T.17]&#39;</span><span class="p">,</span> <span class="s1">&#39;C(hr)[T.4]&#39;</span><span class="p">]</span>
+<span class="n">tab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;beta&#39;</span><span class="p">:</span> <span class="n">pois</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">terms</span><span class="p">],</span> <span class="s1">&#39;SE&#39;</span><span class="p">:</span> <span class="n">pois</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="n">terms</span><span class="p">],</span>
+                    <span class="s1">&#39;rate ratio&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">pois</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">terms</span><span class="p">])})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tab</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>deviance 269005.9 on 8616 df,   log-lik -161021.8,   AIC 322101.7
+                                   beta     SE  rate ratio
+Intercept                         3.042  0.008      20.944
+temp                              1.567  0.005       4.792
+workingday                        0.002  0.002       1.002
+C(weathersit)[T.cloudy/misty]    -0.051  0.002       0.951
+C(weathersit)[T.light rain/snow] -0.505  0.004       0.603
+C(weathersit)[T.heavy rain/snow] -1.349  0.167       0.260
+C(hr)[T.8]                        1.826  0.009       6.209
+C(hr)[T.17]                       1.970  0.009       7.169
+C(hr)[T.4]                       -2.045  0.025       0.129
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> Everything lives on the log-mean scale, so exponentiate: light rain cuts the expected count to <span class="math notranslate nohighlight">\(e^{-0.505} = 0.603\)</span> of the clear-sky rate (<span class="math notranslate nohighlight">\(39.7\%\)</span> fewer riders, all else equal); a <span class="math notranslate nohighlight">\(+0.1\)</span> rise in <code class="docutils literal notranslate"><span class="pre">temp</span></code> (<span class="math notranslate nohighlight">\(\approx 4^\circ\)</span>C) multiplies the rate by <span class="math notranslate nohighlight">\(e^{0.1 \times 1.567} = 1.17\)</span>; and 17:00 carries <span class="math notranslate nohighlight">\(e^{1.970 - (-2.045)} = 55.4\)</span> times the 04:00 rate. Distrust the heavy-rain coefficient (<span class="math notranslate nohighlight">\(0.260\)</span>) — it rests on a single observed hour. Report <span class="math notranslate nohighlight">\(e^{\hat\beta}\)</span>, not <span class="math notranslate nohighlight">\(\hat\beta\)</span>.</p>
+</section>
+<section id="deviance-lrt-and-aic">
+<h2>4. Deviance, LRT and AIC<a class="headerlink" href="#deviance-lrt-and-aic" title="Link to this heading">¶</a></h2>
+<p>The deviance is the GLM’s residual sum of squares; differences of deviances between nested fits are likelihood-ratio statistics. Drop <code class="docutils literal notranslate"><span class="pre">weathersit</span></code> and test it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">red</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="s1">&#39;bikers ~ C(hr) + temp + workingday&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bike</span><span class="p">,</span>
+              <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Poisson</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">LR</span> <span class="o">=</span> <span class="n">red</span><span class="o">.</span><span class="n">deviance</span> <span class="o">-</span> <span class="n">pois</span><span class="o">.</span><span class="n">deviance</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">red</span><span class="o">.</span><span class="n">df_resid</span> <span class="o">-</span> <span class="n">pois</span><span class="o">.</span><span class="n">df_resid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;reduced deviance </span><span class="si">{</span><span class="n">red</span><span class="o">.</span><span class="n">deviance</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">   full </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">deviance</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;LR = </span><span class="si">{</span><span class="n">LR</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> on </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s1"> df   (chi2 95% critical value: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;AIC: full </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">aic</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">   reduced </span><span class="si">{</span><span class="n">red</span><span class="o">.</span><span class="n">aic</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>reduced deviance 287262.7   full 269005.9
+LR = 18256.8 on 3 df   (chi2 95% critical value: 7.81)
+AIC: full 322101.7   reduced 340352.4
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> <span class="math notranslate nohighlight">\(\text{LR} = 18{,}256.8 \gg 7.81\)</span>: weather adds explanatory power far beyond chance, given hour, temperature and day type. The AICs agree (<span class="math notranslate nohighlight">\(322{,}101.7\)</span> vs <span class="math notranslate nohighlight">\(340{,}352.4\)</span>). Two cautions from the deck: deviance differences are <span class="math notranslate nohighlight">\(\chi^2\)</span> only for <em>nested</em> models with fixed dispersion, and AICs are only comparable across models fitted to <em>identical</em> data.</p>
+</section>
+<section id="overdispersion-quasi-poisson-and-negative-binomial">
+<h2>5. Overdispersion: quasi-Poisson and negative binomial<a class="headerlink" href="#overdispersion-quasi-poisson-and-negative-binomial" title="Link to this heading">¶</a></h2>
+<p>The Poisson family forces <span class="math notranslate nohighlight">\(\text{Var} = \mu\)</span>. Check it before believing any Poisson SE: the Pearson dispersion <span class="math notranslate nohighlight">\(\hat\varphi = X^2/(n-p)\)</span> should be near 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">phi</span> <span class="o">=</span> <span class="n">pois</span><span class="o">.</span><span class="n">pearson_chi2</span> <span class="o">/</span> <span class="n">pois</span><span class="o">.</span><span class="n">df_resid</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pearson X2 = </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">pearson_chi2</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">  -&gt;  dispersion phi_hat = </span><span class="si">{</span><span class="n">phi</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span>
+      <span class="sa">f</span><span class="s1">&#39;   (SEs must grow by sqrt(phi) = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+<span class="c1"># Observed cell variance vs cell mean (hr x day type x weather cells, n &gt;= 20).</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">bike</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;workingday&#39;</span><span class="p">,</span> <span class="s1">&#39;weathersit&#39;</span><span class="p">],</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s1">&#39;bikers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">300</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">],</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cells (hr x day x weather)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Poisson: Var $= \mu$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">phi</span><span class="o">*</span><span class="n">m</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">rf</span><span class="s1">&#39;quasi-Poisson: Var $= </span><span class="si">{</span><span class="n">phi</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">\,\mu$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mf">0.3049</span><span class="o">*</span><span class="n">m</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;neg. binomial: Var $= \mu + 0.30\,\mu^2$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;cell mean&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;cell variance&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;The variance law, chosen by the data&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Pearson X2 = 266229  -&gt;  dispersion phi_hat = 30.90   (SEs must grow by sqrt(phi) = 5.56)
+</pre></div>
+</div>
+<img alt="../_images/367edd922237db0cc4fcc681b876ee1fac3d368a7ded7ac179a4ef0ec343b13f.png" src="../_images/367edd922237db0cc4fcc681b876ee1fac3d368a7ded7ac179a4ef0ec343b13f.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fix 1 -- quasi-Poisson: same estimates, honest SEs (scale=&#39;X2&#39;).</span>
+<span class="n">quasi</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bike</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Poisson</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;X2&#39;</span><span class="p">)</span>
+
+<span class="c1"># Fix 2 -- negative binomial: estimate alpha by ML, then fit the NB GLM.</span>
+<span class="n">nb_ml</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">negativebinomial</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bike</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">disp</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>   <span class="c1"># NB2, alpha estimated</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">nb_ml</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span>
+<span class="n">nb</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bike</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">NegativeBinomial</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;NB dispersion parameter alpha_hat = </span><span class="si">{</span><span class="n">alpha</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;workingday&#39;</span><span class="p">,</span> <span class="s1">&#39;C(weathersit)[T.light rain/snow]&#39;</span><span class="p">]</span>
+<span class="n">tab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;Poisson beta&#39;</span><span class="p">:</span> <span class="n">pois</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>   <span class="s1">&#39;Poisson SE&#39;</span><span class="p">:</span> <span class="n">pois</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>
+    <span class="s1">&#39;quasi SE&#39;</span><span class="p">:</span> <span class="n">quasi</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>
+    <span class="s1">&#39;NB beta&#39;</span><span class="p">:</span> <span class="n">nb</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>          <span class="s1">&#39;NB SE&#39;</span><span class="p">:</span> <span class="n">nb</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tab</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">AIC:  Poisson </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">aic</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">   quasi-Poisson: undefined (no likelihood)   NB </span><span class="si">{</span><span class="n">nb</span><span class="o">.</span><span class="n">aic</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NB dispersion parameter alpha_hat = 0.3049
+                                  Poisson beta  Poisson SE  quasi SE  NB beta  NB SE
+temp                                     1.567       0.005     0.026    1.893  0.032
+workingday                               0.002       0.002     0.011   -0.195  0.013
+C(weathersit)[T.light rain/snow]        -0.505       0.004     0.022   -0.538  0.022
+
+AIC:  Poisson 322102   quasi-Poisson: undefined (no likelihood)   NB 90590
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> <span class="math notranslate nohighlight">\(\hat\varphi = 30.9\)</span> — the variance is <span class="math notranslate nohighlight">\(31\times\)</span> the Poisson claim, a categorical rejection. Quasi-Poisson keeps every <span class="math notranslate nohighlight">\(\hat\beta\)</span> and multiplies SEs by <span class="math notranslate nohighlight">\(\sqrt{30.9} = 5.56\)</span>; it has no likelihood, hence no AIC. The negative binomial <em>refits</em>: its quadratic variance law wins the AIC contest by a mile (<span class="math notranslate nohighlight">\(90{,}590\)</span> vs <span class="math notranslate nohighlight">\(322{,}102\)</span> — legitimate, because both are genuine likelihoods for the same response). And note <code class="docutils literal notranslate"><span class="pre">workingday</span></code>: <span class="math notranslate nohighlight">\(+0.002\)</span> under Poisson, <span class="math notranslate nohighlight">\(-0.195\)</span> under NB — when two reasonable likelihoods disagree this much, the effect is heterogeneous across hours and belongs in an interaction or a GAM, not a single number.</p>
+</section>
+<section id="penalized-splines-on-wage">
+<h2>6. Penalized splines on Wage<a class="headerlink" href="#penalized-splines-on-wage" title="Link to this heading">¶</a></h2>
+<p>Chapter 7 chose knots; penalized splines make knots plentiful and put all structural choice into one dial: minimise <span class="math notranslate nohighlight">\(\text{Deviance} + \lambda \int f''(t)^2\,dt\)</span>. The effective degrees of freedom <span class="math notranslate nohighlight">\(\text{edf} = \text{tr}\,H(\lambda)\)</span> measure how much was really fitted, and GCV chooses <span class="math notranslate nohighlight">\(\lambda\)</span> without refitting.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">BSpline</span>
+
+<span class="n">Wage</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;Wage&#39;</span><span class="p">)</span>
+<span class="n">xa</span><span class="p">,</span> <span class="n">yw</span> <span class="o">=</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">&#39;wage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bspline_design</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xr</span><span class="p">,</span> <span class="n">nseg</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;P-spline design: equally spaced knots, cubic B-splines.&quot;&quot;&quot;</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">xr</span> <span class="o">-</span> <span class="n">xl</span><span class="p">)</span> <span class="o">/</span> <span class="n">nseg</span>
+    <span class="n">knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xl</span> <span class="o">-</span> <span class="n">deg</span><span class="o">*</span><span class="n">dx</span><span class="p">,</span> <span class="n">xr</span> <span class="o">+</span> <span class="p">(</span><span class="n">deg</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">knots</span><span class="p">)</span> <span class="o">-</span> <span class="n">deg</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">K</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">K</span><span class="p">);</span> <span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">B</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">BSpline</span><span class="p">(</span><span class="n">knots</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">deg</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">B</span><span class="p">,</span> <span class="n">K</span>
+
+<span class="n">B</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="n">bspline_design</span><span class="p">(</span><span class="n">xa</span><span class="p">,</span> <span class="n">xa</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xa</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">nseg</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>      <span class="c1"># K = 23 basis functions</span>
+<span class="n">D2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">D2</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">D2</span>                                               <span class="c1"># curvature penalty</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pspline_fit</span><span class="p">(</span><span class="n">lam</span><span class="p">):</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">B</span> <span class="o">+</span> <span class="n">lam</span><span class="o">*</span><span class="n">S</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">yw</span><span class="p">)</span>
+    <span class="n">edf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">B</span><span class="p">))</span>
+    <span class="n">rss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">yw</span> <span class="o">-</span> <span class="n">B</span> <span class="o">@</span> <span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">gcv</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yw</span><span class="p">)</span><span class="o">*</span><span class="n">rss</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yw</span><span class="p">)</span> <span class="o">-</span> <span class="n">edf</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">beta</span><span class="p">,</span> <span class="n">edf</span><span class="p">,</span> <span class="n">gcv</span>
+
+<span class="n">lams</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">121</span><span class="p">)</span>
+<span class="n">edfs</span><span class="p">,</span> <span class="n">gcvs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">pspline_fit</span><span class="p">(</span><span class="n">l</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lams</span><span class="p">])</span>
+<span class="n">best</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">gcvs</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;K = </span><span class="si">{</span><span class="n">K</span><span class="si">}</span><span class="s1"> basis functions;  GCV chooses lambda = </span><span class="si">{</span><span class="n">lams</span><span class="p">[</span><span class="n">best</span><span class="p">]</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">,  edf = </span><span class="si">{</span><span class="n">edfs</span><span class="p">[</span><span class="n">best</span><span class="p">]</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">lams</span><span class="p">[</span><span class="n">best</span><span class="p">],</span> <span class="mf">1e7</span><span class="p">):</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">edf</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pspline_fit</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  lambda = </span><span class="si">{</span><span class="n">lam</span><span class="si">:</span><span class="s1">10.4g</span><span class="si">}</span><span class="s1">:  edf = </span><span class="si">{</span><span class="n">edf</span><span class="si">:</span><span class="s1">5.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>K = 23 basis functions;  GCV chooses lambda = 261,  edf = 6.2
+  lambda =     0.0001:  edf =  22.7
+  lambda =        261:  edf =   6.2
+  lambda =      1e+07:  edf =   2.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xa</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xa</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">400</span><span class="p">)</span>
+<span class="n">Bg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bspline_design</span><span class="p">(</span><span class="n">xg</span><span class="p">,</span> <span class="n">xa</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xa</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">nseg</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xa</span><span class="p">,</span> <span class="n">yw</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">lam</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">lab</span> <span class="ow">in</span> <span class="p">[(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$\lambda=10^{-4}$ (edf 22.7)&#39;</span><span class="p">),</span>
+                      <span class="p">(</span><span class="n">lams</span><span class="p">[</span><span class="n">best</span><span class="p">],</span> <span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="sa">rf</span><span class="s1">&#39;$\lambda_</span><span class="se">{{</span><span class="s1">GCV</span><span class="se">}}</span><span class="s1">=</span><span class="si">{</span><span class="n">lams</span><span class="p">[</span><span class="n">best</span><span class="p">]</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">$ (edf </span><span class="si">{</span><span class="n">edfs</span><span class="p">[</span><span class="n">best</span><span class="p">]</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">),</span>
+                      <span class="p">(</span><span class="mf">1e7</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$\lambda=10^</span><span class="si">{7}</span><span class="s1">$ (edf 2.0)&#39;</span><span class="p">)]:</span>
+    <span class="n">beta</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pspline_fit</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xg</span><span class="p">,</span> <span class="n">Bg</span> <span class="o">@</span> <span class="n">beta</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;wage ($1000s)&#39;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">340</span><span class="p">),</span>
+       <span class="n">title</span><span class="o">=</span><span class="s1">&#39;One basis, one dial: the penalized spline across lambda&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/58f04463001ea6b1d5a52da642f43289e5e5599f90834c11365e5154dc902d96.png" src="../_images/58f04463001ea6b1d5a52da642f43289e5e5599f90834c11365e5154dc902d96.png" />
+</div>
+</div>
+<p><strong>Reading the output.</strong> At <span class="math notranslate nohighlight">\(\lambda = 10^{-4}\)</span> the fit burns <span class="math notranslate nohighlight">\(22.7\)</span> edf and chases noise around age 78; at <span class="math notranslate nohighlight">\(\lambda = 10^7\)</span> it collapses to a straight line (<span class="math notranslate nohighlight">\(2.0\)</span> edf — the penalty’s null space) and misses the plateau. GCV picks <span class="math notranslate nohighlight">\(\lambda = 261\)</span>, <span class="math notranslate nohighlight">\(\text{edf} = 6.2\)</span> — close to the df Chapter 7 found by CV for this very curve. Report edf, not <span class="math notranslate nohighlight">\(\lambda\)</span>: <span class="math notranslate nohighlight">\(\lambda\)</span>’s scale depends on the basis, edf reads directly as “a curve worth <span class="math notranslate nohighlight">\(6.2\)</span> parameters”.</p>
+</section>
+<section id="a-penalized-spline-gam-for-bikeshare">
+<h2>7. A penalized-spline GAM for Bikeshare<a class="headerlink" href="#a-penalized-spline-gam-for-bikeshare" title="Link to this heading">¶</a></h2>
+<p>The meeting point: <span class="math notranslate nohighlight">\(\log\mu_i = \beta_0 + f_1(\texttt{hr}_i) + f_2(\texttt{temp}_i) + \beta_w\,\texttt{workingday}_i + \gamma^\top\texttt{weather}_i\)</span> — a Poisson GLM whose two smooth terms are penalized B-splines, each with its own penalty weight chosen by <code class="docutils literal notranslate"><span class="pre">select_penweight</span></code> (a GCV-type criterion).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.gam.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">GLMGam</span><span class="p">,</span> <span class="n">BSplines</span>
+
+<span class="n">xs</span> <span class="o">=</span> <span class="n">bike</span><span class="p">[[</span><span class="s1">&#39;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;temp&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">bs</span> <span class="o">=</span> <span class="n">BSplines</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="n">degree</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>     <span class="c1"># rich bases for hr, temp</span>
+<span class="n">Xpar</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>                            <span class="c1"># the parametric part</span>
+    <span class="s1">&#39;const&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s1">&#39;workingday&#39;</span><span class="p">:</span> <span class="n">bike</span><span class="o">.</span><span class="n">workingday</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="s1">&#39;w_cloudy&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">bike</span><span class="o">.</span><span class="n">weathersit</span> <span class="o">==</span> <span class="s1">&#39;cloudy/misty&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="s1">&#39;w_light&#39;</span><span class="p">:</span>  <span class="p">(</span><span class="n">bike</span><span class="o">.</span><span class="n">weathersit</span> <span class="o">==</span> <span class="s1">&#39;light rain/snow&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="s1">&#39;w_heavy&#39;</span><span class="p">:</span>  <span class="p">(</span><span class="n">bike</span><span class="o">.</span><span class="n">weathersit</span> <span class="o">==</span> <span class="s1">&#39;heavy rain/snow&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+<span class="p">})</span>
+
+<span class="n">gam</span> <span class="o">=</span> <span class="n">GLMGam</span><span class="p">(</span><span class="n">bike</span><span class="o">.</span><span class="n">bikers</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="n">Xpar</span><span class="p">,</span> <span class="n">smoother</span><span class="o">=</span><span class="n">bs</span><span class="p">,</span>
+             <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">gam</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>                                    <span class="c1"># initial fit (sets the model scale)</span>
+<span class="n">alpha_hat</span> <span class="o">=</span> <span class="n">gam</span><span class="o">.</span><span class="n">select_penweight</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>            <span class="c1"># GCV-type choice, ~15s</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;selected penalty weights (hr, temp):&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">alpha_hat</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="n">gam</span> <span class="o">=</span> <span class="n">GLMGam</span><span class="p">(</span><span class="n">bike</span><span class="o">.</span><span class="n">bikers</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="n">Xpar</span><span class="p">,</span> <span class="n">smoother</span><span class="o">=</span><span class="n">bs</span><span class="p">,</span>
+             <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">alpha_hat</span><span class="p">))</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">gam</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">npar</span> <span class="o">=</span> <span class="n">Xpar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;deviance </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">deviance</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">   AIC </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">aic</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">   &#39;</span>
+      <span class="sa">f</span><span class="s1">&#39;(GLM with dummy hr + linear temp: </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">deviance</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">aic</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;edf: hour smooth </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">edf</span><span class="p">[</span><span class="n">npar</span><span class="p">:</span><span class="n">npar</span><span class="o">+</span><span class="mi">11</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">,  temp smooth </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">edf</span><span class="p">[</span><span class="n">npar</span><span class="o">+</span><span class="mi">11</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;weather (light rain) coefficient: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;w_light&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">   (GLM: </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;C(weathersit)[T.light rain/snow]&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>selected penalty weights (hr, temp): [0.319 0.004]
+deviance 259650   AIC 312730   (GLM with dummy hr + linear temp: 269006 / 322102)
+edf: hour smooth 11.0,  temp smooth 5.0
+weather (light rain) coefficient: -0.569   (GLM: -0.505)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">ttl</span> <span class="ow">in</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;Smooth of hour of day&#39;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;Smooth of temperature&#39;</span><span class="p">)]:</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">se</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">partial_values</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">xv</span> <span class="o">=</span> <span class="n">bike</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">xv</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">xv</span><span class="p">[</span><span class="n">o</span><span class="p">],</span> <span class="p">(</span><span class="n">vals</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">se</span><span class="p">)[</span><span class="n">o</span><span class="p">],</span> <span class="p">(</span><span class="n">vals</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">se</span><span class="p">)[</span><span class="n">o</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xv</span><span class="p">[</span><span class="n">o</span><span class="p">],</span> <span class="n">vals</span><span class="p">[</span><span class="n">o</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;partial effect on $\log\mu$&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">ttl</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">hrv</span> <span class="o">=</span> <span class="n">bike</span><span class="p">[</span><span class="s1">&#39;hr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">vals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">partial_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">f18</span><span class="p">,</span> <span class="n">f3</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="n">hrv</span> <span class="o">==</span> <span class="mi">18</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">vals</span><span class="p">[</span><span class="n">hrv</span> <span class="o">==</span> <span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;f(18) = </span><span class="si">{</span><span class="n">f18</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">,  f(3) = </span><span class="si">{</span><span class="n">f3</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">  -&gt;  6 p.m. vs 3 a.m. rate ratio e^</span><span class="si">{</span><span class="n">f18</span><span class="o">-</span><span class="n">f3</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f18</span><span class="o">-</span><span class="n">f3</span><span class="p">)</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">x&#39;</span><span class="p">)</span>
+<span class="n">f17</span><span class="p">,</span> <span class="n">f4</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="n">hrv</span> <span class="o">==</span> <span class="mi">17</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">vals</span><span class="p">[</span><span class="n">hrv</span> <span class="o">==</span> <span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;smooth 17:00 vs 04:00: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f17</span><span class="o">-</span><span class="n">f4</span><span class="p">)</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">x   (the dummy-hr GLM said 55.4x)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ae328c9239c6d3989495d7744069bf7df1bb9aa65c5d1698bb827d61d5d6c742.png" src="../_images/ae328c9239c6d3989495d7744069bf7df1bb9aa65c5d1698bb827d61d5d6c742.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>f(18) = 4.77,  f(3) = 1.21  -&gt;  6 p.m. vs 3 a.m. rate ratio e^3.56 = 35x
+smooth 17:00 vs 04:00: 24.6x   (the dummy-hr GLM said 55.4x)
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong> The machine chose light penalties — with <span class="math notranslate nohighlight">\(8{,}645\)</span> observations the data can afford <span class="math notranslate nohighlight">\(\approx 11\)</span> edf for the hour curve and <span class="math notranslate nohighlight">\(\approx 5\)</span> for temperature — and the smooth-temp model beats the linear-temp GLM by <span class="math notranslate nohighlight">\(\sim 9{,}400\)</span> AIC points with <em>fewer</em> effective parameters: the linear-temp assumption was the binding constraint. The hour curve troughs at 3 a.m. and peaks at the two commutes (<span class="math notranslate nohighlight">\(e^{4.77-1.21} \approx 35\times\)</span>); the temperature curve <em>falls</em> above temp <span class="math notranslate nohighlight">\(\approx 0.75\)</span> (<span class="math notranslate nohighlight">\(\sim 31^\circ\)</span>C) — the hot-weather dip a linear term is structurally unable to show. One honest caveat: smooths smooth — the dummy model rates 17:00 at <span class="math notranslate nohighlight">\(55.4\times\)</span> the 04:00 level, the penalized curve says <span class="math notranslate nohighlight">\(24.6\times\)</span>; for genuinely discontinuous patterns, factors beat a heavily penalized smooth.</p>
+</section>
+<section id="lecture-exercises-worked-python-solutions">
+<h2>Lecture exercises — worked Python solutions<a class="headerlink" href="#lecture-exercises-worked-python-solutions" title="Link to this heading">¶</a></h2>
+<p>These are the <strong>[Python]-tagged exercises from the lecture slides</strong>, solved step by step; run them cell by cell and compare with the slide solutions. Data loads through the <code class="docutils literal notranslate"><span class="pre">load()</span></code> helper defined in the Setup cell, so every cell works locally and on Colab.</p>
+<section id="exercise-a4-3-rate-ratios-on-bikeshare-python">
+<h3>Exercise A4.3 — Rate ratios on Bikeshare [Python]<a class="headerlink" href="#exercise-a4-3-rate-ratios-on-bikeshare-python" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> Using the fitted Poisson GLM (<code class="docutils literal notranslate"><span class="pre">bikers</span> <span class="pre">~</span> <span class="pre">C(hr)</span> <span class="pre">+</span> <span class="pre">temp</span> <span class="pre">+</span> <span class="pre">workingday</span> <span class="pre">+</span> <span class="pre">C(weathersit)</span></code>):</p>
+<ol class="arabic simple">
+<li><p>compute the rate ratio for <code class="docutils literal notranslate"><span class="pre">light</span> <span class="pre">rain/snow</span></code> versus <code class="docutils literal notranslate"><span class="pre">clear</span></code>, and phrase it as a percentage change in expected riders;</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">temp</span></code> coefficient is <span class="math notranslate nohighlight">\(\hat\beta = 1.567\)</span> — by what factor does the expected count change when <code class="docutils literal notranslate"><span class="pre">temp</span></code> rises by <span class="math notranslate nohighlight">\(0.2\)</span> (about <span class="math notranslate nohighlight">\(8^\circ\)</span>C)? Write the one line of Python that computes it from <code class="docutils literal notranslate"><span class="pre">pois.params</span></code>;</p></li>
+<li><p>why would it be wrong to say “a <span class="math notranslate nohighlight">\(0.2\)</span> rise in temp <em>adds</em> <span class="math notranslate nohighlight">\(0.2 \times 1.567 = 0.31\)</span> bikers”?</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (1) --------------------------------------------------------------------</span>
+<span class="n">b_light</span> <span class="o">=</span> <span class="n">pois</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;C(weathersit)[T.light rain/snow]&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;beta = </span><span class="si">{</span><span class="n">b_light</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">   rate ratio e^beta = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_light</span><span class="p">)</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span>
+      <span class="sa">f</span><span class="s1">&#39;   -&gt;  </span><span class="si">{</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_light</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1"> fewer expected riders than clear weather&#39;</span><span class="p">)</span>
+
+<span class="c1"># (2) --------------------------------------------------------------------</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">0.2</span> <span class="o">*</span> <span class="n">pois</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">])),</span> <span class="mi">3</span><span class="p">))</span>   <span class="c1"># Expected: 1.368</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>beta = -0.505   rate ratio e^beta = 0.603   -&gt;  39.7% fewer expected riders than clear weather
+1.368
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>(3) Interpretation.</strong> <span class="math notranslate nohighlight">\(0.31\)</span> is a change in <span class="math notranslate nohighlight">\(\log\mu\)</span>, not in <span class="math notranslate nohighlight">\(\mu\)</span>. The additive reading confuses the two scales: the actual change in expected riders depends on the starting level — <span class="math notranslate nohighlight">\(+36.8\%\)</span> of <span class="math notranslate nohighlight">\(10\)</span> riders is <span class="math notranslate nohighlight">\(\approx 3.7\)</span> riders, of <span class="math notranslate nohighlight">\(400\)</span> riders <span class="math notranslate nohighlight">\(\approx 147\)</span>. On the log link, <span class="math notranslate nohighlight">\(\hat\beta_j\)</span> is a <strong>log rate ratio</strong>; only <span class="math notranslate nohighlight">\(e^{\hat\beta_j}\)</span> has a direct count-scale meaning.</p>
+</section>
+<section id="extended-exercise-a4-2-build-and-defend-a-count-gam-python">
+<h3>Extended Exercise A4.2 — Build and defend a count GAM [Python]<a class="headerlink" href="#extended-exercise-a4-2-build-and-defend-a-count-gam-python" title="Link to this heading">¶</a></h3>
+<p><strong>Task (from the slides).</strong> Using <code class="docutils literal notranslate"><span class="pre">GLMGam</span></code> with <code class="docutils literal notranslate"><span class="pre">BSplines(df=[12,</span> <span class="pre">6],</span> <span class="pre">degree=[3,</span> <span class="pre">3])</span></code> on <code class="docutils literal notranslate"><span class="pre">hr</span></code> and <code class="docutils literal notranslate"><span class="pre">temp</span></code>, plus parametric <code class="docutils literal notranslate"><span class="pre">workingday</span></code> and weather dummies:</p>
+<ol class="arabic simple">
+<li><p>write down the model equation for <span class="math notranslate nohighlight">\(\log\mu_i\)</span> and say which parts are penalized;</p></li>
+<li><p>the selected penalties give edf <span class="math notranslate nohighlight">\(\approx 11\)</span> (hr) and <span class="math notranslate nohighlight">\(\approx 5\)</span> (temp) — what would edf <span class="math notranslate nohighlight">\(\approx 2\)</span> for <code class="docutils literal notranslate"><span class="pre">temp</span></code> have told you?</p></li>
+<li><p>from the fitted hour smooth, <span class="math notranslate nohighlight">\(f(18) = 4.77\)</span> and <span class="math notranslate nohighlight">\(f(3) = 1.21\)</span>: compute the 6 p.m. vs 3 a.m. rate ratio;</p></li>
+<li><p>the GAM’s weather coefficient is <span class="math notranslate nohighlight">\(-0.569\)</span> (light rain) vs the GLM’s <span class="math notranslate nohighlight">\(-0.505\)</span> — give one reason the estimates differ;</p></li>
+<li><p>name the single most important robustness check before this model ships.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># (2)-(4): every number, recomputed from the Section 7 fit -----------------</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;edf hour </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">edf</span><span class="p">[</span><span class="n">npar</span><span class="p">:</span><span class="n">npar</span><span class="o">+</span><span class="mi">11</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">,  edf temp </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">edf</span><span class="p">[</span><span class="n">npar</span><span class="o">+</span><span class="mi">11</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;f(18) = </span><span class="si">{</span><span class="n">f18</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, f(3) = </span><span class="si">{</span><span class="n">f3</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">  -&gt;  rate ratio e^</span><span class="si">{</span><span class="n">f18</span><span class="o">-</span><span class="n">f3</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f18</span><span class="o">-</span><span class="n">f3</span><span class="p">)</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">x&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GAM light rain </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;w_light&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">   vs GLM </span><span class="si">{</span><span class="n">pois</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;C(weathersit)[T.light rain/snow]&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># (5): the overdispersion audit applies to GAMs verbatim -------------------</span>
+<span class="n">mu_hat</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">fittedvalues</span>
+<span class="n">phi_gam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">bike</span><span class="o">.</span><span class="n">bikers</span> <span class="o">-</span> <span class="n">mu_hat</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">mu_hat</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bike</span><span class="p">)</span> <span class="o">-</span> <span class="n">res</span><span class="o">.</span><span class="n">edf</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GAM Pearson dispersion: </span><span class="si">{</span><span class="n">phi_gam</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">  (still &gt;&gt; 1 — widen the uncertainty!)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>edf hour 11.0,  edf temp 5.0
+f(18) = 4.77, f(3) = 1.21  -&gt;  rate ratio e^3.56 = 35x
+GAM light rain -0.569   vs GLM -0.505
+GAM Pearson dispersion: 30.7  (still &gt;&gt; 1 — widen the uncertainty!)
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Reading the output.</strong></p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(\log\mu_i = \beta_0 + f_1(\texttt{hr}_i) + f_2(\texttt{temp}_i) + \beta_w\,\texttt{workingday}_i + \gamma_1\texttt{cloudy}_i + \gamma_2\texttt{light}_i + \gamma_3\texttt{heavy}_i\)</span> — only <span class="math notranslate nohighlight">\(f_1\)</span> and <span class="math notranslate nohighlight">\(f_2\)</span> are penalized (each with its own <span class="math notranslate nohighlight">\(\alpha\)</span>); the intercept, dummies and <span class="math notranslate nohighlight">\(\beta_w\)</span> are ordinary ML parameters.</p></li>
+<li><p>edf <span class="math notranslate nohighlight">\(\approx 2\)</span> for <code class="docutils literal notranslate"><span class="pre">temp</span></code> would mean the penalty had shrunk the smooth to near-linearity — the data see no curvature, and the linear-temp GLM would have been adequate. The actual edf <span class="math notranslate nohighlight">\(\approx 5\)</span> says the bend (including the hot-weather dip) is real structure.</p></li>
+<li><p><span class="math notranslate nohighlight">\(e^{4.77 - 1.21} = e^{3.56} \approx 35\)</span>: holding temperature, weather and day type fixed, 6 p.m. carries about <span class="math notranslate nohighlight">\(35\times\)</span> the 3 a.m. count.</p></li>
+<li><p>The two models adjust for temperature differently — the GLM forces a linear temp effect, the GAM lets it bend. Rainy hours are also cool hours, so when the temperature adjustment changes shape, the weather dummies absorb a different share of the rain–cold overlap. Coefficients of correlated regressors always move when a co-regressor’s functional form changes.</p></li>
+<li><p>The <strong>overdispersion audit</strong> of the GAM itself: its Pearson dispersion is still <span class="math notranslate nohighlight">\(\gg 1\)</span>, so shipping the <span class="math notranslate nohighlight">\(35\times\)</span> headline with Poisson bands would overstate certainty roughly <span class="math notranslate nohighlight">\(5\)</span>–<span class="math notranslate nohighlight">\(6\)</span>-fold. Flexible means do not repair broken variances — quasi rescaling or an NB-GAM before anything ships.</p></li>
+</ol>
+</section>
+</section>
+<section id="exercises">
+<h2>8. Exercises<a class="headerlink" href="#exercises" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Add an <code class="docutils literal notranslate"><span class="pre">hr</span> <span class="pre">×</span> <span class="pre">workingday</span></code> interaction to the Poisson GLM of Section 3 and re-test <code class="docutils literal notranslate"><span class="pre">workingday</span></code>. Does the heterogeneity story of Section 5 (positive at commutes, negative at night) show up in the coefficients?</p></li>
+<li><p>Refit Section 5’s negative binomial with <code class="docutils literal notranslate"><span class="pre">alpha</span></code> fixed at half and at double the ML estimate. How sensitive are the coefficients and their SEs?</p></li>
+<li><p>In Section 6, replace GCV with 10-fold cross-validation on the <span class="math notranslate nohighlight">\(\lambda\)</span> grid. Does the chosen edf change materially?</p></li>
+<li><p>Fit the Section 7 GAM with <code class="docutils literal notranslate"><span class="pre">df=[24,</span> <span class="pre">6]</span></code> for the hour basis. Does more basis freedom bring the 17:00-vs-04:00 ratio closer to the dummy model’s <span class="math notranslate nohighlight">\(55.4\times\)</span>, and what happens to the edf?</p></li>
+</ol>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="advanced_05_svm_lab.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 9 — Support Vector Machines</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="advanced_03_conformal_lab.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Advanced Module A3 — Conformal Prediction</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Christoph Weisser. Based on ISLP (Springer, 2023)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ChrisW09/Quantitative-Research-Methods" aria-label="GitHub"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.011.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Advanced Module A4 — GLMs and Splines</a><ul>
+<li><a class="reference internal" href="#lab-poisson-regression-on-bikeshare-deviance-and-lrts-overdispersion-penalized-splines-a-count-gam">Lab: Poisson regression on Bikeshare, deviance and LRTs, overdispersion, penalized splines, a count GAM</a></li>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+<li><a class="reference internal" href="#bikeshare-and-the-linear-model-failing">1. Bikeshare, and the linear model failing</a></li>
+<li><a class="reference internal" href="#the-exponential-family-in-one-numeric-check">2. The exponential family in one numeric check</a></li>
+<li><a class="reference internal" href="#poisson-regression-on-bikeshare">3. Poisson regression on Bikeshare</a></li>
+<li><a class="reference internal" href="#deviance-lrt-and-aic">4. Deviance, LRT and AIC</a></li>
+<li><a class="reference internal" href="#overdispersion-quasi-poisson-and-negative-binomial">5. Overdispersion: quasi-Poisson and negative binomial</a></li>
+<li><a class="reference internal" href="#penalized-splines-on-wage">6. Penalized splines on Wage</a></li>
+<li><a class="reference internal" href="#a-penalized-spline-gam-for-bikeshare">7. A penalized-spline GAM for Bikeshare</a></li>
+<li><a class="reference internal" href="#lecture-exercises-worked-python-solutions">Lecture exercises — worked Python solutions</a><ul>
+<li><a class="reference internal" href="#exercise-a4-3-rate-ratios-on-bikeshare-python">Exercise A4.3 — Rate ratios on Bikeshare [Python]</a></li>
+<li><a class="reference internal" href="#extended-exercise-a4-2-build-and-defend-a-count-gam-python">Extended Exercise A4.2 — Build and defend a count GAM [Python]</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercises">8. Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7f41d439"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>
