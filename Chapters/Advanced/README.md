@@ -16,15 +16,15 @@ and Short Exam E carries a multiple-testing problem drawn from A7.
 
 | Module | Title | What it covers | Deck | Exercises | Notebook |
 |---|---|---|---|---|---|
-| A1 | Randomised Controlled Trials | Potential outcomes, selection-bias decomposition, randomisation, regression adjustment (HC2), power/MDE, ITT vs per-protocol, peeking | 76 pages | 6 + 2 extended | `advanced_01_rcts_lab.ipynb` |
-| A2 | Explainable AI with Shapley Values | Cooperative games, the Shapley axioms, exact enumeration vs Monte-Carlo, waterfalls, global importance, correlated-feature and retrain pitfalls | 81 pages | 6 + 2 extended | `advanced_02_shapley_lab.ipynb` |
-| A3 | Conformal Prediction | Exchangeability, split conformal, the finite-sample quantile, marginal vs conditional coverage, CQR, prediction sets, the OLS stress test | 78 pages | 6 + 2 extended | `advanced_03_conformal_lab.ipynb` |
-| A4 | GLMs and Splines | Exponential family, Poisson regression on `Bikeshare`, deviance/LRT/AIC, overdispersion (quasi-Poisson, NB), penalized splines and edf, a count GAM | 93 pages | 7 + 2 extended | `advanced_04_glms_splines_lab.ipynb` |
+| A1 | Randomised Controlled Trials | Potential outcomes, selection-bias decomposition, randomisation, regression adjustment (HC2), power/MDE, ITT vs per-protocol, peeking | 77 pages | 6 + 2 extended | `advanced_01_rcts_lab.ipynb` |
+| A2 | Explainable AI with Shapley Values | Cooperative games, the Shapley axioms, exact enumeration vs Monte-Carlo, waterfalls, global importance, correlated-feature and retrain pitfalls | 82 pages | 6 + 2 extended | `advanced_02_shapley_lab.ipynb` |
+| A3 | Conformal Prediction | Exchangeability, split conformal, the finite-sample quantile, marginal vs conditional coverage, CQR, prediction sets, the OLS stress test | 79 pages | 6 + 2 extended | `advanced_03_conformal_lab.ipynb` |
+| A4 | GLMs and Splines | Exponential family, Poisson regression on `Bikeshare`, deviance/LRT/AIC, overdispersion (quasi-Poisson, NB), penalized splines and edf, a count GAM | 94 pages | 7 + 2 extended | `advanced_04_glms_splines_lab.ipynb` |
 | A5 | Support Vector Machines *(ISLP Ch 9)* | Maximal-margin classifier, the soft margin and the cost *C*, the support-vector classifier, polynomial and radial kernels, tuning by CV | 94 pages | 7 + 3 | `advanced_05_svm_lab.ipynb` |
 | A6 | Survival Analysis *(ISLP Ch 11)* | Censoring, the survival and hazard functions, Kaplan–Meier, the log-rank test, Cox proportional hazards | 96 pages | 7 + 3 | `advanced_06_survival_lab.ipynb` |
-| A7 | Multiple Testing *(ISLP Ch 13)* | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 74 pages | 5 + 3 | `advanced_07_multiple_testing_lab.ipynb` |
+| A7 | Multiple Testing *(ISLP Ch 13)* | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 75 pages | 5 + 3 | `advanced_07_multiple_testing_lab.ipynb` |
 | A8 | Unsupervised Learning *(ISLP Ch 12)* | No test error to validate against, PCA (loadings, scores, PVE, biplot), scaling, *K*-means and its local optima, dendrograms, linkage and dissimilarity, clusters in pure noise | 102 pages | 6 + 3 | `advanced_08_unsupervised_lab.ipynb` |
-| A9 | Deep Learning *(ISLP Ch 10)* | The MLP as adaptive basis functions, activations, training as gradient descent on a loss, epochs and early stopping, dropout and weight decay, when a boosted tree still wins | 92 pages | 6 + 3 | `advanced_09_deep_learning_lab.ipynb` |
+| A9 | Deep Learning *(ISLP Ch 10)* | The MLP as adaptive basis functions, activations, training as gradient descent on a loss, epochs and early stopping, dropout and weight decay, when a boosted tree still wins | 93 pages | 6 + 3 | `advanced_09_deep_learning_lab.ipynb` |
 
 ## Prerequisites, and a suggested reading order
 

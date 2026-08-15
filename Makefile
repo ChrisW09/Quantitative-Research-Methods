@@ -143,7 +143,21 @@ $(HANDOUTS)/chapter_$(1)_handout.pdf: $(SLIDEDIR)/chapter_$(1)/chapter_$(1).pdf 
 endef
 $(foreach c,$(CHAPTERS),$(eval $(call HANDOUT_RULE,$(c))))
 
-handouts: $(HANDOUT_PDFS)
+# The advanced modules get the same 2-up handout — their runsheets tell the
+# lecturer to post the summary pages as the revision sheet, and this is that
+# sheet. Same template, one directory deeper.
+ADV_HANDOUT_PDFS := $(foreach a,$(ADVANCED),$(HANDOUTS)/$(a)_handout.pdf)
+
+define ADV_HANDOUT_RULE
+$(HANDOUTS)/$(1)_handout.pdf: $(ADV_DIR)/$(1)/$(1).pdf $(GUIDE)/handout_template.tex
+	@echo "  [handout]  $(1)"
+	@mkdir -p $(HANDOUTS)
+	@cd $(HANDOUTS) && $(LATEX) -jobname=$(1)_handout \
+	  "\def\deckpath{../../$(ADV_DIR)/$(1)/$(1).pdf}\input{../handout_template.tex}" >/dev/null
+endef
+$(foreach a,$(ADVANCED),$(eval $(call ADV_HANDOUT_RULE,$(a))))
+
+handouts: $(HANDOUT_PDFS) $(ADV_HANDOUT_PDFS)
 
 # ----------------------------------------------------------------- teaching index
 # The index also covers advanced_08_unsupervised (it was a taught chapter until
