@@ -1,11 +1,12 @@
 # Advanced modules
 
-Nine optional, self-study modules. Four extend the taught course beyond ISLP —
-causal inference, model explanation, distribution-free uncertainty, and the
-GLM/spline machinery behind Chapters 4 and 7 — and five are ISLP chapters
-lifted out of the taught sequence: support vector machines (Ch 9), deep
-learning (Ch 10), survival analysis (Ch 11), unsupervised learning (Ch 12)
-and multiple testing (Ch 13).
+Twelve optional, self-study modules. Seven extend the taught course beyond ISLP —
+causal inference from experiments (A1) and from observational data (A10), model
+explanation, distribution-free uncertainty, the GLM/spline machinery behind
+Chapters 4 and 7, time series and forecasting (A11), and Bayesian inference
+(A12) — and five are ISLP chapters lifted out of the taught sequence: support
+vector machines (Ch 9), deep learning (Ch 10), survival analysis (Ch 11),
+unsupervised learning (Ch 12) and multiple testing (Ch 13).
 Each module is a full Beamer
 deck in the course's house style — same box grammar, every exercise followed
 immediately by its worked solution, closing summary block, optional appendix —
@@ -25,6 +26,9 @@ and Short Exam E carries a multiple-testing problem drawn from A7.
 | A7 | Multiple Testing *(ISLP Ch 13)* | Why naive testing fails at scale, FWER, Bonferroni and Holm, the false discovery rate, Benjamini–Hochberg, *p*-hacking | 75 pages | 5 + 3 | `advanced_07_multiple_testing_lab.ipynb` |
 | A8 | Unsupervised Learning *(ISLP Ch 12)* | No test error to validate against, PCA (loadings, scores, PVE, biplot), scaling, *K*-means and its local optima, dendrograms, linkage and dissimilarity, clusters in pure noise | 102 pages | 6 + 3 | `advanced_08_unsupervised_lab.ipynb` |
 | A9 | Deep Learning *(ISLP Ch 10)* | The MLP as adaptive basis functions, activations, training as gradient descent on a loss, epochs and early stopping, dropout and weight decay, when a boosted tree still wins | 93 pages | 6 + 3 | `advanced_09_deep_learning_lab.ipynb` |
+| A10 | Causal Inference from Observational Data | Confounders/mediators/colliders, omitted-variable bias (γδ), regression adjustment, stratification, propensity-score matching, difference-in-differences, instrumental variables (Wald) | 58 pages | 5 + 2 extended | *(in preparation — `make_figures.py` is the lab)* |
+| A11 | Time Series and Forecasting | Stationarity, the ACF by hand and in code, AR as OLS on lags, baselines (mean, seasonal naive), rolling-origin backtesting vs shuffled-CV leakage, why returns resist forecasting | 55 pages | 5 + 2 extended | *(in preparation — `make_figures.py` is the lab)* |
+| A12 | Bayesian Inference | Prior × likelihood ∝ posterior, Beta–binomial updating, credible intervals, precision-weighted shrinkage, ridge as MAP (λ = σ²/τ²), Metropolis from scratch, a Bayesian A/B decision | 53 pages | 4 + 2 extended | *(in preparation — `make_figures.py` is the lab)* |
 
 ## Prerequisites, and a suggested reading order
 
@@ -39,17 +43,20 @@ Each module assumes the course chapters it extends:
 - **A7** — Ch 0 (hypothesis testing, *p*-values), Ch 5 (resampling).
 - **A8** — Ch 2 (what a test error buys you), Ch 5 (resampling, stability).
 - **A9** — Ch 3 (least squares, the linear predictor), Ch 5 (validation, overfitting).
+- **A10** — Ch 3 (regression, omitted variables), Ch 4 (logistic → propensity scores), Ch 5 (simulation), A1 (potential outcomes).
+- **A11** — Ch 3 (OLS on lagged copies), Ch 4 (`Weekly`), Ch 5 (evaluation, leakage).
+- **A12** — Ch 0 (intervals, tests), Ch 3–4 (the likelihood), Ch 6 (ridge, shrinkage).
 
-The numbering is a grouping (A1–A4 extend the course, A5–A9 are lifted ISLP
-chapters), **not** a reading order. Two constraints and one priority determine
-a sensible sequence:
+The numbering is a grouping (A1–A4 and A10–A12 extend the course, A5–A9 are
+lifted ISLP chapters), **not** a reading order. Three constraints and one
+priority determine a sensible sequence:
 
 1. **A7 and A9 first** — they are the exam-relevant pair (assigned as
    self-study after the Chapter 8 session), and they unlock A1 and A2.
-2. **A7 before A1**, and **A9 before A2** — the only inter-module
-   dependencies.
-3. Everything else — A3, A4, A5, A6, A8 — stands alone on the taught chapters
-   and can be read in any order; folder order works.
+2. **A7 before A1**, **A9 before A2**, and **A1 before A10** — the only
+   inter-module dependencies.
+3. Everything else — A3, A4, A5, A6, A8, A11, A12 — stands alone on the taught
+   chapters and can be read in any order; folder order works.
 
 ## Layout
 
@@ -76,8 +83,12 @@ bundled `ALL CSV FILES - 2nd Edition/` folder, exactly like the course labs.
 Locally: run it from inside its own module folder so the relative CSV path
 resolves.
 No packages beyond the course `requirements.txt` are needed — Shapley values,
-conformal prediction and the P-splines are implemented from scratch on purpose
-(`shap` and `MAPIE` are named on the slides as the production tools).
+conformal prediction, the P-splines, propensity matching, the ACF/AR machinery
+and the Metropolis sampler are implemented from scratch on purpose (`shap`,
+`MAPIE`, `linearmodels`, `statsmodels.tsa` and `PyMC` are named on the slides
+as the production tools). A10–A12 do not have companion notebooks yet: their
+`make_figures.py` doubles as the lab and reproduces every number on the
+slides.
 
 ## Rebuilding a deck
 

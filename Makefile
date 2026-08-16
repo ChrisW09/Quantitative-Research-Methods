@@ -26,7 +26,7 @@
 #                   starters) and diff its output against the outputs stored in
 #                   it — the repository has no CI, so run this yourself before
 #                   publishing (needs nbclient)
-#   make advanced   rebuild the nine advanced-module decks (Chapters/Advanced/)
+#   make advanced   rebuild the twelve advanced-module decks (Chapters/Advanced/)
 #
 # Requires: TeX Live (beamer, tcolorbox, tikz, listings, booktabs, pdfpages,
 # enumitem and mathtools — the last two for the exam papers and review decks)
@@ -71,11 +71,12 @@ deck-%:
 	@$(MAKE) --no-print-directory $(SLIDEDIR)/chapter_$*/chapter_$*.pdf
 
 # --------------------------------------------------------------- advanced decks
-# Nine optional self-study modules in Advanced/ — same two-pass LaTeX build,
+# Twelve optional self-study modules in Advanced/ — same two-pass LaTeX build,
 # kept out of `all` because they are not part of the taught deliverable.
 ADVANCED := advanced_01_rcts advanced_02_shapley advanced_03_conformal advanced_04_glms_splines \
             advanced_05_svm advanced_06_survival advanced_07_multiple_testing \
-            advanced_08_unsupervised advanced_09_deep_learning
+            advanced_08_unsupervised advanced_09_deep_learning \
+            advanced_10_causal_observational advanced_11_time_series advanced_12_bayesian
 ADV_DIR  := Chapters/Advanced
 ADV_PDFS := $(foreach a,$(ADVANCED),$(ADV_DIR)/$(a)/$(a).pdf)
 
