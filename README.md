@@ -285,6 +285,50 @@ Every notebook is also
 [rendered in full](https://chrisw09.github.io/Quantitative-Research-Methods/labs.html)
 on the documentation site, stored outputs included.
 
+### 🐣 Python for Data Science Workshop — a separate course
+
+[`Python_Course/`](./Python_Course/) holds a **separate, self-contained
+beginner Python course** — not part of Quantitative Research Methods, with no
+shared prerequisites. It is vendored from the
+[Bridging AI & Society Summer Schools](https://bridgingaiandsociety.org)'
+[Python-for-Data-Science-Workshop](https://github.com/BridgingAISocietySummerSchools/Python-for-Data-Science-Workshop)
+(MIT-licensed; see [`Python_Course/README.md`](./Python_Course/README.md) for
+full attribution) and kept here for convenient local access. Two tracks,
+twenty-one notebooks, all Colab-ready.
+
+**Track 1 — Introduction Session** *(90 min, live, five notebooks + one optional bonus)*
+
+| # | Notebook | Time | Open in Colab |
+|:--:|---|:--:|:--:|
+| 1 | Welcome to Python | ~15 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/01_welcome_to_python.ipynb) |
+| 2 | Data Structures | ~18 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/02_data_structures.ipynb) |
+| 3 | Control Flow | ~12 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/03_control_flow.ipynb) |
+| 4 | Functions | ~12 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/04_functions.ipynb) |
+| 5 | First Steps with Pandas | ~18 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/05_pandas_intro.ipynb) |
+| ✨ | A First Look at Seaborn *(bonus)* | ~10 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/06_seaborn_intro.ipynb) |
+
+**Track 2 — Advanced & Self-Learning** *(self-paced, ~12–14 h, fifteen notebooks)*
+
+| # | Notebook | Time | Open in Colab |
+|:--:|---|:--:|:--:|
+| 1 | Python Basics | 30–35 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/01_python_basics.ipynb) |
+| 2 | Control Structures | 35–40 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/02_control_structures.ipynb) |
+| 3 | Lists and Sequences | 30–40 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/03_lists_data_structures.ipynb) |
+| 4 | Dictionaries and Nested Data | 35–45 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/04_dictionaries_advanced.ipynb) |
+| 5 | Functions and Modules | 35–40 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/05_functions_and_modules.ipynb) |
+| 6 | NumPy Fundamentals | 45–55 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/06_numpy_fundamentals.ipynb) |
+| 7 | Pandas Essentials | 45–55 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/07_pandas_essentials.ipynb) |
+| 8 | Data Cleaning and Preprocessing | 45–55 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/08_data_cleaning_preprocessing.ipynb) |
+| 9 | Visualisation with Matplotlib | 50–60 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/09_visualization_matplotlib.ipynb) |
+| 10 | Visualisation with Seaborn | 50–60 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/10_visualization_seaborn.ipynb) |
+| 11 | Exploratory Data Analysis | 50–60 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/11_exploratory_data_analysis.ipynb) |
+| 12 | Machine Learning Basics | 45–55 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/12_machine_learning_basics.ipynb) |
+| 13 | The Scikit-Learn Workflow | 70–85 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/13_scikit_learn_workflow.ipynb) |
+| 14 | PyTorch Basics | 50–60 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/14_pytorch_basics.ipynb) |
+| 15 | Capstone Project | 75–105 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/15_capstone_project.ipynb) |
+
+Full descriptions for every notebook: [`Python_Course/README.md`](./Python_Course/README.md).
+
 ---
 
 ## 👩‍🏫 Teaching it
@@ -412,28 +456,6 @@ Each has a trap the brief does not reveal, and in several of them **"this cannot
 be predicted well enough to act on" is a correct answer**. The projects are
 formative — the module is graded by the written exam — and each folder carries a
 `SOLUTION_NOTES.md` with expected findings and a marking guide.
-
----
-
-## 🐣 Also included: Python for Data Science Workshop
-
-[`Python_Course/`](./Python_Course/) holds a **separate, self-contained
-beginner Python course** — not part of Quantitative Research Methods, with no
-shared prerequisites. It is vendored from the
-[Bridging AI & Society Summer Schools](https://bridgingaiandsociety.org)'
-[Python-for-Data-Science-Workshop](https://github.com/BridgingAISocietySummerSchools/Python-for-Data-Science-Workshop)
-(MIT-licensed; see its [`README.md`](./Python_Course/README.md) for full
-attribution) and kept here for convenient local access.
-
-Two tracks, twenty-one notebooks, all Colab-ready:
-
-| Track | Format | Duration | Start here |
-|---|---|:--:|:--:|
-| 1 — Introduction Session | Live, instructor-led | 90 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/01_welcome_to_python.ipynb) |
-| 2 — Advanced & Self-Learning | Self-paced | ~12–14 h | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/01_python_basics.ipynb) |
-
-Full notebook-by-notebook index with every Colab link:
-[`Python_Course/README.md`](./Python_Course/README.md).
 
 ---
 
