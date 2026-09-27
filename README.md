@@ -415,6 +415,28 @@ formative — the module is graded by the written exam — and each folder carri
 
 ---
 
+## 🐣 Also included: Python for Data Science Workshop
+
+[`Python_Course/`](./Python_Course/) holds a **separate, self-contained
+beginner Python course** — not part of Quantitative Research Methods, with no
+shared prerequisites. It is vendored from the
+[Bridging AI & Society Summer Schools](https://bridgingaiandsociety.org)'
+[Python-for-Data-Science-Workshop](https://github.com/BridgingAISocietySummerSchools/Python-for-Data-Science-Workshop)
+(MIT-licensed; see its [`README.md`](./Python_Course/README.md) for full
+attribution) and kept here for convenient local access.
+
+Two tracks, twenty-one notebooks, all Colab-ready:
+
+| Track | Format | Duration | Start here |
+|---|---|:--:|:--:|
+| 1 — Introduction Session | Live, instructor-led | 90 min | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/01_welcome_to_python.ipynb) |
+| 2 — Advanced & Self-Learning | Self-paced | ~12–14 h | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/01_python_basics.ipynb) |
+
+Full notebook-by-notebook index with every Colab link:
+[`Python_Course/README.md`](./Python_Course/README.md).
+
+---
+
 ## 🗂️ Repository layout
 
 | Path | Contents |
@@ -422,6 +444,7 @@ formative — the module is graded by the written exam — and each folder carri
 | [`Chapters/`](./Chapters/) | **One folder per chapter, holding its deck and its lab together**: `chapter_NN/` contains `chapter_NN.tex`, the compiled `.pdf`, `images/`, and `chapter_NN_lab.ipynb`. Ten decks and ten notebooks, one pair per chapter. See its [deck guide](./Chapters/README.md). |
 | [`Chapters/Advanced/`](./Chapters/Advanced/) | Nine optional self-study modules — RCTs, Shapley values, conformal prediction, GLMs & splines, SVMs, survival analysis, multiple testing, unsupervised learning — each a full deck plus companion notebook. See its [module guide](./Chapters/Advanced/README.md). |
 | [`Projects/`](./Projects/) | Six short projects (3–5 h): a real decision on real data, with a fixed held-out set, a baseline to beat and a one-page memo as the deliverable. See its [project guide](./Projects/README.md). |
+| [`Python_Course/`](./Python_Course/) | A separate, self-contained beginner Python course (21 notebooks, two tracks), vendored from an external MIT-licensed workshop — not part of Quantitative Research Methods. See its [guide](./Python_Course/README.md). |
 | [`Teaching_Guide/`](./Teaching_Guide/) | Instructor material: semester plan, runsheets, slide index, before-class checklist, printable handouts |
 | [`ALL CSV FILES - 2nd Edition/`](./ALL%20CSV%20FILES%20-%202nd%20Edition/) | Course datasets (from [statlearning.com](https://www.statlearning.com)) |
 | [`Makefile`](./Makefile) | One-command rebuild of figures, decks, handouts and the index |
