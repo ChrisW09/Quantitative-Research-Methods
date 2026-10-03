@@ -529,6 +529,8 @@ how the deployment works, are in
 
 ## 👤 About
 
+<img align="right" alt="Portrait of Prof. Dr. Christoph Weisser" src="Chapters/chapter_00/images/ch00_profile.jpg" width="180">
+
 I am Christoph Weisser, Professor of Mathematics, specializing in Business Data
 Science at Hochschule Bielefeld, and former Technical Lead Analytics &
 Artificial Intelligence at BASF. My work focuses on Artificial Intelligence,
