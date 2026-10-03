@@ -44,7 +44,7 @@ precourse.
 session drawing on both precourse decks, because the chapter decks use
 all of this material and explain none of it.
 
-One session cannot cover both decks — together they run to 165 slides — so the
+One session cannot cover both decks — together they run to 166 slides — so the
 session is a **guided selection**, and the two decks stay available in full as
 your reference. The skip rule below is what tells you which parts you still
 need to read on your own.
@@ -65,7 +65,7 @@ of that deck shows the count next to each one.
 ```{admonition} How to tell which parts of Precourse (a) you still need
 :class: tip
 
-**Page 7 of `chapter_00.pdf` is a twelve-question self-check** — one question per
+**Page 8 of `chapter_00.pdf` is a twelve-question self-check** — one question per
 section, so a wrong answer tells you which section to read. The deck's own
 scoring rule:
 

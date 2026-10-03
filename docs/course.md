@@ -56,12 +56,12 @@ you stop and resume cleanly:
 ```{admonition} One session, two decks — so it is a selection
 :class: important
 
-The two precourse decks carry **165 slides** in their main flow (112 + 53). A
+The two precourse decks carry **166 slides** in their main flow (113 + 53). A
 single 180-minute session cannot cover them, and is not meant to: the session
 sets up the notation, the standard-error material and the Python patterns the
 chapters lean on hardest, and both decks stay available in full as the
 reference. The tools for closing the rest yourself are built in — the
-twelve-question self-check on page 7 of `chapter_00.pdf` and the notation table
+twelve-question self-check on page 8 of `chapter_00.pdf` and the notation table
 on page 5 of `chapter_00b.pdf` — see [For students](for-students.md).
 ```
 

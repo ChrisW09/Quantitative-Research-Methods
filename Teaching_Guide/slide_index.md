@@ -6,39 +6,39 @@ Page numbers are the printed slide numbers in each deck's PDF. Time budgets are 
 
 ### Precourse (a) — Statistics Refresher
 
-`chapter_00.pdf` — **112 slides** in the main flow plus **20** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.3 min per slide).
+`chapter_00.pdf` — **113 slides** in the main flow plus **20** in the appendix, planned for **1 × 180 min** (≈ 145 min of actual teaching, ≈ 1.3 min per slide).
 
 | Section | Pages | Slides | Time budget |
 |---|:--:|:--:|:--:|
-| *front matter* | 1–8 | 8 | 10 min |
-| Data, variables and notation | 9–16 | 8 | 11 min |
-| Describing one variable | 17–29 | 13 | 17 min |
-| Describing two variables | 30–40 | 11 | 14 min |
-| Probability essentials | 41–51 | 11 | 14 min |
-| Distributions you will meet | 52–56 | 5 | 6 min |
-| Sampling, estimation and confidence intervals | 57–61 | 5 | 7 min |
-| Hypothesis testing | 62–75 | 14 | 18 min |
-| Simple linear regression: the bridge | 76–88 | 13 | 17 min |
-| The Python toolkit | 89–102 | 14 | 18 min |
-| Summary | 103–112 | 10 | 13 min |
-| Appendix: optional and advanced material | 113–132 | 20 | optional |
+| *front matter* | 1–9 | 9 | 12 min |
+| Data, variables and notation | 10–17 | 8 | 10 min |
+| Describing one variable | 18–30 | 13 | 16 min |
+| Describing two variables | 31–41 | 11 | 15 min |
+| Probability essentials | 42–52 | 11 | 14 min |
+| Distributions you will meet | 53–57 | 5 | 6 min |
+| Sampling, estimation and confidence intervals | 58–62 | 5 | 7 min |
+| Hypothesis testing | 63–76 | 14 | 18 min |
+| Simple linear regression: the bridge | 77–89 | 13 | 16 min |
+| The Python toolkit | 90–103 | 14 | 18 min |
+| Summary | 104–113 | 10 | 13 min |
+| Appendix: optional and advanced material | 114–133 | 20 | optional |
 
 | Exercise | Type | Tag | Prompt | Solution |
 |---|:--:|:--:|:--:|:--:|
-| Exercise 0.1 | short | Concept | p. 15 | p. 16 |
-| Exercise 0.2 | short | Math | p. 27 | p. 28 |
-| Exercise 0.3 | short | Math | p. 38 | p. 39 |
-| Exercise 0.4 | short | Math | p. 47 | p. 48 |
-| Exercise 0.5 | short | Math | p. 49 | p. 50 |
-| Exercise 0.6 | short | Concept | p. 69 | p. 70 |
-| Extended Exercise 0.1 | extended | Math | p. 72 | p. 73 |
-| Extended Exercise 0.2 | extended | Math | p. 82 | p. 83 |
-| Exercise 0.7 | short | Python | p. 87 | p. 88 |
-| Exercise 0.9 | short | Python | p. 96 | p. 97 |
-| Exercise 0.10 | short | Concept | p. 98 | p. 99 |
-| Extended Exercise 0.4 | extended | Integrative | p. 100 | p. 101 |
-| Exercise 0.8 | short | Math | p. 121 | p. 122 |
-| Extended Exercise 0.3 | extended | — | p. 128 | p. 129 |
+| Exercise 0.1 | short | Concept | p. 16 | p. 17 |
+| Exercise 0.2 | short | Math | p. 28 | p. 29 |
+| Exercise 0.3 | short | Math | p. 39 | p. 40 |
+| Exercise 0.4 | short | Math | p. 48 | p. 49 |
+| Exercise 0.5 | short | Math | p. 50 | p. 51 |
+| Exercise 0.6 | short | Concept | p. 70 | p. 71 |
+| Extended Exercise 0.1 | extended | Math | p. 73 | p. 74 |
+| Extended Exercise 0.2 | extended | Math | p. 83 | p. 84 |
+| Exercise 0.7 | short | Python | p. 88 | p. 89 |
+| Exercise 0.9 | short | Python | p. 97 | p. 98 |
+| Exercise 0.10 | short | Concept | p. 99 | p. 100 |
+| Extended Exercise 0.4 | extended | Integrative | p. 101 | p. 102 |
+| Exercise 0.8 | short | Math | p. 122 | p. 123 |
+| Extended Exercise 0.3 | extended | — | p. 129 | p. 130 |
 
 **Notebook cues:** 8 in this deck.
 

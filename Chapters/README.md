@@ -91,7 +91,7 @@ works as homework.
 
 | Chapter | Topic | Short ex. | Extended ex. | Pages (main + appendix) |
 |---|---|:--:|:--:|:--:|
-| 0  | Precourse (a) — statistics refresher | 10 | 4 | 112 + 20 |
+| 0  | Precourse (a) — statistics refresher | 10 | 4 | 113 + 20 |
 | 0b | Precourse (b) — toolkit | 6 | 2 | 53 + 14 |
 | 1  | Introduction | 3 | 1 | 74 + 8 |
 | 2  | Statistical Learning | 8 | 4 | 81 + 42 |

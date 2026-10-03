@@ -107,7 +107,7 @@ refer to.
 
 | Chapter | Sessions | Topic |
 |:--:|:--:|--|
-| **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 165 slides across the two, so the session is a selection and the decks stay the reference |
+| **Precourse** — 0 + 0b | 1 | **Taught in one session**, from both precourse decks: descriptive statistics, probability, distributions, inference, simple regression, Python — and reading notation, logs & exponentials, odds & the logit, likelihood and MLE, counting & cost. 166 slides across the two, so the session is a selection and the decks stay the reference |
 | **1** | ½ | Introduction; prediction vs. inference |
 | **2** | 1½ | What is statistical learning; model accuracy; bias–variance trade-off |
 | **3** | 2 | Linear regression: estimation, inference, dummies, interactions, diagnostics |
@@ -151,7 +151,7 @@ advanced material that the main thread never depends on.
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher *(taught in session 1)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 112 (+20) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
+| 0 | Precourse (a) — Statistics refresher *(taught in session 1)* | Descriptive statistics, probability and Bayes, distributions, standard errors and CIs, testing and power, simple regression, the Python toolkit | 10 + 4 | 113 (+20) | [PDF](./Chapters/chapter_00/chapter_00.pdf) |
 | 0b | Precourse (b) — Toolkit *(taught in session 1)* | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 53 (+14) | [PDF](./Chapters/chapter_00b/chapter_00b.pdf) |
 | 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 74 (+8) | [PDF](./Chapters/chapter_01/chapter_01.pdf) |
 | 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance (the Bayes classifier and KNN moved to the appendix) | 8 + 4 | 81 (+42) | [PDF](./Chapters/chapter_02/chapter_02.pdf) |

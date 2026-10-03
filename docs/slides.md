@@ -37,7 +37,7 @@ on — see [what each appendix holds](#what-each-appendix-holds).
 
 | Ch. | Deck | What it covers | Exercises | Slides | PDF |
 |:--:|---|---|:--:|:--:|:--:|
-| 0 | Precourse (a) — Statistics refresher | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 112 (+20) | <a href="slides/chapter_00.pdf">Open</a> |
+| 0 | Precourse (a) — Statistics refresher | Descriptive statistics, probability and Bayes, distributions, standard errors and confidence intervals, testing and power, simple regression, the Python toolkit | 10 + 4 | 113 (+20) | <a href="slides/chapter_00.pdf">Open</a> |
 | 0b | Precourse (b) — Toolkit | Reading notation, logs and exponentials, odds and the logit, likelihood, computational cost, the Python patterns the labs use | 6 + 2 | 53 (+14) | <a href="slides/chapter_00b.pdf">Open</a> |
 | 1 | Introduction | What statistical learning is, prediction vs. inference, the three motivating data sets, notation and the design matrix | 3 + 1 | 74 (+8) | <a href="slides/chapter_01.pdf">Open</a> |
 | 2 | Statistical Learning | Estimating *f*, parametric vs. nonparametric, the flexibility trade-off, training vs. test error, bias–variance — the Bayes classifier and KNN now sit in the appendix | 8 + 4 | 81 (+42) | <a href="slides/chapter_02.pdf">Open</a> |
@@ -129,7 +129,7 @@ optional.
 
 Both are **taught**, in the single precourse session that opens the semester,
 and both exist because the chapter decks assume their content silently.
-One session cannot cover 165 slides, so it draws a selection from the two and the
+One session cannot cover 166 slides, so it draws a selection from the two and the
 decks remain the full reference — see
 [the course at a glance](course.md) and [For students](for-students.md).
 

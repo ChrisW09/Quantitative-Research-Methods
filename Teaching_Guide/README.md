@@ -70,7 +70,7 @@ use them:
 - **Taught**, as one or two extra sessions in the week before the course
   starts — worth it for a cohort with mixed backgrounds.
 - **Set as self-study**, pointing students at the twelve-question self-check on
-  slide 7 of `chapter_00`. Students who answer nine or more can skip it.
+  slide 8 of `chapter_00`. Students who answer nine or more can skip it.
 
 Either way, tell students the material is assumed from Chapter 1 onwards. The
 commonest cause of a struggling student in this course is not the machine

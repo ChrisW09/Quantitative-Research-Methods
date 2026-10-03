@@ -10,7 +10,7 @@ under [`../Chapters/Advanced/`](../Chapters/Advanced/). The module is 6 ECTS,
 graded by one 120-minute written exam at the end of the semester; every paper in
 the calendar below is practice.
 
-The precourse decks run to 165 slides in their main flow (112 + 53), so the one
+The precourse decks run to 166 slides in their main flow (113 + 53), so the one
 session is a selection — set up notation, standard errors and the lab Python
 patterns, and leave both decks with the cohort as the reference.
 
@@ -28,7 +28,7 @@ appendix pages are extra material to assign, not to teach.
 
 | Chapter | Session | Deck | Slides | Exercises | Notes |
 |:--:|---|---|:--:|:--:|---|
-| **0 + 0b** | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 112 + 20, 53 + 14 | 10 + 4, 6 + 2 | 165 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
+| **0 + 0b** | Precourse *(taught, one session)* | `chapter_00` + `chapter_00b` | 113 + 20, 53 + 14 | 10 + 4, 6 + 2 | 166 main-flow slides across the two: teach a selection (notation, standard errors, the lab Python patterns), leave both decks as the cohort's reference |
 | **1 + 2** | Introduction + Statistical Learning I | `chapter_01`, `chapter_02` | 74, then pp. 1–41 | 3 + 1, then 2.1–2.2 | Stop after "regression vs. classification" |
 | **2** | Statistical Learning II | `chapter_02` | pp. 42–81 | 2.3–2.8 | Accuracy, bias–variance, Bayes classifier, KNN, lab |
 | **3** | Linear Regression I | `chapter_03` | pp. 1–79 | 3.1–3.6 | Stop after multiple regression and the four questions |
