@@ -79,7 +79,8 @@
               \textbf{power} of a test,
         \item read \textbf{critical values} from the $z$- and $t$-tables and
               link them to the $p$-value,
-        \item implement every procedure in \texttt{R}.
+        \item implement every procedure in Python
+              (\texttt{scipy.stats}).
       \end{itemize}
     \end{column}
   \end{columns}
@@ -1088,17 +1089,28 @@ from memory, they have understood the classical test.}
   \end{exampleblock}
 \end{frame}
 
-\subsection{Tests with R}
+\subsection{Tests with Python}
 
-\begin{frame}[fragile]{Hypothesis test with R -- \texttt{t.test}}
-  \begin{block}{Command (one-sample $t$-test)}
+\begin{frame}[fragile]{Hypothesis test with Python -- \texttt{ttest\_1samp}}
 \begin{lstlisting}
-milk <- c(1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009)
-t.test(milk, mu = 1000)
+import numpy as np
+from scipy import stats
+
+milk = np.array([1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009])
+res = stats.ttest_1samp(milk, popmean=1000)    # two-sided by default
+ci = res.confidence_interval(confidence_level=0.95)
+print(f"t = {res.statistic:.4f}, df = {res.df}, p = {res.pvalue:.4f}")
+print(f"95% CI: [{ci.low:.2f}, {ci.high:.2f}]")
+\end{lstlisting}
+  \begin{block}{Output (one-sample $t$-test)}
+\begin{lstlisting}[style=Pyout]
+t = 0.7947, df = 8, p = 0.4497
+95% CI: [998.10, 1003.90]
 \end{lstlisting}
   \end{block}
-  By default \texttt{t.test} performs a \textbf{two-sided} $t$-test with
-  \textbf{unknown} variance and directly returns $t$, df, $p$-value and CI.
+  \footnotesize By default \texttt{stats.ttest\_1samp} performs a
+  \textbf{two-sided} $t$-test with \textbf{unknown} variance; the result holds
+  $t$, df and $p$-value, \texttt{.confidence\_interval()} adds the CI.
 \end{frame}
 
 % ---- Bridge to the p-value --------------------------------------------------
@@ -1177,7 +1189,7 @@ $0.034$ resp.\ $0.052$. Keep it short -- a springboard, not new content.}
     \item \textbf{``At least as extreme'' is set by $H_1$:} two-sided
           ($\mu\neq\mu_0$) $=$ both tails $|Z|\ge|Z_n|$; one-sided $=$ only the
           tail in the $H_1$ direction. Same statistic, different $p$.
-    \item $0 \le p \le 1$; software (e.g.\ \texttt{R}) always reports it.
+    \item $0 \le p \le 1$; software (e.g.\ \texttt{scipy.stats}) always reports it.
     \item \textbf{Advantage:} more informative than a bare yes/no -- it
           quantifies the \emph{strength} of the evidence.
   \end{itemize}
@@ -1296,7 +1308,7 @@ exam error (dedicated slide follows).}
   \end{columns}
   \begin{exampleblock}{Decision}
     Both $p$-values $> 0.05 \Rightarrow H_0:\mu=1000$ not rejected.
-    The value $0.4497$ matches the \texttt{t.test} output.
+    The value $0.4497$ matches the \texttt{ttest\_1samp} output.
   \end{exampleblock}
 \end{frame}
 
@@ -1907,21 +1919,26 @@ computing the tail area.}
   lies on the critical side.}
 \end{frame}
 
-\begin{frame}[fragile]{One-sided test with R}
+\begin{frame}[fragile]{One-sided test with Python}
 \begin{lstlisting}
-# left-sided (H1: mu < mu0)
-t.test(milk, mu = 1000, alternative = "less")
-# right-sided (H1: mu > mu0)
-t.test(milk, mu = 1000, alternative = "greater")
+stats.ttest_1samp(milk, 1000, alternative="less")      # H1: mu < mu0, p = 0.7751
+stats.ttest_1samp(milk, 1000, alternative="greater")   # H1: mu > mu0, p = 0.2249
+
+cream = np.array([251, 248, 248, 249, 250, 251, 247, 246,
+                  252, 251, 248, 247, 246, 249, 248, 252])
+res = stats.ttest_1samp(cream, 250, alternative="less")   # left-sided
+ci = res.confidence_interval(0.95)                        # one-sided CI
+print(f"t = {res.statistic:.4f}, df = {res.df}, p = {res.pvalue:.4f}")
+print(f"95% CI: [{ci.low}, {ci.high:.2f}]")
 \end{lstlisting}
-  \begin{block}{Cream, left-sided -- excerpt}
-\begin{lstlisting}[style=Rout]
-t = -2.1086, df = 15, p-value = 0.02606
-95 percent confidence interval:  -Inf  249.82
+  \begin{block}{Cream, left-sided -- output}
+\begin{lstlisting}[style=Pyout]
+t = -2.1086, df = 15, p = 0.0261
+95% CI: [-inf, 249.82]
 \end{lstlisting}
   \end{block}
   \footnotesize The argument \texttt{alternative} controls the direction
-  (\texttt{"two.sided"}, \texttt{"less"}, \texttt{"greater"}).
+  (\texttt{"two-sided"} (default), \texttt{"less"}, \texttt{"greater"}).
 \end{frame}
 
 \subsection{One-sided confidence intervals}
@@ -1930,7 +1947,8 @@ t = -2.1086, df = 15, p-value = 0.02606
   \begin{itemize}
     \item A one-sided test has a one-sided CI -- only \emph{one} bound, the
           other is $\pm\infty$.
-    \item \texttt{R} reports them as $(-\infty;\,x]$ resp.\ $[x;\,+\infty)$.
+    \item \texttt{scipy} reports them with \texttt{low=-inf} resp.\
+          \texttt{high=inf}, i.e.\ $(-\infty;\,x]$ resp.\ $[x;\,+\infty)$.
   \end{itemize}
   \begin{block}{Calculation (known variance)}
     \begin{align*}

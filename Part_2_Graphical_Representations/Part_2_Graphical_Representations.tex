@@ -36,7 +36,7 @@
         \item \textbf{interpret} the shape of a distribution (symmetry,
               skewness, outliers) from these graphics,
         \item combine the numbers of Part~1 with the pictures of Part~2,
-        \item create every graphic in \texttt{R}.
+        \item create every graphic in Python (\texttt{matplotlib}).
       \end{itemize}
     \end{column}
   \end{columns}
@@ -158,25 +158,24 @@
   \end{center}
 \end{frame}
 
-% Slide 57: ECDF in R
-\begin{frame}[fragile]{Empirical CDF in R}
+% Slide 57: ECDF in Python
+\begin{frame}[fragile]{Empirical CDF in Python}
   \begin{block}{Computing}
     \begin{lstlisting}
-Fn.fussball <- ecdf(fussball)
+import numpy as np, matplotlib.pyplot as plt
+from statsmodels.distributions.empirical_distribution import ECDF
+shoe = np.array([40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39])
+F = ECDF(shoe)    # F is a function of x
     \end{lstlisting}
   \end{block}
-
   \begin{block}{Evaluating}
     \begin{lstlisting}
-Fn.fussball(39)   # value of the empirical CDF at x = 39
+F(39)             # value of the empirical CDF at x = 39: 0.6364 (= 7/11)
     \end{lstlisting}
   \end{block}
-
   \begin{block}{Plotting}
     \begin{lstlisting}
-plot(ecdf(fussball),
-     verticals = TRUE,
-     do.points = FALSE)
+plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
     \end{lstlisting}
   \end{block}
 \end{frame}
@@ -319,19 +318,27 @@ plot(ecdf(fussball),
   \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Histograms in R}
+\begin{frame}[fragile]{Histograms in Python}
   \begin{block}{Class width 2}
     \begin{lstlisting}
-hist(fussball, breaks = c(37,39,41,43,45,47), prob = TRUE)
-hist(fussball, breaks = seq(37,47,2), prob = TRUE)  # alternative
+import pandas as pd
+breaks = [37, 39, 41, 43, 45, 47]          # alternative: np.arange(37, 48, 2)
+cls = pd.cut(shoe, breaks, right=True, include_lowest=True)  # [37,39], (39,41], ...
+f = pd.Series(cls).value_counts(normalize=True, sort=False)   # rel. frequencies f_j
+w = np.diff(breaks)                        # class widths
+dens = f.to_numpy() / w                    # densities: 0.3182 0.1364 0 0 0.0455
+plt.bar(breaks[:-1], dens, width=w, align="edge", edgecolor="black")
     \end{lstlisting}
   \end{block}
 
   \begin{block}{Unequal class widths}
     \begin{lstlisting}
-hist(fussball, breaks = c(37,39,40,41,46), prob = TRUE)
+breaks = [37, 39, 40, 41, 46]              # then the same lines as above   
+                                           # densities: 0.3182 0.1818 0.0909 0.0182
     \end{lstlisting}
   \end{block}
+  \footnotesize Why not simply \texttt{plt.hist}? It uses classes $[a,b)$ -- see
+  \emph{Python Commands: Histogram}.
 \end{frame}
 
 
@@ -379,40 +386,63 @@ hist(fussball, breaks = c(37,39,40,41,46), prob = TRUE)
   \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{R Commands: Histogram}
-  \begin{block}{Histogram with equal class widths (here: 2)}
+\begin{frame}[fragile]{Python Commands: Histogram}
+  \begin{alertblock}{Trap: \texttt{plt.hist} and \texttt{np.histogram} use classes $[a,b)$}
+    Ours: $(a,b]$, first class $[a,b]$. NumPy: a boundary value goes to the class on its \textbf{right}.
     \begin{lstlisting}
-hist(fussball, breaks=c(37,39,41,43,45,47), prob=TRUE)
-hist(fussball, breaks=seq(37,47,2), prob=TRUE)
+np.histogram(shoe, bins=[37, 39, 41, 43, 45, 47], density=True)[0]
+# [0.1364 0.2727 0.0455 0. 0.0455]   <- not our densities!
     \end{lstlisting}
+  \end{alertblock}
+  \begin{block}{Why?}
+    $39$ (four times) and $41$ lie on class boundaries: $39$ falls into $[39,41)$ instead of
+    $[37,39]$, $41$ into $[41,43)$ instead of $(39,41]$ -- \texttt{plt.hist} draws these wrong bars.
   \end{block}
-  \vspace{0.2cm}
-  \begin{block}{Histogram with unequal class widths}
-    \begin{lstlisting}
-hist(fussball, breaks=c(37,39,40,41,46), prob=TRUE)
-    \end{lstlisting}
+  \begin{block}{Remedy}
+    Classes with \texttt{pd.cut(..., right=True, include\_lowest=True)}, bars with \texttt{plt.bar} (next slide).
   \end{block}
-  \vspace{0.2cm}
-  \texttt{prob=TRUE} plots the densities $f_j/\Delta x_j$ instead of the absolute frequencies.
-  The \texttt{breaks} argument specifies the class boundaries.
 \end{frame}
 
-\begin{frame}[fragile]{R Commands: Classified Frequencies}
+\begin{frame}[fragile]{Python Commands: Histogram with Our Classes}
+  \begin{block}{Correct: classes with \texttt{pd.cut}, bars with \texttt{plt.bar}}
+    \begin{lstlisting}
+def density_hist(x, breaks):
+    cls = pd.cut(x, breaks, right=True, include_lowest=True)
+    f = pd.Series(cls).value_counts(normalize=True, sort=False)
+    w = np.diff(breaks)                                  # class widths
+    plt.bar(breaks[:-1], f / w, width=w, align="edge", edgecolor="black")
+    return f / w                                         # densities f_j / w_j
+
+density_hist(shoe, [37, 39, 41, 43, 45, 47])   # 0.3182 0.1364 0 0 0.0455
+density_hist(shoe, [37, 39, 40, 41, 46])       # 0.3182 0.1818 0.0909 0.0182
+    \end{lstlisting}
+  \end{block}
+  \begin{itemize}
+    \item \texttt{right=True}: classes $(a,b]$; \texttt{include\_lowest=True}: first class closed $[a,b]$.
+    \item Bar heights are the densities $f_j/\Delta x_j$, so every bar area equals $f_j$.
+    \item The densities reproduce the tables of this section exactly.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Python Commands: Classified Frequencies}
   \begin{block}{Class partition}
     \begin{lstlisting}
-cut(fussball, breaks=c(value1,value2,...,valuen), include.lowest=TRUE)
+breaks = [37, 39, 41, 43, 45, 47]          # class boundaries b0, b1, ..., bk
+cls = pd.cut(shoe, breaks, right=True, include_lowest=True)
     \end{lstlisting}
   \end{block}
   \begin{block}{Absolute classified frequencies}
     \begin{lstlisting}
-table(cut(fussball, breaks=c(value1,...,valuen), include.lowest=TRUE))
+pd.Series(cls).value_counts(sort=False)                   # 7 3 0 0 1
     \end{lstlisting}
   \end{block}
   \begin{block}{Relative classified frequencies}
     \begin{lstlisting}
-prop.table(table(cut(fussball, breaks=c(value1,...,valuen), include.lowest=TRUE)))
+pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.0909
     \end{lstlisting}
   \end{block}
+  \footnotesize pandas labels the first class \texttt{(36.999, 39.0]} -- this is
+  exactly the closed class $[37,39]$.
 \end{frame}
 
 \section{Boxplot}
@@ -967,108 +997,141 @@ prop.table(table(cut(fussball, breaks=c(value1,...,valuen), include.lowest=TRUE)
   \end{center}
 \end{frame}
 
-\section[R]{R Commands}
-% R-Introduction: Frequencies and Measures of Central Tendency
-\begin{frame}[fragile]{R Commands: Frequencies and Measures of Central Tendency}
+\section[Python]{Python Commands}
+% Python Commands: Frequencies and Measures of Central Tendency
+\begin{frame}[fragile]{Python Commands: Frequencies and Measures of Central Tendency}
   \begin{block}{Absolute frequencies}
     \begin{lstlisting}
-tab.fussball <- table(fussball)
-(tab.fussball <- table(fussball))  # assign and print
+import numpy as np, pandas as pd
+shoe = np.array([40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39])
+tab = pd.Series(shoe).value_counts().sort_index()   # sorted by shoe size
+print(tab)                                          # 37:1 38:2 39:4 40:2 41:1 46:1
     \end{lstlisting}
   \end{block}
   \begin{block}{Mean, median and quantiles}
     \begin{lstlisting}
-mean(fussball)    # arithmetic mean
-median(fussball)  # note: not our definition!
-# Better: quantile (type=1 matches our definition):
-quantile(fussball, 0.8, type=1)              # 80% quantile
-quantile(fussball, c(0.25,0.5,0.75), type=1)  # quartiles
+np.mean(shoe)     # arithmetic mean: 39.6364
+np.median(shoe)   # 39.0 -- note: averages for even n, not our definition!
+# Better: method="inverted_cdf" matches our definition x_(ceil(n*p)):
+np.quantile(shoe, 0.8, method="inverted_cdf")                # 80% quantile: 40
+np.quantile(shoe, [0.25, 0.5, 0.75], method="inverted_cdf")  # quartiles: 38 39 40
     \end{lstlisting}
   \end{block}
 \end{frame}
 
-% R Commands: Measures of Dispersion
-\begin{frame}[fragile]{R Commands: Measures of Dispersion}
+% Python Commands: Measures of Dispersion
+\begin{frame}[fragile]{Python Commands: Measures of Dispersion}
   \begin{block}{Sample variance and standard deviation}
     \begin{lstlisting}
-var(fussball)
-sd(fussball)
+np.var(shoe, ddof=1)    # s^2 = 5.6545   (ddof=1: divide by n - 1)
+np.std(shoe, ddof=1)    # s   = 2.3779
     \end{lstlisting}
   \end{block}
   \begin{block}{Coefficient of variation}
     \begin{lstlisting}
-(v <- sd(fussball)/mean(fussball))
+v = np.std(shoe, ddof=1) / np.mean(shoe)   # 0.0600
     \end{lstlisting}
   \end{block}
   \begin{block}{Normalised coefficient of variation}
     \begin{lstlisting}
-(vstar <- v/sqrt(length(fussball)))
+vstar = v / np.sqrt(len(shoe))             # 0.0181
     \end{lstlisting}
   \end{block}
+  \footnotesize Without \texttt{ddof=1}, NumPy divides by $n$ ($5.1405$ instead of
+  $s^2 = 5.6545$); pandas' \texttt{.var()} and \texttt{.std()} already use \texttt{ddof=1}.
 \end{frame}
 
-% R Commands: Empirical CDF
-\begin{frame}[fragile]{R Commands: Empirical CDF}
+% Python Commands: Empirical CDF
+\begin{frame}[fragile]{Python Commands: Empirical CDF}
   \begin{block}{Computing and evaluating}
     \begin{lstlisting}
-Fn.fussball <- ecdf(fussball)
-Fn.fussball(39)  # value of the ECDF at x = 39
+from statsmodels.distributions.empirical_distribution import ECDF
+F = ECDF(shoe)
+F(39)           # value of the ECDF at x = 39: 0.6364
     \end{lstlisting}
   \end{block}
   \begin{block}{Plotting}
     \begin{lstlisting}
-plot(ecdf(fussball), verticals=TRUE, do.points=FALSE)
+import matplotlib.pyplot as plt
+plt.ecdf(shoe)  # step function with vertical jumps
+plt.show()
     \end{lstlisting}
   \end{block}
 \end{frame}
 
-% R Commands: Histogram
-\begin{frame}[fragile]{R Commands: Histogram}
+% Python Commands: Histogram
+\begin{frame}[fragile]{Python Commands: Histogram}
   \begin{block}{Equal class widths (here: 2)}
     \begin{lstlisting}
-hist(fussball, breaks=c(37,39,41,43,45,47), prob=TRUE)
-hist(fussball, breaks=seq(37,47,2), prob=TRUE)
+density_hist(shoe, [37, 39, 41, 43, 45, 47])   # 0.3182 0.1364 0 0 0.0455
+density_hist(shoe, np.arange(37, 48, 2))       # same breaks, generated
     \end{lstlisting}
   \end{block}
   \begin{block}{Unequal class widths}
     \begin{lstlisting}
-hist(fussball, breaks=c(37,39,40,41,46), prob=TRUE)
+density_hist(shoe, [37, 39, 40, 41, 46])       # 0.3182 0.1818 0.0909 0.0182
     \end{lstlisting}
   \end{block}
+  \footnotesize \texttt{density\_hist} (\texttt{pd.cut} + \texttt{plt.bar}) is defined in the
+  Histogram section. Do \textbf{not} use \texttt{plt.hist(shoe, bins=breaks, density=True)}:
+  its classes are $[a,b)$, so $39$ and $41$ would be counted in the wrong class.
 \end{frame}
 
-% R Commands: Classified Frequencies
-\begin{frame}[fragile]{R Commands: Classified Frequencies}
+% Python Commands: Classified Frequencies
+\begin{frame}[fragile]{Python Commands: Classified Frequencies}
   \begin{block}{Absolute frequencies}
     \begin{lstlisting}
-table(fussball)
+pd.Series(shoe).value_counts().sort_index()
     \end{lstlisting}
   \end{block}
   \begin{block}{Class partition}
     \begin{lstlisting}
-cut(fussball, breaks=c(value1,value2,...,valuen), include.lowest=TRUE)
+cls = pd.cut(shoe, bins=[37, 39, 41, 43, 45, 47], right=True, include_lowest=True)
     \end{lstlisting}
   \end{block}
   \begin{block}{Absolute and relative classified frequencies}
     \begin{lstlisting}
-table(cut(fussball, breaks=c(value1,...,valuen), include.lowest=TRUE))
-prop.table(table(cut(fussball, breaks=c(value1,...,valuen), include.lowest=TRUE)))
+pd.Series(cls).value_counts(sort=False)                   # 7 3 0 0 1
+pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.0909
     \end{lstlisting}
   \end{block}
 \end{frame}
 
-% R Commands: Boxplot
-\begin{frame}[fragile]{R Commands: Boxplot}
+% Python Commands: Boxplot
+\begin{frame}[fragile]{Python Commands: Boxplot}
   \begin{block}{Standard boxplot (Tukey)}
     \begin{lstlisting}
-boxplot(fussball, horizontal=TRUE, range=1.5)
+plt.boxplot(shoe, vert=False, whis=1.5)   # horizontal, whiskers at k = 1.5
     \end{lstlisting}
-    \texttt{range} can be omitted for the default $k = 1.5$.
+    \texttt{whis} can be omitted for the default $k = 1.5$.
   \end{block}
-  \begin{block}{Boxplot with our quartile definition (type=1)}
+  \begin{alertblock}{Trap: matplotlib interpolates the quartiles}
+    \texttt{plt.boxplot} uses NumPy's default (linear interpolation), not our definition
+    $x_{(\lceil n\cdot p\rceil)}$:
     \begin{lstlisting}
-library(qboxplot)
-qboxplot(fussball ~ 1, qtype=1, horizontal=TRUE)
+np.quantile(shoe, [0.25, 0.75])                          # [38.5 40.] interpolated
+np.quantile(shoe, [0.25, 0.75], method="inverted_cdf")   # [38 40]    our definition
+    \end{lstlisting}
+    The box would start at $38.5$ instead of $Q_1 = 38$ -- next slide: boxplot with our quartiles.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Python Commands: Boxplot with Our Quartile Definition}
+  \begin{block}{Quartiles, whisker bounds, whiskers and outliers}
+    \begin{lstlisting}
+q1, med, q3 = np.quantile(shoe, [0.25, 0.5, 0.75], method="inverted_cdf")  # 38 39 40
+iqr = q3 - q1                                    # IQR = 2
+lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr          # bounds: 35.0  43.0
+inside = shoe[(shoe >= lo) & (shoe <= hi)]
+whislo, whishi = inside.min(), inside.max()      # whiskers: 37  41
+outliers = shoe[(shoe < lo) | (shoe > hi)]       # outlier: [46]
+    \end{lstlisting}
+  \end{block}
+  \begin{block}{Drawing the boxplot from exactly these statistics}
+    \begin{lstlisting}
+stats = dict(q1=q1, med=med, q3=q3, whislo=whislo, whishi=whishi, fliers=outliers)
+plt.gca().bxp([stats], vert=False)
+plt.show()
     \end{lstlisting}
   \end{block}
 \end{frame}
@@ -1163,3 +1226,4 @@ qboxplot(fussball ~ 1, qtype=1, horizontal=TRUE)
 \end{frame}
 
 \end{document}
+

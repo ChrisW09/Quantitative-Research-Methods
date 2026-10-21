@@ -89,7 +89,7 @@
               precision} from a confusion matrix,
         \item read a \textbf{ROC curve} and interpret the \textbf{AUC},
         \item evaluate a classifier honestly on \textbf{test data},
-        \item carry out every step in \texttt{R}.
+        \item carry out every step in Python.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -380,8 +380,8 @@
   \begin{itemize}\setlength{\itemsep}{2pt}
     \item In practice we maximise the \textbf{log-likelihood}
           $\log L=\sum_i\bigl[y_i\log p(x_i)+(1-y_i)\log(1-p(x_i))\bigr]$.
-    \item There is no closed formula -- \texttt{R} solves the problem
-          numerically (\texttt{glm}).
+    \item There is no closed formula -- Python solves it numerically
+          (\texttt{smf.logit(...).fit()}).
   \end{itemize}
 \end{frame}
 
@@ -429,25 +429,27 @@
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Logistic regression with R}
+\begin{frame}[fragile]{Logistic regression with Python}
   \begin{block}{Fitting the model}
 \begin{lstlisting}
-df <- read.csv("../data/Default.csv", stringsAsFactors = TRUE)
-g1 <- glm(default ~ balance, family = binomial, data = df)
-summary(g1)
+import pandas as pd
+import statsmodels.formula.api as smf
+df = pd.read_csv("../data/Default.csv")
+df["y"] = (df.default == "Yes").astype(int)     # 1 = default, 0 = no
+g1 = smf.logit("y ~ balance", data=df).fit(disp=0)
+print(g1.summary2().tables[1])
 \end{lstlisting}
   \end{block}
-\begin{lstlisting}[style=Rout]
-Coefficients:
-              Estimate Std. Error z value Pr(>|z|)
-(Intercept) -1.065e+01  3.612e-01  -29.49   <2e-16 ***
-balance      5.499e-03  2.204e-04   24.95   <2e-16 ***
+\begin{lstlisting}[style=Pyout]
+               Coef.  Std.Err.          z          P>|z|     [0.025    0.975]
+Intercept -10.651331  0.361169 -29.491287  3.723665e-191 -11.359208 -9.943453
+balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
 \end{lstlisting}
   \begin{itemize}\setlength{\itemsep}{2pt}
-    \item \texttt{family = binomial} makes \texttt{glm} (generalised linear
-          model) fit a logistic regression by maximum likelihood.
+    \item \texttt{smf.logit} fits a logistic regression by maximum
+          likelihood ($y$ coded $0/1$).
     \item Estimated model: $\hat\eta=-10.65+0.0055\cdot\text{balance}$.
-    \item The output looks like \texttt{lm} -- with $z$- instead of
+    \item The output looks like \texttt{smf.ols} -- with $z$- instead of
           $t$-values (see ``Inference'').
   \end{itemize}
 \end{frame}
@@ -646,24 +648,26 @@ balance      5.499e-03  2.204e-04   24.95   <2e-16 ***
           \textbf{holding all other variables fixed}; $e^{\beta_j}$ is the
           corresponding odds ratio.
     \item Qualitative variables enter as \textbf{dummies} (e.g.\
-          \texttt{studentYes} $=1$ for students).
+          \texttt{student[T.Yes]} $=1$ for students).
     \item Simple and multiple coefficients can differ completely --
           \textbf{confounding}.
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Multiple logistic regression with R}
+\begin{frame}[fragile]{Multiple logistic regression with Python}
 \begin{lstlisting}
-g3 <- glm(default ~ balance + income + student, family = binomial, data = df)
-summary(g3)
+g3 = smf.logit("y ~ balance + income + student", data=df).fit(disp=0)
+print(g3.summary().tables[1])
 \end{lstlisting}
-\begin{lstlisting}[style=Rout]
-Coefficients:
-              Estimate Std. Error z value Pr(>|z|)
-(Intercept) -1.087e+01  4.923e-01 -22.080  < 2e-16 ***
-balance      5.737e-03  2.319e-04  24.738  < 2e-16 ***
-income       3.033e-06  8.203e-06   0.370  0.71152
-studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
+\begin{lstlisting}[style=Pyout]
+==================================================================================
+                     coef    std err          z      P>|z|      [0.025      0.975]
+----------------------------------------------------------------------------------
+Intercept        -10.8690      0.492    -22.079      0.000     -11.834      -9.904
+student[T.Yes]    -0.6468      0.236     -2.738      0.006      -1.110      -0.184
+balance            0.0057      0.000     24.737      0.000       0.005       0.006
+income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-05
+==================================================================================
 \end{lstlisting}
   \begin{itemize}\setlength{\itemsep}{2pt}
     \item \textbf{Balance:} highly significant, positive.
@@ -740,7 +744,7 @@ studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
         & $\hat\beta_j$ & $\mathrm{SE}(\hat\beta_j)$\\
         \midrule
         income (per \$) & $3.033\cdot10^{-6}$ & $8.203\cdot10^{-6}$\\
-        studentYes & $-0.6468$ & $0.2363$\\
+        \texttt{student[T.Yes]} & $-0.6468$ & $0.2363$\\
         \bottomrule
       \end{tabular}
     \end{center}
@@ -809,8 +813,8 @@ studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
       \qquad
       \hat p_B=\frac{e^{0.054}}{1+e^{0.054}}=\textbf{0.514}
     \]
-    A is a very safe customer, B is right at the knife edge. (\texttt{R}
-    with unrounded coefficients: $0.0066$ and $0.512$.)
+    A is a very safe customer, B is right at the knife edge. (Python
+    with unrounded coefficients, \texttt{g3.predict(...)}: $0.0066$ and $0.512$.)
   \end{exampleblock}
   \textbf{(2)} $\;e^{0.00574\cdot100}=e^{0.574}=\textbf{1.78}$: $100$\,\$ more
   balance raises the odds by $78\,\%$ -- whatever the starting point.
@@ -1156,9 +1160,11 @@ studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
             confusion matrix and the AUC -- data the model has never seen.
     \end{itemize}
   \end{block}
-  \begin{exampleblock}{Default data: $7000$ training, $3000$ test customers (\texttt{set.seed(1)})}
-    Test AUC $=0.938$ (training data: $0.950$). At $t=0.5$ the model catches
-    $21$ of $102$ test defaulters, at $t=0.2$ already $58$.
+  \begin{exampleblock}{Default data: $7000$ training, $3000$ test customers (\texttt{random\_state=1})}
+    At $t=0.5$ the model catches $34$ of $112$ test defaulters, at $t=0.2$
+    already $67$. Test AUC $=0.956$ (in-sample on all data: $0.950$) -- with
+    only four coefficients there is little to overfit, and chance can even
+    push a test value above the in-sample one.
   \end{exampleblock}
 \end{frame}
 
@@ -1166,15 +1172,15 @@ studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
   \begin{block}{Problem statement}
     The model \texttt{default \textasciitilde\ balance + income + student} is
     fitted on $7000$ training customers and applied to the $3000$ test
-    customers ($102$ of them defaulted):
+    customers ($112$ of them defaulted):
     \begin{center}
       \renewcommand{\arraystretch}{1.2}
       \begin{tabular}{lcccc}
         \toprule
         & TN & FP & FN & TP\\
         \midrule
-        Test data, $t=0.5$ & $2896$ & $2$ & $81$ & $21$\\
-        Test data, $t=0.2$ & $2839$ & $59$ & $44$ & $58$\\
+        Test data, $t=0.5$ & $2878$ & $10$ & $78$ & $34$\\
+        Test data, $t=0.2$ & $2824$ & $64$ & $45$ & $67$\\
         \bottomrule
       \end{tabular}
     \end{center}
@@ -1195,43 +1201,42 @@ studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
       \toprule
       & $t=0.5$ & $t=0.2$\\
       \midrule
-      Accuracy & $\frac{2896+21}{3000}=0.972$ & $\frac{2839+58}{3000}=0.966$\\[2pt]
-      Sensitivity & $\frac{21}{102}=0.206$ & $\frac{58}{102}=0.569$\\[2pt]
-      Specificity & $\frac{2896}{2898}=0.999$ & $\frac{2839}{2898}=0.980$\\[2pt]
-      Precision & $\frac{21}{23}=0.913$ & $\frac{58}{117}=0.496$\\
+      Accuracy & $\frac{2878+34}{3000}=0.971$ & $\frac{2824+67}{3000}=0.964$\\[2pt]
+      Sensitivity & $\frac{34}{112}=0.304$ & $\frac{67}{112}=0.598$\\[2pt]
+      Specificity & $\frac{2878}{2888}=0.997$ & $\frac{2824}{2888}=0.978$\\[2pt]
+      Precision & $\frac{34}{44}=0.773$ & $\frac{67}{131}=0.511$\\
       \bottomrule
     \end{tabular}
   \end{center}
-  \textbf{(2)} On new customers the model catches only $20.6\,\%$ of the
-  defaulters at $t=0.5$, instead of $31.5\,\%$ on the data it was fitted on.
-  In-sample figures are \textbf{optimistic}; part of the gap is also chance,
-  as the test set contains only $102$ defaulters.
+  \textbf{(2)} On new customers the model catches $30.4\,\%$ of the
+  defaulters at $t=0.5$, slightly less than the $31.5\,\%$ on the data it was
+  fitted on. In-sample figures tend to be \textbf{optimistic}; here the gap is
+  small (a simple model, $7000$ training customers), and with only $112$ test
+  defaulters part of any difference is chance.
 
   \medskip
   \inworten{Report the test-data metrics -- they describe what the bank can
   expect for future applicants.}
 \end{frame}
 
-\begin{frame}[fragile]{Classification with R}
+\begin{frame}[fragile]{Classification with Python}
   \begin{block}{Predicted probabilities and confusion matrix}
 \begin{lstlisting}
-phat <- predict(g3, type = "response")         # estimated P(default = Yes)
-table(Actual = df$default, Predicted = phat > 0.5)
-table(Actual = df$default, Predicted = phat > 0.2)
+phat = g3.predict(df)            # P(default = Yes); log-odds: which="linear"
+print(pd.crosstab(df.default, phat > 0.5))     # t = 0.5: 9627 40 / 228 105
 \end{lstlisting}
   \end{block}
-  \begin{block}{Training and test data}
+  \begin{block}{Training and test data, test AUC}
 \begin{lstlisting}
-set.seed(1)                                    # reproducible split
-train <- sample(nrow(df), 7000)                # 70 % training data
-g_tr <- glm(default ~ balance + income + student, family = binomial,
-            data = df[train, ])
-p_te <- predict(g_tr, df[-train, ], type = "response")
-table(Actual = df$default[-train], Predicted = p_te > 0.5)
+from sklearn.metrics import roc_auc_score
+train = df.sample(n=7000, random_state=1)      # 70 % training data
+test = df.drop(train.index)                    # remaining 30 % test data
+g_tr = smf.logit("y ~ balance + income + student", data=train).fit(disp=0)
+p_te = g_tr.predict(test)                      # test-set probabilities
+print(pd.crosstab(test.default, p_te > 0.5))   # 2878 10 / 78 34
+print(roc_auc_score(test.y, p_te))             # test AUC 0.956
 \end{lstlisting}
   \end{block}
-  \inworten{Without \texttt{type = "response"}, \texttt{predict()} returns the
-  log-odds $\hat\eta$, not the probabilities.}
 \end{frame}
 
 % ============================================================================
@@ -1287,33 +1292,34 @@ table(Actual = df$default[-train], Predicted = p_te > 0.5)
 
 
 
-\begin{frame}[fragile]{Summary 3 -- important R commands}
+\begin{frame}[fragile]{Summary 3 -- important Python commands}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
       \begin{block}{Logistic regression}
 \begin{lstlisting}
-g <- glm(y ~ x1 + x2, family = binomial,
-         data = df)
-summary(g)              # z-tests
-exp(coef(g))            # odds ratios
-exp(confint.default(g)) # CIs for ORs
-predict(g, new, type = "response")
+g = smf.logit("y ~ x1 + x2",
+              data=df).fit()
+print(g.summary())    # z-tests
+np.exp(g.params)      # odds ratios
+np.exp(g.conf_int())  # CIs for ORs
+g.predict(new)        # probabilities
 \end{lstlisting}
       \end{block}
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{block}{Decisions and evaluation}
 \begin{lstlisting}
-phat <- predict(g, type = "response")
-table(df$y, phat > 0.5)  # confusion
-set.seed(1)
-train <- sample(nrow(df), 7000)
-test  <- df[-train, ]     # evaluate here
+phat = g.predict(df)
+pd.crosstab(df.y, phat > 0.5)
+roc_auc_score(df.y, phat)  # AUC
+train = df.sample(n=7000,
+                  random_state=1)
+test = df.drop(train.index)
 \end{lstlisting}
       \end{block}
     \end{column}
   \end{columns}
-  \appendixnote{Bayes classifiers in R: \texttt{MASS::lda()}, \texttt{e1071::naiveBayes()}}
+  \appendixnote{Bayes classifiers in sklearn: \texttt{LinearDiscriminantAnalysis}, \texttt{GaussianNB}}
 \end{frame}
 
 \begin{frame}{Five classic pitfalls -- final checklist}
@@ -1389,7 +1395,7 @@ test  <- df[-train, ]     # evaluate here
       A.1 Bayes' theorem & Prior $\times$ likelihood $\to$ posterior; the Bayes classifier\\
       A.2 Naive Bayes & Independent features: the spam filter (exercise)\\
       A.3 LDA & Normal classes with common variance (exercise)\\
-      A.4 Comparison & Logistic regression, LDA and naive Bayes; R commands\\
+      A.4 Comparison & Logistic regression, LDA and naive Bayes; Python commands\\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -1624,19 +1630,20 @@ test  <- df[-train, ]     # evaluate here
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Bayes classifiers with R}
+\begin{frame}[fragile]{Bayes classifiers with Python}
   \begin{block}{Linear discriminant analysis}
 \begin{lstlisting}
-library(MASS)                                   # provides lda()
-ld <- lda(default ~ balance + student, data = df)
-table(Actual = df$default, Predicted = predict(ld)$class)  # 9644 23 / 252 81
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+X = pd.get_dummies(df[["balance", "student"]], drop_first=True)
+lda = LinearDiscriminantAnalysis().fit(X, df.default)
+print(pd.crosstab(df.default, lda.predict(X)))   # 9644 23 / 252 81
 \end{lstlisting}
   \end{block}
   \begin{block}{Naive Bayes}
 \begin{lstlisting}
-library(e1071)                                  # provides naiveBayes()
-nb <- naiveBayes(default ~ balance + student, data = df)
-table(Actual = df$default, Predicted = predict(nb, df))
+from sklearn.naive_bayes import GaussianNB
+nb = GaussianNB().fit(X, df.default)       # normal f_kj for every feature
+print(pd.crosstab(df.default, nb.predict(X)))
 \end{lstlisting}
   \end{block}
 \end{frame}

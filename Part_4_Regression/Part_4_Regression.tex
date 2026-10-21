@@ -78,7 +78,7 @@
         \item compute and interpret \textbf{covariance} and
               \textbf{correlation},
         \item estimate a \textbf{simple linear regression} by least
-              squares -- by hand and in \texttt{R},
+              squares -- by hand and in Python,
         \item assess the fit with $R^2$, the \textbf{residual plot} and the
               \textbf{QQ-plot},
         \item carry out \textbf{$t$-tests}, compute \textbf{confidence
@@ -418,18 +418,20 @@
   \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{Covariance and correlation with R}
+\begin{frame}[fragile]{Covariance and correlation with Python}
   \begin{block}{Data}
 \begin{lstlisting}
-price    <- c(80, 85, 90, 95, 100, 105, 110, 115, 120)
-quantity <- c(20, 17, 15,  9,  11,   8,   4,   4,   2)
-plot(price, quantity)            # scatter plot
+import pandas as pd
+import matplotlib.pyplot as plt
+df = pd.DataFrame({"price":    [80, 85, 90, 95, 100, 105, 110, 115, 120],
+                   "quantity": [20, 17, 15,  9,  11,   8,   4,   4,   2]})
+plt.scatter(df["price"], df["quantity"])     # scatter plot
 \end{lstlisting}
   \end{block}
   \begin{block}{Covariance and correlation}
 \begin{lstlisting}
-cov(price, quantity)             # -83.75
-cor(price, quantity)             # -0.9732 (Pearson is the default)
+df["price"].cov(df["quantity"])     # -83.75  (divides by n-1)
+df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
 \end{lstlisting}
   \end{block}
 \end{frame}
@@ -736,21 +738,22 @@ cor(price, quantity)             # -0.9732 (Pearson is the default)
   lies near the data.}
 \end{frame}
 
-\begin{frame}[fragile]{Linear regression with R}
+\begin{frame}[fragile]{Linear regression with Python}
   \begin{block}{Coefficients by hand}
 \begin{lstlisting}
-(beta1 <- cov(price, quantity) / var(price))       # -0.4467
-(beta0 <- mean(quantity) - beta1 * mean(price))    # 54.6667
-beta1 * sd(price) / sd(quantity)                   # = cor(price, quantity)
+beta1 = df["price"].cov(df["quantity"]) / df["price"].var()   # -0.4467
+beta0 = df["quantity"].mean() - beta1 * df["price"].mean()   # 54.6667
+beta1 * df["price"].std() / df["quantity"].std()   # -0.9732 = correlation
 \end{lstlisting}
   \end{block}
 
-  \begin{block}{Regression with \texttt{lm()} (linear model)}
+  \begin{block}{Regression with \texttt{smf.ols()} (ordinary least squares)}
 \begin{lstlisting}
-reg <- lm(quantity ~ price)       # read: quantity explained by price
-coef(reg)                         # 54.6667  -0.4467
-plot(price, quantity, xlim = c(0, 125), ylim = c(0, 60))
-abline(reg)
+import statsmodels.formula.api as smf
+reg = smf.ols("quantity ~ price", data=df).fit()  # quantity explained by price
+reg.params                        # Intercept 54.6667, price -0.4467
+plt.scatter(df["price"], df["quantity"]); plt.xlim(0, 125); plt.ylim(0, 60)
+plt.axline((0, reg.params["Intercept"]), slope=reg.params["price"])
 \end{lstlisting}
   \end{block}
 \end{frame}
@@ -1165,23 +1168,23 @@ abline(reg)
     \]
   \end{exampleblock}
   \inworten{The middle formula is the one that also works in multiple
-  regression -- it is the one \texttt{R} uses.}
+  regression -- it is the one statsmodels uses for \texttt{rsquared}.}
 \end{frame}
 
-\begin{frame}[fragile]{Coefficient of determination in R}
-  \begin{block}{R command}
+\begin{frame}[fragile]{Coefficient of determination in Python}
+  \begin{block}{Python command}
 \begin{lstlisting}
-summary(reg)                   # full output, incl. "Multiple R-squared"
-summary(reg)$r.squared         # 0.9470
+print(reg.summary())           # full output, incl. "R-squared"
+reg.rsquared                   # 0.9470
 \end{lstlisting}
   \end{block}
 
   \begin{exampleblock}{Manual variants}
 \begin{lstlisting}
-RSS <- sum(resid(reg)^2)                       # 16.7333
-TSS <- sum((quantity - mean(quantity))^2)      # 316
-1 - RSS / TSS                                  # 0.9470
-cor(price, quantity)^2                         # simple regression only
+RSS = (reg.resid**2).sum()                                 # 16.7333
+TSS = ((df["quantity"] - df["quantity"].mean())**2).sum()  # 316
+1 - RSS / TSS                                              # 0.9470
+df["price"].corr(df["quantity"])**2                        # simple regression only
 \end{lstlisting}
   \end{exampleblock}
 \end{frame}
@@ -1341,21 +1344,21 @@ cor(price, quantity)^2                         # simple regression only
   \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Creating a residual plot with R}
-  \begin{block}{R commands}
+\begin{frame}[fragile]{Creating a residual plot with Python}
+  \begin{block}{Python commands}
 \begin{lstlisting}
-reg <- lm(quantity ~ price)
-plot(fitted(reg), resid(reg), xlab = "fitted values",
-     ylab = "residuals", main = "Residual plot")
-abline(h = 0, lty = 2)        # zero line for orientation
+reg = smf.ols("quantity ~ price", data=df).fit()
+plt.scatter(reg.fittedvalues, reg.resid)
+plt.axhline(0, linestyle="--")      # zero line for orientation
+plt.xlabel("fitted values"); plt.ylabel("residuals"); plt.title("Residual plot")
 \end{lstlisting}
   \end{block}
 
-  \begin{block}{Helper functions}
+  \begin{block}{Attributes of the fitted model}
     \begin{itemize}
-      \item \texttt{fitted(reg)}: fitted values
+      \item \texttt{reg.fittedvalues}: fitted values
             $\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$ ($x$-axis)
-      \item \texttt{resid(reg)}: residuals
+      \item \texttt{reg.resid}: residuals
             $\hat{u}_i = y_i - \hat{y}_i$ ($y$-axis)
     \end{itemize}
   \end{block}
@@ -1432,26 +1435,27 @@ abline(h = 0, lty = 2)        # zero line for orientation
   \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Creating a QQ-plot with R}
+\begin{frame}[fragile]{Creating a QQ-plot with Python}
   \begin{block}{Drawing the QQ-plot}
 \begin{lstlisting}
-qqplot(price, quantity)
+import numpy as np
+x, y = np.sort(df["price"]), np.sort(df["quantity"])
+plt.scatter(x, y)               # sorted values = empirical quantiles
 \end{lstlisting}
   \end{block}
 
   \begin{block}{Adding a line to the QQ-plot}
 \begin{lstlisting}
-qqline(quantity,
-       distribution = function(p) quantile(price, prob = p),
-       lty = 2)
+qx, qy = np.percentile(x, [25, 75]), np.percentile(y, [25, 75])
+plt.axline((qx[0], qy[0]), (qx[1], qy[1]), linestyle="--")
 \end{lstlisting}
   \end{block}
 
   \begin{exampleblock}{Idea}
-    \texttt{qqplot()} produces a QQ-diagram for the
-    \emph{empirical} distributions of two samples;
-    \texttt{qqline()} adds a reference line through the $25\,\%$
-    and $75\,\%$ quantiles.
+    Sorting two samples of equal size pairs their \emph{empirical}
+    quantiles -- this is the QQ-diagram;
+    the dashed reference line runs through the $25\,\%$
+    and $75\,\%$ quantiles of both samples.
   \end{exampleblock}
 \end{frame}
 
@@ -1517,24 +1521,23 @@ qqline(quantity,
   \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{QQ-plot of the residuals against the normal distribution in R}
-  \begin{block}{Create QQ-plot}
+\begin{frame}[fragile]{QQ-plot of the residuals against the normal distribution in Python}
+  \begin{block}{QQ-plot -- and the table of the previous slides by hand}
 \begin{lstlisting}
-qqnorm(resid(reg))
-\end{lstlisting}
-  \end{block}
-
-  \begin{block}{Add line through the quartiles}
-\begin{lstlisting}
-qqline(resid(reg))
+import statsmodels.api as sm
+from scipy import stats
+sm.qqplot(reg.resid, line="q", a=0.5)   # QQ-plot with line through quartiles
+u = np.sort(reg.resid)                  # sorted residuals
+p = (np.arange(1, 10) - 0.5) / 9        # plotting positions (i - 0.5)/n
+z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
 \end{lstlisting}
   \end{block}
 
   \begin{exampleblock}{What the commands do}
-    \texttt{qqnorm()} computes the plotting positions
-    $p_i = (i-0.5)/n$, the normal quantiles
+    \texttt{sm.qqplot()} computes the plotting positions
+    $p_i = (i-0.5)/n$ (set by \texttt{a=0.5}), the normal quantiles
     $z_i = \Phi^{-1}(p_i)$ and plots the pairs
-    $(z_i, \hat{u}_{(i)})$. \texttt{qqline()} adds a reference
+    $(z_i, \hat{u}_{(i)})$. \texttt{line="q"} adds a reference
     line through the $25\,\%$ and $75\,\%$ quantiles.
   \end{exampleblock}
 \end{frame}
@@ -1971,8 +1974,8 @@ qqline(resid(reg))
   \begin{alertblock}{As in Part~3}
     The direction must be fixed \emph{before} looking at the data, and the
     one-sided $p$-value is half the two-sided one only if $T$ points in the
-    direction of $H_1$. \texttt{R} always reports the \textbf{two-sided}
-    $p$-value.
+    direction of $H_1$. statsmodels always reports the \textbf{two-sided}
+    $p$-value (\texttt{P>|t|}, \texttt{reg.pvalues}).
   \end{alertblock}
 \end{frame}
 
@@ -2048,7 +2051,7 @@ qqline(resid(reg))
   \end{block}
 \end{frame}
 
-\subsection{\texorpdfstring{$p$}{p}-values and R output}
+\subsection{\texorpdfstring{$p$}{p}-values and Python output}
 
 \begin{frame}{The $p$-value of a coefficient}
   \begin{block}{Definition (as in Part~3)}
@@ -2073,28 +2076,31 @@ qqline(resid(reg))
   $\Leftrightarrow$ hypothesized value outside the CI.}
 \end{frame}
 
-\begin{frame}[fragile]{Reading the regression output in R}
-\begin{lstlisting}[style=Rout]
-> summary(lm(quantity ~ price))
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)
-(Intercept) 54.66667    4.02519   13.58 2.76e-06 ***
-price       -0.44667    0.03992  -11.19 1.02e-05 ***
----
-Residual standard error: 1.546 on 7 degrees of freedom
-Multiple R-squared:  0.947,  Adjusted R-squared:  0.9395
-F-statistic: 125.2 on 1 and 7 DF,  p-value: 1.016e-05
+\begin{frame}[fragile]{Reading the regression output in Python}
+\begin{lstlisting}[style=Pyout]
+>>> print(reg.summary())                                          # excerpt
+Dep. Variable:               quantity   R-squared:                       0.947
+Model:                            OLS   Adj. R-squared:                  0.939
+Method:                 Least Squares   F-statistic:                     125.2
+Date:                Wed, 21 Oct 2026   Prob (F-statistic):           1.02e-05
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept     54.6667      4.025     13.581      0.000      45.149      64.185
+price         -0.4467      0.040    -11.189      0.000      -0.541      -0.352
+>>> print(np.sqrt(reg.scale))           # sigma-hat: not part of the summary
+1.5461164867099084
 \end{lstlisting}
   \begin{center}
-    \footnotesize
-    \renewcommand{\arraystretch}{1.1}
+    \scriptsize
+    \renewcommand{\arraystretch}{1.05}
     \begin{tabular}{@{}ll@{}}
       \toprule
-      \texttt{Estimate}, \texttt{Std.\ Error} & $\hat\beta_j$ and $\operatorname{SE}(\hat\beta_j)$\\
-      \texttt{t value}, \texttt{Pr(>|t|)} & $T$ for $H_0:\beta_j=0$ and its two-sided $p$-value\\
-      \texttt{Residual standard error} & $\hat\sigma=\sqrt{\text{RSS}/(n-2)}$ with $n-2=7$ degrees of freedom\\
-      \texttt{Multiple R-squared} & $R^2$ \quad (adjusted $R^2$: see multiple regression)\\
-      \texttt{F-statistic} & tests all slopes jointly; here $F=T^2=(-11.19)^2=125.2$\\
+      \texttt{coef}, \texttt{std err} & $\hat\beta_j$, $\operatorname{SE}(\hat\beta_j)$ \quad (rounded; exact: \texttt{reg.bse} gives $0.03992$)\\
+      \texttt{t}, \texttt{P>|t|} & $T$ for $H_0:\beta_j=0$, two-sided $p$-value \quad ($0.000$: $p<0.0005$; exact: \texttt{reg.pvalues})\\
+      \texttt{[0.025\ \ 0.975]} & $95\,\%$ confidence interval for $\beta_j$ \quad (\texttt{reg.conf\_int()})\\
+      \texttt{R-squared}, \texttt{Adj.\ R-squared} & $R^2$ and adjusted $R^2$ (see multiple regression)\\
+      \texttt{F-statistic}, \texttt{Prob (F-statistic)} & all slopes jointly: $F=T^2=(-11.19)^2=125.2$, $p=1.02\cdot10^{-5}$\\
+      \texttt{np.sqrt(reg.scale)} & $\hat\sigma=\sqrt{\text{RSS}/(n-2)}$, $n-2=7$ degrees of freedom (\texttt{Df Residuals})\\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -2193,35 +2199,39 @@ F-statistic: 125.2 on 1 and 7 DF,  p-value: 1.016e-05
   \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Inference in simple regression with R (1/2)}
+\begin{frame}[fragile]{Inference in simple regression with Python (1/2)}
   \begin{block}{Tests, $p$-values and confidence intervals}
 \begin{lstlisting}
-reg <- lm(quantity ~ price)
-summary(reg)                     # estimates, SE, t, p, R^2
-confint(reg, level = 0.95)       # CI for beta0 and beta1
+reg = smf.ols("quantity ~ price", data=df).fit()
+print(reg.summary())             # estimates, SE, t, p, R^2
+reg.conf_int(alpha=0.05)         # CI for beta0 and beta1
 \end{lstlisting}
   \end{block}
   \begin{block}{By hand}
 \begin{lstlisting}
-se_b1 <- summary(reg)$coefficients["price", "Std. Error"]
-T <- (coef(reg)["price"] - (-0.5)) / se_b1    # H0: beta1 = -0.5
-2 * pt(-abs(T), df = 7)                       # p-value 0.223
-qt(0.975, df = 7)                             # critical value 2.3646
+from scipy import stats
+se_b1 = reg.bse["price"]                         # 0.03992
+T = (reg.params["price"] - (-0.5)) / se_b1       # H0: beta1 = -0.5
+2 * stats.t.cdf(-abs(T), df=7)                   # p-value 0.223
+stats.t.ppf(0.975, df=7)                         # critical value 2.3646
 \end{lstlisting}
   \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{Inference in simple regression with R (2/2)}
+\begin{frame}[fragile]{Inference in simple regression with Python (2/2)}
   \begin{block}{Prediction}
 \begin{lstlisting}
-new <- data.frame(price = 110)
-predict(reg, new, interval = "confidence")    # mean sales: [3.99, 7.07]
-predict(reg, new, interval = "prediction")    # one store:  [1.57, 9.50]
+new = pd.DataFrame({"price": [110]})
+pred = reg.get_prediction(new).summary_frame(alpha=0.05)
+pred[["mean_ci_lower", "mean_ci_upper"]]    # mean sales: [3.99, 7.07]
+pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
 \end{lstlisting}
   \end{block}
   \begin{exampleblock}{Note}
-    \texttt{predict()} needs a data frame whose column has \emph{the same
-    name} as the explanatory variable in the model (here \texttt{price}).
+    \texttt{get\_prediction()} needs a data frame whose column has \emph{the
+    same name} as the explanatory variable in the formula (here
+    \texttt{price}). \texttt{mean\_ci\_*} is the confidence interval for the
+    mean, \texttt{obs\_ci\_*} the prediction interval for one observation.
   \end{exampleblock}
 \end{frame}
 
@@ -2525,25 +2535,26 @@ predict(reg, new, interval = "prediction")    # one store:  [1.57, 9.50]
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Multiple regression with R}
+\begin{frame}[fragile]{Multiple regression with Python}
   \begin{block}{Fitting the model}
 \begin{lstlisting}
-ad <- read.csv("../data/Advertising.csv", row.names = 1)
-m3 <- lm(sales ~ TV + radio + newspaper, data = ad)  # sales explained by ...
-summary(m3)
+ad = pd.read_csv("../data/Advertising.csv", index_col=0)
+m3 = smf.ols("sales ~ TV + radio + newspaper", data=ad).fit()  # sales explained by ...
+print(m3.summary()); print(np.sqrt(m3.scale))    # excerpt; sigma-hat in last line
 \end{lstlisting}
   \end{block}
-\begin{lstlisting}[style=Rout]
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)
-(Intercept)  2.938889   0.311908   9.422   <2e-16 ***
-TV           0.045765   0.001395  32.809   <2e-16 ***
-radio        0.188530   0.008611  21.893   <2e-16 ***
-newspaper   -0.001037   0.005871  -0.177     0.86
----
-Residual standard error: 1.686 on 196 degrees of freedom
-Multiple R-squared:  0.8972,  Adjusted R-squared:  0.8956
-F-statistic: 570.3 on 3 and 196 DF,  p-value: < 2.2e-16
+\begin{lstlisting}[style=Pyout]
+Dep. Variable:                  sales   R-squared:                       0.897
+Model:                            OLS   Adj. R-squared:                  0.896
+Method:                 Least Squares   F-statistic:                     570.3
+Date:                Wed, 21 Oct 2026   Prob (F-statistic):           1.58e-96
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept      2.9389      0.312      9.422      0.000       2.324       3.554
+TV             0.0458      0.001     32.809      0.000       0.043       0.049
+radio          0.1885      0.009     21.893      0.000       0.172       0.206
+newspaper     -0.0010      0.006     -0.177      0.860      -0.013       0.011
+1.685510373414744
 \end{lstlisting}
 \end{frame}
 
@@ -2949,22 +2960,27 @@ F-statistic: 570.3 on 3 and 196 DF,  p-value: < 2.2e-16
 
 \begin{frame}[fragile]{Exercise -- reading a multiple regression output}
   \footnotesize
-  Credit data ($n=400$): card balance (in \$) explained by income (in
-  $1000$\,\$), credit limit (in \$) and student status.
-\begin{lstlisting}[style=Rout]
-              Estimate Std. Error t value Pr(>|t|)
-(Intercept) -4.323e+02  1.243e+01  -34.78   <2e-16 ***
-Income      -7.902e+00  2.432e-01  -32.49   <2e-16 ***
-Limit        2.675e-01  3.712e-03   72.07   <2e-16 ***
-StudentYes   4.270e+02  1.742e+01   24.52   <2e-16 ***
-Residual standard error: 104.4 on 396 degrees of freedom
-Multiple R-squared:  0.9488,  Adjusted R-squared:  0.9484
-F-statistic:  2447 on 3 and 396 DF,  p-value: < 2.2e-16
+  Credit data ($n=400$): balance (\$) explained by income ($1000$\,\$), credit
+  limit (\$) and student status.
+\begin{lstlisting}[style=Pyout]
+>>> mc = smf.ols("Balance ~ Income + Limit + Student", data=cr).fit()
+>>> print(mc.summary())                                               # excerpt
+Dep. Variable:                Balance   R-squared:                       0.949
+Model:                            OLS   Adj. R-squared:                  0.948
+Method:                 Least Squares   F-statistic:                     2447.
+Date:                Wed, 21 Oct 2026   Prob (F-statistic):          4.00e-255
+                     coef    std err          t      P>|t|      [0.025      0.975]
+----------------------------------------------------------------------------------
+Intercept       -432.3374     12.431    -34.778      0.000    -456.777    -407.898
+Student[T.Yes]   427.0233     17.416     24.519      0.000     392.784     461.263
+Income            -7.9016      0.243    -32.495      0.000      -8.380      -7.424
+Limit              0.2675      0.004     72.069      0.000       0.260       0.275
 \end{lstlisting}
   \begin{enumerate}
-    \item Interpret the coefficients of \texttt{Limit} and \texttt{StudentYes}.
-    \item Compute the $95\,\%$ CI for the income coefficient
-          ($t_{0.975;\,396}=1.966$).
+    \item Interpret the coefficients of \texttt{Limit} and \texttt{Student[T.Yes]}.
+    \item Compute the $95\,\%$ CI for the income coefficient by hand
+          ($t_{0.975;\,396}=1.966$, unrounded \texttt{std err} $0.2432$) and
+          compare it with the columns \texttt{[0.025\ \ 0.975]}.
     \item Alone, \texttt{Balance \textasciitilde\ Income} has slope $+6.05$.
           Why is it negative here? ($r(\text{Income},\text{Limit})=0.79$.)
     \item What do the $F$-test and $R^2$ say? Predict the balance of a
@@ -2975,8 +2991,9 @@ F-statistic:  2447 on 3 and 396 DF,  p-value: < 2.2e-16
 \begin{frame}{Solution (1/2) -- reading a multiple regression output}
   \textbf{(1)} Holding income and student status fixed, $1$\,\$ more credit
   limit goes along with $0.27$\,\$ more balance ($1000$\,\$ limit
-  $\to$ $267.5$\,\$). At the same income and limit, students carry on average
-  $427$\,\$ more balance than non-students.
+  $\to$ $267.5$\,\$). At the same income and limit, students
+  (\texttt{Student[T.Yes]}: dummy $=1$ for ``Yes'', baseline ``No'') carry on
+  average $427$\,\$ more balance than non-students.
 
   \medskip
   \textbf{(2)}
@@ -2984,7 +3001,8 @@ F-statistic:  2447 on 3 and 396 DF,  p-value: < 2.2e-16
     -7.902\pm1.966\cdot0.2432=-7.902\pm0.478=[-8.380;\,-7.424]
   \]
   $1000$\,\$ more income goes along with $7.4$ to $8.4$\,\$ \emph{less} balance
-  -- holding limit and student status fixed. $0$ lies far outside the CI.
+  -- holding limit and student status fixed. This is exactly the interval in
+  the columns \texttt{[0.025\ \ 0.975]}; $0$ lies far outside it.
 
   \medskip
   \textbf{(3)} \textbf{Confounding:} people with higher incomes get higher
@@ -2995,16 +3013,19 @@ F-statistic:  2447 on 3 and 396 DF,  p-value: < 2.2e-16
 
 \begin{frame}{Solution (2/2) -- reading a multiple regression output}
   \begin{exampleblock}{(4) $F$-test and $R^2$}
-    $F=2447$ with $p<2.2\cdot10^{-16}$: at least one variable is related to
-    the balance. The model explains $94.9\,\%$ of the variance
-    ($\bar R^2=0.948$, almost identical with only $p=3$ variables).
+    \texttt{F-statistic} $=2447$ with \texttt{Prob (F-statistic)}
+    $=4.00\cdot10^{-255}$, i.e.\ $p\approx0$: at least one variable is related
+    to the balance. The model explains $94.9\,\%$ of the variance
+    (\texttt{R-squared}); \texttt{Adj.\ R-squared} $=0.948$ is almost
+    identical with only $p=3$ variables.
   \end{exampleblock}
   \begin{exampleblock}{(4) Prediction (non-student, income $50$, limit $5000$)}
     \[
       \hat y_0=-432.3-7.902\cdot50+0.2675\cdot5000+427.0\cdot0
              =-432.3-395.1+1337.5\approx\mathbf{510}\,\$
     \]
-    \texttt{R} (unrounded): $510.3$, $95\,\%$ prediction interval
+    Python (unrounded, \texttt{mc.get\_prediction(new).summary\_frame()}):
+    $510.3$, $95\,\%$ prediction interval (\texttt{obs\_ci\_*})
     $[304.7;\,715.8]$. A student with the same income and limit: $937.3$\,\$.
   \end{exampleblock}
   \inworten{Every number in a regression output has a meaning -- but only
@@ -3034,21 +3055,23 @@ F-statistic:  2447 on 3 and 396 DF,  p-value: < 2.2e-16
 
 
 
-\begin{frame}[fragile]{Multiple regression with R -- overview}
+\begin{frame}[fragile]{Multiple regression with Python -- overview}
   \begin{block}{Fitting, testing, comparing}
 \begin{lstlisting}
-m3 <- lm(sales ~ TV + radio + newspaper, data = ad)
-summary(m3)            # t-tests, R^2, adjusted R^2, F-test
-confint(m3)            # confidence intervals
-m2 <- lm(sales ~ TV + radio, data = ad)
-anova(m2, m3)          # F-test: does newspaper add anything? (p = 0.86)
+m3 = smf.ols("sales ~ TV + radio + newspaper", data=ad).fit()
+print(m3.summary())         # t-tests, R^2, adjusted R^2, F-test
+m3.conf_int()               # confidence intervals
+m2 = smf.ols("sales ~ TV + radio", data=ad).fit()
+sm.stats.anova_lm(m2, m3)   # F-test: does newspaper add anything? (p = 0.86)
 \end{lstlisting}
   \end{block}
   \begin{block}{Dummy variables and prediction}
 \begin{lstlisting}
-lm(Balance ~ Income + Student, data = cr)   # factor -> dummy automatically
-predict(m2, data.frame(TV = 100, radio = 20), interval = "prediction")
-plot(fitted(m2), resid(m2)); abline(h = 0)  # residual plot
+cr = pd.read_csv("../data/Credit.csv")
+smf.ols("Balance ~ Income + Student", data=cr).fit()  # text -> dummy Student[T.Yes]
+new = pd.DataFrame({"TV": [100], "radio": [20]})
+m2.get_prediction(new).summary_frame()      # obs_ci_*: prediction interval
+plt.scatter(m2.fittedvalues, m2.resid); plt.axhline(0)   # residual plot
 \end{lstlisting}
   \end{block}
   \appendixnote{interactions, diagnostics in multiple regression, collinearity}
@@ -3135,30 +3158,31 @@ plot(fitted(m2), resid(m2)); abline(h = 0)  # residual plot
   \appendixnote{interactions, diagnostics, collinearity (VIF)}
 \end{frame}
 
-\begin{frame}[fragile]{Summary 5 -- important R commands}
+\begin{frame}[fragile]{Summary 5 -- important Python commands}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
       \begin{block}{Description and estimation}
 \begin{lstlisting}
-plot(x, y)              # scatter plot
-cov(x, y); cor(x, y)    # covariance, corr.
-reg <- lm(y ~ x)        # linear model
-coef(reg)               # coefficients
-abline(reg)             # regression line
-summary(reg)            # SE, t, p, R^2, F
+plt.scatter(df["x"], df["y"])   # scatter
+df["x"].cov(df["y"])            # covariance
+df["x"].corr(df["y"])           # correlation
+reg = smf.ols("y ~ x", data=df).fit()
+b0, b1 = reg.params             # estimates
+plt.axline((0, b0), slope=b1)   # line
+print(reg.summary())    # SE, t, p, R^2, F
 \end{lstlisting}
       \end{block}
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{block}{Inference and diagnostics}
 \begin{lstlisting}
-confint(reg)            # CIs
-predict(reg, new, interval = "prediction")
-plot(fitted(reg), resid(reg))
-qqnorm(resid(reg)); qqline(resid(reg))
-hatvalues(reg)          # leverages
-lm(y ~ x1 + x2 + x3)    # multiple reg.
-anova(small, large)     # F-test
+reg.conf_int()                  # CIs
+reg.get_prediction(new).summary_frame()
+plt.scatter(reg.fittedvalues, reg.resid)
+sm.qqplot(reg.resid, line="q")  # QQ-plot
+reg.get_influence().hat_matrix_diag
+smf.ols("y ~ x1 + x2 + x3", data=df).fit()
+sm.stats.anova_lm(small, large) # F-test
 \end{lstlisting}
       \end{block}
     \end{column}
@@ -3531,14 +3555,22 @@ anova(small, large)     # F-test
   \end{alertblock}
 \end{frame}
 
-\begin{frame}[fragile]{Appendix -- R commands}
+\begin{frame}[fragile]{Appendix -- Python commands}
   \begin{block}{Interactions and diagnostics}
 \begin{lstlisting}
-mi <- lm(sales ~ TV * radio, data = ad)     # TV + radio + TV:radio
-summary(mi)
-plot(fitted(m2), resid(m2)); abline(h = 0)  # residual plot (curvature?)
-hatvalues(m2) > 2 * (2 + 1) / 200           # flag high leverage, p = 2
-1 / (1 - summary(lm(Limit ~ Age + Rating, data = cr))$r.squared)  # VIF
+mi = smf.ols("sales ~ TV * radio", data=ad).fit()   # TV + radio + TV:radio
+print(mi.summary())
+plt.scatter(m2.fittedvalues, m2.resid); plt.axhline(0)   # curvature?
+h = m2.get_influence().hat_matrix_diag      # leverages h_i
+(h > 2 * (2 + 1) / 200).sum()               # high leverage (p = 2): 2 points
+\end{lstlisting}
+  \end{block}
+  \begin{block}{Variance inflation factor}
+\begin{lstlisting}
+1 / (1 - smf.ols("Limit ~ Age + Rating", data=cr).fit().rsquared)  # 160.6
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+X = sm.add_constant(cr[["Age", "Limit", "Rating"]])
+[variance_inflation_factor(X.values, j) for j in (1, 2, 3)]  # 1.01 160.6 160.7
 \end{lstlisting}
   \end{block}
 \end{frame}
