@@ -5,7 +5,7 @@
 
 \subtitle{Part 5: Classification}
 \newcommand{\overviewleft}{1-4}
-\newcommand{\overviewright}{5-7}
+\newcommand{\overviewright}{5-6}
 
 \begin{document}
 
@@ -28,7 +28,7 @@
       \tableofcontents[hideallsubsections,sections={1-4}]
     \end{column}
     \begin{column}{0.5\textwidth}
-      \tableofcontents[hideallsubsections,sections={5-7}]
+      \tableofcontents[hideallsubsections,sections={5-6}]
     \end{column}
   \end{columns}
 \end{frame}
@@ -72,7 +72,7 @@
   After this part you will be able to \ldots
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \small\begin{itemize}\setlength{\itemsep}{2pt}
+      \small\begin{itemize}\setlength{\itemsep}{1pt}
         \item explain why \textbf{linear regression fails} for a $0/1$
               variable,
         \item convert between \textbf{probability, odds and log-odds},
@@ -83,19 +83,19 @@
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \small\begin{itemize}\setlength{\itemsep}{2pt}
+      \small\begin{itemize}\setlength{\itemsep}{1pt}
         \item turn probabilities into decisions with a \textbf{threshold},
         \item compute \textbf{accuracy, sensitivity, specificity and
               precision} from a confusion matrix,
         \item read a \textbf{ROC curve} and interpret the \textbf{AUC},
-        \item apply \textbf{Bayes' theorem} for classification (naive Bayes,
-              LDA),
+        \item evaluate a classifier honestly on \textbf{test data},
         \item carry out every step in \texttt{R}.
       \end{itemize}
     \end{column}
   \end{columns}
   \kernaussage{Common thread: classification = estimating a probability
   \emph{plus} a decision rule -- and both have to be evaluated honestly.}
+\appendixnote{Bayes' theorem for classification, naive Bayes, LDA}
 \end{frame}
 
 % ============================================================================
@@ -1185,11 +1185,167 @@ table(Actual = df$default[-train], Predicted = p_te > 0.5)
 \end{frame}
 
 % ============================================================================
-% SECTION 6: BAYES CLASSIFIERS
+% SECTION 7: SUMMARY
 % ============================================================================
-\section[Bayes classifiers]{Bayes' Theorem and Generative Classifiers}
+\section{Summary}
 
-\subsection{Bayes' theorem for classification}
+\begin{frame}{Summary 1 -- logistic regression}
+  \begin{block}{Model}
+    \[
+      \log\frac{p(x)}{1-p(x)}=\beta_0+\beta_1x_1+\dots+\beta_px_p,
+      \qquad
+      p(x)=\frac{e^{\eta}}{1+e^{\eta}}
+    \]
+    estimated by \textbf{maximum likelihood}.
+  \end{block}
+  \begin{block}{Interpretation of $\beta_j$ (holding the other variables fixed)}
+    \begin{itemize}\setlength{\itemsep}{0pt}
+      \item sign: direction of the effect on the probability,
+      \item $\beta_j$: change of the log-odds per unit of $x_j$,
+      \item $e^{\beta_j}$: \textbf{odds ratio} -- factor by which the odds
+            change per unit of $x_j$.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Inference}
+    $Z=\hat\beta_j/\mathrm{SE}(\hat\beta_j)\approx N(0,1)$, \
+    CI $\hat\beta_j\pm z_{1-\alpha/2}\mathrm{SE}(\hat\beta_j)$, \
+    CI for the odds ratio: exponentiate the bounds.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Summary 2 -- decisions and evaluation}
+  \begin{block}{Classification rule}
+    $\hat y=1$ if $\hat p(x)>t$ \ $\Leftrightarrow$ \ $\hat\eta(x)>\log\frac{t}{1-t}$;
+    \ the threshold $t$ is a business decision.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{l|l|l}
+      \toprule
+      \textbf{Measure} & \textbf{Formula} & \textbf{Question}\\
+      \midrule
+      Accuracy & $(\mathrm{TP}+\mathrm{TN})/n$ & share of correct decisions\\
+      Sensitivity & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ & share of positives caught\\
+      Specificity & $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ & share of negatives left alone\\
+      Precision & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$ & share of alarms that are real\\
+      AUC & area under ROC curve & ranking quality over all thresholds\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{Evaluate on \textbf{test data} the model has not seen.}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Summary 3 -- important R commands}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Logistic regression}
+\begin{lstlisting}
+g <- glm(y ~ x1 + x2, family = binomial,
+         data = df)
+summary(g)              # z-tests
+exp(coef(g))            # odds ratios
+exp(confint.default(g)) # CIs for ORs
+predict(g, new, type = "response")
+\end{lstlisting}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Decisions and evaluation}
+\begin{lstlisting}
+phat <- predict(g, type = "response")
+table(df$y, phat > 0.5)  # confusion
+set.seed(1)
+train <- sample(nrow(df), 7000)
+test  <- df[-train, ]     # evaluate here
+\end{lstlisting}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \appendixnote{Bayes classifiers in R: \texttt{MASS::lda()}, \texttt{e1071::naiveBayes()}}
+\end{frame}
+
+\begin{frame}{Five classic pitfalls -- final checklist}
+  \small
+  \begin{center}
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.7cm}@{}}
+      \toprule
+      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
+      \textbf{Correct version \ \textcolor{hsbigruen}{$\checkmark$}}\\
+      \midrule
+      ``The odds ratio is $1.78$, so the probability rises by $78\,\%$.'' &
+        The \emph{odds} rise by $78\,\%$; the change in probability depends on
+        the starting point.\\
+      ``Accuracy $97\,\%$ -- an excellent classifier.'' &
+        With $3\,\%$ defaulters, always saying ``no'' gives $97\,\%$; check
+        sensitivity and specificity.\\
+      ``$t=0.5$ is the correct threshold.'' &
+        The threshold depends on the costs of the two errors.\\
+      ``A better threshold improves the AUC.'' &
+        The threshold moves along the ROC curve; only a better model raises
+        the AUC.\\
+      ``Students are riskier, so reject students.'' &
+        At the same balance, students are \emph{less} risky -- ask what is
+        held fixed.\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Looking back: the lecture in one slide}
+  \begin{center}
+    \small\renewcommand{\arraystretch}{1.22}
+    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{9.6cm}@{}}
+      \toprule
+      \textbf{Part} & \textbf{Key idea}\\
+      \midrule
+      1 -- Descriptive Statistics & Summarise data by location and dispersion ($\bar x$, $\tilde x$, $s$, $v$).\\
+      2 -- Graphical Representations & Show the distribution: empirical CDF, histogram, boxplot.\\
+      3 -- Statistical Inference & Infer from sample to population: estimate $\pm$ critical value $\times$ SE; tests and $p$-values.\\
+      4 -- Regression & Explain a metric $Y$ by several $X$ -- with $t$-tests, CIs and diagnostics.\\
+      5 -- Classification & Explain a categorical $Y$: logistic regression, decision rules, evaluation.\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \kernaussage{One thread through all five parts: every number computed from
+  data is an \textbf{estimate} -- describe it, picture it, and report its
+  uncertainty.}
+\end{frame}
+
+
+% ============================================================================
+% APPENDIX: OPTIONAL AND ADVANCED MATERIAL
+% ============================================================================
+\appendix
+\let\overviewleft\undefined
+\section[Appendix]{Appendix: Bayes' Theorem and Generative Classifiers}
+
+\begin{frame}{Appendix -- what is in here, and why}
+  \begin{block}{Optional material}
+    The main part covers the standard classification workflow with logistic
+    regression. The appendix shows a second family of classifiers that
+    start from \textbf{Bayes' theorem} -- useful for small samples, many
+    features or more than two classes.
+  \end{block}
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{9.6cm}@{}}
+      \toprule
+      \textbf{Topic} & \textbf{Content}\\
+      \midrule
+      A.1 Bayes' theorem & Prior $\times$ likelihood $\to$ posterior; the Bayes classifier\\
+      A.2 Naive Bayes & Independent features: the spam filter (exercise)\\
+      A.3 LDA & Normal classes with common variance (exercise)\\
+      A.4 Comparison & Logistic regression, LDA and naive Bayes; R commands\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\subsection{A.1 Bayes' theorem for classification}
 
 \begin{frame}{Two ways to obtain $P(Y=k\mid x)$}
   \begin{columns}[T]
@@ -1264,7 +1420,7 @@ table(Actual = df$default[-train], Predicted = p_te > 0.5)
   differ only in \textbf{how they model the likelihood} $f_k(x)$.}
 \end{frame}
 
-\subsection{Naive Bayes}
+\subsection{A.2 Naive Bayes}
 
 \begin{frame}{Naive Bayes: an extreme simplification}
   \begin{block}{Assumption}
@@ -1330,7 +1486,7 @@ table(Actual = df$default[-train], Predicted = p_te > 0.5)
   \end{alertblock}
 \end{frame}
 
-\subsection{Linear discriminant analysis}
+\subsection{A.3 Linear discriminant analysis}
 
 \begin{frame}{Linear discriminant analysis (LDA) with one variable}
   \begin{block}{Assumption}
@@ -1394,7 +1550,7 @@ table(Actual = df$default[-train], Predicted = p_te > 0.5)
   became rare: the rarer class needs stronger evidence.}
 \end{frame}
 
-\subsection{Comparison}
+\subsection{A.4 Comparison}
 
 \begin{frame}{Logistic regression, LDA and naive Bayes}
   \begin{center}
@@ -1435,58 +1591,7 @@ table(Actual = df$default, Predicted = predict(nb, df))
   \end{block}
 \end{frame}
 
-% ============================================================================
-% SECTION 7: SUMMARY
-% ============================================================================
-\section{Summary}
-
-\begin{frame}{Summary 1 -- logistic regression}
-  \begin{block}{Model}
-    \[
-      \log\frac{p(x)}{1-p(x)}=\beta_0+\beta_1x_1+\dots+\beta_px_p,
-      \qquad
-      p(x)=\frac{e^{\eta}}{1+e^{\eta}}
-    \]
-    estimated by \textbf{maximum likelihood}.
-  \end{block}
-  \begin{block}{Interpretation of $\beta_j$ (holding the other variables fixed)}
-    \begin{itemize}\setlength{\itemsep}{0pt}
-      \item sign: direction of the effect on the probability,
-      \item $\beta_j$: change of the log-odds per unit of $x_j$,
-      \item $e^{\beta_j}$: \textbf{odds ratio} -- factor by which the odds
-            change per unit of $x_j$.
-    \end{itemize}
-  \end{block}
-  \begin{block}{Inference}
-    $Z=\hat\beta_j/\mathrm{SE}(\hat\beta_j)\approx N(0,1)$, \
-    CI $\hat\beta_j\pm z_{1-\alpha/2}\mathrm{SE}(\hat\beta_j)$, \
-    CI for the odds ratio: exponentiate the bounds.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Summary 2 -- decisions and evaluation}
-  \begin{block}{Classification rule}
-    $\hat y=1$ if $\hat p(x)>t$ \ $\Leftrightarrow$ \ $\hat\eta(x)>\log\frac{t}{1-t}$;
-    \ the threshold $t$ is a business decision.
-  \end{block}
-  \begin{center}
-    \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{l|l|l}
-      \toprule
-      \textbf{Measure} & \textbf{Formula} & \textbf{Question}\\
-      \midrule
-      Accuracy & $(\mathrm{TP}+\mathrm{TN})/n$ & share of correct decisions\\
-      Sensitivity & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ & share of positives caught\\
-      Specificity & $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ & share of negatives left alone\\
-      Precision & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$ & share of alarms that are real\\
-      AUC & area under ROC curve & ranking quality over all thresholds\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \inworten{Evaluate on \textbf{test data} the model has not seen.}
-\end{frame}
-
-\begin{frame}{Summary 3 -- Bayes classifiers}
+\begin{frame}{Appendix summary -- Bayes classifiers}
   \begin{block}{Bayes' theorem}
     \[
       P(Y=k\mid x)=\frac{\pi_k\,f_k(x)}{\sum_\ell\pi_\ell\,f_\ell(x)}
@@ -1502,83 +1607,6 @@ table(Actual = df$default, Predicted = predict(nb, df))
     \item A rare class needs stronger evidence -- the prior shifts the
           boundary.
   \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Summary 4 -- important R commands}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Logistic regression}
-\begin{lstlisting}
-g <- glm(y ~ x1 + x2, family = binomial,
-         data = df)
-summary(g)              # z-tests
-exp(coef(g))            # odds ratios
-exp(confint.default(g)) # CIs for ORs
-predict(g, new, type = "response")
-\end{lstlisting}
-      \end{block}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Decisions and evaluation}
-\begin{lstlisting}
-phat <- predict(g, type = "response")
-table(df$y, phat > 0.5)  # confusion
-set.seed(1)
-train <- sample(nrow(df), 7000)
-MASS::lda(y ~ x1 + x2, data = df)
-e1071::naiveBayes(y ~ x1, data = df)
-\end{lstlisting}
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Five classic pitfalls -- final checklist}
-  \small
-  \begin{center}
-    \renewcommand{\arraystretch}{1.45}
-    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.7cm}@{}}
-      \toprule
-      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
-      \textbf{Correct version \ \textcolor{hsbigruen}{$\checkmark$}}\\
-      \midrule
-      ``The odds ratio is $1.78$, so the probability rises by $78\,\%$.'' &
-        The \emph{odds} rise by $78\,\%$; the change in probability depends on
-        the starting point.\\
-      ``Accuracy $97\,\%$ -- an excellent classifier.'' &
-        With $3\,\%$ defaulters, always saying ``no'' gives $97\,\%$; check
-        sensitivity and specificity.\\
-      ``$t=0.5$ is the correct threshold.'' &
-        The threshold depends on the costs of the two errors.\\
-      ``A better threshold improves the AUC.'' &
-        The threshold moves along the ROC curve; only a better model raises
-        the AUC.\\
-      ``Students are riskier, so reject students.'' &
-        At the same balance, students are \emph{less} risky -- ask what is
-        held fixed.\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-\end{frame}
-
-\begin{frame}{Looking back: the lecture in one slide}
-  \begin{center}
-    \small\renewcommand{\arraystretch}{1.22}
-    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{9.6cm}@{}}
-      \toprule
-      \textbf{Part} & \textbf{Key idea}\\
-      \midrule
-      1 -- Descriptive Statistics & Summarise data by location and dispersion ($\bar x$, $\tilde x$, $s$, $v$).\\
-      2 -- Graphical Representations & Show the distribution: empirical CDF, histogram, boxplot.\\
-      3 -- Statistical Inference & Infer from sample to population: estimate $\pm$ critical value $\times$ SE; tests and $p$-values.\\
-      4 -- Regression & Explain a metric $Y$ by several $X$ -- with $t$-tests, CIs and diagnostics.\\
-      5 -- Classification & Explain a categorical $Y$: logistic regression, decision rules, evaluation.\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \kernaussage{One thread through all five parts: every number computed from
-  data is an \textbf{estimate} -- describe it, picture it, and report its
-  uncertainty.}
 \end{frame}
 
 \end{document}

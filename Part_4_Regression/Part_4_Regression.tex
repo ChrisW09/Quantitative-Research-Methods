@@ -5,7 +5,7 @@
 
 \subtitle{Part 4: Regression}
 \newcommand{\overviewleft}{1-4}
-\newcommand{\overviewright}{5-8}
+\newcommand{\overviewright}{5-7}
 
 \begin{document}
 
@@ -28,7 +28,7 @@
       \tableofcontents[hideallsubsections,sections={1-4}]
     \end{column}
     \begin{column}{0.5\textwidth}
-      \tableofcontents[hideallsubsections,sections={5-8}]
+      \tableofcontents[hideallsubsections,sections={5-7}]
     \end{column}
   \end{columns}
 \end{frame}
@@ -74,7 +74,7 @@
   After this part you will be able to \ldots
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \begin{itemize}\setlength{\itemsep}{3pt}
+      \small\begin{itemize}\setlength{\itemsep}{2pt}
         \item compute and interpret \textbf{covariance} and
               \textbf{correlation},
         \item estimate a \textbf{simple linear regression} by least
@@ -87,19 +87,20 @@
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \begin{itemize}\setlength{\itemsep}{3pt}
+      \small\begin{itemize}\setlength{\itemsep}{2pt}
         \item distinguish a \textbf{confidence interval} for the mean from
               a \textbf{prediction interval} for a single value,
         \item interpret the coefficients of a \textbf{multiple regression}
               (``holding the others fixed''),
-        \item use the \textbf{$F$-test}, adjusted $R^2$, dummy variables
-              and interactions,
-        \item recognise \textbf{confounding} and \textbf{collinearity}.
+        \item use the \textbf{$F$-test}, adjusted $R^2$ and dummy
+              variables,
+        \item recognise \textbf{confounding}.
       \end{itemize}
     \end{column}
   \end{columns}
   \kernaussage{Common thread: a regression coefficient is an
   \emph{estimate} -- report it together with its uncertainty.}
+\appendixnote{derivations, interactions, diagnostics, collinearity}
 \end{frame}
 
 % ============================================================================
@@ -558,42 +559,9 @@ cor(price, quantity)             # -0.9732 (Pearson is the default)
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Derivation (1/2): set the derivatives to zero}
-  \small
-  The sum of squared residuals
-  $\operatorname{RSS}(\beta_0,\beta_1)=\sum_{i}(y_i-\beta_0-\beta_1x_i)^2$ is a
-  ``bowl'' in $(\beta_0,\beta_1)$; at its minimum both partial derivatives
-  vanish:
-  \begin{align*}
-    \frac{\partial\,\operatorname{RSS}}{\partial \beta_0}
-      &= -2 \sum_{i=1}^n (y_i - \beta_0 - \beta_1 x_i) \stackrel{!}{=} 0
-      && \rhd\ \text{\scriptsize divide by }{-2n}\\[2pt]
-    \Longrightarrow\quad \bar y &= \hat\beta_0+\hat\beta_1\bar x
-      \quad\Longleftrightarrow\quad \hat\beta_0=\bar y-\hat\beta_1\bar x .
-  \end{align*}
-  \inworten{The first condition already shows that the line passes through
-  the \textbf{centroid} $(\bar x,\bar y)$ of the cloud of points -- and that
-  the residuals sum to zero.}
-\end{frame}
 
-\begin{frame}{Derivation (2/2): the slope}
-  \small
-  \begin{align*}
-    \frac{\partial\,\operatorname{RSS}}{\partial \beta_1}
-      &= -2 \sum_{i=1}^n x_i\,(y_i - \beta_0 - \beta_1 x_i) \stackrel{!}{=} 0
-      && \rhd\ \text{\scriptsize insert }\hat\beta_0\\[2pt]
-    0 &= \sum_{i=1}^n x_i\bigl[(y_i-\bar y)-\hat\beta_1(x_i-\bar x)\bigr]
-      && \rhd\ \text{\scriptsize use }\textstyle\sum_i(x_i-\bar x)=0\\[2pt]
-    0 &= \sum_{i=1}^n (x_i-\bar x)(y_i-\bar y)-\hat\beta_1\sum_{i=1}^n(x_i-\bar x)^2
-  \end{align*}
-  \kernaussage{Least-squares estimators:
-  \[
-    \hat\beta_1=\frac{\sum_{i}(x_i-\bar x)(y_i-\bar y)}{\sum_{i}(x_i-\bar x)^2}
-      =\frac{S_{xy}}{S_{xx}}=\frac{s_{xy}}{s_x^{2}},
-    \qquad
-    \hat\beta_0=\bar y-\hat\beta_1\,\bar x .
-  \]}
-\end{frame}
+
+
 
 \begin{frame}{Least squares solution}
   \begin{block}{Slope}
@@ -613,6 +581,7 @@ cor(price, quantity)             # -0.9732 (Pearson is the default)
   \end{block}
   \inworten{Estimated values are marked with a ``hat'': $\hat y_i$,
   $\hat\beta_0$, $\hat\beta_1$, $\hat u_i$.}
+  \appendixnote{derivation of the least-squares estimators}
 \end{frame}
 
 \begin{frame}{Least squares solution -- interpretation}
@@ -965,34 +934,7 @@ abline(reg)
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Explained variance -- derivation}
-  \small
-  \begin{block}{Step 1: mean of the fitted values}
-    Since $\hat{\beta}_0$ and $\hat{\beta}_1$ are constants:
-    $\;\bar{\hat{y}} = \tfrac{1}{n}\sum_{i}\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1\,\bar{x}\;(=\bar y)$.
-  \end{block}
 
-  \begin{block}{Step 2: form the difference -- the intercept cancels out}
-    \[
-      \hat{y}_i - \bar{\hat{y}}
-        = \bigl(\hat{\beta}_0 + \hat{\beta}_1 x_i\bigr)
-            - \bigl(\hat{\beta}_0 + \hat{\beta}_1 \bar{x}\bigr)
-        = \hat{\beta}_1\,(x_i - \bar{x}).
-    \]
-  \end{block}
-
-  \begin{block}{Step 3: square, sum, divide by $n-1$}
-    \[
-      s_{\hat{y}}^{\,2}
-        = \tfrac{1}{n-1}\sum_{i=1}^{n}\hat{\beta}_1^{\,2}(x_i - \bar{x})^{2}
-        = \hat{\beta}_1^{\,2}\cdot
-              \underbrace{\tfrac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^{2}}_{=\,s_x^{\,2}}
-        = \hat{\beta}_1^{\,2}\, s_x^{\,2}.
-    \]
-  \end{block}
-  \inworten{The explained variance is the variance of $x$, scaled by the
-  \textbf{square} of the slope.}
-\end{frame}
 
 \begin{frame}{Coefficient of determination in simple regression}
   \begin{block}{Alternative formula}
@@ -1016,6 +958,7 @@ abline(reg)
     With several explanatory variables, $R^2$ is no longer the square of a
     single correlation coefficient.
   \end{alertblock}
+\appendixnote{derivation of $s_{\hat y}^{\,2}=\hat\beta_1^{\,2}s_x^{\,2}$}
 \end{frame}
 
 \begin{frame}{Coefficient of determination -- lamp example}
@@ -2935,7 +2878,299 @@ F-statistic: 570.3 on 3 and 196 DF,  p-value: < 2.2e-16
   \end{alertblock}
 \end{frame}
 
-\subsection{Interactions}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{frame}[fragile]{Multiple regression with R -- overview}
+  \begin{block}{Fitting, testing, comparing}
+\begin{lstlisting}
+m3 <- lm(sales ~ TV + radio + newspaper, data = ad)
+summary(m3)            # t-tests, R^2, adjusted R^2, F-test
+confint(m3)            # confidence intervals
+m2 <- lm(sales ~ TV + radio, data = ad)
+anova(m2, m3)          # F-test: does newspaper add anything? (p = 0.86)
+\end{lstlisting}
+  \end{block}
+  \begin{block}{Dummy variables and prediction}
+\begin{lstlisting}
+lm(Balance ~ Income + Student, data = cr)   # factor -> dummy automatically
+predict(m2, data.frame(TV = 100, radio = 20), interval = "prediction")
+plot(fitted(m2), resid(m2)); abline(h = 0)  # residual plot
+\end{lstlisting}
+  \end{block}
+  \appendixnote{interactions, diagnostics in multiple regression, collinearity}
+\end{frame}
+
+% ============================================================================
+% SECTION 8: SUMMARY
+% ============================================================================
+\section{Summary}
+
+\begin{frame}{Summary 1 -- correlation and simple regression}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{l|l}
+      \toprule
+      \textbf{Quantity} & \textbf{Formula} \\
+      \midrule
+      Covariance & $s_{xy} = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})$ \\
+      Correlation coefficient & $r_{xy} = \frac{s_{xy}}{s_x \, s_y}, \qquad -1 \leq r_{xy} \leq 1$ \\
+      Model & $y_i = \beta_0 + \beta_1 x_i + u_i, \qquad \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$\\
+      Slope & $\hat{\beta}_1 = \frac{s_{xy}}{s_x^2}=\frac{S_{xy}}{S_{xx}}=r_{xy}\frac{s_y}{s_x}$ \\
+      Intercept & $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$ \\
+      Coefficient of determination & $R^2 = \frac{\text{ESS}}{\text{TSS}} = 1 - \frac{\text{RSS}}{\text{TSS}} \;\bigl(= r_{xy}^2\text{ in simple regression}\bigr)$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Summary 2 -- model diagnostics}
+  \begin{block}{Residuals $\hat{u}_i = y_i - \hat{y}_i$}
+    \begin{itemize}
+      \item \textbf{Residual plot} ($\hat y_i$ vs.\ $\hat u_i$): no pattern
+            $\to$ model appropriate; curve $\to$ missing term; funnel $\to$
+            heteroscedasticity.
+      \item \textbf{QQ-plot}: points on the line $\to$ normality plausible.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Influential points}
+    Leverage $h_i>4/n$ (simple regression): inspect the point, do not delete
+    it blindly.
+  \end{block}
+  \begin{exampleblock}{Coefficient of determination -- assessment}
+    $R^2<0.6$: weak \quad $0.6\le R^2<0.8$: moderate \quad $R^2\ge0.8$:
+    good \quad (context-dependent!)
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Summary 3 -- inference for regression coefficients}
+  \begin{block}{Standard error and residual standard error}
+    \[
+      \hat\sigma=\sqrt{\frac{\text{RSS}}{n-p-1}},\qquad
+      \operatorname{SE}(\hat\beta_1)=\frac{\hat\sigma}{\sqrt{S_{xx}}}\ \ (\text{simple regression, }p=1)
+    \]
+  \end{block}
+  \begin{block}{$t$-test, confidence interval, $p$-value}
+    \[
+      T=\frac{\hat\beta_j-\beta_{j,0}}{\operatorname{SE}(\hat\beta_j)}\sim t_{n-p-1},\qquad
+      \hat\beta_j\pm t_{1-\alpha/2,\,n-p-1}\,\operatorname{SE}(\hat\beta_j),\qquad
+      p=2\,F_{t,n-p-1}(-|T|)
+    \]
+  \end{block}
+  \begin{block}{Prediction at $x_0$ (simple regression)}
+    \[
+      \hat y_0\pm t_{1-\alpha/2,\,n-2}\,\hat\sigma
+      \sqrt{\underbrace{1}_{\text{PI only}}+\frac1n+\frac{(x_0-\bar x)^2}{S_{xx}}}
+    \]
+  \end{block}
+\end{frame}
+
+\begin{frame}{Summary 4 -- multiple regression}
+  \begin{itemize}\setlength{\itemsep}{4pt}
+    \item $\beta_j$: expected change in $Y$ per unit of $X_j$,
+          \textbf{holding all other variables fixed}.
+    \item \textbf{Confounding}: simple and multiple slopes can differ
+          completely (newspaper: $0.055\to-0.001$).
+    \item \textbf{$F$-test} for $H_0:\beta_1=\dots=\beta_p=0$:
+          $F=\dfrac{(\text{TSS}-\text{RSS})/p}{\text{RSS}/(n-p-1)}$ -- first
+          check, then the $t$-tests.
+    \item \textbf{Adjusted} $\bar R^2=1-\dfrac{\text{RSS}/(n-p-1)}{\text{TSS}/(n-1)}$
+          for comparing models of different size.
+    \item \textbf{Dummies}: $K$ categories $\to$ $K-1$ dummies; coefficients
+          are differences to the baseline.
+  \end{itemize}
+  \appendixnote{interactions, diagnostics, collinearity (VIF)}
+\end{frame}
+
+\begin{frame}[fragile]{Summary 5 -- important R commands}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Description and estimation}
+\begin{lstlisting}
+plot(x, y)              # scatter plot
+cov(x, y); cor(x, y)    # covariance, corr.
+reg <- lm(y ~ x)        # linear model
+coef(reg)               # coefficients
+abline(reg)             # regression line
+summary(reg)            # SE, t, p, R^2, F
+\end{lstlisting}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Inference and diagnostics}
+\begin{lstlisting}
+confint(reg)            # CIs
+predict(reg, new, interval = "prediction")
+plot(fitted(reg), resid(reg))
+qqnorm(resid(reg)); qqline(resid(reg))
+hatvalues(reg)          # leverages
+lm(y ~ x1 + x2 + x3)    # multiple reg.
+anova(small, large)     # F-test
+\end{lstlisting}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Five classic pitfalls -- final checklist}
+  \small
+  \begin{center}
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.7cm}@{}}
+      \toprule
+      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
+      \textbf{Correct version \ \textcolor{hsbigruen}{$\checkmark$}}\\
+      \midrule
+      ``$r_{xy}=-0.97$, so price \emph{causes} the sales to fall.'' &
+        Correlation and regression show association, not causation.\\
+      ``$R^2$ is high, so the model is correct.'' &
+        Check the residual plot; a curved relationship can have a high $R^2$.\\
+      ``The slope is not significant, so $X$ has no effect.'' &
+        No evidence found -- the CI shows which effects are still compatible.\\
+      ``In the multiple regression, $\hat\beta_j$ is the total effect of $X_j$.'' &
+        It is the effect \emph{holding the other variables fixed}.\\
+      ``The model predicts $-1.17$ lamps at $125$ Euro.'' &
+        No extrapolation far beyond the observed $x$-range.\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Outlook: Part 5 -- Classification}
+  \begin{block}{What we have so far}
+    Regression explains a \textbf{metric} variable $Y$ (sales, shoe size,
+    balance) by one or several explanatory variables -- with full inference.
+  \end{block}
+  \begin{block}{Next part}
+    What if $Y$ is \textbf{categorical} -- default yes/no, spam or not? A
+    straight line would predict ``probabilities'' below $0$ or above $1$.
+    \textbf{Logistic regression} keeps the linear model on the log-odds
+    scale and reuses everything from this part: coefficients, standard
+    errors, tests, confidence intervals and confounding.
+  \end{block}
+  \kernaussage{Classification = regression for categories -- plus the
+  question of how to turn a probability into a decision.}
+\end{frame}
+
+
+% ============================================================================
+% APPENDIX: OPTIONAL AND ADVANCED MATERIAL
+% ============================================================================
+\appendix
+\let\overviewleft\undefined
+\section[Appendix]{Appendix: Optional and Advanced Material}
+
+\begin{frame}{Appendix -- what is in here, and why}
+  \begin{block}{Optional material}
+    The main part of this deck is self-contained. The appendix collects
+    material for further study -- not needed for the exercises of the main
+    part, but useful for projects with real data.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{8.6cm}@{}}
+      \toprule
+      \textbf{Topic} & \textbf{Content}\\
+      \midrule
+      A.1 Derivations & Least-squares estimators via differential calculus;
+        explained variance $s_{\hat y}^{\,2}=\hat\beta_1^{\,2}s_x^{\,2}$\\
+      A.2 Interactions & When the effect of one variable depends on another\\
+      A.3 Diagnostics & Residual plots, outliers and leverage in multiple
+        regression, collinearity and the VIF, a case study\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\subsection{A.1 Derivations}
+
+\begin{frame}{Derivation (1/2): set the derivatives to zero}
+  \small
+  The sum of squared residuals
+  $\operatorname{RSS}(\beta_0,\beta_1)=\sum_{i}(y_i-\beta_0-\beta_1x_i)^2$ is a
+  ``bowl'' in $(\beta_0,\beta_1)$; at its minimum both partial derivatives
+  vanish:
+  \begin{align*}
+    \frac{\partial\,\operatorname{RSS}}{\partial \beta_0}
+      &= -2 \sum_{i=1}^n (y_i - \beta_0 - \beta_1 x_i) \stackrel{!}{=} 0
+      && \rhd\ \text{\scriptsize divide by }{-2n}\\[2pt]
+    \Longrightarrow\quad \bar y &= \hat\beta_0+\hat\beta_1\bar x
+      \quad\Longleftrightarrow\quad \hat\beta_0=\bar y-\hat\beta_1\bar x .
+  \end{align*}
+  \inworten{The first condition already shows that the line passes through
+  the \textbf{centroid} $(\bar x,\bar y)$ of the cloud of points -- and that
+  the residuals sum to zero.}
+\end{frame}
+
+\begin{frame}{Derivation (2/2): the slope}
+  \small
+  \begin{align*}
+    \frac{\partial\,\operatorname{RSS}}{\partial \beta_1}
+      &= -2 \sum_{i=1}^n x_i\,(y_i - \beta_0 - \beta_1 x_i) \stackrel{!}{=} 0
+      && \rhd\ \text{\scriptsize insert }\hat\beta_0\\[2pt]
+    0 &= \sum_{i=1}^n x_i\bigl[(y_i-\bar y)-\hat\beta_1(x_i-\bar x)\bigr]
+      && \rhd\ \text{\scriptsize use }\textstyle\sum_i(x_i-\bar x)=0\\[2pt]
+    0 &= \sum_{i=1}^n (x_i-\bar x)(y_i-\bar y)-\hat\beta_1\sum_{i=1}^n(x_i-\bar x)^2
+  \end{align*}
+  \kernaussage{Least-squares estimators:
+  \[
+    \hat\beta_1=\frac{\sum_{i}(x_i-\bar x)(y_i-\bar y)}{\sum_{i}(x_i-\bar x)^2}
+      =\frac{S_{xy}}{S_{xx}}=\frac{s_{xy}}{s_x^{2}},
+    \qquad
+    \hat\beta_0=\bar y-\hat\beta_1\,\bar x .
+  \]}
+\end{frame}
+
+\begin{frame}{Explained variance -- derivation}
+  \small
+  \begin{block}{Step 1: mean of the fitted values}
+    Since $\hat{\beta}_0$ and $\hat{\beta}_1$ are constants:
+    $\;\bar{\hat{y}} = \tfrac{1}{n}\sum_{i}\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1\,\bar{x}\;(=\bar y)$.
+  \end{block}
+
+  \begin{block}{Step 2: form the difference -- the intercept cancels out}
+    \[
+      \hat{y}_i - \bar{\hat{y}}
+        = \bigl(\hat{\beta}_0 + \hat{\beta}_1 x_i\bigr)
+            - \bigl(\hat{\beta}_0 + \hat{\beta}_1 \bar{x}\bigr)
+        = \hat{\beta}_1\,(x_i - \bar{x}).
+    \]
+  \end{block}
+
+  \begin{block}{Step 3: square, sum, divide by $n-1$}
+    \[
+      s_{\hat{y}}^{\,2}
+        = \tfrac{1}{n-1}\sum_{i=1}^{n}\hat{\beta}_1^{\,2}(x_i - \bar{x})^{2}
+        = \hat{\beta}_1^{\,2}\cdot
+              \underbrace{\tfrac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^{2}}_{=\,s_x^{\,2}}
+        = \hat{\beta}_1^{\,2}\, s_x^{\,2}.
+    \]
+  \end{block}
+  \inworten{The explained variance is the variance of $x$, scaled by the
+  \textbf{square} of the slope.}
+\end{frame}
+
+\subsection{A.2 Interactions}
 
 \begin{frame}{When the effect of one variable depends on another}
   \begin{block}{Interaction model}
@@ -2968,10 +3203,7 @@ F-statistic: 570.3 on 3 and 196 DF,  p-value: < 2.2e-16
   \end{itemize}
 \end{frame}
 
-% ============================================================================
-% SECTION 7: DIAGNOSTICS
-% ============================================================================
-\section[Diagnostics]{Diagnostics in Multiple Regression}
+\subsection{A.3 Diagnostics in multiple regression}
 
 \begin{frame}{The classical problems -- and how to spot them}
   \begin{center}
@@ -3127,181 +3359,31 @@ F-statistic: 570.3 on 3 and 196 DF,  p-value: < 2.2e-16
   \end{alertblock}
 \end{frame}
 
-\begin{frame}[fragile]{Multiple regression with R -- overview}
-  \begin{block}{Fitting, testing, comparing}
+\begin{frame}[fragile]{Appendix -- R commands}
+  \begin{block}{Interactions and diagnostics}
 \begin{lstlisting}
-m3 <- lm(sales ~ TV + radio + newspaper, data = ad)
-summary(m3)            # t-tests, R^2, adjusted R^2, F-test
-confint(m3)            # confidence intervals
-m2 <- lm(sales ~ TV + radio, data = ad)
-anova(m2, m3)          # F-test: does newspaper add anything? (p = 0.86)
-\end{lstlisting}
-  \end{block}
-  \begin{block}{Dummies, interactions, diagnostics}
-\begin{lstlisting}
-lm(Balance ~ Income + Student, data = cr)   # factor -> dummy automatically
-lm(sales ~ TV * radio, data = ad)           # TV + radio + TV:radio
-plot(fitted(m2), resid(m2)); abline(h = 0)  # residual plot
-hatvalues(m2)                               # leverages h_i
+mi <- lm(sales ~ TV * radio, data = ad)     # TV + radio + TV:radio
+summary(mi)
+plot(fitted(m2), resid(m2)); abline(h = 0)  # residual plot (curvature?)
+hatvalues(m2) > 2 * (2 + 1) / 200           # flag high leverage, p = 2
 1 / (1 - summary(lm(Limit ~ Age + Rating, data = cr))$r.squared)  # VIF
 \end{lstlisting}
   \end{block}
 \end{frame}
 
-% ============================================================================
-% SECTION 8: SUMMARY
-% ============================================================================
-\section{Summary}
-
-\begin{frame}{Summary 1 -- correlation and simple regression}
-  \begin{center}
-    \renewcommand{\arraystretch}{1.4}
-    \begin{tabular}{l|l}
-      \toprule
-      \textbf{Quantity} & \textbf{Formula} \\
-      \midrule
-      Covariance & $s_{xy} = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})$ \\
-      Correlation coefficient & $r_{xy} = \frac{s_{xy}}{s_x \, s_y}, \qquad -1 \leq r_{xy} \leq 1$ \\
-      Model & $y_i = \beta_0 + \beta_1 x_i + u_i, \qquad \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$\\
-      Slope & $\hat{\beta}_1 = \frac{s_{xy}}{s_x^2}=\frac{S_{xy}}{S_{xx}}=r_{xy}\frac{s_y}{s_x}$ \\
-      Intercept & $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$ \\
-      Coefficient of determination & $R^2 = \frac{\text{ESS}}{\text{TSS}} = 1 - \frac{\text{RSS}}{\text{TSS}} \;\bigl(= r_{xy}^2\text{ in simple regression}\bigr)$ \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-\end{frame}
-
-\begin{frame}{Summary 2 -- model diagnostics}
-  \begin{block}{Residuals $\hat{u}_i = y_i - \hat{y}_i$}
-    \begin{itemize}
-      \item \textbf{Residual plot} ($\hat y_i$ vs.\ $\hat u_i$): no pattern
-            $\to$ model appropriate; curve $\to$ missing term; funnel $\to$
-            heteroscedasticity.
-      \item \textbf{QQ-plot}: points on the line $\to$ normality plausible.
-    \end{itemize}
-  \end{block}
-  \begin{block}{Influential points and collinearity}
-    \begin{itemize}
-      \item Leverage $h_i>2(p+1)/n$ (simple regression $4/n$): inspect, do
-            not delete blindly.
-      \item $\operatorname{VIF}_j=1/(1-R_j^2)>5$: collinearity inflates
-            $\operatorname{SE}(\hat\beta_j)$.
-    \end{itemize}
-  \end{block}
-  \begin{exampleblock}{Coefficient of determination -- assessment}
-    $R^2<0.6$: weak \quad $0.6\le R^2<0.8$: moderate \quad $R^2\ge0.8$:
-    good \quad (context-dependent!)
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}{Summary 3 -- inference for regression coefficients}
-  \begin{block}{Standard error and residual standard error}
-    \[
-      \hat\sigma=\sqrt{\frac{\text{RSS}}{n-p-1}},\qquad
-      \operatorname{SE}(\hat\beta_1)=\frac{\hat\sigma}{\sqrt{S_{xx}}}\ \ (\text{simple regression, }p=1)
-    \]
-  \end{block}
-  \begin{block}{$t$-test, confidence interval, $p$-value}
-    \[
-      T=\frac{\hat\beta_j-\beta_{j,0}}{\operatorname{SE}(\hat\beta_j)}\sim t_{n-p-1},\qquad
-      \hat\beta_j\pm t_{1-\alpha/2,\,n-p-1}\,\operatorname{SE}(\hat\beta_j),\qquad
-      p=2\,F_{t,n-p-1}(-|T|)
-    \]
-  \end{block}
-  \begin{block}{Prediction at $x_0$ (simple regression)}
-    \[
-      \hat y_0\pm t_{1-\alpha/2,\,n-2}\,\hat\sigma
-      \sqrt{\underbrace{1}_{\text{PI only}}+\frac1n+\frac{(x_0-\bar x)^2}{S_{xx}}}
-    \]
-  \end{block}
-\end{frame}
-
-\begin{frame}{Summary 4 -- multiple regression}
-  \begin{itemize}\setlength{\itemsep}{4pt}
-    \item $\beta_j$: expected change in $Y$ per unit of $X_j$,
-          \textbf{holding all other variables fixed}.
-    \item \textbf{Confounding}: simple and multiple slopes can differ
-          completely (newspaper: $0.055\to-0.001$).
-    \item \textbf{$F$-test} for $H_0:\beta_1=\dots=\beta_p=0$:
-          $F=\dfrac{(\text{TSS}-\text{RSS})/p}{\text{RSS}/(n-p-1)}$ -- first
-          check, then the $t$-tests.
-    \item \textbf{Adjusted} $\bar R^2=1-\dfrac{\text{RSS}/(n-p-1)}{\text{TSS}/(n-1)}$
-          for comparing models of different size.
-    \item \textbf{Dummies}: $K$ categories $\to$ $K-1$ dummies; coefficients
-          are differences to the baseline.
-    \item \textbf{Interactions} $x_1x_2$: the effect of $x_1$ depends on
-          $x_2$; keep the main effects (hierarchy principle).
+\begin{frame}{Appendix summary}
+  \begin{itemize}\setlength{\itemsep}{5pt}
+    \item \textbf{Least squares} follows from setting both partial
+          derivatives of RSS to zero; the line passes through
+          $(\bar x,\bar y)$.
+    \item \textbf{Interactions} $x_1x_2$: the effect of $x_1$ is
+          $\beta_1+\beta_3x_2$; keep the main effects (hierarchy principle).
+    \item \textbf{Leverage} in multiple regression: flag $h_i>2(p+1)/n$ --
+          inspect, do not delete blindly.
+    \item \textbf{Collinearity}: $\operatorname{VIF}_j=1/(1-R_j^2)>5$
+          inflates $\operatorname{SE}(\hat\beta_j)$ by $\sqrt{\operatorname{VIF}_j}$;
+          predictions stay fine, the attribution to single variables does not.
   \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Summary 5 -- important R commands}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Description and estimation}
-\begin{lstlisting}
-plot(x, y)              # scatter plot
-cov(x, y); cor(x, y)    # covariance, corr.
-reg <- lm(y ~ x)        # linear model
-coef(reg)               # coefficients
-abline(reg)             # regression line
-summary(reg)            # SE, t, p, R^2, F
-\end{lstlisting}
-      \end{block}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Inference and diagnostics}
-\begin{lstlisting}
-confint(reg)            # CIs
-predict(reg, new, interval = "prediction")
-plot(fitted(reg), resid(reg))
-qqnorm(resid(reg)); qqline(resid(reg))
-hatvalues(reg)          # leverages
-lm(y ~ x1 + x2 + x3)    # multiple reg.
-anova(small, large)     # F-test
-\end{lstlisting}
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Five classic pitfalls -- final checklist}
-  \small
-  \begin{center}
-    \renewcommand{\arraystretch}{1.45}
-    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.7cm}@{}}
-      \toprule
-      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
-      \textbf{Correct version \ \textcolor{hsbigruen}{$\checkmark$}}\\
-      \midrule
-      ``$r_{xy}=-0.97$, so price \emph{causes} the sales to fall.'' &
-        Correlation and regression show association, not causation.\\
-      ``$R^2$ is high, so the model is correct.'' &
-        Check the residual plot; a curved relationship can have a high $R^2$.\\
-      ``The slope is not significant, so $X$ has no effect.'' &
-        No evidence found -- the CI shows which effects are still compatible.\\
-      ``In the multiple regression, $\hat\beta_j$ is the total effect of $X_j$.'' &
-        It is the effect \emph{holding the other variables fixed}.\\
-      ``The model predicts $-1.17$ lamps at $125$ Euro.'' &
-        No extrapolation far beyond the observed $x$-range.\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-\end{frame}
-
-\begin{frame}{Outlook: Part 5 -- Classification}
-  \begin{block}{What we have so far}
-    Regression explains a \textbf{metric} variable $Y$ (sales, shoe size,
-    balance) by one or several explanatory variables -- with full inference.
-  \end{block}
-  \begin{block}{Next part}
-    What if $Y$ is \textbf{categorical} -- default yes/no, spam or not? A
-    straight line would predict ``probabilities'' below $0$ or above $1$.
-    \textbf{Logistic regression} keeps the linear model on the log-odds
-    scale and reuses everything from this part: coefficients, standard
-    errors, tests, confidence intervals and confounding.
-  \end{block}
-  \kernaussage{Classification = regression for categories -- plus the
-  question of how to turn a probability into a decision.}
 \end{frame}
 
 \end{document}

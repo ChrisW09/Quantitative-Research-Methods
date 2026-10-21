@@ -7,8 +7,8 @@ Lecture slides (LaTeX Beamer) by Prof. Dr. Christoph Weisser, HSBI — Summer Se
 | 1 | `Part_1_Descriptive_Statistics` | Basic concepts, levels of measurement, frequencies, measures of central tendency and dispersion |
 | 2 | `Part_2_Graphical_Representations` | Empirical CDF, histogram, boxplot |
 | 3 | `Part_3_Statistical_Inference` | Confidence intervals, hypothesis tests, p-values, one-sided tests, types of error |
-| 4 | `Part_4_Regression` | Correlation, simple and multiple linear regression, inference for regression, diagnostics |
-| 5 | `Part_5_Classification` | Logistic regression, classification rules, confusion matrix, ROC/AUC, Bayes classifiers |
+| 4 | `Part_4_Regression` | Correlation, simple and multiple linear regression, inference for regression (appendix: derivations, interactions, diagnostics, collinearity) |
+| 5 | `Part_5_Classification` | Logistic regression, classification rules, confusion matrix, ROC/AUC (appendix: Bayes classifiers -- naive Bayes, LDA) |
 
 Each part folder contains
 

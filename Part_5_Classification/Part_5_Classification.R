@@ -10,7 +10,7 @@
 #   3  Multiple logistic regression (student paradox)
 #   4  From probabilities to decisions (threshold, decision boundary)
 #   5  Evaluating a classifier      (confusion matrix, ROC/AUC, test data)
-#   6  Bayes classifiers            (naive Bayes, LDA)
+#   Appendix                        (Bayes classifiers: naive Bayes, LDA)
 # =====================================================================
 
 df <- read.csv("../data/Default.csv", stringsAsFactors = TRUE)
@@ -120,7 +120,7 @@ y_te <- as.numeric(df$default[-train] == "Yes"); r <- rank(p_te)
   (sum(y_te) * sum(1 - y_te))                               # test AUC 0.938
 
 # =====================================================================
-# 6 Bayes classifiers
+# Appendix: Bayes classifiers
 # =====================================================================
 # naive Bayes by hand (spam example)
 score_spam <- 0.4 * 0.6 * 0.7; score_ham <- 0.6 * 0.1 * 0.2

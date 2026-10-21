@@ -11,7 +11,7 @@
 #   4  Residual analysis        (residual plot, QQ-plot), body heights
 #   5  Inference                (SE, t-test, CI, p-value, prediction)
 #   6  Multiple regression      (Advertising, Credit)
-#   7  Diagnostics              (residual plot, collinearity / VIF)
+#   Appendix                  (interactions, diagnostics, collinearity / VIF)
 # =====================================================================
 
 # ---------------------------------------------------------------------
@@ -166,7 +166,7 @@ anova(m2, m3)                        # partial F = 0.031, p = 0.86
 predict(m2, data.frame(TV = 100, radio = 20), interval = "confidence")
 predict(m2, data.frame(TV = 100, radio = 20), interval = "prediction")
 
-# interaction
+# interaction (appendix A.2)
 mi <- lm(sales ~ TV * radio, data = ad)
 summary(mi)
 
@@ -177,7 +177,7 @@ summary(lm(Balance ~ Income + Student, data = cr))$coefficients
 summary(lm(Balance ~ Region, data = cr))$coefficients   # baseline East
 
 # =====================================================================
-# 7 Diagnostics
+# Appendix A.3: Diagnostics in multiple regression
 # =====================================================================
 plot(fitted(m2), resid(m2)); abline(h = 0, lty = 2)    # curvature
 plot(fitted(mi), resid(mi)); abline(h = 0, lty = 2)    # pattern gone
