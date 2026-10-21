@@ -434,6 +434,73 @@ cor(price, quantity)             # -0.9732 (Pearson is the default)
   \end{block}
 \end{frame}
 
+\subsection{Exercise}
+
+\begin{frame}{Exercise -- covariance and correlation by hand}
+  \begin{block}{Problem statement}
+    A shop records its weekly advertising budget $x$ (in $100$ Euro) and the
+    number of units sold $y$ in five weeks:
+    \begin{center}
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{lccccc}
+        \toprule
+        Week & 1 & 2 & 3 & 4 & 5\\
+        \midrule
+        Budget $x_i$ & 2 & 4 & 5 & 6 & 8\\
+        Units sold $y_i$ & 10 & 14 & 17 & 16 & 23\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+    \begin{enumerate}
+      \item Compute the means and the deviations from the means.
+      \item Compute the covariance $s_{xy}$ and the standard deviations
+            $s_x$, $s_y$.
+      \item Compute the correlation coefficient $r_{xy}$ and interpret it.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- covariance and correlation by hand}
+  \textbf{(1) Means:} $\bar x=\tfrac{25}{5}=5$, \quad $\bar y=\tfrac{80}{5}=16$.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lrrrrrr}
+      \toprule
+      & & & & & & $\Sigma$\\
+      \midrule
+      $x_i-\bar x$ & $-3$ & $-1$ & $0$ & $1$ & $3$ & \\
+      $y_i-\bar y$ & $-6$ & $-2$ & $1$ & $0$ & $7$ & \\
+      $(x_i-\bar x)(y_i-\bar y)$ & $18$ & $2$ & $0$ & $0$ & $21$ & $41$\\
+      $(x_i-\bar x)^2$ & $9$ & $1$ & $0$ & $1$ & $9$ & $20$\\
+      $(y_i-\bar y)^2$ & $36$ & $4$ & $1$ & $0$ & $49$ & $90$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{exampleblock}{(2) Covariance and standard deviations}
+    \[
+      s_{xy}=\frac{41}{5-1}=\mathbf{10.25},\qquad
+      s_x=\sqrt{\tfrac{20}{4}}=2.2361,\qquad
+      s_y=\sqrt{\tfrac{90}{4}}=4.7434
+    \]
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- covariance and correlation by hand}
+  \begin{exampleblock}{(3) Correlation coefficient}
+    \[
+      r_{xy}=\frac{s_{xy}}{s_x\,s_y}=\frac{10.25}{2.2361\cdot4.7434}=\mathbf{0.9664}
+      \qquad\Bigl(=\frac{S_{xy}}{\sqrt{S_{xx}S_{yy}}}=\frac{41}{\sqrt{20\cdot90}}\ \checkmark\Bigr)
+    \]
+  \end{exampleblock}
+  \begin{alertblock}{Interpretation}
+    A \textbf{strong positive} linear relationship ($|r_{xy}|>0.8$): weeks
+    with a higher advertising budget go along with higher sales. Whether the
+    budget \emph{causes} the sales cannot be read from $r_{xy}$.
+  \end{alertblock}
+  \inworten{The covariance $10.25$ depends on the units (``$100$ Euro
+  $\times$ units''); the correlation $0.97$ does not.}
+\end{frame}
+
 % ============================================================================
 % SECTION 2: SIMPLE LINEAR REGRESSION
 % ============================================================================
@@ -2878,6 +2945,72 @@ F-statistic: 570.3 on 3 and 196 DF,  p-value: < 2.2e-16
   \end{alertblock}
 \end{frame}
 
+\subsection{Exercise: reading a full output}
+
+\begin{frame}[fragile]{Exercise -- reading a multiple regression output}
+  \footnotesize
+  Credit data ($n=400$): card balance (in \$) explained by income (in
+  $1000$\,\$), credit limit (in \$) and student status.
+\begin{lstlisting}[style=Rout]
+              Estimate Std. Error t value Pr(>|t|)
+(Intercept) -4.323e+02  1.243e+01  -34.78   <2e-16 ***
+Income      -7.902e+00  2.432e-01  -32.49   <2e-16 ***
+Limit        2.675e-01  3.712e-03   72.07   <2e-16 ***
+StudentYes   4.270e+02  1.742e+01   24.52   <2e-16 ***
+Residual standard error: 104.4 on 396 degrees of freedom
+Multiple R-squared:  0.9488,  Adjusted R-squared:  0.9484
+F-statistic:  2447 on 3 and 396 DF,  p-value: < 2.2e-16
+\end{lstlisting}
+  \begin{enumerate}
+    \item Interpret the coefficients of \texttt{Limit} and \texttt{StudentYes}.
+    \item Compute the $95\,\%$ CI for the income coefficient
+          ($t_{0.975;\,396}=1.966$).
+    \item Alone, \texttt{Balance \textasciitilde\ Income} has slope $+6.05$.
+          Why is it negative here? ($r(\text{Income},\text{Limit})=0.79$.)
+    \item What do the $F$-test and $R^2$ say? Predict the balance of a
+          non-student with income $50$ and limit $5000$.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- reading a multiple regression output}
+  \textbf{(1)} Holding income and student status fixed, $1$\,\$ more credit
+  limit goes along with $0.27$\,\$ more balance ($1000$\,\$ limit
+  $\to$ $267.5$\,\$). At the same income and limit, students carry on average
+  $427$\,\$ more balance than non-students.
+
+  \medskip
+  \textbf{(2)}
+  \[
+    -7.902\pm1.966\cdot0.2432=-7.902\pm0.478=[-8.380;\,-7.424]
+  \]
+  $1000$\,\$ more income goes along with $7.4$ to $8.4$\,\$ \emph{less} balance
+  -- holding limit and student status fixed. $0$ lies far outside the CI.
+
+  \medskip
+  \textbf{(3)} \textbf{Confounding:} people with higher incomes get higher
+  credit limits ($r=0.79$), and a high limit means a high balance. Alone,
+  income borrows the limit's effect ($+6.05$); at a \emph{fixed} limit,
+  higher income goes along with a \emph{lower} balance.
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- reading a multiple regression output}
+  \begin{exampleblock}{(4) $F$-test and $R^2$}
+    $F=2447$ with $p<2.2\cdot10^{-16}$: at least one variable is related to
+    the balance. The model explains $94.9\,\%$ of the variance
+    ($\bar R^2=0.948$, almost identical with only $p=3$ variables).
+  \end{exampleblock}
+  \begin{exampleblock}{(4) Prediction (non-student, income $50$, limit $5000$)}
+    \[
+      \hat y_0=-432.3-7.902\cdot50+0.2675\cdot5000+427.0\cdot0
+             =-432.3-395.1+1337.5\approx\mathbf{510}\,\$
+    \]
+    \texttt{R} (unrounded): $510.3$, $95\,\%$ prediction interval
+    $[304.7;\,715.8]$. A student with the same income and limit: $937.3$\,\$.
+  \end{exampleblock}
+  \inworten{Every number in a regression output has a meaning -- but only
+  together with the clause ``holding the other variables fixed''.}
+\end{frame}
+
 
 
 
@@ -3201,6 +3334,45 @@ anova(small, large)     # F-test
           i.e.\ $0.030$ at radio $=10$, but $0.063$ at radio $=40$.
     \item Parallel lines $=$ no interaction; lines that fan out $=$ synergy.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Exercise -- interactions and the hierarchy principle}
+  \begin{block}{Problem statement}
+    The interaction model for the advertising data gives
+    \[
+      \widehat{\texttt{sales}}=6.750+0.0191\,\texttt{TV}+0.0289\,\texttt{radio}
+        +0.00109\,\texttt{TV}\cdot\texttt{radio}.
+    \]
+    \begin{enumerate}
+      \item Interpret the interaction coefficient $0.00109$ in words.
+      \item Compute the effect of $1000$\,\$ more TV budget when the radio
+            budget is $0$ and when it is $50$ (in $1000$\,\$).
+      \item Suppose the TV main effect were not significant, but the
+            interaction were. Should TV be dropped from the model?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- interactions and the hierarchy principle}
+  \textbf{(1)} The effect of TV on sales is not constant: it grows with the
+  radio budget (and vice versa). Each additional unit of radio budget
+  raises the TV slope by $0.00109$ -- a \textbf{synergy} between the media.
+
+  \medskip
+  \textbf{(2)} Effect of TV: $\;0.0191+0.00109\cdot\texttt{radio}$
+  \[
+    \texttt{radio}=0:\ 0.0191,\qquad
+    \texttt{radio}=50:\ 0.0191+0.00109\cdot50=0.0736
+  \]
+  With a radio budget of $50$, TV is almost four times as effective.
+
+  \medskip
+  \textbf{(3)} No -- by the \textbf{hierarchy principle}, the main effects
+  stay in the model whenever their interaction does.
+  \begin{alertblock}{Common mistake}
+    Quoting $0.0191$ as ``the'' TV effect. With an interaction, it is only
+    the TV effect at $\texttt{radio}=0$.
+  \end{alertblock}
 \end{frame}
 
 \subsection{A.3 Diagnostics in multiple regression}

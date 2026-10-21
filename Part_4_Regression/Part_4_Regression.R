@@ -30,6 +30,10 @@ cov(price, quantity)                 # -83.75
 cor(price, quantity)                 # -0.9732
 sd(price); sd(quantity)              # 13.6931, 6.2849
 
+# Exercise "covariance and correlation by hand"
+xa <- c(2, 4, 5, 6, 8); ya <- c(10, 14, 17, 16, 23)
+cov(xa, ya); sd(xa); sd(ya); cor(xa, ya)      # 10.25, 2.2361, 4.7434, 0.9664
+
 # =====================================================================
 # 2 Simple linear regression
 # =====================================================================
@@ -172,6 +176,14 @@ summary(mi)
 
 # qualitative predictors (Credit data)
 cr <- read.csv("../data/Credit.csv")
+# Exercise "reading a multiple regression output" (Credit data)
+mc <- lm(Balance ~ Income + Limit + Student, data = cr)
+summary(mc); confint(mc)                      # Income: [-8.380, -7.424]
+coef(lm(Balance ~ Income, data = cr))         # alone: +6.05 (confounding)
+cor(cr$Income, cr$Limit)                      # 0.79
+predict(mc, data.frame(Income = 50, Limit = 5000, Student = c("No", "Yes")),
+        interval = "prediction")              # 510.3 [304.7, 715.8]; 937.3
+
 summary(lm(Balance ~ Student, data = cr))$coefficients
 summary(lm(Balance ~ Income + Student, data = cr))$coefficients
 summary(lm(Balance ~ Region, data = cr))$coefficients   # baseline East

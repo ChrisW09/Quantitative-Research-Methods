@@ -1162,6 +1162,56 @@ studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
   \end{exampleblock}
 \end{frame}
 
+\begin{frame}{Exercise -- training vs.\ test data}
+  \begin{block}{Problem statement}
+    The model \texttt{default \textasciitilde\ balance + income + student} is
+    fitted on $7000$ training customers and applied to the $3000$ test
+    customers ($102$ of them defaulted):
+    \begin{center}
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{lcccc}
+        \toprule
+        & TN & FP & FN & TP\\
+        \midrule
+        Test data, $t=0.5$ & $2896$ & $2$ & $81$ & $21$\\
+        Test data, $t=0.2$ & $2839$ & $59$ & $44$ & $58$\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+    \begin{enumerate}
+      \item Compute accuracy, sensitivity, specificity and precision for
+            both thresholds.
+      \item On all $10\,000$ customers (training $=$ evaluation data) the
+            sensitivity at $t=0.5$ was $0.315$. Compare and explain.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- training vs.\ test data}
+  \textbf{(1) Test-data metrics:}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{lcc}
+      \toprule
+      & $t=0.5$ & $t=0.2$\\
+      \midrule
+      Accuracy & $\frac{2896+21}{3000}=0.972$ & $\frac{2839+58}{3000}=0.966$\\[2pt]
+      Sensitivity & $\frac{21}{102}=0.206$ & $\frac{58}{102}=0.569$\\[2pt]
+      Specificity & $\frac{2896}{2898}=0.999$ & $\frac{2839}{2898}=0.980$\\[2pt]
+      Precision & $\frac{21}{23}=0.913$ & $\frac{58}{117}=0.496$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \textbf{(2)} On new customers the model catches only $20.6\,\%$ of the
+  defaulters at $t=0.5$, instead of $31.5\,\%$ on the data it was fitted on.
+  In-sample figures are \textbf{optimistic}; part of the gap is also chance,
+  as the test set contains only $102$ defaulters.
+
+  \medskip
+  \inworten{Report the test-data metrics -- they describe what the bank can
+  expect for future applicants.}
+\end{frame}
+
 \begin{frame}[fragile]{Classification with R}
   \begin{block}{Predicted probabilities and confusion matrix}
 \begin{lstlisting}

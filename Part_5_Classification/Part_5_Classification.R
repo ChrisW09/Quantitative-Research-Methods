@@ -115,6 +115,9 @@ g_tr <- glm(default ~ balance + income + student, family = binomial,
 p_te <- predict(g_tr, df[-train, ], type = "response")
 table(Actual = df$default[-train], Predicted = p_te > 0.5)  # 2896 2 / 81 21
 table(Actual = df$default[-train], Predicted = p_te > 0.2)  # 2839 59 / 44 58
+# Exercise "training vs. test data": metrics on the test data
+tab5 <- table(df$default[-train], p_te > 0.5); tab2 <- table(df$default[-train], p_te > 0.2)
+tab5[2, 2] / sum(tab5[2, ]); tab2[2, 2] / sum(tab2[2, ])   # sensitivity 0.206, 0.569
 y_te <- as.numeric(df$default[-train] == "Yes"); r <- rank(p_te)
 (sum(r[y_te == 1]) - sum(y_te) * (sum(y_te) + 1) / 2) /
   (sum(y_te) * sum(1 - y_te))                               # test AUC 0.938
