@@ -13,7 +13,7 @@ Lecture slides (LaTeX Beamer) by Prof. Dr. Christoph Weisser, HSBI — Summer Se
 Each part folder contains
 
 - `Part_k_<Topic>.tex` — the slide deck (compiled PDF next to it),
-- `Part_k_<Topic>.R` — R script that reproduces every number on the slides,
+- `Part_k_<Topic>.py` — Python script that reproduces every number on the slides,
 - `make_figures.py` — regenerates the computed figures in `images/` (Parts 2–5),
 - `images/` — all figures used by the deck.
 
@@ -34,5 +34,8 @@ Speaker notes (talk tracks in Part 3) can be enabled in `common/preamble.tex`.
 ## Requirements
 
 - TeX Live (beamer, tikz, pgfplots, listings, booktabs)
-- R with the packages `MASS` and `e1071` (Part 5)
-- Python 3 with numpy, pandas, matplotlib, scipy, statsmodels (only to regenerate figures)
+- Python 3 with numpy, pandas, scipy, statsmodels, matplotlib (>= 3.8) and
+  scikit-learn (Part 5), e.g. via the Anaconda Distribution or
+  `pip install numpy pandas scipy statsmodels matplotlib scikit-learn jupyter`
+
+Run a script from its folder, e.g. `cd Part_4_Regression && python3 Part_4_Regression.py`.
