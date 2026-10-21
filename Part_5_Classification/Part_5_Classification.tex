@@ -1,0 +1,1578 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\newcommand{\currentpart}{5}
+\input{../common/preamble.tex}
+
+\subtitle{Part 5: Classification}
+\newcommand{\overviewleft}{1-4}
+\newcommand{\overviewright}{5-7}
+
+\begin{document}
+
+% ============================================================================
+% TITLE PAGE
+% ============================================================================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% Course overview (identical in all five parts)
+\courseoverview
+
+% ============================================================================
+% TABLE OF CONTENTS
+% ============================================================================
+\begin{frame}{Contents -- Part 5}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \tableofcontents[hideallsubsections,sections={1-4}]
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \tableofcontents[hideallsubsections,sections={5-7}]
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================================================
+% COMMON THREAD / LEARNING OBJECTIVES
+% ============================================================================
+\begin{frame}{The common thread of this part}
+  \begin{block}{One question runs through every section}
+    The variable $Y$ is no longer metric but \textbf{categorical} (yes/no).
+    How do we estimate the \textbf{probability} of ``yes'' -- and how do we
+    turn it into a good \textbf{decision}?
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small
+      \textbf{Three steps:}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item \textcolor{hsbiblau}{\textbf{Model}} -- logistic regression:
+              a linear model for the log-odds (Part~4 on a new scale).
+        \item \textcolor{hsbiblau}{\textbf{Decide}} -- a threshold turns a
+              probability into a class.
+        \item \textcolor{hsbiblau}{\textbf{Evaluate}} -- confusion matrix,
+              sensitivity, specificity, ROC curve.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small
+      \textbf{One running story:}
+      \begin{block}{Credit card default}
+        A bank observes $n=10\,000$ customers: did they \textbf{default}
+        on their credit card debt? Explanatory variables: the card
+        \textbf{balance}, the \textbf{income} and whether the customer is
+        a \textbf{student}.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Learning objectives -- Part 5}
+  After this part you will be able to \ldots
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\begin{itemize}\setlength{\itemsep}{2pt}
+        \item explain why \textbf{linear regression fails} for a $0/1$
+              variable,
+        \item convert between \textbf{probability, odds and log-odds},
+        \item interpret the coefficients of a \textbf{logistic regression}
+              (sign, odds ratio, probability),
+        \item carry out \textbf{$z$-tests} and compute \textbf{confidence
+              intervals} for coefficients and odds ratios,
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\begin{itemize}\setlength{\itemsep}{2pt}
+        \item turn probabilities into decisions with a \textbf{threshold},
+        \item compute \textbf{accuracy, sensitivity, specificity and
+              precision} from a confusion matrix,
+        \item read a \textbf{ROC curve} and interpret the \textbf{AUC},
+        \item apply \textbf{Bayes' theorem} for classification (naive Bayes,
+              LDA),
+        \item carry out every step in \texttt{R}.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \kernaussage{Common thread: classification = estimating a probability
+  \emph{plus} a decision rule -- and both have to be evaluated honestly.}
+\end{frame}
+
+% ============================================================================
+% LIST OF SYMBOLS
+% ============================================================================
+\begin{frame}{List of symbols (1/2)}
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}lp{4.5cm}lp{4.5cm}@{}}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
+      \midrule
+      $Y\in\{0,1\}$ & Binary response (1 $=$ ``yes'') & $X_1,\dots,X_p$ & Explanatory variables \\
+      $p(x)$ & $P(Y=1\mid X=x)$ & $\hat p(x)$ & Estimated probability \\
+      $\frac{p}{1-p}$ & Odds & $\log\frac{p}{1-p}$ & Log-odds (logit) \\
+      $\eta=\beta_0+\beta_1x$ & Linear predictor (log-odds) & $e^{\beta_j}$ & Odds ratio \\
+      $L(\beta)$ & Likelihood & $\hat\beta_j$ & Maximum likelihood estimate \\
+      $Z$ & $z$-statistic $\hat\beta_j/\mathrm{SE}(\hat\beta_j)$ & $z_{1-\alpha/2}$ & Quantile of $N(0,1)$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{List of symbols (2/2)}
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}lp{4.5cm}lp{4.5cm}@{}}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
+      \midrule
+      $t$ & Threshold of the classification rule & $\hat y$ & Predicted class \\
+      TP, TN & True positives / negatives & FP, FN & False positives / negatives \\
+      Sens. & Sensitivity $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ & Spec. & Specificity $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ \\
+      ROC & Receiver operating characteristic & AUC & Area under the ROC curve \\
+      $\pi_k$ & Prior probability of class $k$ & $f_k(x)$ & Density of $X$ in class $k$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{center}
+    \footnotesize As in Parts~3 and~4: $H_0$, $H_1$, $\alpha$, $p$-value,
+    confidence level $1-\alpha$, standard error SE.
+  \end{center}
+\end{frame}
+
+% ============================================================================
+% SECTION 1: CLASSIFICATION PROBLEMS
+% ============================================================================
+\section[Problem]{Classification Problems}
+
+\subsection{What is classification?}
+
+\begin{frame}{From regression to classification}
+  \begin{block}{Regression (Part~4)}
+    The variable to be explained $Y$ is \textbf{metric}: sales quantity,
+    shoe size, card balance.
+  \end{block}
+  \begin{block}{Classification (Part~5)}
+    $Y$ is \textbf{categorical} -- in this part \emph{binary}: yes/no,
+    coded $Y=1$ (``yes'') and $Y=0$ (``no'').
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}lll@{}}
+      \toprule
+      \textbf{Question} & \textbf{$Y$} & \textbf{Explanatory variables}\\
+      \midrule
+      Will the customer default? & default yes/no & balance, income, student\\
+      Is this e-mail spam? & spam yes/no & words, links, sender\\
+      Will the customer churn? & churn yes/no & usage, contract, complaints\\
+      Is the patient ill? & diagnosis yes/no & test results, age\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Two tasks in every classification problem}
+  \centering
+  \resizebox{0.95\textwidth}{!}{%
+  \begin{tikzpicture}[node distance=12mm]
+    \node[flowboxo, text width=2.8cm] (x) {\footnotesize customer data\\ $x$ = balance, income, \ldots};
+    \node[flowbox, text width=3.2cm, right=of x] (p)
+      {\footnotesize \textbf{1. Estimate}\\ $\hat p(x)=\hat P(Y=1\mid x)$};
+    \node[flowbox, text width=3.2cm, right=of p] (d)
+      {\footnotesize \textbf{2. Decide}\\ $\hat y=1$ if $\hat p(x)>t$};
+    \node[flowboxg, text width=2.4cm, right=of d] (e)
+      {\footnotesize \textbf{3. Evaluate}\\ errors, costs};
+    \draw[flowarr] (x) -- (p) node[midway,above,font=\scriptsize]{model};
+    \draw[flowarr] (p) -- (d) node[midway,above,font=\scriptsize]{threshold};
+    \draw[flowarr] (d) -- (e);
+  \end{tikzpicture}}
+  \vspace{1em}
+  \begin{itemize}\setlength{\itemsep}{4pt}
+    \item The \textbf{probability} is a statistical question -- answered by a
+          model such as logistic regression (Sections 2--3).
+    \item The \textbf{decision} is also a business question -- which error
+          is more expensive? (Sections 4--5)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Our story: the Default data}
+  \begin{center}
+    \includegraphics[width=0.97\textwidth,height=0.5\textheight,keepaspectratio]{images/cls_default_data.png}
+  \end{center}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item $n=10\,000$ customers, of which only $333$ ($3.33\,\%$) defaulted.
+    \item Defaulters have clearly \textbf{higher balances}; income hardly
+          differs between the groups.
+  \end{itemize}
+  \sourcenote{Default data from James, Witten, Hastie, Tibshirani: \emph{An Introduction to Statistical Learning}, www.statlearning.com}
+\end{frame}
+
+\subsection{Why not linear regression?}
+
+\begin{frame}{Why not simply use linear regression?}
+  \begin{block}{Tempting idea}
+    Code $Y=1$ for default and $Y=0$ otherwise and run the regression of
+    Part~4: $\hat y=\hat\beta_0+\hat\beta_1\,\text{balance}$.
+  \end{block}
+  \begin{center}
+    \includegraphics[width=0.9\textwidth,height=0.46\textheight,keepaspectratio]{images/cls_linear_vs_logistic.png}
+  \end{center}
+  \inworten{The straight line predicts \emph{negative} default
+  ``probabilities'' for $3123$ customers (all balances below $579$\,\$); the
+  S-curve stays between $0$ and $1$.}
+\end{frame}
+
+\begin{frame}{Three problems of linear regression with a $0/1$ variable}
+  \begin{alertblock}{Problems}
+    \begin{enumerate}\setlength{\itemsep}{3pt}
+      \item \textbf{Predictions outside $[0,1]$} -- they cannot be read as
+            probabilities.
+      \item \textbf{Heteroscedasticity by construction} --
+            $\operatorname{Var}(Y\mid x)=p(x)\,(1-p(x))$ depends on $x$, so
+            the standard errors and tests of Part~4 are not valid.
+      \item \textbf{No natural extension to more than two categories} --
+            codes $1,2,3$ would impose an order and equal distances that
+            the categories do not have.
+    \end{enumerate}
+  \end{alertblock}
+  \kernaussage{We need a model whose output is always a probability in
+  $(0,1)$ -- the \textbf{logistic regression}.}
+\end{frame}
+
+\begin{frame}{Exercise -- why not linear regression?}
+  \begin{block}{Problem statement}
+    A colleague wants to predict the emergency diagnosis of a patient. She
+    codes the three \emph{unordered} categories as $Y=1$ (stroke), $Y=2$
+    (overdose), $Y=3$ (seizure) and fits a linear regression.
+    \begin{enumerate}
+      \item Which implicit assumptions does the coding $1,2,3$ make?
+      \item With only two categories coded $0/1$: name two problems of the
+            fitted values as probabilities.
+      \item Would relabelling the categories change the fit? What does this
+            imply?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- why not linear regression?}
+  \begin{enumerate}\setlength{\itemsep}{4pt}
+    \item \textbf{Order and equal spacing:} the coding claims stroke $<$
+          overdose $<$ seizure and equal distances between them. A fitted
+          value of $1.5$ would mean ``halfway between stroke and overdose''
+          -- medically meaningless.
+    \item \textbf{Two problems:} fitted values can lie outside $[0,1]$
+          (e.g.\ a negative probability), and the error variance
+          $p(1-p)$ is not constant.
+    \item \textbf{Yes:} swapping the codes of stroke and seizure gives a
+          different response and hence a different fit -- although the data
+          are the same. The result depends on an arbitrary choice, so linear
+          regression is \emph{not appropriate} here.
+  \end{enumerate}
+  \begin{alertblock}{Common mistake}
+    Hoping that more data fix the problem. The flaw lies in the model
+    specification, not in sampling noise.
+  \end{alertblock}
+\end{frame}
+
+% ============================================================================
+% SECTION 2: LOGISTIC REGRESSION
+% ============================================================================
+\section[Logistic regression]{Logistic Regression}
+
+\subsection{Probability, odds and log-odds}
+
+\begin{frame}{Odds -- another way to express a probability}
+  \begin{block}{Definition}
+    For an event with probability $p$:
+    \[
+      \text{odds}=\frac{p}{1-p}\in(0,\infty),
+      \qquad
+      \text{log-odds (logit)}=\log\frac{p}{1-p}\in(-\infty,\infty).
+    \]
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{lccccc}
+      \toprule
+      Probability $p$ & $0.1$ & $0.2$ & $0.5$ & $0.8$ & $0.9$\\
+      \midrule
+      Odds $p/(1-p)$ & $0.111$ & $0.25$ & $1$ & $4$ & $9$\\
+      Log-odds & $-2.197$ & $-1.386$ & $0$ & $1.386$ & $2.197$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{Odds of $4$ mean ``$4$ to $1$'': the event occurs four times as
+  often as it does not ($p=0.8$). Back from odds to probability:
+  $p=\text{odds}/(1+\text{odds})$.}
+\end{frame}
+
+\begin{frame}{Why log-odds?}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth,height=0.52\textheight,keepaspectratio]{images/cls_sigmoid.png}
+  \end{center}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item The log-odds can take \textbf{any real value} -- just like the
+          right-hand side $\beta_0+\beta_1x$ of a regression.
+    \item The logistic function (a) is the inverse of the logit (b): it maps
+          every log-odds value back into $(0,1)$.
+  \end{itemize}
+\end{frame}
+
+\subsection{The model}
+
+\begin{frame}{The logistic regression model}
+  \begin{block}{Model: linear on the log-odds scale}
+    \[
+      \log\frac{p(x)}{1-p(x)}=\beta_0+\beta_1x
+      \qquad\Longleftrightarrow\qquad
+      p(x)=P(Y=1\mid x)=\frac{e^{\beta_0+\beta_1x}}{1+e^{\beta_0+\beta_1x}}
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Both forms describe the \emph{same} model: the left one shows the
+          linearity, the right one guarantees $0<p(x)<1$.
+    \item We write $\eta=\beta_0+\beta_1x$ for the \textbf{linear predictor}
+          (the log-odds).
+    \item Several explanatory variables: $\eta=\beta_0+\beta_1x_1+\dots+\beta_px_p$
+          (Section~3).
+  \end{itemize}
+  \kernaussage{Logistic regression = the regression model of Part~4, applied
+  to the \textbf{log-odds} instead of $Y$ itself.}
+\end{frame}
+
+\begin{frame}{Reading the model symbol by symbol}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{@{}cl@{}}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning} \\
+      \midrule
+      $Y$ & Binary response, $0$ or $1$ (default no/yes) \\
+      $p(x)$ & $P(Y=1\mid x)$, the probability of default given $x$ \\
+      $p(x)/(1-p(x))$ & The \emph{odds} of default \\
+      $\eta=\log[p/(1-p)]$ & The \emph{log-odds}, linear in $x$ \\
+      $\beta_1$ & Change of the \emph{log-odds} per unit of $x$ \\
+      $e^{\beta_1}$ & Factor by which the \emph{odds} change per unit of $x$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{Every probability statement goes through the pipeline
+  $x\;\xrightarrow{\ \text{linear}\ }\;\eta\;\xrightarrow{\ \exp\ }\;\text{odds}
+  \;\xrightarrow{\ \text{odds}/(1+\text{odds})\ }\;p$.}
+\end{frame}
+
+\subsection{Estimation}
+
+\begin{frame}{Estimation: maximum likelihood}
+  \begin{block}{Idea}
+    Least squares makes no sense for $0/1$ data. Instead we choose the
+    coefficients under which the \textbf{observed outcomes are most
+    probable}.
+  \end{block}
+  \begin{block}{Likelihood}
+    \[
+      L(\beta_0,\beta_1)=\prod_{i:\,y_i=1}p(x_i)\;\prod_{i:\,y_i=0}\bigl(1-p(x_i)\bigr)
+    \]
+    Each defaulter contributes $p(x_i)$, each non-defaulter $1-p(x_i)$.
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item In practice we maximise the \textbf{log-likelihood}
+          $\log L=\sum_i\bigl[y_i\log p(x_i)+(1-y_i)\log(1-p(x_i))\bigr]$.
+    \item There is no closed formula -- \texttt{R} solves the problem
+          numerically (\texttt{glm}).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Exercise -- which parameters are more plausible?}
+  \begin{block}{Problem statement}
+    Four customers with balances $1000$, $1500$, $2000$, $2500$\,\$; the last
+    two defaulted ($y=0,0,1,1$). Compare two candidate parameter sets:
+    \[
+      \text{(A)}\ \ \beta_0=-10.65,\ \beta_1=0.0055
+      \qquad\qquad
+      \text{(B)}\ \ \beta_0=-5,\ \beta_1=0.002
+    \]
+    \begin{enumerate}
+      \item Compute $p(x_i)$ for all four customers under (A) and (B).
+      \item Compute the likelihood $L$ for (A) and (B).
+      \item Which parameter set would maximum likelihood prefer?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- which parameters are more plausible?}
+  Example: $\eta(2000)=-10.65+0.0055\cdot2000=0.35$,
+  $p=e^{0.35}/(1+e^{0.35})=0.5866$.
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.08}
+    \begin{tabular}{c|c|cc|cc}
+      \toprule
+      & & \multicolumn{2}{c|}{\textbf{(A)}} & \multicolumn{2}{c}{\textbf{(B)}}\\
+      balance & $y_i$ & $p(x_i)$ & contribution & $p(x_i)$ & contribution\\
+      \midrule
+      $1000$ & $0$ & $0.0058$ & $0.9942$ & $0.0474$ & $0.9526$\\
+      $1500$ & $0$ & $0.0832$ & $0.9168$ & $0.1192$ & $0.8808$\\
+      $2000$ & $1$ & $0.5866$ & $0.5866$ & $0.2689$ & $0.2689$\\
+      $2500$ & $1$ & $0.9569$ & $0.9569$ & $0.5000$ & $0.5000$\\
+      \midrule
+      \multicolumn{2}{c|}{$L$ (product)} & \multicolumn{2}{c|}{$\mathbf{0.5117}$} & \multicolumn{2}{c}{$0.1128$}\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{exampleblock}{Decision}
+    Under (A) the observed pattern is $4.5$ times as probable as under (B)
+    $\Rightarrow$ maximum likelihood prefers \textbf{(A)}: high probabilities
+    for the actual defaulters, low ones for the others.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Logistic regression with R}
+  \begin{block}{Fitting the model}
+\begin{lstlisting}
+df <- read.csv("../data/Default.csv", stringsAsFactors = TRUE)
+g1 <- glm(default ~ balance, family = binomial, data = df)
+summary(g1)
+\end{lstlisting}
+  \end{block}
+\begin{lstlisting}[style=Rout]
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)
+(Intercept) -1.065e+01  3.612e-01  -29.49   <2e-16 ***
+balance      5.499e-03  2.204e-04   24.95   <2e-16 ***
+\end{lstlisting}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item \texttt{family = binomial} makes \texttt{glm} (generalised linear
+          model) fit a logistic regression by maximum likelihood.
+    \item Estimated model: $\hat\eta=-10.65+0.0055\cdot\text{balance}$.
+    \item The output looks like \texttt{lm} -- with $z$- instead of
+          $t$-values (see ``Inference'').
+  \end{itemize}
+\end{frame}
+
+\subsection{Interpretation}
+
+\begin{frame}{Interpreting the coefficients -- three scales}
+  \begin{block}{Three ways to read $\hat\beta_1$}
+    \begin{description}\setlength{\itemsep}{3pt}
+      \item[Sign:] $\hat\beta_1>0$ $\Rightarrow$ a larger $x$ raises the
+            probability of $Y=1$; $\hat\beta_1<0$ lowers it.
+      \item[Log-odds:] one unit more of $x$ changes the log-odds by
+            $\hat\beta_1$ -- constant, but hard to imagine.
+      \item[Odds:] one unit more of $x$ \textbf{multiplies the odds} by
+            $e^{\hat\beta_1}$ (\textbf{odds ratio}) -- constant and easy to
+            communicate.
+    \end{description}
+  \end{block}
+  \begin{alertblock}{Not on the probability scale}
+    The change in the \emph{probability} is not constant: it is largest in
+    the steep middle of the S-curve and small at the flat ends.
+  \end{alertblock}
+  \inworten{Why the odds ratio? $\frac{\text{odds}(x+1)}{\text{odds}(x)}
+  =\frac{e^{\beta_0+\beta_1(x+1)}}{e^{\beta_0+\beta_1x}}=e^{\beta_1}$ --
+  independent of $x$.}
+\end{frame}
+
+\begin{frame}{Worked example: default and balance}
+  \textbf{Model:} $\hat\eta=-10.65+0.0055\cdot\text{balance}$.
+  \begin{exampleblock}{Three scales for $1000$\,\$ more balance}
+    \begin{itemize}\setlength{\itemsep}{3pt}
+      \item \textbf{Log-odds:} $+0.0055\cdot1000=+5.5$.
+      \item \textbf{Odds:} multiplied by $e^{5.5}\approx245$.
+      \item \textbf{Probability:} depends on the starting point:
+    \end{itemize}
+    \begin{center}
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{lcccc}
+        \toprule
+        balance (\$) & $1000$ & $1500$ & $2000$ & $2500$\\
+        \midrule
+        $\hat p(x)$ & $0.006$ & $0.083$ & $0.586$ & $0.957$\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{exampleblock}
+  \begin{alertblock}{Common mistake}
+    ``The odds multiply by $245$'' does \emph{not} mean the probability is
+    $245$ times as large -- probabilities can never exceed $1$.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Exercise -- computing $\hat p(x)$ from the coefficients}
+  \begin{block}{Problem statement}
+    The logistic regression of default on balance gives
+    $\hat\eta=-10.65+0.0055\cdot\text{balance}$. For a customer with a
+    balance of $1500$\,\$:
+    \begin{enumerate}
+      \item Compute the log-odds $\hat\eta$.
+      \item Compute the probability of default $\hat p$.
+      \item Compute the odds and relate them to part (1).
+      \item At which balance does the model give $\hat p=0.5$?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- computing $\hat p(x)$ from the coefficients}
+  \begin{exampleblock}{(1)--(3) Log-odds, probability, odds}
+    \[
+      \hat\eta = -10.65+0.0055\cdot1500=-2.40,\qquad
+      \hat p = \frac{e^{-2.40}}{1+e^{-2.40}}=\frac{0.0907}{1.0907}=\mathbf{0.083},
+    \]
+    \[
+      \text{odds} = \frac{0.083}{0.917}=0.091=e^{-2.40}\ \checkmark
+      \quad\text{(about one default per eleven non-defaults)}
+    \]
+  \end{exampleblock}
+  \begin{exampleblock}{(4) Balance with $\hat p=0.5$}
+    $\hat p=0.5\Leftrightarrow\text{odds}=1\Leftrightarrow\hat\eta=0$:
+    \quad $0=-10.65+0.0055\cdot\text{balance}$ $\Rightarrow$
+    balance $=10.65/0.0055\approx\mathbf{1936}$\,\$.
+  \end{exampleblock}
+  \begin{alertblock}{Common mistake}
+    Reading $\hat\eta=-2.40$ as a probability -- log-odds must first be
+    passed through the logistic function.
+  \end{alertblock}
+\end{frame}
+
+\subsection{Inference for the coefficients}
+
+\begin{frame}{Inference -- the same recipe once more}
+  \begin{block}{$z$-test for a coefficient (Wald test)}
+    \[
+      H_0:\beta_j=0\quad\text{vs.}\quad H_1:\beta_j\neq0,
+      \qquad
+      Z=\frac{\hat\beta_j}{\mathrm{SE}(\hat\beta_j)}\;\approx\;N(0,1)\ \text{ under }H_0
+    \]
+    Reject if $|Z|>z_{1-\alpha/2}$ ($1.96$ for $\alpha=0.05$); $p=2\,\Phi(-|Z|)$.
+  \end{block}
+  \begin{block}{Confidence intervals}
+    \[
+      \beta_j:\ \ \hat\beta_j\pm z_{1-\alpha/2}\,\mathrm{SE}(\hat\beta_j),
+      \qquad
+      \text{odds ratio } e^{\beta_j}:\ \ \bigl[e^{\text{lower}},\,e^{\text{upper}}\bigr]
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item Why $z$ and not $t$? Maximum likelihood estimators are
+          approximately normal for large $n$ -- as for the known-variance
+          case of Part~3.
+    \item The CI for the odds ratio is obtained by \textbf{exponentiating
+          the bounds} -- it is not symmetric around $e^{\hat\beta_j}$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Inference -- balance and student status}
+  \begin{exampleblock}{Balance ($\hat\beta_1=0.005499$, $\mathrm{SE}=0.000220$)}
+    \[
+      Z=\frac{0.005499}{0.000220}=24.95,\qquad p<2\cdot10^{-16},\qquad
+      \text{CI}_{0.95}(\beta_1)=[\,0.005067\,;\,0.005931\,]
+    \]
+    Per $100$\,\$: odds ratio $e^{0.5499}=1.733$, CI
+    $[e^{0.5067};\,e^{0.5931}]=[\,1.660\,;\,1.810\,]$ -- every $100$\,\$ of
+    balance raises the odds of default by $66$ to $81\,\%$.
+  \end{exampleblock}
+  \begin{exampleblock}{Student ($\hat\beta=0.4049$, $\mathrm{SE}=0.1150$), \texttt{default \textasciitilde\ student}}
+    \[
+      Z=\frac{0.4049}{0.1150}=3.52,\qquad p=0.0004,\qquad
+      e^{0.4049}=1.50,\quad \text{CI}=[\,1.20\,;\,1.88\,]
+    \]
+    Students have $50\,\%$ higher odds of default -- \emph{on their own}
+    (more on this in Section~3).
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Exercise -- coefficients on the odds scale}
+  \begin{block}{Problem statement}
+    The logistic regression of default on balance gives
+    $\hat\beta_1=0.0055$ (per \$) with $\mathrm{SE}(\hat\beta_1)=0.00022$.
+    \begin{enumerate}
+      \item By how much do the \emph{log-odds} change for $500$\,\$ more
+            balance?
+      \item By which factor do the \emph{odds} change for $500$\,\$ more
+            balance?
+      \item Test $H_0:\beta_1=0$ at $\alpha=0.05$.
+      \item Why can we state a constant effect on the odds but not on the
+            probability?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- coefficients on the odds scale}
+  \textbf{(1)} $\;\Delta\eta=0.0055\cdot500=\mathbf{2.75}$.
+  \qquad
+  \textbf{(2)} $\;e^{2.75}=\mathbf{15.6}$: the odds are about $16$ times as
+  large.
+
+  \medskip
+  \textbf{(3)} $\;Z=0.0055/0.00022=25.0>1.96$ $\Rightarrow$ reject $H_0$:
+  balance is a highly significant predictor.
+
+  \medskip
+  \textbf{(4)} The log-odds are linear in $x$, so a fixed $\Delta x$ always
+  shifts them by $\beta_1\Delta x$ and multiplies the odds by
+  $e^{\beta_1\Delta x}$. The probability is the S-shaped logistic function of
+  the log-odds:
+  \begin{center}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{lccc}
+      \toprule
+      start & odds before & odds after ($\times15.6$) & probability after\\
+      \midrule
+      $p=0.10$ & $0.111$ & $1.74$ & $0.63$ \ ($+53$ points)\\
+      $p=0.90$ & $9$ & $141$ & $0.993$ \ ($+9$ points)\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% ============================================================================
+% SECTION 3: MULTIPLE LOGISTIC REGRESSION
+% ============================================================================
+\section[Multiple logistic]{Multiple Logistic Regression}
+
+\subsection{The model}
+
+\begin{frame}{Several explanatory variables}
+  \begin{block}{Model}
+    \[
+      \log\frac{p(x)}{1-p(x)}=\beta_0+\beta_1x_1+\beta_2x_2+\dots+\beta_px_p
+    \]
+  \end{block}
+  Everything from Part~4 carries over:
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item $\beta_j$ is the change of the log-odds per unit of $x_j$
+          \textbf{holding all other variables fixed}; $e^{\beta_j}$ is the
+          corresponding odds ratio.
+    \item Qualitative variables enter as \textbf{dummies} (e.g.\
+          \texttt{studentYes} $=1$ for students).
+    \item Simple and multiple coefficients can differ completely --
+          \textbf{confounding}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Multiple logistic regression with R}
+\begin{lstlisting}
+g3 <- glm(default ~ balance + income + student, family = binomial, data = df)
+summary(g3)
+\end{lstlisting}
+\begin{lstlisting}[style=Rout]
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)
+(Intercept) -1.087e+01  4.923e-01 -22.080  < 2e-16 ***
+balance      5.737e-03  2.319e-04  24.738  < 2e-16 ***
+income       3.033e-06  8.203e-06   0.370  0.71152
+studentYes  -6.468e-01  2.363e-01  -2.738  0.00619 **
+\end{lstlisting}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item \textbf{Balance:} highly significant, positive.
+    \item \textbf{Income:} not significant given balance and student
+          ($p=0.71$).
+    \item \textbf{Student:} significant and now \emph{negative}:
+          $e^{-0.6468}=0.524$.
+  \end{itemize}
+\end{frame}
+
+\subsection{Confounding: the student paradox}
+
+\begin{frame}{The student paradox}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Alone: \texttt{default \textasciitilde\ student}}
+        $\hat\beta_{\text{student}}=+0.405$ ($p=0.0004$)\\
+        Students default \emph{more often}: $4.31\,\%$ vs.\ $2.92\,\%$.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Together with balance and income}
+        $\hat\beta_{\text{student}}=-0.647$ ($p=0.006$)\\
+        At the \emph{same} balance, students default \emph{less often}.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \medskip
+  \begin{alertblock}{How can both be true?}
+    Students carry \textbf{larger balances} on average ($988$\,\$ vs.\
+    $772$\,\$) -- and a large balance is the main risk factor. Balance is a
+    \textbf{confounder} of the student effect.
+  \end{alertblock}
+  \inworten{The same phenomenon as the newspaper budget in Part~4: the
+  simple coefficient answers a different question than the multiple one.}
+\end{frame}
+
+\begin{frame}{The student paradox visualised}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth,height=0.56\textheight,keepaspectratio]{images/cls_student_paradox.png}
+  \end{center}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item (a) For every balance, the student curve lies \emph{below} the
+          non-student curve; the overall rates (dashed) point the other way.
+    \item (b) Students are concentrated at higher balances.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Which coefficient is ``right''?}
+  \begin{block}{Both -- they answer different questions}
+    \begin{itemize}\setlength{\itemsep}{3pt}
+      \item \textbf{Simple model:} ``Is a randomly chosen student riskier
+            than a randomly chosen non-student?'' -- \emph{yes} (relevant if
+            nothing else is known about the applicant).
+      \item \textbf{Multiple model:} ``Is a student riskier than a
+            non-student \emph{with the same balance and income}?'' --
+            \emph{no} (relevant for an individual credit decision, where the
+            balance is known).
+    \end{itemize}
+  \end{block}
+  \kernaussage{Always ask \emph{which variables are held fixed} before
+  interpreting a coefficient -- in linear and in logistic regression.}
+\end{frame}
+
+\subsection{Exercises}
+
+\begin{frame}{Exercise -- inference in the multiple model}
+  \begin{block}{Problem statement}
+    In the model \texttt{default \textasciitilde\ balance + income + student}:
+    \begin{center}
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{lcc}
+        \toprule
+        & $\hat\beta_j$ & $\mathrm{SE}(\hat\beta_j)$\\
+        \midrule
+        income (per \$) & $3.033\cdot10^{-6}$ & $8.203\cdot10^{-6}$\\
+        studentYes & $-0.6468$ & $0.2363$\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+    \begin{enumerate}
+      \item Test $H_0:\beta_{\text{income}}=0$ at $\alpha=0.05$.
+      \item Compute a $95\,\%$ CI for the odds ratio of $10\,000$\,\$ more
+            income.
+      \item Compute the odds ratio for students and its $95\,\%$ CI.
+            Interpret it.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- inference in the multiple model}
+  \textbf{(1)} $\;Z=\dfrac{3.033}{8.203}=0.37<1.96$ $\Rightarrow$ keep $H_0$
+  ($p=0.71$): given balance and student status, income adds no detectable
+  information.
+
+  \medskip
+  \textbf{(2)} Per $10\,000$\,\$: $\hat\beta=0.0303$, $\mathrm{SE}=0.0820$:
+  \[
+    0.0303\pm1.96\cdot0.0820=[\,-0.130\,;\,0.191\,]
+    \;\Rightarrow\;
+    \text{OR}\in[\,e^{-0.130};\,e^{0.191}\,]=[\,0.878\,;\,1.211\,]
+  \]
+  The interval contains $1$ (``no change of the odds'') -- consistent with (1).
+
+  \medskip
+  \textbf{(3)} $e^{-0.6468}=\mathbf{0.524}$;
+  $-0.6468\pm1.96\cdot0.2363=[\,-1.110\,;\,-0.184\,]$
+  $\Rightarrow$ OR $\in[\,0.330\,;\,0.832\,]$.
+  \begin{exampleblock}{Interpretation}
+    At the same balance and income, a student's odds of default are about
+    half ($48\,\%$ lower) those of a non-student; the CI excludes $1$.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Exercise -- logistic regression from A to Z}
+  \begin{block}{Problem statement}
+    Use the multiple model with (rounded) coefficients
+    $\hat\eta=-10.869+0.00574\cdot\text{balance}+0.003\cdot\text{income}-0.6468\cdot\text{student}$
+    (income in $1000$\,\$, student $=1$ for students). Two customers:
+    \begin{itemize}
+      \item \textbf{A}: non-student, balance $1000$\,\$, income $40\,000$\,\$;
+      \item \textbf{B}: student, balance $2000$\,\$, income $30\,000$\,\$.
+    \end{itemize}
+    \begin{enumerate}
+      \item Compute $\hat\eta$ and $\hat p$ for A and B.
+      \item By which factor do the odds change for $100$\,\$ more balance?
+      \item At which balance does a non-student with $40\,000$\,\$ income
+            reach $\hat p=0.5$? And a student with the same income?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- logistic regression from A to Z}
+  \begin{exampleblock}{(1) Log-odds and probabilities (watch the units: income in $1000$\,\$)}
+    \begin{align*}
+      \hat\eta_A&=-10.869+0.00574\cdot1000+0.003\cdot40=-10.869+5.740+0.120=-5.009\\
+      \hat\eta_B&=-10.869+0.00574\cdot2000+0.003\cdot30-0.6468=0.054
+    \end{align*}
+    \[
+      \hat p_A=\frac{e^{-5.009}}{1+e^{-5.009}}=\mathbf{0.0066},
+      \qquad
+      \hat p_B=\frac{e^{0.054}}{1+e^{0.054}}=\mathbf{0.514}
+    \]
+    A is a very safe customer, B is right at the knife edge. (\texttt{R}
+    with unrounded coefficients: $0.0066$ and $0.512$.)
+  \end{exampleblock}
+  \textbf{(2)} $\;e^{0.00574\cdot100}=e^{0.574}=\mathbf{1.78}$: $100$\,\$ more
+  balance raises the odds by $78\,\%$ -- whatever the starting point.
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- logistic regression from A to Z}
+  \begin{exampleblock}{(3) Decision boundary: $\hat p=0.5\Leftrightarrow\hat\eta=0$}
+    Non-student, income $40$:
+    \[
+      0=-10.869+0.00574\cdot\text{balance}+0.120
+      \;\Rightarrow\;
+      \text{balance}=\frac{10.869-0.120}{0.00574}\approx\mathbf{1873}\,\$
+    \]
+    Student, income $40$:
+    \[
+      \text{balance}=\frac{10.869-0.120+0.6468}{0.00574}\approx\mathbf{1985}\,\$
+    \]
+  \end{exampleblock}
+  \inworten{A student needs about $112$\,\$ more balance to reach the same
+  $50\,\%$ risk -- the negative student coefficient, expressed in dollars.}
+  \begin{alertblock}{Common mistake}
+    Inserting the income in dollars: $0.003\cdot40\,000=120$ would push every
+    probability to $1$.
+  \end{alertblock}
+\end{frame}
+
+% ============================================================================
+% SECTION 4: FROM PROBABILITIES TO DECISIONS
+% ============================================================================
+\section[Decisions]{From Probabilities to Decisions}
+
+\begin{frame}{The classification rule}
+  \begin{block}{Rule with threshold $t$}
+    \[
+      \hat y=\begin{cases}1\ (\text{``default''}) & \text{if } \hat p(x)>t,\\
+                         0\ (\text{``no default''}) & \text{otherwise.}\end{cases}
+    \]
+    The usual default is $t=0.5$: assign the more probable class.
+  \end{block}
+  \begin{block}{Threshold on the log-odds scale}
+    Because the logistic function is increasing,
+    \[
+      \hat p(x)>t \quad\Longleftrightarrow\quad \hat\eta(x)>\log\frac{t}{1-t}
+    \]
+    $t=0.5$ corresponds to $\hat\eta>0$; $t=0.2$ to $\hat\eta>\log(0.25)=-1.386$.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Decision boundary -- default and balance}
+  \textbf{Model:} $\hat\eta=-10.65+0.0055\cdot\text{balance}$.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{lcc}
+      \toprule
+      Threshold & log-odds cut-off & balance cut-off\\
+      \midrule
+      $t=0.5$ & $\hat\eta>0$ & $10.65/0.0055=1936$\,\$\\
+      $t=0.2$ & $\hat\eta>\log(0.2/0.8)=-1.386$ & $(10.65-1.386)/0.0055=1684$\,\$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{Lowering the threshold moves the boundary to the left: more
+  defaulters are caught -- but more good customers are rejected as well.}
+  \kernaussage{The threshold is not a statistical but a \textbf{business
+  decision}: it depends on the cost of a missed defaulter compared with the
+  cost of a rejected good customer.}
+\end{frame}
+
+\begin{frame}{Exercise -- from probability to decision}
+  \begin{block}{Problem statement}
+    Use $\hat\eta=-10.65+0.0055\cdot\text{balance}$. Three applicants have
+    balances of $1800$, $2000$ and $2200$\,\$.
+    \begin{enumerate}
+      \item Compute the predicted probability of default for each.
+      \item Classify them with the threshold $t=0.5$.
+      \item The bank lowers the threshold to $t=0.2$. Which classifications
+            change?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- from probability to decision}
+  \begin{exampleblock}{(1) Probabilities}
+    \begin{align*}
+      1800:&\ \ \hat\eta=-10.65+9.90=-0.75, & \hat p&=\tfrac{e^{-0.75}}{1+e^{-0.75}}=0.321\\
+      2000:&\ \ \hat\eta=-10.65+11.00=\phantom{-}0.35, & \hat p&=\tfrac{e^{0.35}}{1+e^{0.35}}=0.587\\
+      2200:&\ \ \hat\eta=-10.65+12.10=\phantom{-}1.45, & \hat p&=\tfrac{e^{1.45}}{1+e^{1.45}}=0.810
+    \end{align*}
+  \end{exampleblock}
+  \textbf{(2)} $t=0.5$ (boundary $1936$\,\$): $1800\to$ \textbf{No},
+  $2000\to$ \textbf{Yes}, $2200\to$ \textbf{Yes}.
+
+  \medskip
+  \textbf{(3)} $t=0.2$ (boundary $1684$\,\$): the applicant with $1800$\,\$
+  ($\hat p=0.321>0.2$) flips to \textbf{Yes}; the other two stay
+  \textbf{Yes}.
+  \inworten{Equally spaced balances ($+200$\,\$) give unequal probability
+  steps ($+0.27$, $+0.22$) -- the S-curve is non-linear.}
+\end{frame}
+
+% ============================================================================
+% SECTION 5: EVALUATING A CLASSIFIER
+% ============================================================================
+\section[Evaluation]{Evaluating a Classifier}
+
+\subsection{Confusion matrix}
+
+\begin{frame}{Why accuracy alone is not enough}
+  \begin{block}{The trivial classifier}
+    Only $3.33\,\%$ of the customers default. The ``classifier'' that
+    \textbf{always predicts ``no default''} is right for
+    $96.67\,\%$ of the customers -- and detects not a single defaulter.
+  \end{block}
+  \begin{alertblock}{Imbalanced classes}
+    With a rare class, a high accuracy is easy to achieve and says little.
+    We must look at the two kinds of errors \textbf{separately} -- they also
+    have very different costs.
+  \end{alertblock}
+  \inworten{As in Part~3 there are two ways to be wrong: a false alarm
+  (Type~I) and a miss (Type~II).}
+\end{frame}
+
+\begin{frame}{The confusion matrix}
+  \begin{columns}[c]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \begin{tikzpicture}[font=\small,
+          cell/.style={minimum width=2.6cm,minimum height=1.3cm,draw=black!45,align=center}]
+        \node[font=\footnotesize\bfseries] at (2.6,3.25) {Predicted};
+        \node[font=\footnotesize] at (1.3,2.85) {No};
+        \node[font=\footnotesize] at (3.9,2.85) {Yes};
+        \node[rotate=90,font=\footnotesize\bfseries] at (-0.75,1.3) {Actual};
+        \node[font=\footnotesize] at (-0.3,1.95) {No};
+        \node[font=\footnotesize] at (-0.3,0.65) {Yes};
+        \node[cell,fill=hsbigruen!18] at (1.3,1.95) {\textbf{TN}\\true negative};
+        \node[cell,fill=hsbirot!15]   at (3.9,1.95) {\textbf{FP}\\false positive};
+        \node[cell,fill=hsbirot!15]   at (1.3,0.65) {\textbf{FN}\\false negative};
+        \node[cell,fill=hsbigruen!18] at (3.9,0.65) {\textbf{TP}\\true positive};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Measures}
+        \vspace{-0.6em}
+        \begin{align*}
+          \text{Accuracy}&=\frac{\mathrm{TP}+\mathrm{TN}}{n}\\[2pt]
+          \text{\textcolor{hsbiorange!85!black}{Sensitivity}}&=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}}\\[2pt]
+          \text{\textcolor{hsbiblau}{Specificity}}&=\frac{\mathrm{TN}}{\mathrm{TN}+\mathrm{FP}}\\[2pt]
+          \text{Precision}&=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}}
+        \end{align*}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \medskip
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item \textbf{Sensitivity} (recall): share of actual defaulters that are
+          caught. \textbf{Specificity}: share of non-defaulters correctly
+          left alone.
+    \item \textbf{Precision}: share of flagged customers that really default.
+          Error rate $=1-$ accuracy.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Confusion matrix -- Default data, $t=0.5$}
+  \textbf{Model:} \texttt{default \textasciitilde\ balance + income + student},
+  threshold $t=0.5$, all $n=10\,000$ customers:
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{l|cc|c}
+      \toprule
+      & Pred.\ No & Pred.\ Yes & Total\\
+      \midrule
+      Actual No & $9627$ & $40$ & $9667$\\
+      Actual Yes & $228$ & $105$ & $333$\\
+      \midrule
+      Total & $9855$ & $145$ & $10\,000$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{exampleblock}{Metrics}
+    \begin{tabular}{@{}ll@{}}
+      Accuracy $=\frac{9627+105}{10\,000}=0.973$ & Sensitivity $=\frac{105}{333}=0.315$\\[4pt]
+      Specificity $=\frac{9627}{9667}=0.996$ & Precision $=\frac{105}{145}=0.724$
+    \end{tabular}
+  \end{exampleblock}
+  \inworten{An accuracy of $97.3\,\%$ -- but $228$ of $333$ defaulters
+  ($68\,\%$) are missed.}
+\end{frame}
+
+\begin{frame}{Exercise -- reading a confusion matrix}
+  \begin{block}{Problem statement}
+    The bank lowers the threshold of the same model to $t=0.2$:
+    \begin{center}
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{l|cc|c}
+        \toprule
+        & Pred.\ No & Pred.\ Yes & Total\\
+        \midrule
+        Actual No & $9390$ & $277$ & $9667$\\
+        Actual Yes & $130$ & $203$ & $333$\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+    \begin{enumerate}
+      \item Compute accuracy, error rate, sensitivity, specificity and
+            precision.
+      \item Compare with $t=0.5$ (previous slide). Which threshold would you
+            recommend to the bank?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- reading a confusion matrix}
+  \textbf{(1) Metrics at $t=0.2$} (with $t=0.5$ for comparison):
+  \begin{center}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lccl}
+      \toprule
+      & $t=0.5$ & $t=0.2$ & \\
+      \midrule
+      Accuracy & $0.973$ & $0.959$ & $=(9390+203)/10\,000$\\
+      Error rate & $0.027$ & $0.041$ & $=1-0.959$\\
+      Sensitivity & $0.315$ & $0.610$ & $=203/333$\\
+      Specificity & $0.996$ & $0.971$ & $=9390/9667$\\
+      Precision & $0.724$ & $0.423$ & $=203/(203+277)$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \textbf{(2)} With $t=0.2$ the bank catches almost twice as many defaulters
+  ($203$ instead of $105$) at the price of $237$ additional false alarms. If a
+  missed default costs much more than a rejected good customer, $t=0.2$ is
+  the better choice -- although its accuracy is lower.
+  \inworten{Do not confuse sensitivity and precision: both have TP on top, but
+  divide by the \emph{actual} ($333$) or the \emph{predicted} ($480$)
+  positives.}
+\end{frame}
+
+\subsection{ROC curve and AUC}
+
+\begin{frame}{The threshold trade-off}
+  \begin{center}
+    \includegraphics[width=0.9\textwidth,height=0.55\textheight,keepaspectratio]{images/cls_threshold_tradeoff.png}
+  \end{center}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item Lower $t$ $\Rightarrow$ sensitivity $\uparrow$, specificity
+          $\downarrow$ -- and vice versa.
+    \item The error rate is minimal around $t=0.5$, but that is not
+          necessarily the \emph{cheapest} threshold.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The ROC curve}
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{images/cls_roc.png}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Construction}
+        For \emph{every} threshold $t$, plot the pair
+        \[
+          \bigl(1-\text{specificity},\ \text{sensitivity}\bigr).
+        \]
+      \end{block}
+      \begin{itemize}\setlength{\itemsep}{2pt}
+        \item Each point is one threshold; the curve shows all of them.
+        \item The diagonal is random guessing.
+        \item The closer the curve gets to the \textbf{top-left corner},
+              the better the classifier.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{AUC -- area under the ROC curve}
+  \begin{block}{Definition and interpretation}
+    The AUC is the area under the ROC curve. Equivalently,
+    \[
+      \text{AUC}=P\bigl(\hat p(\text{random defaulter})>\hat p(\text{random non-defaulter})\bigr).
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item $\text{AUC}=0.5$: no better than random; $\text{AUC}=1$: perfect
+          ranking.
+    \item \textbf{Default data:} $\text{AUC}=0.950$ -- a randomly chosen
+          defaulter receives a higher predicted probability than a randomly
+          chosen non-defaulter in $95\,\%$ of all pairs.
+    \item The AUC summarises \textbf{all thresholds} at once -- changing $t$
+          moves along the curve but never changes the AUC.
+  \end{itemize}
+  \kernaussage{The ROC curve and AUC evaluate the \emph{model}; the
+  confusion matrix evaluates one \emph{decision rule} (one threshold).}
+\end{frame}
+
+\begin{frame}{Exercise -- threshold, ROC and AUC}
+  \begin{block}{Problem statement}
+    For the Default model: $t=0.5$ gives sensitivity $0.315$ and
+    specificity $0.996$; $t=0.2$ gives sensitivity $0.610$ and specificity
+    $0.971$.
+    \begin{enumerate}
+      \item Locate both operating points on the ROC axes.
+      \item How does the point move when the threshold drops from $0.5$ to
+            $0.2$?
+      \item A colleague hopes to improve the AUC by choosing a better
+            threshold. Comment.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- threshold, ROC and AUC}
+  \textbf{(1)} $t=0.5$: $(1-0.996,\ 0.315)=(0.004,\ 0.315)$; \quad
+  $t=0.2$: $(1-0.971,\ 0.610)=(0.029,\ 0.610)$.
+
+  \medskip
+  \textbf{(2)} The point moves \textbf{up and to the right along the same
+  curve}: a small loss in specificity ($+0.025$ on the $x$-axis) buys a
+  large gain in sensitivity ($+0.295$).
+
+  \medskip
+  \textbf{(3)} Impossible: the threshold only selects a point \emph{on} the
+  curve. The AUC belongs to the model's ranking of the customers -- only a
+  better \emph{model} (better variables) can raise it.
+  \begin{exampleblock}{Practice}
+    Choose the model by its AUC, then choose the threshold by the costs of
+    the two error types.
+  \end{exampleblock}
+\end{frame}
+
+\subsection{Training and test data}
+
+\begin{frame}{Honest evaluation: training and test data}
+  \begin{block}{Problem}
+    So far we evaluated the model on the \emph{same} data used to fit it.
+    This is \textbf{optimistic}: the model has adapted to exactly these
+    customers. What counts is the performance on \textbf{new} customers.
+  \end{block}
+  \begin{block}{Solution: split the data}
+    \begin{itemize}
+      \item \textbf{Training data} (e.g.\ $70\,\%$): estimate the model.
+      \item \textbf{Test data} (the remaining $30\,\%$): compute the
+            confusion matrix and the AUC -- data the model has never seen.
+    \end{itemize}
+  \end{block}
+  \begin{exampleblock}{Default data: $7000$ training, $3000$ test customers (\texttt{set.seed(1)})}
+    Test AUC $=0.938$ (training data: $0.950$). At $t=0.5$ the model catches
+    $21$ of $102$ test defaulters, at $t=0.2$ already $58$.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Classification with R}
+  \begin{block}{Predicted probabilities and confusion matrix}
+\begin{lstlisting}
+phat <- predict(g3, type = "response")         # estimated P(default = Yes)
+table(Actual = df$default, Predicted = phat > 0.5)
+table(Actual = df$default, Predicted = phat > 0.2)
+\end{lstlisting}
+  \end{block}
+  \begin{block}{Training and test data}
+\begin{lstlisting}
+set.seed(1)                                    # reproducible split
+train <- sample(nrow(df), 7000)                # 70 % training data
+g_tr <- glm(default ~ balance + income + student, family = binomial,
+            data = df[train, ])
+p_te <- predict(g_tr, df[-train, ], type = "response")
+table(Actual = df$default[-train], Predicted = p_te > 0.5)
+\end{lstlisting}
+  \end{block}
+  \inworten{Without \texttt{type = "response"}, \texttt{predict()} returns the
+  log-odds $\hat\eta$, not the probabilities.}
+\end{frame}
+
+% ============================================================================
+% SECTION 6: BAYES CLASSIFIERS
+% ============================================================================
+\section[Bayes classifiers]{Bayes' Theorem and Generative Classifiers}
+
+\subsection{Bayes' theorem for classification}
+
+\begin{frame}{Two ways to obtain $P(Y=k\mid x)$}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Discriminative}
+        Model $P(Y=1\mid x)$ \textbf{directly}.\\[2pt]
+        Example: logistic regression.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Generative}
+        Model how $x$ is distributed \textbf{within each class} and combine
+        it with the class frequencies via \textbf{Bayes' theorem}.\\[2pt]
+        Examples: naive Bayes, LDA.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \medskip
+  \begin{exampleblock}{When generative models are useful}
+    Small samples, well separated classes, more than two classes -- and
+    they make the \textbf{base rate} (prior) explicit, which matters
+    whenever one class is rare.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Bayes' theorem in the classification setting}
+  \begin{block}{Posterior probability of class $k$}
+    \[
+      P(Y=k\mid X=x)=\frac{\pi_k\,f_k(x)}{\sum_{\ell}\pi_\ell\,f_\ell(x)}
+    \]
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}cl@{}}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning}\\
+      \midrule
+      $\pi_k=P(Y=k)$ & \textbf{prior}: share of class $k$ (e.g.\ $3.33\,\%$ defaulters)\\
+      $f_k(x)$ & \textbf{likelihood}: how typical is $x$ for class $k$?\\
+      $P(Y=k\mid x)$ & \textbf{posterior}: probability of class $k$ given $x$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{block}{Bayes classifier}
+    Assign $x$ to the class with the \textbf{largest posterior} -- for two
+    classes: $\hat y=1$ if $P(Y=1\mid x)>0.5$.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Bayes' theorem as a flow}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[font=\footnotesize,
+      op/.style={circle,draw=hsbiblaudunkel,very thick,fill=hsbiblau!8,
+                 minimum size=0.75cm,inner sep=0pt,font=\normalsize}]
+    \node[flowboxo,text width=2.8cm] (prior) at (0,1.2)
+      {\textbf{Prior} $\pi_k$\\[1pt]\scriptsize how frequent is class $k$?};
+    \node[flowboxo,text width=2.8cm] (lik) at (0,-1.2)
+      {\textbf{Likelihood} $f_k(x)$\\[1pt]\scriptsize how typical is $x$ in class $k$?};
+    \node[op] (times) at (3.1,0) {$\times$};
+    \node[flowbox,text width=2.0cm] (joint) at (5.5,0) {\textbf{Score}\\ $\pi_k\,f_k(x)$};
+    \node[flowboxg,text width=4.2cm] (post) at (10.6,0)
+      {\textbf{Posterior}\\[2pt]
+       $\displaystyle P(Y=k\mid x)=\frac{\pi_k f_k(x)}{\sum_\ell \pi_\ell f_\ell(x)}$};
+    \draw[flowarr] (prior.east) -- (times);
+    \draw[flowarr] (lik.east) -- (times);
+    \draw[flowarr] (times) -- (joint);
+    \draw[flowarr] (joint) -- node[above=1pt,font=\scriptsize,align=center]{divide by\\the sum} (post);
+  \end{tikzpicture}}
+  \vspace{0.6em}
+  \kernaussage{Every generative classifier is this flow -- naive Bayes and LDA
+  differ only in \textbf{how they model the likelihood} $f_k(x)$.}
+\end{frame}
+
+\subsection{Naive Bayes}
+
+\begin{frame}{Naive Bayes: an extreme simplification}
+  \begin{block}{Assumption}
+    Within each class, the explanatory variables are \textbf{independent}:
+    \[
+      f_k(x)=f_{k1}(x_1)\cdot f_{k2}(x_2)\cdots f_{kp}(x_p).
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Instead of one $p$-dimensional distribution, only $p$
+          one-dimensional ones have to be estimated -- e.g.\ simple
+          proportions for yes/no features.
+    \item The assumption is almost always \emph{wrong} -- yet the
+          \emph{ranking} of the cases is often good enough to classify well.
+  \end{itemize}
+  \inworten{Classic application: spam filters -- each word contributes its
+  own factor to the score.}
+\end{frame}
+
+\begin{frame}{Exercise -- naive Bayes spam filter}
+  \begin{block}{Problem statement}
+    A spam filter has priors $P(\text{Spam})=0.4$, $P(\text{Ham})=0.6$ and two
+    binary features: $F_1=$ ``contains the word \emph{free}'', $F_2=$
+    ``contains a link''.
+    \begin{center}
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{lcc}
+        \toprule
+        & $P(F_1=1\mid\cdot)$ & $P(F_2=1\mid\cdot)$\\
+        \midrule
+        Spam & $0.6$ & $0.7$\\
+        Ham & $0.1$ & $0.2$\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+    A new e-mail contains \emph{both} features.
+    \begin{enumerate}
+      \item Compute the score $\pi_k\,f_k(x)$ of each class.
+      \item Compute $P(\text{Spam}\mid F_1=1,F_2=1)$ and classify the e-mail.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- naive Bayes spam filter}
+  \begin{exampleblock}{(1) Scores (prior $\times$ product of the feature probabilities)}
+    \[
+      \text{Spam: } 0.4\cdot0.6\cdot0.7=0.168,
+      \qquad
+      \text{Ham: } 0.6\cdot0.1\cdot0.2=0.012
+    \]
+  \end{exampleblock}
+  \begin{exampleblock}{(2) Posterior}
+    \[
+      P(\text{Spam}\mid F_1,F_2)=\frac{0.168}{0.168+0.012}=\frac{0.168}{0.180}=\mathbf{0.933}
+      \;>\;0.5\;\Rightarrow\;\textbf{Spam}
+    \]
+  \end{exampleblock}
+  \inworten{The two features together are $21$ times as likely under Spam as
+  under Ham ($0.42/0.02$); this overwhelms the prior, which favoured Ham.}
+  \begin{alertblock}{Common mistake}
+    Ignoring the prior: $0.42/(0.42+0.02)=0.955$ overstates the spam
+    probability. With rare positives the prior can even flip the decision.
+  \end{alertblock}
+\end{frame}
+
+\subsection{Linear discriminant analysis}
+
+\begin{frame}{Linear discriminant analysis (LDA) with one variable}
+  \begin{block}{Assumption}
+    Within each class, $X$ is \textbf{normally distributed} with mean $\mu_k$
+    and a \textbf{common} variance $\sigma^2$: $\;X\mid Y=k\sim N(\mu_k,\sigma^2)$.
+  \end{block}
+  \begin{block}{Discriminant score and decision boundary (two classes)}
+    Inserting the normal densities into Bayes' theorem and taking logs gives
+    a score that is \textbf{linear} in $x$:
+    \[
+      \delta_k(x)=x\,\frac{\mu_k}{\sigma^2}-\frac{\mu_k^2}{2\sigma^2}+\log\pi_k,
+      \qquad
+      x^\star=\frac{\mu_0+\mu_1}{2}-\frac{\sigma^2}{\mu_1-\mu_0}\,\log\frac{\pi_1}{\pi_0}.
+    \]
+    Assign the class with the larger score; at $x^\star$ both scores are equal.
+  \end{block}
+  \inworten{Equal priors: the boundary is the midpoint of the means. A rare
+  class~1 pushes the boundary towards $\mu_1$.}
+\end{frame}
+
+\begin{frame}{LDA with one variable -- in pictures}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth,height=0.52\textheight,keepaspectratio]{images/cls_lda_1d.png}
+  \end{center}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item LDA compares the \textbf{prior-weighted densities}
+          $\pi_kf_k(x)$; the boundary lies where they cross.
+    \item The grey overlap is the error that \emph{no} classifier can avoid.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Exercise -- LDA in one dimension}
+  \begin{block}{Problem statement}
+    Two classes with $X\mid Y=k\sim N(\mu_k,\sigma^2)$, $\sigma^2=1$,
+    $\mu_0=0$, $\mu_1=2$.
+    \begin{enumerate}
+      \item With equal priors, write down $\delta_0(x)$ and $\delta_1(x)$
+            and find the decision boundary.
+      \item Classify $x=1.5$.
+      \item Now take $\pi_0=0.8$, $\pi_1=0.2$. Recompute the boundary and
+            reclassify $x=1.5$.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- LDA in one dimension}
+  \begin{exampleblock}{(1)--(2) Equal priors}
+    $\delta_0(x)=0+\log0.5$, \quad $\delta_1(x)=2x-2+\log0.5$. The equal
+    $\log\pi_k$ terms cancel: $0=2x-2$ $\Rightarrow$ $x^\star=1$ (the midpoint
+    of the means). $x=1.5>1$ $\Rightarrow$ \textbf{class 1}.
+  \end{exampleblock}
+  \begin{exampleblock}{(3) Unequal priors}
+    $\delta_0=\log0.8=-0.223$, \quad $\delta_1=2x-2+\log0.2=2x-3.609$:
+    \[
+      -0.223=2x-3.609\;\Rightarrow\;x^\star=1.693
+      \qquad\Bigl(\text{check: }1-\tfrac12\log\tfrac{0.2}{0.8}=1+0.693\ \checkmark\Bigr)
+    \]
+    Now $x=1.5<1.693$ $\Rightarrow$ \textbf{class 0}.
+  \end{exampleblock}
+  \inworten{Same observation, opposite decision -- purely because class 1
+  became rare: the rarer class needs stronger evidence.}
+\end{frame}
+
+\subsection{Comparison}
+
+\begin{frame}{Logistic regression, LDA and naive Bayes}
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.22}
+    \begin{tabular}{@{}p{2.6cm}p{3.6cm}p{3.4cm}p{3.4cm}@{}}
+      \toprule
+      & \textbf{Logistic regression} & \textbf{LDA} & \textbf{Naive Bayes}\\
+      \midrule
+      Models & $P(Y=1\mid x)$ directly & normal $f_k$, common variance & independent features\\
+      Boundary & linear in $x$ & linear in $x$ & flexible\\
+      Strength & few assumptions; interpretable odds ratios, tests & stable for small $n$, several classes & very many features, small $n$\\
+      Weakness & unstable if classes are perfectly separated & wrong if normality fails & miscalibrated probabilities\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{exampleblock}{Default data (all customers, $t=0.5$)}
+    LDA (\texttt{balance + student}) catches $81$ of $333$ defaulters with
+    $23$ false alarms; logistic regression catches $105$ with $40$ false
+    alarms -- similar trade-offs, AUC around $0.95$ for both.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Bayes classifiers with R}
+  \begin{block}{Linear discriminant analysis}
+\begin{lstlisting}
+library(MASS)                                   # provides lda()
+ld <- lda(default ~ balance + student, data = df)
+table(Actual = df$default, Predicted = predict(ld)$class)  # 9644 23 / 252 81
+\end{lstlisting}
+  \end{block}
+  \begin{block}{Naive Bayes}
+\begin{lstlisting}
+library(e1071)                                  # provides naiveBayes()
+nb <- naiveBayes(default ~ balance + student, data = df)
+table(Actual = df$default, Predicted = predict(nb, df))
+\end{lstlisting}
+  \end{block}
+\end{frame}
+
+% ============================================================================
+% SECTION 7: SUMMARY
+% ============================================================================
+\section{Summary}
+
+\begin{frame}{Summary 1 -- logistic regression}
+  \begin{block}{Model}
+    \[
+      \log\frac{p(x)}{1-p(x)}=\beta_0+\beta_1x_1+\dots+\beta_px_p,
+      \qquad
+      p(x)=\frac{e^{\eta}}{1+e^{\eta}}
+    \]
+    estimated by \textbf{maximum likelihood}.
+  \end{block}
+  \begin{block}{Interpretation of $\beta_j$ (holding the other variables fixed)}
+    \begin{itemize}\setlength{\itemsep}{0pt}
+      \item sign: direction of the effect on the probability,
+      \item $\beta_j$: change of the log-odds per unit of $x_j$,
+      \item $e^{\beta_j}$: \textbf{odds ratio} -- factor by which the odds
+            change per unit of $x_j$.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Inference}
+    $Z=\hat\beta_j/\mathrm{SE}(\hat\beta_j)\approx N(0,1)$, \
+    CI $\hat\beta_j\pm z_{1-\alpha/2}\mathrm{SE}(\hat\beta_j)$, \
+    CI for the odds ratio: exponentiate the bounds.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Summary 2 -- decisions and evaluation}
+  \begin{block}{Classification rule}
+    $\hat y=1$ if $\hat p(x)>t$ \ $\Leftrightarrow$ \ $\hat\eta(x)>\log\frac{t}{1-t}$;
+    \ the threshold $t$ is a business decision.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{l|l|l}
+      \toprule
+      \textbf{Measure} & \textbf{Formula} & \textbf{Question}\\
+      \midrule
+      Accuracy & $(\mathrm{TP}+\mathrm{TN})/n$ & share of correct decisions\\
+      Sensitivity & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ & share of positives caught\\
+      Specificity & $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ & share of negatives left alone\\
+      Precision & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$ & share of alarms that are real\\
+      AUC & area under ROC curve & ranking quality over all thresholds\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{Evaluate on \textbf{test data} the model has not seen.}
+\end{frame}
+
+\begin{frame}{Summary 3 -- Bayes classifiers}
+  \begin{block}{Bayes' theorem}
+    \[
+      P(Y=k\mid x)=\frac{\pi_k\,f_k(x)}{\sum_\ell\pi_\ell\,f_\ell(x)}
+      \qquad(\text{posterior}\propto\text{prior}\times\text{likelihood})
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item \textbf{Naive Bayes:} $f_k(x)=\prod_jf_{kj}(x_j)$ -- independent
+          features within each class.
+    \item \textbf{LDA:} normal $f_k$ with common variance; one variable:
+          boundary
+          $x^\star=\frac{\mu_0+\mu_1}{2}-\frac{\sigma^2}{\mu_1-\mu_0}\log\frac{\pi_1}{\pi_0}$.
+    \item A rare class needs stronger evidence -- the prior shifts the
+          boundary.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Summary 4 -- important R commands}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Logistic regression}
+\begin{lstlisting}
+g <- glm(y ~ x1 + x2, family = binomial,
+         data = df)
+summary(g)              # z-tests
+exp(coef(g))            # odds ratios
+exp(confint.default(g)) # CIs for ORs
+predict(g, new, type = "response")
+\end{lstlisting}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Decisions and evaluation}
+\begin{lstlisting}
+phat <- predict(g, type = "response")
+table(df$y, phat > 0.5)  # confusion
+set.seed(1)
+train <- sample(nrow(df), 7000)
+MASS::lda(y ~ x1 + x2, data = df)
+e1071::naiveBayes(y ~ x1, data = df)
+\end{lstlisting}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Five classic pitfalls -- final checklist}
+  \small
+  \begin{center}
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}p{6.7cm}@{}}
+      \toprule
+      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
+      \textbf{Correct version \ \textcolor{hsbigruen}{$\checkmark$}}\\
+      \midrule
+      ``The odds ratio is $1.78$, so the probability rises by $78\,\%$.'' &
+        The \emph{odds} rise by $78\,\%$; the change in probability depends on
+        the starting point.\\
+      ``Accuracy $97\,\%$ -- an excellent classifier.'' &
+        With $3\,\%$ defaulters, always saying ``no'' gives $97\,\%$; check
+        sensitivity and specificity.\\
+      ``$t=0.5$ is the correct threshold.'' &
+        The threshold depends on the costs of the two errors.\\
+      ``A better threshold improves the AUC.'' &
+        The threshold moves along the ROC curve; only a better model raises
+        the AUC.\\
+      ``Students are riskier, so reject students.'' &
+        At the same balance, students are \emph{less} risky -- ask what is
+        held fixed.\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Looking back: the lecture in one slide}
+  \begin{center}
+    \small\renewcommand{\arraystretch}{1.22}
+    \begin{tabular}{@{}lp{9.6cm}@{}}
+      \toprule
+      \textbf{Part} & \textbf{Key idea}\\
+      \midrule
+      1 -- Descriptive Statistics & Summarise data by location and dispersion ($\bar x$, $\tilde x$, $s$, $v$).\\
+      2 -- Graphical Representations & Show the distribution: empirical CDF, histogram, boxplot.\\
+      3 -- Statistical Inference & Infer from sample to population: estimate $\pm$ critical value $\times$ SE; tests and $p$-values.\\
+      4 -- Regression & Explain a metric $Y$ by several $X$ -- with $t$-tests, CIs and diagnostics.\\
+      5 -- Classification & Explain a categorical $Y$: logistic regression, decision rules, evaluation.\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \kernaussage{One thread through all five parts: every number computed from
+  data is an \textbf{estimate} -- describe it, picture it, and report its
+  uncertainty.}
+\end{frame}
+
+\end{document}

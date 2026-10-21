@@ -1,0 +1,2368 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\newcommand{\currentpart}{3}
+\input{../common/preamble.tex}
+
+\subtitle{Part 3: Statistical Inference}
+
+\begin{document}
+
+% ============================================================================
+% TITLE PAGE
+% ============================================================================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% Course overview (identical in all five parts)
+\courseoverview
+
+% ============================================================================
+% TABLE OF CONTENTS
+% ============================================================================
+\begin{frame}{Contents -- Part 3}
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+% ============================================================================
+% COMMON THREAD / LEARNING OBJECTIVES
+% ============================================================================
+\begin{frame}{The common thread of this part}
+  \begin{block}{One question runs through every section}
+    We draw a \textbf{sample} and want to learn something about the
+    \textbf{population} from it -- while being \emph{honest} about the
+    remaining uncertainty.
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small
+      \textbf{Two tools, one idea:}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item \textcolor{hsbiblau}{\textbf{Confidence interval}} --
+              ``Which values of $\mu$ are \emph{compatible} with the data?''
+        \item \textcolor{hsbiblau}{\textbf{Hypothesis test}} --
+              ``Is a specific value $\mu_0$ compatible -- or do the data
+              \emph{reject} it?''
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small
+      \textbf{One running story:}
+      \begin{block}{The dairy}
+        A machine fills milk. Is it working correctly? We measure,
+        estimate and test -- and follow this example throughout the
+        entire part.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================================================
+% LEARNING OBJECTIVES
+% ============================================================================
+\begin{frame}{Learning objectives -- Part 3}
+  After this part you will be able to \ldots
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item compute and correctly interpret a \textbf{confidence interval}
+              for $\mu$,
+        \item carry out a \textbf{hypothesis test} (known/unknown
+              variance, one-/two-sided),
+        \item compute the \textbf{$p$-value} and read it as a measure of
+              evidence,
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item distinguish \textbf{Type I and Type II errors} as well as the
+              \textbf{power} of a test,
+        \item read \textbf{critical values} from the $z$- and $t$-tables and
+              link them to the $p$-value,
+        \item implement every procedure in \texttt{R}.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \kernaussage{Common thread: infer from a sample -- and report the
+  uncertainty honestly.}
+\end{frame}
+
+% ============================================================================
+% LIST OF SYMBOLS
+% ============================================================================
+\begin{frame}{List of symbols (1/2)}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{@{}lp{4.1cm}lp{4.1cm}@{}}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
+      \midrule
+      $\mu$         & Expected value        & $n$             & Sample size \\
+      $\sigma^{2}$  & Variance              & $X_i$           & Sample variable \\
+      $\sigma$      & Standard deviation    & $x_i$           & Observed value \\
+      $\bar{X}$     & Sample mean           & $\mu_0$         & Hypothesized value \\
+      $\bar{x}$     & Realization           & $s^{2}$         & Sample variance \\
+      $s$           & Sample std.\ dev.     & $H_0$           & Null hypothesis \\
+      $H_1$         & Alternative hypothesis & $\alpha$        & Type I error prob. \\
+      $\beta$       & Type II error prob.   & $1-\beta$       & Power \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{center}
+    \footnotesize Convention: $N(\mu,\sigma^{2})$ -- the second argument is the
+    \textbf{variance} (not the standard deviation).
+  \end{center}
+\end{frame}
+
+\begin{frame}{List of symbols (2/2)}
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{@{}lp{4.1cm}lp{4.1cm}@{}}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
+      \midrule
+      $Z_n$              & Test stat., known var.   & $T_n$              & Test stat., unknown var. \\
+      $z_{1-\alpha/2}$   & Two-sided quantile, $N(0,1)$ & $t_{1-\alpha/2,n-1}$ & Two-sided quantile, $t_{n-1}$ \\
+      $z_{1-\alpha}$     & One-sided quantile, $N(0,1)$ & $t_{1-\alpha,n-1}$ & One-sided quantile, $t_{n-1}$ \\
+      $\Phi(\cdot)$      & CDF of $N(0,1)$          & $F_{t,n-1}$        & CDF of $t_{n-1}$ \\
+      $p$                & $p$-value                & $\text{CI}$        & Confidence interval \\
+      $\alpha$           & Significance level       & $1-\alpha$         & Confidence level \\
+      $\beta$            & Type II error prob.      & $1-\beta$          & Power \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+% ============================================================================
+% SECTION 1: CONFIDENCE INTERVALS
+% ============================================================================
+\section[CIs]{Confidence Intervals}
+
+\subsection{Motivation and intuition}
+
+% ---- Motivation: descriptive -> inferential --------------------------------
+\begin{frame}{Why inferential statistics?}
+  \begin{block}{The starting question}
+    We only know one \textbf{sample} -- but want to say something about the
+    \textbf{whole population}.
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \begin{tikzpicture}[node distance=12mm]
+        \node[flowbox, text width=3.4cm] (gg)
+          {\textbf{Population}\\[2pt]\footnotesize parameters $\mu,\sigma^2$\\ \textcolor{hsbirot}{unknown}};
+        \node[flowboxo, text width=3.4cm, below=14mm of gg] (st)
+          {\textbf{Sample}\\[2pt]\footnotesize $x_1,\dots,x_n$\\ observed};
+        \draw[flowarr] ($(gg.south)+(-0.9,0)$) -- ($(st.north)+(-0.9,0)$)
+              node[midway,left,font=\scriptsize]{draw};
+        \draw[flowarr, draw=hsbiorange!85!black] ($(st.north)+(0.9,0)$) -- ($(gg.south)+(0.9,0)$)
+              node[midway,right,font=\scriptsize]{\emph{infer}};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{itemize}\setlength{\itemsep}{4pt}
+        \item \textbf{Descriptive:} describes the data at hand.
+        \item \textbf{Inferential:} infers \emph{back} from the sample to the
+              population.
+        \item This inference is \emph{uncertain} -- we must report the
+              uncertainty.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---- Intuition: a point estimate is not enough -----------------------------
+\begin{frame}{A single estimate is not enough}
+  \begin{block}{Intuition}
+    From the sample we compute the mean $\bar x$. But it almost \textbf{never}
+    hits the true value $\mu$ exactly -- a second sample would give a
+    different value.
+  \end{block}
+  \begin{itemize}
+    \item Instead of a single point we report a \textbf{range} of values that
+          are \emph{compatible with the data}.
+    \item The more precise our estimate, the \emph{narrower} this range.
+  \end{itemize}
+  \kernaussage{A \textbf{confidence interval} reports the estimate
+  \emph{together with its uncertainty} -- a range of plausible values for
+  $\mu$. (It is \emph{not} a probability statement about where $\mu$ lies --
+  see the interpretation slides.)}
+\end{frame}
+
+% ---- Estimation chain (TikZ) -----------------------------------------------
+\begin{frame}{From the sample to the interval}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[node distance=22mm and 26mm]
+    \node[flowboxo, text width=2.4cm] (st) {\footnotesize Sample\\ $x_1,\dots,x_n$};
+    \node[flowbox, text width=2.5cm, right=of st] (ps)
+      {\footnotesize \textbf{Point estimator}\\ $\bar x$};
+    \node[flowbox, text width=3.2cm, right=of ps] (ki)
+      {\footnotesize \textbf{Interval estimator}\\ $[\,\bar x - e,\ \bar x + e\,]$};
+    \node[flowboxg, text width=2.2cm, right=of ki] (mu)
+      {\footnotesize Parameter\\ $\mu$};
+    \draw[flowarr] (st) -- (ps)
+      node[midway,above,font=\scriptsize,fill=white,inner sep=2pt]{average};
+    \draw[flowarr] (ps) -- (ki)
+      node[midway,above,font=\scriptsize,align=center,fill=white,inner sep=2pt]{$+$ uncertainty};
+    \draw[flowarr, draw=hsbiorange!85!black] (ki) -- (mu)
+      node[midway,above,font=\scriptsize,fill=white,inner sep=2pt]{covers};
+  \end{tikzpicture}}
+  \vspace{1.2em}
+  \begin{itemize}
+    \item The point estimator $\bar x$ is the \emph{best single estimate}.
+    \item The \emph{margin of error} $e=z_{1-\alpha/2}\,\sigma/\sqrt n$ (half
+          the interval's width) turns it into an interval -- built so that the
+          \emph{procedure} covers the fixed true $\mu$ in $(1-\alpha)$ of
+          samples.
+  \end{itemize}
+\end{frame}
+
+% ---- Sampling distribution: estimators are random variables ----------------
+\begin{frame}{Estimators are random variables}
+  \small The sample $X_1,\dots,X_n$ is \textbf{random}, so \emph{anything}
+  computed from it -- $\bar X$, $s$, $Z_n$, $T_n$ -- is itself a \textbf{random
+  variable}.
+  \begin{itemize}\small\setlength{\itemsep}{2pt}
+    \item New sample $\Rightarrow$ a new $\bar x$ \emph{and} a new $s$.
+    \item Its distribution over \emph{all possible samples} is the
+          \textbf{sampling distribution} -- so $\bar X$ and $s$ each have
+          their own.
+  \end{itemize}
+  \begin{center}
+  \begin{tikzpicture}
+    \node[flowboxo, text width=2.6cm] (s) {\footnotesize random sample\\ $X_1,\dots,X_n$};
+    \node[flowbox, text width=2.4cm, right=16mm of s] (st) {\footnotesize statistic\\ $\bar X$ \ or\ $s$};
+    \node[flowboxg, text width=2.8cm, right=16mm of st] (d) {\footnotesize \textbf{sampling}\\ \textbf{distribution}};
+    \draw[flowarr] (s) -- (st)
+      node[midway,above=1pt,font=\scriptsize,fill=white,inner sep=1.5pt]{compute};
+    \draw[flowarr] (st) -- (d)
+      node[midway,above=1pt,font=\scriptsize,fill=white,inner sep=1.5pt]{repeat};
+  \end{tikzpicture}
+  \end{center}
+  \kernaussage{A confidence interval or test is built on the \emph{sampling
+  distribution} of an estimator -- never on a single number alone.}
+\end{frame}
+
+% ---- Standard error -------------------------------------------------------
+\begin{frame}{The standard error: how much $\bar X$ wobbles}
+  \begin{block}{Definition}
+    The \textbf{standard error} (SE) is the \emph{standard deviation of the
+    sampling distribution} of an estimator -- the spread of $\bar X$ from
+    sample to sample, \emph{not} the spread of the raw data.
+    \[
+      \mathrm{SE}(\bar X)=\frac{\sigma}{\sqrt n}\quad
+      \Bigl(\text{or }\tfrac{s}{\sqrt n}\text{ when }\sigma\text{ is estimated}\Bigr).
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item It is the natural \textbf{ruler} for inference: $Z_n$ and $T_n$ count
+          \emph{how many standard errors} $\bar x$ sits away from $\mu_0$.
+    \item Larger $n$ $\Rightarrow$ smaller SE $\Rightarrow$ narrower CI and
+          sharper test.
+  \end{itemize}
+  \kernaussage{Standard \emph{deviation} = spread of the data; \quad standard
+  \emph{error} = spread of the estimate.}
+\end{frame}
+
+% ---- Why standardize -------------------------------------------------------
+\begin{frame}{Why divide by the standard error?}
+  \begin{block}{The raw deviation is not enough}
+    A sample mean $\bar x = 8$ lies $2$ units from a reference value
+    $\mu_0=10$. Whether that gap is \emph{small or large} depends entirely on
+    the standard error -- how much $\bar X$ wobbles.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lccc}
+      \toprule
+      Scenario & $\mathrm{SE}=\sigma/\sqrt n$ & $z=\dfrac{8-10}{\mathrm{SE}}$ & reading\\
+      \midrule
+      large spread, small $n$ \ ($\sigma=6,\ n=9$)   & $2.0$ & $-1.0$ & ordinary\\
+      small spread, large $n$ \ ($\sigma=4,\ n=100$) & $0.4$ & $-5.0$ & far out\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \kernaussage{Same raw deviation, opposite readings. Dividing by the SE turns
+  it into a \emph{universal} ruler -- ``how many standard errors'' -- comparable
+  across samples and units.}
+\end{frame}
+\note{Talk track: walk the table row by row -- same gap of $2$ units, but in
+row 1 the mean typically wobbles by $2$ anyway (nothing special), while in
+row 2 it wobbles by $0.4$, so a gap of $2$ is five wobbles away (very
+unusual). This is THE reason every test statistic in this course has the same
+shape: (estimate $-$ hypothesized) / SE.}
+
+% ---- Frequentist paradigm --------------------------------------------------
+\begin{frame}{How we read probability: the frequentist view}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Fixed vs.\ random}
+        \begin{itemize}\footnotesize\setlength{\itemsep}{2pt}
+          \item Parameters $\mu,\sigma$ are \textbf{fixed} (unknown) constants
+                -- not random.
+          \item The data -- and all we build from them ($\bar X$, $s$, the CI
+                bounds, $Z_n$, $p$) -- are \textbf{random}.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{What ``probability'' means here}
+        \footnotesize The long-run \emph{relative frequency} of an event over
+        (hypothetically) very many repeated samples.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \kernaussage{``$95\%$ confidence'' and ``$5\%$ significance'' describe the
+  \textbf{procedure across repeated samples} -- not one particular interval and
+  not one particular dataset.}
+\end{frame}
+\note{Talk track: this slide is the philosophical key to the whole part --
+return to it whenever an interpretation question comes up. Anchor sentence:
+``$\mu$ does not move; OUR numbers move from sample to sample.'' The casino
+analogy works well: a casino cannot predict one evening, but it knows its
+long-run win rate -- our procedures are calibrated the same way.}
+
+\subsection{Known variance}
+
+% ---- Milk example setup ----------------------------------------------------
+\begin{frame}{Our story: filling milk}
+  \framesubtitle{Example with known variance}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item A dairy fills milk (label: $1\,\text{l} = 1000\,\text{ml}$).
+        \item Machine with \textbf{known} variance
+              $\sigma^{2}=9\,\text{ml}^{2}$, i.e.\ $\sigma=3\,\text{ml}$.
+        \item After servicing: is it still working correctly?
+        \item Sample $n=9$ (in ml):
+      \end{itemize}
+      \[ 1005,\,1001,\,997,\,1000,\,1001,\,998,\,999,\,999,\,1009 \]
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{Key figures}
+        \begin{align*}
+          \bar x &= 1001\,\text{ml}\\
+          1-\alpha &= 0.95\ \Rightarrow\ \alpha = 0.05
+        \end{align*}
+      \end{block}
+      \textbf{Goal:} confidence interval for the true mean $\mu$.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---- 3 levels: (1) intuition ----------------------------------------------
+\begin{frame}{How does the mean fluctuate? -- (1) intuition}
+  \begin{block}{Thought experiment}
+    Imagine we draw the sample \emph{over and over again}. Each time we get a
+    slightly different $\bar x$.
+  \end{block}
+  \begin{itemize}
+    \item These $\bar x$-values scatter around the true value $\mu$.
+    \item But they scatter \textbf{more tightly} than the individual values --
+          the average evens out outliers.
+    \item The standard error shrinks with $\sqrt{n}$: four times as much data
+          $\Rightarrow$ half the spread \emph{of the sample mean}.
+    \item Reason: variances \emph{add} for independent values, so the spread
+          grows like $\sqrt n$ for the \emph{sum} but shrinks like $1/\sqrt n$
+          once we \emph{average}. (For non-normal data the \textbf{Central
+          Limit Theorem} makes $\bar X$ approximately normal for large $n$.)
+  \end{itemize}
+\end{frame}
+
+% ---- 3 levels: (2) graphical -----------------------------------------------
+\begin{frame}{How does the mean fluctuate? -- (2) graphically}
+  \begin{center}
+    \includegraphics[width=0.82\textwidth,height=0.62\textheight,keepaspectratio]{images/mean_distribution.png}
+  \end{center}
+  \footnotesize Distribution of the standardized statistic $Z_n\sim N(0,1)$:
+  the central (blue) region holds $95\,\%$ of the probability -- in $95\,\%$ of
+  samples $Z_n$ lands here; $2.5\,\%$ in each tail.
+\end{frame}
+
+% ---- 3 levels: (3) formal --------------------------------------------------
+\begin{frame}{How does the mean fluctuate? -- (3) formally}
+  \begin{block}{Sampling distribution of the sample mean}
+    For $X_i \sim N(\mu,\sigma^{2})$ i.i.d., the \emph{sampling distribution} of
+    the random variable $\bar X$ is
+    \[
+      \bar{X} \sim N\!\left(\mu,\,\tfrac{\sigma^{2}}{n}\right)
+      \quad\Longrightarrow\quad
+      Z_n := \frac{\bar{X}-\mu}{\sigma/\sqrt{n}} \sim N(0,1).
+    \]
+  \end{block}
+  {\footnotesize Why $\sigma^2/n$? Averaging $n$ independent draws divides the
+  variance by $n$ ($\mathrm{Var}(\bar X)=\sigma^2/n$), so the standard error is
+  $\sigma/\sqrt n$; $Z_n$ is just $\bar X$ centred and scaled to $N(0,1)$.}
+  \begin{block}{Two-sided probability statement}
+    \[
+      P\!\left(-z_{1-\alpha/2} \le Z_n \le z_{1-\alpha/2}\right) = 1-\alpha
+    \]
+  \end{block}
+  \inworten{With probability $1-\alpha$, $Z_n$ lies between the two quantiles
+  $\pm z_{1-\alpha/2}$.}
+\end{frame}
+
+% ---- Derivation ------------------------------------------------------------
+\begin{frame}{Derivation (1/2): rearrange step by step}
+  \footnotesize
+  Start from the pivot $Z_n=\dfrac{\bar X-\mu}{\sigma/\sqrt n}\sim N(0,1)$, which lies
+  within $\pm z_{1-\alpha/2}$ with probability $1-\alpha$:
+  \begin{align*}
+    1-\alpha
+      &= P\!\left(-z_{1-\alpha/2}\ \le\ \tfrac{\bar X-\mu}{\sigma/\sqrt n}\ \le\ z_{1-\alpha/2}\right)
+         && \rhd\ \text{\scriptsize starting point}\\[4pt]
+      &= P\!\left(-z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\ \le\ \bar X-\mu\ \le\ z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\right)
+         && \rhd\ \text{\scriptsize multiply all 3 parts by }\tfrac{\sigma}{\sqrt n}>0\\[4pt]
+      &= P\!\left(-\bar X-z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\ \le\ -\mu\ \le\ -\bar X+z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\right)
+         && \rhd\ \text{\scriptsize subtract }\bar X\text{ everywhere}
+  \end{align*}
+  \inworten{Multiplying by a \emph{positive} number keeps the ``$\le$'' signs; we
+  only used equivalence steps, so the probability stays exactly $1-\alpha$.}
+\end{frame}
+\note{Talk track: the whole derivation is just ``solve the inequality for
+$\mu$''. Announce that upfront so the algebra has a destination. Emphasize at
+the end of (2/2): the randomness sits in the BOUNDS (they contain $\bar X$),
+$\mu$ never moves -- that is what later justifies the careful CI
+interpretation.}
+
+\begin{frame}{Derivation (2/2): from $-\mu$ to the interval}
+  \footnotesize
+  \begin{align*}
+    1-\alpha
+      &= P\!\left(\bar X+z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\ \ge\ \mu\ \ge\ \bar X-z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\right)
+         && \rhd\ \text{\scriptsize multiply by }(-1):\ \text{signs flip}\\[4pt]
+      &= P\!\left(\bar X-z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\ \le\ \mu\ \le\ \bar X+z_{1-\alpha/2}\tfrac{\sigma}{\sqrt n}\right)
+         && \rhd\ \text{\scriptsize just read it left-to-right}
+  \end{align*}
+  \kernaussage{Confidence interval with \textbf{known} variance:
+    \[
+      \text{CI}_{1-\alpha} =
+      \left[\bar{X}-z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}},\;
+            \bar{X}+z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}}\right]
+    \]}
+  \footnotesize Multiplying an inequality by $-1$ \textbf{reverses} ``$\le$'' into
+  ``$\ge$'' -- that is the only subtle step. What is random are the \emph{bounds}
+  (they contain $\bar X$); $\mu$ itself is a fixed unknown.
+\end{frame}
+
+\begin{frame}{The formula in words}
+  \[
+    \text{CI} = \big[\;\underbrace{\bar{X}}_{\text{estimate}}
+       \;\pm\; \underbrace{z_{1-\alpha/2}}_{\substack{\text{critical}\\\text{value}}}
+       \cdot \underbrace{\tfrac{\sigma}{\sqrt{n}}}_{\text{standard error}}\;\big]
+  \]
+  \begin{itemize}\setlength{\itemsep}{4pt}
+    \item \textbf{Centre} $\bar X$: our best estimate of $\mu$.
+    \item \textbf{Standard error} $\sigma/\sqrt{n}$: how strongly $\bar X$
+          fluctuates.
+    \item \textbf{Critical value} $z_{1-\alpha/2}$: how many standard errors
+          we go to the left/right ($1.96$ at $95\,\%$).
+  \end{itemize}
+\end{frame}
+
+% ---- Milk calculation ------------------------------------------------------
+\begin{frame}{Milk example: calculation}
+  \textbf{Given:} $\bar{x}=1001$, $\sigma=3$, $n=9$, $\alpha=0.05$,
+  $z_{0.975}=1.96$.
+  \begin{align*}
+    \text{margin of error } e &= z_{1-\alpha/2}\cdot\frac{\sigma}{\sqrt{n}}
+       = 1.96\cdot\frac{3}{\sqrt{9}} = 1.96\\[2pt]
+    \text{lower bound}  &= 1001 - 1.96 = 999.04\\
+    \text{upper bound}  &= 1001 + 1.96 = 1002.96
+  \end{align*}
+  \begin{exampleblock}{Result}
+    \[
+      \text{CI}_{0.95} = \bigl[\,999.04\,;\,1002.96\,\bigr]\,\text{ml}
+    \]
+    The hypothesized target value $\mu_0 = 1000$ lies \emph{inside} the
+    interval $\Rightarrow$ no evidence against a correctly working machine.
+  \end{exampleblock}
+\end{frame}
+
+% ---- Interpretation: simulation -------------------------------------------
+\begin{frame}{What does ``95\,\% confidence'' mean?}
+  \begin{center}
+    \includegraphics[width=0.80\textwidth,height=0.62\textheight,keepaspectratio]{images/ci_20_simulation.png}
+  \end{center}
+  \footnotesize Of $20$ computed $95\,\%$ intervals, on average $\approx 19$
+  cover the true value $\mu$ (red line). The confidence \emph{level} refers to
+  the \textbf{procedure} across many samples.
+\end{frame}
+
+% ---- Interpretation: misconception ----------------------------------------
+\begin{frame}{A common misconception}
+  \begin{alertblock}{Careful with the interpretation}
+    ``With $95\,\%$ probability $\mu$ lies in \emph{this particular}
+    interval'' is, strictly speaking, \textbf{wrong}.
+  \end{alertblock}
+  \begin{itemize}
+    \item $\mu$ is a fixed (unknown) number -- it either is or is not inside
+          the particular interval.
+    \item What is random are the \emph{bounds} of the interval, not $\mu$.
+    \item Correct: ``The \textbf{procedure} yields, in $95\,\%$ of samples, an
+          interval that covers $\mu$.''
+  \end{itemize}
+\end{frame}
+
+% ---- Interpretation: the correct readings ---------------------------------
+\begin{frame}{Three correct ways to read a confidence interval}
+  \begin{enumerate}\setlength{\itemsep}{5pt}
+    \item \textbf{Coverage (the procedure).} The method produces intervals that
+          contain the fixed true $\mu$ in a fraction $(1-\alpha)$ of all
+          samples.
+    \item \textbf{Compatibility.} The interval is the range of values for $\mu$
+          that are \emph{consistent with the observed data}.
+    \item \textbf{Duality with the test.} It is exactly the set of null values
+          $\mu_0$ that a two-sided level-$\alpha$ test would \emph{not} reject.
+  \end{enumerate}
+  \kernaussage{All three avoid the trap of putting a probability on \emph{this
+  one} interval: $\mu$ is fixed, the \textbf{interval} is what is random.}
+\end{frame}
+
+\subsection{Length of the confidence interval}
+
+\begin{frame}{What does the length depend on?}
+  \begin{block}{Length}
+    \[
+      L = 2\cdot z_{1-\alpha/2}\cdot\frac{\sigma}{\sqrt{n}}
+    \]
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item Higher confidence level $\Rightarrow$ larger
+              $z_{1-\alpha/2}$ $\Rightarrow$ \emph{longer}.
+        \item Larger $n$ $\Rightarrow$ \emph{shorter} (with $1/\sqrt{n}$).
+        \item Larger spread $\sigma$ $\Rightarrow$ \emph{longer}.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \includegraphics[width=\textwidth,height=0.48\textheight,keepaspectratio]{images/ci_length.png}
+    \end{column}
+  \end{columns}
+  \inworten{More confidence \emph{or} more precision -- both require a larger
+  sample.}
+\end{frame}
+
+\begin{frame}{Different confidence levels -- milk}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lcc}
+      \toprule
+      Confidence level & Quantile $z_{1-\alpha/2}$ & CI for milk example \\
+      \midrule
+      $90\,\%$ & $z_{0.95}  = 1.645$ & $[999.36\,;\,1002.65]$\\
+      $95\,\%$ & $z_{0.975} = 1.96$  & $[999.04\,;\,1002.96]$\\
+      $99\,\%$ & $z_{0.995} = 2.576$ & $[998.42\,;\,1003.58]$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \vspace{0.4em}
+  \kernaussage{Higher confidence level $\Rightarrow$ wider interval
+  $\Rightarrow$ less precise statement. Confidence and precision are a
+  trade-off.}
+\end{frame}
+
+\subsection{Unknown variance}
+
+% ---- Problem & t-distribution ----------------------------------------------
+\begin{frame}{More realistic: the variance is unknown}
+  \begin{block}{Problem}
+    In practice $\sigma^{2}$ is almost never known. We must \emph{also
+    estimate} it from the sample.
+  \end{block}
+  \begin{block}{Estimator of the variance}
+    \[
+      s^{2} = \frac{1}{n-1}\sum_{i=1}^{n}(X_i - \bar{X})^{2}
+    \]
+  \end{block}
+  \begin{itemize}
+    \item We replace $\sigma$ by $s$ in the test statistic.
+    \item This costs \emph{accuracy} -- and changes the distribution
+          (see next slide).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Why the $t$-distribution? -- intuitively and graphically}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Standardized statistic (normal data)}
+        \[
+          T_n = \frac{\bar{X}-\mu}{s/\sqrt{n}} \sim t_{n-1}
+        \]
+      \end{block}
+      \begin{itemize}\setlength{\itemsep}{2pt}
+        \item $s$ is \textbf{itself a random variable}.
+        \item $T_n$ is a ratio of \emph{two} random quantities $\Rightarrow$
+              \textbf{heavier tails}.
+        \item For large $n$, $s$ barely varies, so $t_{n-1}\to N(0,1)$.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \includegraphics[width=\textwidth,height=0.50\textheight,keepaspectratio]{images/t_vs_normal.png}
+    \end{column}
+  \end{columns}
+  \kernaussage{With unknown $\sigma$ always use the $t_{n-1}$-distribution --
+  its quantiles are larger, so the CI is wider.}
+\end{frame}
+
+\begin{frame}{Milk example with unknown variance}
+  \begin{block}{Confidence interval}
+    \[
+      \text{CI} = \left[\bar{X} - t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}},\;
+                         \bar{X} + t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}}\right]
+    \]
+  \end{block}
+  \textbf{Data:} $\bar{x}=1001$, $n=9$, $\alpha=0.05$, $s = 3.7749$,
+  $t_{0.975;\,8} = 2.3060$.
+  \begin{align*}
+    e &= 2.3060\cdot\frac{3.7749}{\sqrt{9}} = 2.9017\\
+    \text{CI}_{0.95} &= [\,1001\pm 2.9017\,] = [\,998.10\,;\,1003.90\,]
+  \end{align*}
+  \begin{exampleblock}{Comparison}
+    Wider than $[999.04\,;\,1002.96]$ (known variance) -- the price for
+    estimating $\sigma$.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Summary: known vs.\ unknown variance}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lcc}
+      \toprule
+       & \textbf{known} $\sigma$ & \textbf{unknown} $\sigma$\\
+      \midrule
+      Spread used      & $\sigma$ & $s$ (estimated)\\
+      Distribution     & $N(0,1)$ & $t_{n-1}$\\
+      Quantile ($95\,\%$, $n=9$) & $1.96$ & $2.31$\\
+      CI               & narrower & wider\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{itemize}
+    \item For large $n$ ($n \gtrsim 30$) the difference is small
+          ($t_{n-1}\approx N(0,1)$).
+    \item For small samples it is clearly noticeable.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Do not confuse: CI vs.\ fluctuation interval}
+  \begin{columns}[T]
+    \begin{column}{0.54\textwidth}
+      \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{images/ci_vs_fluctuation.png}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{itemize}\setlength{\itemsep}{5pt}
+        \item \textbf{Fluctuation interval:} spread of \emph{individual} values
+              $X_i$ around $\mu$ -- uses $\sigma$ (wide).
+        \item \textbf{Confidence interval:} uncertainty about $\mu$ -- uses
+              $\sigma/\sqrt{n}$ (narrow).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \inworten{Both intervals share the same centre but answer completely
+  different questions.}
+\end{frame}
+
+\subsection{Exercises}
+
+\begin{frame}{Exercise -- filling cream}
+  \begin{block}{Problem statement}
+    A dairy fills cream into cups (label: $250\,\text{g}$). The variance of the
+    machine is known: $\sigma^{2} = 4\,\text{g}^{2}$. After servicing, $n=16$
+    cups are sampled (in g):
+    \[
+      251,248,248,249,250,251,247,246,252,251,248,247,246,249,248,252
+    \]
+    Confidence level $1-\alpha=0.95$.
+  \end{block}
+  \textbf{Required:} confidence interval for $\mu$ -- (a) with known,
+  (b) with unknown variance.
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- cream, known variance}
+  \textbf{Rule:} $\text{CI}=\bigl[\bar x \pm z_{1-\alpha/2}\,\sigma/\sqrt{n}\bigr]$.\\[2pt]
+  \textbf{Intermediate values:} $\bar{x} = 248.9375$, $\sigma = 2$, $n = 16$,
+  $z_{0.975} = 1.96$.
+  \begin{align*}
+    e &= 1.96\cdot\frac{2}{\sqrt{16}} = 1.96\cdot 0.5 = 0.98\\
+    \text{CI}_{0.95} &= [\,248.9375 \pm 0.98\,]
+       = \mathbf{[\,247.96\,;\,249.92\,]}
+  \end{align*}
+  \begin{alertblock}{Interpretation}
+    The target value $\mu_0 = 250$ lies \emph{outside} the CI $\Rightarrow$ with
+    known variance: indication that the machine is \textbf{not} working
+    correctly.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- cream, unknown variance}
+  \textbf{Rule:} as above, but $z\to t_{1-\alpha/2,\,n-1}$ and $\sigma\to s$.\\[2pt]
+  \textbf{Intermediate values:} $s^{2} = 4.0625\Rightarrow s = 2.0156$,
+  $t_{0.975;\,15} = 2.1314$.
+  \begin{align*}
+    e &= 2.1314\cdot\frac{2.0156}{\sqrt{16}} = 1.0740\\
+    \text{CI}_{0.95} &= [\,248.9375 \pm 1.0740\,]
+       = \mathbf{[\,247.86\,;\,250.01\,]}
+  \end{align*}
+  \begin{exampleblock}{Comparison}
+    Now $\mu_0 = 250$ lies (just) \emph{inside} the CI -- the verdict turns out
+    \emph{differently} than with known variance. The wider $t$-interval is more
+    cautious.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Summary and outlook}
+  \begin{itemize}\setlength{\itemsep}{4pt}
+    \item Confidence intervals quantify the \textbf{uncertainty} of a point
+          estimate.
+    \item Known variance: quantiles of $N(0,1)$; unknown: of $t_{n-1}$.
+    \item \textbf{Bridge to the test:} if the CI contains the hypothesized
+          value $\mu_0$, there is no evidence against $H_0:\mu=\mu_0$ --
+          otherwise there is.
+  \end{itemize}
+  \begin{block}{Next section}
+    We formalize this procedure as a \textbf{hypothesis test}.
+  \end{block}
+\end{frame}
+% ============================================================================
+% SECTION 2: HYPOTHESIS TESTS
+% ============================================================================
+\section[Tests]{Hypothesis Tests}
+
+\subsection{Idea and hypotheses}
+
+% ---- Intuition: courtroom --------------------------------------------------
+\begin{frame}{What is a hypothesis test? -- intuition}
+  \begin{block}{The basic idea, as in court}
+    An assumption (the \emph{null hypothesis} $H_0$) is held true until the
+    data \textbf{speak strongly enough against it}.
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item \textbf{$H_0$} = ``innocent'' (status quo).
+        \item We reject $H_0$ only on \emph{convincing} evidence.
+        \item Little evidence $\Rightarrow$ acquittal for lack of evidence
+              -- not ``proven innocent''.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{exampleblock}{Milk}
+        $H_0:\mu = 1000$ -- ``the machine works correctly''.
+        Only a clear deviation from $1000$ makes us doubt this.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---- Hypotheses & asymmetry ------------------------------------------------
+\begin{frame}{The two hypotheses}
+  \begin{block}{Structure}
+    \[
+      H_0:\mu = \mu_0 \qquad\text{vs.}\qquad H_1:\mu \neq \mu_0
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item We \textbf{always} argue under ``$H_0$ is true''.
+    \item Why unequal? $H_0:\mu=\mu_0$ fixes a \emph{single} value, so the test
+          statistic has \emph{one} definite distribution we can compute with;
+          $H_1$ is a whole \emph{range}, with no single distribution.
+    \item Two outcomes: \emph{keep} $H_0$ or \emph{reject} it.
+  \end{itemize}
+  \kernaussage{What you want to \textbf{establish} statistically goes into
+  $H_1$.}
+\end{frame}
+
+\begin{frame}{Which hypothesis goes where?}
+  \begin{block}{Rule of thumb}
+    The statement you want to \emph{find evidence for} -- the ``more
+    important'' claim -- is formulated as $H_1$, because only the Type~I error
+    (wrongly rejecting $H_0$) can be controlled via $\alpha$.
+  \end{block}
+  \vspace{0.4em}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{@{}p{8.2cm}cc@{}}
+      \toprule
+      \textbf{You want evidence that \ldots} & \textbf{$H_0$} & \textbf{$H_1$}\\
+      \midrule
+      the supplier's fill weight \emph{deviates} from the spec
+        & $\mu = \mu_0$ & $\mu \neq \mu_0$\\
+      the mean processing time \emph{changed} after the update
+        & $\mu = \mu_0$ & $\mu \neq \mu_0$\\
+      the mean daily revenue \emph{differs} from the plan figure
+        & $\mu = \mu_0$ & $\mu \neq \mu_0$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\subsection{From CI to test}
+
+% ---- CI <-> test equivalence -----------------------------------------------
+\begin{frame}{Bridge: confidence interval and test are the same}
+  \begin{block}{Testing with the CI}
+    If $\mu_0$ lies \emph{inside} the confidence interval, $H_0:\mu=\mu_0$ is
+    \textbf{not} rejected -- if it lies outside, it is.
+  \end{block}
+  \begin{block}{Equivalence -- same algebra, two readings}
+    ``$\mu_0$ inside the CI'' means
+    $|\bar x-\mu_0|\le z_{1-\alpha/2}\,\sigma/\sqrt n$, which rearranges to
+    $|Z_n|\le z_{1-\alpha/2}$ -- exactly the non-rejection condition. So a
+    test (level $\alpha$) and a CI (level $1-\alpha$) \textbf{always} agree.
+  \end{block}
+  \inworten{The CI shows \emph{all} $\mu_0$ that you would not reject.}
+\end{frame}
+
+% ---- Duality on the number line (both running examples) --------------------
+\begin{frame}{The duality on the number line}
+  \centering
+  {\small\textbf{Milk:} $\mu_0=1000$ lies \emph{inside} the CI
+   $\Rightarrow$ \textcolor{hsbiblaudunkel}{\textbf{keep $H_0$}}}\\[4pt]
+  \begin{tikzpicture}[x=1.30cm]
+    \draw[->,thick,gray] (-0.2,0) -- (6.6,0) node[right,font=\scriptsize,black]{ml};
+    \draw[line width=5pt, hsbiblau!55] (1.04,0) -- (4.96,0);
+    \node[above,font=\scriptsize,hsbiblau] at (4.35,0.10) {$95\,\%$ CI};
+    \fill[hsbiblaudunkel] (3,0) circle (2.2pt)
+      node[above=3pt,font=\scriptsize]{$\bar x=1001$};
+    \draw[very thick, hsbirot] (2,0.16)--(2,-0.16)
+      node[below=7pt,font=\scriptsize,hsbirot]{$\mu_0=1000$};
+    \node[below=1pt,font=\scriptsize,hsbiblau] at (1.04,0) {$999.04$};
+    \node[below=1pt,font=\scriptsize,hsbiblau] at (4.96,0) {$1002.96$};
+  \end{tikzpicture}\\[10pt]
+  {\small\textbf{Cream:} $\mu_0=250$ lies \emph{outside} the CI
+   $\Rightarrow$ \textcolor{hsbirot}{\textbf{reject $H_0$}}}\\[4pt]
+  \begin{tikzpicture}[x=1.95cm]
+    \draw[->,thick,gray] (-0.2,0) -- (3.7,0) node[right,font=\scriptsize,black]{g};
+    \draw[line width=5pt, hsbiblau!55] (0.96,0) -- (2.92,0);
+    \fill[hsbiblaudunkel] (1.94,0) circle (2.2pt)
+      node[above=3pt,font=\scriptsize]{$\bar x=248.94$};
+    \draw[very thick, hsbirot] (3.0,0.16)--(3.0,-0.16)
+      node[below=7pt,font=\scriptsize,hsbirot]{$\mu_0=250$};
+    \node[below=1pt,font=\scriptsize,hsbiblau] at (0.96,0) {$247.96$};
+    \node[below=1pt,font=\scriptsize,hsbiblau] at (2.92,0) {$249.92$};
+  \end{tikzpicture}
+  \kernaussage{$\mu_0$ inside the CI $\Leftrightarrow$ keep $H_0$;\quad
+  outside $\Leftrightarrow$ reject. (Both at known $\sigma$, $\alpha=0.05$.)}
+\end{frame}
+\note{Talk track: ``the CI is the set of all null values that survive the
+test.'' Walk both lines: milk -- target inside, nothing to complain about;
+cream -- target outside, the data are incompatible with 250\,g. Point out the
+CI is centred at $\bar x$, never at $\mu_0$.}
+
+% ---- Graphic: same figure, two readings ------------------------------------
+\begin{frame}{One picture, two readings}
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+      \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{images/mean_distribution.png}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \begin{itemize}\setlength{\itemsep}{5pt}
+        \item \textbf{Distribution reading:} the central blue region holds
+              $95\,\%$ of the $Z_n$ distribution (in $95\,\%$ of samples $Z_n$
+              lands here).
+        \item \textbf{Test reading:} blue = \textbf{acceptance region}
+              ($=$ non-rejection region), orange = \textbf{rejection region}
+              ($\alpha$).
+        \item Test statistic in the orange tail $\Rightarrow$ reject $H_0$.
+      \end{itemize}
+      \footnotesize ``Acceptance region'' is conventional for the
+      \emph{non-rejection} region: landing there means we \emph{fail to reject}
+      $H_0$, not that we accept it as true.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\subsection{Known variance}
+
+% ---- Critical value intuition (moved here: used by the recipe below) -------
+\begin{frame}{The critical value -- the bar you must clear}
+  \begin{block}{Plain idea}
+    The \textbf{critical value} is a fixed threshold on the test statistic. It
+    splits all possible outcomes into two zones:
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{exampleblock}{Keep $H_0$}
+        Statistic \emph{inside} the threshold -- the deviation is small enough
+        to pass as ordinary chance.
+      \end{exampleblock}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{alertblock}{Reject $H_0$}
+        Statistic \emph{beyond} the threshold -- too extreme to be chance at
+        level $\alpha$.
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+\note{Talk track: ``A critical value is just a line in the sand on the test
+statistic.'' Use the high-jump image -- $\alpha$ sets the bar height; smaller
+$\alpha$ = higher bar = harder to reject. Common student confusion: thinking a
+larger statistic is automatically ``better'' -- it only matters relative to the
+bar. Anchor: the acceptance region is everything inside the bar(s).}
+
+% ---- Recipe (TikZ flow) ----------------------------------------------------
+\begin{frame}{The test recipe (known variance)}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[node distance=6mm]
+    \node[flowbox, text width=2.5cm] (h)
+      {\footnotesize \textbf{1. Hypotheses}\\ $H_0:\mu=\mu_0$\\ $H_1:\mu\neq\mu_0$};
+    \node[flowbox, text width=2.7cm, right=8mm of h] (z)
+      {\footnotesize \textbf{2. Test statistic}\\ $Z_n=\dfrac{\bar x-\mu_0}{\sigma/\sqrt n}$};
+    \node[flowbox, text width=2.5cm, right=8mm of z] (c)
+      {\footnotesize \textbf{3. crit.\ value}\\ $z_{1-\alpha/2}$};
+    \node[diamond, draw=hsbiblaudunkel, very thick, fill=hsbiblau!8,
+          aspect=2, inner sep=1pt, text width=2.2cm, align=center,
+          right=8mm of c] (d) {\scriptsize $|Z_n|>z_{1-\alpha/2}$?};
+    \node[flowboxo, text width=2.3cm, above right=2mm and 8mm of d] (ja)
+      {\footnotesize \textbf{yes:} reject $H_0$};
+    \node[flowboxg, text width=2.3cm, below right=2mm and 8mm of d] (nein)
+      {\footnotesize \textbf{no:} keep $H_0$};
+    \draw[flowarr] (h)--(z); \draw[flowarr] (z)--(c); \draw[flowarr] (c)--(d);
+    \draw[flowarr] (d.north) to[out=90,in=180] (ja.west);
+    \draw[flowarr] (d.south) to[out=-90,in=180] (nein.west);
+  \end{tikzpicture}}
+  \vspace{0.8em}
+  \begin{itemize}
+    \item \textbf{Key move:} plug the hypothesized $\mu_0$ in for the unknown
+          $\mu$ -- \emph{if} $H_0$ holds then $Z_n\sim N(0,1)$, so a $|Z_n|$
+          that would be very unusual for $N(0,1)$ is evidence against $H_0$.
+    \item $|Z_n|\le z_{1-\alpha/2}$: acceptance (non-rejection) region; beyond
+          it: rejection region (area $\alpha$ under $H_0$). Fix $\alpha$
+          \emph{in advance}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Milk test with known variance}
+  \textbf{Data:} $\bar{x}=1001$, $\sigma=3$, $n=9$, $\mu_0=1000$,
+  $\alpha=0.05$, $z_{0.975}=1.96$.
+  \begin{align*}
+    Z_n &= \frac{1001-1000}{3/\sqrt{9}} = \frac{1}{1} = 1.000\\[2pt]
+    |Z_n| &= 1.000 \;<\; 1.96 = z_{0.975}
+  \end{align*}
+  \begin{exampleblock}{Decision}
+    $H_0:\mu=1000$ is \textbf{not} rejected -- no evidence against a correctly
+    working machine.
+  \end{exampleblock}
+  \inworten{Same result as the CI: $\mu_0=1000 \in [999.04\,;\,1002.96]$.}
+\end{frame}
+
+\subsection{Unknown variance}
+
+\begin{frame}{Test with unknown variance}
+  \begin{block}{Only two changes to the recipe}
+    \[
+      T_n = \frac{\bar{X}-\mu_0}{s/\sqrt{n}} \sim t_{n-1}\ \text{under } H_0,
+      \qquad
+      \text{rejection: } |T_n| > t_{1-\alpha/2,\,n-1}.
+    \]
+  \end{block}
+  \begin{itemize}
+    \item $\sigma \to s$ (estimated) and $z \to t_{n-1}$.
+    \item \textbf{Assumption:} data (approximately) normally distributed
+          \emph{or} $n \ge 30$ (central limit theorem).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Milk test with unknown variance}
+  \textbf{Data:} $\bar{x}=1001$, $s=3.7749$, $n=9$, $\mu_0=1000$,
+  $\alpha=0.05$, $t_{0.975;\,8}=2.3060$.
+  \begin{align*}
+    T_n &= \frac{1001-1000}{3.7749/\sqrt{9}} = \frac{1}{1.2583} = 0.7947\\[2pt]
+    |T_n| &= 0.7947 \;<\; 2.3060
+  \end{align*}
+  \begin{exampleblock}{Decision}
+    $H_0:\mu=1000$ is \textbf{not} rejected. (More cautious $t$-quantile
+    $2.31$ instead of $1.96$ -- the result is nevertheless the same here.)
+  \end{exampleblock}
+\end{frame}
+
+% ---- Assumptions checklist ---------------------------------------------------
+\begin{frame}{Before you test -- the assumptions checklist}
+  \begin{enumerate}\setlength{\itemsep}{5pt}
+    \item \textbf{Random sample, independent observations} -- the $X_i$ are
+          i.i.d.\ draws from the population. (No clustering, no repeated
+          measurements of the same unit.)
+    \item \textbf{Distribution:} data approximately normal \emph{or}
+          $n\gtrsim 30$ -- then the CLT makes $\bar X$ approximately normal.
+    \item \textbf{Spread:} $\sigma$ known $\to$ $z$-test; \ $\sigma$ estimated
+          by $s$ $\to$ $t$-test with $\mathrm{df}=n-1$.
+    \item \textbf{Question fixed in advance:} $\mu_0$, the direction
+          (one-/two-sided) and $\alpha$ are chosen \emph{before} seeing the
+          results.
+  \end{enumerate}
+  \kernaussage{If 1.--2.\ fail, the stated $\alpha$ is not honest: the
+  $5\,\%$ false-alarm guarantee only holds under the model assumptions.}
+\end{frame}
+\note{Talk track: a test is a measurement instrument -- the checklist is its
+calibration. Point 1 is the one most often violated in practice (convenience
+samples, duplicated units). For point 2, with $n=9$ as in the milk example we
+genuinely rely on approximate normality of fill volumes; mention a histogram
+or QQ-plot as the quick diagnostic. Point 4 anticipates the one-sided section:
+direction-after-data doubles the true $\alpha$.}
+
+\subsection{Exercises}
+
+\begin{frame}{Exercise -- cream test}
+  \begin{block}{Problem statement}
+    Cream, label $250\,\text{g}$, known variance $\sigma^{2}=4$.
+    Sample $n=16$, $\bar x = 248.9375$. Significance level
+    $\alpha=0.05$, $\mu_0 = 250$.
+  \end{block}
+  Carry out the test -- (a) known variance, (b) unknown variance
+  ($s=2.0156$, $t_{0.975;\,15}=2.1314$).
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- cream, known variance}
+  \textbf{Rule:} reject if $|Z_n| > z_{1-\alpha/2}$.
+  \[
+    Z_n = \frac{248.9375 - 250}{2/\sqrt{16}} = \frac{-1.0625}{0.5}
+        = -2.125
+  \]
+  \[
+    |Z_n| = 2.125 \;>\; 1.96 = z_{0.975}
+  \]
+  \begin{alertblock}{Decision}
+    $H_0: \mu = 250$ is \textbf{rejected}. There is evidence that the
+    machine does not fill correctly. (Consistent with the CI:
+    $250 \notin [247.96\,;\,249.92]$.)
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- cream, unknown variance}
+  \[
+    T_n = \frac{248.9375-250}{2.0156/\sqrt{16}}
+        = \frac{-1.0625}{0.5039} = -2.1086
+  \]
+  \[
+    |T_n| = 2.1086 \;<\; 2.1314 = t_{0.975;\,15}
+  \]
+  \begin{exampleblock}{Decision}
+    $H_0: \mu = 250$ is \textbf{not} rejected (just barely!).
+  \end{exampleblock}
+  \kernaussage{Same data set, a different assumption about $\sigma$ -- a
+  different decision. The $t$-distribution is more conservative (heavier
+  tails).}
+\end{frame}
+
+% ---- Recap visual: both running examples in one picture --------------------
+\begin{frame}{Milk vs.\ cream -- the picture behind both decisions}
+  \begin{center}
+    \includegraphics[width=0.97\textwidth,height=0.66\textheight,keepaspectratio]{images/test_milk_cream.png}
+  \end{center}
+  \footnotesize Two-sided test, known $\sigma$, $\alpha=0.05$: the milk
+  statistic ($Z_n=1.00$) stays \emph{inside} the bars $\pm1.96$, the cream
+  statistic ($Z_n=-2.125$) lands \emph{beyond} them. The decision is nothing
+  more than: \textbf{where does my statistic fall?}
+\end{frame}
+\note{Talk track: this is the recap picture for the whole section -- one curve
+(the $H_0$ world), two bars (the critical values), and the only question:
+inside or outside? Milk inside, cream outside. If students can redraw this
+from memory, they have understood the classical test.}
+
+\begin{frame}{Exercise -- reaction time (large sample)}
+  \begin{block}{Problem}
+    A training is meant to change the baseline reaction time
+    $\mu_0 = 250\,$ms. A sample of $n=50$ gives $\bar x = 242$, $s = 30$. Test
+    \emph{two-sided} at $\alpha=0.05$.
+  \end{block}
+  \textbf{Hint:} $t_{0.975;\,49} = 2.0096$ (already close to $1.96$).
+\end{frame}
+
+\begin{frame}{Solution -- reaction time}
+  \[
+    T_n = \frac{242-250}{30/\sqrt{50}} = \frac{-8}{4.2426} = -1.8856,
+    \qquad |T_n| = 1.8856 < 2.0096
+  \]
+  \begin{exampleblock}{Decision \& outlook}
+    Keep $H_0$ (two-sided): $p = 2\,F_{t,49}(-1.8856) = \mathbf{0.0653} >
+    0.05$. With $n=50\ge 30$ the CLT justifies the $t$-test. \emph{But} the
+    question may be directional -- a one-sided test can decide differently
+    (see the one-sided exercises).
+  \end{exampleblock}
+\end{frame}
+
+\subsection{Tests with R}
+
+\begin{frame}[fragile]{Hypothesis test with R -- \texttt{t.test}}
+  \begin{block}{Command (one-sample $t$-test)}
+\begin{lstlisting}
+milk <- c(1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009)
+t.test(milk, mu = 1000)
+\end{lstlisting}
+  \end{block}
+  By default \texttt{t.test} performs a \textbf{two-sided} $t$-test with
+  \textbf{unknown} variance and directly returns $t$, df, $p$-value and CI.
+\end{frame}
+
+% ---- Bridge to the p-value --------------------------------------------------
+\begin{frame}{Recap -- and one limitation of the recipe}
+  \begin{block}{The recipe in one line}
+    Standardize the deviation, compare with the critical value, decide.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{@{}lcccl@{}}
+      \toprule
+      \textbf{Example} & \textbf{Statistic} & \textbf{Bar} &
+        \textbf{Decision} & \textbf{How close?}\\
+      \midrule
+      milk, $\sigma$ known    & $|Z_n|=1.000$ & $1.960$
+        & keep $H_0$            & clear call\\
+      cream, $\sigma$ known   & $|Z_n|=2.125$ & $1.960$
+        & \textcolor{hsbirot}{reject $H_0$} & close call\\
+      cream, $\sigma$ unknown & $|T_n|=2.109$ & $2.131$
+        & keep $H_0$            & razor-thin\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{block}{Next section}
+    All three verdicts are a bare \emph{yes/no} -- the last column is
+    invisible in them. The \textbf{$p$-value} puts exactly this -- the
+    \emph{strength} of the evidence -- on a continuous $0$--$1$ scale.
+  \end{block}
+\end{frame}
+\note{Talk track: read the table row by row -- same recipe, three very
+different situations. Then point at the decision column: it cannot
+distinguish the comfortable milk ``keep'' from the razor-thin cream ``keep'',
+nor say how decisive the cream rejection was. That missing ``how close?''
+column is precisely what the $p$-value will deliver: milk $0.32$, cream
+$0.034$ resp.\ $0.052$. Keep it short -- a springboard, not new content.}
+% ============================================================================
+% SECTION 3: p-VALUE
+% ============================================================================
+\section[$p$-value]{The $p$-Value}
+
+\subsection{Concept}
+
+% ---- Intuition -------------------------------------------------------------
+\begin{frame}{The $p$-value -- intuition}
+  \begin{block}{A single question}
+    ``How \textbf{surprising} is my data if $H_0$ were true?''
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item \textbf{Small $p$-value} ($\approx 0$): such an extreme result would
+          be very rare under $H_0$ $\Rightarrow$ doubt about $H_0$.
+    \item \textbf{Large $p$-value} ($\approx 1$): the data are unsurprising
+          under $H_0$ $\Rightarrow$ no reason to doubt it (but \emph{not}
+          positive proof of $H_0$).
+  \end{itemize}
+  \kernaussage{The $p$-value measures \emph{how surprising} the data are if
+  $H_0$ holds -- the smaller, the stronger the evidence \textbf{against} $H_0$.}
+\end{frame}
+
+% ---- Graphical -------------------------------------------------------------
+\begin{frame}{The $p$-value -- graphically}
+  \begin{center}
+    \includegraphics[width=0.80\textwidth,height=0.62\textheight,keepaspectratio]{images/p_value_twosided.png}
+  \end{center}
+  \footnotesize The (two-sided) $p$-value is the \textbf{total area} in both
+  tails that is \emph{at least as extreme} as the observed value.
+\end{frame}
+
+% ---- Formal definition -----------------------------------------------------
+\begin{frame}{The $p$-value -- definition}
+  \begin{block}{Definition}
+    The $p$-value is the probability, under the validity of $H_0$, of observing
+    a test statistic that is \textbf{at least as extreme} as the one actually
+    observed.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{``At least as extreme'' is set by $H_1$:} two-sided
+          ($\mu\neq\mu_0$) $=$ both tails $|Z|\ge|Z_n|$; one-sided $=$ only the
+          tail in the $H_1$ direction. Same statistic, different $p$.
+    \item $0 \le p \le 1$; software (e.g.\ \texttt{R}) always reports it.
+    \item \textbf{Advantage:} more informative than a bare yes/no -- it
+          quantifies the \emph{strength} of the evidence.
+  \end{itemize}
+\end{frame}
+\note{Talk track: read the definition twice, slowly -- every word carries
+weight. ``Under the validity of $H_0$'' = we compute in the $H_0$ world.
+``At least as extreme'' = the observed value or anything further out, where
+``out'' is defined by $H_1$. Warn explicitly: the $p$-value is NOT the
+probability that $H_0$ is true -- that misreading is the single most common
+exam error (dedicated slide follows).}
+
+% ---- Decision rule + comparison --------------------------------------------
+\begin{frame}{Decision rule}
+  \begin{alertblock}{One rule for all tests}
+    \[
+      p < \alpha \;\Longrightarrow\; \text{reject } H_0
+      \qquad\qquad
+      p \ge \alpha \;\Longrightarrow\; \text{keep } H_0
+    \]
+  \end{alertblock}
+  \begin{columns}[T]
+    \begin{column}{0.62\textwidth}
+      \includegraphics[width=\textwidth,height=0.52\textheight,keepaspectratio]{images/p_value_comparison.png}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{4pt}
+        \item Left: $p$ large, value in the acceptance region.
+        \item Right: $p$ small, value in the rejection region.
+        \item $\alpha$ is the ``benchmark''.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Two rules, one decision: critical value $\leftrightarrow$ $p$-value}
+  \begin{columns}[T]
+    \begin{column}{0.6\textwidth}
+      \includegraphics[width=\textwidth,height=0.52\textheight,keepaspectratio]{images/cv_pvalue_link.png}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{5pt}
+        \item $\alpha$ = tail area beyond the \textbf{critical value} (fixed in
+              advance).
+        \item $p$ = tail area beyond your \textbf{observed} statistic.
+        \item Statistic past the bar $\Leftrightarrow$ its tail is smaller
+              $\Leftrightarrow p<\alpha$.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \kernaussage{The two decision rules are \textbf{identical}: ``test statistic
+  beyond the critical value'' and ``$p<\alpha$'' always agree -- the critical
+  value is simply the statistic whose tail area equals $\alpha$.}
+\end{frame}
+
+\begin{frame}{Both rules, one verdict -- worked example}
+  \textbf{Cream, two-sided, known $\sigma$:} \ $Z_n=-2.125$, \ $\alpha=0.05$.
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Critical-value rule}
+        \[ |Z_n| = 2.125 \;>\; 1.96 = z_{0.975} \]
+        \centering $\Rightarrow$ \textbf{reject} $H_0$.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{$p$-value rule}
+        \[ p = 2\,\Phi(-2.125) = 0.034 \]
+        \centering $0.034 < 0.05 \Rightarrow$ \textbf{reject} $H_0$.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \kernaussage{Same data, same $\alpha$, \textbf{same decision} -- because
+  $|Z_n|>z_{0.975}$ and $p<\alpha$ are just two ways of saying the observed
+  value sits past the bar.}
+\end{frame}
+
+\subsection{Calculation}
+
+\begin{frame}{Computing the $p$-value (two-sided)}
+  \begin{block}{Known variance}
+    \[
+      p = 2\cdot\Phi\!\bigl(-|Z_n|\bigr) = P\!\bigl(|Z| > |Z_n|\bigr),
+      \quad Z\sim N(0,1)
+    \]
+  \end{block}
+  \begin{block}{Unknown variance}
+    \[
+      p = 2\cdot F_{t,n-1}\!\bigl(-|T_n|\bigr)
+    \]
+  \end{block}
+  \inworten{\textbf{Why double?} With $H_1:\mu\neq\mu_0$ a deviation in
+  \emph{either} direction counts, so ``at least as extreme'' means \emph{both}
+  tails $|Z|>|Z_n|$; by symmetry each has area $\Phi(-|Z_n|)$ -- hence the
+  factor $2$. (One-sided: a single tail, no doubling.)}
+\end{frame}
+
+\begin{frame}{$p$-value -- milk (two variants)}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{known variance, $Z_n=1.000$}
+        \begin{align*}
+          p &= 2\cdot\Phi(-1.00)\\
+            &= 2\cdot 0.15866 = 0.3173
+        \end{align*}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{unknown variance, $T_n=0.7947$}
+        \begin{align*}
+          p &= 2\cdot F_{t,8}(-0.7947)\\
+            &= 2\cdot 0.2249 = 0.4497
+        \end{align*}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \begin{exampleblock}{Decision}
+    Both $p$-values $> 0.05 \Rightarrow H_0:\mu=1000$ not rejected.
+    The value $0.4497$ matches the \texttt{t.test} output.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{$p$-value -- cream (two variants)}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{known variance, $Z_n=-2.125$}
+        \begin{align*}
+          p &= 2\cdot\Phi(-2.125)\\
+            &= 2\cdot 0.0168 = \mathbf{0.0336}
+        \end{align*}
+        $0.0336 < 0.05 \Rightarrow$ reject.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{unknown variance, $T_n=-2.1086$}
+        \begin{align*}
+          p &= 2\cdot F_{t,15}(-2.1086)\\
+            &= 2\cdot 0.0261 = \mathbf{0.0522}
+        \end{align*}
+        $0.0522 > 0.05 \Rightarrow$ keep.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \kernaussage{The same data set can be just \emph{significant} or just
+  \emph{not significant} depending on the assumption about $\sigma$.}
+\end{frame}
+
+\begin{frame}{$p$-value -- typical misconceptions}
+  \begin{alertblock}{What the $p$-value is \emph{not}}
+    \begin{itemize}
+      \item \textbf{Not} the probability that $H_0$ is true.
+      \item A large $p$-value does \textbf{not prove} $H_0$ -- it only shows
+            \emph{no contradiction}.
+    \end{itemize}
+  \end{alertblock}
+  \begin{block}{Correct -- mind the direction}
+    The $p$-value is the probability \emph{of the data (or more extreme)}
+    \textbf{assuming} $H_0$ (chance) holds: $P(\text{data}\mid H_0)$. It
+    \emph{conditions on} chance; it does \textbf{not} give the probability that
+    chance was the \emph{cause}, $P(H_0\mid\text{data})$.
+  \end{block}
+\end{frame}
+\note{Talk track: use the courtroom again -- $P(\text{evidence}\mid\text{innocent})$
+is not $P(\text{innocent}\mid\text{evidence})$. Concrete anchor: ``the
+probability that a randomly tested person has these symptoms IF healthy'' vs.\
+``the probability the person is healthy GIVEN the symptoms'' -- clearly
+different. Also stress the third bullet: a large $p$ means the data cannot
+distinguish $H_0$ from nearby alternatives -- absence of evidence, not
+evidence of absence.}
+
+\begin{frame}{Significant $\neq$ important -- the large-$n$ trap}
+  \begin{block}{The $p$-value measures evidence, not size}
+    With enough data, \emph{any} tiny deviation from $\mu_0$ becomes
+    statistically significant -- even one that is practically irrelevant.
+  \end{block}
+  \begin{exampleblock}{Milk machine, observed $\bar x = 1000.2$ ml ($\mu_0=1000$, $\sigma=3$)}
+    \centering
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lccl}
+      \toprule
+      & $Z_n$ & $p$ (two-sided) & verdict at $\alpha=0.05$\\
+      \midrule
+      $n=9$       & $0.20$ & $0.84$      & not significant\\
+      $n=10\,000$ & $6.67$ & $<0.0001$   & \textbf{highly} significant\\
+      \bottomrule
+    \end{tabular}
+  \end{exampleblock}
+  \kernaussage{The same irrelevant $0.2$\,ml deviation -- invisible at $n=9$,
+  ``highly significant'' at $n=10\,000$. So report the \textbf{effect size and
+  the CI}, not just $p$.}
+\end{frame}
+\note{Talk track: significance answers ``is there evidence of ANY deviation?'',
+not ``is the deviation large enough to matter?''. With $n=10\,000$ the SE is
+$0.03$\,ml -- the test becomes a microscope. Flip side (links to power): with
+small $n$, even an important deviation often stays invisible. Practical rule
+for the students: $p$-value for evidence, CI for magnitude -- always read both.}
+\subsection{Exercises}
+
+\begin{frame}{Exercise -- $p$-value and the choice of $\alpha$}
+  \begin{block}{Problem}
+    A two-sided test with known variance yields $Z_n = 1.85$. Compute the
+    $p$-value and decide at $\alpha = 0.05$ and at $\alpha = 0.10$.
+  \end{block}
+  \textbf{Hint:} $\Phi(1.85) = 0.9678$.
+\end{frame}
+
+\begin{frame}{Solution -- $p$-value and $\alpha$}
+  \[
+    p = 2\,\bigl(1-\Phi(1.85)\bigr) = 2\cdot 0.0322 = \mathbf{0.0643}
+  \]
+  \begin{itemize}
+    \item At $\alpha = 0.05$: \ $0.0643 > 0.05 \Rightarrow$ \textbf{keep} $H_0$.
+    \item At $\alpha = 0.10$: \ $0.0643 < 0.10 \Rightarrow$ \textbf{reject} $H_0$.
+  \end{itemize}
+  \kernaussage{The same data can be ``significant'' or not -- $\alpha$ must be
+  fixed \emph{in advance}, never chosen to fit the result.}
+\end{frame}
+
+\begin{frame}{Exercise -- interpret the $p$-value (concept)}
+  \begin{block}{Which statements are correct? \ ($p = 0.03$, $\alpha=0.05$)}
+    \begin{enumerate}
+      \item ``There is a $3\,\%$ probability that $H_0$ is true.''
+      \item ``If $H_0$ were true, data this extreme occur in $3\,\%$ of samples.''
+      \item ``We reject $H_0$ at $\alpha=0.05$.''
+      \item ``The effect is large and important.''
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- interpret the $p$-value}
+  \begin{exampleblock}{Answers}
+    \begin{enumerate}
+      \item \textbf{Wrong}: $p$ is $P(\text{data}\mid H_0)$, not
+            $P(H_0\mid \text{data})$.
+      \item \textbf{Correct}: that is exactly the definition.
+      \item \textbf{Correct}: $0.03 < 0.05$.
+      \item \textbf{Wrong}: significance $\neq$ effect size; a tiny effect can
+            be significant with large $n$.
+    \end{enumerate}
+  \end{exampleblock}
+  \kernaussage{A small $p$-value signals \emph{evidence against $H_0$} -- not
+  the probability of $H_0$, and not the size or importance of the effect.}
+\end{frame}
+
+% ============================================================================
+% SECTION 4: ONE-SIDED TESTS
+% ============================================================================
+\section[One-sided]{One-Sided Tests}
+
+\subsection{Motivation}
+
+\begin{frame}{When only one direction matters}
+  \begin{block}{The idea}
+    In a two-sided test \emph{any} departure from $\mu_0$ counts against
+    $H_0$. Often, though, a deviation is a \textbf{problem in only one
+    direction} -- the other direction is harmless or even welcome.
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{exampleblock}{Too little in the bottle}
+        For consumer protection only \emph{underfilling} ($\mu<1000$) is
+        critical -- overfilling does not harm the customer.
+      \end{exampleblock}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{exampleblock}{Unemployment insurance}
+        Only if the rate \emph{exceeds} a threshold do contributions fall
+        short. A lower rate causes no problem.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+  \kernaussage{The \emph{question} -- not the data -- decides the direction.
+  The deviation we truly care about defines $H_1$, and the \emph{whole}
+  $\alpha$ goes on that one side instead of $\alpha/2$ on each.}
+\end{frame}
+
+\begin{frame}{Business examples -- one direction only}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{@{}p{7.8cm}cc@{}}
+      \toprule
+      \textbf{You want evidence that \ldots} & \textbf{$H_1$}
+        & \textbf{Direction}\\
+      \midrule
+      the new ad campaign \emph{raises} the conversion rate
+        & $\mu > \mu_0$ & right-sided\\
+      the new process \emph{lowers} the average unit cost
+        & $\mu < \mu_0$ & left-sided\\
+      \bottomrule
+    \end{tabular}\\[4pt]
+    {\footnotesize In both cases $H_0:\mu=\mu_0$, as before.}
+  \end{center}
+  \kernaussage{As in the two-sided case, the claim goes into $H_1$ -- but now
+  its \emph{inequality} also fixes the side on which we reject.}
+\end{frame}
+
+\begin{frame}{How to find the critical value -- 3 steps}
+  \begin{enumerate}\setlength{\itemsep}{4pt}
+    \item \textbf{Direction} (read from $H_1$): one-sided or two-sided?
+    \item \textbf{Tail probability:}
+      \begin{itemize}\footnotesize
+        \item two-sided $\to$ \emph{split} $\alpha$: use the $1-\alpha/2$
+              quantile ($\pm$ value),
+        \item one-sided $\to$ keep $\alpha$ \emph{whole}: use the $1-\alpha$
+              quantile (one value, on the $H_1$ side).
+      \end{itemize}
+    \item \textbf{Which table?} $\sigma$ known $\to z$ (normal);
+          $\sigma$ unknown $\to t$ with $\mathrm{df}=n-1$.
+  \end{enumerate}
+  \begin{exampleblock}{$\alpha=0.05$ -- read the numbers off the table}
+    known $\sigma$:\ two-sided $z_{0.975}=1.96$, \ one-sided $z_{0.95}=1.645$.\\
+    unknown $\sigma$, $n=12$:\ two-sided $t_{0.975;11}=2.20$, \ one-sided
+    $t_{0.95;11}=1.80$.
+  \end{exampleblock}
+\end{frame}
+\note{Talk track: walk the 3 steps aloud at $\alpha=0.05$. The ONLY one- vs
+two-sided difference is whether you split $\alpha$ ($1-\alpha/2$) or not
+($1-\alpha$). Then ``known $\sigma\to z$, unknown $\to t$ with $n-1$''. Have
+them read both $1.96$ and $1.645$ off the table so they SEE the bar move
+inward. Common error: using $1-\alpha$ for a two-sided test (or vice versa).}
+
+\begin{frame}{One-sided critical values -- left and right}
+  \begin{center}
+    \includegraphics[width=0.96\textwidth,height=0.66\textheight,keepaspectratio]{images/critical_value_onesided.png}
+  \end{center}
+  \footnotesize The whole rejection area $\alpha$ sits in \emph{one} tail --
+  left for ``too small'', right for ``too large''. The curve is the
+  \textbf{symmetric} $t$-distribution: only the side changes, the shape never
+  does.
+\end{frame}
+\note{Talk track: point at the picture. ``Same bell curve -- the whole $\alpha$
+just moves into one tail.'' Left tail tests ``too small'', right tail ``too
+large''. Stress the curve is the symmetric $t$ -- it never becomes skewed. Ask
+the room: ``if $T_n$ lands in the blue, what do we do?'' (keep $H_0$). Common
+habit to break: shading both tails -- one-sided means ONE tail.}
+
+\begin{frame}{The golden rule of one-sided tests}
+  \begin{alertblock}{If you remember only one sentence}
+    We reject $H_0$ when the sample result is \textbf{sufficiently extreme in
+    the direction specified by the alternative hypothesis} $H_1$.
+  \end{alertblock}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{@{}l@{\hspace{3mm}}c@{\hspace{3mm}}l@{}}
+      \footnotesize $H_1:\mu<\mu_0$ \emph{(smaller)} &
+        \begin{tikzpicture}[baseline=-3pt]
+          \draw[->,gray] (-2.2,0)--(2.2,0);
+          \draw[line width=4pt,hsbiorange] (-2.2,0)--(-1.45,0);
+          \draw (0,0.13)--(0,-0.13) node[below,font=\tiny]{$\mu_0$};
+        \end{tikzpicture}
+        & \footnotesize reject if $z$ very \textbf{negative}\\
+      \footnotesize $H_1:\mu>\mu_0$ \emph{(larger)} &
+        \begin{tikzpicture}[baseline=-3pt]
+          \draw[->,gray] (-2.2,0)--(2.2,0);
+          \draw[line width=4pt,hsbiorange] (1.45,0)--(2.2,0);
+          \draw (0,0.13)--(0,-0.13) node[below,font=\tiny]{$\mu_0$};
+        \end{tikzpicture}
+        & \footnotesize reject if $z$ very \textbf{positive}\\
+      \footnotesize $H_1:\mu\neq\mu_0$ \emph{(different)} &
+        \begin{tikzpicture}[baseline=-3pt]
+          \draw[->,gray] (-2.2,0)--(2.2,0);
+          \draw[line width=4pt,hsbiorange] (-2.2,0)--(-1.6,0);
+          \draw[line width=4pt,hsbiorange] (1.6,0)--(2.2,0);
+          \draw (0,0.13)--(0,-0.13) node[below,font=\tiny]{$\mu_0$};
+        \end{tikzpicture}
+        & \footnotesize reject if $z$ very \textbf{large} (either way)\\
+    \end{tabular}
+  \end{center}
+  \kernaussage{The inequality in $H_1$ points straight at the rejection region
+  (orange): ``$<$'' $\to$ left tail, ``$>$'' $\to$ right tail, ``$\neq$'' $\to$
+  both.}
+\end{frame}
+\note{Talk track: make them memorize the one sentence in the alert box -- it
+decides every one-sided question. Drill with quick calls: ``$H_1:\mu>5$, where
+do we reject?'' (right tail) -- ``$z=-3$ in that test?'' (keep! wrong
+direction). The orange bars in the table are the visual anchor.}
+
+% ---- Lawyer's argument (evidence scale) ------------------------------------
+\begin{frame}{A left-sided test as a lawyer's argument}
+  \textbf{Your claim} ($H_1:\mu<10$): ``the true mean is \emph{smaller} than
+  $10$.'' \ The sample mean $\bar x$ is your evidence:
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{ccccc}
+      \toprule
+      $\bar x=8$ & $\bar x=9$ & $\bar x=10$ & $\bar x=11$ & $\bar x=12$\\
+      \midrule
+      strong \emph{for} & some \emph{for} & neutral & against & against\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item Below $10$ $\Rightarrow$ evidence \emph{for} $H_1$; if extreme enough,
+          \textbf{reject} $H_0$.
+    \item $\bar x=12$ is far from $10$ but in the \emph{wrong} direction -- it
+          gives \textbf{no} support for ``$\mu<10$''.
+  \end{itemize}
+  \kernaussage{The test asks whether the evidence \emph{in the $H_1$ direction}
+  is strong enough to reject $H_0$ -- a big deviation the wrong way counts for
+  nothing.}
+\end{frame}
+
+\begin{frame}{Critical values of the standard normal $N(0,1)$}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{ccccc}
+      \toprule
+      Confidence $1-\alpha$ & $\alpha$ & \textbf{one-sided} $z_{1-\alpha}$
+        & \textbf{two-sided} $z_{1-\alpha/2}$\\
+      \midrule
+      $90\,\%$   & $0.10$  & $1.282$ & $1.645$\\
+      $95\,\%$   & $0.05$  & $1.645$ & $1.960$\\
+      $98\,\%$   & $0.02$  & $2.054$ & $2.326$\\
+      $99\,\%$   & $0.01$  & $2.326$ & $2.576$\\
+      $99.9\,\%$ & $0.001$ & $3.090$ & $3.291$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{Pattern: the two-sided value at level $\alpha$ equals the one-sided
+  value at level $\alpha/2$ -- e.g.\ two-sided $95\%=1.96=$ one-sided $97.5\%$.}
+\end{frame}
+
+\begin{frame}{Critical values of the $t$-distribution $t_{\mathrm{df}}$}
+  \begin{center}
+    \scriptsize
+    \renewcommand{\arraystretch}{0.95}
+    \begin{tabular}{r|ccccc}
+      \toprule
+      & \multicolumn{5}{c}{\textbf{upper-tail probability}\ \ (one-sided $\alpha$ \ $\mid$\ two-sided $\alpha/2$)}\\
+      \cmidrule(l){2-6}
+      df $=n-1$ & $0.10$ & $0.05$ & $0.025$ & $0.01$ & $0.005$\\
+      \midrule
+      $1$   & $3.078$ & $6.314$ & $12.706$ & $31.821$ & $63.657$\\
+      $2$   & $1.886$ & $2.920$ & $4.303$  & $6.965$  & $9.925$\\
+      $3$   & $1.638$ & $2.353$ & $3.182$  & $4.541$  & $5.841$\\
+      $4$   & $1.533$ & $2.132$ & $2.776$  & $3.747$  & $4.604$\\
+      $5$   & $1.476$ & $2.015$ & $2.571$  & $3.365$  & $4.032$\\
+      $6$   & $1.440$ & $1.943$ & $2.447$  & $3.143$  & $3.707$\\
+      $7$   & $1.415$ & $1.895$ & $2.365$  & $2.998$  & $3.499$\\
+      $8$   & $1.397$ & $1.860$ & $2.306$  & $2.896$  & $3.355$\\
+      $9$   & $1.383$ & $1.833$ & \cellcolor{hsbiorange!35}$2.262$ & $2.821$ & $3.250$\\
+      $10$  & $1.372$ & $1.812$ & $2.228$  & $2.764$  & $3.169$\\
+      $15$  & $1.341$ & $1.753$ & $2.131$  & $2.602$  & $2.947$\\
+      $20$  & $1.325$ & $1.725$ & $2.086$  & $2.528$  & $2.845$\\
+      $30$  & $1.310$ & $1.697$ & $2.042$  & $2.457$  & $2.750$\\
+      $60$  & $1.296$ & $1.671$ & $2.000$  & $2.390$  & $2.660$\\
+      $\infty$ & $1.282$ & $1.645$ & $1.960$ & $2.326$ & $2.576$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \scriptsize Highlighted: $t_{0.975;\,9}=2.262$ (two-sided $95\%$, $n=10$); the $\infty$-row is the normal.
+\end{frame}
+
+\begin{frame}{How to read the tables -- worked lookups}
+  \begin{block}{Three questions, every time}
+    (1) one- or two-sided? \quad (2) which $\alpha$? \quad (3) $z$ or $t$ (df $=n-1$)?
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Normal} ($\sigma$ known):
+      \begin{itemize}\footnotesize\setlength{\itemsep}{2pt}
+        \item two-sided, $\alpha=0.05$ $\to$ column $1-\tfrac{\alpha}{2}=0.975$
+              $\to z=1.96$.
+        \item one-sided, $\alpha=0.05$ $\to$ $1-\alpha=0.95$ $\to z=1.645$.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{$t$} ($\sigma$ unknown), $n=10\Rightarrow$ df$=9$:
+      \begin{itemize}\footnotesize\setlength{\itemsep}{2pt}
+        \item two-sided, $\alpha=0.05$ $\to$ upper-tail $0.025$ $\to t=2.262$.
+        \item one-sided, $\alpha=0.05$ $\to$ upper-tail $0.05$ $\to t=1.833$.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \kernaussage{Two-sided \emph{halves} the tail probability ($\alpha\to\alpha/2$);
+  the $t$-row is $\mathrm{df}=n-1$. As df grows, the $t$-value slides toward $z$.}
+\end{frame}
+
+\begin{frame}{Why the $t$-table ends in the normal}
+  \begin{columns}[T]
+    \begin{column}{0.62\textwidth}
+      \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{images/t_crit_convergence.png}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{6pt}
+        \item Small df $\to$ heavier tails $\to$ \emph{larger} critical value.
+        \item As df grows, the $t$-value shrinks toward the $z$-value.
+        \item By df $\approx 30$ the gap is tiny -- the $\infty$ row \emph{is}
+              the normal.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{The wording reveals the test direction}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{p{4.6cm}cc}
+      \toprule
+      \textbf{Signal words} & \textbf{Hypotheses} & \textbf{Direction}\\
+      \midrule
+      exceed, greater, increased
+        & $H_0:\mu=\mu_0$,\ \ $H_1:\mu>\mu_0$ & right-sided\\
+      fall below, smaller, reduced
+        & $H_0:\mu=\mu_0$,\ \ $H_1:\mu<\mu_0$ & left-sided\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{alertblock}{Note}
+    The \emph{question} decides one- or two-sided -- not the data. The statement
+    you want to find evidence for goes into $H_1$.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Why put the whole $\alpha$ on one side?}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \includegraphics[width=\textwidth,height=0.56\textheight,keepaspectratio]{images/onesided_vs_twosided.png}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{4pt}
+        \item Two-sided spends $\alpha/2$ guarding \emph{each} tail --
+              guarding the harmless side is wasted.
+        \item One-sided puts the \emph{whole} $\alpha$ in the relevant tail,
+              so the critical value moves inward ($1.96\to1.645$).
+        \item A true deviation in that direction now clears the bar
+              \emph{more easily}.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \kernaussage{Same $\alpha$, more power -- but \emph{only} in the chosen
+  direction. A one-sided test at level $\alpha$ uses the critical value of a
+  two-sided test at level $2\alpha$ on that side.}
+\end{frame}
+\note{Key sentence to say out loud: ``a one-sided test at $\alpha$ uses the same
+cutoff as a two-sided test at $2\alpha$ on that side'' -- that is why $1.96$
+drops to $1.645$. Frame it as a trade: more power one way, in exchange for zero
+ability to detect the other way.}
+
+\begin{frame}{The price: you must commit in advance}
+  \begin{alertblock}{The direction is part of the hypothesis}
+    Choose one- vs.\ two-sided \textbf{before} looking at the data -- based on
+    the research question alone.
+  \end{alertblock}
+  \begin{itemize}\setlength{\itemsep}{4pt}
+    \item Picking the side \emph{after} seeing which way the data point
+          inflates the true Type~I error from $\alpha$ to as much as $2\alpha$.
+    \item A one-sided test is \textbf{blind} to deviations in the other
+          direction: even a large effect on the ``wrong'' side never rejects
+          $H_0$.
+    \item If both directions genuinely matter, use a two-sided test.
+  \end{itemize}
+  \inworten{One-sided tests buy power with a promise -- that the other
+  direction really does not matter.}
+\end{frame}
+
+\subsection{Left- and right-sided}
+
+\begin{frame}{Left-sided test -- consumer protection}
+  \begin{block}{Task}
+    A new filling line fills milk (label $1\,\text{l}$). Are the consumer
+    protection requirements met, i.e.\ is \emph{not too little} being filled?
+    Test with $1-\alpha=0.95$.
+  \end{block}
+  \begin{itemize}
+    \item $H_0:\mu = 1000$ \quad vs.\quad $H_1:\mu < 1000$.
+    \item Only $\mu < 1000$ (too little in the bottle) is critical.
+  \end{itemize}
+  \begin{block}{Procedure}
+    Test statistic $T_n = \dfrac{\bar X - \mu_0}{s/\sqrt n}$; reject if
+    $T_n < -t_{1-\alpha,\,n-1}$ \ (known: $Z_n < -z_{1-\alpha}$).\\
+    $p$-value: $p = F_{t,n-1}(T_n)$.
+  \end{block}
+  \inworten{We reject only if $\bar X$ falls \emph{clearly below} $\mu_0$ --
+  a value above $\mu_0$ can never be evidence for ``too little''.}
+\end{frame}
+
+\begin{frame}{Right-sided test -- do not exceed a limit}
+  \begin{block}{Task}
+    Advertisement: ``Our milk contains \textbf{at most}
+    $1\,\text{mg} = 1000\,\mu\text{g}$ of a contaminant per litre.'' Is this
+    met? We measure in $\mu$g, so $\mu_0 = 1000\,\mu$g.
+  \end{block}
+  \begin{itemize}
+    \item $H_0:\mu = 1000\,\mu\text{g}$ \quad vs.\quad $H_1:\mu > 1000\,\mu\text{g}$.
+    \item \emph{Exceeding} the limit is critical.
+  \end{itemize}
+  \begin{block}{Procedure}
+    Reject if $T_n > t_{1-\alpha,\,n-1}$ \ (known: $Z_n > z_{1-\alpha}$).\\
+    $p$-value: $p = 1 - F_{t,n-1}(T_n)$.
+  \end{block}
+  \inworten{Mirror image of the left-sided case: we reject only for values
+  \emph{clearly above} $\mu_0$.}
+\end{frame}
+
+\begin{frame}{Right-sided test -- substance K with numbers}
+  \textbf{Data (known variance):} $\sigma=90\,\mu$g, $n=9$,
+  $\bar x = 1060\,\mu$g, $\mu_0=1000$, $\alpha=0.05$, $z_{0.95}=1.645$.
+  \begin{align*}
+    Z_n &= \frac{1060-1000}{90/\sqrt{9}} = \frac{60}{30} = 2.00\\[2pt]
+    Z_n &= 2.00 \;>\; 1.645 = z_{0.95}
+  \end{align*}
+  \begin{alertblock}{Decision}
+    $H_0:\mu=1000$ is \textbf{rejected} ($p = 1-\Phi(2.00) = 0.0228$).
+    Evidence that the limit is \emph{exceeded} -- the advertising claim is not
+    statistically tenable.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Left vs.\ right-sided -- at a glance}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{p{2.4cm}cc}
+      \toprule
+       & \textbf{left-sided} & \textbf{right-sided}\\
+      \midrule
+      Question        & ``too \emph{small}?''      & ``too \emph{large}?''\\
+      $H_0$ / $H_1$    & $\mu=\mu_0$ / $\mu<\mu_0$ & $\mu=\mu_0$ / $\mu>\mu_0$\\
+      Reject if        & $T_n<-t_{1-\alpha,n-1}$    & $T_n>t_{1-\alpha,n-1}$\\
+      Rejection region & far \emph{left} tail       & far \emph{right} tail\\
+      $p$-value        & $F_{t,n-1}(T_n)$           & $1-F_{t,n-1}(T_n)$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \footnotesize Some textbooks write the null as $\mu\ge\mu_0$ resp.\
+  $\mu\le\mu_0$ -- the test is \textbf{identical}, because critical value and
+  $p$-value are computed at the boundary $\mu=\mu_0$ either way.
+  \kernaussage{$H_1$ always points \emph{toward} the rejection region: the
+  inequality in $H_1$ tells you which tail you reject in.}
+\end{frame}
+\note{Use this slide as the cheat-sheet. Say: ``the inequality in $H_1$ literally
+points at the rejection tail -- $<$ means the left tail, $>$ means the right
+tail.'' Quick exercise: have students cover the table and rebuild the reject
+rule just from the sign in $H_1$.}
+
+\subsection{One-sided $p$-value}
+
+\begin{frame}{One-sided $p$-value -- formulas}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Left-sided}
+        \[ p = F_{t,n-1}(T_n) \]
+        \footnotesize known: $p=\Phi(Z_n)$
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Right-sided}
+        \[ p = 1 - F_{t,n-1}(T_n) \]
+        \footnotesize known: $p=1-\Phi(Z_n)$
+      \end{block}
+    \end{column}
+  \end{columns}
+  \inworten{In a one-sided test we do \emph{not} double -- only the one
+  relevant tail area counts.}
+\end{frame}
+
+\begin{frame}{One-sided $p$-value -- graphically}
+  \begin{center}
+    \includegraphics[width=0.97\textwidth,height=0.66\textheight,keepaspectratio]{images/p_value_onesided.png}
+  \end{center}
+  \footnotesize The $p$-value is the \emph{single} tail area beyond the
+  observed statistic, \textbf{in the direction of $H_1$}. Left panel: the
+  cream example ($T_n=-2.11$, df $=15$, $p=0.026$).
+\end{frame}
+\note{Talk track: contrast directly with the two-sided picture (both tails,
+factor 2). Here only the tail that $H_1$ points to counts. Ask: ``what would
+$p$ be in the LEFT panel if $T_n$ were $+2.11$?'' Answer: $F_{t,15}(2.11)
+\approx 0.97$ -- huge, never reject. That sets up the sign-trap slide that
+follows.}
+
+\begin{frame}{One-sided $p$-value -- mind the sign}
+  \begin{block}{Only the $H_1$-tail counts}
+    The one-sided $p$-value is the probability, under $H_0$, of a value
+    \emph{at least as far in the $H_1$ direction} as the one observed. The
+    opposite tail is irrelevant -- a deviation there supports $H_0$.
+  \end{block}
+  \begin{alertblock}{Sign check -- a big $|z|$ in the wrong direction is \emph{not} significant}
+    Right-sided test with $z=-2.5$: the statistic is on the $H_0$ side, so
+    $p = 1-\Phi(-2.5) = 0.994 > 0.5$ -- you \textbf{never} reject, even though
+    $|z|$ is large. Check the data point in the $H_1$ direction \emph{before}
+    computing.
+  \end{alertblock}
+  \inworten{Link to two-sided: if the deviation is in the $H_1$ direction,
+  $p_{\text{one}} = p_{\text{two}}/2$; otherwise $p_{\text{one}} =
+  1-p_{\text{two}}/2$.}
+\end{frame}
+\note{The classic trap: a right-sided test with a \emph{negative} $T_n$. Say:
+``if your statistic is on the $H_0$ side, $p>0.5$ -- stop, you can never
+reject.'' Always check the statistic points the $H_1$ way \emph{before}
+computing the tail area.}
+
+\begin{frame}{One-sided $p$-value -- milk ($T_n=0.7947$, df $=8$)}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{left-sided}
+        \[ p = F_{t,8}(0.7947) = 0.7751 \]
+        $> 0.05 \Rightarrow H_0:\mu=1000$ kept.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{right-sided}
+        \[ p = 1-0.7751 = 0.2249 \]
+        $> 0.05 \Rightarrow H_0:\mu=1000$ kept.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \begin{exampleblock}{Interpretation (left)}
+    No evidence that the machine fills \emph{too little} -- from a statistical
+    point of view, consumer protection is met.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{One-sided $p$-value -- cream (left, unknown var.)}
+  With $T_n = -2.1086$, $\mathrm{df}=15$:
+  \[
+    p = F_{t,15}(-2.1086) = 0.0261
+  \]
+  \begin{alertblock}{Decision}
+    $p = 0.0261 < 0.05 \Rightarrow H_0:\mu = 250$ is \textbf{rejected}
+    (in favour of $H_1:\mu<250$).
+  \end{alertblock}
+  \kernaussage{In contrast to the two-sided test ($p=0.0522$), the
+  left-sided test is \textbf{significant} here -- because the whole $\alpha$
+  lies on the critical side.}
+\end{frame}
+
+\begin{frame}[fragile]{One-sided test with R}
+\begin{lstlisting}
+# left-sided (H1: mu < mu0)
+t.test(milk, mu = 1000, alternative = "less")
+# right-sided (H1: mu > mu0)
+t.test(milk, mu = 1000, alternative = "greater")
+\end{lstlisting}
+  \begin{block}{Cream, left-sided -- excerpt}
+\begin{lstlisting}
+t = -2.1086, df = 15, p-value = 0.02606
+95 percent confidence interval:  -Inf  249.82
+\end{lstlisting}
+  \end{block}
+  \footnotesize The argument \texttt{alternative} controls the direction
+  (\texttt{"two.sided"}, \texttt{"less"}, \texttt{"greater"}).
+\end{frame}
+
+\subsection{One-sided confidence intervals}
+
+\begin{frame}{One-sided confidence intervals}
+  \begin{itemize}
+    \item A one-sided test has a one-sided CI -- only \emph{one} bound, the
+          other is $\pm\infty$.
+    \item \texttt{R} reports them as $[-\infty;\,x]$ resp.\ $[x;\,+\infty]$.
+  \end{itemize}
+  \begin{block}{Calculation (known variance)}
+    \begin{align*}
+      \text{left-sided test } (H_1:\mu<\mu_0):\quad &
+        \Bigl(-\infty,\ \bar X + z_{1-\alpha}\tfrac{\sigma}{\sqrt n}\Bigr]\\
+      \text{right-sided test } (H_1:\mu>\mu_0):\quad &
+        \Bigl[\bar X - z_{1-\alpha}\tfrac{\sigma}{\sqrt n},\ +\infty\Bigr)
+    \end{align*}
+    For unknown variance: replace $z_{1-\alpha}$ by $t_{1-\alpha,\,n-1}$.
+  \end{block}
+  \footnotesize Note the one-sided quantile $z_{1-\alpha}$ (not $z_{1-\alpha/2}$)
+  -- the whole $\alpha$ sits on one side, exactly as in the test.
+\end{frame}
+
+\begin{frame}{One-sided CIs -- milk and cream (known)}
+  \textbf{CI for the \emph{left-sided} test: upper bound} ($z_{0.95}=1.645$):
+  \begin{align*}
+    \text{Milk}:\; & 1001 + 1.645\cdot\tfrac{3}{\sqrt{9}} = 1002.645\\
+    \text{Cream}:\; & 248.9375 + 1.645\cdot\tfrac{2}{\sqrt{16}} = 249.760
+  \end{align*}
+  \textbf{CI for the \emph{right-sided} test: lower bound:}
+  \begin{align*}
+    \text{Milk}:\; & 1001 - 1.645\cdot\tfrac{3}{\sqrt{9}} = 999.355\\
+    \text{Cream}:\; & 248.9375 - 1.645\cdot\tfrac{2}{\sqrt{16}} = 248.115
+  \end{align*}
+  \inworten{If $\mu_0$ lies beyond the single bound, $H_0$ is rejected.}
+\end{frame}
+\subsection{Exercises}
+
+\begin{frame}{Exercise -- net weight (left-sided, unknown $\sigma$)}
+  \begin{block}{Problem}
+    A package must contain \emph{at least} $\mu_0 = 500\,$g. A sample of
+    $n=12$ gives $\bar x = 496$, $s = 6$. Is there evidence of underfilling?
+    \ ($\alpha=0.05$.)
+  \end{block}
+  \textbf{Hint:} $t_{0.95;\,11} = 1.7959$.
+\end{frame}
+
+\begin{frame}{Solution -- net weight}
+  Underfilling is critical $\Rightarrow$ $H_0:\mu= 500$ vs.\ $H_1:\mu<500$
+  (left-sided). Reject if $T_n < -t_{0.95;\,11} = -1.7959$.
+  \[
+    T_n = \frac{496-500}{6/\sqrt{12}} = \frac{-4}{1.7321} = -2.3094 < -1.7959
+  \]
+  \begin{alertblock}{Decision}
+    Reject $H_0$: evidence of underfilling.
+    $p = F_{t,11}(-2.3094) = \mathbf{0.0207} < 0.05$.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Exercise -- one- vs.\ two-sided on the same data}
+  \begin{block}{Problem}
+    A coating must \emph{exceed} a target thickness. A test gives
+    $T_n = 1.80$ with df $=15$. Compare the right-sided and the two-sided
+    decision at $\alpha = 0.05$.
+  \end{block}
+  \textbf{Hint:} $1-F_{t,15}(1.80) = 0.0460$.
+\end{frame}
+
+\begin{frame}{Solution -- one- vs.\ two-sided}
+  \begin{align*}
+    \text{right-sided:}\ & p = 1-F_{t,15}(1.80) = \mathbf{0.0460} < 0.05
+       \;\Rightarrow\; \text{reject}\\
+    \text{two-sided:}\ & p = 2\cdot 0.0460 = \mathbf{0.0920} > 0.05
+       \;\Rightarrow\; \text{keep}
+  \end{align*}
+  \kernaussage{Identical data, opposite decisions. The one-sided test is more
+  powerful \emph{in the chosen direction} -- exactly why the direction must be
+  fixed before seeing the data.}
+\end{frame}
+
+% ============================================================================
+% SECTION 5: TYPES OF ERROR
+% ============================================================================
+\section[Errors]{Types of Error}
+
+\subsection{The two types of error}
+
+\begin{frame}{Two ways to be wrong}
+  \begin{block}{Intuition}
+    Like a smoke detector, we can be wrong in two ways:
+    \textbf{false alarm} or \textbf{missed fire}.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{l|c|c}
+      \toprule
+       \textbf{Decision} & \textbf{$H_0$ true} & \textbf{$H_0$ false}\\
+      \midrule
+      reject $H_0$
+        & \cellcolor{hsbirot!20}\,Type I error ($\alpha$)\,
+        & \cellcolor{green!18}\,correct (power $1-\beta$)\,\\
+      keep $H_0$
+        & \cellcolor{green!18}\,correct ($1-\alpha$)\,
+        & \cellcolor{hsbiorange!28}\,Type II error ($\beta$)\,\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \footnotesize \textbf{Type I error} = false alarm (reject although $H_0$ is
+  true). \quad \textbf{Type II error} = miss (keep although $H_1$ is true).
+\end{frame}
+\note{Talk track: build the table column by column -- ``first fix the TRUE
+state of the world (column), then look at what our test DID (row).'' Smoke
+detector: too sensitive = many false alarms (Type I); too sluggish = missed
+fire (Type II). Make students say which error the milk test could have made
+(it kept $H_0$, so only a Type II is possible). Common confusion: thinking
+both errors can occur in the same test run -- only one column is ever real.}
+
+\begin{frame}{$\alpha$ and $\beta$ in a picture}
+  \begin{columns}[T]
+    \begin{column}{0.62\textwidth}
+      \includegraphics[width=\textwidth,height=0.64\textheight,keepaspectratio]{images/error_alpha_beta.png}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{4pt}
+        \item The two curves are $\bar X$ in each ``world'': left centred at
+              $\mu_0$ (if $H_0$ holds), right at the true $\mu_1$ (if $H_1$);
+              the red line is the critical value.
+        \item \textcolor{hsbiorange!85!black}{$\alpha$}: $H_0$ true, but
+              beyond the critical value.
+        \item \textcolor{hsbiblau}{$\beta$}: $H_1$ true, but on this side.
+        \item The distributions overlap -- both errors cannot be $0$ at once.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\subsection{$\alpha$, $\beta$ and power}
+
+\begin{frame}{Type I error ($\alpha$) -- controllable}
+  \begin{block}{Definition}
+    \[
+      P(\text{reject } H_0 \mid H_0 \text{ true}) = \alpha
+    \]
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Directly controllable} through the choice of $\alpha$
+          (typically $0.05$).
+    \item In $5\,\%$ of cases a \emph{true} $H_0$ is wrongly rejected.
+  \end{itemize}
+  \begin{exampleblock}{Milk}
+    $H_0:\mu=1000$ is true, yet the test rejects (false alarm) --
+    probability $=\alpha$.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Type II error ($\beta$) -- only indirectly influenced}
+  \begin{block}{Definition (at a specific alternative $\mu_1$)}
+    \[
+      P(\text{keep } H_0 \mid \mu = \mu_1) = \beta
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item No \emph{direct} lever; $\beta$ depends on:
+          \begin{itemize}\footnotesize
+            \item $\alpha$, sample size $n$, spread $\sigma^2$,
+            \item true deviation $|\mu-\mu_0|$ (effect size).
+          \end{itemize}
+    \item At a fixed $\mu_1$: smaller $\alpha$ $\Rightarrow$ higher bar
+          $\Rightarrow$ more misses ($\beta$ \emph{rises}); \ larger $n$
+          $\Rightarrow$ smaller SE $\Rightarrow$ $\beta$ \emph{falls}.
+  \end{itemize}
+  \kernaussage{Power $=1-\beta$: the ability to actually reject a
+  \emph{false} $H_0$.}
+\end{frame}
+
+\begin{frame}{Only one error is controllable}
+  \textbf{Question:} Which error can we only make when we \emph{reject} $H_0$?
+  \begin{block}{Answer}
+    The Type I error -- and that is exactly the one we control via $\alpha$.
+  \end{block}
+  \begin{alertblock}{Consequence for the choice of hypotheses}
+    This is why the ``worse'' alternative is formulated as $H_1$:
+    the feared error becomes the controllable Type I error.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Trade-off and power}
+  \begin{columns}[T]
+    \begin{column}{0.6\textwidth}
+      \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{images/power_curve.png}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{4pt}
+        \item $\alpha\!\downarrow \Rightarrow \beta\!\uparrow$ (trade-off).
+        \item Larger $n$ raises power at every $\mu\neq\mu_0$ (at $\mu_0$ it
+              stays at $\alpha$) -- more power at the same level.
+        \item Power rises with the true deviation.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \begin{block}{Practice}
+    Typically $\alpha=0.05$ and desired power $1-\beta\ge 0.80$. A
+    \textbf{power analysis} provides the required $n$.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Computing $\beta$ concretely -- milk}
+  \textbf{Setup:} $H_0:\mu=1000$ vs.\ $H_1:\mu\neq1000$, $\sigma=3$, $n=9$
+  ($\mathrm{SE}=1$), $\alpha=0.05$.\\[2pt]
+  \textbf{Step 1} -- turn ``$|Z_n|\le1.96$'' into bounds on $\bar X$:
+  $\mu_0\pm1.96\cdot\mathrm{SE}=1000\pm1.96=[998.04;\,1001.96]$.\\[2pt]
+  \textbf{Step 2} -- the truth is $\mu_1=1002$; find how often $\bar X$ still
+  lands in that region, \emph{standardizing with $\mu_1$}:
+  \begin{align*}
+    \beta &= P\bigl(998.04 \le \bar X \le 1001.96 \;\big|\; \mu=1002\bigr)\\
+          &= \Phi\!\bigl(\tfrac{1001.96-1002}{1}\bigr) - \Phi\!\bigl(\tfrac{998.04-1002}{1}\bigr)
+           = 0.484
+  \end{align*}
+  \begin{exampleblock}{Result}
+    Power $=1-\beta = 0.516$: a true deviation of $2\,$ml is detected with
+    $n=9$ in only just over half the cases.
+  \end{exampleblock}
+\end{frame}
+\note{Talk track: the key move is the change of world. Step 1 lives in the
+$H_0$ world (where the acceptance region was built); step 2 asks how often
+$\bar X$ lands in that same region when the TRUTH is $\mu_1=1002$ -- so we
+standardize with $1002$, not $1000$. Students often reuse $\mu_0$ in step 2;
+catch that explicitly. The sobering message: with $n=9$, a real 2\,ml error
+escapes detection almost half the time.}
+
+\begin{frame}{Four levers for more power}
+  More sample size helps decisively. Same situation with $n=36$ instead of $9$:
+  \[
+    \text{SE}=\tfrac{3}{\sqrt{36}}=0.5 \;\Rightarrow\; \beta = 0.021,\quad
+    \text{power}=0.979.
+  \]
+  \begin{block}{Levers of power $1-\beta$}
+    \begin{enumerate}
+      \item \textbf{Sample size} $n\uparrow$ (strongest lever).
+      \item \textbf{Effect size} $|\mu_1-\mu_0|$ (given).
+      \item \textbf{Spread} $\sigma\downarrow$ (e.g.\ measure more precisely).
+      \item \textbf{Level} $\alpha\uparrow$ (buys more Type I error).
+    \end{enumerate}
+  \end{block}
+  \kernaussage{Quadrupling $n$ from $9$ to $36$ raises the power from
+  $0.52$ to $0.98$.}
+\end{frame}
+\note{Talk track: go through the four levers and ask for each ``who controls
+this?'' -- $n$: the researcher (budget); effect size: nature/the question;
+$\sigma$: partly the lab (better instruments); $\alpha$: the convention, and
+raising it is usually unacceptable. So in practice power planning $=$ sample
+size planning. Connect back to the CI planning exercise: same logic,
+$1/\sqrt n$.}
+\subsection{Exercises}
+
+\begin{frame}{Exercise -- compute $\beta$ and power (two-sided)}
+  \begin{block}{Problem}
+    Test $H_0:\mu = 100$ vs.\ $H_1:\mu\neq 100$, known $\sigma = 10$, $n=25$,
+    $\alpha=0.05$. The true mean is actually $\mu_1 = 105$. Find the Type~II
+    error $\beta$ and the power.
+  \end{block}
+  \textbf{Step 1:} the acceptance region for $\bar X$ under $H_0$.
+\end{frame}
+
+\begin{frame}{Solution -- $\beta$ and power (two-sided)}
+  $\text{SE} = 10/\sqrt{25} = 2$. Acceptance region:
+  $100 \pm 1.96\cdot 2 = [96.08\,;\,103.92]$.
+  \begin{align*}
+    \beta &= P(96.08 \le \bar X \le 103.92 \mid \mu = 105)\\
+          &= \Phi\!\Big(\tfrac{103.92-105}{2}\Big)
+             - \Phi\!\Big(\tfrac{96.08-105}{2}\Big)
+           = \Phi(-0.54) - \Phi(-4.46)\\
+          &= 0.2946 - 0.0000 = \mathbf{0.2946}
+  \end{align*}
+  \begin{exampleblock}{Power}
+    $1-\beta = \mathbf{0.7054}$: a true shift of $5$ units is detected in about
+    $71\,\%$ of samples.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Exercise -- power of a one-sided test}
+  \begin{block}{Problem}
+    Now use a \emph{right-sided} test, $H_1:\mu>100$, with $\sigma=10$,
+    $n=25$, $\alpha=0.05$, true $\mu_1=105$. Find the power and compare with
+    the two-sided value $0.7054$.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- one-sided power}
+  $\text{SE}=2$. Critical mean:
+  $\bar x_{\text{crit}} = 100 + 1.645\cdot 2 = 103.29$.
+  \[
+    1-\beta = P(\bar X > 103.29 \mid \mu=105)
+            = 1-\Phi\!\Big(\tfrac{103.29-105}{2}\Big)
+            = 1-\Phi(-0.855) = \mathbf{0.8038}
+  \]
+  \begin{exampleblock}{Comparison}
+    Power $0.804$ vs.\ $0.705$ two-sided -- the one-sided test is \emph{more
+    powerful} for the same $n$ and $\alpha$, because the whole $\alpha$ sits on
+    the relevant side.
+  \end{exampleblock}
+\end{frame}
+
+% ============================================================================
+% SECTION 6: SUMMARY
+% ============================================================================
+\section[Summary]{Summary}
+
+\begin{frame}{Summary 1 -- confidence intervals}
+  \begin{block}{Known variance $\sigma$ \quad ($Z_n\sim N(0,1)$)}
+    \[
+      \mathrm{CI}_{1-\alpha} =
+      \left[\bar{X}-z_{1-\alpha/2}\tfrac{\sigma}{\sqrt{n}},\;
+            \bar{X}+z_{1-\alpha/2}\tfrac{\sigma}{\sqrt{n}}\right]
+    \]
+  \end{block}
+  \begin{block}{Unknown variance \quad ($T_n\sim t_{n-1}$)}
+    \[
+      \mathrm{CI}_{1-\alpha} =
+      \left[\bar{X}-t_{1-\alpha/2,\,n-1}\tfrac{s}{\sqrt{n}},\;
+            \bar{X}+t_{1-\alpha/2,\,n-1}\tfrac{s}{\sqrt{n}}\right]
+    \]
+  \end{block}
+\end{frame}
+
+\begin{frame}{Summary 2 -- hypothesis test (two-sided)}
+  $H_0:\mu=\mu_0$ vs.\ $H_1:\mu\ne\mu_0$
+  \begin{block}{Test statistics}
+    \[
+      Z_n = \frac{\bar{X}-\mu_0}{\sigma/\sqrt{n}},\qquad
+      T_n = \frac{\bar{X}-\mu_0}{s/\sqrt{n}}\sim t_{n-1}
+    \]
+  \end{block}
+  \begin{alertblock}{Decision}
+    Reject if $|Z_n|>z_{1-\alpha/2}$ resp.\ $|T_n|>t_{1-\alpha/2,n-1}$.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Summary 3 -- the $p$-value}
+  \begin{block}{One idea behind every formula}
+    $p$ = probability, \emph{if $H_0$ were true}, of a value \textbf{at least as
+    extreme as observed} -- in the direction(s) that $H_1$ allows.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{p{2.4cm}p{3.2cm}c}
+      \toprule
+      \textbf{If $H_1$ is\ldots} & \textbf{add up the\ldots} & \textbf{$p$ \ (unknown $\sigma$)}\\
+      \midrule
+      $\mu\neq\mu_0$ & \emph{both} tails beyond $|T_n|$ & $2\,F_{t,n-1}(-|T_n|)$\\
+      $\mu<\mu_0$ (left)  & \emph{lower} tail below $T_n$ & $F_{t,n-1}(T_n)$\\
+      $\mu>\mu_0$ (right) & \emph{upper} tail above $T_n$ & $1-F_{t,n-1}(T_n)$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \footnotesize \textbf{Known $\sigma$?} Just replace $T_n\to Z_n$ and
+  $F_{t,n-1}\to\Phi$. \quad \textbf{Decide:} $p<\alpha \Rightarrow$ reject $H_0$.
+\end{frame}
+
+\begin{frame}{Summary 4 -- one-sided tests \& types of error}
+  \begin{block}{One-sided tests (unknown variance)}
+    \begin{tabular}{ll}
+      \textbf{left:}\ \ \, $H_1:\mu<\mu_0$ & reject if $T_n<-t_{1-\alpha,\,n-1}$\\[2pt]
+      \textbf{right:}\ $H_1:\mu>\mu_0$ & reject if $T_n> t_{1-\alpha,\,n-1}$
+    \end{tabular}
+  \end{block}
+  \begin{block}{Types of error}
+    $P(\text{reject } H_0\mid \mu=\mu_0)= \alpha$ \quad
+    $P(\text{keep } H_0\mid \mu=\mu_1)= \beta$ \\
+    $\alpha$ is \emph{controllable}; $\beta$ falls with $n\uparrow$ and $\alpha\uparrow$;
+    power $=1-\beta$.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Which procedure? -- decision tree}
+  \centering
+  \resizebox{0.74\textwidth}{!}{%
+  \begin{tikzpicture}[node distance=5mm and 9mm]
+    \node[flowbox, text width=2.7cm] (q) {\footnotesize \textbf{Question?}};
+    \node[flowboxo, text width=3.3cm, above right=3mm and 12mm of q] (ki)
+      {\footnotesize \textbf{Range for $\mu$}\\ $\Rightarrow$ confidence interval};
+    \node[flowboxo, text width=2.9cm, below right=3mm and 12mm of q] (test)
+      {\footnotesize \textbf{Is $\mu_0$ compatible?}\\ $\Rightarrow$ hypothesis test};
+    \node[flowboxg, text width=3.0cm, right=10mm of test] (sub)
+      {\scriptsize $\sigma$ known $\to z$, else $t$;\\ direction per question:\\ one-/two-sided};
+    \draw[flowarr] (q) -- (ki); \draw[flowarr] (q) -- (test);
+    \draw[flowarr] (test) -- (sub);
+  \end{tikzpicture}}
+  \par\vspace{0.4em}
+  {\footnotesize The same logic -- \emph{standardize}, then ask whether the
+  deviation is extreme \emph{in the $H_1$ direction} -- underlies essentially
+  every classical test: $z$, $t$, proportion, regression coefficient, ANOVA
+  $F$.}
+  \kernaussage{First clarify the \emph{question}, then choose the tool.}
+\end{frame}
+
+% ---- Final checklist: classic pitfalls --------------------------------------
+\begin{frame}{Five classic pitfalls -- final checklist}
+  \small
+  \begin{center}
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}p{6.7cm}@{}}
+      \toprule
+      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
+      \textbf{Correct version \ \textcolor{green!55!black}{$\checkmark$}}\\
+      \midrule
+      ``$p$ is the probability that $H_0$ is true.'' &
+        $p = P(\text{data at least this extreme} \mid H_0)$.\\
+      ``$\mu$ lies in \emph{this} CI with $95\,\%$ probability.'' &
+        The \emph{procedure} covers $\mu$ in $95\,\%$ of samples.\\
+      ``$p > \alpha$, so $H_0$ is proven/accepted.'' &
+        No contradiction found -- $H_0$ is \emph{kept}, not proven.\\
+      ``The data point left, so I test left-sided.'' &
+        Direction and $\alpha$ are fixed \emph{before} the data.\\
+      ``Significant, hence large and important.'' &
+        Significance $\neq$ size: judge magnitude by the CI.\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+\note{Talk track: close the lecture with this table -- each row condenses one
+dedicated slide of this part. Exam relevance: these five formulations are
+exactly the distractors used in multiple-choice questions. Have students
+correct each forbidden sentence aloud in their own words.}
+
+\begin{frame}{Outlook: Part 4 -- Regression}
+  \begin{block}{What we have so far}
+    Confidence intervals and tests for \textbf{one} population mean $\mu$:
+    estimate, standard error, critical value -- and the $p$-value.
+  \end{block}
+  \begin{block}{Next part}
+    We study the \textbf{relationship between variables}. The regression
+    slope $\hat\beta_1$ is again an estimator with a standard error, so
+    the \emph{same} recipe gives its $t$-test, its confidence interval and
+    its $p$-value:
+    \[
+      T=\frac{\text{estimate}-\text{hypothesized value}}{\text{standard error}}.
+    \]
+  \end{block}
+  \kernaussage{Everything in this part carries over one-to-one to the
+  coefficients of a regression model.}
+\end{frame}
+
+\end{document}

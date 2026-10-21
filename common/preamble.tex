@@ -1,0 +1,179 @@
+% ============================================================================
+% Quantitative Research -- shared preamble for all five slide decks
+%
+% Every deck starts with
+%     \documentclass[aspectratio=169,11pt]{beamer}
+%     \input{../common/preamble.tex}
+%     \newcommand{\currentpart}{<k>}
+% so that layout, colours, boxes and code listings are identical everywhere.
+% ============================================================================
+
+% ======================== Packages ========================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{verbatim}          % provides the comment environment
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,shapes.geometric,calc,decorations.pathreplacing}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{pgfpages}          % notes on a second screen (only if enabled)
+
+% ======================== Speaker notes (talk-tracks) ========================
+% The decks compile WITHOUT notes by default. To get a version with the
+% talk-tracks, uncomment exactly ONE of the lines below and recompile:
+% \setbeameroption{show notes}                          % notes as separate pages
+% \setbeameroption{show notes on second screen=right}   % slides left, notes right
+
+% ======================== Colour palette (matched to plots / Madrid) ========
+\definecolor{hsbiblau}{HTML}{3333B2}
+\definecolor{hsbiblaudunkel}{HTML}{1C1C6E}
+\definecolor{hsbiorange}{HTML}{E69F00}
+\definecolor{hsbigrau}{HTML}{9A9A9A}
+\definecolor{hsbirot}{HTML}{C0392B}
+\definecolor{hsbigruen}{HTML}{2E8B57}
+
+% ======================== Theme ========================
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamerfont{section in head/foot}{size=\tiny}
+
+% Horizontal section navigation bar in the headline
+\setbeamertemplate{headline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex]{section in head/foot}%
+      \scriptsize\insertsectionnavigationhorizontal{\paperwidth}{}{\hskip0pt plus1filll}%
+    \end{beamercolorbox}%
+  }%
+}
+
+% Footline: lecture part, current section and slide number
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex]{author in head/foot}%
+    \hspace*{2em}Part~\currentpart\ \textbar\ \insertsection\hfill\insertframenumber{}/\inserttotalframenumber\hspace*{2em}%
+  \end{beamercolorbox}%
+  }%
+}
+
+% Automatic section overview slide. Decks with many sections define
+%   \newcommand{\overviewleft}{1-4}\newcommand{\overviewright}{5-8}
+% before \begin{document} to get a two-column overview.
+\newcommand{\overviewtoc}[1]{%
+  \tableofcontents[currentsection,sectionstyle=show/shaded,
+                   subsectionstyle=show/show/hide,sections={#1}]}
+\newcommand{\sectionoverview}{%
+  \ifdefined\overviewleft
+    \begin{columns}[T]
+      \column{0.49\textwidth}\overviewtoc{\overviewleft}
+      \column{0.49\textwidth}\overviewtoc{\overviewright}
+    \end{columns}%
+  \else
+    \tableofcontents[currentsection,sectionstyle=show/shaded,
+                     subsectionstyle=show/show/hide]%
+  \fi}
+\AtBeginSection[]{%
+  \begin{frame}{Overview}
+    \scriptsize
+    \sectionoverview
+  \end{frame}%
+}
+
+% ======================== R listing style ========================
+\lstdefinestyle{Rstyle}{
+  language=R,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{hsbiblau},
+  commentstyle=\color{hsbigrau}\itshape,
+  stringstyle=\color{teal},
+  showstringspaces=false,
+  literate={~}{{$\sim$}}1 {<-}{{$\leftarrow$}}2
+           {–}{{--}}1 {—}{{---}}1 {ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+           {Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1 {ß}{{\ss}}1 {é}{{\'e}}1,
+  upquote=true,
+  columns=fixed, basewidth=0.5em
+}
+% Plain style for printed R output (fixed columns keep tables aligned)
+\lstdefinestyle{Rout}{
+  language={},
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle={}, commentstyle={}, stringstyle={},
+  columns=fixed, keepspaces=true, basewidth=0.52em,
+  showstringspaces=false,
+  upquote=true,
+  literate={~}{{$\sim$}}1 {–}{{--}}1 {—}{{---}}1 {‘}{{`}}1 {’}{{'}}1,
+}
+\lstset{style=Rstyle}
+
+% ======================== Custom commands / styles ========================
+\newcommand{\kernaussage}[1]{\begin{alertblock}{Key takeaway}#1\end{alertblock}}
+\newcommand{\inworten}[1]{{\small\textbf{\textcolor{hsbiblaudunkel}{In words:}}~#1}}
+\newcommand{\sourcenote}[1]{\vfill\hfill{\tiny\itshape\color{gray}Source: #1}\par}
+
+% Reusable TikZ styles for concept diagrams
+\tikzset{
+  flowbox/.style={rounded corners, draw=hsbiblaudunkel, very thick,
+                  fill=hsbiblau!10, align=center, inner sep=5pt, minimum height=8mm},
+  flowboxo/.style={rounded corners, draw=hsbiorange!85!black, very thick,
+                   fill=hsbiorange!18, align=center, inner sep=5pt, minimum height=8mm},
+  flowboxg/.style={rounded corners, draw=hsbigrau!90!black, very thick,
+                   fill=hsbigrau!15, align=center, inner sep=5pt, minimum height=8mm},
+  flowarr/.style={-{Latex[length=2.6mm,width=2mm]}, line width=1pt, draw=hsbiblaudunkel},
+}
+
+% ======================== Course overview (same slide in every deck) ========
+% \courseoverview highlights the part given by \currentpart.
+\newcommand{\cpart}[2]{%
+  \ifnum\currentpart=#1\relax
+    \textcolor{hsbiblau}{\textbf{#2}}%
+  \else
+    #2%
+  \fi}
+\newcommand{\courseoverview}{%
+\begin{frame}{The lecture at a glance}
+  \begin{center}
+    \small\renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}l l p{7.8cm}@{}}
+      \toprule
+      & \textbf{Part} & \textbf{Content} \\
+      \midrule
+      \ifnum\currentpart=1 $\blacktriangleright$\fi & \cpart{1}{1 -- Descriptive Statistics}
+        & \cpart{1}{Basic concepts, levels of measurement, frequencies, measures of central tendency and dispersion} \\
+      \ifnum\currentpart=2 $\blacktriangleright$\fi & \cpart{2}{2 -- Graphical Representations}
+        & \cpart{2}{Empirical CDF, histogram, boxplot} \\
+      \ifnum\currentpart=3 $\blacktriangleright$\fi & \cpart{3}{3 -- Statistical Inference}
+        & \cpart{3}{Confidence intervals, hypothesis tests, $p$-values, one-sided tests, types of error} \\
+      \ifnum\currentpart=4 $\blacktriangleright$\fi & \cpart{4}{4 -- Regression}
+        & \cpart{4}{Correlation, simple and multiple linear regression, inference for regression, diagnostics} \\
+      \ifnum\currentpart=5 $\blacktriangleright$\fi & \cpart{5}{5 -- Classification}
+        & \cpart{5}{Logistic regression, classification rules, confusion matrix, ROC/AUC, Bayes classifiers} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{center}
+    \footnotesize All analyses are carried out in \textbf{R} (with RStudio);
+    every deck comes with an R script that reproduces its numbers.
+  \end{center}
+\end{frame}}
+
+% ======================== Title information (shared) ========================
+\title{Quantitative Research}
+\author{Prof.\ Dr.\ Christoph Weisser}
+\institute{HSBI}
+\date{Summer Semester 2026}
+
+\graphicspath{{images/}}

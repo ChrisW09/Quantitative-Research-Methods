@@ -1,0 +1,1251 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\newcommand{\currentpart}{1}
+\input{../common/preamble.tex}
+
+\subtitle{Part 1: Descriptive Statistics}
+
+\begin{document}
+
+
+
+% Slide 1: Title Slide
+\frame{\titlepage}
+
+\begin{frame}{About the Lecturer}
+
+\begin{columns}[c]
+
+    % Left column: Image
+    \begin{column}{0.38\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/profile.jpg}
+    \end{column}
+
+    % Right column: Text
+    \begin{column}{0.58\textwidth}
+
+        {\textbf{Prof. Dr. rer. pol. Christoph Weisser}}
+
+        \vspace{0.4em}
+
+        MLitt (St Andrews), MSc (Oxford)
+
+        \vspace{0.6em}
+
+        Professor of Mathematics, specializing in Business Data Science, at HSBI
+
+        \vspace{1em}
+
+        \begin{itemize}
+
+            \item Former Technical Lead for Artificial Intelligence and supervisor of industrial doctoral projects at BASF
+            \item Research: Data Science, Machine Learning and Artificial Intelligence
+            \item Focus: Application of AI in business and industry
+
+        \end{itemize}
+
+        \vspace{0.3em}
+
+        \small
+        \textbf{Contact:} christoph.weisser@hsbi.de
+
+    \end{column}
+
+\end{columns}
+\end{frame}
+
+% Course overview (identical in all five parts)
+\courseoverview
+
+% Slide 4: Software and References
+\begin{frame}{Software and References: R and RStudio}
+  \begin{columns}
+    \column{0.5\textwidth}
+    R. M. Venables, D. M. Smith and the R Development Core Team. \textit{An Introduction to R}.
+
+    \column{0.5\textwidth}
+    \begin{center}
+      \includegraphics[width=0.5\textwidth]{images/image_002.png}
+    \end{center}
+  \end{columns}
+\end{frame}
+
+% Table of Contents Part 1
+\begin{frame}{Contents -- Part 1}
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+% Learning objectives
+\begin{frame}{Learning objectives -- Part 1}
+  After this part you will be able to \ldots
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item name the \textbf{basic concepts} (statistical unit, variable,
+              value, observation) and the \textbf{levels of measurement},
+        \item compute \textbf{absolute, relative and cumulative
+              frequencies},
+        \item compute and interpret \textbf{measures of central tendency}
+              (means, median, mode, quantiles),
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item compute and compare \textbf{measures of dispersion}
+              ($s^2$, $s$, $v$, $v^*$),
+        \item choose the \textbf{right measure} for a given comparison,
+        \item carry out every computation in \texttt{R}.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \kernaussage{One running story: the \textbf{shoe sizes of a soccer team} --
+  we describe this small data set completely, first in numbers (Part~1),
+  then in pictures (Part~2).}
+\end{frame}
+
+\begin{frame}{List of Symbols (1)}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{cl@{\hspace{1.2em}}cl}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
+      \midrule
+      $\omega$ & Statistical unit & $h_j$ & Absolute frequency \\
+      $n$ & Number of statistical units & $f_j$ & Relative frequency \\
+      $X$ & Variable & $H_j$ & Cumulative absolute frequency \\
+      $x$ & Value (category) & $F(x)$ & Empirical distribution function \\
+      $x_i$ & Observation & $x_j$ & Value (class $j$) \\
+      $x_{(i)}$ & $i$-th value of the ordered sample & $\tilde{x}$ & Median \\
+      $\bar{x}$ & Arithmetic mean & $\bar{x}_{\text{geo}}$ & Geometric mean \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{List of Symbols (2)}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{cl@{\hspace{1.2em}}cl}
+      \toprule
+      \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
+      \midrule
+      $s^2$ & Variance (sample) & $v$ & Coefficient of variation \\
+      $s$ & Standard deviation & $v^*$ & Normalized coefficient of variation \\
+      $R$ & Range & $x_{p}$ & $p$-quantile \\
+      $\text{IQR}$ & Interquartile range & $x_{0{.}25},\,x_{0{.}75}$ & 25\,\%- and 75\,\%-quantile \\
+      $\lceil\cdot\rceil$ & Rounding up to an integer & $Q_1,\,Q_3$ & 1st and 3rd quartile \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{center}
+    \footnotesize Symbols for regression ($s_{xy}$, $r$, $\beta_0,\beta_1$,
+    $R^2$, \ldots) are introduced in Part~4.
+  \end{center}
+\end{frame}
+
+
+% ===== SECTION: FUNDAMENTALS =====
+\section{Fundamentals}
+
+% Slide 6: Basic Concepts
+\begin{frame}{Basic Concepts}
+  \begin{description}
+    \item[Statistical unit ($\omega$):] Individual object being observed. Must be defined in terms of subject matter, time, and location. e.g.\ daily maximum temperature, on which day, at which location
+
+    \item[$n$:] The number of statistical units
+
+    \item[Sample:] The collected set of statistical units
+
+    \item[Population:] The overarching set from which the sample was drawn
+  \end{description}
+\end{frame}
+
+% Slide 7: Basic Concepts 2
+\begin{frame}{Basic Concepts: Variable and Observed Values}
+  \begin{description}
+    \item[Variable ($X$):] A characteristic of the statistical unit. There may be several characteristics; which one is examined must be specified.
+
+    \item[Values ($x$):] Possible values that the variable can take.
+
+    \item[Observation ($x_i$):] The value that was actually observed for the variable.
+  \end{description}
+\end{frame}
+
+% Slide 8: Basic Concepts - Table
+\begin{frame}{Basic Concepts -- Summary}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{p{2.6cm}cp{4.2cm}p{4.6cm}}
+      \toprule
+      \textbf{Term} & \textbf{Symbol} & \textbf{Explanation} & \textbf{Example} \\
+      \midrule
+      Statistical unit & $\omega$ & Unit of analysis & Persons, institutions, objects \\
+      Variable & $X$ & Characteristic of interest of a statistical unit & Age, market value, weight, height, costs, rating, product count, color \\
+      Value & $x$ & Values, states, categories that a variable can take & Euros, kg, cm, well-being, grades, yes or no, black, white, blue, \ldots \\
+      Observation & $x_i$ & The actually observed value of a variable & 31 years, 1300 euros, 23 cm, 73 kg, black \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% Slide 9: Data Collection
+\begin{frame}{Data Collection and Survey Types}
+  \begin{block}{Data Collection}
+    \begin{itemize}
+      \item \textbf{Primary data:} Data collected specifically for this study
+      \item \textbf{Secondary data:} Data taken from existing statistics
+    \end{itemize}
+  \end{block}
+  \begin{block}{Survey Types}
+    \begin{itemize}
+      \item Observation
+      \item Interview / Questionnaire
+      \item Experiment
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+% Slide 10: Data Protection
+\begin{frame}{Data Protection}
+  \begin{itemize}
+    \item Regulated by law, e.g.\ the GDPR
+    \item Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data, on the free movement of such data, and repealing Directive 95/46/EC
+    \item As well as further national legislation
+  \end{itemize}
+
+  \bigskip
+
+  \begin{alertblock}{Important}
+    Compliance with data protection is a prerequisite for data analysis!
+  \end{alertblock}
+\end{frame}
+
+% Slide 11: Levels of Measurement - Table
+\begin{frame}{Levels of Measurement 1}
+  \begin{center}
+    \small\begin{tabular}{lll}
+      \toprule
+      \textbf{Term} & \textbf{Explanation} & \textbf{Example} \\
+      \midrule
+      Nominal scale & Status/category only, no ordering & Color, gender, origin, occupation \\
+      Ordinal scale & Ranking possible, differences not meaningful & Attitudes, well-being, grades \\
+      Metric scale & Ranking possible, differences meaningful & Monetary units, temperatures \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% Slide 12: Levels of Measurement 2
+\begin{frame}{Levels of Measurement 2}
+  \begin{itemize}
+    \item Categorical data includes nominal and ordinal data.
+   \end{itemize}
+
+  \bigskip
+
+  \begin{alertblock}{Important}
+    A metric level of measurement is a prerequisite for most of the statistical analyses covered in this course!
+  \end{alertblock}
+\end{frame}
+
+% ===== SECTION: DESCRIPTIVE STATISTICS =====
+\section{Descriptive Statistics}
+
+% ===== SUBSECTION: FREQUENCIES =====
+\subsection{Frequencies}
+
+\begin{frame}{Frequencies}
+  Frequencies -- Absolute, Relative, Cumulative
+\end{frame}
+
+% Slide: Frequencies
+\begin{frame}{Frequencies}
+  \begin{description}
+    \item[Absolute frequency:] How often does a value occur:
+    \[
+    h_j = \#\{ i \mid x_i = x_j \}
+    \]
+
+    \item[Relative frequency:] Proportion of the total count:
+    \[
+    f_j = \frac{h_j}{n}
+    \]
+
+    \item[Cumulative relative frequency:] Accumulated relative frequencies:
+    \[
+    F(x) = \sum_{x_j \le x} f_j
+    \]
+  \end{description}
+\end{frame}
+
+% Slide 15: The Data - Example
+\begin{frame}{The Data -- an Example}
+  \begin{columns}
+    \column{0.5\textwidth}
+    \textbf{The statistical units:} the players of a soccer team
+
+    \column{0.5\textwidth}
+    \begin{center}
+      \includegraphics[width=0.5\textwidth]{images/image_003.jpg}
+    \end{center}
+  \end{columns}
+\end{frame}
+
+% Slide 16: The Data - Example 2
+\begin{frame}{The Data -- an Example 2}
+  \textbf{The variable:} The shoe sizes of a soccer team with the following observations:
+
+  \begin{center}
+    40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39
+  \end{center}
+\end{frame}
+
+% Slide 17: Frequency Table
+\begin{frame}{Frequency Table}
+  \begin{center}
+    \small\renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{lccccccc}
+      \toprule
+      Shoe size & 37 & 38 & 39 & 40 & 41 & 46 & Total \\
+      \midrule
+      absolute frequency & 1 & 2 & 4 & 2 & 1 & 1 & 11 \\
+      relative frequency (decimal) & $0.0909$ & $0.1818$ & $0.3636$ & $0.1818$ & $0.0909$ & $0.0909$ & 1 \\
+      relative frequency in \% & $9.1\,\%$ & $18.2\,\%$ & $36.4\,\%$ & $18.2\,\%$ & $9.1\,\%$ & $9.1\,\%$ & $100\,\%$ \\
+      relative frequency (fraction) & $\tfrac{1}{11}$ & $\tfrac{2}{11}$ & $\tfrac{4}{11}$ & $\tfrac{2}{11}$ & $\tfrac{1}{11}$ & $\tfrac{1}{11}$ & 1 \\
+      cumulative rel.\ freq.\ (decimal) & $0.0909$ & $0.2727$ & $0.6364$ & $0.8182$ & $0.9091$ & 1 & \\
+      cumulative rel.\ freq.\ (fraction) & $\tfrac{1}{11}$ & $\tfrac{3}{11}$ & $\tfrac{7}{11}$ & $\tfrac{9}{11}$ & $\tfrac{10}{11}$ & 1 & \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+
+% Slide: Why Statistics Software?
+\begin{frame}{Why Statistics Software?}
+  \begin{columns}[c]
+    \column{0.6\textwidth}
+    \begin{block}{Advantages of Modern Software}
+      \begin{itemize}
+        \item Complex calculations in seconds
+        \item Reproducible analyses through scripts
+        \item Professional visualizations
+        \item Ability to handle large datasets
+      \end{itemize}
+    \end{block}
+    \vspace{0.8em}
+    \textbf{In this course:} We use \textbf{R} and \textbf{RStudio}
+    
+    \column{0.35\textwidth}
+    \begin{center}
+      \includegraphics[width=0.75\textwidth]{images/image_002.png}\\[0.5em]
+      {\small\textcolor{gray}{www.r-project.org}}
+    \end{center}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{What is R?}
+\begin{itemize}
+    \item \textbf{R} is a programming language for statistical analysis and data analysis.
+
+    \vspace{0.3cm}
+
+    \item Typical application areas:
+    \begin{itemize}
+        \item Data Science
+        \item Statistics
+        \item Machine Learning
+        \item Scientific research
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item Strengths of R:
+    \begin{itemize}
+        \item Excellent data visualization (e.g.\ \texttt{ggplot2})
+        \item Large selection of packages
+        \item Comprehensive statistical methods
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item \textbf{Important:} R is the \textit{computation engine} (performs calculations).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What is RStudio?}
+\begin{itemize}
+    \item \textbf{RStudio} is an integrated development environment (IDE) for R.
+
+    \vspace{0.3cm}
+
+    \item It provides a user-friendly interface:
+    \begin{itemize}
+        \item Script editor
+        \item Console for executing code
+        \item Window for plots and visualizations
+        \item Package management
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item \textbf{Analogy:}
+    \begin{itemize}
+        \item R = Engine of a car
+        \item RStudio = Dashboard and steering wheel
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item \textbf{Important:} RStudio only works if R is installed.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Installation (Mac \& Windows)}
+\begin{itemize}
+    \item \textbf{Step 1: Install R}
+    \begin{itemize}
+        \item Website: \texttt{https://cran.r-project.org}
+        \item Download:
+        \begin{itemize}
+            \item Windows: ``Download R for Windows''
+            \item Mac: ``Download R for macOS''
+        \end{itemize}
+        \item Follow the installation instructions
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item \textbf{Step 2: Install RStudio}
+    \begin{itemize}
+        \item Website: \texttt{https://posit.co/download/rstudio-desktop/}
+        \item Download \textbf{RStudio Desktop (free)}
+        \item Install like a regular program
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item \textbf{Step 3: Launch RStudio}
+    \begin{itemize}
+        \item RStudio automatically detects the R installation
+        \item After that, you can start working with R directly
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+
+% Slide 18: Frequencies with R
+\begin{frame}[fragile]{Frequencies with R}
+\begin{lstlisting}
+
+# Soccer team – shoe sizes of the 11 players
+data <- c(40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39)
+
+# Frequency table
+table(data)
+
+# Relative frequencies
+prop.table(table(data))
+
+# Cumulative frequencies
+cumsum(prop.table(table(data)))
+\end{lstlisting}
+\end{frame}
+
+% Slide 19: Column Chart
+\begin{frame}{Column Chart}
+  \begin{center}
+    \includegraphics[width=0.8\textwidth,height=0.75\textheight,keepaspectratio]{images/chart_slide_19.png}
+  \end{center}
+\end{frame}
+
+% Slide 20: Bar Chart
+\begin{frame}{Bar Chart}
+  \begin{center}
+    \includegraphics[width=0.8\textwidth,height=0.75\textheight,keepaspectratio]{images/chart_slide_20.png}
+  \end{center}
+\end{frame}
+
+% Slide 21: Pie Chart
+\begin{frame}{Pie Chart}
+  \begin{center}
+    \includegraphics[width=0.8\textwidth,height=0.75\textheight,keepaspectratio]{images/chart_slide_21.png}
+  \end{center}
+\end{frame}
+
+% Slide 22: Empirical Distribution Function
+\begin{frame}{Empirical Distribution Function}
+  \begin{center}
+    \includegraphics[width=0.8\textwidth,height=0.75\textheight,keepaspectratio]{images/image_004.png}
+  \end{center}
+\end{frame}
+
+% ===== SUBSECTION: MEASURES OF CENTRAL TENDENCY =====
+\subsection{Measures of Central Tendency}
+
+\begin{frame}{Measures of Central Tendency}
+  Measures of Central Tendency -- Means, Median and Quantiles
+\end{frame}
+
+% Slide 24: Measures of Central Tendency
+\begin{frame}{Measures of Central Tendency}
+  \begin{itemize}
+    \item Where is the center?
+    \item Where is the center of the distribution?
+    \item At which value is one quarter of the values reached?
+    \item At which value are three quarters of the values reached?
+  \end{itemize}
+\end{frame}
+
+% Slide 25: Means
+\begin{frame}{Means}
+  \begin{description}
+    \item[Arithmetic mean:] Sum of all values divided by $n$.
+    \[ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i \]
+
+    \item[Geometric mean:] Product of all values, $n$-th root.
+    \[ \bar{x}_{\text{geo}} = \left(\prod_{i=1}^{n} x_i\right)^{1/n} \]
+    Recommended for growth rates.
+  \end{description}
+
+  \vspace{0.5cm}
+  \begin{itemize}
+    \item \textbf{Advantage:} easy to compute
+    \item \textbf{Disadvantage:} sensitive to extreme values (outliers)
+    \item \textbf{Trimmed mean:} Extreme values removed, remainder $\to$ arithmetic mean
+  \end{itemize}
+\end{frame}
+
+% Slide 26: Median
+\begin{frame}{Median}
+  \begin{block}{Definition}
+    Below which observation are at least 50\,\% of the values?
+  \end{block}
+
+  \begin{description}
+    \item[Computation:] $\lceil n/2 \rceil$ = position of the median in the sorted values
+  \end{description}
+
+  \begin{alertblock}{Note: alternative definition}
+    In some textbooks, the median for even $n$ is defined as the average of the two
+    middle values (the ``middle value''). In this course, we use the $\lceil n/2 \rceil$ definition.
+  \end{alertblock}
+
+  \textbf{Advantages of the $\lceil n/2 \rceil$ definition:}
+  \begin{itemize}
+    \item The median is always an actual observation
+    \item Consistent with the quantile definition:
+          Median = 50\,\%-quantile $= x_{\lceil 0.5 \cdot n \rceil}$
+  \end{itemize}
+
+  \textbf{Advantages of the median in general:}
+  \begin{itemize}
+    \item Robust to outliers
+    \item Also suitable for ordinal data
+  \end{itemize}
+\end{frame}
+
+% Slide 27: Mode
+\begin{frame}{Mode}
+  \begin{block}{Definition}
+    The most frequent value in the distribution
+  \end{block}
+
+  \begin{itemize}
+    \item \textbf{Advantage:} suitable for both ordinal and nominal data
+    \item \textbf{Disadvantage:} often not unique
+    \item \textbf{Disadvantage:} may not represent the ``center'' of the distribution
+  \end{itemize}
+\end{frame}
+
+% Slide 28: Measures of Central Tendency Example
+\begin{frame}{Measures of Central Tendency -- Example}
+  \begin{center}
+    \begin{tabular}{r|rrrrrrrrrrr}
+      \toprule
+      Player & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 \\
+      Shoe size & 40 & 39 & 38 & 41 & 46 & 39 & 39 & 38 & 37 & 40 & 39 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.5cm}
+
+  \begin{tabular}{l|l}
+    Sum & 436 \\
+    Arithmetic mean & 39.6364 \\
+    Geometric mean & 39.5755 \\
+    Trimmed mean & 39.2222 \\
+    Median & 39 \\
+    Mode & 39 \\
+  \end{tabular}
+\end{frame}
+
+% Slide 29: Measures of Central Tendency with R
+\begin{frame}[fragile]{Measures of Central Tendency with R 1}
+\begin{lstlisting}
+# Sum
+sum(data)
+
+# Arithmetic mean
+mean(data)
+
+# Geometric mean
+# Step 1: Calculate the product of all values
+product <- prod(data)
+# Step 2: Determine the number of observations
+n <- length(data)
+# Step 3: Take the n-th root
+gmean <- product^(1/n)
+
+\end{lstlisting}
+\end{frame}
+
+% Slide 29: Measures of Central Tendency with R
+\begin{frame}[fragile]{Measures of Central Tendency with R 2}
+\begin{lstlisting}
+# Sum
+sum(data)
+
+# Trimmed mean: 10% of extreme values are removed
+mean(data, trim = 0.10)
+
+# Median
+median(data)  # Note: R's definition may differ!
+
+\end{lstlisting}
+\end{frame}
+
+% Slide 30: Quantiles
+\begin{frame}{Quantiles}
+  \textbf{First, the values must be sorted!}
+
+  \begin{description}
+    \item[1st quartile:] Below which value are at least 25\,\% of the values?
+    \item[2nd quartile:] = Median (Below which value are at least 50\,\% of the values?)
+    \item[3rd quartile:] Below which value are at least 75\,\% of the values?
+    \item[Arbitrary $p$\%-quantile:] Below which value are at least $p$\,\% of the values?
+  \end{description}
+\end{frame}
+
+% Slide 31: Quantile Computation
+\begin{frame}{Quantiles -- Computation}
+  For the $p$-quantile: round up $n \cdot p$, position in sorted values
+
+  \vspace{0.5cm}
+
+  Example 80\%-quantile: $n \cdot 0.8 = 11 \cdot 0.8 = 8.8$, round up to position 9.
+\end{frame}
+
+% Slide 32: Quantile Computation - Example
+\begin{frame}{Quantiles -- Computation Example}
+  \begin{center}
+    \normalsize
+    \begin{tabular}{l|ccccc}
+      \toprule
+      Quantile & $p$ & $n \cdot p$ & Position & Value \\
+      \midrule
+      1st quartile & 0.25 & 2.75 & 3 & 38 \\
+      2nd quartile & 0.50 & 5.50 & 6 & 39 \\
+      3rd quartile & 0.75 & 8.25 & 9 & 40 \\
+      17\%-quantile & 0.17 & 1.87 & 2 & 38 \\
+      80\%-quantile & 0.80 & 8.80 & 9 & 40 \\
+      5\%-quantile & 0.05 & 0.55 & 1 & 37 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% Slide 33: Quantile Worked Example
+\begin{frame}{Quantiles -- Worked Example}
+  Sorted data: 37, 38, 38, 39, 39, 39, 39, 40, 40, 41, 46
+
+  \vspace{0.5cm}
+
+  \begin{align*}
+    \text{Median} &= x_{\lceil 0.5 \cdot 11 \rceil} = x_6 = 39 \\
+    Q_1 &= x_{\lceil 0.25 \cdot 11 \rceil} = x_3 = 38 \\
+    Q_3 &= x_{\lceil 0.75 \cdot 11 \rceil} = x_9 = 40
+  \end{align*}
+\end{frame}
+
+\begin{comment}
+% Slide 34: Quantile Computation - Alternative
+\begin{frame}{Quantiles -- Computation (alternative)}
+  For the $p$-quantile: round up $n \cdot p$, position in sorted values
+
+  \vspace{0.5cm}
+
+  \begin{block}{Alternative}
+    The quantiles can be read from the empirical distribution function, both from the data table describing the function and from the graphical representation.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Reading Quantiles from the Empirical Distribution Function}
+
+\small
+
+\textbf{Key idea:}
+The empirical distribution function \(F_n(x)\) indicates \emph{what proportion of observations is less than or equal to \(x\)}.
+
+\vspace{0.8em}
+
+\[
+F_n(x) = \frac{\#\{x_i \leq x\}}{n}
+\]
+
+\vspace{0.8em}
+
+\textbf{Quantiles reverse this question:}
+A \(p\)-quantile is the value \(x_p\) at which at least the proportion \(p\) of the data is reached.
+
+\vspace{0.8em}
+
+\[
+x_p = \min \{x \in \mathbb{R} \mid F_n(x) \geq p \}
+\]
+
+\vspace{0.8em}
+
+\textbf{Reading from the empirical distribution function:}
+\begin{itemize}
+    \item \textbf{From the table:} Find the smallest value \(x\) for which \(F_n(x) \geq p\).
+    \item \textbf{From the graph:} Go on the y-axis to proportion \(p\), then horizontally to the step function, and finally vertically down to the x-axis.
+\end{itemize}
+
+\vspace{0.8em}
+
+\textbf{Example:}
+The 50\%-quantile (median) is the smallest value \(x\) for which \(F_n(x) \geq 0.5\).
+
+\end{frame}
+
+% Slide 35: Empirical Distribution Function
+\begin{frame}{Empirical Distribution Function}
+  \begin{center}
+    \includegraphics[width=0.8\textwidth,height=0.75\textheight,keepaspectratio]{images/image_004.png}
+  \end{center}
+\end{frame}
+
+\end{comment}
+
+
+% Slide 36: Quantiles with R
+\begin{frame}[fragile]{Quantiles with R}
+\begin{lstlisting}
+# All standard quantiles at once (type = 1: discrete)
+quantile(data, type = 1)
+
+# 1st quartile (25%-quantile)
+quantile(data, 0.25, type = 1)
+
+# 80%-quantile
+quantile(data, 0.80, type = 1)
+\end{lstlisting}
+\end{frame}
+
+% ===== SUBSECTION: MEASURES OF DISPERSION =====
+\subsection{Measures of Dispersion}
+
+\begin{frame}{Measures of Dispersion}
+  Measures of Dispersion -- Variance, Standard Deviation, Coefficient of Variation, Normalized Coefficient of Variation
+\end{frame}
+
+% Slide 38: Measures of Dispersion - Why?
+\begin{frame}{Measures of Dispersion -- Why?}
+  \textit{Example: Shoe sizes of two women's rowing fours (without coxswain)}
+
+  \vspace{0.3cm}
+
+  \begin{center}
+    \begin{tabular}{l|cc}
+      \toprule
+      & \textbf{Four A} & \textbf{Four B} \\
+      \midrule
+      Data & 34, 37, 40, 41 & 36, 37, 39, 40 \\
+      Mean & 38 & 38 \\
+      Median & 37 & 37 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.5cm}
+
+  \begin{block}{Question}
+    The mean and median are identical. Does that mean the data sets are equivalent?
+  \end{block}
+\end{frame}
+
+% Slide 39b: Measures of Dispersion Visualization
+\begin{frame}{Measures of Dispersion -- Visualization}
+  \begin{center}
+    \includegraphics[width=0.9\textwidth,height=0.9\textheight,keepaspectratio]{images/streuung_viz.png}
+  \end{center}
+  \vspace{-0.3cm}
+  \begin{itemize}
+    \item Mean and median are identical -- but the \textbf{dispersion} differs considerably
+    \item Four A: Data farther from the mean $\to$ greater dispersion
+    \item Four B: Data closely concentrated around the mean $\to$ less dispersion
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Sample Variance}
+  \begin{block}{Definition}
+    Mean squared deviation from the mean:
+    \[ s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 \qquad 0 \leq s^2 \leq \infty \]
+  \end{block}
+
+  \begin{itemize}
+    \item \textbf{Why square?} -- So that positive and negative deviations from the mean do not cancel out!
+    \item \textbf{Why divide by $n-1$ only?} -- Because using the mean leaves only $n-1$ degrees of freedom.
+      \begin{itemize}
+        \item If the mean is known and $n-1$ values are given, the $n$-th value can be computed.
+      \end{itemize}
+    \item The dimension has changed, e.g.\ cm becomes cm$^2$.
+    \item Comparison requires the same units. With different $n$, the precision of the estimates may differ.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Sample Variance -- Worked Example}
+  \begin{center}
+    \begin{tabular}{l|cc}
+      \toprule
+      & Four A & Four B \\
+      \midrule
+      Data & 34, 37, 40, 41 & 36, 37, 39, 40 \\
+      Mean $\bar{x}$ & 38 & 38 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.1cm}
+
+  \begin{exampleblock}{Calculation}
+    \begin{align*}
+      s^2_A &= \frac{1}{4-1}\bigl[(34-38)^2 + (37-38)^2 + (40-38)^2 + (41-38)^2\bigr] = \frac{30}{3} = 10 \\[4pt]
+      s^2_B &= \frac{1}{4-1}\bigl[(36-38)^2 + (37-38)^2 + (39-38)^2 + (40-38)^2\bigr] = \frac{10}{3} \approx 3.33
+    \end{align*}
+  \end{exampleblock}
+
+  \vspace{0.1cm}
+
+\end{frame}
+
+\begin{frame}{Standard Deviation}
+  \begin{block}{Definition}
+    The standard deviation is the square root of the variance:
+    \[ s = +\sqrt{s^2} \qquad 0 \leq s \leq \infty \]
+  \end{block}
+
+  \begin{itemize}
+    \item By taking the square root, the measure of dispersion is again in the \textbf{dimension of the original values}
+    \item If $s = 0$: no dispersion -- all values equal the mean
+    \item Same unit as the original values, therefore \textbf{more intuitive} than the sample variance
+    \item Comparison requires the same units. With different $n$, the precision of the estimates may differ.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Standard Deviation -- Worked Example}
+
+
+  \vspace{0.1cm}
+
+  \begin{exampleblock}{Calculation}
+    \begin{align*}
+      s_A &= +\sqrt{s^2_A} = +\sqrt{10} = 3.1623 \\[4pt]
+      s_B &= +\sqrt{s^2_B} = +\sqrt{3.\overline{3}} = 1.8257
+    \end{align*}
+  \end{exampleblock}
+
+  \vspace{0.1cm}
+
+  \begin{alertblock}{Interpretation}
+    The values of Four A deviate on average by $3.16$ units from the mean, while for Four B only by $1.83$ units.
+
+    $\to$ The dispersion is now expressed in the \textbf{same unit} as the original data.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Coefficient of Variation}
+  \begin{block}{Definition}
+    The coefficient of variation is a \textbf{relative} measure of dispersion:
+    \[ v = \frac{s}{\bar{x}} \qquad \text{for data with } x_i > 0 \text{ for all } i \text{ or } x_i < 0 \text{ for all } i \]
+  \end{block}
+
+  \begin{itemize}
+    \item \textbf{Relative} means: independent of the scale
+    \item The values must be either all positive or all negative
+      \begin{itemize}
+        \item Mathematically: $\bar{x} \neq 0$, since otherwise division by zero
+        \item Substantively: $\bar{x}$ must reflect a meaningful \textbf{level} of the data
+        \item With mixed signs, $\bar{x} \approx 0$ is possible -- then $v$ becomes extremely large, even though the dispersion is not unusual
+        \item Example: $-10, -5, +5, +11 \Rightarrow \bar{x} = 0.25$, $v$ loses its interpretive value
+      \end{itemize}
+    \item However: with very different sample sizes, the precision of the estimates differs, so comparisons should be interpreted with caution
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Coefficient of Variation -- Worked Example}
+
+  \begin{exampleblock}{Calculation}
+    \begin{align*}
+      v_A &= \frac{s_A}{\bar{x}_A} = \frac{3.1623}{38} = 0.0832 \\[4pt]
+      v_B &= \frac{s_B}{\bar{x}_B} = \frac{1.8257}{38} = 0.0480
+    \end{align*}
+  \end{exampleblock}
+
+  \vspace{0.2cm}
+
+  \begin{alertblock}{Interpretation}
+    Four A deviates relatively by about $8.3\,\%$ from the mean, Four B only by about $4.8\,\%$.
+
+
+    $\to$ As a relative measure, $v$ allows comparison of dispersions \textbf{regardless of the scale} of the data.
+  \end{alertblock}
+\end{frame}
+
+
+
+\begin{frame}{Normalized Coefficient of Variation}
+  \begin{block}{Definition}
+    The normalized coefficient of variation is a \textbf{relative} measure of dispersion:
+    \[ v^* = \frac{s}{\bar{x}} \cdot \frac{1}{\sqrt{n}} = \frac{v}{\sqrt{n}}
+\qquad
+\text{for data with } x_i > 0 \text{ for all } i \text{ or } x_i < 0 \text{ for all } i \]
+  \end{block}
+
+  \begin{itemize}
+    \item Same prerequisites as for the coefficient of variation $v$
+    \item \textbf{Advantage over $v$:} By dividing by $\sqrt{n}$, $v^*$ is \textbf{explicitly scaled by the sample size $n$}
+    \item $v^*$ thus combines both advantages:
+      \begin{itemize}
+        \item Division by $\bar{x}$ $\to$ independent of the \textbf{scale} (e.g.\ cm vs.\ km)
+        \item Division by $\sqrt{n}$ $\to$ explicitly scaled by the \textbf{sample size}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Normalized Coefficient of Variation -- Worked Example}
+
+  \begin{exampleblock}{Calculation}
+    \begin{align*}
+      v^*_A &= \frac{v_A}{\sqrt{n}} = \frac{0.0832}{\sqrt{4}} = \frac{0.0832}{2} = 0.0416 \\[4pt]
+      v^*_B &= \frac{v_B}{\sqrt{n}} = \frac{0.0480}{\sqrt{4}} = \frac{0.0480}{2} = 0.0240
+    \end{align*}
+  \end{exampleblock}
+
+  \vspace{0.2cm}
+
+  \begin{alertblock}{Interpretation}
+    Both values are close to $0$ $\to$ low relative dispersion.
+
+    $\to$ Because $v^*$ is explicitly scaled by $\sqrt{n}$, these values are more comparable across different sample sizes than $v$ alone.
+  \end{alertblock}
+\end{frame}
+
+
+% Slide 44: Overview Measures of Dispersion
+\begin{frame}{Overview of Measures of Dispersion}
+  \begin{center}
+    \normalsize
+    \begin{tabular}{l|cc}
+      \toprule
+      & Four A & Four B \\
+      \midrule
+      Mean & 38 & 38 \\
+      Median & 37 & 37 \\
+      Sample variance & 10 & 3.3333 \\
+      Standard deviation & 3.1623 & 1.8257 \\
+      Coefficient of variation & 0.0832 & 0.0480 \\
+      Normalized coefficient of variation & 0.0416 & 0.0240 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% Slide 45: Measures of Dispersion with R
+\begin{frame}[fragile]{Measures of Dispersion with R}
+\begin{lstlisting}
+# Variance
+var(data)
+
+# Standard deviation
+sd(data)
+
+# Coefficient of variation
+v <- sd(data) / mean(data)
+
+# Normalized coefficient of variation
+vstar <- v / sqrt(length(data))
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Exercise: Which Measure of Dispersion is Suitable for Which Comparison?}
+  \begin{enumerate}
+    \item The shoe sizes of the rowing four and the rowing eight.
+    \item The shoe sizes of the women's four and the men's four.
+    \item The shoe sizes of the women's four and the women's four with coxswain.
+    \item The shoe sizes of the women's four and the men's eight.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Exercise: Measures of Dispersion -- Explanation}
+
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{l|cc}
+      \toprule
+      \textbf{Measure of dispersion} & \textbf{Scale} & \textbf{Sample size $n$} \\
+      \midrule
+      Sample variance $s^2$              & dependent   & precision depends on $n$ \\
+      Standard deviation $s$             & dependent   & precision depends on $n$ \\
+      Coefficient of variation $v$       & independent & precision depends on $n$ \\
+      Norm.\ coeff.\ of variation $v^*$  & independent & explicitly scaled by $n$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Exercise: Measures of Dispersion -- Solution 1}
+
+  \textbf{1. Four vs.\ Eight} (same unit, same scale, \textbf{different $n$})
+  \begin{itemize}
+    \item $s^2$, $s$, $v$: less suitable, since different $n$ ($4$ vs.\ $8$) affects precision
+    \item $v^*$: \textbf{yes} -- explicitly scaled by $n$
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \textbf{2. Women's four vs.\ men's four} (same unit, \textbf{different scale}, same $n$)
+  \begin{itemize}
+    \item $s^2$, $s$: less suitable, since men's shoe sizes are systematically larger
+    \item $v$: \textbf{yes} -- not affected by scale, $n$ is equal
+    \item $v^*$: \textbf{yes}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Exercise: Measures of Dispersion -- Solution 2}
+
+  \textbf{3. Women's four vs.\ women's four with coxswain} (same unit, same scale, \textbf{different $n$})
+  \begin{itemize}
+    \item $s^2$, $s$, $v$: less suitable, since different $n$ ($4$ vs.\ $5$) affects precision
+    \item $v^*$: \textbf{yes} -- explicitly scaled by $n$
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \textbf{4. Women's four vs.\ men's eight} (\textbf{different scale} and \textbf{different $n$})
+  \begin{itemize}
+    \item $s^2$, $s$: less suitable, scale differs
+    \item $v$: less suitable, different $n$ affects precision
+    \item $v^*$: \textbf{yes} -- not affected by scale and explicitly scaled by $n$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Exercise: Which Measure of Dispersion is Suitable for Which Comparison?}
+  \begin{enumerate}
+    \item The shoe sizes of the rowing four and the rowing eight.
+    \item The shoe sizes of the women's four and the men's four.
+    \item The shoe sizes of the women's four and the women's four with coxswain.
+    \item The shoe sizes of the women's four and the men's eight.
+  \end{enumerate}
+
+  \vspace{0.6em}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lcccc}
+      \toprule
+       & \textbf{1.} & \textbf{2.} & \textbf{3.} & \textbf{4.} \\
+      \midrule
+      Sample variance               & no & no & no & no \\
+      Standard deviation               & no & no & no & no \\
+      Coefficient of variation            & no & yes   & no & no \\
+      Normalized coefficient of variation & yes   & yes   & yes   & yes   \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+
+
+
+% Slide 48: Exercise
+\begin{frame}{Exercise}
+  Calculate the measures of dispersion for the shoe sizes of the handball team!
+\end{frame}
+
+\begin{frame}{Exercise -- Calculate Measures of Dispersion}
+  Shoe sizes of the handball team ($n = 13$):
+  \[ 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39, 40, 42 \]
+
+  \vspace{0.3cm}
+
+  Calculate:
+
+  \vspace{0.2cm}
+
+  \begin{center}
+    \renewcommand{\arraystretch}{1.12}
+    \begin{tabular}{l|l|c}
+      \toprule
+      \textbf{Measure} & \textbf{Formula} & \textbf{Value} \\
+      \midrule
+      Mean $\bar{x}$ & $\frac{1}{n}\sum_{i=1}^{n} x_i$ & ? \\[4pt]
+      Sample variance $s^2$ & $\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2$ & ? \\[4pt]
+      Standard deviation $s$ & $+\sqrt{s^2}$ & ? \\[4pt]
+      Coefficient of variation $v$ & $\frac{s}{\bar{x}}$ & ? \\[4pt]
+      Norm.\ coeff.\ of variation $v^*$ & $\frac{v}{\sqrt{n}}$ & ? \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Exercise -- Results}
+  Shoe sizes: 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39, 40, 42 \quad ($n = 13$)
+
+  \vspace{0.3cm}
+
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{l|l|l}
+      \toprule
+      \textbf{Measure of dispersion} & \textbf{Formula} & \textbf{Value} \\
+      \midrule
+      Mean $\bar{x}$ & $\frac{1}{n}\sum x_i$ & $39.8462$ \\[4pt]
+      Sample variance $s^2$ & $\frac{1}{n-1}\sum(x_i - \bar{x})^2$ & $5.1410$ \\[4pt]
+      Standard deviation $s$ & $\sqrt{s^2}$ & $2.2674$ \\[4pt]
+      Coefficient of variation $v$ & $\frac{s}{\bar{x}}$ & $0.0569$ \\[4pt]
+      Norm.\ coeff.\ of variation $v^*$ & $\frac{v}{\sqrt{n}}$ & $0.0158$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+% ===== SUMMARY SLIDES =====
+
+\section{Summary}
+
+\begin{frame}{Summary 1: Key Concepts}
+  \begin{block}{Fundamentals}
+    \begin{itemize}
+      \item Statistical unit ($\omega$): object being observed, defined by subject, time, location
+      \item Variable ($X$): characteristic of interest; Observation ($x_i$): actually observed value
+      \item Levels of measurement: nominal (categories) $\to$ ordinal (ranking) $\to$ metric (differences meaningful)
+      \item Metric data is required for most statistical analyses in this course
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Frequencies}
+    \begin{description}
+      \item[Absolute frequency:] $h_j = \#\{i \mid x_i = x_j\}$
+      \item[Relative frequency:] $f_j = \dfrac{h_j}{n}$
+      \item[Cumulative relative frequency:] $F(x) = \sum_{x_j \leq x} f_j$
+    \end{description}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Summary 2: Measures of Central Tendency}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{l|l|l}
+      \toprule
+      \textbf{Measure} & \textbf{Formula} & \textbf{Properties} \\
+      \midrule
+      Arithmetic mean & $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$ & Easy to compute; sensitive to outliers \\[4pt]
+      Geometric mean & $\bar{x}_{\text{geo}} = \left(\prod_{i=1}^{n} x_i\right)^{1/n}$ & Recommended for growth rates \\[4pt]
+      Median & $x_{\lceil 0.5 \cdot n \rceil}$ & Robust to outliers; also for ordinal data \\[4pt]
+      Mode & Most frequent value & Also for nominal data; often not unique \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  
+
+  \begin{block}{Quantiles}
+    For the $p$-quantile: position $= \lceil n \cdot p \rceil$ in the sorted data.
+
+    Quartiles: $Q_1 = x_{\lceil 0.25n \rceil}$, \quad $Q_2 = x_{\lceil 0.5n \rceil}$ (Median), \quad $Q_3 = x_{\lceil 0.75n \rceil}$
+  \end{block}
+\end{frame}
+
+\begin{frame}{Summary 3: Measures of Dispersion}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{l|l|l}
+      \toprule
+      \textbf{Measure} & \textbf{Formula} & \textbf{Key property} \\
+      \midrule
+      Variance $s^2$ & $\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2$ & Dimension changes (e.g.\ cm$^2$) \\[4pt]
+      Std.\ deviation $s$ & $+\sqrt{s^2}$ & Same unit as original data \\[4pt]
+      Coeff.\ of variation $v$ & $\frac{s}{\bar{x}}$ & Scale-independent \\[4pt]
+      Norm.\ coeff.\ $v^*$ & $\frac{v}{\sqrt{n}}$ & Scale-independent \& scaled by $n$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.1cm}
+
+  \begin{block}{Which measure for which comparison?}
+    \begin{itemize}
+      \item Same scale, same $n$: $s^2$ or $s$ sufficient
+      \item Different scale, same $n$: use $v$
+      \item Different $n$ (with or without different scale): use $v^*$
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Summary 4: Key R Commands (1/2)}
+  \begin{block}{Frequencies}
+    \begin{lstlisting}
+table(data)                        # Absolute frequencies
+prop.table(table(data))            # Relative frequencies
+cumsum(prop.table(table(data)))    # Cumulative frequencies
+    \end{lstlisting}
+  \end{block}
+
+  
+
+  \begin{block}{Measures of Central Tendency}
+    \begin{lstlisting}
+mean(data)                         # Arithmetic mean
+mean(data, trim = 0.10)            # Trimmed mean (10%)
+median(data)                       # Median
+quantile(data, 0.25, type = 1)     # Quantiles (e.g. Q1)
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Summary 4: Key R Commands (2/2)}
+  \begin{block}{Measures of Dispersion}
+    \begin{lstlisting}
+var(data)                          # Sample variance
+sd(data)                           # Standard deviation
+sd(data) / mean(data)              # Coefficient of variation
+sd(data)/mean(data)/sqrt(length(data))  # Norm. coeff. of var.
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Outlook: Part 2 -- Graphical Representations}
+  \begin{block}{What we have so far}
+    The shoe sizes are now described by \textbf{numbers}: frequencies,
+    measures of central tendency and measures of dispersion.
+  \end{block}
+  \begin{block}{Next part}
+    The same data are described by \textbf{pictures}: the empirical
+    cumulative distribution function, the histogram and the boxplot --
+    the quantiles of this part reappear as the building blocks of the
+    boxplot.
+  \end{block}
+  \kernaussage{Numbers and pictures complement each other: a good
+  description of data always uses both.}
+\end{frame}
+
+\end{document}
