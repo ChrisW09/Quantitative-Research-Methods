@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # =====================================================================
-# generate_figures_en.py
-# Regenerates all figures of "Statistics for Economists -- Part 6"
-# (Confidence Intervals, Hypothesis Tests, Categorical Data) with
-# ENGLISH labels and the HSBI colour palette.
+# make_figures.py
+# Regenerates the figures of "Quantitative Research -- Part 3:
+# Statistical Inference" (confidence intervals, hypothesis tests,
+# p-values, one-sided tests, types of error) with the HSBI colour palette.
 #
-# Output: images_english/*.png  (referenced by presentation_english.tex)
+# Output: images/*.png  (referenced by Part_3_Statistical_Inference.tex)
 #
 # Requires: numpy, scipy, matplotlib
 #   pip install numpy scipy matplotlib
 #
-# Each function reproduces one slide figure. The German originals live
-# in images/ ; the English equivalents are written to images_english/.
+# Each function reproduces one slide figure. (conditional_bars,
+# observed_vs_expected and chi2_distribution belong to the former
+# categorical-data section and are not used in this deck.)
 # =====================================================================
 import os
 import numpy as np
@@ -35,7 +36,7 @@ GREEN      = "#2E8B57"
 CURVE      = BLUE_DARK   # outline colour for density curves
 FILL_BLUE  = BLUE        # acceptance / confidence shading
 
-OUTDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images_english")
+OUTDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
 os.makedirs(OUTDIR, exist_ok=True)
 
 DPI = 200
@@ -257,7 +258,7 @@ def fig_p_value_twosided():
     ax.axvline(zobs, ls="--", color=CURVE, lw=1.3)
     ax.text(-2.55, 0.055, "p/2", color="#B07A00", fontsize=14, ha="center")
     ax.text(2.55, 0.055, "p/2", color="#B07A00", fontsize=14, ha="center")
-    ax.text(0, 0.2, "p-value = sum of\nboth tail areas", color=BLUE_DARK,
+    ax.text(0, 0.13, "p-value = sum of\nboth tail areas", color=BLUE_DARK,
             ha="center", va="center", fontsize=13)
     ax.annotate("observed:\n" + r"$|Z_n| = 2.125$",
                 xy=(zobs, 0.045), xytext=(3.05, 0.26),
@@ -393,10 +394,10 @@ def fig_error_alpha_beta():
     ax.axvline(crit, color=RED, lw=2.0)
     ax.text(crit, 0.43, "critical value", color=RED, fontsize=11.5, ha="center",
             va="bottom", bbox=WBOX)
-    ax.annotate(r"$\beta$  (Type II error)", xy=(1.05, 0.07), xytext=(-0.7, 0.21),
+    ax.annotate(r"$\beta$  (Type II error)", xy=(1.05, 0.07), xytext=(-2.55, 0.265),
                 color=BLUE, fontsize=12.5, ha="center",
                 arrowprops=dict(arrowstyle="->", color=BLUE))
-    ax.annotate(r"$\alpha$  (Type I error)", xy=(2.0, 0.02), xytext=(3.3, 0.14),
+    ax.annotate(r"$\alpha$  (Type I error)", xy=(2.0, 0.02), xytext=(5.35, 0.20),
                 color="#B07A00", fontsize=12.5, ha="center",
                 arrowprops=dict(arrowstyle="->", color=ORANGE))
     ax.set_xlabel("Test statistic")
@@ -541,10 +542,10 @@ def fig_critical_value_onesided():
     ax.axvline(-xc, ls="--", color=RED, lw=2.0)
     ax.text(-xc, 0.012, r"$-t_{1-\alpha,\,n-1}$", color=RED, fontsize=12.5,
             ha="center", va="bottom", bbox=WBOX)
-    ax.annotate("REJECT $H_0$\n(area $=\\alpha$)", xy=(-2.55, 0.022), xytext=(-3.7, 0.17),
+    ax.annotate("REJECT $H_0$\n(area $=\\alpha$)", xy=(-2.8, 0.008), xytext=(-2.95, 0.30),
                 color="#B07A00", fontsize=12.5, ha="center", fontweight="bold",
                 arrowprops=dict(arrowstyle="->", color=ORANGE, lw=2))
-    ax.text(0.55, 0.20, "KEEP $H_0$\n(area $=1-\\alpha$)", color=BLUE_DARK, fontsize=12.5,
+    ax.text(0, 0.13, "KEEP $H_0$\n(area $=1-\\alpha$)", color=BLUE_DARK, fontsize=12,
             ha="center", va="center", fontweight="bold")
     ax.set_title(r"left-sided:  reject if $T_n < -t_{1-\alpha,\,n-1}$", color=BLUE_DARK, fontsize=13.5)
     ax.set_xlabel(r"$T_n$ under $H_0$  (symmetric $t$)"); ax.set_ylabel("Density")
@@ -558,10 +559,10 @@ def fig_critical_value_onesided():
     ax.axvline(xc, ls="--", color=RED, lw=2.0)
     ax.text(xc, 0.012, r"$t_{1-\alpha,\,n-1}$", color=RED, fontsize=12.5,
             ha="center", va="bottom", bbox=WBOX)
-    ax.annotate("REJECT $H_0$\n(area $=\\alpha$)", xy=(2.55, 0.022), xytext=(3.7, 0.17),
+    ax.annotate("REJECT $H_0$\n(area $=\\alpha$)", xy=(2.8, 0.008), xytext=(2.95, 0.30),
                 color="#B07A00", fontsize=12.5, ha="center", fontweight="bold",
                 arrowprops=dict(arrowstyle="->", color=ORANGE, lw=2))
-    ax.text(-0.55, 0.20, "KEEP $H_0$\n(area $=1-\\alpha$)", color=BLUE_DARK, fontsize=12.5,
+    ax.text(0, 0.13, "KEEP $H_0$\n(area $=1-\\alpha$)", color=BLUE_DARK, fontsize=12,
             ha="center", va="center", fontweight="bold")
     ax.set_title(r"right-sided:  reject if $T_n > t_{1-\alpha,\,n-1}$", color=BLUE_DARK, fontsize=13.5)
     ax.set_xlabel(r"$T_n$ under $H_0$  (symmetric $t$)"); ax.set_ylabel("Density")
@@ -645,10 +646,10 @@ def fig_p_value_onesided():
     tail = x[x <= tobs]
     ax.fill_between(tail, stats.t.pdf(tail, v), color=ORANGE, alpha=0.85)
     ax.axvline(tobs, color=BLUE, lw=2.4)
-    ax.text(tobs, 0.40, "observed\n" + r"$T_n=-2.11$", color=BLUE,
-            fontsize=11.5, ha="center", va="bottom")
-    ax.annotate(r"$p = F_{t,15}(T_n)$" + "\n" + r"$= 0.026$",
-                xy=(-2.6, 0.018), xytext=(-2.55, 0.20),
+    ax.text(tobs + 0.15, 0.40, "observed\n" + r"$T_n=-2.11$", color=BLUE,
+            fontsize=11.5, ha="left", va="bottom")
+    ax.annotate(r"$p =$" + "\n" + r"$F_{t,15}(T_n)$" + "\n" + r"$= 0.026$",
+                xy=(-2.6, 0.018), xytext=(-3.05, 0.17),
                 color="#B07A00", fontsize=12.5, ha="center", fontweight="bold",
                 arrowprops=dict(arrowstyle="->", color=ORANGE, lw=2))
     ax.set_title(r"left-sided ($H_1:\mu<\mu_0$): area $\bf below$ $T_n$",
@@ -663,10 +664,10 @@ def fig_p_value_onesided():
     tail = x[x >= tobs]
     ax.fill_between(tail, stats.t.pdf(tail, v), color=ORANGE, alpha=0.85)
     ax.axvline(tobs, color=BLUE, lw=2.4)
-    ax.text(tobs, 0.40, "observed\n" + r"$T_n=+2.11$", color=BLUE,
-            fontsize=11.5, ha="center", va="bottom")
-    ax.annotate(r"$p = 1-F_{t,15}(T_n)$" + "\n" + r"$= 0.026$",
-                xy=(2.6, 0.018), xytext=(3.2, 0.16),
+    ax.text(tobs - 0.15, 0.40, "observed\n" + r"$T_n=+2.11$", color=BLUE,
+            fontsize=11.5, ha="right", va="bottom")
+    ax.annotate(r"$p = 1-$" + "\n" + r"$F_{t,15}(T_n)$" + "\n" + r"$= 0.026$",
+                xy=(2.6, 0.018), xytext=(3.05, 0.17),
                 color="#B07A00", fontsize=12.5, ha="center", fontweight="bold",
                 arrowprops=dict(arrowstyle="->", color=ORANGE, lw=2))
     ax.set_title(r"right-sided ($H_1:\mu>\mu_0$): area $\bf above$ $T_n$",
@@ -706,8 +707,8 @@ def fig_test_milk_cream():
     # milk: Zn = 1.00 -> keep
     ax = axes[0]; base(ax)
     ax.axvline(1.0, color=GREEN, lw=3)
-    ax.annotate("milk:\n" + r"$Z_n = 1.00$", xy=(1.0, 0.30), xytext=(2.35, 0.385),
-                color=GREEN, fontsize=12.5, ha="center", fontweight="bold",
+    ax.annotate("milk:\n" + r"$Z_n = 1.00$", xy=(1.0, 0.30), xytext=(3.05, 0.385),
+                color=GREEN, fontsize=12, ha="center", fontweight="bold", bbox=WBOX, zorder=5,
                 arrowprops=dict(arrowstyle="->", color=GREEN, lw=1.8))
     ax.set_title(r"milk: $|Z_n|<1.96$ $\rightarrow$ keep $H_0$",
                  color=BLUE_DARK, fontsize=13)
@@ -715,8 +716,8 @@ def fig_test_milk_cream():
     # cream: Zn = -2.125 -> reject
     ax = axes[1]; base(ax)
     ax.axvline(-2.125, color=RED, lw=3)
-    ax.annotate("cream:\n" + r"$Z_n = -2.125$", xy=(-2.125, 0.26), xytext=(-3.0, 0.385),
-                color=RED, fontsize=12.5, ha="center", fontweight="bold",
+    ax.annotate("cream:\n" + r"$Z_n =$" + "\n" + r"$-2.125$", xy=(-2.125, 0.20), xytext=(-3.15, 0.34),
+                color=RED, fontsize=12, ha="center", fontweight="bold",
                 arrowprops=dict(arrowstyle="->", color=RED, lw=1.8))
     ax.set_title(r"cream: $|Z_n|>1.96$ $\rightarrow$ reject $H_0$",
                  color=BLUE_DARK, fontsize=13)

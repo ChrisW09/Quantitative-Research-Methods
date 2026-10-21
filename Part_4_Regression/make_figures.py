@@ -141,8 +141,8 @@ def fig_slope_tests():
         ax.set_title(title)
         style(ax)
     axes[0].set_ylabel("Density")
-    axes[0].text(-12.2, 0.37, "reject $H_0$", color=ORANGE, fontsize=12, fontweight="bold")
-    axes[1].text(-1.2, 0.37, "keep $H_0$", color=BLUE_DARK, fontsize=12, fontweight="bold")
+    axes[0].text(-10.75, 0.37, "reject $H_0$", color=ORANGE, fontsize=12, fontweight="bold")
+    axes[1].text(-4.3, 0.37, "keep $H_0$", color=BLUE_DARK, fontsize=12, fontweight="bold")
     fig.tight_layout()
     save(fig, "reg_slope_tests.png")
 

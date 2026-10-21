@@ -3,7 +3,8 @@
 
 Writes images/ecdf_body_heights.png and images/ecdf_body_heights_classified.png:
 the empirical CDF of the raw data and of the classified data (class
-midpoints, class width 10 cm). Requires numpy and matplotlib.
+midpoints, class width 10 cm), and images/hist_body_heights.png: the
+density histogram with class width 10 cm. Requires numpy and matplotlib.
 """
 import os
 
@@ -52,12 +53,29 @@ def ecdf_plot(values, weights, title, fname, annotate=None):
 
 
 vals, counts = np.unique(heights, return_counts=True)
-ecdf_plot(vals, counts, "Empirical CDF -- Body Heights", "ecdf_body_heights.png")
+ecdf_plot(vals, counts, "Empirical CDF – Body Heights", "ecdf_body_heights.png")
 
 # classes [150,160], (160,170], (170,180], (180,190], (190,200] -> midpoints
 mids = np.array([155, 165, 175, 185, 195])
 cls_counts = np.array([3, 7, 3, 0, 2])
 keep = cls_counts > 0
 ecdf_plot(mids[keep], cls_counts[keep],
-          "Empirical CDF -- Classified Data (Class Midpoints)",
+          "Empirical CDF – Classified Data (Class Midpoints)",
           "ecdf_body_heights_classified.png")
+
+
+# density histogram, classes [150,160], (160,170], ..., (190,200]
+edges = np.arange(150, 201, 10)
+dens = cls_counts / cls_counts.sum() / np.diff(edges)
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.bar(edges[:-1], dens, width=np.diff(edges), align="edge",
+       color="#4472C4", edgecolor="black", lw=1.2, zorder=3)
+ax.grid(axis="x", visible=False)
+ax.set_xticks(edges)
+ax.set_xlabel("Body height (cm)")
+ax.set_ylabel(r"Density $f_j/\Delta x_j$")
+ax.set_title("Histogram (Class Width 10 cm)")
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "hist_body_heights.png"), dpi=150)
+plt.close(fig)
+print("wrote hist_body_heights.png")

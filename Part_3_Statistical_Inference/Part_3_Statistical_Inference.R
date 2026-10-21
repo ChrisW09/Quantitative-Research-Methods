@@ -1,333 +1,112 @@
 # =====================================================================
-# R code from: Part_3_Statistical_Inference.tex
 # Quantitative Research -- Part 3: Statistical Inference
-# Translated from: Statistik für Ökonomen Teil 6.R
-# Translated on: 2026-05-03
+# Author:  Prof. Dr. Christoph Weisser (HSBI)
 #
-# Description:
-#   This script collects all R code that appears in the LaTeX Beamer
-#   presentation "Quantitative Research -- Part 3: Statistical Inference" (confidence
-#   intervals, hypothesis tests, p-value, one-sided tests, error types,
-#   contingency and chi-squared test). Every snippet is wrapped with a
-#   greppable SLIDE marker so the same code can be located in both
-#   directions (frame title in .tex <--> SLIDE tag in .R).
-#
-# Required R packages:
-#   Only base R + 'stats' (loaded by default). No external packages
-#   are required.
-#
-# Required data objects (defined in the SETUP section below):
-#   - milch : c(1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009)
-#   - sahne : c(251, 248, 248, 249, 250, 251, 247, 246, 252,
-#               251, 248, 247, 246, 249, 248, 252)
-#   The presentation uses these two example data vectors throughout.
-#   They appear in the text/exercise blocks of the slides but are NOT
-#   re-defined inside every R-code lstlisting -- so we set them once
-#   here so every snippet below is runnable as-is.
-#
-# Overview (slide -> topic):
-#   SETUP                                      -> data definitions
-#   Section "Hypothesis tests / Hypothesis test with R":
-#     SLIDE 39 : Hypothesis test with R        -> t.test() (two-sided)
-#     SLIDE 40 : Hypothesis test with R -- Output (console output)
-#   Section "p-value" (R commands):
-#     SLIDE 54 : R commands with known variance -- Milk
-#     SLIDE 55 : R commands with known variance -- Cream
-#     SLIDE 56 : R commands with unknown variance -- Milk
-#     SLIDE 57 : R commands with unknown variance -- Cream
-#   Section "One-sided tests":
-#     SLIDE 68 : One-sided test with R
-#     SLIDE 69 : One-sided test with R -- Milk example (output)
-#     SLIDE 70 : One-sided test with R -- Cream exercise (output)
-#     SLIDE 77 : One-sided CI in R -- known variance
-#   Section "Analysis of categorical data / Chi^2-test":
-#     SLIDE 106: Test of independence -- R code and example
-#   Section "Summary":
-#     SLIDE 107: Summary 1 -- Confidence intervals
-#     SLIDE 108: Summary 2 -- Hypothesis test, two-sided
-#     SLIDE 109: Summary 3 -- p-value
-#     SLIDE 110: Summary 4 -- One-sided tests & error types
-#     SLIDE 111: Summary 5 -- Contingency & Chi^2-test
+# Reproduces the numbers shown on the slides of Part 3. Base R only.
+# Sections follow the sections of the slide deck:
+#   1  Confidence intervals   (milk, cream; known and unknown variance)
+#   2  Hypothesis tests       (z- and t-test, reaction time)
+#   3  The p-value
+#   4  One-sided tests        (one-sided p-values and CIs, net weight)
+#   5  Types of error         (beta and power)
 # =====================================================================
 
-
 # ---------------------------------------------------------------------
-# SETUP: example data vectors used throughout the presentation
-# Section: (used by all R-code slides below)
-# Source: data values are stated in the LaTeX problem descriptions
-#   - "milch" : Milk example (slide 11, frame "Milk example: Calculation")
-#   - "sahne" : Cream exercise (slide 21, frame "Exercise -- Cream filling")
-# These are NOT inside lstlisting blocks in the .tex; they are added
-# here so every snippet below is self-contained and runnable.
+# SETUP: the two running examples
 # ---------------------------------------------------------------------
-milch <- c(1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009)
-sahne <- c(251, 248, 248, 249, 250, 251, 247, 246, 252,
-           251, 248, 247, 246, 249, 248, 252)
-# --- end SETUP ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 39: "Hypothesis test with R"
-# Section: Hypothesis tests / Hypothesis test with R
-# ---------------------------------------------------------------------
-milch <- c(1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009)
-
-t.test(milch, mu = 1000)
-# --- end SLIDE 39 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 40: "Hypothesis test with R -- Output"
-# Section: Hypothesis tests / Hypothesis test with R
-# Note: This slide shows ONLY the R console output of the t.test() from
-#       SLIDE 39 (no new R commands). It is reproduced here as a comment
-#       block so the script faithfully mirrors the slide deck.
-# ---------------------------------------------------------------------
-# Console output (reference -- not executable):
-#         One Sample t-test
-#
-# data:  milch
-# t = 0.79472, df = 8, p-value = 0.4497
-# alternative hypothesis: true mean is not equal to 1000
-# 95 percent confidence interval:
-#   998.0983 1003.9017
-# sample estimates:
-# mean of x
-#      1001
-# --- end SLIDE 40 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 54: "R commands with known variance -- Milk"
-# Section: p-value
-# ---------------------------------------------------------------------
-alpha <- 0.05
-mu0.milch   <- 1000
-sigma.milch <- 3
-
-(Zn.milch <- (mean(milch) - mu0.milch) /
-             (sigma.milch / sqrt(length(milch))))
-
-(ki.n.milch <- mean(milch) +
-               c(-1, 1) * qnorm(1 - alpha/2) *
-               sigma.milch / sqrt(length(milch)))
-# --- end SLIDE 54 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 55: "R commands with known variance -- Cream"
-# Section: p-value
-# ---------------------------------------------------------------------
-alpha <- 0.05
-mu0.sahne   <- 250
-sigma.sahne <- 2
-
-(Zn.sahne <- (mean(sahne) - mu0.sahne) /
-             (sigma.sahne / sqrt(length(sahne))))
-
-(ki.n.sahne <- mean(sahne) +
-               c(-1, 1) * qnorm(1 - alpha/2) *
-               sigma.sahne / sqrt(length(sahne)))
-# --- end SLIDE 55 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 56: "R commands with unknown variance -- Milk"
-# Section: p-value
-# ---------------------------------------------------------------------
-alpha <- 0.05
-mu0.milch <- 1000
-
-(Tn.milch <- (mean(milch) - mu0.milch) /
-             (sd(milch) / sqrt(length(milch))))
-
-(ki.t.milch <- mean(milch) +
-               c(-1, 1) * qt(1 - alpha/2, length(milch) - 1) *
-               sd(milch) / sqrt(length(milch)))
-# --- end SLIDE 56 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 57: "R commands with unknown variance -- Cream"
-# Section: p-value
-# ---------------------------------------------------------------------
-alpha <- 0.05
-mu0.sahne <- 250
-
-(Tn.sahne <- (mean(sahne) - mu0.sahne) /
-             (sd(sahne) / sqrt(length(sahne))))
-
-(ki.t.sahne <- mean(sahne) +
-               c(-1, 1) * qt(1 - alpha/2, length(sahne) - 1) *
-               sd(sahne) / sqrt(length(sahne)))
-# --- end SLIDE 57 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 68: "One-sided test with R"
-# Section: One-sided tests
-# ---------------------------------------------------------------------
-# left-sided (H1: mu < mu0)
-t.test(milch, mu = 1000, alternative = "less")
-
-# right-sided (H1: mu > mu0)
-t.test(milch, mu = 1000, alternative = "greater")
-# --- end SLIDE 68 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 69: "One-sided test with R -- Milk example"
-# Section: One-sided tests
-# Note: The slide shows the console output of the left-sided test
-#       on the milch data. The command itself is repeated below; the
-#       expected output is reproduced as a comment.
-# ---------------------------------------------------------------------
-t.test(milch, mu = 1000, alternative = "less")
-# Console output (reference -- not executable):
-# > t.test(milch, mu = 1000, alternative = "less")
-#
-#         One Sample t-test
-#
-# data:  milch
-# t = 0.7947, df = 8, p-value = 0.7751
-# alternative hypothesis: true mean is less than 1000
-# 95 percent confidence interval:
-#       -Inf 1003.338
-# sample estimates:
-# mean of x
-#      1001
-# --- end SLIDE 69 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 70: "One-sided test with R -- Cream exercise"
-# Section: One-sided tests
-# Note: Slide shows the console output of the left-sided test on the
-#       sahne data. Command is reproduced below; expected output as
-#       comment.
-# ---------------------------------------------------------------------
-t.test(sahne, mu = 250, alternative = "less")
-# Console output (reference -- not executable):
-# > t.test(sahne, mu = 250, alternative = "less")
-#
-#         One Sample t-test
-#
-# data:  sahne
-# t = -2.1086, df = 15, p-value = 0.02606
-# alternative hypothesis: true mean is less than 250
-# 95 percent confidence interval:
-#       -Inf 249.7849
-# sample estimates:
-# mean of x
-#  248.9375
-# --- end SLIDE 70 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 77: "One-sided CI in R -- known variance"
-# Section: One-sided tests / One-sided confidence intervals
-# Note: The original .tex snippet uses generic placeholders 'daten' and
-#       'sigma.daten'. To make the snippet runnable we apply it to the
-#       milch data (left-sided) and the sahne data (right-sided). The
-#       generic form is preserved as a comment.
-# ---------------------------------------------------------------------
-# Original (generic) form from the slide:
-#   # upper bound of the left-sided CI
-#   (ki.n <- mean(daten) +
-#            qnorm(1 - alpha) * sigma.daten /
-#            sqrt(length(daten)))
-#   # lower bound of the right-sided CI
-#   (ki.n <- mean(daten) -
-#            qnorm(1 - alpha) * sigma.daten /
-#            sqrt(length(daten)))
-
+milk  <- c(1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009)   # ml, sigma = 3
+cream <- c(251, 248, 248, 249, 250, 251, 247, 246, 252,
+           251, 248, 247, 246, 249, 248, 252)                   # g, sigma^2 = 4
 alpha <- 0.05
 
-# upper bound of the left-sided CI (Milk, sigma = 3)
-daten <- milch
-sigma.daten <- 3
-(ki.n <- mean(daten) +
-         qnorm(1 - alpha) * sigma.daten /
-         sqrt(length(daten)))
+# =====================================================================
+# 1 Confidence intervals
+# =====================================================================
+# milk, known variance
+mean(milk)                                           # 1001
+z <- qnorm(1 - alpha / 2)                            # 1.96
+mean(milk) + c(-1, 1) * z * 3 / sqrt(9)              # [999.04, 1002.96]
+# different confidence levels
+for (lev in c(0.90, 0.95, 0.99))
+  print(mean(milk) + c(-1, 1) * qnorm(1 - (1 - lev) / 2) * 3 / sqrt(9))  # slides use z rounded to 3 decimals
 
-# lower bound of the right-sided CI (Milk, sigma = 3)
-(ki.n <- mean(daten) -
-         qnorm(1 - alpha) * sigma.daten /
-         sqrt(length(daten)))
-# --- end SLIDE 77 ---
+# milk, unknown variance
+sd(milk)                                             # 3.7749
+qt(1 - alpha / 2, df = 8)                            # 2.3060
+mean(milk) + c(-1, 1) * qt(0.975, 8) * sd(milk) / sqrt(9)   # [998.10, 1003.90]
 
+# cream exercise: known (sigma = 2) and unknown variance
+mean(cream)                                          # 248.9375
+mean(cream) + c(-1, 1) * 1.96 * 2 / sqrt(16)         # [247.96, 249.92]
+var(cream); sd(cream)                                # 4.0625, 2.0156
+mean(cream) + c(-1, 1) * qt(0.975, 15) * sd(cream) / sqrt(16)  # [247.86, 250.01]
 
-# ---------------------------------------------------------------------
-# SLIDE 106: "Test of independence -- R code and example"
-# Section: Analysis of categorical data / Chi^2-test
-# ---------------------------------------------------------------------
-kontingenz <- matrix(c(10, 8, 7,
-                        6,12, 7), nrow = 2, byrow = TRUE)
-rownames(kontingenz) <- c("m","w")  # TODO: confirm if row labels "m"/"w" (male/female) should be translated -- they are data identifiers used as factor-like labels
-colnames(kontingenz) <- c("1V","2V","3V")
+# =====================================================================
+# 2 Hypothesis tests
+# =====================================================================
+(Zn_milk  <- (mean(milk) - 1000) / (3 / sqrt(9)))             # 1.000
+(Tn_milk  <- (mean(milk) - 1000) / (sd(milk) / sqrt(9)))      # 0.7947
+(Zn_cream <- (mean(cream) - 250) / (2 / sqrt(16)))            # -2.125
+(Tn_cream <- (mean(cream) - 250) / (sd(cream) / sqrt(16)))    # -2.1086
+t.test(milk, mu = 1000)                     # two-sided t-test with CI
 
-chisq.test(kontingenz)
-# --- end SLIDE 106 ---
+# reaction time exercise (n = 50, xbar = 242, s = 30, mu0 = 250)
+(T_rt <- (242 - 250) / (30 / sqrt(50)))                       # -1.8856
+qt(0.975, 49)                                                 # 2.0096
+2 * pt(-abs(T_rt), 49)                                        # 0.0653
 
+# =====================================================================
+# 3 The p-value (two-sided)
+# =====================================================================
+2 * pnorm(-abs(Zn_milk))                    # 0.3173
+2 * pt(-abs(Tn_milk), df = 8)               # 0.4497
+2 * pnorm(-abs(Zn_cream))                   # 0.0336
+2 * pt(-abs(Tn_cream), df = 15)             # 0.0522
+2 * (1 - pnorm(1.85))                       # exercise: 0.0643 (slide: 0.0644 from the table value 0.9678)
 
-# ---------------------------------------------------------------------
-# SLIDE 107: "Summary 1 -- Confidence intervals"
-# Section: Summary
-# Note: The snippet again uses the generic placeholders 'daten' /
-#       'sigma'. We bind them to milch / sigma=3 so the snippet runs.
-# ---------------------------------------------------------------------
-daten <- milch
-sigma <- 3
-alpha <- 0.05
+# large-n trap: xbar = 1000.2, sigma = 3
+for (n in c(9, 10000)) {
+  z_n <- 0.2 / (3 / sqrt(n)); print(c(n = n, z = z_n, p = 2 * pnorm(-z_n)))
+}
 
-# unknown variance: t.test returns the CI directly
-t.test(daten, conf.level = 0.95)$conf.int
+# =====================================================================
+# 4 One-sided tests
+# =====================================================================
+qnorm(0.95); qt(0.95, 11)                   # 1.645, 1.7959
+t.test(milk,  mu = 1000, alternative = "less")      # p = 0.7751
+t.test(milk,  mu = 1000, alternative = "greater")   # p = 0.2249
+t.test(cream, mu = 250,  alternative = "less")      # p = 0.0261, CI (-Inf, 249.82]
 
-# known variance: manually
-mean(daten) + c(-1, 1) * qnorm(1 - alpha/2) *
-              sigma / sqrt(length(daten))
-# --- end SLIDE 107 ---
+# substance K: known sigma = 90, n = 9, xbar = 1060, mu0 = 1000 (right-sided)
+(Z_K <- (1060 - 1000) / (90 / sqrt(9)))     # 2.00
+1 - pnorm(Z_K)                              # 0.0228
 
+# one-sided CIs with known variance
+1001 + qnorm(0.95) * 3 / sqrt(9)            # milk, upper bound 1002.645
+1001 - qnorm(0.95) * 3 / sqrt(9)            # milk, lower bound  999.355
 
-# ---------------------------------------------------------------------
-# SLIDE 108: "Summary 2 -- Hypothesis test, two-sided"
-# Section: Summary
-# ---------------------------------------------------------------------
-# Standard case: two-sided t-test with unknown sigma
-t.test(milch, mu = 1000)
-# Output: t, df, p-value, 95% CI, sample mean
-# --- end SLIDE 108 ---
+# net weight exercise (n = 12, xbar = 496, s = 6, mu0 = 500, left-sided)
+(T_nw <- (496 - 500) / (6 / sqrt(12)))      # -2.3094
+pt(T_nw, df = 11)                           # 0.0207
 
+# one- vs. two-sided (T = 1.80, df = 15)
+1 - pt(1.80, 15); 2 * (1 - pt(1.80, 15))    # 0.0460, 0.0920
 
-# ---------------------------------------------------------------------
-# SLIDE 109: "Summary 3 -- p-value"
-# Section: Summary
-# Note: The snippet uses generic 'Zn', 'Tn', 'n'. We bind these to the
-#       Milk example values (n = 9) so the snippet is runnable.
-# ---------------------------------------------------------------------
-n  <- length(milch)
-Zn <- (mean(milch) - 1000) / (3        / sqrt(n))   # known variance
-Tn <- (mean(milch) - 1000) / (sd(milch)/ sqrt(n))   # unknown variance
+# =====================================================================
+# 5 Types of error: beta and power
+# =====================================================================
+# milk: H0 mu = 1000, sigma = 3, n = 9 (SE = 1), true mu1 = 1002
+se <- 3 / sqrt(9)
+lo <- 1000 - 1.96 * se; hi <- 1000 + 1.96 * se
+(beta <- pnorm((hi - 1002) / se) - pnorm((lo - 1002) / se))   # 0.484
+1 - beta                                                      # power 0.516
+se36 <- 3 / sqrt(36)                                          # n = 36
+1 - (pnorm((1000 + 1.96 * se36 - 1002) / se36) -
+     pnorm((1000 - 1.96 * se36 - 1002) / se36))               # 0.979
 
-2 * pnorm(-abs(Zn))           # known variance, two-sided
-2 * pt(-abs(Tn), df = n-1)    # unknown, two-sided
-pt(Tn, n-1);  1 - pt(Tn, n-1) # left- or right-sided respectively
-# --- end SLIDE 109 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 110: "Summary 4 -- One-sided tests & error types"
-# Section: Summary
-# ---------------------------------------------------------------------
-t.test(milch, mu = 1000, alternative = "less")     # left-sided
-t.test(milch, mu = 1000, alternative = "greater")  # right-sided
-# --- end SLIDE 110 ---
-
-
-# ---------------------------------------------------------------------
-# SLIDE 111: "Summary 5 -- Contingency & Chi^2-test"
-# Section: Summary
-# ---------------------------------------------------------------------
-tab <- matrix(c(11,24,  3,0,  2,0), nrow = 3, byrow = TRUE)
-chisq.test(tab)        # X-squared, df, p-value
-# --- end SLIDE 111 ---
+# exercise: sigma = 10, n = 25, mu0 = 100, mu1 = 105
+se <- 10 / sqrt(25)
+(beta2 <- pnorm((100 + 1.96 * se - 105) / se) -
+          pnorm((100 - 1.96 * se - 105) / se))                # 0.2946
+1 - beta2                                                     # 0.7054
+1 - pnorm((100 + qnorm(0.95) * se - 105) / se)                # right-sided: 0.8037

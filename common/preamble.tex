@@ -35,6 +35,16 @@
 % \setbeameroption{show notes}                          % notes as separate pages
 % \setbeameroption{show notes on second screen=right}   % slides left, notes right
 
+% ======================== Math fonts ========================
+% Beamer typesets text in sans serif; make \mathrm and \mathbf match it
+% (otherwise SE, TP, RSS print in serif and \mathbf falls back to non-bold).
+\renewcommand{\bfdefault}{bx}   % CM sans has bold extended (bx) only
+\DeclareMathAlphabet{\mathrm}{T1}{cmss}{m}{n}
+\DeclareMathAlphabet{\mathbf}{T1}{cmss}{bx}{n}
+\SetMathAlphabet{\mathrm}{bold}{T1}{cmss}{bx}{n}
+\SetMathAlphabet{\mathbf}{bold}{T1}{cmss}{bx}{n}
+\SetSymbolFont{operators}{bold}{OT1}{cmss}{bx}{n}
+
 % ======================== Colour palette (matched to plots / Madrid) ========
 \definecolor{hsbiblau}{HTML}{3333B2}
 \definecolor{hsbiblaudunkel}{HTML}{1C1C6E}
@@ -60,12 +70,15 @@
   }%
 }
 
-% Footline: lecture part, current section and slide number
+% Footline: lecture part, current section (if any) and slide number
+\newcommand{\footsection}{%
+  \setbox0=\hbox{\insertsection}%
+  \ifdim\wd0>0pt\ \textbar\ \insertsection\fi}
 \setbeamertemplate{footline}{%
   \leavevmode%
   \hbox{%
   \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex]{author in head/foot}%
-    \hspace*{2em}Part~\currentpart\ \textbar\ \insertsection\hfill\insertframenumber{}/\inserttotalframenumber\hspace*{2em}%
+    \hspace*{2em}Part~\currentpart\footsection\hfill\insertframenumber{}/\inserttotalframenumber\hspace*{2em}%
   \end{beamercolorbox}%
   }%
 }
@@ -147,7 +160,7 @@
 \begin{frame}{The lecture at a glance}
   \begin{center}
     \small\renewcommand{\arraystretch}{1.25}
-    \begin{tabular}{@{}l l p{7.8cm}@{}}
+    \begin{tabular}{@{}l l >{\raggedright\arraybackslash}p{7.8cm}@{}}
       \toprule
       & \textbf{Part} & \textbf{Content} \\
       \midrule

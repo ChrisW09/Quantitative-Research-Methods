@@ -107,12 +107,12 @@ def fig_linear_vs_logistic():
         ax.set_title(title)
         style(ax)
     axes[0].plot(xs, lpm.params.iloc[0] + lpm.params.iloc[1] * xs, color=BLUE, lw=2.6)
-    axes[0].fill_between(xs, -0.12, 0, where=lpm.params.iloc[0] + lpm.params.iloc[1] * xs < 0,
+    axes[0].fill_between(xs, -0.2, 0, where=lpm.params.iloc[0] + lpm.params.iloc[1] * xs < 0,
                          color=RED, alpha=0.12)
-    axes[0].text(60, -0.09, 'negative "probabilities"', color=RED, fontsize=11.5)
+    axes[0].text(40, -0.165, 'negative "probabilities"', color=RED, fontsize=11.5)
     axes[1].plot(xs, g1.predict(pd.DataFrame({"balance": xs})), color=BLUE, lw=2.6)
     axes[0].set_ylabel("P(default = Yes)")
-    axes[0].set_ylim(-0.12, 1.08)
+    axes[0].set_ylim(-0.2, 1.08)
     save(fig, "cls_linear_vs_logistic.png")
 
 
