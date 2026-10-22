@@ -10,9 +10,7 @@
 # Requires: numpy, scipy, matplotlib
 #   pip install numpy scipy matplotlib
 #
-# Each function reproduces one slide figure. (conditional_bars,
-# observed_vs_expected and chi2_distribution belong to the former
-# categorical-data section and are not used in this deck.)
+# Each function reproduces one slide figure of Part 3.
 # =====================================================================
 import os
 import numpy as np
@@ -440,91 +438,6 @@ def fig_power_curve():
 
 
 # ====================================================================
-# 11. conditional_bars.png   (was bedingte_balken.png)
-#     f(V|m) = (0.40, 0.32, 0.28) ; f(V|f) = (0.24, 0.48, 0.28)
-# ====================================================================
-def fig_conditional_bars():
-    fig, ax = plt.subplots(figsize=(7.0, 4.19))
-    cats = ["1st attempt", "2nd attempt", "3rd attempt"]
-    male = [0.40, 0.32, 0.28]
-    female = [0.24, 0.48, 0.28]
-    xpos = np.arange(3)
-    w = 0.38
-    ax.bar(xpos - w / 2, male, w, color=BLUE, label="male (m)")
-    ax.bar(xpos + w / 2, female, w, color=ORANGE, label="female (f)")
-    for xp, v in zip(xpos - w / 2, male):
-        ax.text(xp, v + 0.01, f"{v:.2f}", ha="center", fontsize=10.5, color=BLUE_DARK)
-    for xp, v in zip(xpos + w / 2, female):
-        ax.text(xp, v + 0.01, f"{v:.2f}", ha="center", fontsize=10.5, color="#B07A00")
-    ax.set_xticks(xpos)
-    ax.set_xticklabels(cats)
-    ax.set_ylabel("Relative frequency")
-    ax.set_ylim(0, 0.58)
-    ax.set_title("Conditional distribution of attempt given gender", color=BLUE_DARK)
-    ax.legend(fontsize=12)
-    style(ax)
-    save(fig, "conditional_bars.png")
-
-
-# ====================================================================
-# 12. observed_vs_expected.png   (was beobachtet_vs_erwartet.png)
-# ====================================================================
-def fig_observed_vs_expected():
-    fig, ax = plt.subplots(figsize=(7.43, 4.21))
-    cells = ["m,1st", "m,2nd", "m,3rd", "f,1st", "f,2nd", "f,3rd"]
-    obs = [10, 8, 7, 6, 12, 7]
-    exp = [8, 10, 7, 8, 10, 7]
-    xpos = np.arange(6)
-    w = 0.40
-    ax.bar(xpos - w / 2, obs, w, color=BLUE, label=r"observed $n_{ij}$")
-    ax.bar(xpos + w / 2, exp, w, color=ORANGE, label=r"expected $\hat{n}_{ij}$")
-    for xp, o, e in zip(xpos, obs, exp):
-        delta = o - e
-        if delta != 0:
-            ax.text(xp, max(o, e) + 0.3, f"$\\Delta$={delta:+d}",
-                    color=RED, fontsize=11, ha="center")
-    ax.set_xticks(xpos)
-    ax.set_xticklabels(cells)
-    ax.set_ylabel("Frequency")
-    ax.set_ylim(0, 14)
-    ax.set_title("Observed vs. expected under independence", color=BLUE_DARK)
-    ax.legend(fontsize=12, loc="upper right")
-    style(ax)
-    save(fig, "observed_vs_expected.png")
-
-
-# ====================================================================
-# 13. chi2_distribution.png   (was chi2_verteilung.png)
-# ====================================================================
-def fig_chi2_distribution():
-    fig, ax = plt.subplots(figsize=(7.43, 4.21))
-    x = np.linspace(0.01, 12, 1000)
-    df = 2
-    y = stats.chi2.pdf(x, df)
-    ax.plot(x, y, color=CURVE, lw=2.6)
-    crit = 5.991
-    xr = x[x >= crit]
-    ax.fill_between(xr, stats.chi2.pdf(xr, df), color=ORANGE, alpha=0.80)
-    obs = 1.8
-    ax.axvline(obs, color=BLUE, lw=2.4)
-    ax.axvline(crit, color=RED, lw=2.0)
-    ax.annotate("observed\n" + r"$\chi^2 = 1.8$", xy=(obs, 0.205),
-                xytext=(3.0, 0.30), color=BLUE, fontsize=12, ha="center",
-                arrowprops=dict(arrowstyle="->", color=BLUE))
-    ax.annotate("critical value\n" + r"$\chi^2_{0.95;2}=5.991$", xy=(crit, 0.03),
-                xytext=(8.6, 0.20), color=RED, fontsize=12, ha="center",
-                arrowprops=dict(arrowstyle="->", color=RED))
-    ax.text(8.4, 0.055, "rejection\nregion ($\\alpha$)", color="#B07A00",
-            fontsize=11.5, ha="center")
-    ax.set_xlabel(r"$\chi^2$  (df = 2)")
-    ax.set_ylabel("Density")
-    ax.set_ylim(0, 0.5)
-    ax.set_xlim(0, 14)
-    style(ax)
-    save(fig, "chi2_distribution.png")
-
-
-# ====================================================================
 # 14. critical_value_onesided.png  (teaching aid: left & right rejection regions)
 #     SYMMETRIC t-distribution (df=12) -- never F-shaped.
 # ====================================================================
@@ -738,9 +651,6 @@ def main():
     fig_onesided_vs_twosided()
     fig_error_alpha_beta()
     fig_power_curve()
-    fig_conditional_bars()
-    fig_observed_vs_expected()
-    fig_chi2_distribution()
     fig_critical_value_onesided()
     fig_cv_pvalue_link()
     fig_t_crit_convergence()

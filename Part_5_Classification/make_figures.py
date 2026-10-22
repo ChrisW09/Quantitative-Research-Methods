@@ -3,7 +3,7 @@
 
 All model-based figures use the full Default data (../data/Default.csv) and
 maximum-likelihood logistic regression -- deterministic, so the numbers agree
-with glm() in R (see Part_5_Classification.R). Simulated or sub-sampled
+with Part_5_Classification.py (smf.logit). Simulated or sub-sampled
 figures use a fixed seed. Colours: HSBI palette of the shared preamble.
 
     python3 make_figures.py
