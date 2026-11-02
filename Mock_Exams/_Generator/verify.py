@@ -5,7 +5,8 @@ The inputs (data, sums, coefficients, confusion matrix) are typed in here a
 second time; every result is computed from them with NumPy / SciPy /
 statsmodels and then looked up in the text of spec_qrm1.py (fields 'short' and
 'result', and where useful 'q' or 'intro'). The three Python commands asked for
-in the exam are executed on suitable data. Exit code 1 if anything disagrees.
+in the exam and the three lines of code students have to read are executed on
+suitable data. Exit code 1 if anything disagrees.
 
     python3 verify.py
 """
@@ -46,6 +47,15 @@ def check(task, letter, value, tokens, fields=("short", "result"), cond=True):
                                                    "" if cond else " / logical check failed"))
 
 
+def run_code(task, letter, **env):
+    """Executes the line of code printed in a code-reading subtask (field 'code',
+    LaTeX escapes removed) with the given variables."""
+    code = item(task, letter)["code"]
+    for old, new in (("\\{", "{"), ("\\}", "}"), ("\\ ", " "), ("\\_", "_")):
+        code = code.replace(old, new)
+    return eval(code, {}, env)
+
+
 def check_text(where, text, tokens):
     missing = [t for t in tokens if t not in text]
     if missing:
@@ -73,7 +83,13 @@ check(1, "a", "H0: mu = %d vs H1: mu != %d" % (mu0, mu0), ["\\mu = %d" % mu0, "\
 check(1, "b", "SE = %g" % se, ["= %g$" % se], cond=se == 2)
 check(1, "b", "SE (question)", ["$\\sigma = 12$", "$n = 36$"], fields=("q",))
 check(1, "c", "Z_n = %.4f" % z, ["= %.2f$" % z], cond=abs(z - 2.15) < 1e-12)
-check(1, "d", "z_0.975 = %.6f -> %.2f" % (z_crit_exact, z_crit), ["%.2f" % z_crit, "z_{0.975}"])
+q_crit = 1 - alpha / 2
+z_code = run_code(1, "d", stats=stats, q=q_crit)          # the printed line with q = 0.975
+check(1, "d", "stats.norm.ppf(%.3f) = %.6f -> %.2f" % (q_crit, z_code, z_crit),
+      ["%.3f" % q_crit, "%.2f" % z_crit, "z_{0.975}"],
+      cond=round(z_code, 2) == 1.96 and round(run_code(1, "d", stats=stats, q=0.95), 2) != 1.96)
+check(1, "d", "ppf (question)", ["$\\alpha = 0.05$", "\\texttt{q}"], fields=("q",))
+check(1, "d", "ppf (solution)", ["stats.norm.ppf(0.975)     # %.6f" % z_crit_exact], fields=("solution",))
 check(1, "e", "|Z_n| = %.2f > %.2f -> reject" % (abs(z), z_crit), ["reject"], cond=abs(z) > z_crit)
 check(1, "f", "Phi(2.15) = %.4f, p = %.4f (exact %.5f)" % (phi_tab, p_table, p_exact),
       ["%.4f" % phi_tab, "%.4f" % p_table], cond=round(p_exact, 4) == round(p_table, 4) and p_table < alpha)
@@ -117,8 +133,13 @@ check(2, "a", "b1 (question)", ["S_{xy} = %g" % sxy, "S_{xx} = %g" % sxx], field
 check(2, "b", "b0 = %g" % b0, ["= %g$" % b0], cond=b0 == -12)
 check(2, "c", "slope interpretation: +1 degree -> +%g" % b1, ["$%g$ more" % b1])
 y25 = b0 + b1 * 25
-check(2, "d", "yhat(25) = %g (25 inside [%g, %g])" % (y25, x.min(), x.max()), ["%g" % y25],
-      cond=x.min() <= 25 <= x.max())
+reg_d = smf.ols("sales ~ temp", data=pd.DataFrame({"temp": x, "sales": y})).fit()
+pred25 = float(run_code(2, "d", reg=reg_d, pd=pd).iloc[0])   # the printed line
+check(2, "d", "reg.predict(temp=25) = %.4f (25 inside [%g, %g])" % (pred25, x.min(), x.max()),
+      ["%g" % y25], cond=abs(pred25 - y25) < 1e-9 and x.min() <= 25 <= x.max())
+check(2, "d", "predict (question)", ["-12 + 3x"], fields=("q",))
+check(2, "d", "predict (solution)", ['reg.predict(pd.DataFrame({"temp": [25]}))     # %.1f' % pred25],
+      fields=("solution",))
 check(2, "e", "yhat_5 = %g, u_5 = %g" % (yhat[4], u[4]), ["%g" % yhat[4], "%g$" % u[4]])
 check(2, "f", "TSS = %g, ESS = %g, RSS = %g, R2 = %.4f" % (tss, ess, rss, r2), ["= %g$" % r2],
       cond=abs(ess + rss - tss) < 1e-9 and abs(r2 - 0.9) < 1e-12)
@@ -194,7 +215,14 @@ sens = TP / (TP + FN)
 spec = TN / (TN + FP)
 prec = TP / (TP + FP)
 check(3, "f", "accuracy = %.4f" % acc, ["%g$" % acc])
-check(3, "g", "sensitivity = %.4f" % sens, ["%g$" % sens])
+# g) run the crosstab line on 200 customers with exactly these counts
+test = pd.DataFrame({"churn": [0] * (TN + FP) + [1] * (FN + TP)})
+phat = pd.Series([0.2] * TN + [0.7] * FP + [0.2] * FN + [0.7] * TP)
+ct = run_code(3, "g", pd=pd, test=test, phat=phat)          # the printed line
+check(3, "g", "crosstab row share [1, True] = %.4f = sensitivity %.4f" % (ct.loc[1, True], sens),
+      ["%g$" % sens], cond=ct.loc[1, True] == sens and ct.loc[0, False] == spec)
+check(3, "g", "crosstab printout (solution)",
+      [l.rstrip() for l in ct.to_string().splitlines()], fields=("solution",))
 check(3, "h", "specificity = %.4f" % spec, ["%g$" % spec])
 check(3, "i", "precision = %.4f" % prec, ["%g$" % prec])
 for L in "fghi":

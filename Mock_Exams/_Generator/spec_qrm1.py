@@ -26,7 +26,8 @@ confidence interval are based on the standard normal distribution (Table~1).
     scenario=r"""Two-sided $z$-test ($\sigma$ known) of the mean order value of an online shop:
 $\mu_0 = 80$~EUR, $\sigma = 12$~EUR, $n = 36$, $\bar x = 84.30$~EUR, $\alpha = 0.05$.
 Asked for are the test in its steps, the $p$-value, the $95\,\%$ confidence interval, two
-interpretations and the Python command for the $t$-test.""",
+interpretations and two Python questions (the quantile function \texttt{stats.norm.ppf} and the
+command for the $t$-test).""",
     slide_scenario=r"""
   \begin{block}{Order values after the website redesign}
     Planning figure $\mu_0 = 80$~EUR, \quad known $\sigma = 12$~EUR\\[2pt]
@@ -39,7 +40,8 @@ interpretations and the Python command for the $t$-test.""",
   \end{itemize}""",
     lecture_ref=r"""Part~3, sections \emph{Confidence Intervals} (known variance),
 \emph{Hypothesis Tests}, \emph{The $p$-Value} and \emph{Types of Error}; Python: slide
-``Hypothesis test with Python -- \texttt{ttest\_1samp}'' and Summary~6.""",
+``Hypothesis test with Python -- \texttt{ttest\_1samp}'' and Summary~6
+(\texttt{stats.norm.ppf}).""",
     concepts=[
         r"\textbf{Standard error} ($\sigma$ known): $\mathrm{SE} = \sigma/\sqrt{n}$ -- how strongly $\bar X$ fluctuates around $\mu$.",
         r"\textbf{Test statistic:} $Z_n = \dfrac{\bar X-\mu_0}{\sigma/\sqrt{n}} \sim N(0,1)$ under $H_0$; two-sided: reject $H_0$ if $|Z_n| > z_{1-\alpha/2}$.",
@@ -78,17 +80,23 @@ deviation is only one sixth of $\sigma$."""),
    = \frac{4.30}{2} = 2.15 . \]
 The sample mean lies $2.15$ standard errors \emph{above} the hypothesised value
 $\mu_0 = 80$~EUR."""),
-        dict(label=r"Critical value",
-             q=r"State the critical value of the two-sided test at the significance level $\alpha = 0.05$ ($\sigma$ known; use Table~1).",
-             short=r"$z_{1-\alpha/2} = z_{0.975} = 1.96$",
-             result=r"$z_{1-\alpha/2} = z_{0.975} = 1.96$ \ (reject $H_0$ if $|Z_n| > 1.96$)",
-             rubric=r"1 P. two-sided quantile $z_{1-\alpha/2} = z_{0.975}$ ($\alpha$ split), 1 P. value $1.96$ from the table (also accepted: $\pm 1.96$).",
-             mistake=r"using the one-sided quantile $z_{0.95} = 1.645$.",
-             solution=r"""Two-sided test: $\alpha$ is split into two tails of $\alpha/2 = 0.025$ each, so the
-$1-\alpha/2 = 0.975$ quantile is needed. Search $0.9750$ \emph{inside} Table~1: row $1.9$,
-column $0.06$, hence
-\[ z_{1-\alpha/2} = z_{0.975} = 1.96 . \]
-$H_0$ is rejected if $|Z_n| > 1.96$, i.e.\ if $Z_n < -1.96$ or $Z_n > 1.96$."""),
+        dict(label=r"Python: critical value with \texttt{stats.norm.ppf}", pycode=True,
+             q=r"In Python, the critical value of the two-sided test at the significance level $\alpha = 0.05$ ($\sigma$ known) is computed with the line below. Which number must be passed as \texttt{q}?",
+             code=r"stats.norm.ppf(q)",
+             short=r"\texttt{q} $= 1-\alpha/2 = 0.975$ \ (returns $z_{0.975} = 1.96$)",
+             result=r"\texttt{q} $= 1-\alpha/2 = 0.975$: \texttt{stats.norm.ppf(0.975)} returns the critical value $z_{0.975} = 1.96$",
+             rubric=r"1 P. two-sided: $\alpha$ split into two tails, quantile $1-\alpha/2$; 1 P. value $0.975$ (also accepted: $0.025$ with the remark that $-1.96$ gives the bounds $\pm 1.96$).",
+             mistake=r"\texttt{q = 0.95} (one-sided quantile $1.645$) or \texttt{q = 0.05} -- \texttt{ppf} expects the probability $p$ of the quantile, not $\alpha$.",
+             solution=r"""\texttt{stats.norm.ppf(q)} is the quantile function of $N(0,1)$: it returns the value
+$z_q$ with $\Phi(z_q) = q$ -- the Python counterpart of searching $q$ \emph{inside} Table~1.
+Two-sided test: $\alpha$ is split into two tails of $\alpha/2 = 0.025$ each, so the upper
+critical value is the $1-\alpha/2 = 0.975$ quantile:
+\begin{lstlisting}
+from scipy import stats
+stats.norm.ppf(0.975)     # 1.959964  ->  z_0.975 = 1.96
+\end{lstlisting}
+Table~1 gives the same value (row $1.9$, column $0.06$). $H_0$ is rejected if
+$|Z_n| > 1.96$, i.e.\ if $Z_n < -1.96$ or $Z_n > 1.96$."""),
         dict(label=r"Test decision",
              q=r"The test statistic is $Z_n = 2.15$ and the critical value is $z_{0.975} = 1.96$. Make the test decision for $H_0\colon \mu = 80$ vs.\ $H_1\colon \mu \neq 80$ at $\alpha = 0.05$.",
              short=r"$|Z_n| = 2.15 > 1.96$ $\Rightarrow$ reject $H_0$",
@@ -215,12 +223,13 @@ need \texttt{alternative="less"} or \texttt{"greater"}."""),
   \medskip
   \begin{itemize}\setlength{\itemsep}{2pt}
     \item Type~I error here: ``the mean changed'' although it is still $80$~EUR -- probability $\alpha = 0.05$.
+    \item Critical value in Python: \texttt{stats.norm.ppf(0.975)} $= 1.96$ -- pass $1-\alpha/2$, not $\alpha$.
     \item $\sigma$ unknown in practice: \texttt{stats.ttest\_1samp(orders, popmean=80)} (two-sided by default, $t_{35}$).
   \end{itemize}
   \kernaussage{Critical value, $p$-value and CI are three views of the same test -- they always agree.}"""),
     ],
     mistakes=[
-        r"Using the one-sided quantile $z_{0.95} = 1.645$ for the two-sided test.",
+        r"Using the one-sided quantile $z_{0.95} = 1.645$ for the two-sided test -- in Python \texttt{stats.norm.ppf(0.95)} instead of \texttt{stats.norm.ppf(0.975)}.",
         r"Forgetting the factor $2$ in the two-sided $p$-value ($0.0158$ instead of $0.0316$).",
         r"Standard error with $n$ or $n-1$ instead of $\sqrt{n}$.",
         r"Reading the CI as the range of single order values, or as ``$95\,\%$ probability for \emph{this} interval''.",
@@ -311,7 +320,7 @@ multiple regression \texttt{sales \textasciitilde{} temp + rain} for $n = 60$ da
     lecture_ref=r"""Part~4, sections \emph{Simple Linear Regression} (least squares,
 interpretation), \emph{Goodness of Fit: the Coefficient of Determination} and
 \emph{Multiple Linear Regression} (ceteris paribus, $t$-test of a coefficient); Python:
-Summary~5.""",
+slide ``Solution (2/2) -- a falling price--demand line'' (\texttt{reg.predict}) and Summary~5.""",
     concepts=[
         r"\textbf{OLS estimators:} $\hat\beta_1 = S_{xy}/S_{xx}$, \ $\hat\beta_0 = \bar y - \hat\beta_1\bar x$; \ line $\hat y = \hat\beta_0 + \hat\beta_1 x$.",
         r"\textbf{Residual:} $\hat u_i = y_i - \hat y_i$ -- positive: point above the line, negative: below.",
@@ -347,12 +356,20 @@ observed range $20$--$28$\,$^{\circ}$C (extrapolation)."""),
 Celsius more goes along with, on average, $3$ more iced coffees sold per day. The line
 describes an association within the observed range ($20$--$28$\,$^{\circ}$C); it does not
 prove a causal effect, and it should not be extended far beyond the data."""),
-        dict(label=r"Prediction at $x = 25$\,$^{\circ}$C",
-             q=r"Use the estimated regression line $\hat y = -12 + 3x$ to predict the number of iced coffees sold on a day with a maximum temperature of $x = 25$\,$^{\circ}$C.",
-             short=r"$\hat y(25) = -12 + 75 = 63$ iced coffees",
-             result=r"$\hat y(25) = -12 + 3\cdot 25 = 63$ iced coffees",
-             rubric=r"1 P. substitution of $x = 25$, 1 P. result $63$.",
-             solution=r"""\[ \hat y(25) = -12 + 3\cdot 25 = -12 + 75 = 63 . \]
+        dict(label=r"Python: prediction with \texttt{reg.predict}", pycode=True,
+             q=r"The fitted regression of \texttt{sales} on \texttt{temp} is stored in the Python object \texttt{reg}; its estimated line is $\hat y = -12 + 3x$. Which value does the following line return?",
+             code=r'reg.predict(pd.DataFrame(\{"temp":\ [25]\}))',
+             short=r"$\hat y(25) = -12 + 3\cdot 25 = 63$ iced coffees",
+             result=r"$\hat y(25) = -12 + 3\cdot 25 = 63$: the command returns the predicted value $63$ (iced coffees on a $25$\,$^{\circ}$C day)",
+             rubric=r"1 P. \texttt{predict} evaluates the estimated line at $x = 25$ ($-12 + 3\cdot 25$), 1 P. result $63$.",
+             mistake=r"reporting the coefficients ($-12$ and $3$) instead of the prediction, or reading $25$ as a number of iced coffees.",
+             solution=r"""\texttt{reg.predict(...)} inserts the $x$-values of a new data frame into the estimated
+line. The new data frame needs a column with the \emph{same name} as the explanatory variable
+in the formula, here \texttt{temp}:
+\begin{lstlisting}
+reg.predict(pd.DataFrame({"temp": [25]}))     # 63.0
+\end{lstlisting}
+\[ \hat y(25) = -12 + 3\cdot 25 = -12 + 75 = 63 . \]
 $x = 25$ lies within the observed range $[20;\ 28]$, so this is an interpolation -- no
 extrapolation problem."""),
         dict(label=r"Residual of day 5",
@@ -452,7 +469,7 @@ still compatible with the data."""),
   \end{tabular}
   \end{center}
   \begin{itemize}\setlength{\itemsep}{2pt}
-    \item Prediction at $x = 25$ (inside the data range): $\hat y = -12 + 75 = 63$.
+    \item Prediction at $x = 25$ (inside the data range): $\hat y = -12 + 75 = 63$ -- in Python \texttt{reg.predict(pd.DataFrame(\{"temp":\ [25]\}))}.
     \item Slope: $1$\,$^{\circ}$C warmer $\Rightarrow$ on average $3$ more iced coffees; the intercept $-12$ is pure extrapolation.
   \end{itemize}"""),
         (r"Task 2 -- sums of squares, $R^2$ and $r_{xy}$", r"""
@@ -541,7 +558,8 @@ $\mathrm{TN} = 140$, $\mathrm{FP} = 20$, $\mathrm{FN} = 10$, $\mathrm{TP} = 30$.
   \end{columns}""",
     lecture_ref=r"""Part~5, sections \emph{Logistic Regression} (odds, log-odds, the model, odds
 ratio), \emph{From Probabilities to Decisions} (classification rule) and \emph{Evaluating a
-Classifier} (confusion matrix, threshold trade-off); Python: Summary~4.""",
+Classifier} (confusion matrix, threshold trade-off); Python: slide ``Rates with Python:
+normalise the rows or the columns'' and Summary~4.""",
     concepts=[
         r"\textbf{Odds:} $\text{odds} = \dfrac{p}{1-p}$; back: $p = \dfrac{\text{odds}}{1+\text{odds}}$.",
         r"\textbf{Logistic model:} linear predictor $\eta = \beta_0 + \beta_1 x$ (log-odds), \ $p(x) = \dfrac{e^{\eta}}{1+e^{\eta}}$.",
@@ -614,15 +632,26 @@ coded $0/1$."""),
              solution=r"""\[ \text{accuracy} = \frac{\mathrm{TP}+\mathrm{TN}}{n} = \frac{30 + 140}{200} = \frac{170}{200} = 0.85 . \]
 $85\,\%$ of all test customers are classified correctly (error rate $0.15$). Note: the trivial
 rule ``nobody churns'' would already reach $160/200 = 0.80$ -- accuracy alone is not enough."""),
-        dict(label=r"Sensitivity",
-             q=r"Compute the sensitivity of the classifier from the confusion matrix with $\mathrm{TN} = 140$, $\mathrm{FP} = 20$, $\mathrm{FN} = 10$ and $\mathrm{TP} = 30$.",
-             short=r"$30/(30 + 10) = 0.75$",
-             result=r"$\text{sensitivity} = \dfrac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} = \dfrac{30}{40} = 0.75$",
-             rubric=r"1 P. formula $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ (row ``Actual Yes''), 1 P. result $0.75$.",
-             mistake=r"dividing by the column total ``Pred.\ Yes'' ($30/50$ is the precision).",
-             solution=r"""Condition on the row ``Actual Yes'' ($40$ actual churners):
-\[ \text{sensitivity} = P(\hat y = 1 \mid y = 1) = \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} = \frac{30}{30+10} = 0.75 . \]
-The rule catches $75\,\%$ of the customers who actually churn."""),
+        dict(label=r"Python: row shares with \texttt{pd.crosstab}", pycode=True,
+             q=r"The DataFrame \texttt{test} holds the actual class \texttt{churn} (coded $0/1$) of the test customers, \texttt{phat} their predicted churn probabilities; at $t = 0.5$ the confusion matrix has $\mathrm{TN} = 140$, $\mathrm{FP} = 20$, $\mathrm{FN} = 10$ and $\mathrm{TP} = 30$. Which value does the following line show in the row \texttt{churn}~$= 1$, column \texttt{True}?",
+             code=r'pd.crosstab(test.churn,\ phat > 0.5,\ normalize="index")',
+             short=r"row share $30/(30 + 10) = 0.75$ (the sensitivity)",
+             result=r'\texttt{normalize="index"} divides by the row total: $\dfrac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} = \dfrac{30}{40} = 0.75$ -- the sensitivity',
+             rubric=r"1 P. row share (divide by the row total ``Actual Yes'' $= 40$), 1 P. value $0.75$.",
+             mistake=r'dividing by the column total ($30/50 = 0.6$ -- that is \texttt{normalize="columns"}, the precision) or by $n$ ($30/200$).',
+             solution=r"""\texttt{normalize="index"} turns the counts into \emph{row} shares: every row sums to
+$1$, i.e.\ each entry is conditioned on the \emph{actual} class. The row \texttt{churn}~$= 1$
+holds the $40$ actual churners, the column \texttt{True} those flagged by $\hat p > 0.5$:
+\[ \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} = \frac{30}{30+10} = 0.75 = P(\hat y = 1 \mid y = 1) = \text{sensitivity}. \]
+\begin{lstlisting}[style=Pyout]
+col_0  False  True
+churn
+0      0.875  0.125
+1      0.250  0.750
+\end{lstlisting}
+The rule catches $75\,\%$ of the customers who actually churn. The other row shows the
+specificity ($0.875$). \texttt{normalize="columns"} would condition on the prediction
+instead (column \texttt{True}: precision $30/50 = 0.6$)."""),
         dict(label=r"Specificity",
              q=r"Compute the specificity of the classifier from the confusion matrix with $\mathrm{TN} = 140$, $\mathrm{FP} = 20$, $\mathrm{FN} = 10$ and $\mathrm{TP} = 30$.",
              short=r"$140/(140 + 20) = 0.875$",
@@ -714,7 +743,7 @@ is best is a business decision (cost of a lost customer vs.\ cost of a retention
     mistakes=[
         r"Reading the log-odds $\hat\eta$ (or the odds $e^{\hat\eta}$) as a probability.",
         r"``The odds ratio is $1.65$, so the \emph{probability} rises by $65\,\%$.''",
-        r"Mixing up sensitivity (divide by \emph{actual} Yes) and precision (divide by \emph{predicted} Yes).",
+        r'Mixing up sensitivity (divide by \emph{actual} Yes, \texttt{normalize="index"}) and precision (divide by \emph{predicted} Yes, \texttt{normalize="columns"}).',
         r"Rows and columns of the confusion matrix confused (specificity $\neq$ $\mathrm{TN}/(\mathrm{TN}+\mathrm{FN})$).",
         r"Believing that a lower threshold catches \emph{fewer} churners.",
     ],

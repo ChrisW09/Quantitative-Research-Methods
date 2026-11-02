@@ -197,6 +197,7 @@
   \medskip
   \begin{itemize}\setlength{\itemsep}{2pt}
     \item Type~I error here: ``the mean changed'' although it is still $80$~EUR -- probability $\alpha = 0.05$.
+    \item Critical value in Python: \texttt{stats.norm.ppf(0.975)} $= 1.96$ -- pass $1-\alpha/2$, not $\alpha$.
     \item $\sigma$ unknown in practice: \texttt{stats.ttest\_1samp(orders, popmean=80)} (two-sided by default, $t_{35}$).
   \end{itemize}
   \kernaussage{Critical value, $p$-value and CI are three views of the same test -- they always agree.}
@@ -210,7 +211,7 @@
     \textbf{a)} & Hypothesis pair & $H_0\colon \mu = 80$ vs.\ $H_1\colon \mu \neq 80$\\
     \textbf{b)} & Standard error & $\sigma/\sqrt{n} = 12/6 = 2$~EUR\\
     \textbf{c)} & Test statistic $Z_n$ & $Z_n = 4.30/2 = 2.15$\\
-    \textbf{d)} & Critical value & $z_{1-\alpha/2} = z_{0.975} = 1.96$\\
+    \textbf{d)} & Python: critical value with \texttt{stats.norm.ppf} & \texttt{q} $= 1-\alpha/2 = 0.975$ \ (returns $z_{0.975} = 1.96$)\\
     \textbf{e)} & Test decision & $|Z_n| = 2.15 > 1.96$ $\Rightarrow$ reject $H_0$\\
     \bottomrule
   \end{tabular}
@@ -246,7 +247,7 @@
 
 \begin{frame}{Task 1 -- typical mistakes}
   \begin{itemize}\setlength{\itemsep}{4pt}
-    \item Using the one-sided quantile $z_{0.95} = 1.645$ for the two-sided test.
+    \item Using the one-sided quantile $z_{0.95} = 1.645$ for the two-sided test -- in Python \texttt{stats.norm.ppf(0.95)} instead of \texttt{stats.norm.ppf(0.975)}.
     \item Forgetting the factor $2$ in the two-sided $p$-value ($0.0158$ instead of $0.0316$).
     \item Standard error with $n$ or $n-1$ instead of $\sqrt{n}$.
     \item Reading the CI as the range of single order values, or as ``$95\,\%$ probability for \emph{this} interval''.
@@ -315,7 +316,7 @@
   \end{tabular}
   \end{center}
   \begin{itemize}\setlength{\itemsep}{2pt}
-    \item Prediction at $x = 25$ (inside the data range): $\hat y = -12 + 75 = 63$.
+    \item Prediction at $x = 25$ (inside the data range): $\hat y = -12 + 75 = 63$ -- in Python \texttt{reg.predict(pd.DataFrame(\{"temp":\ [25]\}))}.
     \item Slope: $1$\,$^{\circ}$C warmer $\Rightarrow$ on average $3$ more iced coffees; the intercept $-12$ is pure extrapolation.
   \end{itemize}
 \end{frame}
@@ -358,7 +359,7 @@ rain          -0.4313      0.374     -1.154      0.253      -1.180       0.317
     \textbf{a)} & Slope $\hat\beta_1$ & $\hat\beta_1 = 120/40 = 3$\\
     \textbf{b)} & Intercept $\hat\beta_0$ & $\hat\beta_0 = 60 - 3\cdot 24 = -12$\\
     \textbf{c)} & Interpretation of the slope & $1$\,$^{\circ}$C warmer $\Rightarrow$ on average about $3$ more iced coffees sold\\
-    \textbf{d)} & Prediction at $x = 25$\,$^{\circ}$C & $\hat y(25) = -12 + 75 = 63$ iced coffees\\
+    \textbf{d)} & Python: prediction with \texttt{reg.predict} & $\hat y(25) = -12 + 3\cdot 25 = 63$ iced coffees\\
     \textbf{e)} & Residual of day 5 & $\hat u_5 = 68 - 72 = -4$\\
     \bottomrule
   \end{tabular}
@@ -507,7 +508,7 @@ rain          -0.4313      0.374     -1.154      0.253      -1.180       0.317
   \begin{tabular}{@{}c>{\raggedright\arraybackslash}p{4.9cm}>{\raggedright\arraybackslash}p{8.4cm}@{}}
     \toprule Part & Asked for & Result\\ \midrule
     \textbf{f)} & Accuracy & $(30 + 140)/200 = 0.85$\\
-    \textbf{g)} & Sensitivity & $30/(30 + 10) = 0.75$\\
+    \textbf{g)} & Python: row shares with \texttt{pd.crosstab} & row share $30/(30 + 10) = 0.75$ (the sensitivity)\\
     \textbf{h)} & Specificity & $140/(140 + 20) = 0.875$\\
     \textbf{i)} & Precision & $30/(30 + 20) = 0.6$\\
     \textbf{j)} & Lower threshold $t = 0.3$ & sensitivity \textbf{increases} (more churners caught)\\
@@ -526,7 +527,7 @@ rain          -0.4313      0.374     -1.154      0.253      -1.180       0.317
   \begin{itemize}\setlength{\itemsep}{4pt}
     \item Reading the log-odds $\hat\eta$ (or the odds $e^{\hat\eta}$) as a probability.
     \item ``The odds ratio is $1.65$, so the \emph{probability} rises by $65\,\%$.''
-    \item Mixing up sensitivity (divide by \emph{actual} Yes) and precision (divide by \emph{predicted} Yes).
+    \item Mixing up sensitivity (divide by \emph{actual} Yes, \texttt{normalize="index"}) and precision (divide by \emph{predicted} Yes, \texttt{normalize="columns"}).
     \item Rows and columns of the confusion matrix confused (specificity $\neq$ $\mathrm{TN}/(\mathrm{TN}+\mathrm{FN})$).
     \item Believing that a lower threshold catches \emph{fewer} churners.
   \end{itemize}
@@ -542,7 +543,7 @@ rain          -0.4313      0.374     -1.154      0.253      -1.180       0.317
   \begin{itemize}\setlength{\itemsep}{4pt}
     \item All subtasks are \textbf{independent}: skip whatever is stuck and come back to it at
       the end -- you lose no further points.
-    \item Each subtask asks for \textbf{one} result. Write it in the answer box.
+    \item Each subtask asks for \textbf{one} result -- mark it clearly on your working pages.
     \item Still write down your working: a result without working earns only half the points.
     \item Do not forget units, signs and rounding.
   \end{itemize}

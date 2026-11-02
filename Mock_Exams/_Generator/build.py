@@ -60,7 +60,8 @@ def sentences(text):
 
 def audit(spec):
     """Checks: 3 tasks x 10 subtasks, exactly one requested result, no back-references,
-    at most 3 one-sentence answers and at most one Python-command subtask per task."""
+    at most 3 one-sentence answers, at most one Python-command subtask (python=True) and
+    at most one Python code-reading subtask (pycode=True) per task."""
     warn = []
     if len(spec["tasks"]) != 3:
         warn.append("the exam has %d instead of 3 tasks" % len(spec["tasks"]))
@@ -69,10 +70,13 @@ def audit(spec):
             warn.append("Task %d has %d instead of 10 subtasks" % (a["nr"], len(a["items"])))
         n_satz = sum(1 for it in a["items"] if it.get("kind") == "satz")
         n_py = sum(1 for it in a["items"] if it.get("python"))
+        n_code = sum(1 for it in a["items"] if it.get("pycode"))
         if n_satz > 3:
             warn.append("Task %d has %d one-sentence answers (at most 3)" % (a["nr"], n_satz))
         if n_py > 1:
             warn.append("Task %d has %d Python-command subtasks (at most 1)" % (a["nr"], n_py))
+        if n_code > 1:
+            warn.append("Task %d has %d Python code-reading subtasks (at most 1)" % (a["nr"], n_code))
         for i, it in enumerate(a["items"]):
             tag = "T%d %s)" % (a["nr"], LETTERS[i])
             for key in REQUIRED:
@@ -90,12 +94,23 @@ def audit(spec):
                     warn.append("%s: back-reference to another subtask -- %s" % (tag, it["label"]))
             if it.get("python") and not re.search(r"\bcommand\b", q):
                 warn.append("%s: Python subtask must ask for exactly one 'command'" % tag)
+            if it.get("pycode") and not it.get("code"):
+                warn.append("%s: Python code-reading subtask needs the field 'code'" % tag)
             if not q.rstrip().endswith((".", "?")):
                 warn.append("%s: question does not end with '.' or '?'" % tag)
     return warn
 
 
 # ------------------------------------------------------------------ exam
+def question(it):
+    """Question text; for code-reading subtasks the line of code follows on its own,
+    indented line (upright typewriter, also inside the italic question of the solutions)."""
+    q = it["q"].strip()
+    if it.get("code"):
+        q += r"\\*[3pt]\hspace*{1.5em}\texttt{\upshape %s}" % it["code"].strip()
+    return q
+
+
 def build_exam(spec):
     nr = str(spec["nr"])
     out = [EXAM_PREAMBLE.replace("@@NR@@", nr).replace("@@RULES@@", TITLEPAGE_RULES)]
@@ -104,12 +119,10 @@ def build_exam(spec):
         out.append(r"\begin{task} [20 points -- 10 subtasks worth 2 points each]" + "\n")
         out.append(a["intro"].strip() + "\n\n")
         out.append(r"\begin{enumerate}[label=\textbf{\alph*)},leftmargin=1.9em,"
-                   r"itemsep=6pt,topsep=4pt]" + "\n")
+                   r"itemsep=10pt,topsep=4pt]" + "\n")
         for it in a["items"]:
-            box = {"satz": r"\answerboxsentence", "skizze": r"\answerboxsketch"}.get(
-                it.get("kind"), r"\answerbox")
-            need = {"satz": 9, "skizze": 12}.get(it.get("kind"), 7)
-            out.append(r"\keepitem{%d}\item %s \pts %s" % (need, it["q"].strip(), box) + "\n")
+            # no answer boxes: working and result go on the correction-margin pages
+            out.append(r"\keepitem{5}\item %s \pts" % question(it) + "\n")
         out.append(r"\end{enumerate}" + "\n")
         out.append(r"\end{task}" + "\n")
         out.append(r"\pagebreak" + "\n" + r"\correctionmargin" + "\n" +
@@ -185,7 +198,7 @@ def build_solutions(spec):
             out.append(r"\subsection*{%s)\quad %s}" % (LETTERS[i], it["label"]) + "\n")
             # question never split, and never separated from the first solution line
             out.append(r"{\interlinepenalty=10000\noindent\textit{%s}\par}\nopagebreak[4]"
-                       % it["q"].strip() + "\n\n")
+                       % question(it) + (r"\medskip" if it.get("code") else "") + "\n\n")
             out.append(it["solution"].strip() + "\n")
             out.append(r"\result{%s}" % it["result"].strip() + "\n")
             out.append(r"\rubric{%s}" % it["rubric"].strip() + "\n")
@@ -296,7 +309,7 @@ def build_slides(spec):
   \begin{itemize}\setlength{\itemsep}{4pt}
     \item All subtasks are \textbf{independent}: skip whatever is stuck and come back to it at
       the end -- you lose no further points.
-    \item Each subtask asks for \textbf{one} result. Write it in the answer box.
+    \item Each subtask asks for \textbf{one} result -- mark it clearly on your working pages.
     \item Still write down your working: a result without working earns only half the points.
     \item Do not forget units, signs and rounding.
   \end{itemize}

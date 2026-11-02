@@ -119,9 +119,10 @@ TITLEPAGE_RULES = r"""
 \item[Allowed:] The only permitted aids are one of the calculators named in the lecture (Casio fx-85-MS, fx-85-MS-2, fx-82-MS or fx-82-MS-2) and a handwritten formula sheet of at most one A4 sheet.
 \item[Points:] Each subtask is worth \textbf{2 points}; each task gives 20 points, the whole exam \textbf{60 points}.
 \item[Independence:] \textbf{All subtasks can be solved independently of each other.} Every subtask states all the numbers needed to solve it. If you cannot solve a subtask, simply continue with the others -- you lose nothing else.
-\item[Note 1:] Each subtask asks for exactly \emph{one} result. Write it in the answer box provided.
-\item[Note 2:] Show your working on the pages with a correction margin after each task. A result without comprehensible working earns only half of the points.
+\item[Note 1:] Each subtask asks for exactly \emph{one} result. Write your working and the result on the pages with a correction margin after each task, and mark the result clearly.
+\item[Note 2:] A result without comprehensible working earns only half of the points.
 \item[Note 3:] Round final results to four decimal places, or to two where this is sensible (e.g.\ amounts in euros).
+\item[Python:] Some subtasks ask for a Python command or for the value that a given line of Python code returns. Answer them by hand -- no computer is needed.
 \item[Tables:] The standard normal table (Table~1) and the $t$-table (Table~2) are at the end of the exam.
 \end{description}
 \normalsize
@@ -169,18 +170,10 @@ EXAM_PREAMBLE = r"""\NeedsTeXFormat{LaTeX2e}
 %% points flush right on the last line of the question (or on a line of their own)
 \newcommand{\pts}{{\unskip\nobreak\hfil\penalty50\hskip1.5em\hbox{}\nobreak\hfil
   \mbox{\small(2 points)}\parfillskip=0pt\finalhyphendemerits=0\par}}
-%% answer boxes
+%% a subtask is never split across pages (no answer boxes: working and result
+%% go on the correction-margin pages after each task)
 \usepackage{needspace}
 \newcommand{\keepitem}[1]{\Needspace{#1\baselineskip}}
-\newcommand{\answerbox}{\par\nopagebreak\vspace{2pt}%
-  \noindent\hspace*{0.4em}{\footnotesize\textbf{Result:}}~%
-  \fbox{\rule{0pt}{1.45em}\hspace{0.60\linewidth}}\par}
-\newcommand{\answerboxsentence}{\par\nopagebreak\vspace{2pt}%
-  \noindent\hspace*{0.4em}{\footnotesize\textbf{Result (one sentence):}}\par\nopagebreak\vspace{1pt}%
-  \noindent\hspace*{0.4em}\fbox{\rule{0pt}{2.6em}\hspace{0.93\linewidth}}\par}
-\newcommand{\answerboxsketch}{\par\nopagebreak\vspace{2pt}%
-  \noindent\hspace*{0.4em}{\footnotesize\textbf{Result (sketch):}}\par\nopagebreak\vspace{1pt}%
-  \noindent\hspace*{0.4em}\fbox{\rule{0pt}{5.2em}\hspace{0.93\linewidth}}\par}
 
 \usepackage{tikz}
 \definecolor{cloverdark}{RGB}{27,94,32}

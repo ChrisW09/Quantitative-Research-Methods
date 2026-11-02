@@ -43,10 +43,14 @@ Requirements: Python 3 with numpy, pandas, scipy, statsmodels, matplotlib; TeX L
   (statistical inference), Task 2 = Part 4 (regression), Task 3 = Part 5 (classification).
 * Every subtask can be solved **independently**: no intermediate result of another
   subtask is needed; all values are stated in the subtask itself.
-* Exactly **one** result per subtask, with an answer box in the exam (`\answerbox`;
-  `\answerboxsentence` for one-sentence answers via `kind="satz"`, `\answerboxsketch`
-  via `kind="skizze"`). At most 3 one-sentence answers and at most one Python-command
-  subtask (`python=True`) per task.
+* Exactly **one** result per subtask. The exam has **no answer boxes**: students write
+  working and result on the correction-margin pages after each task. One-sentence answers
+  are marked `kind="satz"`; at most 3 per task.
+* **Python in every task:** exactly one Python-command subtask (`python=True`, "Give the
+  ... command that ...") and one simple code-reading subtask (`pycode=True`, "Which value
+  does the following line return / show?"; the line itself goes into the field `code` and is
+  printed on its own indented line below the question). Use only commands that appear on
+  the lecture slides; `verify.py` runs every one of them, the `code` lines verbatim.
 * Notation as in the lecture decks: $N(\mu,\sigma^2)$, $Z_n$, $z_{1-\alpha/2}$,
   $t_{0.975;\,\mathrm{df}}$, $\hat\beta_0$, $\hat\beta_1$, $S_{xx}$, $S_{xy}$, TSS/ESS/RSS,
   $\hat\eta$, odds ratio $e^{\beta_j}$, TP/TN/FP/FN.
@@ -62,7 +66,8 @@ Requirements: Python 3 with numpy, pandas, scipy, statsmodels, matplotlib; TeX L
   two calculation verbs in one sentence),
 * **back-references** to other subtasks ("from part b)", "computed above",
   "your result" ...),
-* more than 3 one-sentence answers or more than one Python-command subtask per task,
+* more than 3 one-sentence answers, more than one Python-command subtask or more than one
+  Python code-reading subtask per task,
 * LaTeX errors, undefined references and overfull boxes > 1 pt.
 
 A clean run prints `Check OK: 3 x 10 subtasks, one requested result each, no
