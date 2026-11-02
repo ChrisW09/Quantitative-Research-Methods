@@ -9,7 +9,11 @@ preamble. Run from anywhere:
     python3 make_figures.py
 
 Output: images/reg_*.png. The images taken over from the original decks
-(image_0xx_en.png, 3_3.pdf, 3_5.pdf) are not touched.
+(image_0xx_en.png, 3_3.pdf, 3_5.pdf) are not touched. The small-data plots
+of Sections 1-4 (lamp, twelve stores, residual plots, QQ-plots, body heights)
+are drawn inline with pgfplots in the .tex file; their coordinates are
+printed by Part_4_Regression.py, so image_020_en.png ... image_029_en.png are
+no longer used by the deck.
 """
 import os
 
@@ -88,7 +92,7 @@ def fig_sampling_lines():
     xx = np.array([78, 122])
     ax.plot(xx, b0 + b1 * xx, color=RED, lw=2.6, label="population line (fixed)")
     ax.plot([], [], color=GRAY, lw=1, label="OLS lines of 25 samples")
-    ax.set_xlabel("Price (Euro)")
+    ax.set_xlabel("Price (EUR)")
     ax.set_ylabel("Sales quantity")
     ax.set_title("(a) Every sample gives its own line")
     ax.legend(loc="upper right", fontsize=10.5)
@@ -160,7 +164,7 @@ def fig_lamp_ci_pi():
     ax.scatter(price, qty, color=POINT, s=55, zorder=3, label="observations")
     ax.axvline(price.mean(), color=GRAY, lw=1, ls=":")
     ax.text(price.mean() + 0.6, 22.3, r"$\bar x = 100$", color="#555555", fontsize=11)
-    ax.set_xlabel("Price (Euro)")
+    ax.set_xlabel("Price (EUR)")
     ax.set_ylabel("Sales quantity")
     ax.set_xlim(75, 125)
     ax.legend(loc="lower left", fontsize=10.5)

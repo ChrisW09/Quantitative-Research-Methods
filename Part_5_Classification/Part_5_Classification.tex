@@ -3,6 +3,15 @@
 \newcommand{\currentpart}{5}
 \input{../common/preamble.tex}
 
+% Local TikZ styles of Part 5: probability trees with natural frequencies
+\tikzset{
+  treenode/.style={rounded corners=2pt, draw=hsbiblaudunkel, thick, fill=hsbiblau!8,
+                   align=center, inner sep=3pt, font=\footnotesize},
+  treenodeo/.style={treenode, draw=hsbiorange!85!black, fill=hsbiorange!15},
+  treeedge/.style={-{Latex[length=2mm,width=1.6mm]}, thick, draw=hsbiblaudunkel},
+  treelab/.style={font=\footnotesize, fill=white, inner sep=1pt},
+}
+
 \subtitle{Part 5: Classification}
 \newcommand{\overviewleft}{1-4}
 \newcommand{\overviewright}{5-6}
@@ -39,20 +48,21 @@
 \begin{frame}{The common thread of this part}
   \begin{block}{One question runs through every section}
     The variable $Y$ is no longer metric but \textbf{categorical} (yes/no).
-    How do we estimate the \textbf{probability} of ``yes'' -- and how do we
-    turn it into a good \textbf{decision}?
+    How do we estimate the \textbf{conditional probability} of ``yes'' given
+    the data $x$ -- and how do we turn it into a good \textbf{decision}?
   \end{block}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \small
       \textbf{Three steps:}
       \begin{itemize}\setlength{\itemsep}{3pt}
-        \item \textcolor{hsbiblau}{\textbf{Model}} -- logistic regression:
-              a linear model for the log-odds (Part~4 on a new scale).
+        \item \textcolor{hsbiblau}{\textbf{Model}} $P(Y=1\mid x)$ -- from a
+              two-way table to logistic regression, a linear model for the
+              log-odds (Part~4 on a new scale).
         \item \textcolor{hsbiblau}{\textbf{Decide}} -- a threshold turns a
               probability into a class.
         \item \textcolor{hsbiblau}{\textbf{Evaluate}} -- confusion matrix,
-              sensitivity, specificity, ROC curve.
+              precision and base rate, ROC curve.
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
@@ -69,33 +79,36 @@
 \end{frame}
 
 \begin{frame}{Learning objectives -- Part 5}
-  After this part you will be able to \ldots
+  After this part you will be able to \ldots{} (and to carry out every step
+  in Python)
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.49\textwidth}
       \small\begin{itemize}\setlength{\itemsep}{1pt}
+        \item read \textbf{joint, marginal and conditional} relative
+              frequencies from a two-way table and check
+              \textbf{independence},
         \item explain why \textbf{linear regression fails} for a $0/1$
               variable,
         \item convert between \textbf{probability, odds and log-odds},
         \item interpret the coefficients of a \textbf{logistic regression}
               (sign, odds ratio, probability),
-        \item carry out \textbf{$z$-tests} and compute \textbf{confidence
-              intervals} for coefficients and odds ratios,
       \end{itemize}
     \end{column}
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.49\textwidth}
       \small\begin{itemize}\setlength{\itemsep}{1pt}
+        \item carry out \textbf{$z$-tests} and compute \textbf{confidence
+              intervals} for coefficients and odds ratios,
         \item turn probabilities into decisions with a \textbf{threshold},
         \item compute \textbf{accuracy, sensitivity, specificity and
-              precision} from a confusion matrix,
+              precision} and explain the role of the \textbf{base rate},
         \item read a \textbf{ROC curve} and interpret the \textbf{AUC},
-        \item evaluate a classifier honestly on \textbf{test data},
-        \item carry out every step in Python.
+        \item evaluate a classifier honestly on \textbf{test data}.
       \end{itemize}
     \end{column}
   \end{columns}
-  \kernaussage{Common thread: classification = estimating a probability
-  \emph{plus} a decision rule -- and both have to be evaluated honestly.}
-\appendixnote{Bayes' theorem for classification, naive Bayes, LDA}
+  \kernaussage{Classification = a conditional probability \emph{plus} a
+  decision rule -- both evaluated honestly.}
+\appendixnote{total probability and Bayes' theorem, naive Bayes, LDA}
 \end{frame}
 
 % ============================================================================
@@ -109,6 +122,8 @@
       \toprule
       \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
       \midrule
+      $P(A\mid B)$ & Probability of $A$ given $B$ & $A\cap B$, $A\cup B$ & ``$A$ and $B$'', ``$A$ or $B$'' \\
+      $n(A)$ & Number of observations in $A$ & $\bar A$ & ``not $A$'' (complement) \\
       $Y\in\{0,1\}$ & Binary response (1 $=$ ``yes'') & $X_1,\dots,X_p$ & Explanatory variables \\
       $p(x)$ & $P(Y=1\mid X=x)$ & $\hat p(x)$ & Estimated probability \\
       $\frac{p}{1-p}$ & Odds & $\log\frac{p}{1-p}$ & Log-odds (logit) \\
@@ -131,6 +146,7 @@
       $t$ & Threshold of the classification rule & $\hat y$ & Predicted class \\
       TP, TN & True positives / negatives & FP, FN & False positives / negatives \\
       Sens. & Sensitivity $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ & Spec. & Specificity $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ \\
+      Prec. & Precision $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$ & $\pi$ & Base rate $P(Y=1)$ \\
       ROC & Receiver operating characteristic & AUC & Area under the ROC curve \\
       $\pi_k$ & Prior probability of class $k$ & $f_k(x)$ & Density of $X$ in class $k$ \\
       \bottomrule
@@ -173,7 +189,7 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{Two tasks in every classification problem}
+\begin{frame}{Three steps in every classification problem}
   \centering
   \resizebox{0.95\textwidth}{!}{%
   \begin{tikzpicture}[node distance=16mm]
@@ -207,6 +223,340 @@
           differs between the groups.
   \end{itemize}
   \sourcenote{Default data from James, Witten, Hastie, Tibshirani: \emph{An Introduction to Statistical Learning}, www.statlearning.com}
+\end{frame}
+
+\subsection{Two-way tables and conditional probability}
+
+\begin{frame}{Default by student status -- a two-way table}
+  \guidingquestion{Do students default more often than non-students? Before
+  building a model, we simply \textbf{count}.}
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \centering
+      \textbf{Counts} $n(\cdot)$\\[2pt]
+      \renewcommand{\arraystretch}{1.15}
+      \begin{tabular}{@{}l|cc|c@{}}
+        \toprule
+        & no default & default & Total\\
+        \midrule
+        non-student & $6850$ & $206$ & $7056$\\
+        student & $2817$ & $127$ & $2944$\\
+        \midrule
+        Total & $9667$ & $333$ & $10\,000$\\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \centering
+      \textbf{Relative frequencies} $n(\cdot)/n$\\[2pt]
+      \renewcommand{\arraystretch}{1.15}
+      \begin{tabular}{@{}l|cc|c@{}}
+        \toprule
+        & no default & default & Total\\
+        \midrule
+        non-student & $0.6850$ & $0.0206$ & $\mathbf{0.7056}$\\
+        student & $0.2817$ & \textcolor{hsbiorange!85!black}{$\mathbf{0.0127}$} & $\mathbf{0.2944}$\\
+        \midrule
+        Total & $\mathbf{0.9667}$ & $\mathbf{0.0333}$ & $1$\\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \medskip
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item \textbf{Joint} relative frequency (inner cells): \textcolor{hsbiorange!85!black}{$1.27\,\%$}
+          of all customers are students \emph{and} defaulted.
+    \item \textbf{Marginal} relative frequencies (\textbf{bold} totals): $29.44\,\%$
+          are students, $3.33\,\%$ defaulted -- each variable on its own.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Conditional relative frequencies -- change the denominator}
+  \begin{block}{``Among the students, what share defaulted?''}
+    Look only at the row ``student'' and divide by \emph{its} total:
+    \[
+      \frac{n(\text{student}\cap\text{default})}{n(\text{student})}
+      =\frac{127}{2944}=0.0431
+      \qquad\Bigl(=\frac{0.0127}{0.2944}=\frac{\text{joint}}{\text{marginal}}\Bigr)
+    \]
+  \end{block}
+  \begin{columns}[c]
+    \begin{column}{0.47\textwidth}
+      \centering
+      \renewcommand{\arraystretch}{1.12}
+      \begin{tabular}{@{}l|cc|c@{}}
+        \toprule
+        & no default & default & Total\\
+        \midrule
+        non-student & $0.9708$ & $\mathbf{0.0292}$ & $1$\\
+        student & $0.9569$ & $\mathbf{0.0431}$ & $1$\\
+        \midrule
+        all customers & $0.9667$ & $0.0333$ & $1$\\
+        \bottomrule
+      \end{tabular}\\[1pt]
+      {\footnotesize each row divided by its row total}
+    \end{column}
+    \begin{column}{0.51\textwidth}
+      \small
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item Students default \textbf{more often}: $4.31\,\%$ vs.\ $2.92\,\%$
+              (overall $3.33\,\%$).
+        \item The other direction is a \emph{different} question:
+              $\frac{127}{333}=0.381$ -- $38\,\%$ of the \emph{defaulters}
+              are students (divide by the column total).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \smallskip
+  \inworten{Conditioning = restricting attention to one row (or column)
+  and dividing by its total.}
+\end{frame}
+
+\begin{frame}{Conditional probability -- definition and two rules}
+  \begin{block}{Conditional probability of $A$ given $B$}
+    \vspace{-0.2em}
+    \[
+      P(A\mid B)=\frac{P(A\cap B)}{P(B)}\qquad(P(B)>0)
+    \]
+  \end{block}
+  \inworten{the share of the cases in $B$ that also belong to $A$ (a row or
+  column share of the table).}
+  \smallskip
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Multiplication rule (``$A$ and $B$'')}
+        \centering
+        $P(A\cap B)=P(A\mid B)\,P(B)=P(B\mid A)\,P(A)$
+      \end{block}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Addition rule (``$A$ or $B$'')}
+        \centering
+        $P(A\cup B)=P(A)+P(B)-P(A\cap B)$
+      \end{block}
+    \end{column}
+  \end{columns}
+  \begin{exampleblock}{Default data ($A=$ default, $B=$ student)}
+    $P(A\mid B)=0.0127/0.2944=0.0431$; \ and back:
+    $P(A\cap B)=0.0431\cdot0.2944=0.0127$.\\
+    $P(A\cup B)=0.0333+0.2944-0.0127=0.3150$: $31.5\,\%$ are students
+    \emph{or} defaulters (or both).
+  \end{exampleblock}
+  {\footnotesize Relative frequencies in the data \emph{estimate} these
+  probabilities, e.g.\ $\hat P(\text{default}\mid\text{student})=0.0431$.\par}
+\end{frame}
+
+\begin{frame}{Independence}
+  \begin{block}{Definition}
+    Two events $A$ and $B$ are \textbf{independent} if
+    \vspace{-0.3em}
+    \[
+      P(A\cap B)=P(A)\,P(B)
+      \qquad\Longleftrightarrow\qquad
+      P(A\mid B)=P(A)\quad(P(B)>0).
+    \]
+  \end{block}
+  \inworten{knowing that $B$ occurred does not change the probability of $A$.}
+  \begin{exampleblock}{Default data: are default and student status independent?}
+    $P(\text{default})\,P(\text{student})=0.0333\cdot0.2944=0.0098
+    \neq0.0127=P(\text{default}\cap\text{student})$\\
+    $\Rightarrow$ \textbf{not independent}; equivalently
+    $P(\text{default}\mid\text{student})=0.0431\neq0.0333$.\\
+    Independence would mean $10\,000\cdot0.0098=98$ student defaulters --
+    we observe $127$.
+  \end{exampleblock}
+  \kernaussage{If $Y$ were independent of $X$, knowing $X$ would not help to
+  predict $Y$: classification lives on the \textbf{dependence} of $Y$ on $X$.}
+\end{frame}
+
+\begin{frame}{Classification = estimating $P(Y=1\mid x)$}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item For a \textbf{categorical} $x$ (student yes/no) the two-way table
+          gives $\hat P(\text{default}\mid x)$ directly.
+    \item \textbf{Balance} is metric: almost every customer has a different
+          value. A first attempt -- group the balances into classes:
+  \end{itemize}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{@{}lccccc@{}}
+      \toprule
+      balance class (\$) & $[0,500)$ & $[500,1000)$ & $[1000,1500)$ & $[1500,2000)$ & $\ge2000$\\
+      \midrule
+      customers & $2613$ & $3755$ & $2721$ & $805$ & $106$\\
+      defaulters & $0$ & $6$ & $69$ & $177$ & $81$\\
+      default rate $\hat P(\text{default}\mid\text{class})$ & $0.000$ & $0.002$ & $0.025$ & $0.220$ & $0.764$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{The conditional default rate first hardly moves, then rises
+  steeply -- an \textbf{S-shape}. But the classes are crude: a customer with
+  $1999$\,\$ is treated like one with $1500$\,\$.}
+  \kernaussage{Classification means estimating the \textbf{conditional
+  probability} $p(x)=P(Y=1\mid X=x)$ as a smooth function of $x$ -- this needs
+  a \textbf{model}.}
+\end{frame}
+
+\begin{frame}[fragile]{Two-way tables with Python}
+\begin{lstlisting}
+tab = pd.crosstab(df.student, df.default, margins=True)   # counts + totals
+print(tab)
+print(pd.crosstab(df.student, df.default, normalize="index").round(4))
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.42\textwidth}
+\begin{lstlisting}[style=Pyout]
+default    No  Yes    All
+student
+No       6850  206   7056
+Yes      2817  127   2944
+All      9667  333  10000
+default      No     Yes
+student
+No       0.9708  0.0292
+Yes      0.9569  0.0431
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.56\textwidth}
+      \small
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{@{}ll@{}}
+        \toprule
+        \textbf{Option} & \textbf{Result}\\
+        \midrule
+        \texttt{margins=True} & adds row and column totals\\
+        \texttt{normalize="all"} & joint relative frequencies\\
+        \texttt{normalize="index"} & each \textbf{row} sums to $1$\\
+        \texttt{normalize="columns"} & each \textbf{column} sums to $1$\\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \medskip
+  \inworten{\texttt{normalize="index"} conditions on the row variable (here:
+  student status), \texttt{"columns"} on the column variable.}
+\end{frame}
+
+\begin{frame}{Exercise -- newsletter and purchases}
+  \begin{block}{Problem statement}
+    \begin{columns}[c]
+      \begin{column}{0.5\textwidth}
+        An online shop records for $n=60$ randomly chosen customers whether
+        they subscribe to the newsletter and whether they bought something
+        last month.
+      \end{column}
+      \begin{column}{0.46\textwidth}
+        \centering
+        \renewcommand{\arraystretch}{1.0}
+        \begin{tabular}{@{}l|cc|c@{}}
+          \toprule
+          newsletter $\backslash$ purchase & yes & no & Total\\
+          \midrule
+          yes & $15$ & $5$ & $20$\\
+          no & $15$ & $25$ & $40$\\
+          \midrule
+          Total & $30$ & $30$ & $60$\\
+          \bottomrule
+        \end{tabular}
+      \end{column}
+    \end{columns}
+    \begin{enumerate}
+      \item Compute the marginal relative frequencies and the joint one of
+            (yes, yes). Are newsletter and purchase independent? How many
+            subscribing buyers would independence predict?
+      \item Compute the purchase rates of subscribers and of
+            non-subscribers and compare them with the overall rate.
+      \item Compute the share of subscribers among the buyers. Why does it
+            differ from the purchase rate of the subscribers?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- newsletter and purchases}
+  \textbf{(1)} Marginal: $\frac{20}{60}=0.333$ subscribe,
+  $\frac{40}{60}=0.667$ do not; $\frac{30}{60}=0.5$ buy.
+  Joint: $\frac{15}{60}=0.25$.
+  \[
+    \text{independence would require } 0.333\cdot0.5=0.167
+    \;\neq\; 0.25
+    \;\Rightarrow\;\textbf{not independent}.
+  \]
+  Under independence we would expect $60\cdot0.167=10$ subscribers who buy
+  -- we observe $15$.
+
+  \medskip
+  \textbf{(2)} Condition on the row (divide by the row total):
+  \[
+    P(\text{purchase}\mid\text{subscriber})=\tfrac{15}{20}=\textbf{0.75},
+    \qquad
+    P(\text{purchase}\mid\text{non-subscriber})=\tfrac{15}{40}=\textbf{0.375}
+  \]
+  Subscribers buy twice as often; under independence both rates would equal
+  the overall rate $0.5$.
+
+  \medskip
+  \textbf{(3)} Condition on the column ``purchase yes'':
+  $P(\text{subscriber}\mid\text{purchase})=\frac{15}{30}=\textbf{0.5}$ -- half
+  of the buyers subscribe. Same cell ($15$), different denominator: $20$
+  subscribers in (2), $30$ buyers in (3).
+  \begin{alertblock}{Common mistakes}
+    Confusing $P(A\mid B)$ with $P(B\mid A)$ -- and reading the association
+    as an effect: loyal customers may simply be more likely to subscribe.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Exercise -- streaming and gaming (exam style)}
+  \begin{block}{Problem statement}
+    Among the users of a smartphone model, $60\,\%$ use the streaming app
+    ($S$), $50\,\%$ play games ($G$) and $30\,\%$ do both.
+    \begin{enumerate}
+      \item Compute $P(G\mid S)$ and interpret it.
+      \item Compute $P(S\cup G)$. What share of the users does neither?
+      \item Check whether $S$ and $G$ are independent.
+      \item Fill in the two-way table of probabilities for $S$/not $S$ and
+            $G$/not $G$.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- streaming and gaming (exam style)}
+  \begin{columns}[T]
+    \begin{column}{0.57\textwidth}
+      \textbf{(1)} $\;P(G\mid S)=\frac{P(G\cap S)}{P(S)}=\frac{0.30}{0.60}=\textbf{0.50}$:
+      half of the streaming users also play games.
+
+      \medskip
+      \textbf{(2)} $\;P(S\cup G)=0.60+0.50-0.30=\textbf{0.80}$;\\
+      neither: $1-0.80=\textbf{0.20}$. (Without $-0.30$ the users who do
+      both are counted twice: $1.10>1$.)
+
+      \medskip
+      \textbf{(3)} $\;P(S)\,P(G)=0.60\cdot0.50=0.30=P(S\cap G)$\\
+      $\Rightarrow$ \textbf{independent}. Equivalently
+      $P(G\mid S)=0.50=P(G)$: knowing that someone streams does not change
+      the probability that they play.
+    \end{column}
+    \begin{column}{0.41\textwidth}
+      \textbf{(4)} Enter the given values, fill the rest by subtraction:
+      \begin{center}
+        \renewcommand{\arraystretch}{1.15}
+        \begin{tabular}{@{}l|cc|c@{}}
+          \toprule
+          & $G$ & not $G$ & Total\\
+          \midrule
+          $S$ & $\mathbf{0.30}$ & $0.30$ & $\mathbf{0.60}$\\
+          not $S$ & $0.20$ & $0.20$ & $0.40$\\
+          \midrule
+          Total & $\mathbf{0.50}$ & $0.50$ & $1$\\
+          \bottomrule
+        \end{tabular}\\[1pt]
+        {\footnotesize given values in bold}
+      \end{center}
+      \begin{alertblock}{Common mistake}
+        Independent $\neq$ disjoint: disjoint means $P(S\cap G)=0$ -- here
+        $30\,\%$ do both.
+      \end{alertblock}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \subsection{Why not linear regression?}
@@ -318,6 +668,51 @@
     \item The logistic function (a) is the inverse of the logit (b): it maps
           every log-odds value back into $(0,1)$.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Exercise -- probability, odds and log-odds}
+  \begin{block}{Problem statement}
+    In the two-way table of Section~1, $127$ of the $2944$ students and $206$
+    of the $7056$ non-students defaulted.
+    \begin{enumerate}
+      \item Compute the probability, the odds and the log-odds of default
+            for students and for non-students.
+      \item Compute the \textbf{odds ratio} (odds of the students divided by
+            the odds of the non-students) and its logarithm. Interpret it.
+      \item Compare the odds ratio with the ratio of the two default
+            probabilities. Why are the two so close here?
+      \item A churn model assigns a customer the log-odds $-1$. Compute the
+            odds and the churn probability.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- probability, odds and log-odds}
+  \textbf{(1)} Odds $=$ number of ``yes'' / number of ``no'' -- straight
+  from the table:
+  \begin{center}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}lccc@{}}
+      \toprule
+      & probability $p$ & odds $p/(1-p)$ & log-odds $\log(\text{odds})$\\
+      \midrule
+      students & $127/2944=0.0431$ & $127/2817=0.0451$ & $-3.099$\\
+      non-students & $206/7056=0.0292$ & $206/6850=0.0301$ & $-3.504$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \textbf{(2)} Odds ratio $=0.0451/0.0301=\textbf{1.50}$, \ $\log1.50=-3.099-(-3.504)=\textbf{0.405}$:
+  the odds of default of students are $1.5$ times (i.e.\ $50\,\%$ higher
+  than) those of non-students.
+
+  \medskip
+  \textbf{(3)} Probability ratio $0.0431/0.0292=1.48\approx1.50$: for
+  \emph{rare} events $1-p\approx1$, so odds $\approx$ probability. For common
+  events they differ: $p=0.8$ vs.\ $0.5$ gives a probability ratio of $1.6$
+  but an odds ratio of $4/1=4$.
+
+  \medskip
+  \textbf{(4)} odds $=e^{-1}=0.368$, \ $p=\dfrac{0.368}{1+0.368}=\textbf{0.269}$.
 \end{frame}
 
 \subsection{The model}
@@ -491,7 +886,7 @@ balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
         \toprule
         balance (\$) & $1000$ & $1500$ & $2000$ & $2500$\\
         \midrule
-        $\hat p(x)$ & $0.006$ & $0.083$ & $0.586$ & $0.957$\\
+        $\hat p(x)$ & $0.006$ & $0.083$ & $0.587$ & $0.957$\\
         \bottomrule
       \end{tabular}
     \end{center}
@@ -568,7 +963,7 @@ balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
 \begin{frame}{Inference -- balance and student status}
   \begin{exampleblock}{Balance ($\hat\beta_1=0.005499$, $\mathrm{SE}=0.000220$)}
     \[
-      Z=\frac{0.005499}{0.000220}=24.95,\qquad p<2\cdot10^{-16},\qquad
+      Z=\frac{0.005499}{0.000220}=24.95,\qquad p<0.0001,\qquad
       \text{CI}_{0.95}(\beta_1)=[\,0.005067\,;\,0.005931\,]
     \]
     Per $100$\,\$: odds ratio $e^{0.5499}=1.733$, CI
@@ -581,7 +976,9 @@ balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
       e^{0.4049}=1.50,\quad \text{CI}=[\,1.20\,;\,1.88\,]
     \]
     Students have $50\,\%$ higher odds of default -- \emph{on their own}
-    (more on this in Section~3).
+    (more on this in Section~3). With a single dummy the model reproduces
+    the two-way table: $\hat\beta_0=-3.504$ is the log-odds of the
+    non-students and $1.50$ the odds ratio (exercise on odds).
   \end{exampleblock}
 \end{frame}
 
@@ -685,7 +1082,8 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
     \begin{column}{0.48\textwidth}
       \begin{block}{Alone: \texttt{default $\sim$ student}}
         $\hat\beta_{\text{student}}=+0.405$ ($p=0.0004$)\\
-        Students default \emph{more often}:\\ $4.31\,\%$ vs.\ $2.92\,\%$.
+        Students default \emph{more often}:\\ $4.31\,\%$ vs.\ $2.92\,\%$
+        (two-way table, Section~1).
       \end{block}
     \end{column}
     \begin{column}{0.48\textwidth}
@@ -833,8 +1231,9 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
       \text{balance}=\frac{10.869-0.120+0.6468}{0.00574}\approx\textbf{1985}\,\$
     \]
   \end{exampleblock}
-  \inworten{A student needs about $112$\,\$ more balance to reach the same
-  $50\,\%$ risk -- the negative student coefficient, expressed in dollars.}
+  \inworten{A student needs about $0.6468/0.00574\approx113$\,\$ more balance
+  to reach the same $50\,\%$ risk -- the negative student coefficient,
+  expressed in dollars.}
   \begin{alertblock}{Common mistake}
     Inserting the income in dollars: $0.003\cdot40\,000=120$ would push every
     probability to $1$.
@@ -1005,6 +1404,61 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
   ($68\,\%$) are missed.}
 \end{frame}
 
+\begin{frame}{The confusion matrix is a two-way table}
+  Rows: actual class $y$; columns: predicted class $\hat y$. Every measure is
+  a relative frequency in this table -- the only question is \textbf{which
+  total we divide by}:
+  \begin{center}
+    \renewcommand{\arraystretch}{1.22}
+    \begin{tabular}{@{}llll@{}}
+      \toprule
+      \textbf{Measure} & \textbf{as a probability} & \textbf{divide by the \ldots} & \textbf{Default, $t=0.5$}\\
+      \midrule
+      Sensitivity & $P(\hat y=1\mid y=1)$ & row total ``Actual Yes'' & $105/333=0.315$\\
+      Specificity & $P(\hat y=0\mid y=0)$ & row total ``Actual No'' & $9627/9667=0.996$\\
+      Precision & $P(y=1\mid \hat y=1)$ & column total ``Pred.\ Yes'' & $105/145=0.724$\\
+      Accuracy & $P(\hat y=y)$ & grand total $n$ & $9732/10\,000=0.973$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \kernaussage{Sensitivity and precision both count the TP but condition on
+  different events: $P(\hat y=1\mid y=1)\neq P(y=1\mid\hat y=1)$ -- like
+  $P(\text{default}\mid\text{student})\neq P(\text{student}\mid\text{default})$.}
+\end{frame}
+
+\begin{frame}[fragile]{Rates with Python: normalise the rows or the columns}
+\begin{lstlisting}
+phat = g3.predict(df)                                # P(default = Yes), model g3
+pred = phat > 0.5                                    # True = "default" predicted
+print(pd.crosstab(df.default, pred, normalize="index").round(4))    # given y
+print(pd.crosstab(df.default, pred, normalize="columns").round(4))  # given y-hat
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+\begin{lstlisting}[style=Pyout]
+col_0     False   True
+default
+No       0.9959  0.0041
+Yes      0.6847  0.3153
+col_0     False   True
+default
+No       0.9769  0.2759
+Yes      0.0231  0.7241
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.62\textwidth}
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item \textbf{Rows} sum to $1$: row ``Yes'' gives the sensitivity
+              $0.3153$ (and the miss rate $0.6847$), row ``No'' the
+              specificity $0.9959$.
+        \item \textbf{Columns} sum to $1$: column ``True'' gives the
+              precision $0.7241$; column ``False'': $97.7\,\%$ of the
+              customers predicted ``no default'' really do not default.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
 \begin{frame}{Exercise -- reading a confusion matrix}
   \begin{block}{Problem statement}
     The bank lowers the threshold of the same model to $t=0.2$:
@@ -1022,7 +1476,7 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
     \begin{enumerate}
       \item Compute accuracy, error rate, sensitivity, specificity and
             precision.
-      \item Compare with $t=0.5$ (previous slide). Which threshold would you
+      \item Compare with the confusion matrix at $t=0.5$. Which threshold would you
             recommend to the bank?
     \end{enumerate}
   \end{block}
@@ -1053,6 +1507,156 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
   \inworten{Do not confuse sensitivity and precision: both have TP on top, but
   divide by the \emph{actual} ($333$) or the \emph{predicted} ($480$)
   positives.}
+\end{frame}
+
+\subsection{Base rates and precision}
+
+\begin{frame}{The base-rate effect}
+  \guidingquestion{Our rule with $t=0.2$ catches $61\,\%$ of the defaulters
+  and flags only $2.87\,\%$ of the good customers. Are its alarms just as
+  reliable in a bank where only $1\,\%$ of the customers default?}
+  \begin{columns}[c]
+    \begin{column}{0.64\textwidth}
+      \centering
+      \resizebox{\textwidth}{!}{%
+      \begin{tikzpicture}[font=\footnotesize]
+        \node[treenode] (r) at (0,0) {$10\,000$\\customers};
+        \node[treenodeo] (d) at (3.3,1.15) {$100$ defaulters};
+        \node[treenode] (n) at (3.3,-1.15) {$9900$ non-defaulters};
+        \node[treenodeo,anchor=west] (dp) at (6.2,1.7) {$\mathbf{61}$ flagged (TP)};
+        \node[treenode,anchor=west] (dm) at (6.2,0.6) {$39$ missed (FN)};
+        \node[treenodeo,anchor=west] (np) at (6.2,-0.6) {$\mathbf{284}$ flagged (FP)};
+        \node[treenode,anchor=west] (nm) at (6.2,-1.7) {$9616$ not flagged (TN)};
+        \draw[treeedge] (r.east) -- node[treelab]{$1\,\%$} (d.west);
+        \draw[treeedge] (r.east) -- node[treelab]{$99\,\%$} (n.west);
+        \draw[treeedge] (d.east) -- node[treelab]{$0.610$} (dp.west);
+        \draw[treeedge] (d.east) -- node[treelab]{$0.390$} (dm.west);
+        \draw[treeedge] (n.east) -- node[treelab]{$0.0287$} (np.west);
+        \draw[treeedge] (n.east) -- node[treelab]{$0.9713$} (nm.west);
+      \end{tikzpicture}}
+    \end{column}
+    \begin{column}{0.34\textwidth}
+      \begin{exampleblock}{Precision}
+        \[
+          \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}}=\frac{61}{61+284}=\textbf{0.177}
+        \]
+        Only about one alarm in six -- compared with $0.423$ at the actual
+        base rate of $3.33\,\%$.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+  \medskip
+  \inworten{The rule has not changed (same sensitivity and specificity) --
+  the mix has: with rare defaulters,
+  the few false alarms from the huge majority outnumber the correct alarms.}
+\end{frame}
+
+\begin{frame}{Precision depends on the base rate}
+  \begin{columns}[c]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Precision for base rate $\pi=P(Y=1)$}
+        \vspace{-0.3em}
+        \[
+          \text{precision}=\frac{\text{sens}\cdot\pi}
+          {\text{sens}\cdot\pi+(1-\text{spec})(1-\pi)}
+        \]
+      \end{block}
+      \inworten{correct alarms divided by all alarms; false alarms come
+      from the $1-\pi$ non-defaulters.}
+
+      \smallskip
+      {\small Check ($\pi=0.0333$): $0.610\cdot0.0333=0.0203$,
+      $0.0287\cdot0.9667=0.0277$ $\Rightarrow$
+      $0.0203/0.0480=0.423$ \checkmark\par}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \begin{axis}[width=7.4cm,height=4.7cm,
+            xmin=0,xmax=30,ymin=0,ymax=1,
+            xlabel={base rate $\pi$ (\%)},ylabel={precision},
+            xlabel style={font=\small},ylabel style={font=\small},
+            tick label style={font=\scriptsize},
+            grid=major,grid style={hsbigrau!30},
+            title={\footnotesize Default rule $t=0.2$ (sens.\ $0.610$, spec.\ $0.9713$)}]
+          \addplot[domain=0.2:30,samples=150,very thick,hsbiblau]
+            {0.6096*x/(0.6096*x+0.028654*(100-x))};
+          \addplot[only marks,mark=*,mark size=2.4pt,hsbiorange!85!black]
+            coordinates {(1,0.177) (3.33,0.423) (10,0.703)};
+          \node[font=\scriptsize,anchor=west] at (axis cs:1.6,0.14) {$1\,\%$: $0.177$};
+          \node[font=\scriptsize,anchor=west] at (axis cs:4.0,0.39) {$3.33\,\%$: $0.423$};
+          \node[font=\scriptsize,anchor=north west] at (axis cs:10.6,0.70) {$10\,\%$: $0.703$};
+        \end{axis}
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \kernaussage{Sensitivity and specificity describe the \emph{rule};
+  precision also depends on the \textbf{base rate} (Appendix~A.1).}
+\end{frame}
+
+\begin{frame}{Exercise -- rapid test and base rate}
+  \begin{block}{Problem statement}
+    A rapid test is designed to detect a disease that affects $1\,\%$ of the
+    population (\textbf{prevalence} $=$ base rate). Sensitivity: an ill
+    person tests positive with probability $0.9$. Specificity: a healthy
+    person tests negative with probability $0.9$.
+    \begin{enumerate}
+      \item Set up the expected confusion matrix for $1000$ people tested.
+      \item What share of all tests is positive?
+      \item A randomly chosen person tests positive. How likely is the person
+            ill (precision)? Interpret the result.
+      \item What share of the negative results is correct?
+      \item In a doctor's practice, $20\,\%$ of the people tested are ill.
+            Recompute (3) for this group.
+    \end{enumerate}
+  \end{block}
+  {\footnotesize The same calculation applies to quality control (defective
+  part $\leftrightarrow$ alarm) and to spam filters.\par}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- rapid test and base rate}
+  \textbf{Rule:} expected count $=$ $n$ $\times$ base rate $\times$
+  conditional rate (``natural frequencies'').
+
+  \medskip
+  \textbf{(1)} Of $1000$ people, $1000\cdot0.01=10$ are ill and $990$
+  healthy. Of the ill, $0.9\cdot10=9$ test positive; of the healthy,
+  $0.9\cdot990=891$ test negative and $99$ positive.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{l|cc|c}
+      \toprule
+      & test $-$ & test $+$ & Total\\
+      \midrule
+      healthy & $891$ (TN) & $99$ (FP) & $990$\\
+      ill & $1$ (FN) & $9$ (TP) & $10$\\
+      \midrule
+      Total & $892$ & $108$ & $1000$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \textbf{(2)} $P(+)=\dfrac{108}{1000}=\textbf{0.108}$: $10.8\,\%$ of all tests
+  are positive -- and $99$ of these $108$ come from healthy people.
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- rapid test and base rate}
+  \textbf{(3)} Condition on the column ``test $+$'':
+  $\;P(\text{ill}\mid +)=\dfrac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}}=\dfrac{9}{108}=\textbf{0.083}$.\\[2pt]
+  Only one in twelve positive results is a real case: the $99$ false alarms
+  ($10\,\%$ of the $990$ healthy) outnumber the $9$ correct ones. Still, the
+  test is informative: the probability rises from $1\,\%$ to $8.3\,\%$.
+
+  \medskip
+  \textbf{(4)} Condition on the column ``test $-$'':
+  $\frac{891}{892}=\textbf{0.9989}$ -- a negative result is very reliable.
+
+  \medskip
+  \textbf{(5)} $1000$ people: $200$ ill $\to$ $0.9\cdot200=180$ positive,
+  $800$ healthy $\to$ $0.1\cdot800=80$ positive.\\
+  Precision $=180/(180+80)=180/260=\textbf{0.692}$.
+  \kernaussage{Same test, different base rate -- a completely different
+  meaning of a positive result. Python check:
+  \texttt{0.9*pi/(0.9*pi + 0.1*(1-pi))} gives $0.083$ and $0.692$.}
 \end{frame}
 
 \subsection{ROC curve and AUC}
@@ -1240,11 +1844,37 @@ print(roc_auc_score(test.y, p_te))             # test AUC 0.956
 \end{frame}
 
 % ============================================================================
-% SECTION 7: SUMMARY
+% SECTION 6: SUMMARY
 % ============================================================================
 \section{Summary}
 
-\begin{frame}{Summary 1 -- logistic regression}
+\begin{frame}{Summary 1 -- two-way tables and conditional probability}
+  \begin{block}{Two-way table of two categorical variables}
+    \textbf{joint} relative frequency: cell$/n$; \ \textbf{marginal}: row or
+    column total$/n$; \ \textbf{conditional}: cell$/$row (or column) total.
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Rules}
+        $P(A\mid B)=P(A\cap B)/P(B)$\\[2pt]
+        $P(A\cap B)=P(A\mid B)\,P(B)=P(B\mid A)\,P(A)$\\[2pt]
+        $P(A\cup B)=P(A)+P(B)-P(A\cap B)$\\[2pt]
+        independent: $P(A\cap B)=P(A)\,P(B)\Leftrightarrow P(A\mid B)=P(A)$
+      \end{block}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Link to classification}
+        Classification estimates $p(x)=P(Y=1\mid X=x)$ -- for a metric $x$
+        with a model. Sensitivity $P(\hat y=1\mid y=1)$ and precision
+        $P(y=1\mid\hat y=1)$ condition in opposite directions.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \inworten{$P(A\mid B)\neq P(B\mid A)$: $4.3\,\%$ of the students
+  default, but $38\,\%$ of the defaulters are students.}
+\end{frame}
+
+\begin{frame}{Summary 2 -- logistic regression}
   \begin{block}{Model}
     \[
       \log\frac{p(x)}{1-p(x)}=\beta_0+\beta_1x_1+\dots+\beta_px_p,
@@ -1268,33 +1898,40 @@ print(roc_auc_score(test.y, p_te))             # test AUC 0.956
   \end{block}
 \end{frame}
 
-\begin{frame}{Summary 2 -- decisions and evaluation}
+\begin{frame}{Summary 3 -- decisions and evaluation}
   \begin{block}{Classification rule}
     $\hat y=1$ if $\hat p(x)>t$ \ $\Leftrightarrow$ \ $\hat\eta(x)>\log\frac{t}{1-t}$;
     \ the threshold $t$ is a business decision.
   \end{block}
   \begin{center}
-    \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{l|l|l}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{l|l|l|l}
       \toprule
-      \textbf{Measure} & \textbf{Formula} & \textbf{Question}\\
+      \textbf{Measure} & \textbf{Formula} & \textbf{Probability} & \textbf{Question}\\
       \midrule
-      Accuracy & $(\mathrm{TP}+\mathrm{TN})/n$ & share of correct decisions\\
-      Sensitivity & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ & share of positives caught\\
-      Specificity & $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ & share of negatives left alone\\
-      Precision & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$ & share of alarms that are real\\
-      AUC & area under ROC curve & ranking quality over all thresholds\\
+      Accuracy & $(\mathrm{TP}+\mathrm{TN})/n$ & $P(\hat y=y)$ & share of correct decisions\\
+      Sensitivity & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ & $P(\hat y=1\mid y=1)$ & share of positives caught\\
+      Specificity & $\mathrm{TN}/(\mathrm{TN}+\mathrm{FP})$ & $P(\hat y=0\mid y=0)$ & share of negatives left alone\\
+      Precision & $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$ & $P(y=1\mid\hat y=1)$ & share of alarms that are real\\
+      AUC & area under ROC & -- & ranking over all thresholds\\
       \bottomrule
     \end{tabular}
   \end{center}
-  \inworten{Evaluate on \textbf{test data} the model has not seen.}
+  \inworten{precision also depends on the base rate $\pi$:
+  $\text{sens}\cdot\pi\,/\,[\text{sens}\cdot\pi+(1-\text{spec})(1-\pi)]$.
+  Evaluate on \textbf{test data} the model has not seen.}
 \end{frame}
 
-
-
-\begin{frame}[fragile]{Summary 3 -- important Python commands}
+\begin{frame}[fragile]{Summary 4 -- important Python commands}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
+      \begin{block}{Two-way tables}
+\begin{lstlisting}
+pd.crosstab(df.a, df.b, margins=True)
+pd.crosstab(df.a, df.b,
+            normalize="index")  # rows
+\end{lstlisting}
+      \end{block}
       \begin{block}{Logistic regression}
 \begin{lstlisting}
 g = smf.logit("y ~ x1 + x2",
@@ -1311,6 +1948,8 @@ g.predict(new)        # probabilities
 \begin{lstlisting}
 phat = g.predict(df)
 pd.crosstab(df.y, phat > 0.5)
+pd.crosstab(df.y, phat > 0.5,
+            normalize="index")
 roc_auc_score(df.y, phat)  # AUC
 train = df.sample(n=7000,
                   random_state=1)
@@ -1322,11 +1961,11 @@ test = df.drop(train.index)
   \appendixnote{Bayes classifiers in sklearn: \texttt{LinearDiscriminantAnalysis}, \texttt{GaussianNB}}
 \end{frame}
 
-\begin{frame}{Five classic pitfalls -- final checklist}
+\begin{frame}{Six classic pitfalls -- final checklist}
   \small
   \begin{center}
-    \renewcommand{\arraystretch}{1.45}
-    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.7cm}@{}}
+    \renewcommand{\arraystretch}{1.22}
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.52\textwidth}@{}}
       \toprule
       \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
       \textbf{Correct version \ \textcolor{hsbigruen}{$\checkmark$}}\\
@@ -1345,6 +1984,10 @@ test = df.drop(train.index)
       ``Students are riskier, so reject students.'' &
         At the same balance, students are \emph{less} risky -- ask what is
         held fixed.\\
+      ``The test catches $95\,\%$ of the defects, so $95\,\%$ of the
+      flagged parts are defective.'' &
+        That is $P(+\mid D)$; $P(D\mid +)$ also depends on the base rate --
+        with $2\,\%$ defects only $33\,\%$.\\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -1381,27 +2024,378 @@ test = df.drop(train.index)
 \begin{frame}{Appendix -- what is in here, and why}
   \begin{block}{Optional material}
     The main part covers the standard classification workflow with logistic
-    regression. The appendix shows a second family of classifiers that
-    start from \textbf{Bayes' theorem} -- useful for small samples, many
+    regression. The appendix first derives \textbf{Bayes' theorem} -- the
+    rule behind the base-rate effect of Section~5 -- and then shows a second
+    family of classifiers built on it, useful for small samples, many
     features or more than two classes.
   \end{block}
   \begin{center}
     \small
-    \renewcommand{\arraystretch}{1.25}
+    \renewcommand{\arraystretch}{1.2}
     \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{9.6cm}@{}}
       \toprule
       \textbf{Topic} & \textbf{Content}\\
       \midrule
-      A.1 Bayes' theorem & Prior $\times$ likelihood $\to$ posterior; the Bayes classifier\\
-      A.2 Naive Bayes & Independent features: the spam filter (exercise)\\
-      A.3 LDA & Normal classes with common variance (exercise)\\
-      A.4 Comparison & Logistic regression, LDA and naive Bayes; Python commands\\
+      A.1 Bayes' theorem & Total probability, prior $\times$ likelihood $\to$ posterior, taxi example; exercises: suppliers, quality test\\
+      A.2 Bayes classifier & Bayes' theorem with classes and features; largest posterior wins\\
+      A.3 Naive Bayes & Independent features: the spam filter (exercise)\\
+      A.4 LDA & Normal classes with common variance (exercise)\\
+      A.5 Comparison & Logistic regression, LDA and naive Bayes; Python commands\\
       \bottomrule
     \end{tabular}
   \end{center}
 \end{frame}
 
-\subsection{A.1 Bayes' theorem for classification}
+\subsection{A.1 Bayes' theorem}
+
+\begin{frame}{Law of total probability}
+  \begin{columns}[c]
+    \begin{column}{0.47\textwidth}
+      \begin{block}{Two cases $B$ and $\bar B$ (``not $B$'')}
+        \vspace{-0.5em}
+        \[
+          P(A)=P(A\mid B)\,P(B)+P(A\mid\bar B)\,P(\bar B)
+        \]
+        In general, if $B_1,\dots,B_k$ are disjoint and together cover all
+        cases: $P(A)=\sum_{j}P(A\mid B_j)\,P(B_j)$.
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \resizebox{\textwidth}{!}{%
+      \begin{tikzpicture}[font=\small,
+          every node/.append style={font=\small},
+          treelab/.append style={font=\footnotesize}]
+        \node[treenode] (r) at (0,0) {all\\cases};
+        \node[treenode] (b) at (1.9,1.2) {$B$};
+        \node[treenode] (nb) at (1.9,-1.2) {$\bar B$};
+        \node[treenodeo,anchor=west] (ba) at (3.9,1.8) {$A$: \ $P(A\mid B)\,P(B)$};
+        \node[treenode,anchor=west] (bna) at (3.9,0.65) {$\bar A$};
+        \node[treenodeo,anchor=west] (nba) at (3.9,-0.65) {$A$: \ $P(A\mid\bar B)\,P(\bar B)$};
+        \node[treenode,anchor=west] (nbna) at (3.9,-1.8) {$\bar A$};
+        \draw[treeedge] (r.east) -- node[treelab]{$P(B)$} (b.west);
+        \draw[treeedge] (r.east) -- node[treelab]{$P(\bar B)$} (nb.west);
+        \draw[treeedge] (b.east) -- node[treelab]{$P(A\mid B)$} (ba.west);
+        \draw[treeedge] (b.east) -- (bna.west);
+        \draw[treeedge] (nb.east) -- node[treelab]{$P(A\mid\bar B)$} (nba.west);
+        \draw[treeedge] (nb.east) -- (nbna.west);
+      \end{tikzpicture}}
+    \end{column}
+  \end{columns}
+  \medskip
+  \inworten{multiply along each path (multiplication rule) and add up
+  \textbf{all paths that end in $A$}.}
+  \begin{exampleblock}{Example (Section~5): how often does the rapid test raise an alarm?}
+    $P(+)=P(+\mid\text{ill})\,P(\text{ill})+P(+\mid\text{healthy})\,P(\text{healthy})
+    =0.9\cdot0.01+0.1\cdot0.99=0.108$
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Bayes' theorem -- reversing a conditional probability}
+  \textbf{Known:} $P(+\mid\text{ill})$. \ \textbf{Wanted:}
+  $P(\text{ill}\mid +)$ -- the conditional probability in the other
+  direction.\\[3pt]
+  \textbf{Step 1:} multiplication rule in both directions,
+  $P(A\mid B)\,P(B)=P(A\cap B)=P(B\mid A)\,P(A)$; solve for $P(B\mid A)$.\\
+  \textbf{Step 2:} compute the denominator $P(A)$ with the law of total
+  probability.
+  \begin{block}{Bayes' theorem}
+    \vspace{-0.8em}
+    \[
+      \underbrace{P(B_i\mid A)}_{\text{posterior}}
+      =\frac{\overbrace{P(A\mid B_i)}^{\text{likelihood}}\;\overbrace{P(B_i)}^{\text{prior}}}
+             {\underbrace{\textstyle\sum_{j}P(A\mid B_j)\,P(B_j)}_{\text{total probability }P(A)}}
+      \qquad
+      \text{two cases: }\
+      P(B\mid A)=\frac{P(A\mid B)\,P(B)}{P(A\mid B)\,P(B)+P(A\mid\bar B)\,P(\bar B)}
+    \]
+  \end{block}
+  \inworten{observe $A$ $\Rightarrow$ update the probabilities of the
+  possible explanations $B_i$. Rapid test: $P(\text{ill})=0.01$ $\to$
+  $P(\text{ill}\mid +)=0.009/0.108=0.083$.}
+\end{frame}
+
+\begin{frame}{Bayes' theorem -- the three building blocks}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Prior $P(B_i)$}
+        What we know about $B_i$ \emph{before} observing $A$ -- often a known
+        share, e.g.\ the base rate of a disease or of defaulters.
+      \end{block}
+      \begin{block}{Likelihood $P(A\mid B_i)$}
+        How probable the observation $A$ is \emph{if} $B_i$ is true -- e.g.\
+        the sensitivity of a test.
+      \end{block}
+      \begin{block}{Posterior $P(B_i\mid A)$}
+        What we know about $B_i$ \emph{after} observing $A$ -- the quantity
+        we actually want.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{alertblock}{Bayes as a learning rule}
+        \[
+          P(B_i)\;\xrightarrow{\ \text{observe }A\ }\;P(B_i\mid A)
+        \]
+        Prior knowledge is updated by data.
+      \end{alertblock}
+      \begin{exampleblock}{Dictionary for classification}
+        \renewcommand{\arraystretch}{1.15}
+        \begin{tabular}{@{}ll@{}}
+          cases $B_i$ & classes $Y=k$\\
+          observation $A$ & features $X=x$\\
+          prior $P(B_i)$ & class share $\pi_k$\\
+          likelihood & $f_k(x)$ (A.2)\\
+        \end{tabular}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Worked example: the night-time taxi (1/2)}
+  \begin{alertblock}{Scenario}
+    At night a taxi causes an accident. A witness says: ``It was a
+    \textbf{blue} taxi.'' The town has $5$ blue and $25$ green taxis. Tests
+    show that the witness recognises \emph{both} colours correctly in
+    $80\,\%$ of the cases. How likely was the taxi really blue?
+  \end{alertblock}
+  \begin{columns}[c]
+    \begin{column}{0.42\textwidth}
+      \small
+      \textbf{Events:} $B$ $=$ the taxi was really blue, $W$ $=$ the witness
+      says ``blue''.\\[3pt]
+      \textbf{Prior:} $P(B)=5/30$, \ $P(\bar B)=25/30$.\\[3pt]
+      \textbf{Likelihoods:} $P(W\mid B)=0.8$,
+      $P(W\mid\bar B)=0.2$ (green mistaken for blue).\\[3pt]
+      \textbf{Tree:} natural frequencies -- imagine the scene once with
+      each of the $30$ taxis.
+    \end{column}
+    \begin{column}{0.56\textwidth}
+      \centering
+      \resizebox{\textwidth}{!}{%
+      \begin{tikzpicture}[font=\footnotesize]
+        \node[treenode] (r) at (0,0) {$30$ taxis};
+        \node[treenode] (b) at (2.6,1.05) {$5$ blue};
+        \node[treenode] (g) at (2.6,-1.05) {$25$ green};
+        \node[treenodeo,anchor=west] (bw) at (4.8,1.55) {$\mathbf{4}$ say ``blue''};
+        \node[treenode,anchor=west] (bg) at (4.8,0.55) {$1$ says ``green''};
+        \node[treenodeo,anchor=west] (gw) at (4.8,-0.55) {$\mathbf{5}$ say ``blue''};
+        \node[treenode,anchor=west] (gg) at (4.8,-1.55) {$20$ say ``green''};
+        \draw[treeedge] (r.east) -- node[treelab]{$5/30$} (b.west);
+        \draw[treeedge] (r.east) -- node[treelab]{$25/30$} (g.west);
+        \draw[treeedge] (b.east) -- node[treelab]{$0.8$} (bw.west);
+        \draw[treeedge] (b.east) -- node[treelab]{$0.2$} (bg.west);
+        \draw[treeedge] (g.east) -- node[treelab]{$0.2$} (gw.west);
+        \draw[treeedge] (g.east) -- node[treelab]{$0.8$} (gg.west);
+      \end{tikzpicture}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Worked example: the night-time taxi (2/2)}
+  \begin{block}{Total probability: when does the witness say ``blue''?}
+    \vspace{-0.4em}
+    \[
+      P(W)=\underbrace{0.8\cdot\tfrac{5}{30}}_{\text{blue, correct}}
+      +\underbrace{0.2\cdot\tfrac{25}{30}}_{\text{green, mistaken}}
+      =\tfrac{4}{30}+\tfrac{5}{30}=\tfrac{9}{30}=0.3
+    \]
+  \end{block}
+  \begin{columns}[c]
+    \begin{column}{0.47\textwidth}
+      \begin{block}{Bayes' theorem}
+        \vspace{-0.4em}
+        \[
+          P(B\mid W)=\frac{0.8\cdot\frac{5}{30}}{\frac{9}{30}}
+          =\frac{4}{9}=\textbf{0.444}
+        \]
+      \end{block}
+    \end{column}
+    \begin{column}{0.51\textwidth}
+      \centering\small
+      \renewcommand{\arraystretch}{1.25}
+      \begin{tabular}{@{}l|cc|c@{}}
+        \toprule
+        & says ``blue'' & says ``green'' & Total\\
+        \midrule
+        really blue & $\mathbf{4}$ & $1$ & $5$\\
+        really green & $5$ & $20$ & $25$\\
+        \midrule
+        Total & $\mathbf{9}$ & $21$ & $30$\\
+        \bottomrule
+      \end{tabular}\\[1pt]
+      {\footnotesize counts out of $30$ scenes ($\div30$ = probabilities)}
+    \end{column}
+  \end{columns}
+  \medskip
+  \inworten{only $4$ of the $9$ ``blue'' statements are correct -- the other
+  $5$ come from the many green taxis. The witness raises the probability from
+  $\frac{5}{30}=17\,\%$ (prior) to $44\,\%$ (posterior) -- still less than
+  $50\,\%$.}
+\end{frame}
+
+\begin{frame}{Exercise -- three suppliers}
+  \begin{block}{Problem statement}
+    An electronics manufacturer buys a component from three suppliers:
+    $L_1$ delivers $50\,\%$, $L_2$ $30\,\%$ and $L_3$ $20\,\%$ of the parts.
+    Incoming inspection shows that $2\,\%$ of the parts from $L_1$ are
+    defective ($D$), $4\,\%$ from $L_2$ and $10\,\%$ from $L_3$. A part is
+    taken at random from stock.
+    \begin{enumerate}
+      \item Write the given numbers as probabilities $P(L_i)$ and
+            $P(D\mid L_i)$.
+      \item Compute $P(L_i\cap D)$ for $i=1,2,3$.
+      \item Compute $P(D)$. How many defective parts are expected among
+            $1000$?
+      \item Are ``defective'' and ``from $L_1$'' independent?
+      \item The part is defective. Compute $P(L_i\mid D)$ for all three
+            suppliers. Which supplier is the most likely source?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- three suppliers}
+  \textbf{(1)} $L_1,L_2,L_3$ split all parts (each part comes from exactly
+  one supplier), so the priors add up to $1$. Given: the first two rows of
+  the table.
+
+  \medskip
+  \textbf{(2)} Multiplication rule $P(L_i\cap D)=P(D\mid L_i)\,P(L_i)$: the
+  third row.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}lccc@{}}
+      \toprule
+      & $L_1$ & $L_2$ & $L_3$\\
+      \midrule
+      prior $P(L_i)$ & $0.5$ & $0.3$ & $0.2$\\
+      likelihood $P(D\mid L_i)$ & $0.02$ & $0.04$ & $0.10$\\
+      $P(L_i\cap D)$ & $0.02\cdot0.5=\mathbf{0.010}$ & $0.04\cdot0.3=\mathbf{0.012}$ & $0.10\cdot0.2=\mathbf{0.020}$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{$1\,\%$ of all parts in stock are defective parts from $L_1$,
+  $1.2\,\%$ from $L_2$ and $2\,\%$ from $L_3$ -- the \emph{smallest} supplier
+  contributes the \emph{most} defective parts.}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- three suppliers}
+  \textbf{(3)} Total probability:
+  $P(D)=0.010+0.012+0.020=\textbf{0.042}$; among $1000$ parts we expect
+  $\textbf{42}$ defective ones ($10$ from $L_1$, $12$ from $L_2$, $20$ from
+  $L_3$).
+
+  \medskip
+  \textbf{(4)} $P(L_1)\,P(D)=0.5\cdot0.042=0.021\neq0.010=P(L_1\cap D)$
+  $\Rightarrow$ \textbf{not independent}; equivalently
+  $P(D\mid L_1)=0.02\neq P(D)=0.042$.
+
+  \medskip
+  \textbf{(5)} Bayes' theorem $P(L_i\mid D)=P(L_i\cap D)/P(D)$:
+  \[
+    P(L_1\mid D)=\frac{0.010}{0.042}=\textbf{0.238},\quad
+    P(L_2\mid D)=\frac{0.012}{0.042}=\textbf{0.286},\quad
+    P(L_3\mid D)=\frac{0.020}{0.042}=\textbf{0.476}
+  \]
+  The posteriors add up to $1$. The most likely source is $\mathbf{L_3}$
+  (largest posterior -- the rule of the Bayes classifier in A.2): although
+  $L_3$ delivers only $20\,\%$ of the parts, its high defect rate
+  (likelihood) outweighs the small prior.
+\end{frame}
+
+\begin{frame}{Exercise -- automated quality test (exam style)}
+  \begin{block}{Problem statement}
+    In a production line $2\,\%$ of all parts are defective ($D$). An
+    automated test raises an alarm ($+$) for a defective part with
+    probability $0.95$ and -- wrongly -- for an intact part with probability
+    $0.04$.
+    \begin{enumerate}
+      \item Draw a probability tree and compute $P(D\cap +)$ and
+            $P(\bar D\cap +)$.
+      \item Compute the probability $P(+)$ that the test raises an alarm.
+      \item Compute $P(D\mid +)$. Explain in one sentence why only about a
+            third of the flagged parts are defective, although the test
+            catches $95\,\%$ of them.
+      \item In the language of Section~5: what are the base rate,
+            sensitivity, specificity and precision of this test?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- automated quality test (exam style)}
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      \centering
+      \resizebox{\textwidth}{!}{%
+      \begin{tikzpicture}[font=\footnotesize]
+        \node[treenode] (r) at (0,0) {part};
+        \node[treenodeo] (d) at (2.2,1.1) {$D$};
+        \node[treenode] (nd) at (2.2,-1.1) {$\bar D$};
+        \node[treenodeo,anchor=west] (dp) at (4.0,1.6) {$+$: \ $0.02\cdot0.95=\mathbf{0.0190}$};
+        \node[treenode,anchor=west] (dm) at (4.0,0.6) {$-$: \ $0.02\cdot0.05=0.0010$};
+        \node[treenodeo,anchor=west] (ndp) at (4.0,-0.6) {$+$: \ $0.98\cdot0.04=\mathbf{0.0392}$};
+        \node[treenode,anchor=west] (ndm) at (4.0,-1.6) {$-$: \ $0.98\cdot0.96=0.9408$};
+        \draw[treeedge] (r.east) -- node[treelab]{$0.02$} (d.west);
+        \draw[treeedge] (r.east) -- node[treelab]{$0.98$} (nd.west);
+        \draw[treeedge] (d.east) -- node[treelab]{$0.95$} (dp.west);
+        \draw[treeedge] (d.east) -- node[treelab]{$0.05$} (dm.west);
+        \draw[treeedge] (nd.east) -- node[treelab]{$0.04$} (ndp.west);
+        \draw[treeedge] (nd.east) -- node[treelab]{$0.96$} (ndm.west);
+      \end{tikzpicture}}
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \textbf{(1)} Path rule (multiplication rule):\\[4pt]
+      $P(D\cap +)=0.02\cdot0.95=\textbf{0.0190}$,\\[2pt]
+      $P(\bar D\cap +)=0.98\cdot0.04=\textbf{0.0392}$.\\[4pt]
+      The four path probabilities add up to $1$.
+    \end{column}
+  \end{columns}
+  \medskip
+  \textbf{(2)} Total probability -- add both paths that end in ``$+$'':
+  \[
+    P(+)=P(+\mid D)\,P(D)+P(+\mid\bar D)\,P(\bar D)=0.0190+0.0392=\textbf{0.0582}
+  \]
+  The larger part of the alarms ($0.0392$ of $0.0582$) comes from
+  \emph{intact} parts.
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- automated quality test (exam style)}
+  \textbf{(3)} Bayes' theorem:
+  $\;P(D\mid +)=\dfrac{P(+\mid D)\,P(D)}{P(+)}=\dfrac{0.0190}{0.0582}=\textbf{0.3265}$.
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}
+      \small Natural frequencies for $10\,000$ parts:
+      \begin{center}
+        \renewcommand{\arraystretch}{1.15}
+        \begin{tabular}{@{}l|cc|c@{}}
+          \toprule
+          & no alarm & alarm & Total\\
+          \midrule
+          intact & $9408$ & $392$ & $9800$\\
+          defective & $10$ & $190$ & $200$\\
+          \midrule
+          Total & $9418$ & $582$ & $10\,000$\\
+          \bottomrule
+        \end{tabular}
+      \end{center}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small Only $190$ of the $582$ alarms are justified:
+      $190/582=0.3265$. Because defective parts are rare ($2\,\%$), the
+      $4\,\%$ false alarms among the $98\,\%$ intact parts produce more alarms
+      than the defective parts themselves.
+    \end{column}
+  \end{columns}
+  \medskip
+  \textbf{(4)} Base rate $\pi=0.02$, sensitivity $0.95$, specificity
+  $1-0.04=0.96$, precision $\mathbf{0.3265}$ -- the base-rate effect of
+  Section~5.
+  \begin{alertblock}{Common mistake}
+    Confusing $P(D\mid +)$ with $P(+\mid D)$: ``$95\,\%$ of the flagged parts
+    are defective'' is wrong.
+  \end{alertblock}
+\end{frame}
+
+\subsection{A.2 The Bayes classifier}
 
 \begin{frame}{Two ways to obtain $P(Y=k\mid x)$}
   \begin{columns}[T]
@@ -1428,7 +2422,7 @@ test = df.drop(train.index)
 \end{frame}
 
 \begin{frame}{Bayes' theorem in the classification setting}
-  \begin{block}{Posterior probability of class $k$}
+  \begin{block}{Posterior of class $k$ (Bayes' theorem, A.1, with $B_k=\{Y=k\}$, $A=\{X=x\}$)}
     \[
       P(Y=k\mid X=x)=\frac{\pi_k\,f_k(x)}{\sum_{\ell}\pi_\ell\,f_\ell(x)}
     \]
@@ -1476,7 +2470,7 @@ test = df.drop(train.index)
   differ only in \textbf{how they model the likelihood} $f_k(x)$.}
 \end{frame}
 
-\subsection{A.2 Naive Bayes}
+\subsection{A.3 Naive Bayes}
 
 \begin{frame}{Naive Bayes: an extreme simplification}
   \begin{block}{Assumption}
@@ -1542,7 +2536,7 @@ test = df.drop(train.index)
   \end{alertblock}
 \end{frame}
 
-\subsection{A.3 Linear discriminant analysis}
+\subsection{A.4 Linear discriminant analysis}
 
 \begin{frame}{Linear discriminant analysis (LDA) with one variable}
   \begin{block}{Assumption}
@@ -1606,7 +2600,7 @@ test = df.drop(train.index)
   became rare: the rarer class needs stronger evidence.}
 \end{frame}
 
-\subsection{A.4 Comparison}
+\subsection{A.5 Comparison}
 
 \begin{frame}{Logistic regression, LDA and naive Bayes}
   \begin{center}
@@ -1648,12 +2642,19 @@ print(pd.crosstab(df.default, nb.predict(X)))
   \end{block}
 \end{frame}
 
-\begin{frame}{Appendix summary -- Bayes classifiers}
-  \begin{block}{Bayes' theorem}
+\begin{frame}{Appendix summary -- Bayes' theorem and Bayes classifiers}
+  \begin{block}{Total probability and Bayes' theorem}
+    \vspace{-0.4em}
     \[
-      P(Y=k\mid x)=\frac{\pi_k\,f_k(x)}{\sum_\ell\pi_\ell\,f_\ell(x)}
-      \qquad(\text{posterior}\propto\text{prior}\times\text{likelihood})
+      P(A)=\sum_jP(A\mid B_j)\,P(B_j),
+      \qquad
+      P(B_i\mid A)=\frac{P(A\mid B_i)\,P(B_i)}{P(A)}
     \]
+    \inworten{posterior $\propto$ likelihood $\times$ prior; the
+    denominator comes from the law of total probability.}\\[2pt]
+    Classes and features: \
+    $P(Y=k\mid x)=\pi_k\,f_k(x)\big/\sum_\ell\pi_\ell\,f_\ell(x)$; the Bayes
+    classifier picks the largest posterior.
   \end{block}
   \begin{itemize}\setlength{\itemsep}{3pt}
     \item \textbf{Naive Bayes:} $f_k(x)=\prod_jf_{kj}(x_j)$ -- independent

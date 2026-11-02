@@ -4,6 +4,8 @@
 \input{../common/preamble.tex}
 
 \subtitle{Part 3: Statistical Inference}
+\newcommand{\overviewleft}{1-4}
+\newcommand{\overviewright}{5-7}
 
 \begin{document}
 
@@ -21,7 +23,14 @@
 % TABLE OF CONTENTS
 % ============================================================================
 \begin{frame}{Contents -- Part 3}
-  \tableofcontents[hideallsubsections]
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \tableofcontents[hideallsubsections,sections={1-4}]
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \tableofcontents[hideallsubsections,sections={5-7}]
+    \end{column}
+  \end{columns}
 \end{frame}
 
 % ============================================================================
@@ -36,8 +45,10 @@
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \small
-      \textbf{Two tools, one idea:}
+      \textbf{One foundation, two tools:}
       \begin{itemize}\setlength{\itemsep}{3pt}
+        \item \textcolor{hsbiblau}{\textbf{Foundations}} -- ``How much does a
+              sample mean fluctuate?'' (normal distribution, CLT)
         \item \textcolor{hsbiblau}{\textbf{Confidence interval}} --
               ``Which values of $\mu$ are \emph{compatible} with the data?''
         \item \textcolor{hsbiblau}{\textbf{Hypothesis test}} --
@@ -65,16 +76,19 @@
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \begin{itemize}\setlength{\itemsep}{3pt}
+        \item work with the \textbf{normal distribution} and the
+              $\Phi$-table, and explain why $\bar X$ is approximately normal
+              (\textbf{CLT}),
         \item compute and correctly interpret a \textbf{confidence interval}
-              for $\mu$,
+              for $\mu$ -- and plan the \textbf{sample size} it needs,
         \item carry out a \textbf{hypothesis test} (known/unknown
               variance, one-/two-sided),
-        \item compute the \textbf{$p$-value} and read it as a measure of
-              evidence,
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{itemize}\setlength{\itemsep}{3pt}
+        \item compute the \textbf{$p$-value} and read it as a measure of
+              evidence,
         \item distinguish \textbf{Type I and Type II errors} as well as the
               \textbf{power} of a test,
         \item read \textbf{critical values} from the $z$- and $t$-tables and
@@ -86,6 +100,7 @@
   \end{columns}
   \kernaussage{Common thread: infer from a sample -- and report the
   uncertainty honestly.}
+  \appendixnote{properties of estimators, law of large numbers}
 \end{frame}
 
 % ============================================================================
@@ -93,19 +108,20 @@
 % ============================================================================
 \begin{frame}{List of symbols (1/2)}
   \begin{center}
-    \renewcommand{\arraystretch}{1.2}
+    \renewcommand{\arraystretch}{1.15}
     \begin{tabular}{@{}lp{4.1cm}lp{4.1cm}@{}}
       \toprule
       \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
       \midrule
-      $\mu$         & Expected value        & $n$             & Sample size \\
-      $\sigma^{2}$  & Variance              & $X_i$           & Sample variable \\
-      $\sigma$      & Standard deviation    & $x_i$           & Observed value \\
-      $\bar{X}$     & Sample mean           & $\mu_0$         & Hypothesized value \\
-      $\bar{x}$     & Realization           & $s^{2}$         & Sample variance \\
-      $s$           & Sample std.\ dev.     & $H_0$           & Null hypothesis \\
-      $H_1$         & Alternative hypothesis & $\alpha$        & Type I error prob. \\
-      $\beta$       & Type II error prob.   & $1-\beta$       & Power \\
+      $\mu=E(X)$              & Expected value        & $n$             & Sample size \\
+      $\sigma^{2}=\mathrm{Var}(X)$ & Variance         & $X_i$           & Sample variable (random) \\
+      $\sigma$                & Standard deviation    & $x_i$           & Observed value \\
+      $\bar{X}$               & Sample mean (random)  & $\mu_0$         & Hypothesised value \\
+      $\bar{x}$               & Realisation of $\bar X$ & $s^{2}$       & Sample variance \\
+      $s$                     & Sample std.\ dev.     & $\mathrm{SE}$   & Standard error, $\sigma/\sqrt n$ \\
+      $e$                     & Margin of error       & $H_0$           & Null hypothesis \\
+      $H_1$                   & Alternative hypothesis & $\alpha$       & Type I error prob. \\
+      $\beta$                 & Type II error prob.   & $1-\beta$       & Power \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -118,28 +134,31 @@
 \begin{frame}{List of symbols (2/2)}
   \begin{center}
     \small
-    \renewcommand{\arraystretch}{1.2}
-    \begin{tabular}{@{}lp{4.1cm}lp{4.1cm}@{}}
+    \renewcommand{\arraystretch}{1.12}
+    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{4.4cm}l>{\raggedright\arraybackslash}p{4.4cm}@{}}
       \toprule
       \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
       \midrule
-      $Z_n$              & Test stat., known var.   & $T_n$              & Test stat., unknown var. \\
+      $Z\sim N(0,1)$     & Standard normal variable & $\varphi$, $\Phi$ & Density, CDF of $N(0,1)$ \\
+      $Z_n$              & Standardised mean, $\sigma$ known (CI pivot / test statistic)
+                         & $T_n$              & The same with $s$ instead of $\sigma$ \\
+      $z_p$              & $p$-quantile: $\Phi(z_p)=p$ & $F_{t,n-1}$ & CDF of $t_{n-1}$ \\
       $z_{1-\alpha/2}$   & Two-sided quantile, $N(0,1)$ & $t_{1-\alpha/2,n-1}$ & Two-sided quantile, $t_{n-1}$ \\
       $z_{1-\alpha}$     & One-sided quantile, $N(0,1)$ & $t_{1-\alpha,n-1}$ & One-sided quantile, $t_{n-1}$ \\
-      $\Phi(\cdot)$      & CDF of $N(0,1)$          & $F_{t,n-1}$        & CDF of $t_{n-1}$ \\
       $p$                & $p$-value                & $\text{CI}$        & Confidence interval \\
       $\alpha$           & Significance level       & $1-\alpha$         & Confidence level \\
-      $\beta$            & Type II error prob.      & $1-\beta$          & Power \\
+      $\xrightarrow{d}$  & Convergence in distribution & i.i.d.  & Independent, identically distributed \\
+      $\xrightarrow{P}$  & Convergence in probability & $\hat\theta$ & Estimator of a parameter $\theta$ \\
       \bottomrule
     \end{tabular}
   \end{center}
 \end{frame}
 % ============================================================================
-% SECTION 1: CONFIDENCE INTERVALS
+% SECTION 1: FOUNDATIONS (probability refresher)
 % ============================================================================
-\section[CIs]{Confidence Intervals}
+\section[Foundations]{Foundations: a Probability Refresher}
 
-\subsection{Motivation and intuition}
+\subsection{From data to models}
 
 % ---- Motivation: descriptive -> inferential --------------------------------
 \begin{frame}{Why inferential statistics?}
@@ -172,6 +191,607 @@
     \end{column}
   \end{columns}
 \end{frame}
+
+% ---- Two worlds -------------------------------------------------------------
+\begin{frame}{Two worlds: data and model}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Data world (descriptive, Parts 1--2)}
+        A \textbf{concrete sample} $x_1,\dots,x_n$, summarised by
+        \begin{itemize}\setlength{\itemsep}{1pt}
+          \item the mean $\bar x=\tfrac1n\sum x_i$,
+          \item the variance $s^2$ and standard deviation $s$,
+          \item relative frequencies.
+        \end{itemize}
+        \emph{Changes} from sample to sample.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Model world (probability)}
+        A \textbf{random variable} $X$ with an (unknown) distribution:
+        \begin{itemize}\setlength{\itemsep}{1pt}
+          \item the expected value $E(X)=\mu$,
+          \item the variance $\mathrm{Var}(X)=\sigma^2$ and standard
+                deviation $\sigma$,
+          \item probabilities.
+        \end{itemize}
+        \emph{Fixed} -- but unknown.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \kernaussage{The sample figures serve as \textbf{estimates} of the model
+  parameters: $\hat\mu=\bar x$, \ $\hat\sigma^2=s^2$. Inference asks how far
+  such an estimate can be off.}
+  \appendixnote{properties of estimators, law of large numbers}
+\end{frame}
+\note{Talk track: everything in Parts 1--2 lived in the left box. This part
+needs the right box, because the question ``how far can $\bar x$ be from
+$\mu$?'' is a question about the \emph{model}. Anchor sentence: ``$\bar x$ is
+a number we see, $\mu$ is a number we want.'' The hat notation $\hat\mu$ will
+come back in regression ($\hat\beta_1$).}
+
+% ---- Random variables, E and Var --------------------------------------------
+\begin{frame}{Random variables, expected value and variance}
+  \begin{block}{Random variable}
+    A \textbf{random variable} $X$ assigns a number to every outcome of a random
+    experiment (e.g.\ the fill volume of the \emph{next} bottle). Its
+    distribution says which values occur with which probability.
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.51\textwidth}
+      \small
+      \textbf{Expected value} -- probability-weighted mean:
+      \[ \mu=E(X)=\sum_i x_i\,P(X=x_i) \]
+      \textbf{Variance} -- mean squared deviation from $\mu$:
+      \[ \sigma^2=\mathrm{Var}(X)=E\bigl[(X-\mu)^2\bigr]=E(X^2)-\mu^2 \]
+      {\footnotesize Continuous $X$ with density $f$: sums become integrals,
+      e.g.\ $E(X)=\int x\,f(x)\,\mathrm{d}x$.}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{exampleblock}{Complaints per day in an online shop}
+        \footnotesize
+        \begin{tabular}{@{}lcccc@{}}
+          $x$        & $0$   & $1$   & $2$   & $3$\\
+          $P(X=x)$   & $0.1$ & $0.3$ & $0.4$ & $0.2$
+        \end{tabular}\\[4pt]
+        $E(X)=0\cdot0.1+1\cdot0.3+2\cdot0.4+3\cdot0.2=\mathbf{1.7}$\\[2pt]
+        $E(X^2)=0+0.3+1.6+1.8=3.7$\\[2pt]
+        $\mathrm{Var}(X)=3.7-1.7^2=\mathbf{0.81}$, \ $\sigma=\mathbf{0.9}$
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+  \inworten{In the long run: $1.7$ complaints per day on average -- a value
+  that no single day can have.}
+\end{frame}
+
+% ---- Rules for E and Var ----------------------------------------------------
+\begin{frame}{Two rules that explain why averaging helps}
+  \begin{columns}[T]
+    \begin{column}{0.44\textwidth}
+      \begin{block}{Linear transformation}
+        \vspace{-4pt}
+        \begin{align*}
+          E(a+bX)&=a+b\,E(X)\\
+          \mathrm{Var}(a+bX)&=b^2\,\mathrm{Var}(X)
+        \end{align*}
+        \vspace{-14pt}
+      \end{block}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Sums}
+        \vspace{-4pt}
+        \begin{align*}
+          E(X+Y)&=E(X)+E(Y) && \text{\scriptsize always}\\
+          \mathrm{Var}(X+Y)&=\mathrm{Var}(X)+\mathrm{Var}(Y) && \text{\scriptsize if independent}
+        \end{align*}
+        \vspace{-14pt}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \medskip
+  \textbf{Applied to the sample mean} of i.i.d.\ $X_1,\dots,X_n$ with
+  $E(X_i)=\mu$, $\mathrm{Var}(X_i)=\sigma^2$:
+  \[
+    E(\bar X)=\frac1n\cdot n\mu=\mu,\qquad
+    \mathrm{Var}(\bar X)=\frac{1}{n^2}\cdot n\sigma^2=\frac{\sigma^2}{n},\qquad
+    \sqrt{\mathrm{Var}(\bar X)}=\frac{\sigma}{\sqrt n}.
+  \]
+  \kernaussage{$\bar X$ is right \emph{on average}, and its variance shrinks
+  like $1/n$: the variances of the $n$ values add up to $n\sigma^2$, but
+  averaging divides by $n^2$. (Variances add -- standard deviations do
+  \emph{not}.)}
+\end{frame}
+\note{Talk track: two lines of algebra carry the whole part. Write
+$\bar X=\tfrac1n(X_1+\dots+X_n)$ on the board, apply ``sum rule'' and
+``constant squared'' -- done. Common error: adding standard deviations
+($n\sigma$) instead of variances ($n\sigma^2$). The independence assumption
+matters: duplicated or clustered observations break $\sigma^2/n$.}
+
+\subsection{Normal distribution}
+
+% ---- Normal distribution ----------------------------------------------------
+\begin{frame}{The normal distribution $N(\mu,\sigma^2)$}
+  \centering
+  \includegraphics[width=\textwidth,height=0.50\textheight,keepaspectratio]{images/normal_bell.png}\par
+  \raggedright
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Density of $X\sim N(\mu,\sigma^2)$}
+        \vspace{-2pt}
+        \[ f(x)=\frac{1}{\sqrt{2\pi}\,\sigma}\;e^{-\frac{(x-\mu)^2}{2\sigma^2}},
+           \quad x\in\mathbb{R} \]
+        \vspace{-12pt}
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{1pt}
+        \item $E(X)=\mu$ (location), $\mathrm{Var}(X)=\sigma^2$ (spread);
+              symmetric bell around $\mu$.
+        \item Probabilities are \textbf{areas} under $f$.
+        \item Careful: \texttt{scipy} wants the \emph{standard deviation},
+              \texttt{stats.norm(loc=$\mu$, scale=$\sigma$)}.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+\note{Talk track: start with the left panel -- measure many bottles, the
+histogram looks like a bell. The normal distribution is the idealised model
+of such data. Right panel: $\mu$ moves the bell, $\sigma$ widens it (and
+lowers it, because the area stays $1$). Repeat the convention: in this course
+the second argument is the variance; scipy's \texttt{scale} is $\sigma$.}
+
+% ---- Standardisation --------------------------------------------------------
+\begin{frame}{Standardisation: one table for all normal distributions}
+  \begin{block}{Standard normal distribution}
+    $Z\sim N(0,1)$ has density $\varphi(z)$ and CDF $\Phi(z)=P(Z\le z)$.
+    Normal areas have no closed formula, but every normal variable can be
+    \textbf{standardised}:
+    \[
+      X\sim N(\mu,\sigma^2)\quad\Longrightarrow\quad
+      Z=\frac{X-\mu}{\sigma}\sim N(0,1),\qquad\text{conversely } X=\mu+\sigma Z .
+    \]
+  \end{block}
+  \begin{exampleblock}{Milk: a single bottle, $X\sim N(1000,\,3^2)$}
+    \vspace{-6pt}
+    \[
+      P(X\le 997)=P\Bigl(Z\le\tfrac{997-1000}{3}\Bigr)=\Phi(-1)
+      =1-\Phi(1)=1-0.8413=\mathbf{0.1587}
+    \]
+    \vspace{-12pt}\par
+    $997$\,ml lies one standard deviation below $\mu$: about $16\,\%$ of the
+    bottles hold at most $997$\,ml.
+  \end{exampleblock}
+  \kernaussage{Standardising reduces every normal probability to \emph{one}
+  table -- that of $\Phi$.}
+\end{frame}
+\note{Talk track: ``$z$ = distance from the mean in standard deviations''
+-- say it until it sticks. Work the milk example on the board: subtract
+$\mu$, divide by $\sigma$, look up $\Phi(1)$, use symmetry. Point ahead: the
+standardised mean (and later the test statistic) is exactly this move applied
+to $\bar X$, with the standard error instead of $\sigma$.}
+
+% ---- Four basic cases ---------------------------------------------------------
+\begin{frame}{Probabilities as areas -- the four basic cases}
+  \centering
+  \includegraphics[width=0.92\textwidth,height=0.63\textheight,keepaspectratio]{images/normal_areas.png}\par
+  \raggedright\footnotesize
+  The table gives only $\Phi(z)=P(Z\le z)$. Everything else follows from
+  \textbf{total area $=1$} and \textbf{symmetry}: \ $P(Z>z)=1-\Phi(z)$, \
+  $\Phi(-z)=1-\Phi(z)$, \ $P(a\le Z\le b)=\Phi(b)-\Phi(a)$.
+\end{frame}
+\note{Talk track: ``draw before you calculate'' -- sketch the bell, shade
+the area, then decide which rule applies. Ask: why is $P(Z>0.75)$ equal to
+$P(Z\le-0.75)$? (symmetry). For continuous variables $P(Z=z)=0$, so $<$ and
+$\le$ give the same probability.}
+
+% ---- Phi table ----------------------------------------------------------------
+\begin{frame}{Standard normal table $\Phi(z)=P(Z\le z)$ (1/2)}
+  \begin{center}
+    \scriptsize\setlength{\tabcolsep}{3.2pt}\renewcommand{\arraystretch}{0.96}
+    \begin{tabular}{c|cccccccccc}
+      \toprule
+      $z$ & $.00$ & $.01$ & $.02$ & $.03$ & $.04$ & $.05$ & $.06$ & $.07$ & $.08$ & $.09$\\
+      \midrule
+      $0.0$ & 0.5000 & 0.5040 & 0.5080 & 0.5120 & 0.5160 & 0.5199 & 0.5239 & 0.5279 & 0.5319 & 0.5359 \\
+      $0.1$ & 0.5398 & 0.5438 & 0.5478 & 0.5517 & 0.5557 & 0.5596 & 0.5636 & 0.5675 & 0.5714 & 0.5753 \\
+      $0.2$ & 0.5793 & 0.5832 & 0.5871 & 0.5910 & 0.5948 & 0.5987 & 0.6026 & 0.6064 & 0.6103 & 0.6141 \\
+      $0.3$ & 0.6179 & 0.6217 & 0.6255 & 0.6293 & 0.6331 & 0.6368 & 0.6406 & 0.6443 & 0.6480 & 0.6517 \\
+      $0.4$ & 0.6554 & 0.6591 & 0.6628 & 0.6664 & 0.6700 & 0.6736 & 0.6772 & 0.6808 & 0.6844 & 0.6879 \\
+      $0.5$ & 0.6915 & 0.6950 & 0.6985 & 0.7019 & 0.7054 & 0.7088 & 0.7123 & 0.7157 & 0.7190 & 0.7224 \\
+      $0.6$ & 0.7257 & 0.7291 & 0.7324 & 0.7357 & 0.7389 & 0.7422 & 0.7454 & 0.7486 & 0.7517 & 0.7549 \\
+      $0.7$ & 0.7580 & 0.7611 & 0.7642 & 0.7673 & 0.7704 & \cellcolor{hsbiorange!35}0.7734 & 0.7764 & 0.7794 & 0.7823 & 0.7852 \\
+      $0.8$ & 0.7881 & 0.7910 & 0.7939 & 0.7967 & 0.7995 & 0.8023 & 0.8051 & 0.8078 & 0.8106 & 0.8133 \\
+      $0.9$ & 0.8159 & 0.8186 & 0.8212 & 0.8238 & 0.8264 & 0.8289 & 0.8315 & 0.8340 & 0.8365 & 0.8389 \\
+      $1.0$ & 0.8413 & 0.8438 & 0.8461 & 0.8485 & 0.8508 & 0.8531 & 0.8554 & 0.8577 & 0.8599 & 0.8621 \\
+      $1.1$ & 0.8643 & 0.8665 & 0.8686 & 0.8708 & 0.8729 & 0.8749 & 0.8770 & 0.8790 & 0.8810 & 0.8830 \\
+      $1.2$ & 0.8849 & 0.8869 & 0.8888 & 0.8907 & 0.8925 & 0.8944 & 0.8962 & 0.8980 & 0.8997 & 0.9015 \\
+      $1.3$ & 0.9032 & 0.9049 & 0.9066 & 0.9082 & 0.9099 & 0.9115 & 0.9131 & 0.9147 & 0.9162 & 0.9177 \\
+      $1.4$ & 0.9192 & 0.9207 & 0.9222 & 0.9236 & 0.9251 & 0.9265 & 0.9279 & 0.9292 & 0.9306 & 0.9319 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  {\footnotesize \textbf{Reading:} row $=$ $z$ to one decimal, column $=$
+  second decimal. Highlighted: $z=0.75$ $\to$ row $0.7$, column $.05$ $\to$
+  $\Phi(0.75)=0.7734$.}
+\end{frame}
+
+\begin{frame}{Standard normal table $\Phi(z)=P(Z\le z)$ (2/2)}
+  \begin{center}
+    \scriptsize\setlength{\tabcolsep}{3.2pt}\renewcommand{\arraystretch}{0.96}
+    \begin{tabular}{c|cccccccccc}
+      \toprule
+      $z$ & $.00$ & $.01$ & $.02$ & $.03$ & $.04$ & $.05$ & $.06$ & $.07$ & $.08$ & $.09$\\
+      \midrule
+      $1.5$ & 0.9332 & 0.9345 & 0.9357 & 0.9370 & 0.9382 & 0.9394 & 0.9406 & 0.9418 & 0.9429 & 0.9441 \\
+      $1.6$ & 0.9452 & 0.9463 & 0.9474 & 0.9484 & \cellcolor{hsbiorange!35}0.9495 & \cellcolor{hsbiorange!35}0.9505 & 0.9515 & 0.9525 & 0.9535 & 0.9545 \\
+      $1.7$ & 0.9554 & 0.9564 & 0.9573 & 0.9582 & 0.9591 & 0.9599 & 0.9608 & 0.9616 & 0.9625 & 0.9633 \\
+      $1.8$ & 0.9641 & 0.9649 & 0.9656 & 0.9664 & 0.9671 & 0.9678 & 0.9686 & 0.9693 & 0.9699 & 0.9706 \\
+      $1.9$ & 0.9713 & 0.9719 & 0.9726 & 0.9732 & 0.9738 & 0.9744 & \cellcolor{hsbiorange!35}0.9750 & 0.9756 & 0.9761 & 0.9767 \\
+      $2.0$ & 0.9772 & 0.9778 & 0.9783 & 0.9788 & 0.9793 & 0.9798 & 0.9803 & 0.9808 & 0.9812 & 0.9817 \\
+      $2.1$ & 0.9821 & 0.9826 & 0.9830 & 0.9834 & 0.9838 & 0.9842 & 0.9846 & 0.9850 & 0.9854 & 0.9857 \\
+      $2.2$ & 0.9861 & 0.9864 & 0.9868 & 0.9871 & 0.9875 & 0.9878 & 0.9881 & 0.9884 & 0.9887 & 0.9890 \\
+      $2.3$ & 0.9893 & 0.9896 & 0.9898 & 0.9901 & 0.9904 & 0.9906 & 0.9909 & 0.9911 & 0.9913 & 0.9916 \\
+      $2.4$ & 0.9918 & 0.9920 & 0.9922 & 0.9925 & 0.9927 & 0.9929 & 0.9931 & 0.9932 & 0.9934 & 0.9936 \\
+      $2.5$ & 0.9938 & 0.9940 & 0.9941 & 0.9943 & 0.9945 & 0.9946 & 0.9948 & 0.9949 & 0.9951 & 0.9952 \\
+      $2.6$ & 0.9953 & 0.9955 & 0.9956 & 0.9957 & 0.9959 & 0.9960 & 0.9961 & 0.9962 & 0.9963 & 0.9964 \\
+      $2.7$ & 0.9965 & 0.9966 & 0.9967 & 0.9968 & 0.9969 & 0.9970 & 0.9971 & 0.9972 & 0.9973 & 0.9974 \\
+      $2.8$ & 0.9974 & 0.9975 & 0.9976 & 0.9977 & 0.9977 & 0.9978 & 0.9979 & 0.9979 & 0.9980 & 0.9981 \\
+      $2.9$ & 0.9981 & 0.9982 & 0.9982 & 0.9983 & 0.9984 & 0.9984 & 0.9985 & 0.9985 & 0.9986 & 0.9986 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  {\footnotesize Negative $z$ via symmetry: $\Phi(-z)=1-\Phi(z)$. For
+  $z\ge 3$: $\Phi(z)\approx 1$. Highlighted: the quantiles $1.645$ and $1.96$
+  (next slide).}
+\end{frame}
+
+% ---- Reading forwards / backwards ---------------------------------------------
+\begin{frame}[fragile]{Reading the table -- forwards and backwards}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Forwards: probability wanted}
+        \small
+        $z=0.75$: row $0.7$, column $.05$ $\Rightarrow$
+        $\Phi(0.75)=\mathbf{0.7734}$.\\[2pt]
+        Negative $z$: $\Phi(-0.75)=1-0.7734=0.2266$.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Backwards: quantile wanted}
+        \small
+        Search $0.95$ \emph{inside} the table: $\Phi(1.64)=0.9495$,
+        $\Phi(1.65)=0.9505$ $\Rightarrow$ $z_{0.95}\approx\mathbf{1.645}$.\\[2pt]
+        $\Phi(1.96)=0.9750$ $\Rightarrow$ $z_{0.975}=\mathbf{1.96}$.
+      \end{block}
+    \end{column}
+  \end{columns}
+  {\small The \textbf{$p$-quantile} $z_p$ is defined by $\Phi(z_p)=p$; by
+  symmetry $z_{1-p}=-z_p$ (e.g.\ $z_{0.05}=-1.645$).}
+\begin{lstlisting}
+from scipy import stats
+stats.norm.cdf(0.75)                     # Phi(0.75)              -> 0.7734
+stats.norm.ppf(0.95)                     # quantile z_0.95        -> 1.6449
+stats.norm.cdf(997, loc=1000, scale=3)   # P(X <= 997), N(1000,9) -> 0.1587
+\end{lstlisting}
+  \kernaussage{The famous $1.96$ is the $0.975$-quantile of $N(0,1)$: the
+  central $95\,\%$ of the area lies between $\pm1.96$.}
+\end{frame}
+\note{Talk track: forwards = look up the margin, read inside; backwards =
+look up inside, read the margin. Let students find $1.96$ themselves in the
+(2/2) table -- the ``magic number'' of the next section loses its mystery.
+\texttt{cdf} goes forwards, \texttt{ppf} (percent point function) goes
+backwards.}
+
+\subsection{Sampling distribution and CLT}
+
+% ---- Sampling distribution: estimators are random variables ----------------
+\begin{frame}{Estimators are random variables}
+  \small The sample $X_1,\dots,X_n$ is \textbf{random}, so \emph{anything}
+  computed from it -- $\bar X$, $s$, and later the test statistics -- is itself
+  a \textbf{random variable}.
+  \begin{itemize}\small\setlength{\itemsep}{2pt}
+    \item New sample $\Rightarrow$ a new $\bar x$ \emph{and} a new $s$.
+    \item Its distribution over \emph{all possible samples} is the
+          \textbf{sampling distribution} -- so $\bar X$ and $s$ each have
+          their own.
+  \end{itemize}
+  \begin{center}
+  \begin{tikzpicture}
+    \node[flowboxo, text width=2.6cm] (s) {\footnotesize random sample\\ $X_1,\dots,X_n$};
+    \node[flowbox, text width=2.4cm, right=16mm of s] (st) {\footnotesize statistic\\ $\bar X$ \ or\ $s$};
+    \node[flowboxg, text width=2.8cm, right=16mm of st] (d) {\footnotesize \textbf{sampling}\\ \textbf{distribution}};
+    \draw[flowarr] (s) -- (st)
+      node[midway,above=1pt,font=\scriptsize,fill=white,inner sep=1.5pt]{compute};
+    \draw[flowarr] (st) -- (d)
+      node[midway,above=1pt,font=\scriptsize,fill=white,inner sep=1.5pt]{repeat};
+  \end{tikzpicture}
+  \end{center}
+  \kernaussage{A confidence interval or test is built on the \emph{sampling
+  distribution} of an estimator -- never on a single number alone.}
+\end{frame}
+
+% ---- Standard error -------------------------------------------------------
+\begin{frame}{The standard error: how much $\bar X$ wobbles}
+  \begin{block}{Definition}
+    The \textbf{standard error} (SE) is the \emph{standard deviation of the
+    sampling distribution} of an estimator -- the spread of $\bar X$ from
+    sample to sample, \emph{not} the spread of the raw data.
+    \[
+      \mathrm{SE}(\bar X)=\sqrt{\mathrm{Var}(\bar X)}=\frac{\sigma}{\sqrt n}\quad
+      \Bigl(\text{or }\tfrac{s}{\sqrt n}\text{ when }\sigma\text{ is estimated}\Bigr).
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item It is the natural \textbf{ruler} for inference: we will measure
+          \emph{how many standard errors} $\bar x$ lies away from a reference
+          value -- this standardised quantity reappears as the test statistic
+          in Section~3.
+    \item Larger $n$ $\Rightarrow$ smaller SE $\Rightarrow$ narrower CI and
+          sharper test.
+  \end{itemize}
+  \kernaussage{Standard \emph{deviation} = spread of the data; \quad standard
+  \emph{error} = spread of the estimate.}
+\end{frame}
+
+% ---- CLT: intuition -------------------------------------------------------------
+\begin{frame}{The central limit theorem -- intuition}
+  \guidingquestion{Our inference rests on $\bar X\sim N(\mu,\sigma^2/n)$. But
+  real data -- waiting times, incomes, processing times -- are often
+  \emph{skewed}. Does the recipe still work?}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item Draw $n$ independent values from \emph{any} distribution (skewed,
+          flat, bimodal) with mean $\mu$ and standard deviation $\sigma$.
+    \item Their \textbf{mean} $\bar X$ is approximately \textbf{normal} once
+          $n$ is large enough -- the shape of the original distribution washes
+          out.
+    \item Why? In an average, unusually high and unusually low values partly
+          cancel out; what remains is a symmetric bell around $\mu$.
+  \end{itemize}
+  \kernaussage{Whatever the shape of the data: for large $n$ the
+  \textbf{sample mean} is approximately normal, with centre $\mu$ and
+  standard error $\sigma/\sqrt n$.}
+\end{frame}
+\note{Talk track: ask first -- ``waiting times at a checkout are skewed;
+is the AVERAGE waiting time of 50 customers skewed too?'' Let them guess, then
+show the simulation on the next slide. Keep the distinction sharp: the CLT is
+about averages (and sums), never about single observations.}
+
+% ---- CLT: simulation ------------------------------------------------------------
+\begin{frame}{The central limit theorem -- a simulation}
+  \centering
+  \includegraphics[width=\textwidth,height=0.56\textheight,keepaspectratio]{images/clt_simulation.png}\par
+  \raggedright\footnotesize
+  Processing times of customer orders are right-skewed (here: gamma
+  distribution with $\mu=12$, $\sigma=6$ minutes). For each $n$, $20\,000$
+  samples were drawn and their means $\bar x$ plotted. For $n=1$ the normal
+  curve fits badly; at $n=36$ the histogram of $\bar x$ is practically normal
+  -- and it narrows like $6/\sqrt n$.
+\end{frame}
+\note{Talk track: read the panels from left to right. Left: single values,
+clearly skewed -- the orange normal curve is wrong. Each step to the right:
+the histogram becomes more symmetric AND narrower. Two messages in one
+picture: the shape becomes normal (CLT) and the spread shrinks like
+$1/\sqrt n$ (standard error). Seed and code are in \texttt{make\_figures.py}.}
+
+% ---- CLT: formal ----------------------------------------------------------------
+\begin{frame}{The central limit theorem -- formal statement}
+  \begin{block}{Central limit theorem (Lindeberg--L\'evy)}
+    Let $X_1,\dots,X_n$ be i.i.d.\ with $E(X_i)=\mu$ and
+    $0<\mathrm{Var}(X_i)=\sigma^2<\infty$. Then
+    \[
+      Z_n=\frac{\bar X-\mu}{\sigma/\sqrt n}\ \xrightarrow{\;d\;}\ N(0,1)
+      \quad (n\to\infty),
+      \qquad\text{i.e.}\qquad
+      \bar X\ \overset{\text{approx.}}{\sim}\ N\Bigl(\mu,\frac{\sigma^2}{n}\Bigr).
+    \]
+  \end{block}
+  \inworten{For large $n$ the standardised mean behaves like a standard
+  normal variable -- whatever the distribution of the single values.}
+  \begin{itemize}\small\setlength{\itemsep}{1pt}
+    \item $\xrightarrow{d}$ = convergence \emph{in distribution}: the CDF of
+          $Z_n$ approaches $\Phi$.
+    \item Rule of thumb: $n\gtrsim 30$ is usually enough; strongly skewed data
+          need more.
+    \item For \emph{normal} data, $\bar X\sim N(\mu,\sigma^2/n)$ holds
+          \emph{exactly}, for every $n$.
+    \item The CLT is about $\bar X$ -- it does \emph{not} make the single
+          values normal.
+  \end{itemize}
+\end{frame}
+\note{Talk track: connect to what follows -- every CI and test in this part
+standardises $\bar X$ like $Z_n$; the CLT is the licence to do so for non-normal data with
+$n\gtrsim30$ (assumptions checklist later). Typical exam trap: ``by the CLT
+the data are normal'' -- no, only the mean is.}
+
+\subsection{Exercises}
+
+% ---- Exercise: fill volume --------------------------------------------------------
+\begin{frame}{Exercise -- normal distribution: fill volume}
+  \begin{block}{Problem statement}
+    A bottling plant fills orange juice into 1-litre bottles. The fill volume
+    $X$ (in ml) is normally distributed with $\mu=1000$ and $\sigma=10$, i.e.\
+    $X\sim N(1000,\,10^2)$. The legal minimum content is $985$\,ml.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item[a)] What share of the bottles is underfilled, $P(X<985)$?
+    \item[b)] With what probability does a bottle contain between $990$ and
+              $1015$\,ml?
+    \item[c)] Which fill volume $x_{0.95}$ is exceeded by only $5\,\%$ of the
+              bottles?
+    \item[d)] The share of underfilled bottles is to be cut to at most
+              $1\,\%$. To which setpoint $\mu$ must the plant be adjusted if
+              $\sigma=10$ stays the same?
+  \end{enumerate}
+  \textbf{Hint:} standardise, $z=(x-\mu)/\sigma$, and use the $\Phi$ table.
+\end{frame}
+\note{Talk track: give 5--7 minutes. Insist on a sketch of the bell curve
+for every part -- a) and b) are areas (forwards), c) and d) are quantiles
+(backwards). Part d) is the business punchline: the safety margin costs juice
+in every single bottle.}
+
+\begin{frame}{Solution (1/3) -- fill volume: probabilities}
+  \textbf{Rules:} $P(X\le x)=\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$; \
+  $\Phi(-z)=1-\Phi(z)$; \ $P(a\le X\le b)=\Phi(z_b)-\Phi(z_a)$.
+  \begin{align*}
+    \text{a)}\quad P(X<985) &= \Phi\Bigl(\tfrac{985-1000}{10}\Bigr)=\Phi(-1.5)
+      =1-\Phi(1.5)=1-0.9332=\mathbf{0.0668}\\[4pt]
+    \text{b)}\quad P(990\le X\le 1015)
+      &=\Phi\Bigl(\tfrac{1015-1000}{10}\Bigr)-\Phi\Bigl(\tfrac{990-1000}{10}\Bigr)
+       =\Phi(1.5)-\Phi(-1)\\
+      &=0.9332-(1-0.8413)=0.9332-0.1587=\mathbf{0.7745}
+  \end{align*}
+  \begin{exampleblock}{Interpretation}
+    About $6.7\,\%$ of the bottles are underfilled; about $77.5\,\%$ contain
+    between $990$ and $1015$\,ml.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/3) -- fill volume: quantile and setpoint}
+  \textbf{Rules:} quantile $x_p=\mu+\sigma z_p$ (search $p$ \emph{inside} the
+  table); \ $z_{1-p}=-z_p$.
+  \begin{align*}
+    \text{c)}\quad &\Phi(z)=0.95\ \Rightarrow\ z_{0.95}=1.645
+       \ \Rightarrow\ x_{0.95}=1000+1.645\cdot10=\mathbf{1016.45\ ml}\\[4pt]
+    \text{d)}\quad &P(X<985)=0.01\ \Rightarrow\
+       \tfrac{985-\mu}{10}=z_{0.01}=-z_{0.99}\approx-2.33
+       \quad(\text{table: }\Phi(2.33)=0.9901)\\
+     &\Rightarrow\ \mu=985+2.33\cdot10=\mathbf{1008.3\ ml}
+       \quad(\text{exact } z_{0.99}=2.3263:\ 1008.26\text{ ml})
+  \end{align*}
+  \begin{exampleblock}{Interpretation}
+    Only $5\,\%$ of the bottles contain more than $1016.45$\,ml. To cut
+    underfilling from $6.7\,\%$ to $1\,\%$, the setpoint must rise by about
+    $8$\,ml -- every bottle gets more juice: the price of safety.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (3/3) -- fill volume: with Python}
+  \textbf{Rule:} \texttt{cdf} gives $P(X\le x)$, \texttt{ppf} the quantile;
+  \texttt{scale} $=\sigma$ is the \emph{standard deviation}.
+\begin{lstlisting}
+from scipy import stats
+
+X = stats.norm(loc=1000, scale=10)          # X ~ N(1000, 10^2)
+print(f"a) {X.cdf(985):.4f}")
+print(f"b) {X.cdf(1015) - X.cdf(990):.4f}")
+print(f"c) {X.ppf(0.95):.2f}")
+print(f"d) {985 - stats.norm.ppf(0.01) * 10:.2f}")   # mu = 985 - z_0.01 * sigma
+\end{lstlisting}
+  \begin{block}{Output}
+\begin{lstlisting}[style=Pyout]
+a) 0.0668
+b) 0.7745
+c) 1016.45
+d) 1008.26
+\end{lstlisting}
+  \end{block}
+  \footnotesize The table answers differ only by rounding ($z_{0.99}=2.33$
+  instead of $2.3263$ in d).
+\end{frame}
+
+% ---- Exercise: CLT --------------------------------------------------------------
+\begin{frame}{Exercise -- central limit theorem: processing times}
+  \begin{block}{Problem statement}
+    The processing time $X$ of a customer order in a service centre (in
+    minutes) is \textbf{right-skewed}; its exact distribution is unknown.
+    Known are only $\mu=12$ and $\sigma=6$. In one shift, $n=36$ orders are
+    processed independently of each other.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item[a)] How is the mean processing time $\bar X$ of a shift
+              (approximately) distributed? Why?
+    \item[b)] With what probability is the mean processing time of a shift
+              above $13.5$ minutes?
+    \item[c)] What would $P(X>13.5)$ be for a \emph{single} order if $X$ were
+              normal? Why can this not be computed without that assumption --
+              whereas b) can?
+    \item[d)] How many orders per shift would be needed for a standard error of
+              the mean of at most $0.5$ minutes?
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution (1/3) -- processing times: distribution of the mean}
+  \textbf{Rule (CLT):} for i.i.d.\ $X_i$ and large $n$,
+  $\bar X\overset{\text{approx.}}{\sim}N(\mu,\sigma^2/n)$ -- whatever the
+  shape of the distribution of $X$.
+  \begin{align*}
+    \text{a)}\quad & E(\bar X)=12,\qquad
+      \mathrm{SE}=\frac{\sigma}{\sqrt n}=\frac{6}{\sqrt{36}}=1
+      \quad\Rightarrow\quad \bar X\overset{\text{approx.}}{\sim}\mathbf{N(12,\,1^2)}\\[4pt]
+    \text{b)}\quad & P(\bar X>13.5)=P\Bigl(Z>\tfrac{13.5-12}{1}\Bigr)
+      =1-\Phi(1.5)=1-0.9332=\mathbf{0.0668}
+  \end{align*}
+  \begin{exampleblock}{Interpretation}
+    Although single processing times are skewed, the mean of $36$ orders is
+    approximately normal ($n=36\ge30$). Only in about $6.7\,\%$ of the shifts
+    does the mean processing time exceed $13.5$ minutes.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/3) -- processing times: single value vs.\ mean}
+  \textbf{Rule:} $P(X>x)=1-\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$ for a
+  \emph{single} value holds \textbf{only} if $X$ itself is normal -- the CLT
+  says nothing about $X$, only about $\bar X$.
+  \[
+    \text{c)}\quad P(X>13.5)=1-\Phi\Bigl(\tfrac{13.5-12}{6}\Bigr)
+      =1-\Phi(0.25)=1-0.5987=\mathbf{0.4013}
+  \]
+  \vspace{-6pt}
+  \centerline{\small (valid \emph{only} if $X$ itself is normal)}
+  \begin{itemize}\small\setlength{\itemsep}{2pt}
+    \item For a skewed $X$ with the same $\mu$ and $\sigma$ the true value can
+          differ markedly. Example: under the gamma model of the simulation
+          slide, $P(X>13.5)=0.342$ -- not $0.401$.
+    \item $P(\bar X>13.5)=0.0668$ is reliable: the CLT delivers the normal
+          shape of the mean \emph{without} knowing the shape of $X$ (gamma
+          model, exact: $0.071$).
+  \end{itemize}
+  \kernaussage{A single order exceeds $13.5$ minutes often (roughly $35$--$40\,\%$),
+  the shift mean rarely ($\approx7\,\%$): averaging shrinks the spread by the
+  factor $\sqrt{36}=6$.}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (3/3) -- processing times: sample size and Python}
+  \textbf{Rule:} $\mathrm{SE}=\sigma/\sqrt n$ -- the standard error falls with
+  $\sqrt n$, not with $n$.
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+      \[
+        \text{d)}\quad \frac{6}{\sqrt n}\le 0.5
+        \;\Leftrightarrow\; \sqrt n\ge\frac{6}{0.5}=12
+        \;\Leftrightarrow\; n\ge \mathbf{144}
+      \]
+      \inworten{Halving the standard error (from $1$ to $0.5$ minutes)
+      requires four times as many orders ($36\to144$).}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \begin{block}{Output (code below)}
+\begin{lstlisting}[style=Pyout]
+b) 0.0668
+c) 0.4013
+d) 144
+\end{lstlisting}
+      \end{block}
+    \end{column}
+  \end{columns}
+\begin{lstlisting}
+import numpy as np
+from scipy import stats
+
+print(f"b) {stats.norm.sf(13.5, loc=12, scale=6 / np.sqrt(36)):.4f}")  # mean
+print(f"c) {stats.norm.sf(13.5, loc=12, scale=6):.4f}")   # single value, IF normal
+print(f"d) {(6 / 0.5) ** 2:.0f}")
+\end{lstlisting}
+\end{frame}
+
+% ============================================================================
+% SECTION 2: CONFIDENCE INTERVALS
+% ============================================================================
+\section[CIs]{Confidence Intervals}
+
+\subsection{Motivation and intuition}
+
 
 % ---- Intuition: a point estimate is not enough -----------------------------
 \begin{frame}{A single estimate is not enough}
@@ -220,54 +840,9 @@
   \end{itemize}
 \end{frame}
 
-% ---- Sampling distribution: estimators are random variables ----------------
-\begin{frame}{Estimators are random variables}
-  \small The sample $X_1,\dots,X_n$ is \textbf{random}, so \emph{anything}
-  computed from it -- $\bar X$, $s$, $Z_n$, $T_n$ -- is itself a \textbf{random
-  variable}.
-  \begin{itemize}\small\setlength{\itemsep}{2pt}
-    \item New sample $\Rightarrow$ a new $\bar x$ \emph{and} a new $s$.
-    \item Its distribution over \emph{all possible samples} is the
-          \textbf{sampling distribution} -- so $\bar X$ and $s$ each have
-          their own.
-  \end{itemize}
-  \begin{center}
-  \begin{tikzpicture}
-    \node[flowboxo, text width=2.6cm] (s) {\footnotesize random sample\\ $X_1,\dots,X_n$};
-    \node[flowbox, text width=2.4cm, right=16mm of s] (st) {\footnotesize statistic\\ $\bar X$ \ or\ $s$};
-    \node[flowboxg, text width=2.8cm, right=16mm of st] (d) {\footnotesize \textbf{sampling}\\ \textbf{distribution}};
-    \draw[flowarr] (s) -- (st)
-      node[midway,above=1pt,font=\scriptsize,fill=white,inner sep=1.5pt]{compute};
-    \draw[flowarr] (st) -- (d)
-      node[midway,above=1pt,font=\scriptsize,fill=white,inner sep=1.5pt]{repeat};
-  \end{tikzpicture}
-  \end{center}
-  \kernaussage{A confidence interval or test is built on the \emph{sampling
-  distribution} of an estimator -- never on a single number alone.}
-\end{frame}
 
-% ---- Standard error -------------------------------------------------------
-\begin{frame}{The standard error: how much $\bar X$ wobbles}
-  \begin{block}{Definition}
-    The \textbf{standard error} (SE) is the \emph{standard deviation of the
-    sampling distribution} of an estimator -- the spread of $\bar X$ from
-    sample to sample, \emph{not} the spread of the raw data.
-    \[
-      \mathrm{SE}(\bar X)=\frac{\sigma}{\sqrt n}\quad
-      \Bigl(\text{or }\tfrac{s}{\sqrt n}\text{ when }\sigma\text{ is estimated}\Bigr).
-    \]
-  \end{block}
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item It is the natural \textbf{ruler} for inference: $Z_n$ and $T_n$ count
-          \emph{how many standard errors} $\bar x$ sits away from $\mu_0$.
-    \item Larger $n$ $\Rightarrow$ smaller SE $\Rightarrow$ narrower CI and
-          sharper test.
-  \end{itemize}
-  \kernaussage{Standard \emph{deviation} = spread of the data; \quad standard
-  \emph{error} = spread of the estimate.}
-\end{frame}
 
-% ---- Why standardize -------------------------------------------------------
+% ---- Why standardise -------------------------------------------------------
 \begin{frame}{Why divide by the standard error?}
   \begin{block}{The raw deviation is not enough}
     A sample mean $\bar x = 8$ lies $2$ units from a reference value
@@ -293,7 +868,7 @@
 row 1 the mean typically wobbles by $2$ anyway (nothing special), while in
 row 2 it wobbles by $0.4$, so a gap of $2$ is five wobbles away (very
 unusual). This is THE reason every test statistic in this course has the same
-shape: (estimate $-$ hypothesized) / SE.}
+shape: (estimate $-$ hypothesised) / SE.}
 
 % ---- Frequentist paradigm --------------------------------------------------
 \begin{frame}{How we read probability: the frequentist view}
@@ -303,8 +878,9 @@ shape: (estimate $-$ hypothesized) / SE.}
         \begin{itemize}\footnotesize\setlength{\itemsep}{2pt}
           \item Parameters $\mu,\sigma$ are \textbf{fixed} (unknown) constants
                 -- not random.
-          \item The data -- and all we build from them ($\bar X$, $s$, the CI
-                bounds, $Z_n$, $p$) -- are \textbf{random}.
+          \item The data -- and all we build from them ($\bar X$, $s$, $Z_n$,
+                the CI bounds, later the test results) -- are
+                \textbf{random}.
         \end{itemize}
       \end{block}
     \end{column}
@@ -315,9 +891,10 @@ shape: (estimate $-$ hypothesized) / SE.}
       \end{block}
     \end{column}
   \end{columns}
-  \kernaussage{``$95\%$ confidence'' and ``$5\%$ significance'' describe the
-  \textbf{procedure across repeated samples} -- not one particular interval and
-  not one particular dataset.}
+  \kernaussage{``$95\,\%$ confidence'' and ``$5\,\%$ significance'' describe
+  the \textbf{procedure across repeated samples} -- not one particular interval
+  and not one particular dataset.}
+  \appendixnote{law of large numbers -- why relative frequencies settle down}
 \end{frame}
 \note{Talk track: this slide is the philosophical key to the whole part --
 return to it whenever an interpretation question comes up. Anchor sentence:
@@ -353,37 +930,27 @@ long-run win rate -- our procedures are calibrated the same way.}
   \end{columns}
 \end{frame}
 
-% ---- 3 levels: (1) intuition ----------------------------------------------
-\begin{frame}{How does the mean fluctuate? -- (1) intuition}
-  \begin{block}{Thought experiment}
-    Imagine we draw the sample \emph{over and over again}. Each time we get a
-    slightly different $\bar x$.
+% ---- How the mean fluctuates: bridge from Foundations + picture ------------
+\begin{frame}{How does the mean fluctuate? -- graphically}
+  \begin{block}{Recall from Foundations}
+    Over repeated samples, $\bar x$ scatters around $\mu$ with standard error
+    $\sigma/\sqrt n$ (milk: $3/\sqrt9=1$\,ml), normally -- exactly for normal
+    data, approximately by the CLT. Standardised: $Z_n\sim N(0,1)$.
   \end{block}
-  \begin{itemize}
-    \item These $\bar x$-values scatter around the true value $\mu$.
-    \item But they scatter \textbf{more tightly} than the individual values --
-          the average evens out outliers.
-    \item The standard error shrinks like $1/\sqrt{n}$: four times as much data
-          $\Rightarrow$ half the spread \emph{of the sample mean}.
-    \item Reason: variances \emph{add} for independent values, so the spread
-          grows like $\sqrt n$ for the \emph{sum} but shrinks like $1/\sqrt n$
-          once we \emph{average}. (For non-normal data the \textbf{Central
-          Limit Theorem} makes $\bar X$ approximately normal for large $n$.)
-  \end{itemize}
-\end{frame}
-
-% ---- 3 levels: (2) graphical -----------------------------------------------
-\begin{frame}{How does the mean fluctuate? -- (2) graphically}
   \begin{center}
-    \includegraphics[width=0.82\textwidth,height=0.62\textheight,keepaspectratio]{images/mean_distribution.png}
+    \includegraphics[width=0.80\textwidth,height=0.46\textheight,keepaspectratio]{images/mean_distribution.png}
   \end{center}
-  \footnotesize Distribution of the standardized statistic $Z_n\sim N(0,1)$:
-  the central (blue) region holds $95\,\%$ of the probability -- in $95\,\%$ of
-  samples $Z_n$ lands here; $2.5\,\%$ in each tail.
+  \footnotesize The central (blue) region holds $95\,\%$ of the probability --
+  in $95\,\%$ of samples $Z_n$ lands here; $2.5\,\%$ in each tail.
 \end{frame}
+\note{Talk track: no new theory here -- one sentence recalls the Foundations
+(standard error, CLT), then the picture. Point at the blue area: ``95\,\% of
+all samples land here.'' The next slide turns exactly this picture into a
+probability statement, and the derivation turns that statement into the
+confidence interval.}
 
-% ---- 3 levels: (3) formal --------------------------------------------------
-\begin{frame}{How does the mean fluctuate? -- (3) formally}
+% ---- How the mean fluctuates: formal statement -----------------------------
+\begin{frame}{How does the mean fluctuate? -- formally}
   \begin{block}{Sampling distribution of the sample mean}
     For $X_i \sim N(\mu,\sigma^{2})$ i.i.d., the \emph{sampling distribution} of
     the random variable $\bar X$ is
@@ -393,9 +960,9 @@ long-run win rate -- our procedures are calibrated the same way.}
       Z_n := \frac{\bar{X}-\mu}{\sigma/\sqrt{n}} \sim N(0,1).
     \]
   \end{block}
-  {\footnotesize Why $\sigma^2/n$? Averaging $n$ independent draws divides the
-  variance by $n$ ($\mathrm{Var}(\bar X)=\sigma^2/n$), so the standard error is
-  $\sigma/\sqrt n$; $Z_n$ is just $\bar X$ centred and scaled to $N(0,1)$.}
+  {\footnotesize Both results are from the Foundations ($\mathrm{Var}(\bar X)=
+  \sigma^2/n$, standardisation). New is the probability statement below -- the
+  building block of the confidence interval.}
   \begin{block}{Two-sided probability statement}
     \[
       P\!\left(-z_{1-\alpha/2} \le Z_n \le z_{1-\alpha/2}\right) = 1-\alpha
@@ -423,7 +990,7 @@ long-run win rate -- our procedures are calibrated the same way.}
   only used equivalence steps, so the probability stays exactly $1-\alpha$.}
 \end{frame}
 \note{Talk track: the whole derivation is just ``solve the inequality for
-$\mu$''. Announce that upfront so the algebra has a destination. Emphasize at
+$\mu$''. Announce that upfront so the algebra has a destination. Emphasise at
 the end of (2/2): the randomness sits in the BOUNDS (they contain $\bar X$),
 $\mu$ never moves -- that is what later justifies the careful CI
 interpretation.}
@@ -477,7 +1044,7 @@ interpretation.}
     \[
       \text{CI}_{0.95} = \bigl[\,999.04\,;\,1002.96\,\bigr]\,\text{ml}
     \]
-    The hypothesized target value $\mu_0 = 1000$ lies \emph{inside} the
+    The hypothesised target value $\mu_0 = 1000$ lies \emph{inside} the
     interval $\Rightarrow$ no evidence against a correctly working machine.
   \end{exampleblock}
 \end{frame}
@@ -554,7 +1121,7 @@ interpretation.}
       \toprule
       Confidence level & Quantile $z_{1-\alpha/2}$ & CI for milk example \\
       \midrule
-      $90\,\%$ & $z_{0.95}  = 1.645$ & $[999.36\,;\,1002.65]$\\
+      $90\,\%$ & $z_{0.95}  = 1.645$ & $[999.36\,;\,1002.64]$\\
       $95\,\%$ & $z_{0.975} = 1.96$  & $[999.04\,;\,1002.96]$\\
       $99\,\%$ & $z_{0.995} = 2.576$ & $[998.42\,;\,1003.58]$\\
       \bottomrule
@@ -565,6 +1132,37 @@ interpretation.}
   $\Rightarrow$ less precise statement. Confidence and precision are a
   trade-off.}
 \end{frame}
+
+% ---- Planning the sample size ------------------------------------------------
+\begin{frame}{Planning the sample size}
+  \guidingquestion{How many bottles must the dairy measure so that the $95\,\%$
+  CI is at most $\pm e$ wide -- e.g.\ $\pm1$\,ml?}
+  \begin{block}{Solve the margin of error for $n$}
+    \[
+      e=z_{1-\alpha/2}\,\frac{\sigma}{\sqrt n}
+      \quad\Longleftrightarrow\quad
+      \sqrt n=\frac{z_{1-\alpha/2}\,\sigma}{e}
+      \quad\Longrightarrow\quad
+      n\ \ge\ \Bigl(\frac{z_{1-\alpha/2}\,\sigma}{e}\Bigr)^{2}
+      \quad\text{(round \emph{up})}
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item $n$ grows with the \textbf{square} of $z\sigma/e$: halving the margin
+          of error needs four times as many observations.
+    \item Higher confidence (larger $z$) or a larger spread $\sigma$ also cost
+          sample size.
+    \item $\sigma$ unknown? Plan with an estimate from a pilot study or from
+          past data.
+  \end{itemize}
+  \kernaussage{Decide on the precision you need \emph{before} collecting data
+  -- the formula tells you what it costs.}
+\end{frame}
+\note{Talk track: this is the CI-length formula read backwards. Ask the room
+first: ``we want half the margin -- twice the bottles?'' Most say yes; the
+square says four times. Sample-size planning is the everyday business use of
+this part (surveys, quality control, A/B tests); the same idea returns as
+power analysis in the types-of-error section.}
 
 \subsection{Unknown variance}
 
@@ -589,7 +1187,7 @@ interpretation.}
 \begin{frame}{Why the $t$-distribution? -- intuitively and graphically}
   \begin{columns}[T]
     \begin{column}{0.46\textwidth}
-      \begin{block}{Standardized statistic (normal data)}
+      \begin{block}{Standardised statistic (normal data)}
         \[
           T_n = \frac{\bar{X}-\mu}{s/\sqrt{n}} \sim t_{n-1}
         \]
@@ -605,8 +1203,8 @@ interpretation.}
       \includegraphics[width=\textwidth,height=0.50\textheight,keepaspectratio]{images/t_vs_normal.png}
     \end{column}
   \end{columns}
-  \kernaussage{With unknown $\sigma$ always use the $t_{n-1}$-distribution --
-  its quantiles are larger, so the CI is wider.}
+  \kernaussage{Unknown $\sigma$ $\Rightarrow$ use $t_{n-1}$: larger quantiles,
+  so the CI is wider on average.}
 \end{frame}
 
 \begin{frame}{Milk example with unknown variance}
@@ -638,7 +1236,7 @@ interpretation.}
       Spread used      & $\sigma$ & $s$ (estimated)\\
       Distribution     & $N(0,1)$ & $t_{n-1}$\\
       Quantile ($95\,\%$, $n=9$) & $1.96$ & $2.31$\\
-      CI               & narrower & wider\\
+      CI               & narrower & wider (on average)\\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -651,20 +1249,23 @@ interpretation.}
 
 \begin{frame}{Do not confuse: CI vs.\ fluctuation interval}
   \begin{columns}[T]
-    \begin{column}{0.54\textwidth}
-      \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{images/ci_vs_fluctuation.png}
+    \begin{column}{0.60\textwidth}
+      \includegraphics[width=\textwidth,height=0.64\textheight,keepaspectratio]{images/ci_vs_fluctuation.png}
     \end{column}
-    \begin{column}{0.44\textwidth}
+    \begin{column}{0.38\textwidth}
+      \small
       \begin{itemize}\setlength{\itemsep}{5pt}
         \item \textbf{Fluctuation interval:} spread of \emph{individual} values
               $X_i$ around $\mu$ -- uses $\sigma$ (wide).
         \item \textbf{Confidence interval:} uncertainty about $\mu$ -- uses
-              $\sigma/\sqrt{n}$ (narrow).
+              $\sigma/\sqrt{n}$ (narrow). It is exactly as wide as the
+              fluctuation of $\bar X$ (blue arrow), but centred at $\bar x$,
+              not at $\mu$.
       \end{itemize}
     \end{column}
   \end{columns}
-  \inworten{Both intervals share the same centre but answer completely
-  different questions.}
+  \inworten{Same width as the blue arrow, but a different question: ``Where is
+  $\mu$?'' instead of ``How much does a single value scatter?''}
 \end{frame}
 
 \subsection{Exercises}
@@ -715,21 +1316,152 @@ interpretation.}
   \end{exampleblock}
 \end{frame}
 
+% ---- Exercise: reading a CI correctly (SfOe Teil 6) ------------------------------
+\begin{frame}{Exercise -- reading a confidence interval correctly}
+  \begin{block}{Problem statement}
+    For the cream sample ($n=16$, $\bar x=248.9375$\,g, $\sigma=2$\,g known)
+    the $95\,\%$ CI $[\,247.96\,;\,249.92\,]$ was computed. Which of the
+    following statements are \textbf{true}, which are \textbf{false}? Give a
+    short reason.
+  \end{block}
+  \small
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item ``With $95\,\%$ probability the true mean $\mu$ lies between
+          $247.96$\,g and $249.92$\,g.''
+    \item ``About $95\,\%$ of all filled cups weigh between $247.96$\,g and
+          $249.92$\,g.''
+    \item ``If the sample were repeated very often, about $95\,\%$ of the
+          intervals computed this way would contain the true value $\mu$.''
+    \item ``The target value $250$\,g is \emph{not} compatible with the data
+          at the $95\,\%$ level.''
+    \item ``A $99\,\%$ interval from the same data would be \emph{narrower},
+          because it is more certain.''
+  \end{enumerate}
+\end{frame}
+\note{Talk track: let students vote true/false on each statement before
+showing the solution. Statements 1 and 2 are the two classic misreadings
+(probability of $\mu$; spread of single values); statement 5 tests the
+confidence--precision trade-off. These formulations are typical
+multiple-choice distractors.}
+
+\begin{frame}{Solution (1/2) -- reading a confidence interval correctly}
+  \textbf{Rule:} $\mu$ is a \emph{fixed} number; the \emph{bounds} are random.
+  The confidence level describes the \emph{procedure}, not the one interval.
+  \begin{exampleblock}{Answers 1--3}
+    \begin{enumerate}\setlength{\itemsep}{3pt}
+      \item \textbf{False.} $\mu$ either lies in this particular interval or it
+            does not -- the probability $0.95$ belongs to the procedure across
+            many samples.
+      \item \textbf{False.} The CI describes the uncertainty about $\mu$
+            (spread $\sigma/\sqrt n=0.5$), not the spread of single cups
+            ($\sigma=2$). The fluctuation interval of the cups would be
+            $248.9375\pm1.96\cdot2=\mathbf{[\,245.02\,;\,252.86\,]}$ -- four
+            times as wide.
+      \item \textbf{True.} That is exactly the coverage reading: the procedure
+            hits $\mu$ in $95\,\%$ of the samples.
+    \end{enumerate}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- reading a confidence interval correctly}
+  \begin{exampleblock}{Answers 4--5}
+    \begin{enumerate}\setlength{\itemsep}{2pt}
+      \setcounter{enumi}{3}
+      \item \textbf{True.} $250\notin[\,247.96\,;\,249.92\,]$ -- the target is
+            not among the values compatible with the data (``compatibility''
+            reading). A two-sided test at level $5\,\%$ would reject
+            $H_0:\mu=250$ (next section).
+      \item \textbf{False.} More confidence costs precision:
+            $z_{0.995}=2.576>1.96$, so $e=2.576\cdot\tfrac{2}{\sqrt{16}}=1.288$
+            and $\text{CI}_{0.99}=[\,248.9375\pm1.288\,]
+            =\mathbf{[\,247.65\,;\,250.23\,]}$ -- \emph{wider} than the
+            $95\,\%$ CI, and now $250$ even lies \emph{inside}.
+    \end{enumerate}
+  \end{exampleblock}
+  \kernaussage{A CI is a statement about the \textbf{procedure} and about the
+  values of $\mu$ \textbf{compatible} with the data -- not about single values
+  and not about ``the probability of $\mu$''.}
+\end{frame}
+
+% ---- Exercise: sample size (SfOe Teil 6) ------------------------------------------
+\begin{frame}{Exercise -- how many bottles? (planning the sample size)}
+  \begin{block}{Problem statement}
+    The dairy (milk, $\sigma=3$\,ml known) wants to estimate the mean fill
+    volume $\mu$ \emph{more precisely}. Quality control asks for a $95\,\%$ CI
+    whose margin of error (half width) is at most $e=1$\,ml.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item[a)] What is the margin of error with the current sample ($n=9$)?
+    \item[b)] At least how many bottles are needed for $e\le1$\,ml?
+    \item[c)] How does $n$ change if the confidence level is to be $99\,\%$?
+    \item[d)] How does $n$ change (at $95\,\%$) if the margin is halved to
+              $e\le0.5$\,ml?
+  \end{enumerate}
+  \textbf{Hint:} $z_{0.975}=1.96$, $z_{0.995}=2.576$; always round $n$
+  \emph{up}.
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- planning the sample size}
+  \textbf{Rule:} solve the margin of error $e=z_{1-\alpha/2}\,\sigma/\sqrt n$
+  for $n$:
+  \[
+    n\ \ge\ \Bigl(\frac{z_{1-\alpha/2}\,\sigma}{e}\Bigr)^{2}
+    \qquad\text{(round up to the next integer).}
+  \]
+  \begin{align*}
+    \text{a)}\quad e &= 1.96\cdot\frac{3}{\sqrt9}=1.96\cdot1=\mathbf{1.96\ ml}
+       \qquad(\text{the CI }[\,999.04\,;\,1002.96\,]\text{ from before})\\[4pt]
+    \text{b)}\quad n &\ge \Bigl(\frac{1.96\cdot3}{1}\Bigr)^{2}=5.88^{2}=34.57
+       \;\Longrightarrow\;\mathbf{n=35}\\[4pt]
+    \text{c)}\quad n &\ge \Bigl(\frac{2.576\cdot3}{1}\Bigr)^{2}=7.728^{2}=59.72
+       \;\Longrightarrow\;\mathbf{n=60}
+  \end{align*}
+  \inworten{b) For $\pm1$\,ml instead of $\pm1.96$\,ml the dairy needs almost
+  four times as many bottles ($35$ instead of $9$). c) More confidence costs
+  sample size ($60$ instead of $35$).}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/2) -- planning the sample size}
+  \[
+    \text{d)}\quad n \ge \Bigl(\frac{1.96\cdot3}{0.5}\Bigr)^{2}=11.76^{2}=138.30
+       \;\Longrightarrow\;\mathbf{n=139}
+  \]
+  \inworten{Half the margin $\Rightarrow$ four times the sample
+  ($139\approx4\cdot35$): $n$ grows with the \textbf{square} of $z\sigma/e$.}
+  \par\smallskip
+  {\small The same with Python:\par}
+\begin{lstlisting}
+import math
+from scipy import stats
+def n_required(conf, sigma, e):
+    z = stats.norm.ppf(1 - (1 - conf) / 2)
+    return math.ceil((z * sigma / e) ** 2)
+print(n_required(0.95, 3, 1), n_required(0.99, 3, 1), n_required(0.95, 3, 0.5))
+\end{lstlisting}
+  \begin{block}{Output}
+\begin{lstlisting}[style=Pyout]
+35 60 139
+\end{lstlisting}
+  \end{block}
+\end{frame}
+
 \begin{frame}{Summary and outlook}
   \begin{itemize}\setlength{\itemsep}{4pt}
     \item Confidence intervals quantify the \textbf{uncertainty} of a point
           estimate.
     \item Known variance: quantiles of $N(0,1)$; unknown: of $t_{n-1}$.
-    \item \textbf{Bridge to the test:} if the CI contains the hypothesized
+    \item The required precision fixes the \textbf{sample size}:
+          $n\ge(z_{1-\alpha/2}\,\sigma/e)^2$.
+    \item \textbf{Bridge to the test:} if the CI contains the hypothesised
           value $\mu_0$, there is no evidence against $H_0:\mu=\mu_0$ --
           otherwise there is.
   \end{itemize}
   \begin{block}{Next section}
-    We formalize this procedure as a \textbf{hypothesis test}.
+    We formalise this procedure as a \textbf{hypothesis test}.
   \end{block}
 \end{frame}
 % ============================================================================
-% SECTION 2: HYPOTHESIS TESTS
+% SECTION 3: HYPOTHESIS TESTS
 % ============================================================================
 \section[Tests]{Hypothesis Tests}
 
@@ -931,8 +1663,9 @@ bar. Anchor: the acceptance region is everything inside the bar(s).}
   \end{tikzpicture}}
   \vspace{0.8em}
   \begin{itemize}
-    \item \textbf{Key move:} plug the hypothesized $\mu_0$ in for the unknown
-          $\mu$ -- \emph{if} $H_0$ holds then $Z_n\sim N(0,1)$, so a $|Z_n|$
+    \item \textbf{Key move:} plug the hypothesised $\mu_0$ in for the unknown
+          $\mu$ (the same $Z_n$ as for the CI, only with $\mu_0$ instead of
+          $\mu$) -- \emph{if} $H_0$ holds then $Z_n\sim N(0,1)$, so a $|Z_n|$
           that would be very unusual for $N(0,1)$ is evidence against $H_0$.
     \item $|Z_n|\le z_{1-\alpha/2}$: acceptance (non-rejection) region; beyond
           it: rejection region (area $\alpha$ under $H_0$). Fix $\alpha$
@@ -991,7 +1724,8 @@ bar. Anchor: the acceptance region is everything inside the bar(s).}
           i.i.d.\ draws from the population. (No clustering, no repeated
           measurements of the same unit.)
     \item \textbf{Distribution:} data approximately normal \emph{or}
-          $n\gtrsim 30$ -- then the CLT makes $\bar X$ approximately normal.
+          $n\gtrsim 30$ -- then the CLT (Foundations) makes $\bar X$
+          approximately normal.
     \item \textbf{Spread:} $\sigma$ known $\to$ $z$-test; \ $\sigma$ estimated
           by $s$ $\to$ $t$-test with $\mathrm{df}=n-1$.
     \item \textbf{Question fixed in advance:} $\mu_0$, the direction
@@ -1007,6 +1741,30 @@ samples, duplicated units). For point 2, with $n=9$ as in the milk example we
 genuinely rely on approximate normality of fill volumes; mention a histogram
 or QQ-plot as the quick diagnostic. Point 4 anticipates the one-sided section:
 direction-after-data doubles the true $\alpha$.}
+
+\subsection{Tests with Python}
+
+\begin{frame}[fragile]{Hypothesis test with Python -- \texttt{ttest\_1samp}}
+\begin{lstlisting}
+import numpy as np
+from scipy import stats
+
+milk = np.array([1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009])
+res = stats.ttest_1samp(milk, popmean=1000)    # two-sided by default
+ci = res.confidence_interval(confidence_level=0.95)
+print(f"t = {res.statistic:.4f}, df = {res.df}, p = {res.pvalue:.4f}")
+print(f"95% CI: [{ci.low:.2f}, {ci.high:.2f}]")
+\end{lstlisting}
+  \begin{block}{Output (one-sample $t$-test)}
+\begin{lstlisting}[style=Pyout]
+t = 0.7947, df = 8, p = 0.4497
+95% CI: [998.10, 1003.90]
+\end{lstlisting}
+  \end{block}
+  \footnotesize By default \texttt{stats.ttest\_1samp} performs a
+  \textbf{two-sided} $t$-test with \textbf{unknown} variance; the result holds
+  $t$, df and $p$-value, \texttt{.confidence\_interval()} adds the CI.
+\end{frame}
 
 \subsection{Exercises}
 
@@ -1069,7 +1827,7 @@ from memory, they have understood the classical test.}
 
 \begin{frame}{Exercise -- reaction time (large sample)}
   \begin{block}{Problem}
-    A training is meant to change the baseline reaction time
+    A training programme is meant to change the baseline reaction time
     $\mu_0 = 250\,$ms. A sample of $n=50$ gives $\bar x = 242$, $s = 30$. Test
     \emph{two-sided} at $\alpha=0.05$.
   \end{block}
@@ -1083,40 +1841,132 @@ from memory, they have understood the classical test.}
   \]
   \begin{exampleblock}{Decision \& outlook}
     Keep $H_0$ (two-sided): $p = 2\,F_{t,49}(-1.8856) = \mathbf{0.0653} >
-    0.05$. With $n=50\ge 30$ the CLT justifies the $t$-test. \emph{But} the
-    question may be directional -- a one-sided test can decide differently
-    (see the one-sided exercises).
+    0.05$. With $n=50\ge 30$ the CLT justifies the $t$-test.
+    \emph{Outlook:} had the question -- \emph{before} collecting the data --
+    declared only a \emph{shorter} reaction time relevant, a left-sided test
+    would have been appropriate, and it would decide differently here (see the
+    one-sided exercises). The direction must never be chosen \emph{afterwards}
+    because $\bar x<\mu_0$.
   \end{exampleblock}
 \end{frame}
 
-\subsection{Tests with Python}
+% ---- Exercise: delivery time, complete t-test by hand (SfOe Teil 6) ---------------
+\begin{frame}{Exercise -- delivery time (complete $t$-test by hand)}
+  \begin{block}{Problem statement}
+    A logistics provider contractually guarantees an online shop a
+    \textbf{mean delivery time of $\mu_0=48$ hours}. The shop's controller wants
+    to check whether the actual mean delivery time \emph{deviates} from this --
+    both directions matter (too slow: customer complaints; too fast: the shop
+    could book a cheaper, slower tariff). For $n=8$ randomly selected
+    shipments she records the delivery time (in h):
+    \[
+      51,\ 39,\ 49,\ 41,\ 47,\ 43,\ 45,\ 45
+    \]
+    Delivery times are approximately normal, $\sigma$ unknown, $\alpha=0.05$.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{1pt}
+    \item[a)] Compute $\bar x$ and $s$.
+    \item[b)] State $H_0$/$H_1$, compute $T_n$ and decide with the critical
+              value.
+    \item[c)] Compute the $95\,\%$ CI for $\mu$ and show that it agrees with
+              the test decision.
+  \end{enumerate}
+  \textbf{Hint:} $t_{0.975;\,7}=2.3646$.
+\end{frame}
 
-\begin{frame}[fragile]{Hypothesis test with Python -- \texttt{ttest\_1samp}}
+\begin{frame}{Solution (1/4) -- delivery time: key figures}
+  \textbf{Rule:} $\bar x=\frac1n\sum x_i$, \quad
+  $s^2=\frac{1}{n-1}\sum(x_i-\bar x)^2$.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{l*{8}{r}r}
+      \toprule
+      $x_i$            & 51 & 39   & 49 & 41   & 47 & 43   & 45 & 45 & $\sum=360$\\
+      $x_i-\bar x$     & 6  & $-6$ & 4  & $-4$ & 2  & $-2$ & 0  & 0  & $\sum=0$\\
+      $(x_i-\bar x)^2$ & 36 & 36   & 16 & 16   & 4  & 4    & 0  & 0  & $\sum=112$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{align*}
+    \bar x &= \frac{360}{8}=\mathbf{45\ h}, \qquad
+    s^2=\frac{112}{8-1}=\frac{112}{7}=16
+    \;\Longrightarrow\; s=\mathbf{4\ h}\\[2pt]
+    \text{standard error:}\quad \frac{s}{\sqrt n}&=\frac{4}{\sqrt8}
+      =\frac{4}{2.8284}=\mathbf{1.4142\ h}
+  \end{align*}
+  \inworten{The shipments took $45$\,h on average; single values scatter with
+  $4$\,h, the sample mean only with $1.41$\,h.}
+\end{frame}
+
+\begin{frame}{Solution (2/4) -- delivery time: test with the critical value}
+  \textbf{Hypotheses} (two-sided; the direction follows from the question,
+  \emph{not} from the data):
+  \[
+    H_0:\mu=48 \qquad\text{vs.}\qquad H_1:\mu\neq48
+  \]
+  \textbf{Rule:} $\sigma$ unknown $\Rightarrow$ $t$-test; reject if
+  $|T_n|>t_{1-\alpha/2;\,n-1}=t_{0.975;\,7}=2.3646$.
+  \begin{align*}
+    T_n &= \frac{\bar x-\mu_0}{s/\sqrt n}=\frac{45-48}{1.4142}
+         =\frac{-3}{1.4142}=\mathbf{-2.1213}\\[2pt]
+    |T_n| &= 2.1213 \;<\; 2.3646
+  \end{align*}
+  \begin{exampleblock}{Decision}
+    $H_0:\mu=48$ is \textbf{not rejected} (narrowly). The observed deviation of
+    $3$\,h amounts to just over $2$ standard errors -- with only $n=8$
+    shipments this is still compatible with chance; a breach of contract is
+    \emph{not} statistically established.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (3/4) -- delivery time: CI and duality}
+  \textbf{Rule:} $\text{CI}_{0.95}=\bigl[\bar x\pm t_{0.975;\,7}\,s/\sqrt n\bigr]$.
+  \begin{align*}
+    e &= 2.3646\cdot1.4142=3.344\\
+    \text{CI}_{0.95} &= [\,45\pm3.344\,]=\mathbf{[\,41.66\,;\,48.34\,]}\ \text{h}
+  \end{align*}
+  \begin{block}{Duality CI $\leftrightarrow$ test}
+    $\mu_0=48\in[\,41.66\,;\,48.34\,]$ $\Leftrightarrow$
+    $|T_n|\le t_{0.975;\,7}$ $\Leftrightarrow$ keep $H_0$ -- the same algebra,
+    two readings. That $48$ lies \emph{just} inside the upper bound mirrors the
+    narrow $|T_n|=2.12$ vs.\ $2.36$.
+  \end{block}
+  \inworten{Mean delivery times between $41.7$\,h and $48.3$\,h are compatible
+  with the data -- the contractual $48$\,h are (just) among them.}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (4/4) -- delivery time: with Python}
 \begin{lstlisting}
 import numpy as np
 from scipy import stats
-
-milk = np.array([1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009])
-res = stats.ttest_1samp(milk, popmean=1000)    # two-sided by default
+delivery = np.array([51, 39, 49, 41, 47, 43, 45, 45])    # hours
+print(delivery.mean(), delivery.std(ddof=1), round(stats.t.ppf(0.975, df=7), 4))
+res = stats.ttest_1samp(delivery, popmean=48)            # two-sided
 ci = res.confidence_interval(confidence_level=0.95)
 print(f"t = {res.statistic:.4f}, df = {res.df}, p = {res.pvalue:.4f}")
 print(f"95% CI: [{ci.low:.2f}, {ci.high:.2f}]")
 \end{lstlisting}
-  \begin{block}{Output (one-sample $t$-test)}
+  \begin{block}{Output ($\bar x$, $s$, critical value; test; CI)}
 \begin{lstlisting}[style=Pyout]
-t = 0.7947, df = 8, p = 0.4497
-95% CI: [998.10, 1003.90]
+45.0 4.0 2.3646
+t = -2.1213, df = 7, p = 0.0716
+95% CI: [41.66, 48.34]
 \end{lstlisting}
   \end{block}
-  \footnotesize By default \texttt{stats.ttest\_1samp} performs a
-  \textbf{two-sided} $t$-test with \textbf{unknown} variance; the result holds
-  $t$, df and $p$-value, \texttt{.confidence\_interval()} adds the CI.
+  \footnotesize $t$, df and CI agree with the hand calculation. The reported
+  $p=0.0716>0.05$ leads to the same decision -- what it means exactly is the
+  topic of the next section.
 \end{frame}
+\note{Talk track: this is the complete exam workflow on raw data -- table of
+deviations, $s$ with $n-1$, standard error, statistic, critical value, CI,
+duality. Let students do a)--c) by hand first, then show that one scipy call
+reproduces everything. Point at the $p$-value in the output: it is the bridge
+to the next section, where the same exercise returns with the $t$-table.}
 
 % ---- Bridge to the p-value --------------------------------------------------
 \begin{frame}{Recap -- and one limitation of the recipe}
   \begin{block}{The recipe in one line}
-    Standardize the deviation, compare with the critical value, decide.
+    Standardise the deviation, compare with the critical value, decide.
   \end{block}
   \begin{center}
     \renewcommand{\arraystretch}{1.4}
@@ -1145,9 +1995,9 @@ different situations. Then point at the decision column: it cannot
 distinguish the comfortable milk ``keep'' from the razor-thin cream ``keep'',
 nor say how decisive the cream rejection was. That missing ``how close?''
 column is precisely what the $p$-value will deliver: milk $0.32$, cream
-$0.034$ resp.\ $0.052$. Keep it short -- a springboard, not new content.}
+$0.034$ ($\sigma$ known) and $0.052$ ($\sigma$ unknown). Keep it short -- a springboard, not new content.}
 % ============================================================================
-% SECTION 3: p-VALUE
+% SECTION 4: p-VALUE
 % ============================================================================
 \section[\texorpdfstring{$p$}{p}-value]{The \texorpdfstring{$p$}{p}-Value}
 
@@ -1238,6 +2088,8 @@ exam error (dedicated slide follows).}
         \item $p$ = tail area beyond your \textbf{observed} statistic.
         \item Statistic past the bar $\Leftrightarrow$ its tail is smaller
               $\Leftrightarrow p<\alpha$.
+        \item Picture: \emph{right-sided} test ($z_{0.95}=1.645$); two-sided:
+              both tails, $z_{0.975}=1.96$.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -1310,6 +2162,10 @@ exam error (dedicated slide follows).}
     Both $p$-values $> 0.05 \Rightarrow H_0:\mu=1000$ not rejected.
     The value $0.4497$ matches the \texttt{ttest\_1samp} output.
   \end{exampleblock}
+  \footnotesize\textbf{Exact vs.\ table:} the values above use the unrounded
+  $\Phi$ and $F_{t,8}$ (software). From the printed $\Phi$ table,
+  $\Phi(1.00)=0.8413$ gives $p=2\cdot0.1587=0.3174$. The $t$-table can only
+  bracket: $0.7947<1.397=t_{0.90;\,8}$ $\Rightarrow$ $p>2\cdot0.10=0.20$.
 \end{frame}
 
 \begin{frame}{$p$-value -- cream (two variants)}
@@ -1335,6 +2191,10 @@ exam error (dedicated slide follows).}
   \end{columns}
   \kernaussage{The same data set can be just \emph{significant} or just
   \emph{not significant} depending on the assumption about $\sigma$.}
+  \footnotesize\textbf{Exact vs.\ table:} exact values (software). With the
+  printed tables: $\Phi(2.12)=0.9830$, $\Phi(2.13)=0.9834$ $\Rightarrow$
+  $0.0332<p<0.0340$; \ $t$-table, df $=15$: $1.753<2.1086<2.131$
+  $\Rightarrow$ $0.05<p<0.10$. Both brackets give the same decisions.
 \end{frame}
 
 \begin{frame}{$p$-value -- typical misconceptions}
@@ -1393,12 +2253,13 @@ for the students: $p$-value for evidence, CI for magnitude -- always read both.}
     A two-sided test with known variance yields $Z_n = 1.85$. Compute the
     $p$-value and decide at $\alpha = 0.05$ and at $\alpha = 0.10$.
   \end{block}
-  \textbf{Hint:} $\Phi(1.85) = 0.9678$.
+  \textbf{Hint:} $\Phi(1.85) = 0.9678$ (table: row $1.8$, column $.05$).
 \end{frame}
 
 \begin{frame}{Solution -- $p$-value and $\alpha$}
   \[
     p = 2\,\bigl(1-\Phi(1.85)\bigr) = 2\cdot 0.0322 = \mathbf{0.0644}
+    \qquad(\text{exact, unrounded }\Phi\text{: }0.0643)
   \]
   \begin{itemize}
     \item At $\alpha = 0.05$: \ $0.0644 > 0.05 \Rightarrow$ \textbf{keep} $H_0$.
@@ -1434,8 +2295,166 @@ for the students: $p$-value for evidence, CI for magnitude -- always read both.}
   the probability of $H_0$, and not the size or importance of the effect.}
 \end{frame}
 
+% ---- Exercise: bracketing the p-value with the t-table (SfOe Teil 6) ---------------
+\begin{frame}{Exercise -- bracketing the $p$-value with the $t$-table}
+  \begin{block}{Problem statement}
+    Delivery-time exercise (section ``Hypothesis tests''): two-sided $t$-test
+    with $T_n=-2.1213$ and df $=7$. In the exam there is no software -- only
+    the row df $=7$ of the $t$-table:
+    \begin{center}
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{l|ccccc}
+        \toprule
+        upper-tail probability $P(T>t)$ & $0.10$ & $0.05$ & $0.025$ & $0.01$ & $0.005$\\
+        \midrule
+        $t$ (df $=7$) & $1.415$ & $1.895$ & $2.365$ & $2.998$ & $3.499$\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{1pt}
+    \item[a)] Bracket the two-sided $p$-value from below and above.
+    \item[b)] Decide at $\alpha=0.05$ and at $\alpha=0.10$.
+    \item[c)] Which Python command gives the exact value?
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Solution -- bracketing the $p$-value with the $t$-table}
+  \small
+  \textbf{Rule:} two-sided $p=2\cdot P(T>|T_n|)$; the table gives $P(T>t)$
+  only at a few points -- so \emph{bracket}.
+  \[
+    \text{\textbf{a)}}\quad 1.895<|T_n|=2.121<2.365
+      \;\Longrightarrow\; 0.025<P(T>2.121)<0.05
+      \;\Longrightarrow\; \mathbf{0.05<p<0.10}
+  \]
+  \textbf{b)} $\alpha=0.05$: $p>0.05\Rightarrow$ \textbf{keep} $H_0$ (as
+  $|T_n|<2.365$). \quad $\alpha=0.10$: $p<0.10\Rightarrow$ \textbf{reject}
+  $H_0$ (as $|T_n|>1.895$).
+  \begin{block}{c) exactly, with Python}
+\begin{lstlisting}
+from scipy import stats
+print(round(2 * stats.t.cdf(-2.1213, df=7), 4))        # exact two-sided p-value
+\end{lstlisting}
+\begin{lstlisting}[style=Pyout]
+0.0716
+\end{lstlisting}
+  \end{block}
+  \kernaussage{The table yields only an \emph{interval} for $p$ -- enough for
+  the decision, which only asks ``$p<\alpha$?''. Critical value and $p$-value
+  always lead to the same verdict.}
+\end{frame}
+\note{Talk track: exam-relevant skill. Draw the df $=7$ row as a ruler, mark
+$2.121$ between $1.895$ and $2.365$, read the tail areas $0.05$ and $0.025$
+above them -- then DOUBLE for two-sided. Most common error: forgetting the
+factor $2$ (giving $0.025<p<0.05$ and the wrong decision at $\alpha=0.05$).}
+
+% ---- Exam-style exercise: coffee roastery (mock exam 5, task 3) -------------------
+\begin{frame}{Exercise -- coffee roastery (exam-style, from A to Z)}
+  \begin{block}{Problem statement}
+    A coffee roastery fills tins with a target net weight of
+    $\mu_0=1000$\,g. From long-term process monitoring the standard deviation
+    is \emph{known}: $\sigma=40$\,g. After a refit, a sample of $n=64$ tins
+    gives $\bar x=1012$\,g. Test two-sided at $\alpha=0.05$.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{1pt}
+    \item[a)] State the hypotheses.
+    \item[b)] Compute the standard error $\sigma/\sqrt n$ and the test
+              statistic $Z_n$.
+    \item[c)] Give the critical value and make the test decision.
+    \item[d)] Compute the $p$-value with the $\Phi$-table. Which Python command
+              gives it?
+    \item[e)] Compute the $95\,\%$ CI for $\mu$. What does it imply for
+              $H_0:\mu=1000$?
+    \item[f)] A second check sample gives $n=25$, $\bar x=1012$\,g and an
+              \emph{estimated} $s=40$\,g. Compute the $95\,\%$ CI
+              ($t_{0.975;\,24}=2.0639$). Would $H_0$ be rejected now?
+  \end{enumerate}
+\end{frame}
+\note{Talk track: an exam task in miniature -- let students work in pairs
+for 10 minutes with the $\Phi$-table only. The final part f) is the
+comparison that matters: same $\bar x$, but estimated $\sigma$ and smaller
+$n$ flip the decision.}
+
+\begin{frame}{Solution (1/3) -- coffee roastery: test with the critical value}
+  \textbf{a)} Deviations in \emph{both} directions matter (too little:
+  consumer protection; too much: cost):
+  \[
+    H_0:\mu=1000 \qquad\text{vs.}\qquad H_1:\mu\neq1000
+  \]
+  \textbf{b)} $\sigma$ known $\Rightarrow$ $z$-test (Gauss test):
+  \[
+    \mathrm{SE}=\frac{\sigma}{\sqrt n}=\frac{40}{\sqrt{64}}=\frac{40}{8}=\mathbf{5\ g},
+    \qquad
+    Z_n=\frac{\bar x-\mu_0}{\mathrm{SE}}=\frac{1012-1000}{5}=\mathbf{2.40}
+  \]
+  \textbf{c)} Two-sided: $\alpha/2=0.025$ in each tail, critical value
+  $z_{0.975}=1.96$ (table: $\Phi(1.96)=0.9750$).
+  \begin{alertblock}{Decision}
+    $|Z_n|=2.40>1.96$ $\Rightarrow$ $H_0$ is \textbf{rejected}: the mean fill
+    weight deviates significantly from $1000$\,g -- upwards. Readjusting the
+    machine saves coffee.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/3) -- coffee roastery: $p$-value and CI}
+  \textbf{d)} Table: $\Phi(2.40)=0.9918$, so
+  \[
+    p=2\,\bigl(1-\Phi(2.40)\bigr)=2\cdot0.0082=\mathbf{0.0164}<0.05
+    \;\Rightarrow\;\text{reject } H_0 .
+  \]
+  {\small If the machine were set correctly, a deviation at least this large
+  would occur in only $1.64\,\%$ of all samples.}
+\begin{lstlisting}
+from scipy import stats
+z = (1012 - 1000) / (40 / 64 ** 0.5)
+print(z, round(2 * stats.norm.sf(abs(z)), 4))           # z and two-sided p-value
+\end{lstlisting}
+  \vspace{-4pt}
+\begin{lstlisting}[style=Pyout]
+2.4 0.0164
+\end{lstlisting}
+  \[
+    \text{\textbf{e)}}\quad 1012\pm1.96\cdot5=1012\pm9.8\ \Rightarrow\
+    \text{CI}_{0.95}=\mathbf{[\,1002.2\,;\,1021.8\,]}\ \text{g}
+  \]
+  {\small $1000\notin$ CI $\Rightarrow$ $H_0$ is rejected -- consistent with
+  $|Z_n|>1.96$ and $p<0.05$ (duality).}
+\end{frame}
+
+\begin{frame}{Solution (3/3) -- coffee roastery: estimated $\sigma$}
+  \textbf{f)} Now $\sigma$ is \emph{estimated} $\Rightarrow$ $t$-quantile with
+  df $=24$:
+  \[
+    \frac{s}{\sqrt n}=\frac{40}{5}=8,\qquad
+    1012\pm2.0639\cdot8=1012\pm16.51
+    \ \Rightarrow\ \mathbf{[\,995.49\,;\,1028.51\,]}\ \text{g}
+  \]
+  \begin{center}
+    \small\renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{lcc}
+      \toprule
+       & $\sigma=40$ known, $n=64$ & $s=40$ estimated, $n=25$\\
+      \midrule
+      standard error & $40/8=5$ & $40/5=8$\\
+      quantile & $z_{0.975}=1.96$ & $t_{0.975;\,24}=2.0639$\\
+      $95\,\%$ CI & $[\,1002.2\,;\,1021.8\,]$ & $[\,995.49\,;\,1028.51\,]$\\
+      contains $\mu_0=1000$? & no $\to$ reject & yes $\to$ keep\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \kernaussage{The second interval is wider for \textbf{two} reasons: the
+  smaller sample \emph{and} the larger $t$-quantile for the estimated spread.
+  Now $1000$ lies inside -- $H_0$ would \emph{not} be rejected.}
+\end{frame}
+\note{Talk track: this is a complete exam task (adapted from the mock exams).
+Typical errors to name: $t$ instead of $z$ although $\sigma$ is known;
+$1.645$ instead of $1.96$ for a two-sided test; forgetting the factor $2$ in
+the $p$-value; forgetting $\sqrt n$ ($Z_n=12/40=0.3$); reading the CI as
+``$\mu$ lies inside with $95\,\%$ probability''.}
+
 % ============================================================================
-% SECTION 4: ONE-SIDED TESTS
+% SECTION 5: ONE-SIDED TESTS
 % ============================================================================
 \section[One-sided]{One-Sided Tests}
 
@@ -1499,10 +2518,11 @@ for the students: $p$-value for evidence, CI for magnitude -- always read both.}
     \item \textbf{Which table?} $\sigma$ known $\to z$ (normal);
           $\sigma$ unknown $\to t$ with $\mathrm{df}=n-1$.
   \end{enumerate}
-  \begin{exampleblock}{$\alpha=0.05$ -- read the numbers off the table}
-    known $\sigma$:\ two-sided $z_{0.975}=1.96$, \ one-sided $z_{0.95}=1.645$.\\
+  \begin{exampleblock}{$\alpha=0.05$ -- the resulting critical values}
+    known $\sigma$:\ two-sided $z_{0.975}=1.96$, \ one-sided $z_{0.95}=1.645$
+    ($\Phi$ table).\\
     unknown $\sigma$, $n=12$:\ two-sided $t_{0.975;\,11}=2.20$, \ one-sided
-    $t_{0.95;\,11}=1.80$.
+    $t_{0.95;\,11}=1.80$ (\texttt{stats.t.ppf}; the $t$-table follows).
   \end{exampleblock}
 \end{frame}
 \note{Talk track: walk the 3 steps aloud at $\alpha=0.05$. The ONLY one- vs
@@ -1536,33 +2556,36 @@ habit to break: shading both tails -- one-sided means ONE tail.}
     \begin{tabular}{@{}l@{\hspace{3mm}}c@{\hspace{3mm}}l@{}}
       \footnotesize $H_1:\mu<\mu_0$ \emph{(smaller)} &
         \begin{tikzpicture}[baseline=-3pt]
-          \draw[->,gray] (-2.2,0)--(2.2,0);
+          \path (-2.3,0) (2.55,0);   % same width in every row (alignment)
+          \draw[->,gray] (-2.2,0)--(2.45,0);
           \draw[line width=4pt,hsbiorange] (-2.2,0)--(-1.45,0);
           \draw (0,0.13)--(0,-0.13) node[below,font=\tiny]{$\mu_0$};
         \end{tikzpicture}
         & \footnotesize reject if $z$ very \textbf{negative}\\
       \footnotesize $H_1:\mu>\mu_0$ \emph{(larger)} &
         \begin{tikzpicture}[baseline=-3pt]
-          \draw[->,gray] (-2.2,0)--(2.2,0);
+          \path (-2.3,0) (2.55,0);   % same width in every row (alignment)
+          \draw[->,gray] (-2.2,0)--(2.45,0);
           \draw[line width=4pt,hsbiorange] (1.45,0)--(2.2,0);
           \draw (0,0.13)--(0,-0.13) node[below,font=\tiny]{$\mu_0$};
         \end{tikzpicture}
         & \footnotesize reject if $z$ very \textbf{positive}\\
       \footnotesize $H_1:\mu\neq\mu_0$ \emph{(different)} &
         \begin{tikzpicture}[baseline=-3pt]
-          \draw[->,gray] (-2.2,0)--(2.2,0);
+          \path (-2.3,0) (2.55,0);   % same width in every row (alignment)
+          \draw[->,gray] (-2.2,0)--(2.45,0);
           \draw[line width=4pt,hsbiorange] (-2.2,0)--(-1.6,0);
           \draw[line width=4pt,hsbiorange] (1.6,0)--(2.2,0);
           \draw (0,0.13)--(0,-0.13) node[below,font=\tiny]{$\mu_0$};
         \end{tikzpicture}
-        & \footnotesize reject if $z$ very \textbf{large} (either way)\\
+        & \footnotesize reject if $|z|$ very \textbf{large} (either way)\\
     \end{tabular}
   \end{center}
   \kernaussage{The inequality in $H_1$ points straight at the rejection region
   (orange): ``$<$'' $\to$ left tail, ``$>$'' $\to$ right tail, ``$\neq$'' $\to$
   both.}
 \end{frame}
-\note{Talk track: make them memorize the one sentence in the alert box -- it
+\note{Talk track: make them memorise the one sentence in the alert box -- it
 decides every one-sided question. Drill with quick calls: ``$H_1:\mu>5$, where
 do we reject?'' (right tail) -- ``$z=-3$ in that test?'' (keep! wrong
 direction). The orange bars in the table are the visual anchor.}
@@ -1666,7 +2689,7 @@ direction). The orange bars in the table are the visual anchor.}
     \end{column}
   \end{columns}
   \kernaussage{Two-sided \emph{halves} the tail probability ($\alpha\to\alpha/2$);
-  the $t$-row is $\mathrm{df}=n-1$. As df grows, the $t$-value slides toward $z$.}
+  the $t$-row is $\mathrm{df}=n-1$. As df grows, the $t$-value slides towards $z$.}
 \end{frame}
 
 \begin{frame}{Why the $t$-table ends in the normal}
@@ -1678,7 +2701,7 @@ direction). The orange bars in the table are the visual anchor.}
       \footnotesize
       \begin{itemize}\setlength{\itemsep}{6pt}
         \item Small df $\to$ heavier tails $\to$ \emph{larger} critical value.
-        \item As df grows, the $t$-value shrinks toward the $z$-value.
+        \item As df grows, the $t$-value shrinks towards the $z$-value.
         \item By df $\approx 30$ the gap is tiny -- the $\infty$ row \emph{is}
               the normal.
       \end{itemize}
@@ -1817,10 +2840,10 @@ ability to detect the other way.}
       \bottomrule
     \end{tabular}
   \end{center}
-  \footnotesize Some textbooks write the null as $\mu\ge\mu_0$ resp.\
-  $\mu\le\mu_0$ -- the test is \textbf{identical}, because critical value and
+  \footnotesize Some textbooks write the null as $\mu\ge\mu_0$ (left-sided) or
+  $\mu\le\mu_0$ (right-sided) -- the test is \textbf{identical}, because critical value and
   $p$-value are computed at the boundary $\mu=\mu_0$ either way.
-  \kernaussage{$H_1$ always points \emph{toward} the rejection region: the
+  \kernaussage{$H_1$ always points \emph{towards} the rejection region: the
   inequality in $H_1$ tells you which tail you reject in.}
 \end{frame}
 \note{Use this slide as the cheat-sheet. Say: ``the inequality in $H_1$ literally
@@ -1947,8 +2970,8 @@ t = -2.1086, df = 15, p = 0.0261
   \begin{itemize}
     \item A one-sided test has a one-sided CI -- only \emph{one} bound, the
           other is $\pm\infty$.
-    \item \texttt{scipy} reports them with \texttt{low=-inf} resp.\
-          \texttt{high=inf}, i.e.\ $(-\infty;\,x]$ resp.\ $[x;\,+\infty)$.
+    \item \texttt{scipy} reports them with \texttt{low=-inf} or
+          \texttt{high=inf}, i.e.\ $(-\infty;\,x]$ or $[x;\,+\infty)$.
   \end{itemize}
   \begin{block}{Calculation (known variance)}
     \begin{align*}
@@ -2020,8 +3043,175 @@ t = -2.1086, df = 15, p = 0.0261
   fixed before seeing the data.}
 \end{frame}
 
+% ---- Exam-style exercise: muesli (mock exam 3, task 3) ------------------------------
+\begin{frame}{Exercise -- muesli filling (exam-style, one-sided $t$-test)}
+  \begin{block}{Problem statement}
+    A plant fills muesli into packs with target weight $\mu_0=250$\,g.
+    Overfilling costs money, so management asks: does the plant fill
+    \emph{more} than $250$\,g on average? After maintenance, a sample of
+    $n=25$ packs gives $\bar x=252.6$\,g and $s=5.0$\,g; $\alpha=0.05$.\\[2pt]
+    {\footnotesize Table values: $t_{0.95;\,24}=1.7109$, $t_{0.975;\,24}=2.0639$,
+    $t_{0.99;\,24}=2.4922$, $t_{0.995;\,24}=2.7969$; \ $\Phi(2.60)=0.9953$.}
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{1pt}
+    \item[a)] State the hypotheses.
+    \item[b)] Compute the standard error, the test statistic and the critical
+              value, and decide.
+    \item[c)] Which Python command performs this test for a data vector
+              \texttt{x}?
+    \item[d)] Bracket the $p$-value with the $t$-table, and approximate it with
+              the normal distribution.
+    \item[e)] Compute the (two-sided) $95\,\%$ CI for $\mu$.
+    \item[f)] Decide \emph{without new calculation} whether $H_0:\mu=253$ is
+              rejected by a two-sided test at $\alpha=0.05$.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution (1/3) -- muesli: hypotheses and test}
+  \textbf{a)} The claim to be established (overfilling) goes into $H_1$
+  $\Rightarrow$ \textbf{right-sided}:
+  \[
+    H_0:\mu=250 \qquad\text{vs.}\qquad H_1:\mu>250
+  \]
+  \textbf{b)} $\sigma$ unknown $\Rightarrow$ $t$-test with df $=n-1=24$:
+  \[
+    \frac{s}{\sqrt n}=\frac{5.0}{\sqrt{25}}=\mathbf{1.0\ g},\qquad
+    T_n=\frac{252.6-250}{1.0}=\mathbf{2.60},\qquad
+    \text{critical value } t_{0.95;\,24}=\mathbf{1.7109}
+  \]
+  {\small One-sided: the \emph{whole} $\alpha$ sits in the right tail, so the
+  $0.95$-quantile (not $0.975$).}
+  \begin{alertblock}{Decision}
+    $T_n=2.60>1.7109$ $\Rightarrow$ $H_0$ is \textbf{rejected}: the plant fills
+    significantly more than $250$\,g on average -- it should be readjusted.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/3) -- muesli: Python and the $p$-value}
+  \textbf{c)} and the exact $p$-value from the summary figures:
+\begin{lstlisting}
+from scipy import stats
+# raw data x available:  stats.ttest_1samp(x, popmean=250, alternative="greater")
+t = (252.6 - 250) / (5.0 / 25 ** 0.5)                  # from the summary figures
+print(f"{t:.2f} {stats.t.sf(t, df=24):.4f} {stats.norm.sf(t):.4f}")
+\end{lstlisting}
+  \vspace{-4pt}
+\begin{lstlisting}[style=Pyout]
+2.60 0.0079 0.0047
+\end{lstlisting}
+  \textbf{d)} $T_n$ lies between the $0.99$- and the $0.995$-quantile:
+  \[
+    t_{0.99;\,24}=2.4922 \;<\; 2.60 \;<\; 2.7969=t_{0.995;\,24}
+    \;\Longrightarrow\; \mathbf{0.005<p<0.01}
+  \]
+  {\small One-sided: the upper-tail areas $0.01$ and $0.005$ \emph{are} the
+  bounds -- no doubling (exact: $p=0.0079$).}\\[2pt]
+  Normal approximation: $p\approx1-\Phi(2.60)=1-0.9953=\mathbf{0.0047}$ --
+  smaller than the exact $0.0079$, because the $t$-distribution has heavier
+  tails. Both are far below $0.05$: same decision.
+\end{frame}
+
+\begin{frame}{Solution (3/3) -- muesli: CI and duality}
+  \[
+    \text{\textbf{e)}}\quad 252.6\pm2.0639\cdot1.0=252.6\pm2.0639
+    \ \Rightarrow\ \text{CI}_{0.95}=\mathbf{[\,250.54\,;\,254.66\,]}\ \text{g}
+  \]
+  \textbf{f)} The two-sided CI contains exactly the values $\mu_0$ that a
+  two-sided test does \emph{not} reject:
+  \[
+    250.54<253<254.66 \ \Rightarrow\ H_0:\mu=253 \text{ is \textbf{not} rejected.}
+  \]
+  {\small Every $\mu_0<250.54$ or $\mu_0>254.66$ would be rejected -- e.g.\
+  $\mu_0=250$.}
+  \begin{alertblock}{Careful with the duality}
+    The \emph{two-sided} CI belongs to the \emph{two-sided} test. The partner
+    of the right-sided test in b) is the one-sided CI
+    $[\,252.6-1.7109\cdot1.0\,;\,\infty)=[\,250.89\,;\,\infty)$ -- it excludes
+    $250$, consistent with the rejection.
+  \end{alertblock}
+\end{frame}
+\note{Talk track: typical exam errors in this task -- $t_{0.975}$ instead of
+$t_{0.95}$ for a one-sided test; doubling the one-sided $p$-value; swapping
+the bracket ($t_{0.99}$ belongs to a tail area of $0.01$, not $0.99$);
+df $=25$ instead of $24$. The normal approximation shows nicely why the
+$t$-tails are heavier.}
+
+% ---- Exam-style exercise: delivery time revisited (mock exam 6, task 3A) ----------
+\begin{frame}{Exercise -- delivery time revisited (one-sided test vs.\ two-sided CI)}
+  \begin{block}{Problem statement}
+    The logistics provider from the delivery-time exercise now advertises a
+    mean delivery time \emph{below} $\mu_0=48$ hours. A new sample of $n=16$
+    shipments gives $\bar x=46.4$\,h and $s=3.2$\,h; $\alpha=0.05$.\\[2pt]
+    {\footnotesize Table values: $t_{0.95;\,15}=1.7531$, $t_{0.975;\,15}=2.1314$.}
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item[a)] State the hypotheses and carry out the test with the critical
+              value.
+    \item[b)] Compute the two-sided $95\,\%$ CI. Does it contain $48$? Is that
+              a contradiction to a)?
+    \item[c)] Which confidence interval matches the test in a)? Compute it.
+    \item[d)] Check a) and c) with Python.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- delivery time revisited: left-sided test}
+  \textbf{a)} The advertised claim goes into $H_1$ $\Rightarrow$
+  \textbf{left-sided}:
+  \[
+    H_0:\mu=48 \qquad\text{vs.}\qquad H_1:\mu<48
+  \]
+  \[
+    \frac{s}{\sqrt n}=\frac{3.2}{\sqrt{16}}=0.8,\qquad
+    T_n=\frac{46.4-48}{0.8}=\mathbf{-2.00},\qquad
+    \text{critical value: }{-t_{0.95;\,15}}=\mathbf{-1.7531}
+  \]
+  \begin{alertblock}{Decision}
+    $T_n=-2.00<-1.7531$ $\Rightarrow$ $H_0$ is \textbf{rejected}
+    ($p=F_{t,15}(-2.00)=0.0320$): the mean delivery time is significantly
+    below $48$\,h -- the advertisement is statistically supported.
+  \end{alertblock}
+  {\small The negative sign belongs to the result: the rejection region lies on
+  the \emph{left}. Comparing absolute values would lose the direction.}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/2) -- delivery time revisited: which CI?}
+  \textbf{b)} $46.4\pm2.1314\cdot0.8=46.4\pm1.7051$ $\Rightarrow$
+  $\text{CI}_{0.95}=\mathbf{[\,44.69\,;\,48.11\,]}$ -- it \emph{contains}
+  $48$! \emph{No} contradiction: the two-sided CI belongs to the
+  \emph{two-sided} test, which would indeed keep $H_0$ here ($p=0.064$). The
+  one-sided test puts the whole $\alpha$ on one side and is sharper in that
+  direction.\\[3pt]
+  \textbf{c)} The partner of the left-sided test is the one-sided CI with an
+  upper bound:
+  \[
+    \Bigl(-\infty\,;\ 46.4+1.7531\cdot0.8\Bigr]=\mathbf{(-\infty\,;\,47.80]}
+    \quad\Rightarrow\quad 48\ \text{lies outside -- consistent with a).}
+  \]
+  \textbf{d)} \vspace{-6pt}
+\begin{lstlisting}
+from scipy import stats
+t = (46.4 - 48) / (3.2 / 16 ** 0.5)
+print(f"{t:.2f} {stats.t.cdf(t, df=15):.4f}")           # T_n, left-sided p-value
+print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sided CI
+\end{lstlisting}
+  \vspace{-4pt}
+\begin{lstlisting}[style=Pyout]
+-2.00 0.0320
+47.80
+\end{lstlisting}
+  \vspace{-2pt}
+  {\footnotesize With raw data: \texttt{stats.ttest\_1samp(x, 48,
+  alternative="less")} and \texttt{.confidence\_interval(0.95)}.}
+\end{frame}
+\note{Talk track: the punchline of this task is the duality rule ``like with
+like'': one-sided test $\leftrightarrow$ one-sided CI, two-sided test
+$\leftrightarrow$ two-sided CI. Ask the room before showing b): ``the test
+rejected 48 -- will the 95\,\% CI exclude 48?'' Many say yes. It is the
+compact version of the earlier ``one- vs.\ two-sided on the same data''
+exercise.}
+
 % ============================================================================
-% SECTION 5: TYPES OF ERROR
+% SECTION 6: TYPES OF ERROR
 % ============================================================================
 \section[Errors]{Types of Error}
 
@@ -2065,9 +3255,11 @@ both errors can occur in the same test run -- only one column is ever real.}
     \begin{column}{0.36\textwidth}
       \footnotesize
       \begin{itemize}\setlength{\itemsep}{4pt}
-        \item The two curves are $\bar X$ in each ``world'': left centred at
-              $\mu_0$ (if $H_0$ holds), right at the true $\mu_1$ (if $H_1$);
-              the red line is the critical value.
+        \item The two curves show the \emph{standardised} $\bar X$ in each
+              ``world'': left centred at $\mu_0$ (value $0$, if $H_0$ holds),
+              right at the true $\mu_1$ (here $2.6$ standard errors above
+              $\mu_0$, if $H_1$); the red line is the critical value of a
+              right-sided test ($1.645$).
         \item \textcolor{hsbiorange!85!black}{$\alpha$}: $H_0$ true, but
               beyond the critical value.
         \item \textcolor{hsbiblau}{$\beta$}: $H_1$ true, but on this side.
@@ -2122,8 +3314,10 @@ both errors can occur in the same test run -- only one column is ever real.}
     The Type I error -- and that is exactly the one we control via $\alpha$.
   \end{block}
   \begin{alertblock}{Consequence for the choice of hypotheses}
-    This is why the ``worse'' alternative is formulated as $H_1$:
-    the feared error becomes the controllable Type I error.
+    This is why the claim you want to \emph{establish} goes into $H_1$ (rule of
+    thumb from above): wrongly declaring it ``established'' -- rejecting $H_0$
+    although $H_0$ holds -- is the costly mistake, and exactly this one is the
+    controllable Type~I error.
   \end{alertblock}
 \end{frame}
 
@@ -2154,7 +3348,7 @@ both errors can occur in the same test run -- only one column is ever real.}
   \textbf{Step 1} -- turn ``$|Z_n|\le1.96$'' into bounds on $\bar X$:
   $\mu_0\pm1.96\cdot\mathrm{SE}=1000\pm1.96=[998.04\,;\,1001.96]$.\\[2pt]
   \textbf{Step 2} -- the truth is $\mu_1=1002$; find how often $\bar X$ still
-  lands in that region, \emph{standardizing with $\mu_1$}:
+  lands in that region, \emph{standardising with $\mu_1$}:
   \begin{align*}
     \beta &= P\bigl(998.04 \le \bar X \le 1001.96 \;\big|\; \mu=1002\bigr)\\
           &= \Phi\!\bigl(\tfrac{1001.96-1002}{1}\bigr) - \Phi\!\bigl(\tfrac{998.04-1002}{1}\bigr)
@@ -2168,7 +3362,7 @@ both errors can occur in the same test run -- only one column is ever real.}
 \note{Talk track: the key move is the change of world. Step 1 lives in the
 $H_0$ world (where the acceptance region was built); step 2 asks how often
 $\bar X$ lands in that same region when the TRUTH is $\mu_1=1002$ -- so we
-standardize with $1002$, not $1000$. Students often reuse $\mu_0$ in step 2;
+standardise with $1002$, not $1000$. Students often reuse $\mu_0$ in step 2;
 catch that explicitly. The sobering message: with $n=9$, a real 2\,ml error
 escapes detection almost half the time.}
 
@@ -2246,11 +3440,36 @@ $1/\sqrt n$.}
 \end{frame}
 
 % ============================================================================
-% SECTION 6: SUMMARY
+% SECTION 7: SUMMARY
 % ============================================================================
 \section[Summary]{Summary}
 
-\begin{frame}{Summary 1 -- confidence intervals}
+\begin{frame}{Summary 1 -- foundations}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Normal distribution}
+        $X\sim N(\mu,\sigma^2)$ \ $\Rightarrow$ \
+        $Z=\dfrac{X-\mu}{\sigma}\sim N(0,1)$\\[4pt]
+        $P(X\le x)=\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$, \quad
+        $\Phi(-z)=1-\Phi(z)$\\[4pt]
+        quantile: $x_p=\mu+\sigma\,z_p$, \quad $z_{0.975}=1.96$
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Sampling distribution of $\bar X$}
+        $E(\bar X)=\mu$, \quad $\mathrm{Var}(\bar X)=\sigma^2/n$, \quad
+        $\mathrm{SE}=\sigma/\sqrt n$\\[4pt]
+        normal data: $\bar X\sim N(\mu,\sigma^2/n)$ exactly;\\[2pt]
+        otherwise (CLT, $n\gtrsim30$): approximately.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \kernaussage{Every interval and test in this part \emph{standardises}
+  $\bar X$ with its standard error -- and the CLT makes this work even for
+  non-normal data.}
+\end{frame}
+
+\begin{frame}{Summary 2 -- confidence intervals}
   \begin{block}{Known variance $\sigma$ \quad ($Z_n\sim N(0,1)$)}
     \[
       \text{CI}_{1-\alpha} =
@@ -2265,22 +3484,26 @@ $1/\sqrt n$.}
             \bar{X}+t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}}\right]
     \]
   \end{block}
+  \textbf{Sample size} for a margin of error $e$ (known $\sigma$):
+  \ $n\ge\bigl(z_{1-\alpha/2}\,\sigma/e\bigr)^2$, rounded up.
 \end{frame}
 
-\begin{frame}{Summary 2 -- hypothesis test (two-sided)}
+\begin{frame}{Summary 3 -- hypothesis test (two-sided)}
   $H_0:\mu=\mu_0$ vs.\ $H_1:\mu\ne\mu_0$
   \begin{block}{Test statistics}
     \[
       Z_n = \frac{\bar{X}-\mu_0}{\sigma/\sqrt{n}}\sim N(0,1),\qquad
       T_n = \frac{\bar{X}-\mu_0}{s/\sqrt{n}}\sim t_{n-1}
+      \qquad(\text{under } H_0)
     \]
   \end{block}
   \begin{alertblock}{Decision}
-    Reject if $|Z_n|>z_{1-\alpha/2}$ resp.\ $|T_n|>t_{1-\alpha/2,\,n-1}$.
+    Reject if $|Z_n|>z_{1-\alpha/2}$ ($\sigma$ known) or
+    $|T_n|>t_{1-\alpha/2,\,n-1}$ ($\sigma$ unknown).
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{Summary 3 -- the $p$-value}
+\begin{frame}{Summary 4 -- the $p$-value}
   \begin{block}{One idea behind every formula}
     $p$ = probability, \emph{if $H_0$ were true}, of a value \textbf{at least as
     extreme as observed} -- in the direction(s) that $H_1$ allows.
@@ -2301,7 +3524,7 @@ $1/\sqrt n$.}
   $F_{t,n-1}\to\Phi$. \quad \textbf{Decide:} $p<\alpha \Rightarrow$ reject $H_0$.
 \end{frame}
 
-\begin{frame}{Summary 4 -- one-sided tests \& types of error}
+\begin{frame}{Summary 5 -- one-sided tests \& types of error}
   \begin{block}{One-sided tests (unknown variance)}
     \begin{tabular}{ll}
       \textbf{left:}\ \ \, $H_1:\mu<\mu_0$ & reject if $T_n<-t_{1-\alpha,\,n-1}$\\[2pt]
@@ -2316,6 +3539,41 @@ $1/\sqrt n$.}
   \end{block}
 \end{frame}
 
+\begin{frame}[fragile]{Summary 6 -- important Python commands}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Distributions}
+\begin{lstlisting}
+from scipy import stats
+stats.norm.cdf(1.96)          # Phi(z)
+stats.norm.sf(1.96)           # 1 - Phi(z)
+stats.norm.ppf(0.975)         # z_p
+stats.norm.cdf(997, 1000, 3)  # P(X<=x)
+stats.t.cdf(-2.11, df=15)     # F_t,df(t)
+stats.t.ppf(0.975, df=8)      # t_p,df
+\end{lstlisting}
+      \end{block}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Tests, intervals, sample size}
+\begin{lstlisting}
+res = stats.ttest_1samp(x, popmean=1000)
+res = stats.ttest_1samp(x, 1000,
+                        alternative="less")
+res.statistic, res.df, res.pvalue
+res.confidence_interval(0.95)   # CI
+2 * stats.norm.sf(abs(z))       # z-test p
+math.ceil((1.96 * sigma / e)**2)  # n
+\end{lstlisting}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \footnotesize \texttt{alternative} is \texttt{"two-sided"} (default),
+  \texttt{"less"} or \texttt{"greater"}; \texttt{scale} in \texttt{stats.norm}
+  is the \emph{standard deviation}; \texttt{confidence\_interval} returns the
+  CI that matches the chosen direction.
+\end{frame}
+
 \begin{frame}{Which procedure? -- decision tree}
   \centering
   \begin{tikzpicture}[node distance=5mm and 9mm]
@@ -2326,11 +3584,13 @@ $1/\sqrt n$.}
       {\footnotesize \textbf{Is $\mu_0$ compatible?}\\ $\Rightarrow$ hypothesis test};
     \node[flowboxg, text width=3.4cm, right=10mm of test] (sub)
       {\footnotesize $\sigma$ known $\to z$, else $t$;\\ direction per question:\\ one-/two-sided};
+    \node[flowboxg, text width=3.4cm, right=10mm of ki] (nn)
+      {\footnotesize precision fixed in advance?\\ plan $n\ge(z_{1-\alpha/2}\,\sigma/e)^2$};
     \draw[flowarr] (q) -- (ki); \draw[flowarr] (q) -- (test);
-    \draw[flowarr] (test) -- (sub);
+    \draw[flowarr] (test) -- (sub); \draw[flowarr] (ki) -- (nn);
   \end{tikzpicture}
   \par\vspace{0.4em}
-  {\footnotesize The same logic -- \emph{standardize}, then ask whether the
+  {\footnotesize The same logic -- \emph{standardise}, then ask whether the
   deviation is extreme \emph{in the $H_1$ direction} -- underlies essentially
   every classical test: $z$, $t$, proportion, regression coefficient, ANOVA
   $F$.}
@@ -2377,11 +3637,255 @@ correct each forbidden sentence aloud in their own words.}
     the \emph{same} recipe gives its $t$-test, its confidence interval and
     its $p$-value:
     \[
-      T=\frac{\text{estimate}-\text{hypothesized value}}{\text{standard error}}.
+      T=\frac{\text{estimate}-\text{hypothesised value}}{\text{standard error}}.
     \]
   \end{block}
   \kernaussage{Everything in this part carries over one-to-one to the
   coefficients of a regression model.}
+\end{frame}
+
+
+% ============================================================================
+% APPENDIX: ESTIMATORS AND THE LAW OF LARGE NUMBERS
+% ============================================================================
+\appendix
+\let\overviewleft\undefined
+\section[Appendix]{Appendix: Estimators and the Law of Large Numbers}
+
+\begin{frame}{Appendix -- what is in here, and why}
+  \begin{block}{Optional material}
+    The main part of this deck is self-contained. The appendix adds two pieces
+    of theory behind it -- not needed for the exercises of the main part, but
+    useful for regression (Part 4), where estimators are everywhere.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{8.6cm}@{}}
+      \toprule
+      \textbf{Topic} & \textbf{Content}\\
+      \midrule
+      A.1 Estimators & What makes a good estimator: unbiasedness, efficiency,
+        consistency; why $s^2$ divides by $n-1$; exercise\\
+      A.2 Law of large numbers & Why $\bar x$ settles down at $\mu$ -- and why
+        relative frequencies justify the frequentist view\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\subsection{A.1 Properties of estimators}
+
+\begin{frame}{What makes a good estimator? -- the target picture}
+  \begin{center}
+    \resizebox{!}{0.70\textheight}{%
+    \begin{tikzpicture}[font=\scriptsize,
+        shot/.style={fill=hsbiblau,draw=hsbiblaudunkel,circle,inner sep=1pt}]
+      \foreach \cx/\cy/\ttl in {%
+          0/0/{unbiased \& efficient},
+          5.4/0/{biased \& efficient},
+          0/-3.9/{unbiased \& inefficient},
+          5.4/-3.9/{biased \& inefficient}}{
+        \begin{scope}[shift={(\cx,\cy)}]
+          \foreach \r in {0.45,0.9,1.35}{\draw[hsbigrau] (0,0) circle (\r);}
+          \draw[hsbirot,thick] (-0.18,0)--(0.18,0) (0,-0.18)--(0,0.18);
+          \node[anchor=base,font=\footnotesize\bfseries] at (0,-1.83) {\ttl};
+        \end{scope}
+      }
+      \foreach \x/\y in {0.05/0.08,-0.1/0.02,0.08/-0.06,-0.04/-0.12,0.12/0.05,0/-0.02}{\node[shot] at (\x,\y){};}
+      \begin{scope}[shift={(5.4,0)}]
+        \foreach \x/\y in {0.55/0.5,0.66/0.42,0.58/0.6,0.7/0.5,0.5/0.42,0.62/0.55}{\node[shot] at (\x,\y){};}
+      \end{scope}
+      \begin{scope}[shift={(0,-3.9)}]
+        \foreach \x/\y in {0.35/0.55,-0.55/0.2,0.1/-0.6,-0.35/-0.35,0.6/-0.1,-0.1/0.45}{\node[shot] at (\x,\y){};}
+      \end{scope}
+      \begin{scope}[shift={(5.4,-3.9)}]
+        \foreach \x/\y in {0.4/0.85,0.95/0.3,0.3/0.15,0.85/0.7,1.05/0.5,0.5/0.55}{\node[shot] at (\x,\y){};}
+      \end{scope}
+    \end{tikzpicture}}
+  \end{center}
+  {\footnotesize Each dot $=$ the estimate from \emph{one} sample; red cross
+  $=$ the true value $\theta$. Unbiased $=$ centred on the cross; efficient $=$
+  tightly clustered.}
+\end{frame}
+
+\begin{frame}{Properties of estimators -- the formal criteria}
+  \small
+  An \textbf{estimator} $\hat\theta=\hat\theta(X_1,\dots,X_n)$ is a random
+  variable; its value for the observed sample is the \emph{estimate}.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}p{3.7cm}l@{}}
+      \toprule
+      \textbf{Property} & \textbf{Formal definition}\\
+      \midrule
+      Unbiasedness & $E(\hat\theta)=\theta$\\
+      Bias & $\mathrm{Bias}(\hat\theta)=E(\hat\theta)-\theta$\\
+      Asymptotic unbiasedness & $\lim_{n\to\infty}E(\hat\theta_n)=\theta$\\
+      Efficiency & $\mathrm{Var}(\hat\theta)<\mathrm{Var}(\hat\theta^{*})$
+        \quad (both unbiased)\\
+      Consistency & $\hat\theta_n\xrightarrow{P}\theta$, i.e.\
+        $\lim_{n\to\infty}P\bigl(|\hat\theta_n-\theta|>c\bigr)=0$ for every $c>0$\\
+      \quad sufficient for it & $\lim_{n\to\infty}E(\hat\theta_n)=\theta$ \ and \
+        $\lim_{n\to\infty}\mathrm{Var}(\hat\theta_n)=0$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{\textbf{unbiased} $=$ right on average; \textbf{efficient} $=$
+  small spread; \textbf{consistent} $=$ arbitrarily precise as $n$ grows. The
+  sample mean $\bar X$ is unbiased and consistent, and the most efficient of
+  all unbiased weighted averages $\sum a_iX_i$.}
+\end{frame}
+
+\begin{frame}{Why divide by $n-1$ in $s^2$?}
+  \begin{block}{Sample variance -- unbiased}
+    \[
+      s^2=\frac{1}{n-1}\sum_{i=1}^n\bigl(X_i-\bar X\bigr)^2,
+      \qquad E(s^2)=\sigma^2 .
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item We measure the spread around the \emph{estimated} mean $\bar X$,
+          which sits in the middle of the data -- so the squared deviations
+          come out \textbf{systematically too small}.
+    \item Dividing by $n$ would give
+          $E\bigl(\tfrac1n\sum(X_i-\bar X)^2\bigr)=\tfrac{n-1}{n}\,\sigma^2$
+          -- biased downwards; dividing by $n-1$ corrects exactly this.
+    \item Estimating $\mu$ ``uses up'' one degree of freedom -- the same $n-1$
+          as in $t_{n-1}$.
+  \end{itemize}
+  \begin{exampleblock}{Simulation: $100\,000$ samples of size $n=4$ from
+    $N(50,\,5^2)$, i.e.\ $\sigma^2=25$}
+    Average of $s^2$ with $n-1$: $\mathbf{24.97}$ \quad vs.\quad with $n$:
+    $\mathbf{18.73}$ \ ($\approx\tfrac34\cdot25=18.75$).
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Exercise -- properties of estimators: egg weight}
+  \begin{block}{Problem statement}
+    A farmer draws $n=4$ eggs randomly and independently from a flock with
+    $\mu=50$\,g and $\sigma^2=25$\,g$^2$. Four estimators of $\mu$ are
+    proposed:
+    \[
+      \hat\mu_A=\frac{X_1+X_2+X_3+X_4}{4},\qquad
+      \hat\mu_B=\frac{X_1+X_4}{2},
+    \]
+    \[
+      \hat\mu_C=\frac{X_1+2X_2+X_3+X_4}{5},\qquad
+      \hat\mu_D=\frac{X_1+X_2+X_3}{4}.
+    \]
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item[a)] Which estimators are unbiased? Give the expected value and, if
+              any, the bias.
+    \item[b)] Compute the variance of the four estimators.
+    \item[c)] Which estimator should the farmer use? Argue with the criteria.
+    \item[d)] Let $n$ grow ($\hat\mu_A=\bar X_n$, $\hat\mu_B=\tfrac{X_1+X_n}{2}$):
+              which of the two is consistent?
+  \end{enumerate}
+\end{frame}
+\note{Talk track (optional material): the rules for $E$ and $\mathrm{Var}$
+from the foundations are all that is needed. The lesson of c): unbiasedness
+comes first, then efficiency -- a tiny variance does not help an estimator
+that aims at the wrong value.}
+
+\begin{frame}{Solution (1/2) -- egg weight: expected values and variances}
+  \textbf{Rules:} $E\bigl(\sum a_iX_i\bigr)=\mu\sum a_i$; \ for independent
+  $X_i$: $\mathrm{Var}\bigl(\sum a_iX_i\bigr)=\sigma^2\sum a_i^2$ \ (here
+  $\mu=50$, $\sigma^2=25$).
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{@{}lllll@{}}
+      \toprule
+      & \textbf{weights $a_i$} & \textbf{$E(\hat\mu)$} & \textbf{Bias}
+        & \textbf{$\mathrm{Var}(\hat\mu)$}\\
+      \midrule
+      $\hat\mu_A$ & $\tfrac14,\tfrac14,\tfrac14,\tfrac14$ & $50$ & $0$
+        & $\tfrac{4}{16}\cdot25=\mathbf{6.25}$\\
+      $\hat\mu_B$ & $\tfrac12,0,0,\tfrac12$ & $50$ & $0$
+        & $\tfrac{2}{4}\cdot25=\mathbf{12.5}$\\
+      $\hat\mu_C$ & $\tfrac15,\tfrac25,\tfrac15,\tfrac15$ & $50$ & $0$
+        & $\tfrac{1+4+1+1}{25}\cdot25=\mathbf{7}$\\
+      $\hat\mu_D$ & $\tfrac14,\tfrac14,\tfrac14,0$ & $\tfrac34\cdot50=37.5$
+        & $\mathbf{-12.5}$ & $\tfrac{3}{16}\cdot25=\mathbf{4.6875}$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{a) $A$, $B$, $C$ are unbiased (weights sum to $1$); $D$
+  underestimates the egg weight \emph{systematically} by $12.5$\,g (weights
+  sum to only $\tfrac34$).}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/2) -- egg weight: choice and consistency}
+  \small
+  \textbf{c)} Among the \emph{unbiased} estimators, $\hat\mu_A=\bar X_4$ has
+  the smallest variance -- it is \textbf{efficient}. $\hat\mu_D$ scatters even
+  less but aims systematically at the wrong value: \textbf{use $\bar X_4$.}\\[2pt]
+  \textbf{d)} $\bar X_n$: unbiased and $\mathrm{Var}=\sigma^2/n\to0$
+  $\Rightarrow$ \textbf{consistent}. \ $\tfrac{X_1+X_n}{2}$: unbiased, but
+  $\mathrm{Var}=\sigma^2/2=12.5$ for \emph{every} $n$ (ignores $n-2$ eggs)
+  $\Rightarrow$ \textbf{not consistent}.
+\begin{lstlisting}
+import numpy as np
+rng = np.random.default_rng(1)
+m = rng.normal(50, 5, size=(10_000, 4))       # 10 000 samples of 4 eggs
+A = m.mean(axis=1)
+B = (m[:, 0] + m[:, 3]) / 2
+C = (m[:, 0] + 2 * m[:, 1] + m[:, 2] + m[:, 3]) / 5
+D = (m[:, 0] + m[:, 1] + m[:, 2]) / 4
+print(np.round([A.mean(), B.mean(), C.mean(), D.mean()], 2))
+print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
+\end{lstlisting}
+  \vspace{-4pt}
+\begin{lstlisting}[style=Pyout]
+[49.95 49.95 49.95 37.47]
+[ 6.14 12.52  6.87  4.52]
+\end{lstlisting}
+  Simulation and theory agree: means $\approx50$ (except $D$: $37.5$),
+  variances $\approx6.25$, $12.5$, $7$, $4.69$.
+\end{frame}
+
+\subsection{A.2 Law of large numbers}
+
+\begin{frame}{The law of large numbers -- intuition}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+      \small
+      \textbf{Die example:} a fair die has $E(X)=3.5$. After a few rolls the
+      running mean $\bar x_n$ still jumps around; after many rolls it settles
+      down at $3.5$.
+      \kernaussage{The sample mean $\bar X_n$ gets ever more
+      \textbf{reliably close} to the expected value as $n$ grows.}
+    \end{column}
+    \begin{column}{0.62\textwidth}
+      \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{images/lln_running_mean.png}
+    \end{column}
+  \end{columns}
+  \vspace{2pt}
+  {\footnotesize Twelve sequences of die rolls (grey), one highlighted (blue).
+  The funnel $\mu\pm1.96\,\sigma/\sqrt n$ narrows: $\pm1.06$ at $n=10$,
+  $\pm0.33$ at $n=100$, $\pm0.11$ at $n=1000$.}
+\end{frame}
+
+\begin{frame}{The law of large numbers -- formal statement}
+  \begin{block}{Weak law of large numbers}
+    For i.i.d.\ $X_i$ with $E(X_i)=\mu$ and $\mathrm{Var}(X_i)=\sigma^2<\infty$:
+    \[
+      \lim_{n\to\infty}P\bigl(|\bar X_n-\mu|>c\bigr)=0
+      \quad\text{for every } c>0,
+      \qquad\text{i.e.}\quad \bar X_n\xrightarrow{\;P\;}\mu .
+    \]
+  \end{block}
+  \inworten{Choose any tolerance $c$, however small: the probability that
+  $\bar X_n$ misses $\mu$ by more than $c$ goes to zero.}\par
+  {\small \textbf{Why?} Chebyshev's inequality:
+  $P(|\bar X_n-\mu|>c)\le\mathrm{Var}(\bar X_n)/c^2=\sigma^2/(n\,c^2)\to0$.\par}
+  \begin{exampleblock}{Special case: relative frequencies (Bernoulli)}
+    $X_i=1$ if an event occurs (probability $p$), else $0$: then $\bar X_n$ is
+    the event's \emph{relative frequency}, and $\bar X_n\xrightarrow{P}p$ --
+    the basis of the \textbf{frequentist} view used throughout this part.
+  \end{exampleblock}
+  {\footnotesize LLN: $\bar X_n$ approaches $\mu$. \ CLT: how the remaining
+  fluctuation around $\mu$ is distributed.}
 \end{frame}
 
 \end{document}

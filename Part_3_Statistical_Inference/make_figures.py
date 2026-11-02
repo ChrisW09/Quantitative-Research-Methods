@@ -2,8 +2,10 @@
 # =====================================================================
 # make_figures.py
 # Regenerates the figures of "Quantitative Research -- Part 3:
-# Statistical Inference" (confidence intervals, hypothesis tests,
-# p-values, one-sided tests, types of error) with the HSBI colour palette.
+# Statistical Inference" (foundations: normal distribution and central
+# limit theorem; confidence intervals, hypothesis tests, p-values,
+# one-sided tests, types of error; appendix: law of large numbers) with
+# the HSBI colour palette.
 #
 # Output: images/*.png  (referenced by Part_3_Statistical_Inference.tex)
 #
@@ -112,7 +114,7 @@ def fig_mean_distribution():
     ax.set_ylim(0, 0.45)
     ax.set_xlim(-4, 4)
     ax.set_ylabel("Density")
-    ax.set_xlabel(r"standardized deviation  $Z_n=(\bar{X}-\mu)/(\sigma/\sqrt{n})$")
+    ax.set_xlabel(r"standardised deviation  $Z_n=(\bar{X}-\mu)/(\sigma/\sqrt{n})$")
     legend = [Patch(facecolor=FILL_BLUE, alpha=0.30, label=r"confidence region $1-\alpha$"),
               Patch(facecolor=ORANGE, alpha=0.85, label=r"error $\alpha/2$ each side")]
     ax.legend(handles=legend, loc="upper right", fontsize=12)
@@ -193,15 +195,19 @@ def fig_t_vs_normal():
     ax.set_ylabel("Density")
     ax.set_ylim(0, 0.43)
     ax.legend(loc="upper left", fontsize=12)
-    # inset: heavier tails
-    axin = ax.inset_axes([0.60, 0.42, 0.38, 0.50])
+    # inset: heavier tails (small, in the free upper-right corner, few ticks)
+    axin = ax.inset_axes([0.735, 0.45, 0.255, 0.42])
     xx = np.linspace(1.5, 3.6, 200)
     axin.plot(xx, stats.norm.pdf(xx), color=BLUE_DARK, lw=2)
     axin.plot(xx, stats.t.pdf(xx, 8), color=ORANGE, lw=2)
     axin.plot(xx, stats.t.pdf(xx, 2), color=BLUE, lw=1.8, ls="--")
-    axin.set_title("heavier tails", fontsize=11, color="#666666")
+    axin.set_title("heavier tails", fontsize=12, color="#666666", bbox=WBOX)
     axin.grid(True, alpha=0.5)
-    axin.tick_params(labelsize=9)
+    axin.set_xticks([2, 3])
+    axin.set_yticks([0, 0.05, 0.10])
+    axin.tick_params(labelsize=11)
+    for lab in axin.get_xticklabels() + axin.get_yticklabels():
+        lab.set_bbox(WBOX)
     style(ax)
     save(fig, "t_vs_normal.png")
 
@@ -210,33 +216,42 @@ def fig_t_vs_normal():
 # 5. ci_vs_fluctuation.png   (was ki_vs_fluktuation.png)
 # ====================================================================
 def fig_ci_vs_fluctuation():
+    # Both arrows are centred at mu: the blue arrow is the fluctuation range of
+    # the MEAN (mu +- 1.96 sigma/sqrt(n)) -- exactly as wide as the CI, which
+    # itself is centred at xbar. Explanatory texts sit in the free upper-left area.
     fig, ax = plt.subplots(figsize=(7.425, 4.21))
     mu, sigma, n = 1000.0, 3.0, 9
     se = sigma / np.sqrt(n)
-    x = np.linspace(mu - 12, mu + 12, 1000)
+    x = np.linspace(mu - 14.5, mu + 14.5, 1200)
     ax.plot(x, stats.norm.pdf(x, mu, sigma), color=GRAY, lw=2.6,
             label=r"single values $X_i \sim N(\mu,\sigma^2)$")
     ax.fill_between(x, stats.norm.pdf(x, mu, sigma), color=GRAY, alpha=0.18)
     ax.plot(x, stats.norm.pdf(x, mu, se), color=BLUE, lw=2.8,
             label=r"mean $\bar{X} \sim N(\mu,\sigma^2/n)$")
     ax.fill_between(x, stats.norm.pdf(x, mu, se), color=BLUE, alpha=0.18)
-    ax.axvline(mu, ls="--", color=BLUE_DARK, lw=1.3)
+    ax.plot([mu, mu], [0, stats.norm.pdf(mu, mu, se)], ls="--", color=BLUE_DARK, lw=1.3)
 
     yk = 0.075
     ax.annotate("", xy=(mu + 1.96 * se, yk), xytext=(mu - 1.96 * se, yk),
                 arrowprops=dict(arrowstyle="<->", color=BLUE, lw=2))
-    ax.text(mu, yk + 0.012, "confidence interval (narrow)", color=BLUE,
-            ha="center", fontsize=11.5, bbox=WBOX)
+    ax.text(mu - 13.9, 0.50,
+            "fluctuation of " + r"$\bar{X}$" + " (narrow;\n= width of the CI):\n"
+            + r"$\mu \pm 1.96\,\sigma/\sqrt{n}$ (blue arrow)",
+            color=BLUE, ha="left", va="top", fontsize=12, linespacing=1.35, bbox=WBOX)
     yf = 0.05
     ax.annotate("", xy=(mu + 1.96 * sigma, yf), xytext=(mu - 1.96 * sigma, yf),
                 arrowprops=dict(arrowstyle="<->", color="#6E6E6E", lw=2))
-    ax.text(mu, yf - 0.016, "fluctuation interval (wide)", color="#5A5A5A",
-            ha="center", fontsize=11.5, bbox=WBOX)
+    ax.text(mu - 13.9, 0.31,
+            "fluctuation interval of\nsingle values (wide):\n"
+            + r"$\mu \pm 1.96\,\sigma$ (grey arrow)",
+            color="#5A5A5A", ha="left", va="top", fontsize=12, linespacing=1.35, bbox=WBOX)
 
     ax.set_xlabel("Fill quantity (ml)")
     ax.set_ylabel("Density")
-    ax.set_ylim(0, 0.43)
-    ax.legend(loc="upper right", fontsize=11.5)
+    ax.set_xlim(mu - 14.5, mu + 14.5)
+    ax.set_ylim(0, 0.56)
+    ax.set_yticks([0, 0.1, 0.2, 0.3, 0.4])
+    ax.legend(loc="upper right", fontsize=11.5, borderaxespad=0.3)
     style(ax)
     save(fig, "ci_vs_fluctuation.png")
 
@@ -390,17 +405,19 @@ def fig_error_alpha_beta():
     xa = x[x >= crit]
     ax.fill_between(xa, stats.norm.pdf(xa, mu0), color=ORANGE, alpha=0.80)
     ax.axvline(crit, color=RED, lw=2.0)
-    ax.text(crit, 0.43, "critical value", color=RED, fontsize=11.5, ha="center",
-            va="bottom", bbox=WBOX)
+    ax.text(crit + 0.14, 0.43, "critical value 1.645\n(right-sided)", color=RED,
+            fontsize=11.5, ha="left", va="bottom", bbox=WBOX)
     ax.annotate(r"$\beta$  (Type II error)", xy=(1.05, 0.07), xytext=(-2.55, 0.265),
                 color=BLUE, fontsize=12.5, ha="center",
                 arrowprops=dict(arrowstyle="->", color=BLUE))
-    ax.annotate(r"$\alpha$  (Type I error)", xy=(2.0, 0.02), xytext=(5.35, 0.20),
+    ax.annotate(r"$\alpha$  (Type I error)", xy=(2.0, 0.02), xytext=(5.6, 0.17),
                 color="#B07A00", fontsize=12.5, ha="center",
                 arrowprops=dict(arrowstyle="->", color=ORANGE))
-    ax.set_xlabel("Test statistic")
+    ax.set_xlabel(r"standardised sample mean  $(\bar{X}-\mu_0)/\mathrm{SE}$")
     ax.set_ylabel("Density")
-    ax.set_ylim(0, 0.46)
+    ax.set_ylim(0, 0.54)
+    ax.set_yticks([0, 0.1, 0.2, 0.3, 0.4])
+    ax.set_xlim(-4.6, 7.6)
     ax.legend(loc="upper left", fontsize=11.5)
     style(ax)
     save(fig, "error_alpha_beta.png")
@@ -410,7 +427,7 @@ def fig_error_alpha_beta():
 # 10. power_curve.png   (was power_kurve.png)
 # ====================================================================
 def fig_power_curve():
-    # Power as a function of the standardized effect size d = |mu1-mu0|/SE.
+    # Power as a function of the standardised effect size d = |mu1-mu0|/SE.
     # Two-sided test at alpha = 0.05. Quadrupling n halves SE => doubles d.
     fig, ax = plt.subplots(figsize=(7.425, 4.21))
     alpha = 0.05
@@ -640,6 +657,147 @@ def fig_test_milk_cream():
 
 
 # ====================================================================
+# FOUNDATIONS (section 1) and APPENDIX
+# ====================================================================
+# 19. normal_bell.png  (where the bell curve comes from; role of mu, sigma)
+#     Left: 1000 simulated milk bottles ~ N(1000, 3^2) with density.
+#     Right: location (mu) and spread (sigma) of N(mu, sigma^2).
+# ====================================================================
+def fig_normal_bell():
+    rng = np.random.default_rng(2026)
+    vol = rng.normal(1000, 3, 1000)
+    fig, axes = plt.subplots(1, 2, figsize=(10.4, 3.55))
+    ax = axes[0]
+    bins = np.arange(988.5, 1012.5, 1.0)
+    ax.hist(vol, bins=bins, density=True, color=BLUE, alpha=0.35, edgecolor="white",
+            lw=0.6, label="1000 bottles (histogram)")
+    xx = np.linspace(988, 1012, 400)
+    ax.plot(xx, stats.norm.pdf(xx, 1000, 3), color=BLUE_DARK, lw=2.6,
+            label=r"density of $N(1000,\,3^2)$")
+    ax.set_xlabel("Fill quantity (ml)"); ax.set_ylabel("Density")
+    ax.set_ylim(0, 0.235); ax.set_xlim(988, 1012)
+    ax.set_title("many bottles $\\rightarrow$ bell curve", color=BLUE_DARK, fontsize=13)
+    ax.legend(loc="upper right", fontsize=10.5)
+    style(ax)
+    ax = axes[1]
+    xx = np.linspace(986, 1018, 500)
+    ax.plot(xx, stats.norm.pdf(xx, 1000, 3), color=BLUE_DARK, lw=2.6,
+            label=r"$\mu=1000,\ \sigma=3$")
+    ax.plot(xx, stats.norm.pdf(xx, 1006, 3), color=ORANGE, lw=2.6, ls="--",
+            label=r"$\mu=1006,\ \sigma=3$  (shifted)")
+    ax.plot(xx, stats.norm.pdf(xx, 1000, 6), color=GRAY, lw=2.6,
+            label=r"$\mu=1000,\ \sigma=6$  (wider)")
+    ax.set_xlabel("Fill quantity (ml)"); ax.set_ylabel("Density")
+    ax.set_ylim(0, 0.235); ax.set_xlim(986, 1018)
+    ax.set_title(r"$\mu$ = location, $\sigma$ = spread", color=BLUE_DARK, fontsize=13)
+    ax.legend(loc="upper right", fontsize=10.5)
+    style(ax)
+    fig.tight_layout()
+    save(fig, "normal_bell.png")
+
+
+# ====================================================================
+# 20. normal_areas.png  (probabilities as areas: the four basic cases)
+# ====================================================================
+def fig_normal_areas():
+    x = np.linspace(-4, 4, 800)
+    y = stats.norm.pdf(x)
+    P = stats.norm.cdf
+    cases = [
+        (r"$P(Z \leq 0.75) = \Phi(0.75) = %.4f$" % P(0.75),
+         x <= 0.75, [0.75], "table value"),
+        (r"$P(Z > 0.75) = 1-\Phi(0.75) = %.4f$" % (1 - P(0.75)),
+         x > 0.75, [0.75], "complement"),
+        (r"$P(Z \leq {-0.75}) = 1-\Phi(0.75) = %.4f$" % P(-0.75),
+         x <= -0.75, [-0.75], "symmetry"),
+        (r"$P(-0.5 \leq Z \leq 1) = \Phi(1)-\Phi(-0.5) = %.4f$" % (P(1) - P(-0.5)),
+         (x >= -0.5) & (x <= 1), [-0.5, 1], "difference"),
+    ]
+    fig, axes = plt.subplots(2, 2, figsize=(10.2, 4.9))
+    for ax, (title, mask, lines, rule) in zip(axes.ravel(), cases):
+        ax.plot(x, y, color=BLUE_DARK, lw=2.0)
+        ax.fill_between(x[mask], y[mask], color=BLUE, alpha=0.40, lw=0)
+        for v in lines:
+            ax.axvline(v, color=ORANGE, lw=1.8)
+        ax.set_title(title, fontsize=12.5, color=BLUE_DARK, pad=4)
+        ax.text(3.9, 0.36, rule, ha="right", va="center", fontsize=11.5,
+                color="#666666", bbox=WBOX)
+        ax.set_yticks([]); ax.set_ylim(0, 0.45); ax.set_xlim(-4, 4)
+        ax.set_xticks(range(-3, 4))
+        ax.tick_params(labelsize=11)
+        style(ax)
+    fig.tight_layout(h_pad=0.8, w_pad=1.2)
+    save(fig, "normal_areas.png")
+
+
+# ====================================================================
+# 21. clt_simulation.png  (central limit theorem in a simulation)
+#     Right-skewed processing times: gamma(shape 4, scale 3) => mu = 12,
+#     sigma = 6 minutes (same values as the CLT exercise). 20 000 samples
+#     of size n = 1, 4, 9, 36; histogram of the sample means and the
+#     normal curve N(mu, sigma^2/n). Fixed seed.
+# ====================================================================
+def fig_clt_simulation():
+    rng = np.random.default_rng(42)
+    shape, scale = 4.0, 3.0
+    mu, sigma = shape * scale, np.sqrt(shape) * scale          # 12, 6
+    reps = 20_000
+    fig, axes = plt.subplots(1, 4, figsize=(12.6, 3.75))
+    for ax, n in zip(axes, [1, 4, 9, 36]):
+        means = rng.gamma(shape, scale, size=(reps, n)).mean(axis=1)
+        se = sigma / np.sqrt(n)
+        lo, hi = (0, 40) if n == 1 else (mu - 4.2 * se, mu + 4.2 * se)
+        ax.hist(means, bins=np.linspace(lo, hi, 46), density=True, color=BLUE,
+                alpha=0.45, edgecolor="white", lw=0.4)
+        xs = np.linspace(lo, hi, 400)
+        ax.plot(xs, stats.norm.pdf(xs, mu, se), color=ORANGE, lw=2.4)
+        ax.axvline(mu, color=BLUE_DARK, lw=1.2, ls=":")
+        ax.set_title(("$n=1$ (single values)" if n == 1 else f"$n={n}$")
+                     + "\n" + r"$\mathrm{SE}=6/\sqrt{%d}=%g$" % (n, se),
+                     color=BLUE_DARK, fontsize=12.5)
+        ax.set_xlim(lo, hi); ax.set_yticks([])
+        ax.set_xlabel(r"$\bar{x}$ (minutes)" if n > 1 else "$x$ (minutes)", fontsize=12.5)
+        ax.tick_params(labelsize=11)
+        style(ax)
+    axes[0].set_ylabel("Density")
+    leg = [Patch(facecolor=BLUE, alpha=0.45, label=r"histogram of 20 000 sample means $\bar{x}$"),
+           Line2D([0], [0], color=ORANGE, lw=2.4, label=r"normal curve $N(\mu,\ \sigma^2/n)$")]
+    fig.legend(handles=leg, loc="lower center", ncol=2, frameon=False, fontsize=12.5,
+               bbox_to_anchor=(0.5, -0.02))
+    fig.tight_layout(rect=(0, 0.08, 1, 1), w_pad=1.0)
+    save(fig, "clt_simulation.png")
+
+
+# ====================================================================
+# 22. lln_running_mean.png  (appendix: weak law of large numbers)
+#     Running mean of fair die rolls, 12 sequences, fixed seed.
+# ====================================================================
+def fig_lln_running_mean():
+    rng = np.random.default_rng(7)
+    nmax, npaths = 1000, 12
+    rolls = rng.integers(1, 7, size=(npaths, nmax))
+    run = np.cumsum(rolls, axis=1) / np.arange(1, nmax + 1)
+    mu, sd = 3.5, np.sqrt(35 / 12)
+    n = np.arange(1, nmax + 1)
+    fig, ax = plt.subplots(figsize=(7.425, 4.0))
+    ax.fill_between(n, mu - 1.96 * sd / np.sqrt(n), mu + 1.96 * sd / np.sqrt(n),
+                    color=BLUE, alpha=0.12, lw=0,
+                    label=r"$\mu \pm 1.96\,\sigma/\sqrt{n}$")
+    for i in range(1, npaths):
+        ax.plot(n, run[i], color=GRAY, lw=0.9, alpha=0.6)
+    ax.plot(n, run[0], color=BLUE, lw=1.8, label=r"one sequence of running means $\bar{x}_n$")
+    ax.axhline(mu, color=ORANGE, lw=2.0, ls="--", label=r"expected value $E(X)=3.5$")
+    ax.set_xscale("log")
+    ax.set_xlim(1, nmax); ax.set_ylim(1.4, 5.6)
+    ax.set_xticks([1, 10, 100, 1000]); ax.set_xticklabels(["1", "10", "100", "1000"])
+    ax.set_xlabel("number of rolls $n$ (log scale)")
+    ax.set_ylabel(r"running mean $\bar{x}_n$")
+    ax.legend(loc="upper right", fontsize=11)
+    style(ax)
+    save(fig, "lln_running_mean.png")
+
+
+# ====================================================================
 def main():
     fig_mean_distribution()
     fig_ci_20_simulation()
@@ -656,6 +814,10 @@ def main():
     fig_t_crit_convergence()
     fig_p_value_onesided()
     fig_test_milk_cream()
+    fig_normal_bell()
+    fig_normal_areas()
+    fig_clt_simulation()
+    fig_lln_running_mean()
     print("\nAll figures written to", OUTDIR)
 
 

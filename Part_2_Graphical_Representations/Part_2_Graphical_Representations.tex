@@ -23,18 +23,19 @@
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \begin{itemize}\setlength{\itemsep}{3pt}
-        \item construct the \textbf{empirical CDF} and read off quantiles
-              from it,
+        \item construct the \textbf{empirical CDF} and read off shares
+              and quantiles from it,
         \item build a \textbf{histogram} with equal and unequal class
-              widths (densities!),
+              widths (densities!) and read shares off a given
+              histogram (areas!),
         \item construct a \textbf{boxplot} step by step, including the
               whiskers and outliers,
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{itemize}\setlength{\itemsep}{3pt}
-        \item \textbf{interpret} the shape of a distribution (symmetry,
-              skewness, outliers) from these graphics,
+        \item \textbf{read and interpret} given graphics (symmetry,
+              skewness, outliers) and compare groups with boxplots,
         \item combine the numbers of Part~1 with the pictures of Part~2,
         \item create every graphic in Python (\texttt{matplotlib}).
       \end{itemize}
@@ -71,11 +72,12 @@
       \textbf{Symbol} & \textbf{Meaning} & \textbf{Symbol} & \textbf{Meaning} \\
       \midrule
       $s^2$ & Sample variance & $v$ & Coefficient of variation \\
-      $s$ & Standard deviation & $v^*$ & Normalised coefficient of variation \\
+      $s$ & Standard deviation & $v^*$ & Normalised coeff.\ of variation \\
       $R$ & Range & $\Delta x_j$ & Class width (class $j$) \\
       $\text{IQR}$ & Interquartile range & $f_j/\Delta x_j$ & Density (histogram) \\
       $x_{0.25},\,x_{0.75}$ & 25\,\% and 75\,\% quantile & $k$ & Whisker factor (here $1.5$) \\
-      $Q_1,\,Q_3$ & 1st and 3rd quartile & $x_{\alpha}$ & $\alpha$-quantile, $F(x_\alpha)=\alpha$ \\
+      $Q_1,\,Q_3$ & 1st and 3rd quartile & $x_{p}$ & $p$-quantile $=\min\{x \mid F(x)\ge p\}$ \\
+      $\lceil\cdot\rceil$ & Rounding up & $c_0,\ldots,c_k$ & Class boundaries \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -89,6 +91,9 @@
 \section[ECDF]{Empirical Cumulative Distribution Function}
 % Slide 52: ECDF - Construction
 \begin{frame}{Empirical CDF -- Construction}
+  \guidingquestion{What share of the soccer players wear shoe size $39$ or
+  smaller? And up to which size do we find at least half of the players?}
+
   \textbf{Construction:} The observed values are plotted to scale on the $x$-axis; the corresponding $y$-values are given by the cumulative relative frequencies. The result is a step function whose $y$-values lie between 0 and 1.
 
   \vspace{0.3cm}
@@ -111,8 +116,8 @@
       Relative frequency & $0.0909$ & $0.1818$ & $0.3636$ & $0.1818$ & $0.0909$ & $0.0909$ & 1 \\
       Relative frequency in \% & $9.1\,\%$ & $18.2\,\%$ & $36.4\,\%$ & $18.2\,\%$ & $9.1\,\%$ & $9.1\,\%$ & $100\,\%$ \\
       Relative frequency & $\tfrac{1}{11}$ & $\tfrac{2}{11}$ & $\tfrac{4}{11}$ & $\tfrac{2}{11}$ & $\tfrac{1}{11}$ & $\tfrac{1}{11}$ & 1 \\
-      Cumulative frequency & $0.0909$ & $0.2727$ & $0.6364$ & $0.8182$ & $0.9091$ & 1 & \\
-      Cumulative frequency & $\tfrac{1}{11}$ & $\tfrac{3}{11}$ & $\tfrac{7}{11}$ & $\tfrac{9}{11}$ & $\tfrac{10}{11}$ & 1 & \\
+      Cum.\ rel.\ frequency & $0.0909$ & $0.2727$ & $0.6364$ & $0.8182$ & $0.9091$ & 1 & \\
+      Cum.\ rel.\ frequency & $\tfrac{1}{11}$ & $\tfrac{3}{11}$ & $\tfrac{7}{11}$ & $\tfrac{9}{11}$ & $\tfrac{10}{11}$ & 1 & \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -126,36 +131,57 @@
 \end{frame}
 
 \begin{frame}{Empirical CDF -- Definition}
-  \begin{block}{Definition}
-    \[ F(x) = \sum_{x_i \leq x} f(x_i) \]
+  \begin{block}{Definition (the ``empirical distribution function'' of Part~1)}
+    \[ F(x) \;=\; \sum_{x_i \leq x} f(x_i)
+       \;=\; \frac{\text{number of observations} \le x}{n} \]
+    (the sum runs over the \emph{distinct} observed values $x_i \le x$)
   \end{block}
+  \inworten{$F(x)$ is the share of observations that are \textbf{at most} $x$.
+  Example: $F(39) = \tfrac{7}{11} = 0.6364$ -- $63.6\,\%$ of the players wear
+  size $39$ or smaller.}
 
   \vspace{0.3cm}
 
   \begin{itemize}
-    \item Shows the cumulative proportion of the sorted values
-    \item Computing the quantiles for every observed value yields the empirical CDF
+    \item Computing the cumulative relative frequency for every observed value
+          yields the empirical CDF
+    \item Between two observed values $F$ stays constant; at each observed value
+          it jumps up by $f(x_i)$
     \item Quantiles can therefore be read off directly from it
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Empirical CDF -- Reading Off Quantiles}
-  \textbf{Example: Median.} The median is the smallest value at which the empirical CDF reaches $0.5$:
-  \[ F(x_{0.5}) = 0.5 \quad \Leftrightarrow \quad F^{-1}(0.5) = x_{0.5} \]
-
-  \vspace{0.3cm}
+  \textbf{Example: Median.} The median is the smallest value at which the
+  empirical CDF \textbf{reaches or exceeds} $0.5$:
+  \[ \tilde{x} = x_{0.5} = F^{-1}(0.5) = \min\{x \mid F(x) \geq 0.5\} \]
+  Shoe sizes: $F(38) = 0.2727 < 0.5$, but $F(39) = 0.6364 \ge 0.5$
+  $\;\Rightarrow\; \tilde{x} = 39$.
 
   \begin{block}{Generalisation}
-    Every quantile ($0 \leq \alpha \leq 1$) can be obtained from the empirical CDF:
-    \[ F(x_{\alpha}) = \alpha \quad \Leftrightarrow \quad F^{-1}(\alpha) = x_{\alpha} \]
+    Every $p$-quantile ($0 < p \leq 1$) can be obtained from the empirical CDF:
+    \[ x_{p} = F^{-1}(p) = \min\{x \mid F(x) \geq p\} \]
+    \inworten{go up to the height $p$, move right until you hit the step
+    function and read off the $x$-value there.}
   \end{block}
+
+  \vspace{0.2cm}
+  \textbf{Why ``$\ge p$'' and not ``$= p$''?} $F$ jumps -- here
+  it never takes the value $0.5$.
 \end{frame}
 
-% Slide 56: ECDF - Image
-\begin{frame}{Empirical CDF}
+% Slide 56: ECDF - Image (now with the read-off quantiles)
+\begin{frame}{Empirical CDF -- Reading Off Quantiles Graphically}
   \begin{center}
-    \includegraphics[width=0.8\textwidth,height=0.75\textheight,keepaspectratio]{images/image_004.png}
+    \includegraphics[width=0.8\textwidth,height=0.64\textheight,keepaspectratio]{images/ecdf_shoe_quantiles.png}
   \end{center}
+  \vspace{-0.2cm}
+  \footnotesize
+  $80\,\%$ quantile: $F(39) = 0.6364 < 0.8 \le F(40) = 0.8182$
+  $\Rightarrow x_{0.8} = 40$.\\
+  Same values as with the position rule $x_p = x_{(\lceil n \cdot p \rceil)}$ of Part~1:
+  $\lceil 11 \cdot 0.5 \rceil = 6 \rightarrow 39$ and
+  $\lceil 11 \cdot 0.8 \rceil = 9 \rightarrow 40$.
 \end{frame}
 
 % Slide 57: ECDF in Python
@@ -178,6 +204,120 @@ F(39)             # value of the empirical CDF at x = 39: 0.6364 (= 7/11)
 plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
     \end{lstlisting}
   \end{block}
+\end{frame}
+
+% ----- Exercise: reading values off the empirical CDF (from SfÖ Teil 2) -----
+\subsection{Exercises}
+\begin{frame}{Exercise -- Complaints per Day}
+  \begin{block}{Problem statement}
+    An online shop records the number of customer complaints per day on
+    $n = 10$ days:
+    \begin{center}
+      2, 0, 3, 1, 2, 5, 1, 3, 2, 6
+    \end{center}
+    \begin{enumerate}
+      \item Set up the frequency table with absolute frequencies $h_j$, relative
+        frequencies $f_j$ and cumulative relative frequencies $F(x)$, and draw
+        the empirical CDF.
+      \item Read off: What share of the days had at most 2 complaints? At most
+        4 complaints? More than 1 but at most 3 complaints?
+      \item Determine the median and the $80\,\%$ quantile from the empirical CDF.
+      \item Which Python commands check your results?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/4) -- Complaints: Frequency Table and Empirical CDF}
+  \begin{columns}[T]
+    \begin{column}{0.44\textwidth}
+      \textbf{Sorted:} 0, 1, 1, 2, 2, 2, 3, 3, 5, 6
+      \begin{center}
+        \small
+        \renewcommand{\arraystretch}{1.1}
+        \begin{tabular}{cccc}
+          \toprule
+          $x$ & $h_j$ & $f_j = h_j/n$ & $F(x)$ \\
+          \midrule
+          0 & 1 & $0.1$ & $0.1$ \\
+          1 & 2 & $0.2$ & $0.3$ \\
+          2 & 3 & $0.3$ & $0.6$ \\
+          3 & 2 & $0.2$ & $0.8$ \\
+          5 & 1 & $0.1$ & $0.9$ \\
+          6 & 1 & $0.1$ & $1.0$ \\
+          \midrule
+          Total & 10 & 1 & \\
+          \bottomrule
+        \end{tabular}
+      \end{center}
+      \small \textbf{Rule:} $F(x) = \sum_{x_i \le x} f(x_i)$ -- at every
+      observed value $F$ jumps up by $f_j$.
+    \end{column}
+    \begin{column}{0.54\textwidth}
+      \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{images/ecdf_complaints.png}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Solution (2/4) -- Complaints: Reading Off Shares}
+  \textbf{Rule:} $F(x)$ is the share of observations that are \textbf{at most}
+  $x$. The share in the interval $(a, b]$ is the difference $F(b) - F(a)$.
+  \vspace{0.2cm}
+  \begin{exampleblock}{At most 2 complaints}
+    $F(2) = 0.1 + 0.2 + 0.3 = \mathbf{0.6}$ $\rightarrow$ on $60\,\%$ of the days
+    there were at most 2 complaints.
+  \end{exampleblock}
+  \begin{exampleblock}{At most 4 complaints}
+    The value 4 was never observed -- the step function stays constant between
+    3 and 5: $F(4) = F(3) = \mathbf{0.8}$ $\rightarrow$ $80\,\%$ of the days.
+  \end{exampleblock}
+  \begin{exampleblock}{More than 1 but at most 3 complaints}
+    $F(3) - F(1) = 0.8 - 0.3 = \mathbf{0.5}$ $\rightarrow$ on half of the days
+    there were 2 or 3 complaints.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (3/4) -- Complaints: Reading Off Quantiles}
+  \textbf{Rule:} $x_{p} = \min\{x \mid F(x) \ge p\}$ -- the first value
+  at which the step function reaches or exceeds the height $p$.
+  \vspace{0.2cm}
+  \begin{exampleblock}{Median ($p = 0.5$)}
+    $F(1) = 0.3 < 0.5$, but $F(2) = 0.6 \ge 0.5$ $\rightarrow$
+    $\tilde{x} = x_{0.5} = \mathbf{2}$ complaints.
+  \end{exampleblock}
+  \begin{exampleblock}{$80\,\%$ quantile ($p = 0.8$)}
+    $F(2) = 0.6 < 0.8$, but $F(3) = 0.8 \ge 0.8$ $\rightarrow$
+    $x_{0.8} = \mathbf{3}$: on at least $80\,\%$ of the days there were at most
+    3 complaints.
+  \end{exampleblock}
+  \begin{block}{Check with the position rule $x_{(\lceil n \cdot p \rceil)}$}
+    Median: $\lceil 10 \cdot 0.5 \rceil = 5$ $\rightarrow$ 5th sorted value $= 2$.
+    \quad
+    $80\,\%$: $10 \cdot 0.8 = 8$ is already an integer $\rightarrow$
+    position $8$ $\rightarrow 3$.
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (4/4) -- Complaints: Python}
+  \begin{block}{Shares, quantiles and plot}
+    \begin{lstlisting}
+from statsmodels.distributions.empirical_distribution import ECDF
+compl = np.array([2, 0, 3, 1, 2, 5, 1, 3, 2, 6])
+F = ECDF(compl)
+print(F(2), F(4), F(3) - F(1))                                # shares
+print(np.quantile(compl, [0.5, 0.8], method="inverted_cdf"))  # quantiles
+plt.ecdf(compl)                                               # step function
+    \end{lstlisting}
+    \begin{lstlisting}[style=Pyout]
+0.6 0.8 0.5
+[2 3]
+    \end{lstlisting}
+  \end{block}
+  \begin{itemize}
+    \item \texttt{F(x)} returns the share of observations $\le x$ -- also for
+          values that were never observed, such as $x = 4$.
+    \item \texttt{method="inverted\_cdf"} is the course definition
+          $x_{(\lceil n\cdot p \rceil)}$; the default would interpolate.
+  \end{itemize}
 \end{frame}
 
 \section{Histogram}
@@ -217,7 +357,7 @@ plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
         \item Each class is open on the left and closed on the right: $(a, b]$
         \item This way every value is assigned to \textbf{exactly one} class
         \item Exception: the \textbf{first} class is closed on both sides $[a, b]$ so that the smallest value is not lost
-        \item e.\,g.\ $[37,39],\;(39,41],\;(41,43],\;(43,45],\;(45,47]$
+        \item e.g.\ $[37,39],\;(39,41],\;(41,43],\;(43,45],\;(45,47]$
       \end{itemize}
     \item \textbf{Count the observations in each class} $\to$ absolute frequencies
     \item \textbf{Compute the relative frequencies}
@@ -240,7 +380,7 @@ plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
       Class width & 2 & 2 & 2 & 2 & 2 & \\
       Abs.\ frequency & 7 & 3 & 0 & 0 & 1 & 11 \\
       Rel.\ frequency & $0.6364$ & $0.2727$ & $0$ & $0$ & $0.0909$ & $1$ \\[2pt]
-      Density $= \frac{f_j}{\text{CW}}$ & $0.3182$ & $0.1364$ & $0$ & $0$ & $0.0455$ & \\
+      Density $f_j/\Delta x_j$ & $0.3182$ & $0.1364$ & $0$ & $0$ & $0.0455$ & \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -274,7 +414,7 @@ plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
       Class width & 3 & 3 & 3 & \\
       Abs.\ frequency & 9 & 1 & 1 & 11 \\
       Rel.\ frequency & $0.8182$ & $0.0909$ & $0.0909$ & $1$ \\[2pt]
-      Density $= \frac{f_j}{\text{CW}}$ & $0.2727$ & $0.0303$ & $0.0303$ & \\
+      Density $f_j/\Delta x_j$ & $0.2727$ & $0.0303$ & $0.0303$ & \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -289,8 +429,7 @@ plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
 \begin{frame}{Histogram -- Unequal Class Widths}
   Shoe sizes: 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39 \quad ($n = 11$)
 
-  \vspace{0.3cm}
-
+  
   \begin{center}
     \small
     \begin{tabular}{lcccc@{\hspace{1.5em}}c}
@@ -300,16 +439,18 @@ plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
       Class width & 2 & 1 & 1 & 5 & \\
       Abs.\ frequency & 7 & 2 & 1 & 1 & 11 \\
       Rel.\ frequency & $0.6364$ & $0.1818$ & $0.0909$ & $0.0909$ & $1$ \\[2pt]
-      Density $= \frac{f_j}{\text{CW}}$ & $0.3182$ & $0.1818$ & $0.0909$ & $0.0182$ & \\
+      Density $f_j/\Delta x_j$ & $0.3182$ & $0.1818$ & $0.0909$ & $0.0182$ & \\
       \bottomrule
     \end{tabular}
   \end{center}
 
-  \vspace{0.3cm}
-
+  
   \begin{exampleblock}{Example: last class}
     Density $= \frac{0.0909}{5} = 0.0182$
  \end{exampleblock}
+  \kernaussage{The bar \textbf{height} is the density, the bar \textbf{area} is
+  the share $f_j$: the wide class $(41,46]$ holds as many players as $(40,41]$,
+  but its bar is only a fifth as high.}
 \end{frame}
 
 \begin{frame}{Histogram -- Alternative Class Partition}
@@ -333,60 +474,15 @@ plt.bar(breaks[:-1], dens, width=w, align="edge", edgecolor="black")
 
   \begin{block}{Unequal class widths}
     \begin{lstlisting}
-breaks = [37, 39, 40, 41, 46]              # then the same lines as above   
+breaks = [37, 39, 40, 41, 46]              # then the same lines as above
                                            # densities: 0.3182 0.1818 0.0909 0.0182
     \end{lstlisting}
   \end{block}
   \footnotesize Why not simply \texttt{plt.hist}? It uses classes $[a,b)$ -- see
-  \emph{Python Commands: Histogram}.
+  the next slide.
 \end{frame}
 
-
-% Slide 68: Exercise Histogram
-\begin{frame}{Exercise -- Histogram}
-  Create a histogram for the soccer team's shoe sizes using a class width of 2.
-\end{frame}
-
-% Slide 69: The Data
-\begin{frame}{The Data}
-  Shoe sizes: 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39
-\end{frame}
-
-% Slide 70: Histogram Construction - Table
-\begin{frame}{Histogram -- Construction (Table)}
-  Shoe sizes: 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39 \quad ($n = 11$)
-
-  \vspace{0.3cm}
-
-  \begin{center}
-    \small
-    \begin{tabular}{lccccc@{\hspace{1.5em}}c}
-      \toprule
-      Class & $[37,39]$ & $(39,41]$ & $(41,43]$ & $(43,45]$ & $(45,47]$ & Total \\
-      \midrule
-      Class width & 2 & 2 & 2 & 2 & 2 & \\
-      Abs.\ frequency & 7 & 3 & 0 & 0 & 1 & 11 \\
-      Rel.\ frequency & $0.6364$ & $0.2727$ & $0$ & $0$ & $0.0909$ & $1$ \\[2pt]
-      Density $= \frac{f_j}{\text{CW}}$ & $0.3182$ & $0.1364$ & $0$ & $0$ & $0.0455$ & \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-
-  \vspace{0.3cm}
-
-  \begin{exampleblock}{Example: first class}
-    Density $= \frac{0.6364}{2} = 0.3182$
-  \end{exampleblock}
-\end{frame}
-
-% Slide 71: Histogram Example
-\begin{frame}{Histogram -- Example}
-  \begin{center}
-    \includegraphics[width=0.8\textwidth,height=0.75\textheight,keepaspectratio]{images/hist_kb2.png}
-  \end{center}
-\end{frame}
-
-\begin{frame}[fragile]{Python Commands: Histogram}
+\begin{frame}[fragile]{Histograms in Python -- Trap: Classes $[a,b)$}
   \begin{alertblock}{Trap: \texttt{plt.hist} and \texttt{np.histogram} use classes $[a,b)$}
     Ours: $(a,b]$, first class $[a,b]$. NumPy: a boundary value goes to the class on its \textbf{right}.
     \begin{lstlisting}
@@ -403,7 +499,7 @@ np.histogram(shoe, bins=[37, 39, 41, 43, 45, 47], density=True)[0]
   \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{Python Commands: Histogram with Our Classes}
+\begin{frame}[fragile]{Histograms in Python -- with Our Classes}
   \begin{block}{Correct: classes with \texttt{pd.cut}, bars with \texttt{plt.bar}}
     \begin{lstlisting}
 def density_hist(x, breaks):
@@ -424,10 +520,10 @@ density_hist(shoe, [37, 39, 40, 41, 46])       # 0.3182 0.1818 0.0909 0.0182
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Python Commands: Classified Frequencies}
+\begin{frame}[fragile]{Classified Frequencies in Python}
   \begin{block}{Class partition}
     \begin{lstlisting}
-breaks = [37, 39, 41, 43, 45, 47]          # class boundaries b0, b1, ..., bk
+breaks = [37, 39, 41, 43, 45, 47]          # class boundaries c0, c1, ..., ck
 cls = pd.cut(shoe, breaks, right=True, include_lowest=True)
     \end{lstlisting}
   \end{block}
@@ -445,12 +541,205 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
   exactly the closed class $[37,39]$.
 \end{frame}
 
+% ----- Exercises -----
+\subsection{Exercises}
+% Exercise histogram: fresh data (handball team of Part 1) and shifted classes,
+% so that it does not repeat the worked example of this section
+\begin{frame}{Exercise -- Histogram (Handball Team)}
+  \begin{block}{Problem statement}
+    Shoe sizes of the handball team from Part~1 ($n = 13$):
+    \begin{center}
+      40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39, 40, 42
+    \end{center}
+    \begin{enumerate}
+      \item Use the classes $[36,38],\ (38,40],\ (40,42],\ (42,44],\ (44,46]$
+            (class width $2$). Assign the values to the classes and compute the
+            absolute and relative frequencies. Careful with values that lie
+            exactly on a class boundary!
+      \item Compute the densities and sketch the histogram.
+      \item With the classes of the worked example, $[37,39],\ (39,41],\ \ldots,\ (45,47]$,
+            the same data give the counts $7, 4, 1, 0, 1$. Compare the shapes of
+            the two histograms. What does this tell you about histograms?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- Histogram (Handball Team): Table}
+  \textbf{Rule:} the first class is closed, all others are open on the left -- a
+  value on a boundary belongs to the class \emph{below} it:
+  $38 \to [36,38]$, \ $40 \to (38,40]$, \ $42 \to (40,42]$, \ $46 \to (44,46]$.
+  Here $7$ of the $13$ values lie on a boundary.
+
+  \vspace{0.2cm}
+  \begin{center}
+    \small
+    \begin{tabular}{lccccc@{\hspace{1.5em}}c}
+      \toprule
+      Class & $[36,38]$ & $(38,40]$ & $(40,42]$ & $(42,44]$ & $(44,46]$ & Total \\
+      \midrule
+      Values & 37, 38, 38 & $4\times 39$, $3\times 40$ & 41, 42 & -- & 46 & \\
+      Class width $\Delta x_j$ & 2 & 2 & 2 & 2 & 2 & \\
+      Abs.\ frequency $h_j$ & 3 & 7 & 2 & 0 & 1 & 13 \\
+      Rel.\ frequency $f_j$ & $0.2308$ & $0.5385$ & $0.1538$ & $0$ & $0.0769$ & $1$ \\[2pt]
+      Density $f_j/\Delta x_j$ & $0.1154$ & $0.2692$ & $0.0769$ & $0$ & $0.0385$ & \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.2cm}
+  \begin{exampleblock}{Example: second class}
+    $f_2 = 7/13 = 0.5385$, \quad density $= 0.5385/2 = \mathbf{0.2692}$
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- Histogram (Handball Team): Bars and Comparison}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{images/hist_handball.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \small
+      \textbf{3.} Same data, two impressions:
+      \begin{itemize}
+        \item $[37,39],(39,41],\ldots$: counts $7,4,1,0,1$ -- the bars
+              \textbf{fall from the first class on} (``the smallest sizes are
+              the most common'').
+        \item $[36,38],(38,40],\ldots$: counts $3,7,2,0,1$ -- the bars
+              \textbf{rise to a peak} at $(38,40]$ and then fall.
+      \end{itemize}
+      Shifting all boundaries by one size regroups the values: the four
+      $39$s now share a class with the three $40$s instead of with $37$
+      and $38$.
+      \kernaussage{The shape of a histogram depends on the choice of classes:
+      choose them deliberately and check whether a feature survives a different
+      partition.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ----- Exercise: histogram with unequal class widths (from SfÖ Teil 2) -----
+\begin{frame}{Exercise -- Mobile Phone Costs}
+  \begin{block}{Problem statement}
+    A survey of $n = 10$ students gives the following monthly mobile phone
+    costs (in EUR):
+    \begin{center}
+      12, 25, 6, 38, 15, 60, 9, 19, 32, 18
+    \end{center}
+    The values are to be grouped into the classes $[0,10]$, $(10,20]$,
+    $(20,40]$ and $(40,80]$.
+    \begin{enumerate}
+      \item Determine the absolute and relative frequencies of the classes.
+      \item Compute the class widths and the densities (bar heights) and draw
+            the histogram.
+      \item Why must the bar height \emph{not} equal the relative frequency here?
+            Which class is the most densely populated?
+      \item Which Python commands reproduce the frequencies and densities?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/4) -- Mobile Phone Costs: Class Frequencies}
+  \textbf{Sorted:} 6, 9, 12, 15, 18, 19, 25, 32, 38, 60 \quad ($n = 10$)
+  \vspace{0.2cm}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{llcc}
+      \toprule
+      Class & Values in the class & $h_j$ & $f_j = h_j/n$ \\
+      \midrule
+      $[0,10]$  & 6, 9           & 2 & $0.2$ \\
+      $(10,20]$ & 12, 15, 18, 19 & 4 & $0.4$ \\
+      $(20,40]$ & 25, 32, 38     & 3 & $0.3$ \\
+      $(40,80]$ & 60             & 1 & $0.1$ \\
+      \midrule
+      Total &  & 10 & $1$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \vspace{0.05cm}
+  \begin{exampleblock}{Assigning values to classes}
+    The first class is closed on both sides, all others are open on the left:
+    a value of $10$ would belong to $[0,10]$, a value of $20$ to $(10,20]$.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/4) -- Mobile Phone Costs: Densities and Histogram}
+  \textbf{Rule:} density $= f_j / \Delta x_j$ (class width) -- this is the bar
+  height, not the frequency.
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \small
+        \renewcommand{\arraystretch}{1.15}
+        \begin{tabular}{lccl}
+          \toprule
+          Class & $\Delta x_j$ & $f_j$ & Density \\
+          \midrule
+          $[0,10]$  & 10 & $0.2$ & $0.2/10 = \mathbf{0.02}$ \\
+          $(10,20]$ & 10 & $0.4$ & $0.4/10 = \mathbf{0.04}$ \\
+          $(20,40]$ & 20 & $0.3$ & $0.3/20 = \mathbf{0.015}$ \\
+          $(40,80]$ & 40 & $0.1$ & $0.1/40 = \mathbf{0.0025}$ \\
+          \bottomrule
+        \end{tabular}
+      \end{center}
+      \small \textbf{Check:} area $=$ density $\cdot\,\Delta x_j = f_j$,
+      e.g.\ $0.015 \cdot 20 = 0.3$; all areas add up to $1$.
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{images/hist_phone_costs.png}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Solution (3/4) -- Mobile Phone Costs: Interpretation}
+  \begin{alertblock}{Why not the relative frequency as height?}
+    In a histogram the \textbf{area} of a bar is the share of the class. With
+    height $f_j$, the bar over $(20,40]$ would have the area $0.3 \cdot 20 = 6$, the
+    bar over $(10,20]$ only $0.4 \cdot 10 = 4$ -- the wide class with \emph{fewer}
+    observations would look bigger. Dividing by the class width makes classes
+    of different widths comparable.
+  \end{alertblock}
+  \begin{exampleblock}{Most densely populated class}
+    $(10,20]$ with density $\mathbf{0.04}$: per euro of class width, $4\,\%$ of
+    the students lie in this class.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (4/4) -- Mobile Phone Costs: Python}
+  \begin{block}{Frequencies, densities and bars}
+    \begin{lstlisting}
+costs = np.array([12, 25, 6, 38, 15, 60, 9, 19, 32, 18])
+breaks = [0, 10, 20, 40, 80]
+cls = pd.cut(costs, breaks, right=True, include_lowest=True)
+h = pd.Series(cls).value_counts(sort=False).to_numpy()   # absolute frequencies
+print(h, h / len(costs) / np.diff(breaks))               # h_j and densities
+density_hist(costs, breaks)              # bars (function from "with Our Classes")
+    \end{lstlisting}
+    \begin{lstlisting}[style=Pyout]
+[2 4 3 1] [0.02   0.04   0.015  0.0025]
+    \end{lstlisting}
+  \end{block}
+  \begin{itemize}
+    \item \texttt{np.diff(breaks)} gives the unequal class widths $10, 10, 20, 40$.
+    \item No value lies on a class boundary here, so \texttt{plt.hist} would
+          happen to give the same bars -- with \texttt{pd.cut} the classes are
+          right in every case.
+  \end{itemize}
+\end{frame}
+
 \section{Boxplot}
 % Slide 72: Boxplot Definition
 \begin{frame}{Boxplot}
+  \guidingquestion{How can we see the centre, the spread, the skewness and the
+  outliers of a dataset at one glance -- and compare several groups side by side?}
   \begin{block}{Definition}
     A graphical display that highlights only the most important summary values of a dataset and thereby visualises the distribution of the data.
   \end{block}
+  \begin{itemize}
+    \item Building blocks: the quartiles $Q_1$, $\tilde{x}$, $Q_3$ of Part~1,
+          two whiskers and the outliers
+    \item Example: the shoe sizes of the soccer team (next slides)
+  \end{itemize}
 \end{frame}
 
 % Slide 73: Boxplot Image
@@ -463,7 +752,7 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
 % Slide 74 & 75: Boxplot with labels
 \begin{frame}{Boxplot -- with Labels}
   \begin{center}
-    \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{images/boxplot_schuhgroessen.png}
+    \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{images/boxplot_shoe_labelled.png}
   \end{center}
 \end{frame}
 
@@ -676,7 +965,7 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
 % Slide 74 & 75: Boxplot with labels
 \begin{frame}{Boxplot -- with Labels}
   \begin{center}
-    \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{images/boxplot_schuhgroessen.png}
+    \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{images/boxplot_shoe_labelled.png}
   \end{center}
 \end{frame}
 
@@ -690,7 +979,7 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
       \item Allows a quick assessment of the \textbf{symmetry}
         and \textbf{skewness} of a distribution.
       \item Especially useful for \textbf{comparing several groups}
-        side by side -- e.\,g.\ shoe sizes of different teams.
+        side by side -- e.g.\ shoe sizes of different teams.
       \item \textbf{Outliers} are automatically detected
         and made visible.
     \end{itemize}
@@ -703,7 +992,148 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
   \end{alertblock}
 \end{frame}
 
-\section{Exercise}
+% ----- Exercise: constructing and comparing boxplots (from SfÖ Teil 2) -----
+\subsection{Exercises}
+\begin{frame}{Exercise -- Processing Times of Two Teams}
+  \begin{block}{Problem statement}
+    Two service teams handle customer requests. For $n = 11$ requests each,
+    the processing time (in minutes) was recorded:
+    \begin{center}
+      \begin{tabular}{ll}
+        \toprule
+        Team A & 7, 4, 9, 6, 18, 8, 5, 10, 6, 9, 7 \\
+        Team B & 12, 8, 15, 5, 14, 10, 16, 8, 11, 14, 7 \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+    \begin{enumerate}
+      \item Team A: determine the quartiles, the IQR, the bounds
+        $x_{0.25} - 1.5 \cdot \text{IQR}$ and $x_{0.75} + 1.5 \cdot \text{IQR}$,
+        the whiskers and possible outliers.
+      \item Carry out the same computations for team B.
+      \item Draw both boxplots above a common axis.
+      \item Compare median, IQR and outliers. What does the position of the
+        median in the box say about skewness? Which team works faster and more
+        consistently?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/5) -- Processing Times: Team A}
+  \textbf{Sorted:} 4, 5, \textbf{6}, 6, 7, \textbf{7}, 8, 9, \textbf{9}, 10, 18 \quad ($n = 11$)
+  \begin{block}{Quartiles (position $\lceil n \cdot p \rceil$ in the sorted data)}
+    $x_{0.25}$: $11 \cdot 0.25 = 2.75 \rightarrow$ position 3 $\rightarrow \mathbf{6}$ \\
+    $\tilde{x}$: $11 \cdot 0.5 = 5.5 \rightarrow$ position 6 $\rightarrow \mathbf{7}$ \\
+    $x_{0.75}$: $11 \cdot 0.75 = 8.25 \rightarrow$ position 9 $\rightarrow \mathbf{9}$
+  \end{block}
+  \begin{block}{IQR and bounds ($k = 1.5$)}
+    $\text{IQR} = 9 - 6 = \mathbf{3}$ \qquad
+    lower bound: $6 - 1.5 \cdot 3 = \mathbf{1.5}$ \qquad
+    upper bound: $9 + 1.5 \cdot 3 = \mathbf{13.5}$
+  \end{block}
+  \begin{block}{Whiskers and outliers}
+    Lower whisker $=$ smallest value $\ge 1.5$: $\mathbf{4}$ \qquad
+    Upper whisker $=$ largest value $\le 13.5$: $\mathbf{10}$ \\
+    $18 > 13.5$ $\rightarrow$ \textbf{18 is an outlier} (one unusually long request).
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (2/5) -- Processing Times: Team B}
+  \textbf{Sorted:} 5, 7, \textbf{8}, 8, 10, \textbf{11}, 12, 14, \textbf{14}, 15, 16 \quad ($n = 11$)
+  \begin{block}{Quartiles (same positions as for team A: 3, 6, 9)}
+    $x_{0.25} = \mathbf{8}$ \qquad $\tilde{x} = \mathbf{11}$ \qquad $x_{0.75} = \mathbf{14}$
+  \end{block}
+  \begin{block}{IQR and bounds ($k = 1.5$)}
+    $\text{IQR} = 14 - 8 = \mathbf{6}$ \qquad
+    lower bound: $8 - 1.5 \cdot 6 = \mathbf{-1}$ \qquad
+    upper bound: $14 + 1.5 \cdot 6 = \mathbf{23}$
+  \end{block}
+  \begin{block}{Whiskers and outliers}
+    Lower whisker $=$ smallest value $\ge -1$: $\mathbf{5}$ \qquad
+    Upper whisker $=$ largest value $\le 23$: $\mathbf{16}$ \\
+    All values lie within the bounds $\rightarrow$ \textbf{no outlier};
+    the whiskers reach the minimum and the maximum.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (3/5) -- Processing Times: Boxplots}
+  \begin{columns}[T]
+    \begin{column}{0.38\textwidth}
+      \begin{center}
+        \small
+        \renewcommand{\arraystretch}{1.15}
+        \begin{tabular}{lcc}
+          \toprule
+          & Team A & Team B \\
+          \midrule
+          Lower whisker & 4  & 5  \\
+          $x_{0.25}$    & 6  & 8  \\
+          Median        & 7  & 11 \\
+          $x_{0.75}$    & 9  & 14 \\
+          Upper whisker & 10 & 16 \\
+          Outliers      & 18 & -- \\
+          \midrule
+          IQR           & 3  & 6  \\
+          \bottomrule
+        \end{tabular}
+      \end{center}
+    \end{column}
+    \begin{column}{0.59\textwidth}
+      \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{images/boxplot_teams.png}
+    \end{column}
+  \end{columns}
+  \vspace{0.3cm}
+  \small Common axis: box from $x_{0.25}$ to $x_{0.75}$, line at the median,
+  whiskers to the lower and upper whisker, outliers as single points.
+\end{frame}
+
+\begin{frame}{Solution (4/5) -- Processing Times: Comparison}
+  \begin{exampleblock}{Comparing the two boxplots}
+    \begin{itemize}\setlength{\itemsep}{1pt}
+      \item \textbf{Median:} team B ($11$) $>$ team A ($7$) -- team A typically
+        handles requests faster.
+      \item \textbf{IQR:} team B ($6$) $>$ team A ($3$) -- the middle $50\,\%$
+        of B's times are spread twice as widely; team A works more consistently.
+      \item \textbf{Outliers:} only team A ($18$ minutes) -- a single case,
+        e.g.\ a particularly complex request.
+      \item \textbf{Skewness:} at A the median ($7$) lies in the left half of the
+        box $[6,9]$ ($7-6=1 < 9-7=2$) and the outlier lies far to the right
+        $\rightarrow$ right-skewed (the whiskers alone, $2$ vs.\ $1$ minute,
+        would not show this). At B the median ($11$) lies exactly in the middle
+        of $[8,14]$, the whiskers are $3$ and $2$ minutes long $\rightarrow$
+        roughly symmetric.
+    \end{itemize}
+  \end{exampleblock}
+  \begin{alertblock}{Conclusion}
+    Team A is faster and more consistent (apart from one outlier); team B is
+    slower and its processing times spread more.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (5/5) -- Processing Times: Python}
+  \begin{block}{Boxplot statistics with the course quartiles, then \texttt{bxp}}
+    \begin{lstlisting}
+def box_stats(x, k=1.5):                    # course quartiles + 1.5 IQR rule
+    q1, med, q3 = np.quantile(x, [0.25, 0.5, 0.75], method="inverted_cdf")
+    lo, hi = q1 - k * (q3 - q1), q3 + k * (q3 - q1)
+    inside = x[(x >= lo) & (x <= hi)]
+    return dict(q1=q1, med=med, q3=q3, whislo=inside.min(), whishi=inside.max(),
+                fliers=x[(x < lo) | (x > hi)])
+team_a = np.array([7, 4, 9, 6, 18, 8, 5, 10, 6, 9, 7])
+team_b = np.array([12, 8, 15, 5, 14, 10, 16, 8, 11, 14, 7])
+stats = [box_stats(team_a), box_stats(team_b)]
+# whislo q1 med q3 whishi fliers   A: 4 6 7 9 10 [18]   B: 5 8 11 14 16 []
+fig, ax = plt.subplots()
+ax.bxp(stats, vert=False)                   # both boxplots above a common axis
+ax.set_yticks([1, 2], ["Team A", "Team B"])
+    \end{lstlisting}
+  \end{block}
+  \footnotesize \texttt{plt.boxplot} interpolates the quartiles -- for these data it
+  happens to give the same result, but not in general.
+\end{frame}
+
+\section[Exercises]{Exercises}
+\subsection{Body Heights}
 \begin{frame}{Exercise: Body Heights -- Problem Statement}
   The body heights (in cm) of $n = 15$ persons are studied:
   \begin{center}
@@ -717,7 +1147,9 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
   \vspace{0.2cm}
   \begin{enumerate}
     \item Compute the mean, median, quartiles and the $17\,\%$ quantile.
-    \item Compute the four measures of dispersion.
+    \item Compute the measures of dispersion: range, IQR, sample variance,
+      standard deviation, coefficient of variation and normalised coefficient
+      of variation.
     \item Draw the empirical CDF, a histogram (class width $10$\,cm)
       and a boxplot.
     \item Draw the empirical CDF for the classified data (class midpoints).
@@ -757,7 +1189,7 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
   \end{column}
   \begin{column}{0.3\textwidth}
     \footnotesize
-    \textbf{Note:} $\overline{6}$ denotes a repeating decimal, e.\,g.\
+    \textbf{Note:} $\overline{6}$ denotes a repeating decimal, e.g.\
     \[ 0.0\overline{6} = 0.0666\ldots = \tfrac{1}{15} \]
   \end{column}
   \end{columns}
@@ -819,7 +1251,7 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
   \begin{block}{Median ($p = 0.5$)}
     $n \cdot p = 15 \cdot 0.5 = 7.5$ -- not an integer $\rightarrow$ round up to position $8$
 
-    The 8th value in the sorted sequence is $\tilde{x}_{0.5} = \textbf{168}$\,cm.
+    The 8th value in the sorted sequence is the median: $\tilde{x} = x_{0.5} = \textbf{168}$\,cm.
   \end{block}
   \vspace{0.2cm}
   \begin{block}{Mode}
@@ -829,8 +1261,8 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
 
 % Step by Step: Quartiles and 17% quantile
 \begin{frame}{Exercise: Body Heights -- Quartiles and Quantile}
-  \textbf{Rule:} Compute $n \cdot p$. If the result is \textbf{not an integer},
-  round up -- that position gives the desired value.
+  \textbf{Rule:} position $= \lceil n \cdot p \rceil$ -- compute $n \cdot p$ and
+  round up (if $n \cdot p$ is an integer, it is already the position).
   \vspace{0.2cm}
   \begin{exampleblock}{$17\,\%$ quantile ($p = 0.17$)}
     $n \cdot p = 15 \cdot 0.17 = 2.55$ $\rightarrow$ round up to position $3$
@@ -895,8 +1327,8 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
   \end{block}
   \vspace{0.2cm}
   The normalised coefficient of variation additionally takes the sample size
-  into account -- for larger $n$, $v^*$ becomes smaller because more
-  observations stabilise the estimate of the mean.
+  into account: $v$ is divided by $\sqrt{n}$, its largest possible value for
+  non-negative data, so that $0 \le v^* \le 1$.
 \end{frame}
 
 % Step by Step: Boxplot bounds
@@ -921,23 +1353,70 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
 
 
 
-% Empirical CDF (task 3)
+% Empirical CDF (task 3), with the quantiles of task 1 read off
 \begin{frame}{Exercise: Body Heights -- Empirical CDF}
-  \begin{columns}[c]
-    \begin{column}{0.64\textwidth}
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
       \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{images/ecdf_body_heights.png}
     \end{column}
-    \begin{column}{0.34\textwidth}
+    \begin{column}{0.4\textwidth}
       \footnotesize
-      \begin{itemize}\setlength{\itemsep}{4pt}
-        \item Jump heights $=$ relative frequencies (e.\,g.\ $0.2$ at
-              $168$\,cm, which occurs $3$ times).
-        \item The step function first reaches $0.5$ at $x=168$
-              $\Rightarrow$ median $\tilde{x}=168$\,cm.
-        \item Values from the cumulative column of the data table.
-      \end{itemize}
+      Step function from the column ``Cum.\ freq.'' of the data table: at every
+      observed value it jumps up by $f_j$ (e.g.\ by $0.2$ at $168$\,cm, which
+      occurs $3$ times).
+      \begin{exampleblock}{Reading off quantiles}
+        $x_{p} = \min\{x \mid F(x) \ge p\}$
+        \begin{itemize}\setlength{\itemsep}{0pt}
+          \item $x_{0.17}$: $F(160) = 0.2 \ge 0.17 \rightarrow 160$
+          \item $x_{0.25}$: $F(162) = 0.2\overline{6} \ge 0.25 \rightarrow 162$
+          \item $\tilde{x}$: $F(168) = 0.\overline{6} \ge 0.5 \rightarrow 168$
+          \item $x_{0.75}$: $F(175) = 0.8 \ge 0.75 \rightarrow 175$
+        \end{itemize}
+        Same results as with the position rule.
+      \end{exampleblock}
     \end{column}
   \end{columns}
+\end{frame}
+
+% Histogram table (task 3)
+\begin{frame}{Exercise: Body Heights -- Histogram (Table)}
+  Class width $10$\,cm, first class closed on both sides \quad ($n = 15$)
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lccccc@{\hspace{1.5em}}c}
+      \toprule
+      Class & $[150,160]$ & $(160,170]$ & $(170,180]$ & $(180,190]$ & $(190,200]$ & Total \\
+      \midrule
+      Class width & 10 & 10 & 10 & 10 & 10 & \\
+      Abs.\ frequency & 3 & 7 & 3 & 0 & 2 & 15 \\
+      Rel.\ frequency & $0.2$ & $0.4\overline{6}$ & $0.2$ & $0$ & $0.1\overline{3}$ & $1$ \\[2pt]
+      Density $f_j/\Delta x_j$ & $0.02$ & $0.0467$ & $0.02$ & $0$ & $0.0133$ & \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{exampleblock}{Example: second class $(160,170]$}
+    Values 162, 164, 166, 166, 168, 168, 168 $\rightarrow$ $h_2 = 7$,
+    $f_2 = \frac{7}{15} = 0.4\overline{6}$, density $= \frac{0.4\overline{6}}{10} = 0.0467$
+  \end{exampleblock}
+  \begin{alertblock}{Boundary values}
+    $160$ (twice) belongs to $[150,160]$ and $180$ to $(170,180]$ -- classes are
+    closed on the \textbf{right}.
+  \end{alertblock}
+\end{frame}
+
+% Histogram
+\begin{frame}{Exercise: Body Heights -- Histogram (Class Width 10\,cm)}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth,height=0.78\textheight,keepaspectratio]{images/hist_body_heights.png}
+  \end{center}
+\end{frame}
+
+% Boxplot
+\begin{frame}{Exercise: Body Heights -- Boxplot}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth,height=0.78\textheight,keepaspectratio]{images/boxplot_koerpergroesse.png}
+  \end{center}
 \end{frame}
 
 % Classified data (task 4)
@@ -963,38 +1442,203 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
 \end{frame}
 
 \begin{frame}{Exercise: Body Heights -- Empirical CDF of the Classified Data}
-  \begin{columns}[c]
-    \begin{column}{0.64\textwidth}
-      \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{images/ecdf_body_heights_classified.png}
-    \end{column}
-    \begin{column}{0.34\textwidth}
+  \begin{center}
+    \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{images/ecdf_body_heights_comparison.png}
+  \end{center}
+  \vspace{-0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
       \footnotesize
-      \begin{itemize}\setlength{\itemsep}{4pt}
-        \item Only $4$ steps instead of $10$ -- the classified CDF is
-              much \textbf{coarser}.
-        \item It reaches $0.5$ at $a_2=165$, whereas the exact median is
+      \begin{itemize}\setlength{\itemsep}{2pt}
+        \item Only $4$ steps instead of $10$ -- the classified CDF is much
+              \textbf{coarser}, but its overall shape is similar.
+        \item It reaches $0.5$ at $a_2 = 165$, whereas the exact median is
               $168$\,cm.
       \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
       \begin{alertblock}{Interpretation}
-        Classifying the data simplifies the picture but \textbf{loses
-        information}.
+        \footnotesize Classifying the data simplifies the picture but
+        \textbf{loses information} within the classes.
       \end{alertblock}
     \end{column}
   \end{columns}
 \end{frame}
 
-% Histogram
-\begin{frame}{Exercise: Body Heights -- Histogram (Class Width 10\,cm)}
-  \begin{center}
-    \includegraphics[width=0.95\textwidth,height=0.78\textheight,keepaspectratio]{images/hist_body_heights.png}
-  \end{center}
+\begin{frame}[fragile]{Exercise: Body Heights -- Python}
+  \begin{lstlisting}
+heights = np.array([164, 162, 168, 198, 166, 166, 192, 160, 151, 175,
+                    180, 160, 168, 175, 168])
+np.quantile(heights, [0.17, 0.25, 0.5, 0.75], method="inverted_cdf")  # 160 162 168 175
+breaks = [150, 160, 170, 180, 190, 200]
+cls = pd.cut(heights, breaks, right=True, include_lowest=True)
+h = pd.Series(cls).value_counts(sort=False).to_numpy()   # 3 7 3 0 2
+density_hist(heights, breaks)                            # 0.02 0.0467 0.02 0 0.0133
+plt.figure(); plt.ecdf(heights)                          # new figure: raw-data ECDF
+classified = np.repeat([155, 165, 175, 185, 195], h)     # each value -> class midpoint
+plt.ecdf(classified)                                     # classified ECDF, same axes
+np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 168)
+  \end{lstlisting}
+  \begin{alertblock}{Trap again: \texttt{plt.hist(heights, bins=breaks)}}
+    Classes $[a,b)$ put $160$ and $180$ into the next class: counts
+    $1, 9, 2, 1, 2$ instead of $3, 7, 3, 0, 2$.
+  \end{alertblock}
 \end{frame}
 
-% Boxplot
-\begin{frame}{Exercise: Body Heights -- Boxplot}
+% ----- Exam-style exercise: reading given graphics (adapted from mock exam 3, task 1) -----
+\subsection{Caf\'e Chain (Exam Style)}
+\begin{frame}{Exercise -- Caf\'e Chain (Exam Style): Reading a Boxplot}
+  \begin{block}{Problem statement (Part A): boxplot of the $n = 60$ daily revenues of a caf\'e}
+    \vspace{-0.1cm}
+    \begin{center}
+      \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{images/boxplot_cafe.png}
+    \end{center}
+    \vspace{-0.4cm}
+    \begin{enumerate}
+      \item Read off the median, $Q_1$, $Q_3$ and the whisker ends; compute the IQR.
+      \item On at least how many days was the revenue at most 2800 EUR?
+      \item Compute the fences. Why is $62$ drawn as a point, and why does the
+            upper whisker end at $50$?
+      \item Assess the skewness. Is the mean above or below the median?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Exercise -- Caf\'e Chain (Exam Style): Histogram and Robust Measures}
+  \begin{block}{Problem statement (Parts B and C)}
+    \textbf{B:} Histogram of the values (in EUR) of $n = 50$ orders; the bar
+    labels are the densities.
+    \begin{columns}[T]
+      \begin{column}{0.46\textwidth}
+        \includegraphics[width=\textwidth,height=0.42\textheight,keepaspectratio]{images/hist_cafe_orders.png}
+      \end{column}
+      \begin{column}{0.51\textwidth}
+        \begin{enumerate}\setcounter{enumi}{4}
+          \item Determine the relative frequency and the number of orders of
+                every class.
+          \item Which class contains the most orders? Is it the class with
+                the highest bar?
+          \item What share of the orders is worth more than 10 EUR?
+        \end{enumerate}
+      \end{column}
+    \end{columns}
+    \medskip
+    \textbf{C:} Repair times of the espresso machine (minutes):
+    \ 2, 3, 3, 4, 5, 6, 26.
+    \begin{enumerate}\setcounter{enumi}{7}
+      \item Compute the mean, the median and the trimmed mean (smallest and
+            largest value removed). Is $26$ an outlier by the
+            $1.5 \cdot \text{IQR}$ rule? Which measure would you report?
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/5) -- Caf\'e Chain: Reading Off the Boxplot}
+  \textbf{Rule:} box edges $= Q_1$ and $Q_3$, line in the box $=$ median, whisker
+  ends $=$ the most extreme \emph{data values} inside the fences.
   \begin{center}
-    \includegraphics[width=0.95\textwidth,height=0.78\textheight,keepaspectratio]{images/boxplot_koerpergroesse.png}
+    \includegraphics[width=0.9\textwidth,height=0.5\textheight,keepaspectratio]{images/boxplot_cafe_solution.png}
   \end{center}
+  \vspace{-0.15cm}
+  \begin{enumerate}
+    \item Median $= \mathbf{28}$ (2800 EUR), $Q_1 = \mathbf{24}$, $Q_3 = \mathbf{36}$,
+          whiskers at $\mathbf{15}$ and $\mathbf{50}$;
+          $\text{IQR} = 36 - 24 = \mathbf{12}$: the middle $50\,\%$ of the days
+          lie within a range of 1200 EUR.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution (2/5) -- Caf\'e Chain: Share of Days and Fences}
+  \begin{enumerate}\setcounter{enumi}{1}
+    \item \textbf{Rule:} median $= x_{(\lceil n \cdot 0.5 \rceil)}$ (Part~1).
+      \[ \tilde{x} = x_{(\lceil 60 \cdot 0.5 \rceil)} = x_{(30)} = 28 \]
+      The $30$ smallest revenues are all $\le 28$ $\rightarrow$ on \textbf{at
+      least 30 days} (half of the days) the revenue was at most 2800 EUR,
+      i.e.\ $F(28) \ge 0.5$. (Ties may make it more days.)
+    \item \textbf{Rule:} fences $Q_1 - 1.5 \cdot \text{IQR}$ and
+      $Q_3 + 1.5 \cdot \text{IQR}$.
+      \[ 24 - 1.5 \cdot 12 = 24 - 18 = \mathbf{6}, \qquad
+         36 + 1.5 \cdot 12 = 36 + 18 = \mathbf{54} \]
+      \vspace{-0.4cm}
+      \begin{itemize}
+        \item $62 > 54$ $\rightarrow$ \textbf{outlier}, drawn as a single point.
+        \item The upper whisker ends at the largest \emph{observed} value
+              $\le 54$, which is $50$ -- the fence $54$ itself is no data value.
+        \item $15 \ge 6$: no outlier at the bottom; the lower whisker is the
+              minimum.
+      \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution (3/5) -- Caf\'e Chain: Skewness}
+  \begin{enumerate}\setcounter{enumi}{3}
+    \item Three indications point in the same direction:
+      \begin{itemize}
+        \item $\text{median} - Q_1 = 28 - 24 = 4 \;<\; Q_3 - \text{median} = 36 - 28 = 8$:
+              the median lies in the left half of the box,
+        \item lower whisker $24 - 15 = 9$ $<$ upper whisker $50 - 36 = 14$,
+        \item the only outlier ($62$) lies at the top.
+      \end{itemize}
+      $\rightarrow$ \textbf{right-skewed}: a few days with very high revenue
+      stretch the right tail. They pull the mean upwards, so we expect
+      $\bar{x} > \tilde{x} = 28$, i.e.\ the mean \textbf{above} the median.
+  \end{enumerate}
+  \kernaussage{Reading a boxplot: the box edges are quartiles, the whisker ends
+  are observed values (not the fences). Skewness shows in the position of the
+  median in the box, the whisker lengths and the side of the outliers.}
+\end{frame}
+
+\begin{frame}{Solution (4/5) -- Caf\'e Chain: Reading the Histogram}
+  \textbf{5.}~\textbf{Rule:} area $=$ density $\cdot$ class width $= f_j$ (relative
+  frequency); number of orders $h_j = f_j \cdot n$.
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{lcccc}
+      \toprule
+      Class & $\Delta x_j$ & Density & $f_j = \text{density} \cdot \Delta x_j$ & $h_j = f_j \cdot 50$ \\
+      \midrule
+      $[0,5]$   & 5  & $0.04$  & $0.2$ & 10 \\
+      $(5,10]$  & 5  & $0.06$  & $0.3$ & 15 \\
+      $(10,20]$ & 10 & $0.04$  & $0.4$ & 20 \\
+      $(20,40]$ & 20 & $0.005$ & $0.1$ & 5 \\
+      \midrule
+      Total     &    &         & $1$   & 50 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{enumerate}\setcounter{enumi}{5}
+    \item Most orders: $\mathbf{(10,20]}$ with $20$ orders ($40\,\%$) -- although
+          its bar ($0.04$) is \emph{lower} than that of $(5,10]$ ($0.06$): it is
+          twice as wide. The highest bar shows where the orders lie most
+          \emph{densely} (per euro), not where most of them lie.
+    \item More than 10 EUR: $f_3 + f_4 = 0.4 + 0.1 = \mathbf{0.5}$, i.e.\
+          $50\,\%$ of the orders ($25$ orders).
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (5/5) -- Caf\'e Chain: Robust Measures of Location}
+  \textbf{Sorted:} 2, 3, 3, 4, 5, 6, 26 \quad ($n = 7$)
+  \begin{enumerate}\setcounter{enumi}{7}
+    \item \textbf{Mean} $\bar{x} = 49/7 = \mathbf{7}$; \quad
+          \textbf{median} $= x_{(\lceil 3.5 \rceil)} = x_{(4)} = \mathbf{4}$; \quad
+          \textbf{trimmed mean} $= (3+3+4+5+6)/5 = 21/5 = \mathbf{4.2}$.\\[2pt]
+          Outlier check: $Q_1 = x_{(\lceil 1.75 \rceil)} = x_{(2)} = 3$,
+          $Q_3 = x_{(\lceil 5.25 \rceil)} = x_{(6)} = 6$, $\text{IQR} = 3$,
+          upper fence $6 + 4.5 = 10.5$ $\rightarrow$ $26$ is an \textbf{outlier}.
+  \end{enumerate}
+  \begin{alertblock}{Which measure to report?}
+    The mean ($7$) exceeds six of the seven values -- the outlier pulls it up.
+    Median ($4$) and trimmed mean ($4.2$) are robust $\rightarrow$ report the
+    \textbf{median} (or the trimmed mean).
+  \end{alertblock}
+  \begin{lstlisting}
+rep = np.array([2, 3, 3, 4, 5, 6, 26])
+print(rep.mean(), np.quantile(rep, 0.5, method="inverted_cdf"), np.sort(rep)[1:-1].mean())
+  \end{lstlisting}
+  \begin{lstlisting}[style=Pyout]
+7.0 4 4.2
+  \end{lstlisting}
 \end{frame}
 
 \section[Python]{Python Commands}
@@ -1043,11 +1687,13 @@ vstar = v / np.sqrt(len(shoe))             # 0.0181
 
 % Python Commands: Empirical CDF
 \begin{frame}[fragile]{Python Commands: Empirical CDF}
-  \begin{block}{Computing and evaluating}
+  \begin{block}{Computing and evaluating: shares and quantiles}
     \begin{lstlisting}
 from statsmodels.distributions.empirical_distribution import ECDF
 F = ECDF(shoe)
 F(39)           # value of the ECDF at x = 39: 0.6364
+F(40) - F(38)   # share in (38, 40], i.e. sizes 39 and 40: 0.5455 (= 6/11)
+np.quantile(shoe, [0.5, 0.8], method="inverted_cdf")   # min{x | F(x) >= p}: 39 40
     \end{lstlisting}
   \end{block}
   \begin{block}{Plotting}
@@ -1136,13 +1782,32 @@ plt.show()
   \end{block}
 \end{frame}
 
+\begin{frame}[fragile]{Python Commands: Boxplots of Several Groups}
+  \begin{block}{Boxplot statistics with our quartiles -- for any number of groups}
+    \begin{lstlisting}
+def box_stats(x, k=1.5):
+    q1, med, q3 = np.quantile(x, [0.25, 0.5, 0.75], method="inverted_cdf")
+    lo, hi = q1 - k * (q3 - q1), q3 + k * (q3 - q1)     # fences
+    inside = x[(x >= lo) & (x <= hi)]
+    return dict(q1=q1, med=med, q3=q3, whislo=inside.min(), whishi=inside.max(),
+                fliers=x[(x < lo) | (x > hi)])
+
+fig, ax = plt.subplots()                      # several boxplots, common axis
+ax.bxp([box_stats(team_a), box_stats(team_b)], vert=False)
+ax.set_yticks([1, 2], ["Team A", "Team B"])    # labels of the groups
+    \end{lstlisting}
+  \end{block}
+  \footnotesize Example: processing times of two teams (exercise in the Boxplot
+  section). \texttt{box\_stats(shoe)} reproduces the shoe-size boxplot.
+\end{frame}
+
 % ============================================================
 % ===== SECTION: SUMMARY =====
 % ============================================================
 \section{Summary}
 
 % Slide 1/5: Empirical CDF
-\begin{frame}{Summary (1/3) -- Empirical CDF}
+\begin{frame}{Summary (1/4) -- Empirical CDF}
   \begin{block}{Definition}
     \[
       F(x) \;=\; \sum_{x_i \leq x} f(x_i)
@@ -1151,22 +1816,21 @@ plt.show()
   \end{block}
   \begin{block}{Reading off quantiles}
     \[
-      F(x_{\alpha}) = \alpha
-      \quad \Longleftrightarrow \quad
-      F^{-1}(\alpha) = x_{\alpha},
-      \qquad 0 \leq \alpha \leq 1
+      x_{p} = F^{-1}(p) = \min\{x \mid F(x) \geq p\},
+      \qquad 0 < p \leq 1
     \]
-    Special case: $F^{-1}(0.5) = \tilde{x}$ (median).
+    Special case: $F^{-1}(0.5) = \tilde{x}$ (median); same as the position rule
+    $x_{(\lceil n \cdot p \rceil)}$.
   \end{block}
   \begin{itemize}
-    \item Step function showing the cumulative relative frequency.
-    \item Jump height at $x_i$ equals $f(x_i)$.
-    \item Every quantile can be read off directly.
+    \item Step function showing the cumulative relative frequency; jump height at
+          $x_i$ equals $f(x_i)$.
+    \item Shares: $F(x)$ = share of values $\le x$; share in $(a,b]$ $= F(b) - F(a)$.
   \end{itemize}
 \end{frame}
 
 % Slide 2/5: Histogram
-\begin{frame}{Summary (2/3) -- Histogram}
+\begin{frame}{Summary (2/4) -- Histogram}
   \begin{block}{Density of a class}
     \[
       \text{density}_j \;=\; \frac{f_j}{\Delta x_j}
@@ -1181,14 +1845,16 @@ plt.show()
   \end{block}
   \begin{itemize}
     \item Suitable for metric, classified data.
-    \item Classes: $[a_1,a_2],\,(a_2,a_3],\,\ldots,\,(a_{k-1},a_k]$ (first class closed on both sides).
+    \item Classes $[c_0,c_1],\,(c_1,c_2],\,\ldots,\,(c_{k-1},c_k]$ with
+          boundaries $c_0 < \ldots < c_k$.
     \item The choice of class width strongly affects the shape.
-    \item Unequal class widths are also possible -- bar heights remain densities.
+    \item Unequal class widths are possible -- heights remain densities; the
+          highest bar need not hold the most values.
   \end{itemize}
 \end{frame}
 
 % Slide 3/5: Boxplot
-\begin{frame}{Summary (3/3) -- Boxplot}
+\begin{frame}{Summary (3/4) -- Boxplot}
   \begin{block}{Five-number summary}
     \[
       x_{\min}\ \text{(or lower whisker)},\ x_{0.25},\ \tilde{x},\ x_{0.75},\ x_{\max}\ \text{(or upper whisker)}
@@ -1207,6 +1873,29 @@ plt.show()
     All values $< x_{0.25} - 1.5 \cdot \text{IQR}$ or $> x_{0.75} + 1.5 \cdot \text{IQR}$
     are displayed individually as outliers.
   \end{alertblock}
+\end{frame}
+
+\begin{frame}{Summary (4/4) -- Which Graphic for Which Question?}
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{>{\raggedright\arraybackslash}p{4.6cm}l>{\raggedright\arraybackslash}p{5.2cm}}
+      \toprule
+      \textbf{Question} & \textbf{Graphic} & \textbf{Read off} \\
+      \midrule
+      What share of the values is at most $x$? Up to which value lie at least
+      $p \cdot 100\,\%$ of them? & Empirical CDF &
+      $F(x)$, $F(b) - F(a)$, $x_{p} = \min\{x \mid F(x) \ge p\}$ \\
+      What does the distribution look like (peaks, gaps, tails)? & Histogram &
+      Height $=$ density $f_j/\Delta x_j$, area $=$ share $f_j$ \\
+      Centre, spread, skewness, outliers -- and comparison of groups? & Boxplot &
+      $Q_1$, $\tilde{x}$, $Q_3$, IQR, whisker ends, points beyond the fences \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \kernaussage{Course conventions: quantiles $x_{(\lceil n \cdot p \rceil)}$ and classes
+  $(a,b]$, first class closed -- in Python \texttt{method="inverted\_cdf"} and
+  \texttt{pd.cut(..., include\_lowest=True)}.}
 \end{frame}
 
 

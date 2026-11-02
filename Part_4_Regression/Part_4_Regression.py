@@ -6,15 +6,23 @@
 # folder Part_4_Regression (the data sets are read from ../data):
 #     python3 Part_4_Regression.py
 # Plots are drawn headless (Agg backend) and closed again -- nothing is
-# written to disk; all numbers are printed.
+# written to disk; all numbers are printed. The inline (pgfplots) figures
+# of Sections 1-4 use the coordinates printed here.
 # Sections follow the sections of the slide deck:
 #   1  Correlation              (lamp example)
-#   2  Simple regression        (least squares, leverage)
-#   3  Goodness of fit          (variance decomposition, R^2)
-#   4  Residual analysis        (residual plot, QQ-plot), body heights
+#   2  Simple regression        (twelve stores: the best line, least squares;
+#                                lamp; exercises: online shop, furniture
+#                                store, price-demand)
+#   3  Goodness of fit          (variance decomposition, R^2, three sums;
+#                                exercises: online shop, heating costs,
+#                                study hours -- statsmodels output)
+#   4  Residual analysis        (saturation example, residual plots, leverage,
+#                                QQ-plots; exercises: maintenance costs,
+#                                body heights and shoe sizes)
 #   5  Inference                (SE, t-test, CI, p-value, prediction)
 #   6  Multiple regression      (Advertising, Credit)
-#   Appendix                    (interactions, diagnostics, collinearity / VIF)
+#   Appendix                    (minimum property of OLS, interactions,
+#                                diagnostics, collinearity / VIF)
 # =====================================================================
 import warnings
 from pathlib import Path
@@ -31,7 +39,7 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 pd.set_option("display.width", 120)
-# summary() runs normality tests that warn for small n (n = 6, 9, 15) -- silence them
+# summary() runs normality tests that warn for small n (n = 6, 9, 12, 15) -- silence them
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
@@ -46,13 +54,43 @@ def fit_line(m):
           f"sigma = {np.sqrt(m.scale):.4f}, df = {m.df_resid:.0f}")
 
 
+def sums(x, y):
+    """Means and the three basic sums S_xx, S_yy, S_xy (Section 3)."""
+    x = np.asarray(x, float); y = np.asarray(y, float)
+    xc, yc = x - x.mean(), y - y.mean()
+    return x.mean(), y.mean(), (xc**2).sum(), (yc**2).sum(), (xc * yc).sum()
+
+
+def ols_by_hand(x, y, label):
+    """Recipe of the slide 'Step by step to the regression line'."""
+    xbar, ybar, Sxx_, Syy_, Sxy_ = sums(x, y)
+    n_ = len(x)
+    b1 = Sxy_ / Sxx_; b0 = ybar - b1 * xbar
+    print(f"{label}: n = {n_}, xbar = {xbar:.4f}, ybar = {ybar:.4f}, "
+          f"S_xx = {Sxx_:.4f}, S_yy = {Syy_:.4f}, S_xy = {Sxy_:.4f}")
+    print(f"   s_xy = {Sxy_ / (n_ - 1):.4f}, s_x^2 = {Sxx_ / (n_ - 1):.4f}, "
+          f"b1 = {b1:.4f}, b0 = {b0:.4f}, r = {Sxy_ / np.sqrt(Sxx_ * Syy_):.4f}, "
+          f"R^2 = {Sxy_**2 / (Sxx_ * Syy_):.4f}")
+    return b0, b1
+
+
+def rss_of_line(x, y, b0, b1):
+    u = np.asarray(y, float) - (b0 + b1 * np.asarray(x, float))
+    return u, (u**2).sum()
+
+
 # ---------------------------------------------------------------------
-# SETUP: lamp example (price in Euro, sales quantity) -- running story
+# SETUP: lamp example (price in euros, sales quantity) -- running story
 # ---------------------------------------------------------------------
 price = np.array([80, 85, 90, 95, 100, 105, 110, 115, 120])
 quantity = np.array([20, 17, 15, 9, 11, 8, 4, 4, 2])
 df = pd.DataFrame({"price": price, "quantity": quantity})
 n = len(df)
+
+# twelve stores: advertising and revenue (both in 1000 EUR) -- Sections 2-4
+x12 = np.array([1, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13])
+y12 = np.array([33, 30, 37, 33, 38, 41, 39, 43, 45, 40, 42, 47])
+stores = pd.DataFrame({"adv": x12, "revenue": y12})
 
 # =====================================================================
 # 1 Correlation
@@ -60,7 +98,7 @@ n = len(df)
 header("1 Correlation -- slide 'Covariance and correlation with Python'")
 fig, ax = plt.subplots()
 ax.scatter(df["price"], df["quantity"])
-ax.set(xlabel="Price (Euro)", ylabel="Sales quantity", title="Scatter plot")
+ax.set(xlabel="Price (EUR)", ylabel="Sales quantity", title="Scatter plot")
 plt.close(fig)
 print("cov  :", df["price"].cov(df["quantity"]))            # -83.75
 print("corr :", round(df["price"].corr(df["quantity"]), 4))  # -0.9732
@@ -74,14 +112,39 @@ print("Exercise cov/sd/sd/corr:", xa.cov(ya), round(xa.std(), 4),
 # =====================================================================
 # 2 Simple linear regression
 # =====================================================================
-header("2 Simple regression -- slide 'Linear regression with Python'")
+header("2 Simple regression -- twelve stores: which line is best?")
+print("r_xy (twelve stores) =", round(stores["adv"].corr(stores["revenue"]), 4))   # 0.8803
+# candidate lines of the slides 'Which line describes the data best?' ff.
+lines = {"A": (24, 2), "B": (34.5, 0.6), "C": (35, 1.2), "D": (30, 1.2), "D'": (31.5, 1.0)}
+for name, (a, b) in lines.items():
+    u, rss = rss_of_line(x12, y12, a, b)
+    print(f"line {name:2s} y = {a} + {b} x: residuals {u.round(2).tolist()}, "
+          f"sum = {u.sum():.1f}, sum of squares S = {rss:.1f}")
+# A: sum 0, S = 164.0; B: 0, 120.6; C: -60, 364.8; D: 0, 64.8
+print("store 9: yhat =", 30 + 1.2 * 10, " residual =", 45 - (30 + 1.2 * 10))   # 42, 3
+u_D, _ = rss_of_line(x12, y12, 30, 1.2)
+print("squared residuals of D:", (u_D**2).round(2).tolist())
+
+header("2 Simple regression -- least squares (twelve stores)")
+b0_12, b1_12 = ols_by_hand(x12, y12, "twelve stores")    # S_xy 186, S_xx 155, b1 1.2, b0 30
+print("s_xy = 186/11 =", round(186 / 11, 2), " s_x^2 = 155/11 =", round(155 / 11, 2))  # 16.91, 14.09
+reg12 = smf.ols("revenue ~ adv", data=stores).fit()
+print("smf.ols:", reg12.params.round(4).tolist())          # 30.0, 1.2: line D is the OLS line
+# first-order conditions: sum u = 0 and sum x u = 0
+print("sum u =", round(reg12.resid.sum(), 10), " sum x*u =", round((x12 * reg12.resid).sum(), 10))
+print("fitted values:", reg12.fittedvalues.round(2).tolist())
+# slide 'How do we interpret the slope?': advertising 5 -> 10
+print("yhat(5), yhat(10):", 30 + 1.2 * 5, 30 + 1.2 * 10)   # 36, 42
+
+header("2 Simple regression -- lamp example, slide 'Linear regression with Python'")
 beta1 = df["price"].cov(df["quantity"]) / df["price"].var()
 beta0 = df["quantity"].mean() - beta1 * df["price"].mean()
 print("beta1 =", round(beta1, 4), " beta0 =", round(beta0, 4))   # -0.4467, 54.6667
-print("beta1 * s_x / s_y =", round(beta1 * df["price"].std() / df["quantity"].std(), 4))
+print("s_xy = -670/8 =", -670 / 8, " s_x^2 = 1500/8 =", 1500 / 8)  # -83.75, 187.5
 
 reg = smf.ols("quantity ~ price", data=df).fit()
 print(reg.params.round(4))                                      # 54.6667 -0.4467
+print("reg.resid.sum() =", f"{reg.resid.sum():.1e}")            # practically 0
 fig, ax = plt.subplots()
 ax.scatter(df["price"], df["quantity"])
 xs = np.array([0, 125])
@@ -94,39 +157,141 @@ xc = price - price.mean(); yc = quantity - quantity.mean()
 Sxx, Sxy, Syy = (xc**2).sum(), (xc * yc).sum(), (yc**2).sum()
 print("Sxx, Sxy, Syy:", Sxx, Sxy, Syy)                          # 1500 -670 316
 
-# Slide 'Leverage values -- lamp example': h_i = 1/n + (x_i - xbar)^2 / Sxx
-h = reg.get_influence().hat_matrix_diag
-print("leverages:", h.round(3))                    # 0.378 (ends) ... 0.111 (centre)
-print("rules of thumb 4/n, 6/n:", round(4 / n, 3), round(6 / n, 3))   # 0.444, 0.667
+header("2 Exercise -- a regression line by hand (online shop)")
+shop = pd.DataFrame({"adv": [1, 2, 3, 4, 5], "revenue": [21, 26, 24, 30, 29]})
+xs_, ys_ = shop["adv"].to_numpy(), shop["revenue"].to_numpy()
+print("deviations x:", (xs_ - xs_.mean()).tolist(), " y:", (ys_ - ys_.mean()).tolist())
+print("products:", ((xs_ - 3) * (ys_ - 26)).tolist(), " squares:", ((xs_ - 3)**2).tolist())
+b0_s, b1_s = ols_by_hand(xs_, ys_, "online shop")       # S_xy 20, S_xx 10, s_xy 5, s_x^2 2.5, b 2, 20
+print("prediction yhat(6) =", b0_s + b1_s * 6)          # 32
+u_shop, rss_shop = rss_of_line(xs_, ys_, 20, 2)
+print("residuals:", u_shop.tolist(), " sum =", u_shop.sum(), " RSS =", rss_shop)   # -1 2 -2 2 -1; 14
+for a, b in [(19, 2), (20, 2.5)]:
+    print(f"other line {a} + {b} x: sum of squares =", rss_of_line(xs_, ys_, a, b)[1])  # 19, 27.75
 
-# Exercise "least squares by hand"
-ex = pd.DataFrame({"x": [1, 2, 3, 4, 5], "y": [3, 4, 2, 5, 6]})
-print("Exercise least squares:", smf.ols("y ~ x", data=ex).fit().params.round(4).tolist())  # 1.9, 0.7
+header("2 Exercise -- interpreting coefficients and making predictions (furniture)")
+fs = pd.DataFrame({"adv": [2, 4, 6, 8, 10, 12], "revenue": [44, 49, 58, 62, 61, 71]})
+reg_fs = smf.ols("revenue ~ adv", data=fs).fit()
+print(reg_fs.params.round(4).tolist())                                      # 40.0  2.5
+print(reg_fs.predict(pd.DataFrame({"adv": [5, 30]})).round(4).tolist())     # 52.5  115.0
+print("yhat at 4, 6, 10, 12:", reg_fs.predict(pd.DataFrame({"adv": [4, 6, 10, 12]})).round(4).tolist())
+print("residuals:", reg_fs.resid.round(4).tolist())                         # max |u| = 4
+print(smf.ols("revenue ~ I(1000 * adv)", data=fs).fit().params.round(4).tolist())   # 40.0  0.0025
+fs_euro = pd.DataFrame({"adv": 1000 * fs["adv"], "revenue": 1000 * fs["revenue"]})
+print("both in euros:", smf.ols("revenue ~ adv", data=fs_euro).fit().params.round(4).tolist())  # 40000, 2.5
+
+header("2 Exercise -- a falling price-demand line (mock exam 4, task 2)")
+dem = pd.DataFrame({"price": [10, 12, 14, 16, 18], "units": [64, 50, 46, 42, 38]})
+b0_d, b1_d = ols_by_hand(dem["price"], dem["units"], "price-demand")    # S_xy -120, S_xx 40; -3, 90
+reg_dem = smf.ols("units ~ price", data=dem).fit()
+print(reg_dem.predict(pd.DataFrame({"price": [15, 42]})).round(4).tolist())   # 45, -36
+print("residual week 1:", 64 - (b0_d + b1_d * 10))                            # +4
 
 # =====================================================================
 # 3 Goodness of fit
 # =====================================================================
-header("3 Goodness of fit -- slide 'Coefficient of determination in Python'")
+header("3 Goodness of fit -- twelve stores: variance decomposition")
+yb = y12.mean()
+print("TSS terms :", ((y12 - yb)**2).tolist(), "sum", ((y12 - yb)**2).sum())                 # 288
+print("ESS terms :", ((reg12.fittedvalues - yb)**2).round(2).tolist(),
+      "sum", round(((reg12.fittedvalues - yb)**2).sum(), 4))                                 # 223.2
+print("RSS terms :", (reg12.resid**2).round(2).tolist(), "sum", round((reg12.resid**2).sum(), 4))  # 64.8
+print("store 12: total", 47 - 39, " explained", round(45.6 - 39, 1), " residual", round(47 - 45.6, 1))
+print("R^2 = 223.2/288 =", round(223.2 / 288, 4), " reg12.rsquared =", round(reg12.rsquared, 4))  # 0.775
+print("ESS = b1^2 S_xx = 1.2^2 * 155 =", round(1.2**2 * 155, 4))                            # 223.2
+ess_A = ((24 + 2 * x12 - yb)**2).sum()
+print("line A: ESS_A =", ess_A, " + RSS_A = 164 ->", ess_A + 164, "!= 288")                 # 620
+# extreme cases (schematic data of the slide)
+xe = np.arange(1, 9)
+print("R^2 = 1 example:", round(smf.ols("y ~ x", data=pd.DataFrame({"x": xe, "y": 2 + 1.5 * xe})).fit().rsquared, 4))
+r0 = smf.ols("y ~ x", data=pd.DataFrame({"x": xe, "y": [5, 7, 4, 6, 6, 4, 7, 5]})).fit()
+print("R^2 = 0 example: b =", r0.params.round(4).tolist(), " R^2 =", round(r0.rsquared, 4))   # 5.5, 0, 0
+
+header("3 Goodness of fit -- lamp example, slide 'Coefficient of determination in Python'")
 TSS = ((quantity - quantity.mean())**2).sum()               # 316
 RSS = (reg.resid**2).sum()                                  # 16.7333
 ESS = ((reg.fittedvalues - quantity.mean())**2).sum()       # 299.2667
 print("TSS, RSS, ESS:", TSS, round(RSS, 4), round(ESS, 4))
+print("ESS = b1^2 S_xx =", round((Sxy / Sxx)**2 * Sxx, 2))  # 299.27
 print("R^2 = 1 - RSS/TSS =", round(1 - RSS / TSS, 4))      # 0.9470
 print("reg.rsquared      =", round(reg.rsquared, 4))
 print("corr^2            =", round(df["price"].corr(df["quantity"])**2, 4))
 
+header("3 Useful transformations -- three sums, shift theorem, standardised slope")
+print("twelve stores: r =", round(186 / np.sqrt(155 * 288), 4), " R^2 =", 186**2, "/", 155 * 288,
+      "=", round(186**2 / (155 * 288), 4), " ESS = b1*S_xy =", round(1.2 * 186, 4),
+      " RSS =", round(288 - 1.2 * 186, 4))
+print("online shop: sum xy =", (xs_ * ys_).sum(), " sum x^2 =", (xs_**2).sum(),
+      " sum y^2 =", (ys_**2).sum())                                     # 410, 55, 3434
+print("   S_xy =", (xs_ * ys_).sum() - 5 * 3 * 26, " S_xx =", (xs_**2).sum() - 5 * 9,
+      " S_yy =", (ys_**2).sum() - 5 * 26**2)                            # 20, 10, 54
+print("s_x/s_y (stores) =", round(np.sqrt(155 / 288), 4), " r = 1.2 * s_x/s_y =",
+      round(1.2 * np.sqrt(155 / 288), 4))                               # 0.7336, 0.8803
+print("lamp: r * s_y / s_x =", round(df["price"].corr(df["quantity"]) * df["quantity"].std()
+                                      / df["price"].std(), 4))           # -0.4467
+
+header("3 Exercise -- R^2 and the residual sum of squares (online shop)")
+reg_shop = smf.ols("revenue ~ adv", data=shop).fit()
+print("TSS =", ((ys_ - 26)**2).sum(), " RSS =", rss_shop, " ESS = 2^2*10 =", 4 * 10)    # 54, 14, 40
+print("R^2 =", round(1 - 14 / 54, 4), " r =", round(20 / np.sqrt(10 * 54), 4),
+      " r^2 =", round((20 / np.sqrt(10 * 54))**2, 4))                   # 0.7407, 0.8607
+print("reg.ssr, reg.centered_tss, reg.rsquared:", round(reg_shop.ssr, 4),
+      reg_shop.centered_tss, round(reg_shop.rsquared, 4))               # 14.0 54.0 0.7407
+
+header("3 Exercise -- from sums of squares to the correlation coefficient (heating)")
+hc = pd.DataFrame({"temp": [0, 3, 6, 9, 12], "cost": [82, 65, 63, 41, 49]})
+reg_hc = smf.ols("cost ~ temp", data=hc).fit()
+print(reg_hc.params.round(4).tolist())                                 # 78, -3
+print("TSS =", reg_hc.centered_tss, " RSS =", round(reg_hc.ssr, 4), " ESS =", round(reg_hc.ess, 4))  # 1000 190 810
+print("R^2 =", round(reg_hc.rsquared, 4), " r =", round(hc["temp"].corr(hc["cost"]), 4))  # 0.81, -0.9
+print("S_xx =", ((hc["temp"] - 6)**2).sum(), " ESS = (-3)^2 * 90 =", 9 * 90,
+      " y - ybar:", (hc["cost"] - hc["cost"].mean()).tolist())          # 90, 810; 22 5 3 -19 -11
+
+header("3 Exercise -- reading a simple regression output (study hours; mock exam 1, task 2)")
+# data constructed to match the exam: n = 12, x in [5, 24], xbar = 14, S_xx = 360,
+# TSS = 2500, b0 = 28, b1 = 2.5, R^2 = 0.9 (exactly)
+st = pd.DataFrame({"hours": [5, 7, 8, 10, 12, 14, 16, 17, 17, 18, 20, 24],
+                   "points": [36, 50, 47, 51, 63, 71, 62, 65, 75, 69, 76, 91]})
+reg_st = smf.ols("points ~ hours", data=st).fit()
+print(reg_st.summary())                                 # output (excerpt) shown on the slide
+print("xbar =", st["hours"].mean(), " S_xx =", ((st["hours"] - 14)**2).sum(),
+      " TSS =", reg_st.centered_tss)                    # 14, 360, 2500
+print("predictions 16, 30:", reg_st.predict(pd.DataFrame({"hours": [16, 30]})).round(4).tolist())  # 68, 103
+print("r = sqrt(R^2) =", round(np.sqrt(reg_st.rsquared), 4), " corr =",
+      round(st["hours"].corr(st["points"]), 4))         # 0.9487
+print("ESS =", round(reg_st.ess, 4), " RSS =", round(reg_st.ssr, 4),
+      " b1^2 * S_xx =", 2.5**2 * 360)                   # 2250, 250, 2250
+
 # =====================================================================
 # 4 Residual analysis
 # =====================================================================
-header("4 Residual analysis -- residual plot and QQ-plots")
-# Slide 'Creating a residual plot with Python'
-fig, ax = plt.subplots()
+header("4 Residual analysis -- saturation example (ten regions)")
+sat = pd.DataFrame({"adv": np.arange(1, 11), "revenue": [25, 32, 37, 41, 44, 46, 47, 48, 48, 47]})
+reg_sat = smf.ols("revenue ~ adv", data=sat).fit()
+print(reg_sat.params.round(4).tolist(), " R^2 =", round(reg_sat.rsquared, 4))   # 28.6667 2.3333; 0.81
+print("fitted/residual pairs:", list(zip(reg_sat.fittedvalues.round(4), reg_sat.resid.round(4))))
+
+header("4 Residual analysis -- residual plots (twelve stores, lamp)")
+print("twelve stores (fitted, residual):", list(zip(reg12.fittedvalues.round(2), reg12.resid.round(2))))
+print("largest |residual| =", round(np.abs(reg12.resid).max(), 2))               # 3.6 (store 2)
+fig, ax = plt.subplots()                         # slide 'Creating a residual plot with Python'
 ax.scatter(reg.fittedvalues, reg.resid)
 ax.axhline(0, linestyle="--")
 ax.set(xlabel="fitted values", ylabel="residuals", title="Residual plot")
 plt.close(fig)
+print("lamp (fitted, residual):", list(zip(reg.fittedvalues.round(4), reg.resid.round(4))))
 
-# Slide 'Creating a QQ-plot with Python': two empirical distributions
+header("4 Residual analysis -- leverage values (lamp)")
+# Slide 'Leverage values -- lamp example': h_i = 1/n + (x_i - xbar)^2 / Sxx
+h = reg.get_influence().hat_matrix_diag
+print("leverages:", h.round(3))                    # 0.378 (ends) ... 0.111 (centre)
+print("rules of thumb 4/n, 6/n:", round(4 / n, 3), round(6 / n, 3))   # 0.444, 0.667
+for p_out in (95, 80):                             # fit without one store
+    b_wo = smf.ols("quantity ~ price", data=df[df["price"] != p_out]).fit().params["price"]
+    print(f"slope without the store at {p_out} EUR: {b_wo:.4f}")       # -0.4590, -0.4238
+
+header("4 Residual analysis -- QQ-plots")
+# two empirical distributions (slide 'QQ-plot: prices against quantities')
 fig, ax = plt.subplots()
 qx, qy = np.sort(df["price"]), np.sort(df["quantity"])
 ax.scatter(qx, qy)
@@ -134,27 +299,72 @@ q1x, q3x = np.percentile(qx, [25, 75]); q1y, q3y = np.percentile(qy, [25, 75])
 slope = (q3y - q1y) / (q3x - q1x)
 ax.axline((q1x, q1y), slope=slope, linestyle="--")
 plt.close(fig)
-print("two-sample QQ line through quartiles: slope", round(slope, 4))
-
-# Slide 'QQ-plot of the residuals ... in Python' (positions (i-0.5)/n: a=0.5)
+print("two-sample QQ: quartiles", q1x, q3x, q1y, q3y, " line: y =",
+      round(q1y - slope * q1x, 4), "+", round(slope, 4), "x")           # -45.5 + 0.55 x
+# theoretical quantiles for n = 5 (slide 'Residuals against the normal distribution')
+print("strip boundaries Phi^-1(0.2..0.8):", stats.norm.ppf([0.2, 0.4, 0.6, 0.8]).round(4))
+print("z_i for n = 5:", stats.norm.ppf((np.arange(1, 6) - 0.5) / 5).round(4))
+# residuals against the normal distribution (positions (i-0.5)/n: a=0.5)
 fig = sm.qqplot(reg.resid, line="q", a=0.5)
 plt.close(fig)
-# table on the slide 'Inspecting the residuals with the QQ-plot -- example'
 u = np.sort(reg.resid.to_numpy()); p = (np.arange(1, n + 1) - 0.5) / n
-print(pd.DataFrame({"resid": reg.resid.round(4), "u_sorted": u.round(4),
+order = np.argsort(reg.resid.to_numpy(), kind="stable")
+print(pd.DataFrame({"u_sorted": u.round(4), "price": price[order],
                     "p": p.round(4), "z": stats.norm.ppf(p).round(4)}))
 
+
+def qq_reference_line(resid):
+    """Line through the quartiles of the residuals and of N(0,1) (line='q')."""
+    q1, q3 = np.percentile(resid, [25, 75]); z1, z3 = stats.norm.ppf([0.25, 0.75])
+    b = (q3 - q1) / (z3 - z1)
+    return q1 - b * z1, b
+
+
+print("lamp QQ reference line: intercept, slope =",
+      [round(float(v), 4) for v in qq_reference_line(reg.resid)])               # 0.5833, 0.5189
+
+header("4 Exercise -- draw a residual plot yourself (online shop)")
+print("fitted:", (20 + 2 * xs_).tolist(), " residuals:", u_shop.tolist())   # 22..30; -1 2 -2 2 -1
+
+header("4 Exercise -- a QQ-plot by hand (maintenance costs; mock exam 2, task 2)")
+mc5 = pd.DataFrame({"age": [1, 2, 3, 4, 5], "cost": [17, 21, 25, 29, 43]})
+b0_m, b1_m = ols_by_hand(mc5["age"], mc5["cost"], "maintenance")      # S_xy 60, S_xx 10; 6, 9
+reg_mc5 = smf.ols("cost ~ age", data=mc5).fit()
+print("fitted:", reg_mc5.fittedvalues.round(4).tolist(), " residuals:", reg_mc5.resid.round(4).tolist())
+p5 = (np.arange(1, 6) - 0.5) / 5
+print("sorted:", np.sort(reg_mc5.resid).round(4).tolist(), " p:", p5.tolist(),
+      " z:", stats.norm.ppf(p5).round(2).tolist())
+print("QQ reference line:", [round(float(v), 4) for v in qq_reference_line(reg_mc5.resid)])   # 0, 2.9652
+fig = sm.qqplot(reg_mc5.resid, line="q", a=0.5); plt.close(fig)
+
 # Exercise body heights (k) -- shoe sizes (s)
-header("4 Exercise body heights -- shoe sizes")
+header("4 Exercise -- body heights and shoe sizes")
 ks = pd.DataFrame({
     "k": [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168],
     "s": [39, 38, 39, 46, 40, 39, 45, 37, 36, 42, 43, 38, 41, 40, 39]})
+k_, s_ = ks["k"].to_numpy(), ks["s"].to_numpy()
+print("auxiliary sums:", k_.sum(), s_.sum(), (k_ * s_).sum(), (k_**2).sum(), (s_**2).sum())
+S_ks = (k_ * s_).sum() - k_.sum() * s_.sum() / 15                       # shift theorem
+S_kk = (k_**2).sum() - k_.sum()**2 / 15
+S_ss = (s_**2).sum() - s_.sum()**2 / 15
+print("S_ks, S_kk, S_ss:", round(S_ks, 4), round(S_kk, 4), round(S_ss, 4))   # 471.6 2122.4 111.7333
+print("cov, var_k, var_s:", round(S_ks / 14, 4), round(S_kk / 14, 4), round(S_ss / 14, 4))
 print("cov, corr:", round(ks["k"].cov(ks["s"]), 4), round(ks["k"].corr(ks["s"]), 4))  # 33.6857, 0.9684
+print("s_k, s_s:", round(ks["k"].std(), 4), round(ks["s"].std(), 4))                  # 12.3126, 2.8251
 reg_ks = smf.ols("s ~ k", data=ks).fit()
 print(reg_ks.params.round(4).tolist(), " R^2 =", round(reg_ks.rsquared, 4))  # 2.3147, 0.2222; 0.9379
+print("ESS = b1 * S_ks =", round(reg_ks.params["k"] * S_ks, 2),
+      " RSS =", round(S_ss - reg_ks.params["k"] * S_ks, 2))                 # 104.79, 6.94
+print("(fitted, residual):", list(zip(reg_ks.fittedvalues.round(4), reg_ks.resid.round(4))))
 fig, ax = plt.subplots(); ax.scatter(reg_ks.fittedvalues, reg_ks.resid)
 ax.axhline(0, linestyle="--"); plt.close(fig)
 fig = sm.qqplot(reg_ks.resid, line="q", a=0.5); plt.close(fig)
+p15 = (np.arange(1, 16) - 0.5) / 15
+order15 = np.argsort(reg_ks.resid.to_numpy(), kind="stable")
+print(pd.DataFrame({"u_sorted": np.sort(reg_ks.resid.to_numpy()).round(4),
+                    "person": order15 + 1, "p": p15.round(4),
+                    "z": stats.norm.ppf(p15).round(4)}))
+print("QQ reference line:", [round(float(v), 4) for v in qq_reference_line(reg_ks.resid)])  # -0.0056, 0.7002
 
 # =====================================================================
 # 5 Inference in simple regression
@@ -269,6 +479,19 @@ print(smf.ols("Balance ~ Income + Student", data=cr).fit().summary().tables[1]) 
 print(smf.ols("Balance ~ Region", data=cr).fit().summary().tables[1])           # baseline East
 
 # =====================================================================
+# Appendix A.1: Why no other line beats the OLS line
+# =====================================================================
+header("Appendix A.1 -- S(b0, b1) = RSS + n (a + b xbar)^2 + b^2 S_xx")
+rss12 = (reg12.resid**2).sum()
+for name in ("A", "B", "C"):
+    a0, a1_ = lines[name]
+    a, b = a0 - b0_12, a1_ - b1_12
+    S_formula = rss12 + 12 * (a + b * x12.mean())**2 + b**2 * 155
+    print(f"line {name}: a = {a:.1f}, b = {b:.1f}, a + b*xbar = {a + b * x12.mean():.1f}, "
+          f"S = {S_formula:.1f} (direct: {rss_of_line(x12, y12, a0, a1_)[1]:.1f})")
+# A: 164.0, B: 120.6, C: 364.8
+
+# =====================================================================
 # Appendix A.2: Interactions
 # =====================================================================
 header("Appendix A.2 -- interaction sales ~ TV * radio")
@@ -291,7 +514,7 @@ print("corr(Limit, Rating) =", round(cr["Limit"].corr(cr["Rating"]), 3))   # 0.9
 m_alr = smf.ols("Balance ~ Age + Limit + Rating", data=cr).fit()
 m_al = smf.ols("Balance ~ Age + Limit", data=cr).fit()
 print(m_alr.summary().tables[1]); print(m_al.summary().tables[1])
-print("SE ratio:", round(m_alr.bse["Limit"] / m_al.bse["Limit"], 1))      # 12.6
+print("SE ratio:", round(m_alr.bse["Limit"] / m_al.bse["Limit"], 2))     # 12.53 (0.06296 / 0.00503)
 
 # VIF_j = 1 / (1 - R^2_j), R^2_j from regressing x_j on the other predictors
 for x, others in [("Age", "Limit + Rating"), ("Limit", "Age + Rating"),

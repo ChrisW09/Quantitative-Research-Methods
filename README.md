@@ -4,11 +4,14 @@ Lecture slides (LaTeX Beamer) by Prof. Dr. Christoph Weisser, HSBI — Summer Se
 
 | Part | Folder | Topic |
 |------|--------|-------|
-| 1 | `Part_1_Descriptive_Statistics` | Basic concepts, levels of measurement, frequencies, measures of central tendency and dispersion |
-| 2 | `Part_2_Graphical_Representations` | Empirical CDF, histogram, boxplot |
-| 3 | `Part_3_Statistical_Inference` | Confidence intervals, hypothesis tests, p-values, one-sided tests, types of error |
-| 4 | `Part_4_Regression` | Correlation, simple and multiple linear regression, inference for regression (appendix: derivations, interactions, diagnostics, collinearity) |
-| 5 | `Part_5_Classification` | Logistic regression, classification rules, confusion matrix, ROC/AUC (appendix: Bayes classifiers -- naive Bayes, LDA) |
+| 1 | `Part_1_Descriptive_Statistics` | Basic concepts, levels of measurement, frequencies, measures of central tendency (incl. trimmed and geometric mean) and dispersion (range, IQR, variance, coefficients of variation) |
+| 2 | `Part_2_Graphical_Representations` | Empirical CDF, histogram, boxplot -- constructing, reading and comparing distributions |
+| 3 | `Part_3_Statistical_Inference` | Foundations (normal distribution, CLT), confidence intervals, sample size, hypothesis tests, p-values, one-sided tests, types of error (appendix: estimator properties, law of large numbers) |
+| 4 | `Part_4_Regression` | Correlation, least squares step by step, goodness of fit, residual analysis and QQ-plot, inference for regression, multiple regression (appendix: minimum property of OLS, interactions, diagnostics, collinearity) |
+| 5 | `Part_5_Classification` | Two-way tables and conditional probability, logistic regression, classification rules, confusion matrix, base rates and precision, ROC/AUC (appendix: total probability and Bayes' theorem; Bayes classifiers -- naive Bayes, LDA) |
+
+Every section contains exercises (many adapted from the course *Statistik für
+Ökonomen* and its mock exams) with step-by-step solutions.
 
 Each part folder contains
 
