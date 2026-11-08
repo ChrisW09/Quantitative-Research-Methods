@@ -2,6 +2,7 @@
 
 \newcommand{\currentpart}{2}
 \input{../common/preamble.tex}
+\newcommand{\notebookpath}{Part_2_Graphical_Representations/Part_2_Graphical_Representations.ipynb}
 
 \subtitle{Part 2: Graphical Representations}
 
@@ -15,6 +16,7 @@
 
 \begin{frame}{Contents -- Part 2}
   \tableofcontents[hideallsubsections]
+  \trynotebook{all examples and exercises of this part}
 \end{frame}
 
 % Learning objectives
@@ -204,6 +206,7 @@ F(39)             # value of the empirical CDF at x = 39: 0.6364 (= 7/11)
 plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib >= 3.8)
     \end{lstlisting}
   \end{block}
+  \trynotebook{section 1 ``Empirical Cumulative Distribution Function''}
 \end{frame}
 
 % ----- Exercise: reading values off the empirical CDF (from SfÖ Teil 2) -----
@@ -313,11 +316,12 @@ plt.ecdf(compl)                                               # step function
     \end{lstlisting}
   \end{block}
   \begin{itemize}
-    \item \texttt{F(x)} returns the share of observations $\le x$ -- also for
-          values that were never observed, such as $x = 4$.
+    \item \texttt{F(x)} is the share of observations $\le x$ -- also for
+          unobserved values such as $x = 4$.
     \item \texttt{method="inverted\_cdf"} is the course definition
-          $x_{(\lceil n\cdot p \rceil)}$; the default would interpolate.
+          $x_{(\lceil n\cdot p \rceil)}$; the default interpolates.
   \end{itemize}
+  \trynotebook{section 1.1, exercise ``Complaints per Day''}
 \end{frame}
 
 \section{Histogram}
@@ -484,7 +488,7 @@ plt.ecdf(compl)                                               # step function
   \end{block}
 \end{frame}
 
-\begin{frame}{Solution (1/2) -- Car Park: Shares from Areas}
+\begin{frame}{Solution (1/3) -- Car Park: Shares from Areas}
   \textbf{Rule:} area $=$ density $\cdot$ class width $= f_j$ (share of the
   class); number $h_j = f_j \cdot n$. All areas together add up to $1$.
   \begin{center}
@@ -510,7 +514,7 @@ plt.ecdf(compl)                                               # step function
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Solution (2/2) -- Car Park: Heights versus Areas}
+\begin{frame}{Solution (2/3) -- Car Park: Heights versus Areas}
   \begin{exampleblock}{3.\ Twice as high $\neq$ twice as many}
     \textbf{No.} Both classes have the share $0.3$, i.e.\ $\mathbf{60}$ tickets
     each. The class $(2,4]$ is twice as wide ($2$ hours instead of $1$), so the
@@ -528,6 +532,28 @@ plt.ecdf(compl)                                               # step function
   lie per hour.}
 \end{frame}
 
+\begin{frame}[fragile]{Solution (3/3) -- Car Park: Python}
+  \begin{block}{Shares and numbers of tickets from the bar areas}
+    \begin{lstlisting}
+w = np.diff([0, 1, 2, 4, 10])          # class widths: 1 1 2 6
+dens = np.array([0.25, 0.3, 0.15])     # heights of the first three bars
+f = dens * w[:3]                       # areas = shares: 0.25 0.3 0.3
+f4 = 1 - f.sum()                       # all areas add up to 1: f4 = 0.15
+print(round(f4 / w[3], 4), np.round(np.r_[f, f4] * 200), round(f[0] + f[1], 4))
+    \end{lstlisting}
+    \begin{lstlisting}[style=Pyout]
+0.025 [50. 60. 60. 30.] 0.55
+    \end{lstlisting}
+  \end{block}
+  \begin{itemize}
+    \item Output: missing bar height, tickets per class ($h_j = f_j \cdot 200$)
+          and the share of free tickets ($\le 2$ hours).
+    \item Height $\cdot$ width $=$ area $=$ share $f_j$; the missing share is
+          \mbox{\texttt{1 - f.sum()}}.
+  \end{itemize}
+  \trynotebook{section 2, exercise ``Car Park''}
+\end{frame}
+
 \begin{frame}[fragile]{Histograms in Python}
   \begin{block}{Class width 2}
     \begin{lstlisting}
@@ -541,14 +567,14 @@ plt.bar(breaks[:-1], dens, width=w, align="edge", edgecolor="black")
     \end{lstlisting}
   \end{block}
 
-  \begin{block}{Unequal class widths}
+  \begin{block}{Unequal class widths (then the same lines as above)}
     \begin{lstlisting}
-breaks = [37, 39, 40, 41, 46]              # then the same lines as above
-                                           # densities: 0.3182 0.1818 0.0909 0.0182
+breaks = [37, 39, 40, 41, 46]              # densities: 0.3182 0.1818 0.0909 0.0182
     \end{lstlisting}
   \end{block}
   \footnotesize Why not simply \texttt{plt.hist}? It uses classes $[a,b)$ -- see
   the next slide.
+  \trynotebook{section 2 ``Histogram''}
 \end{frame}
 
 \begin{frame}[fragile]{Histograms in Python -- Trap: Classes $[a,b)$}
@@ -566,6 +592,7 @@ np.histogram(shoe, bins=[37, 39, 41, 43, 45, 47], density=True)[0]
   \begin{block}{Remedy}
     Classes with \texttt{pd.cut(..., right=True, include\_lowest=True)}, bars with \texttt{plt.bar} (next slide).
   \end{block}
+  \trynotebook{section 2 ``Histogram''}
 \end{frame}
 
 \begin{frame}[fragile]{Histograms in Python -- with Our Classes}
@@ -584,9 +611,10 @@ density_hist(shoe, [37, 39, 40, 41, 46])       # 0.3182 0.1818 0.0909 0.0182
   \end{block}
   \begin{itemize}
     \item \texttt{right=True}: classes $(a,b]$; \texttt{include\_lowest=True}: first class closed $[a,b]$.
-    \item Bar heights are the densities $f_j/\Delta x_j$, so every bar area equals $f_j$.
-    \item The densities reproduce the tables of this section exactly.
+    \item Bar heights $=$ densities $f_j/\Delta x_j$ (as in the tables), so every bar
+          area equals $f_j$.
   \end{itemize}
+  \trynotebook{section 2 ``Histogram''}
 \end{frame}
 
 \begin{frame}[fragile]{Classified Frequencies in Python}
@@ -596,18 +624,15 @@ breaks = [37, 39, 41, 43, 45, 47]          # class boundaries c0, c1, ..., ck
 cls = pd.cut(shoe, breaks, right=True, include_lowest=True)
     \end{lstlisting}
   \end{block}
-  \begin{block}{Absolute classified frequencies}
+  \begin{block}{Absolute and relative classified frequencies}
     \begin{lstlisting}
 pd.Series(cls).value_counts(sort=False)                   # 7 3 0 0 1
-    \end{lstlisting}
-  \end{block}
-  \begin{block}{Relative classified frequencies}
-    \begin{lstlisting}
 pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.0909
     \end{lstlisting}
   \end{block}
   \footnotesize pandas labels the first class \texttt{(36.999, 39.0]} -- this is
   exactly the closed class $[37,39]$.
+  \trynotebook{section 2 ``Histogram''}
 \end{frame}
 
 % ----- Exercises -----
@@ -790,10 +815,10 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
   \end{block}
   \begin{itemize}
     \item \texttt{np.diff(breaks)} gives the unequal class widths $10, 10, 20, 40$.
-    \item No value lies on a class boundary here, so \texttt{plt.hist} would
-          happen to give the same bars -- with \texttt{pd.cut} the classes are
-          right in every case.
+    \item No value lies on a class boundary here, so \texttt{plt.hist} happens
+          to give the same bars -- \texttt{pd.cut} is right in every case.
   \end{itemize}
+  \trynotebook{section 2.1, exercise ``Mobile Phone Costs''}
 \end{frame}
 
 \section{Boxplot}
@@ -1001,17 +1026,9 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
 
 \begin{frame}{Solution (1/2) -- Daily Revenues: Quartiles and Bounds}
   \textbf{Rule:} position $= \lceil n \cdot p \rceil$ in the sorted data; if
-  $n \cdot p$ is already an integer, it is \textbf{not} rounded up.
-  \begin{center}
-    \small
-    \begin{tabular}{l*{10}{c}}
-      \toprule
-      Position & 1 & 2 & \textbf{3} & 4 & \textbf{5} & 6 & 7 & \textbf{8} & 9 & 10 \\
-      Revenue, sorted & 4 & 12 & \textbf{13} & 14 & \textbf{15} & 17 & 17 & \textbf{18} & 20 & 22 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \vspace{-0.2cm}
+  $n \cdot p$ is already an integer, it is \textbf{not} rounded up.\\[3pt]
+  \textbf{Sorted:} 4, 12, \textbf{13}, 14, \textbf{15}, 17, 17, \textbf{18}, 20, 22
+  \quad (positions 3, 5 and 8 in bold)
   \begin{block}{Quartiles ($n = 10$)}
     $x_{0.25}$: $10 \cdot 0.25 = 2.5 \rightarrow$ position 3 $\rightarrow \mathbf{13}$ \\
     $\tilde{x}$: $10 \cdot 0.5 = 5$ (integer) $\rightarrow$ position 5
@@ -1029,6 +1046,7 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
   \texttt{np.quantile(rev, [0.25, 0.5, 0.75], method="inverted\_cdf")}
   $\rightarrow$ \texttt{[13 15 18]}, but \texttt{np.median(rev)} $\rightarrow$
   \texttt{16.0} (average of the 5th and 6th value).
+  \trynotebook{section 3, exercise ``Daily Revenues''}
 \end{frame}
 
 \begin{frame}{Solution (2/2) -- Daily Revenues: Whiskers, Outlier and Boxplot}
@@ -1280,13 +1298,13 @@ team_a = np.array([7, 4, 9, 6, 18, 8, 5, 10, 6, 9, 7])
 team_b = np.array([12, 8, 15, 5, 14, 10, 16, 8, 11, 14, 7])
 stats = [box_stats(team_a), box_stats(team_b)]
 # whislo q1 med q3 whishi fliers   A: 4 6 7 9 10 [18]   B: 5 8 11 14 16 []
-fig, ax = plt.subplots()
-ax.bxp(stats, vert=False)                   # both boxplots above a common axis
+fig, ax = plt.subplots(); ax.bxp(stats, vert=False)   # boxplots, common axis
 ax.set_yticks([1, 2], ["Team A", "Team B"])
     \end{lstlisting}
   \end{block}
   \footnotesize \texttt{plt.boxplot} interpolates the quartiles -- for these data it
   happens to give the same result, but not in general.
+  \trynotebook{section 3.1, exercise ``Processing Times of Two Teams''}
 \end{frame}
 
 \section[Exercises]{Exercises}
@@ -1640,6 +1658,7 @@ np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 16
     Classes $[a,b)$ put $160$ and $180$ into the next class: counts
     $1, 9, 2, 1, 2$ instead of $3, 7, 3, 0, 2$.
   \end{alertblock}
+  \trynotebook{section 4.1 ``Body Heights''}
 \end{frame}
 
 % ----- Exam-style exercise: reading given graphics (adapted from mock exam 3, task 1) -----
@@ -1796,6 +1815,7 @@ print(rep.mean(), np.quantile(rep, 0.5, method="inverted_cdf"), np.sort(rep)[1:-
   \begin{lstlisting}[style=Pyout]
 7.0 4 4.2
   \end{lstlisting}
+  \trynotebook{section 4.2 ``Caf\'e Chain (Exam Style)''}
 \end{frame}
 
 \section[Python]{Python Commands}
@@ -1818,6 +1838,7 @@ np.quantile(shoe, 0.8, method="inverted_cdf")                # 80% quantile: 40
 np.quantile(shoe, [0.25, 0.5, 0.75], method="inverted_cdf")  # quartiles: 38 39 40
     \end{lstlisting}
   \end{block}
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 % Python Commands: Measures of Dispersion
@@ -1828,18 +1849,15 @@ np.var(shoe, ddof=1)    # s^2 = 5.6545   (ddof=1: divide by n - 1)
 np.std(shoe, ddof=1)    # s   = 2.3779
     \end{lstlisting}
   \end{block}
-  \begin{block}{Coefficient of variation}
+  \begin{block}{Coefficient of variation and normalised coefficient of variation}
     \begin{lstlisting}
 v = np.std(shoe, ddof=1) / np.mean(shoe)   # 0.0600
-    \end{lstlisting}
-  \end{block}
-  \begin{block}{Normalised coefficient of variation}
-    \begin{lstlisting}
 vstar = v / np.sqrt(len(shoe))             # 0.0181
     \end{lstlisting}
   \end{block}
   \footnotesize Without \texttt{ddof=1}, NumPy divides by $n$ ($5.1405$ instead of
   $s^2 = 5.6545$); pandas' \texttt{.var()} and \texttt{.std()} already use \texttt{ddof=1}.
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 % Python Commands: Empirical CDF
@@ -1860,6 +1878,7 @@ plt.ecdf(shoe)  # step function with vertical jumps
 plt.show()
     \end{lstlisting}
   \end{block}
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 % Python Commands: Histogram
@@ -1878,6 +1897,7 @@ density_hist(shoe, [37, 39, 40, 41, 46])       # 0.3182 0.1818 0.0909 0.0182
   \footnotesize \texttt{density\_hist} (\texttt{pd.cut} + \texttt{plt.bar}) is defined in the
   Histogram section. Do \textbf{not} use \texttt{plt.hist(shoe, bins=breaks, density=True)}:
   its classes are $[a,b)$, so $39$ and $41$ would be counted in the wrong class.
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 % Python Commands: Classified Frequencies
@@ -1898,6 +1918,7 @@ pd.Series(cls).value_counts(sort=False)                   # 7 3 0 0 1
 pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.0909
     \end{lstlisting}
   \end{block}
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 % Python Commands: Boxplot
@@ -1917,6 +1938,7 @@ np.quantile(shoe, [0.25, 0.75], method="inverted_cdf")   # [38 40]    our defini
     \end{lstlisting}
     The box would start at $38.5$ instead of $Q_1 = 38$ -- next slide: boxplot with our quartiles.
   \end{alertblock}
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 \begin{frame}[fragile]{Python Commands: Boxplot with Our Quartile Definition}
@@ -1937,6 +1959,7 @@ plt.gca().bxp([stats], vert=False)
 plt.show()
     \end{lstlisting}
   \end{block}
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 \begin{frame}[fragile]{Python Commands: Boxplots of Several Groups}
@@ -1956,6 +1979,7 @@ ax.set_yticks([1, 2], ["Team A", "Team B"])    # labels of the groups
   \end{block}
   \footnotesize Example: processing times of two teams (exercise in the Boxplot
   section). \texttt{box\_stats(shoe)} reproduces the shoe-size boxplot.
+  \trynotebook{section 5 ``Python Commands''}
 \end{frame}
 
 % ============================================================

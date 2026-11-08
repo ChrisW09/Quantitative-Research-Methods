@@ -1,6 +1,6 @@
 # =====================================================================
 # Quantitative Research -- Part 5: Classification
-# Author:  Prof. Dr. Christoph Weisser (HSBI)
+# Author:  Prof. Dr. Christoph Weisser
 #
 # Reproduces every number shown on the slides of Part 5. Run it from the
 # folder Part_5_Classification (the data are read from ../data):
@@ -21,6 +21,7 @@
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
+from scipy import stats
 from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
@@ -55,15 +56,19 @@ print(127 / 2944, 0.0127 / 0.2944)               # 0.0431 = joint / marginal
 print(pd.crosstab(df.student, df.default, normalize="columns").round(4))
 print(127 / 333)                                 # P(student | default) = 0.381
 
-# Slides "Conditional probability -- definition and two rules" and "Independence"
-p_d = df.y.mean()                                # P(default)              0.0333
-p_s = (df.student == "Yes").mean()               # P(student)              0.2944
-p_ds = ((df.y == 1) & (df.student == "Yes")).mean()  # P(default and student) 0.0127
-print(p_ds / p_s, (p_ds / p_s) * p_s)            # 0.0431 and back to 0.0127
+# Slides "Conditional probability -- definition and two rules", "Independence"
+# and "Conditional probability and independence with Python"
+d = df.default == "Yes"                          # True for the defaulters
+s = df.student == "Yes"                          # True for the students
+p_d, p_s, p_ds = d.mean(), s.mean(), (d & s).mean()  # 0.0333  0.2944  0.0127
+print(p_d, p_s, p_ds)
+print(p_ds / p_s)                                # P(default | student) = 0.0431
+print(p_ds / p_s * p_s)                          # multiplication rule: back to 0.0127
 print(p_d + p_s - p_ds)                          # addition rule: 0.3150
-print(p_d * p_s, 10000 * p_d * p_s)              # 0.0098 -> 98 expected vs 127 observed
+print(p_d * p_s, 10000 * p_d * p_s)              # 0.0098 != 0.0127 -> 98 expected vs 127 observed
 
 # Slide "Classification = estimating P(Y = 1 | x)": default rate by balance class
+# (also on the slide "Conditional probability and independence with Python")
 bal_class = pd.cut(df.balance, [0, 500, 1000, 1500, 2000, np.inf], right=False)
 print(pd.crosstab(bal_class, df.default, margins=True))   # 2613 3755 2721 805 106
 print(pd.crosstab(bal_class, df.default, normalize="index").round(3))
@@ -88,7 +93,8 @@ print(pS + pG - pSG, 1 - (pS + pG - pSG))        # P(S or G) = 0.80, neither 0.2
 print(pS * pG, pSG / pG)                         # 0.30 = P(S and G): independent; P(S | G) = 0.60
 print(pS - pSG, pG - pSG, 1 - pS - pG + pSG)     # table cells 0.30, 0.20, 0.20
 
-# Slide "Why not simply use linear regression?" (linear probability model)
+# Slides "Why not simply use linear regression?" and
+# "Linear regression on a 0/1 variable with Python" (linear probability model)
 lpm = smf.ols("y ~ balance", data=df).fit()
 print(lpm.params)                                # -0.0752, 0.000130
 print((lpm.fittedvalues < 0).sum())              # 3123 negative "probabilities"
@@ -97,10 +103,13 @@ print(df.balance[lpm.fittedvalues < 0].max())    # all balances below 579 $
 # =====================================================================
 # 2 Logistic regression
 # =====================================================================
-# Slide "Odds -- another way to express a probability"
+# Slides "Odds -- another way to express a probability" and
+# "Odds and log-odds with Python"
 p = np.array([0.1, 0.2, 0.5, 0.8, 0.9])
-print(pd.DataFrame({"p": p, "odds": p / (1 - p),
-                    "logodds": np.log(p / (1 - p))}).round(3))
+odds = p / (1 - p)                               # 0.111 0.25 1 4 9
+logodds = np.log(odds)                           # -2.197 -1.386 0 1.386 2.197
+print(pd.DataFrame({"p": p, "odds": odds, "logodds": logodds}).round(3))
+print(odds / (1 + odds))                         # back to p: 0.1 0.2 0.5 0.8 0.9
 
 # Exercise "probability, odds and log-odds" (two-way table default x student)
 for grp, (yes, no) in {"students": (127, 2817), "non-students": (206, 6850)}.items():
@@ -118,6 +127,18 @@ for b0, b1 in [(-10.65, 0.0055), (-5, 0.002)]:
     pb = 1 / (1 + np.exp(-(b0 + b1 * xb)))
     print(pb.round(4), np.prod(np.where(yb == 1, pb, 1 - pb)).round(4))
 # L(A) = 0.5117, L(B) = 0.1128, ratio 4.5
+# "Solution (2/2)": the same calculation as a function
+x = np.array([1000, 1500, 2000, 2500]); y = np.array([0, 0, 1, 1])
+
+
+def likelihood(b0, b1):
+    p = np.exp(b0 + b1 * x) / (1 + np.exp(b0 + b1 * x))   # p(x_i)
+    return np.prod(np.where(y == 1, p, 1 - p))           # product of contributions
+
+
+print(likelihood(-10.65, 0.0055))                # (A) 0.5117
+print(likelihood(-5, 0.002))                     # (B) 0.1128
+print(np.log(likelihood(-10.65, 0.0055)))        # log-likelihood of (A): -0.6701
 
 # Slide "Logistic regression with Python"
 g1 = smf.logit("y ~ balance", data=df).fit(disp=0)
@@ -126,19 +147,28 @@ print(np.exp(g1.params))                         # odds ratio per 1 $
 print(np.exp(100 * g1.params["balance"]))        # odds ratio per 100 $: 1.733
 print(np.exp(1000 * g1.params["balance"]))       # per 1000 $: 244.4
 
-# Slide "Worked example": predicted probabilities
+# Slides "Worked example" and "Odds ratios and predicted probabilities with
+# Python": odds ratios and predicted probabilities
+print(np.exp(g1.params["balance"]))              # odds ratio per 1 $: 1.0055
+print(np.exp(1000 * g1.params["balance"]))       # odds ratio per 1000 $: 244.4
 new = pd.DataFrame({"balance": [1000, 1500, 2000, 2500]})
+eta = g1.predict(new, which="linear")            # log-odds -5.152 -2.403 0.347 3.096
+print(eta)
+print(np.exp(eta) / (1 + np.exp(eta)))           # by hand: 0.0058 0.0829 0.5858 0.9567
 print(g1.predict(new))                           # 0.0058 0.0829 0.5858 0.9567 (unrounded)
 eta_r = -10.65 + 0.0055 * new.balance            # rounded model as on the slide
 print((np.exp(eta_r) / (1 + np.exp(eta_r))).round(3))  # 0.006 0.083 0.587 0.957
-print(g1.predict(new, which="linear"))           # log-odds eta
 # by hand: log-odds -> probability
 eta = g1.params["Intercept"] + g1.params["balance"] * 1500
 print(np.exp(eta) / (1 + np.exp(eta)))           # 0.083
 print(-g1.params["Intercept"] / g1.params["balance"])  # p = 0.5 at balance 1937
 
-# Slide "Inference -- balance and student status": Wald CIs and odds ratios
-print(g1.conf_int())                             # estimate +- 1.96 SE
+# Slides "Inference -- balance and student status" and "Inference with
+# Python": z-test by hand, Wald CIs and odds ratios
+z = g1.params / g1.bse                           # balance: z = 24.95
+print(z)
+print(2 * stats.norm.cdf(-abs(z)))               # p = 2 Phi(-|z|) = 2.0e-137 (= g1.pvalues)
+print(g1.conf_int())                             # estimate +- 1.96 SE: [0.005067, 0.005931]
 print(g1.tvalues["balance"])                     # z = 24.95
 print(g1.pvalues["balance"] < 0.0001)            # True: p = 2.0e-137, reported as p < 0.0001
 print(np.exp(100 * g1.conf_int().loc["balance"]))  # [1.660, 1.810]
@@ -146,8 +176,8 @@ print(np.exp(100 * g1.conf_int().loc["balance"]))  # [1.660, 1.810]
 g2 = smf.logit("y ~ student", data=df).fit(disp=0)
 print(g2.summary().tables[1])                    # student: +0.4049, p = 0.0004
 print(g2.pvalues["student[T.Yes]"])              # 0.00043
-print(np.exp(g2.params["student[T.Yes]"]))       # 1.499
-print(np.exp(g2.conf_int().loc["student[T.Yes]"]))  # [1.20, 1.88]
+print(np.exp(g2.params))                         # odds ratio student: 1.499
+print(np.exp(g2.conf_int()))                     # its 95 % CI: [1.20, 1.88]
 print(g2.params["Intercept"], np.log(206 / 6850))    # -3.504 = log-odds of non-students
 
 # =====================================================================
@@ -162,9 +192,13 @@ print(np.exp(g3.conf_int().loc["student[T.Yes]"]))  # [0.330, 0.832]
 print(1e4 * g3.conf_int().loc["income"])         # per 10000 $: [-0.130, 0.191]
 print(np.exp(1e4 * g3.conf_int().loc["income"])) # OR: [0.878, 1.211]
 
-# Slide "The student paradox"
-print(df.groupby("student").balance.mean())      # students carry larger balances
+# Slides "The student paradox" and "The student paradox with Python"
+print(df.groupby("student").balance.mean())      # No 771.77, Yes 987.82
 print(pd.crosstab(df.student, df.default, normalize="index"))  # 4.31 % vs 2.92 %
+print(g2.params["student[T.Yes]"])               # alone: +0.4049
+print(g3.params["student[T.Yes]"])               # with balance and income: -0.6468
+same = pd.DataFrame({"balance": 1500, "income": 40000, "student": ["No", "Yes"]})
+print(g3.predict(same))                          # same balance: 0.1050 vs 0.0579
 
 # Exercise "logistic regression from A to Z": customers A and B
 AB = pd.DataFrame({"balance": [1000, 2000], "income": [40000, 30000],
@@ -179,10 +213,14 @@ print(0.6468 / 0.00574)                          # a student needs about 113 $ m
 # =====================================================================
 # 4 From probabilities to decisions
 # =====================================================================
-# Slide "Decision boundary -- default and balance"
-b0, b1 = g1.params
+# Slides "Decision boundary -- default and balance" and
+# "The classification rule with Python"
+b0, b1 = g1.params                               # -10.6513, 0.005499
 print(-b0 / b1)                                  # boundary for t = 0.5: 1937
-print((-b0 + np.log(0.2 / 0.8)) / b1)            # boundary for t = 0.2: 1685
+print((np.log(0.2 / 0.8) - b0) / b1)             # boundary for t = 0.2: 1685
+phat1 = g1.predict(df)                           # P(default) for every customer
+yhat = (phat1 > 0.5).astype(int)                 # rule: 1 = "default" if p-hat > t
+print(yhat.sum(), (phat1 > 0.2).sum())           # flagged: 142 (t = 0.5), 462 (t = 0.2)
 
 # Exercise "from probability to decision" (balances 1800, 2000, 2200)
 eta = -10.65 + 0.0055 * np.array([1800, 2000, 2200])
@@ -219,23 +257,23 @@ print(pd.DataFrame({f"t={t}": metrics(y, phat, t) for t in (0.5, 0.2, 0.1)}).T.r
 pred = phat > 0.5
 print(pd.crosstab(df.default, pred, normalize="index").round(4))    # sens 0.3153, spec 0.9959
 print(pd.crosstab(df.default, pred, normalize="columns").round(4))  # precision 0.7241
+print((pred == df.y).mean())                     # accuracy 0.9732
 print(105 / 333, 9627 / 9667, 105 / 145, (9627 + 105) / 10000, 9627 / 9855)
 
-# Subsection "Base rates and precision": the rule t = 0.2 in other portfolios
-sens = 203 / 333                                 # 0.6096
-fpr = 277 / 9667                                 # 1 - specificity = 0.0287
+# Subsection "Base rates and precision" and slide "Base rates with Python":
+# the rule t = 0.2 in other portfolios
 
 
-def precision(pi, sens, fpr):
-    """Precision of a rule with given sensitivity and false-positive rate
-    when the positive class has base rate pi (Bayes' theorem)."""
-    return sens * pi / (sens * pi + fpr * (1 - pi))
+def precision(pi, sens, spec):
+    """Share of correct alarms among all alarms at base rate pi."""
+    return sens * pi / (sens * pi + (1 - spec) * (1 - pi))
 
 
-print(sens, fpr, 1 - fpr)
-for pi in (0.01, 0.0333, 0.10):
-    print(pi, 10000 * pi * sens, 10000 * (1 - pi) * fpr, precision(pi, sens, fpr))
-# 1 %: 61 TP, 284 FP, precision 0.177; 3.33 %: 0.423; 10 %: 0.703
+sens, spec = 203 / 333, 9390 / 9667              # rule t = 0.2: 0.6096, 0.9713
+print(sens, spec, 1 - spec)                      # 1 - specificity = 0.0287
+print(round(10000 * 0.01 * sens), round(10000 * 0.99 * (1 - spec)))  # 61 TP, 284 FP
+for pi in [0.01, 0.0333, 0.10]:
+    print(pi, round(precision(pi, sens, spec), 3))   # 0.177  0.423  0.703
 print(0.6096 * 0.0333, 0.0287 * 0.9667)          # check on the slide: 0.0203, 0.0277
 
 # Exercise "rapid test and base rate": sensitivity = specificity = 0.9
@@ -245,7 +283,13 @@ TP = 0.9 * ill; FN = ill - TP; TN = 0.9 * healthy; FP = healthy - TN
 print(TP, FN, TN, FP, TP + FP, TN + FN)          # 9 1 891 99 / 108 positive, 892 negative
 print((TP + FP) / n_people)                      # P(+) = 0.108
 print(TP / (TP + FP), TN / (TN + FN))            # precision 0.083, negatives correct 0.9989
-print(precision(0.20, 0.9, 0.1))                 # practice with 20 % ill: 180 / 260 = 0.692
+print(precision(0.01, 0.9, 0.9))                 # Python check: 0.083
+print(precision(0.20, 0.9, 0.9))                 # practice with 20 % ill: 180 / 260 = 0.692
+
+# Slide "ROC curve and AUC with Python": sensitivity and specificity per threshold
+for t in [0.1, 0.2, 0.5]:
+    print(t, (phat[df.y == 1] > t).mean(), (phat[df.y == 0] <= t).mean())
+# 0.1: 0.7447 0.9421   0.2: 0.6096 0.9713   0.5: 0.3153 0.9959
 
 # Slide "The ROC curve" and "AUC": ROC by sklearn and AUC as ranking probability
 fpr, tpr, thr = roc_curve(y, phat)               # (1 - specificity, sensitivity)
@@ -278,6 +322,22 @@ pB = 5 / 30; pW_B = 0.8; pW_notB = 0.2
 pW = pW_B * pB + pW_notB * (1 - pB)              # total probability 9/30 = 0.3
 print(pW, pW_B * pB / pW)                        # posterior 4/9 = 0.444
 print(30 * pW_B * pB, 30 * pW_notB * (1 - pB))   # 4 correct and 5 mistaken "blue" statements
+
+# Slide "Bayes' theorem with Python": one array entry per case (blue, green)
+prior = np.array([5, 25]) / 30                   # P(blue), P(green): 0.1667 0.8333
+lik = np.array([0.8, 0.2])                       # P(says "blue" | colour)
+joint = prior * lik                              # multiplication rule: 0.1333 0.1667
+print(prior, joint)
+print(joint.sum())                               # total probability P(W): 0.3
+print(joint / joint.sum())                       # posterior P(colour | W): 0.4444 0.5556
+
+
+def bayes(prior, lik):
+    joint = prior * lik                          # prior x likelihood
+    return joint / joint.sum()                   # divided by the total probability
+
+
+print(bayes(np.array([0.01, 0.99]), np.array([0.9, 0.1])))   # P(ill | +) 0.0833
 
 # Exercise "three suppliers"
 prior = np.array([0.5, 0.3, 0.2]); lik = np.array([0.02, 0.04, 0.10])

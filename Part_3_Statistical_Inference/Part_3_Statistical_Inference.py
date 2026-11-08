@@ -7,7 +7,7 @@
 # Sections follow the sections of the slide deck:
 #   1  Foundations            (expected value/variance, warranty claims,
 #                              normal distribution, standard-normal table,
-#                              central limit theorem)
+#                              central limit theorem incl. simulation)
 #   2  Confidence intervals   (standard error, milk, cream; known and unknown
 #                              variance; sample-size planning)
 #   3  Hypothesis tests       (CI duality, z- and t-test, reaction time,
@@ -135,6 +135,17 @@ for n_ in (1, 4, 9, 36):
     print(f"  n = {n_:>2}: mean of 20000 sample means = {m_.mean():.3f}, "
           f"sd = {m_.std():.3f} (theory SE = {6 / np.sqrt(n_):.3f})")
 
+# Slide "The central limit theorem with Python" (own seed 42, n = 36 only)
+rng = np.random.default_rng(42)
+times = rng.gamma(shape=4, scale=3, size=(20_000, 36))
+means = times.mean(axis=1)
+show("single values: mean, sd", (times.mean(), times.std()), ".1f")        # 12.0, 6.0
+show("shift means: mean, sd", (means.mean(), means.std()), ".3f")          # 12.003, 0.990 -> 0.99
+show("skewness single values, means",
+     (stats.skew(times.ravel()), stats.skew(means)), ".2f")                 # 1.00, 0.15
+show("share of shift means > 13.5 (simulation)", np.mean(means > 13.5))    # 0.0698
+show("CLT: P(Xbar > 13.5) = 1 - Phi(1.5)", norm.sf(13.5, loc=12, scale=6 / np.sqrt(36)))  # 0.0668
+
 # Exercise "Central limit theorem: processing times" (mu = 12, sigma = 6, n = 36)
 show("a) SE = 6/sqrt(36)", 6 / np.sqrt(36), ".1f")              # 1.0
 show("b) P(Xbar > 13.5) = 1 - Phi(1.5)", norm.sf(13.5, 12, 1))  # 0.0668
@@ -230,6 +241,19 @@ show("milk 95% CI, sigma unknown",
 ci = stats.ttest_1samp(milk, 1000).confidence_interval(0.95)
 show("  ... via ttest_1samp().confidence_interval", (ci.low, ci.high), ".2f")
 
+# Slide "Confidence intervals with Python" (stats.norm.interval / stats.t.interval)
+show("xbar, s (milk)", (xbar_milk, s_milk))                     # 1001.0000, 3.7749
+show("z_0.975, t_0.975;8", (norm.ppf(0.975), t_8))              # 1.9600, 2.3060
+show("by formula xbar +- 1.96 * 3/sqrt(9)",
+     xbar_milk + np.array([-1, 1]) * 1.96 * 3 / np.sqrt(9), ".2f")   # [999.04, 1002.96]
+for conf in (0.90, 0.95, 0.99):
+    lo_, hi_ = stats.norm.interval(conf, loc=xbar_milk, scale=3 / np.sqrt(9))
+    print(f"z, {conf:.0%}: [{lo_:.2f}, {hi_:.2f}]")
+lo_, hi_ = stats.t.interval(0.95, df=8, loc=xbar_milk, scale=s_milk / np.sqrt(9))
+print(f"t, 95%: [{lo_:.2f}, {hi_:.2f}]")
+# -> z, 90%: [999.36, 1002.64]  z, 95%: [999.04, 1002.96]  z, 99%: [998.42, 1003.58]
+#    t, 95%: [998.10, 1003.90]
+
 # =====================================================================
 # 3 Hypothesis tests
 # =====================================================================
@@ -317,6 +341,16 @@ show("cream, Phi-table bracket for p",
      (2 * (1 - round(norm.cdf(2.13), 4)), 2 * (1 - round(norm.cdf(2.12), 4))))   # 0.0332, 0.0340
 show("cream, t-table df = 15: t_0.95;15, t_0.975;15 (-> 0.05 < p < 0.10)",
      (stats.t.ppf(0.95, 15), stats.t.ppf(0.975, 15)), ".3f")                    # 1.753, 2.131
+
+# Slide "p-values with Python" (loop over milk and cream, sigma known / estimated)
+for x_, mu0_, sig_ in [(milk, 1000, 3), (cream, 250, 2)]:
+    n_ = len(x_)
+    z_ = (x_.mean() - mu0_) / (sig_ / np.sqrt(n_))
+    t_ = (x_.mean() - mu0_) / (x_.std(ddof=1) / np.sqrt(n_))
+    print(f"z = {z_:.4f}, p = {2 * norm.sf(abs(z_)):.4f} | "
+          f"t = {t_:.4f}, p = {2 * stats.t.sf(abs(t_), df=n_ - 1):.4f}")
+# -> z = 1.0000, p = 0.3173 | t = 0.7947, p = 0.4497
+#    z = -2.1250, p = 0.0336 | t = -2.1086, p = 0.0522
 
 # Slide "Significant != important -- the large-n trap" (xbar = 1000.2, sigma = 3)
 for n in (9, 10_000):
@@ -471,6 +505,20 @@ beta36 = (norm.cdf((1000 + 1.96 * se36 - 1002) / se36)
           - norm.cdf((1000 - 1.96 * se36 - 1002) / se36))
 show("beta (milk, n = 36)", beta36, ".3f")                     # 0.021
 show("power (milk, n = 36)", 1 - beta36, ".3f")                # 0.979
+
+# Slide "beta and power with Python" (milk, n = 9 and 36; statsmodels)
+for n_ in (9, 36):
+    se_ = 3 / np.sqrt(n_)
+    lo_, hi_ = 1000 - 1.96 * se_, 1000 + 1.96 * se_
+    b_ = norm.cdf(hi_, 1002, se_) - norm.cdf(lo_, 1002, se_)
+    print(f"n = {n_}: beta = {b_:.3f}, power = {1 - b_:.3f}")
+# -> n = 9: beta = 0.484, power = 0.516;  n = 36: beta = 0.021, power = 0.979
+pw_ = NormalIndPower()
+show("statsmodels power (d = 2/3, n = 9)",
+     pw_.power(effect_size=2 / 3, nobs1=9, alpha=0.05, ratio=0), ".3f")          # 0.516
+n80 = pw_.solve_power(effect_size=2 / 3, power=0.80, alpha=0.05, ratio=0)
+show("statsmodels solve_power: n for 80 % power", n80, ".2f")                    # 17.66
+print("   -> round up: n =", math.ceil(n80))                                     # 18
 
 # Exercise / solution "beta and power (two-sided)":
 # sigma = 10, n = 25, mu0 = 100, mu1 = 105

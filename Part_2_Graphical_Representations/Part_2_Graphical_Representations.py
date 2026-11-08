@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # =====================================================================
 # Quantitative Research -- Part 2: Graphical Representations
-# Prof. Dr. Christoph Weisser (HSBI)
+# Prof. Dr. Christoph Weisser
 #
 # Python companion to Part_2_Graphical_Representations.tex.
 # Reproduces every number shown on the slides and draws the graphics
@@ -12,7 +12,7 @@
 #   1. Section "Empirical Cumulative Distribution Function"
 #      1b. Exercise "Complaints per Day"
 #   2. Section "Histogram"
-#      2a. Quick exercise "Car Park" (reading a given histogram)
+#      2a. Quick exercise "Car Park" (reading a given histogram, with Python)
 #      2b. Exercises "Histogram (Handball Team)" and "Mobile Phone Costs"
 #   3. Section "Boxplot"
 #      3a. Quick exercise "Daily Revenues" (whiskers by hand, even n)
@@ -22,6 +22,8 @@
 #   5. Section "Python Commands"
 #
 # The figures of the slides are drawn by make_figures.py (same folder).
+# Companion notebook (same folder, also openable in Google Colab):
+# Part_2_Graphical_Representations.ipynb -- its sections follow the slides.
 # Requirements: numpy, pandas, scipy, statsmodels, matplotlib.
 # The script runs headless (matplotlib backend "Agg"); figures are closed
 # after drawing. Run with  python3 Part_2_Graphical_Representations.py --save DIR
@@ -255,7 +257,7 @@ edges_p = np.array([0, 1, 2, 4, 10])                 # parking duration in hours
 w_p = np.diff(edges_p)                               # class widths 1 1 2 6
 dens_p3 = np.array([0.25, 0.3, 0.15])                # labels of the first three bars
 
-# SLIDE: "Solution (1/2) -- Car Park: Shares from Areas"
+# SLIDE: "Solution (1/3) -- Car Park: Shares from Areas"
 f_p3 = dens_p3 * w_p[:3]                             # area = density * width = f_j
 f_p4 = 1 - f_p3.sum()                                # all areas add up to 1
 f_p = np.round(np.r_[f_p3, f_p4], 10)
@@ -267,12 +269,20 @@ print(f"f_4 = 1 - {f_p3.sum():.2f} = {f_p4:.2f} | h_4 = {f_p4 * n_park:.0f}"
       f" | missing height = {f_p4:.2f} / {w_p[3]} = {f_p4 / w_p[3]:.4f}")
 assert np.isclose(tab_p["f_j"].sum(), 1) and tab_p["h_j"].sum() == n_park
 
-# SLIDE: "Solution (2/2) -- Car Park: Heights versus Areas"
+# SLIDE: "Solution (2/3) -- Car Park: Heights versus Areas"
 print("height (1,2] / height (2,4] =", round(tab_p["density"].iloc[1] / tab_p["density"].iloc[2], 4),
       "| tickets:", tab_p["h_j"].iloc[1], "vs", tab_p["h_j"].iloc[2])      # 2.0 | 60 vs 60
 free = tab_p["f_j"].iloc[0] + tab_p["f_j"].iloc[1]     # durations <= 2 h
 print("share of tickets <= 2 h (free):", round(free, 4), "->",
       round(free * n_park), "tickets")                                      # 0.55 -> 110
+
+# SLIDE: "Solution (3/3) -- Car Park: Python" (exact code and output of the slide)
+w = np.diff([0, 1, 2, 4, 10])          # class widths: 1 1 2 6
+dens = np.array([0.25, 0.3, 0.15])     # heights of the first three bars
+f = dens * w[:3]                       # areas = shares: 0.25 0.3 0.3
+f4 = 1 - f.sum()                       # all areas add up to 1: f4 = 0.15
+print(round(f4 / w[3], 4), np.round(np.r_[f, f4] * 200), round(f[0] + f[1], 4))
+# -> 0.025 [50. 60. 60. 30.] 0.55
 
 # SLIDES: "Histograms in Python" / "Python Commands: Histogram"
 fig, axes = plt.subplots(1, 3, figsize=(13, 3.5))

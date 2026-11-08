@@ -18,12 +18,16 @@
 #   3  Goodness of fit          (variance decomposition, R^2, three sums;
 #                                online shop (7)-(8); exercises: heating
 #                                costs, study hours -- statsmodels output)
-#   4  Residual analysis        (saturation example, residual plots, leverage,
-#                                QQ-plots; online shop (9)-(10); exercises:
-#                                maintenance costs, body heights and shoe sizes)
-#   5  Inference                (SE, t-test, CI, p-value, prediction;
-#                                online shop (11))
-#   6  Multiple regression      (Advertising, Credit)
+#   3  (end)                    exercise body heights and shoe sizes, tasks 1-2
+#   4  Inference                (regression model, SE, t-test, CI, p-value,
+#                                prediction; online shop (9)-(10))
+#   5  Multiple regression      (Advertising, Credit)
+#   A.3-A.5 (appendix)          residual analysis, leverage, QQ-plots (saturation
+#                                example; online shop (B)-(C); exercises:
+#                                maintenance costs, body heights residual plot
+#                                and QQ-plot). This block stays before Section 4
+#                                in the script because later sections reuse its
+#                                body-height data.
 #   Appendix                    (derivation of OLS with exercise online
 #                                shop (A), minimum property of OLS,
 #                                interactions, diagnostics, collinearity / VIF)
@@ -306,15 +310,15 @@ print("ESS =", round(reg_st.ess, 4), " RSS =", round(reg_st.ssr, 4),
       " b1^2 * S_xx =", 2.5**2 * 360)                   # 2250, 250, 2250
 
 # =====================================================================
-# 4 Residual analysis
+# Appendix A.3-A.5: residual analysis, leverage, QQ-plots
 # =====================================================================
-header("4 Residual analysis -- saturation example (ten regions)")
+header("Appendix A.3-A.5 -- residual analysis -- saturation example (ten regions)")
 sat = pd.DataFrame({"adv": np.arange(1, 11), "revenue": [25, 32, 37, 41, 44, 46, 47, 48, 48, 47]})
 reg_sat = smf.ols("revenue ~ adv", data=sat).fit()
 print(reg_sat.params.round(4).tolist(), " R^2 =", round(reg_sat.rsquared, 4))   # 28.6667 2.3333; 0.81
 print("fitted/residual pairs:", list(zip(reg_sat.fittedvalues.round(4), reg_sat.resid.round(4))))
 
-header("4 Residual analysis -- residual plots (twelve stores, lamp)")
+header("Appendix A.3-A.5 -- residual analysis -- residual plots (twelve stores, lamp)")
 print("twelve stores (fitted, residual):", list(zip(reg12.fittedvalues.round(2), reg12.resid.round(2))))
 print("largest |residual| =", round(np.abs(reg12.resid).max(), 2))               # 3.6 (store 2)
 fig, ax = plt.subplots()                         # slide 'Creating a residual plot with Python'
@@ -324,7 +328,7 @@ ax.set(xlabel="fitted values", ylabel="residuals", title="Residual plot")
 plt.close(fig)
 print("lamp (fitted, residual):", list(zip(reg.fittedvalues.round(4), reg.resid.round(4))))
 
-header("4 Residual analysis -- leverage values (lamp)")
+header("Appendix A.3-A.5 -- residual analysis -- leverage values (lamp)")
 # Slide 'Leverage values -- lamp example': h_i = 1/n + (x_i - xbar)^2 / Sxx
 h = reg.get_influence().hat_matrix_diag
 print("leverages:", h.round(3))                    # 0.378 (ends) ... 0.111 (centre)
@@ -333,7 +337,7 @@ for p_out in (95, 80):                             # fit without one store
     b_wo = smf.ols("quantity ~ price", data=df[df["price"] != p_out]).fit().params["price"]
     print(f"slope without the store at {p_out} EUR: {b_wo:.4f}")       # -0.4590, -0.4238
 
-header("4 Residual analysis -- QQ-plots")
+header("Appendix A.3-A.5 -- residual analysis -- QQ-plots")
 # two empirical distributions (slide 'QQ-plot: prices against quantities')
 fig, ax = plt.subplots()
 qx, qy = np.sort(df["price"]), np.sort(df["quantity"])
@@ -366,10 +370,10 @@ def qq_reference_line(resid):
 print("lamp QQ reference line: intercept, slope =",
       [round(float(v), 4) for v in qq_reference_line(reg.resid)])               # 0.5833, 0.5189
 
-header("4 Exercise -- online shop (9): draw the residual plot")
+header("Appendix A.3 -- exercise online shop (B): draw the residual plot")
 print("fitted:", (20 + 2 * xs_).tolist(), " residuals:", u_shop.tolist())   # 22..30; -1 2 -2 2 -1
 
-header("4 Exercise -- online shop (10): a month with a big campaign (leverage)")
+header("Appendix A.4 -- exercise online shop (C): a month with a big campaign (leverage)")
 x8 = np.array([1, 2, 3, 4, 5, 6, 7, 20])
 Sxx8 = ((x8 - x8.mean())**2).sum()
 h8 = 1 / len(x8) + (x8 - x8.mean())**2 / Sxx8
@@ -379,7 +383,7 @@ print("h_1, h_6, h_8 =", h8[0].round(4), h8[5].round(4), h8[7].round(4),
 print("all h:", h8.round(4).tolist(), " sum =", round(h8.sum(), 4),
       " 4/n, 6/n =", 4 / len(x8), 6 / len(x8))                                           # sum 2; 0.5, 0.75
 
-header("4 Exercise -- a QQ-plot by hand (maintenance costs; mock exam 2, task 2)")
+header("Appendix A.5 -- exercise: a QQ-plot by hand (maintenance costs; mock exam 2, task 2)")
 mc5 = pd.DataFrame({"age": [1, 2, 3, 4, 5], "cost": [17, 21, 25, 29, 43]})
 b0_m, b1_m = ols_by_hand(mc5["age"], mc5["cost"], "maintenance")      # S_xy 60, S_xx 10; 6, 9
 reg_mc5 = smf.ols("cost ~ age", data=mc5).fit()
@@ -391,7 +395,7 @@ print("QQ reference line:", [round(float(v), 4) for v in qq_reference_line(reg_m
 fig = sm.qqplot(reg_mc5.resid, line="q", a=0.5); plt.close(fig)
 
 # Exercise body heights (k) -- shoe sizes (s)
-header("4 Exercise -- body heights and shoe sizes")
+header("3 Exercise -- body heights and shoe sizes (tasks 1-2; residual plot and QQ-plot: Appendix A.5)")
 ks = pd.DataFrame({
     "k": [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168],
     "s": [39, 38, 39, 46, 40, 39, 45, 37, 36, 42, 43, 38, 41, 40, 39]})
@@ -420,9 +424,9 @@ print(pd.DataFrame({"u_sorted": np.sort(reg_ks.resid.to_numpy()).round(4),
 print("QQ reference line:", [round(float(v), 4) for v in qq_reference_line(reg_ks.resid)])  # -0.0056, 0.7002
 
 # =====================================================================
-# 5 Inference in simple regression
+# 4 Inference in simple regression
 # =====================================================================
-header("5 Inference -- slide 'Reading the regression output in Python'")
+header("4 Inference -- slide 'Reading the regression output in Python'")
 print(reg.summary().tables[1])
 fit_line(reg)                                   # R^2 0.947, F 125.2, sigma 1.5461
 sigma_hat = np.sqrt(RSS / (n - 2))              # = np.sqrt(reg.scale) = 1.5461
@@ -443,7 +447,7 @@ print("left-sided p =", f"{stats.t.cdf(T, df=n - 2):.3g}")             # 5.1e-06
 T2 = (reg.params["price"] - (-0.5)) / reg.bse["price"]                 # 1.336
 print("T2 =", round(T2, 3), " p =", round(2 * stats.t.sf(abs(T2), df=n - 2), 3))  # 0.223
 
-header("5 Exercise -- online shop (11): is the slope significant?")
+header("4 Exercise -- online shop (9) and (10): standard error and t-test")
 sig_s = np.sqrt(rss_shop / (5 - 2)); se_s = sig_s / np.sqrt(10); T_s = 2 / se_s
 print("sigma_hat =", round(sig_s, 4), " SE(b1) =", round(se_s, 4), " sqrt(10) =", round(np.sqrt(10), 4),
       " T =", round(T_s, 4))                                         # 2.1602 0.6831 3.1623 2.9277
@@ -464,7 +468,7 @@ pred = reg.get_prediction(new).summary_frame(alpha=0.05)
 print(pred.round(2))               # 110: CI [3.99, 7.07], PI [1.57, 9.50]; 125: -1.17
 
 # Exercise: inference for the shoe-size regression
-header("5 Exercise -- inference for the shoe-size regression")
+header("4 Exercise -- inference for the shoe-size regression")
 print(reg_ks.summary().tables[1])
 fit_line(reg_ks)
 print(reg_ks.conf_int().round(4))                                      # [0.1879, 0.2565]
@@ -475,7 +479,7 @@ print(reg_ks.get_prediction(pd.DataFrame({"k": [180]}))
       .summary_frame(alpha=0.05).round(2))
 
 # Exercise used cars from A to Z
-header("5 Exercise -- used cars from A to Z")
+header("4 Exercise -- used cars from A to Z")
 cars = pd.DataFrame({"age": range(1, 7), "value": [19, 18, 17, 15, 12, 9]})
 car = smf.ols("value ~ age", data=cars).fit()
 print(car.summary().tables[1])
@@ -486,9 +490,9 @@ print(car.get_prediction(pd.DataFrame({"age": [7]}))
       .summary_frame(alpha=0.05).round(2))                             # PI [4.21, 11.79]
 
 # =====================================================================
-# 6 Multiple linear regression
+# 5 Multiple linear regression
 # =====================================================================
-header("6 Multiple regression -- Advertising data")
+header("5 Multiple regression -- Advertising data")
 ad = pd.read_csv(DATA / "Advertising.csv", index_col=0)
 m_tv = smf.ols("sales ~ TV", data=ad).fit()
 print(m_tv.summary().tables[1]); fit_line(m_tv)                        # slide 'Significant != important'
@@ -522,7 +526,7 @@ pred_ad = m2.get_prediction(pd.DataFrame({"TV": [100], "radio": [20]}))
 print(pred_ad.summary_frame(alpha=0.05).round(2))  # 11.26, CI [10.99, 11.53], PI [7.93, 14.58]
 
 # qualitative predictors (Credit data)
-header("6 Multiple regression -- Credit data")
+header("5 Multiple regression -- Credit data")
 cr = pd.read_csv(DATA / "Credit.csv")
 # Exercise "reading a multiple regression output" (Credit data)
 mc = smf.ols("Balance ~ Income + Limit + Student", data=cr).fit()
@@ -540,9 +544,9 @@ print(smf.ols("Balance ~ Income + Student", data=cr).fit().summary().tables[1]) 
 print(smf.ols("Balance ~ Region", data=cr).fit().summary().tables[1])           # baseline East
 
 # =====================================================================
-# Appendix A.1: Why no other line beats the OLS line
+# Appendix A.2: Why no other line beats the OLS line
 # =====================================================================
-header("Appendix A.1 -- S(b0, b1) = RSS + n (a + b xbar)^2 + b^2 S_xx")
+header("Appendix A.2 -- S(b0, b1) = RSS + n (a + b xbar)^2 + b^2 S_xx")
 rss12 = (reg12.resid**2).sum()
 for name in ("A", "B", "C"):
     a0, a1_ = lines[name]
@@ -553,9 +557,9 @@ for name in ("A", "B", "C"):
 # A: 164.0, B: 120.6, C: 364.8
 
 # =====================================================================
-# Appendix A.2: Interactions
+# Appendix A.6: Interactions
 # =====================================================================
-header("Appendix A.2 -- interaction sales ~ TV * radio")
+header("Appendix A.6 -- interaction sales ~ TV * radio")
 mi = smf.ols("sales ~ TV * radio", data=ad).fit()       # TV + radio + TV:radio
 print(mi.summary().tables[1])
 fit_line(mi)                                             # R^2 0.968, T(TV:radio) 20.7
@@ -563,9 +567,9 @@ print("TV effect at radio = 0, 50:",
       round(mi.params["TV"], 4), round(mi.params["TV"] + 50 * mi.params["TV:radio"], 4))
 
 # =====================================================================
-# Appendix A.3: Diagnostics in multiple regression
+# Appendix A.7: Diagnostics in multiple regression
 # =====================================================================
-header("Appendix A.3 -- diagnostics, collinearity, VIF")
+header("Appendix A.7 -- diagnostics, collinearity, VIF")
 for m in (m2, mi):                                       # curvature / pattern gone
     fig, ax = plt.subplots(); ax.scatter(m.fittedvalues, m.resid)
     ax.axhline(0, linestyle="--"); plt.close(fig)

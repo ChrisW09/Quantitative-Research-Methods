@@ -42,6 +42,22 @@ data = pd.Series([40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39])
 n = len(data)
 
 # =====================================================================
+# SECTION "Fundamentals" > SUBSECTION "Levels of Measurement"
+# Slide "Levels of Measurement with Python"
+# =====================================================================
+header('Slide "Levels of Measurement with Python"')
+# Nominal: categories without an order -> data type "category"
+colour = pd.Series(["black", "white", "blue", "black"], dtype="category")
+print((colour == "black").tolist())    # [True, False, False, True]   (=, != only)
+# Ordinal: categories WITH an order (clothing sizes S < M < L < XL)
+size = pd.Series(pd.Categorical(["M", "S", "XL", "M"],
+                 categories=["S", "M", "L", "XL"], ordered=True))
+print(size.max(), (size > "S").sum())  # XL 3                         (additionally <, >)
+# Metric: numbers -> differences (and means) are meaningful
+price = pd.Series([19.90, 24.90, 29.90, 19.90])   # euros
+print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.65
+
+# =====================================================================
 # SECTION "Descriptive Statistics" > SUBSECTION "Frequencies"
 # =====================================================================
 
@@ -76,6 +92,8 @@ old_share, new_share = 0.40, 0.50
 print("Absolute difference:", round(100 * (new_share - old_share), 2),
       "percentage points")                                 # 10.0
 print("Relative change:    ", round((new_share - old_share) / old_share, 4))  # 0.25
+# Line exactly as on slide "Frequencies with Python"
+print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
 
 # ---------------------------------------------------------------------
 # Slides "Exercise -- Frequencies of a Nominal Variable" /
@@ -132,6 +150,20 @@ ax.set(title="Empirical distribution function - Shoe sizes",
 plt.close(fig)
 
 print("F(39) =", round((data <= 39).mean(), 4))   # 0.6364 = 7/11
+
+# Slide "Charts with Python" -- the same four charts with the plt commands of
+# the slide (plt.show() is replaced by plt.close() in this headless script)
+counts = data.value_counts().sort_index()        # h_j: 37:1, 38:2, 39:4, 40:2, 41:1, 46:1
+print("counts:", dict(zip(counts.index.tolist(), counts.tolist())))
+plt.bar(counts.index, counts.values)             # column chart (numeric axis: gap 41-46)
+plt.xlabel("Shoe size"); plt.ylabel("Absolute frequency")
+plt.close()
+plt.barh(counts.index, counts.values)            # bar chart (horizontal bars)
+plt.close()
+plt.pie(counts.values, labels=counts.index)      # pie chart: slice = share f_j
+plt.close()
+plt.ecdf(data)                                   # empirical distribution function F(x)
+plt.close()
 print("Figures created (not shown, headless mode).")
 
 # =====================================================================
@@ -187,7 +219,7 @@ g = np.array([1.20, 0.90])
 print("Total factor:", round(np.prod(g), 4),                       # 1.08
       "| geometric mean:", round(stats.gmean(g), 4),               # 1.0392
       "| average growth rate:", round(100 * (stats.gmean(g) - 1), 2), "%")  # 3.92
-print("Check 1.0392^2 =", round(1.0392 ** 2, 4),                   # 1.08
+print("Check 1.0392^2 =", round(1.0392 ** 2, 4),                   # 1.0799 (approx. 1.08)
       "| wrong 5 %: 1.05^2 =", round(1.05 ** 2, 4))                # 1.1025
 
 print("Sum:                ", data.sum())                          # 436

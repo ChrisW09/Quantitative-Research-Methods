@@ -2,6 +2,7 @@
 
 \newcommand{\currentpart}{5}
 \input{../common/preamble.tex}
+\newcommand{\notebookpath}{Part_5_Classification/Part_5_Classification.ipynb}
 
 % Local TikZ styles of Part 5: probability trees with natural frequencies
 \tikzset{
@@ -40,6 +41,7 @@
       \tableofcontents[hideallsubsections,sections={5-6}]
     \end{column}
   \end{columns}
+  \trynotebook{all examples and exercises of this part}
 \end{frame}
 
 % ============================================================================
@@ -398,6 +400,8 @@
 
 \begin{frame}[fragile]{Two-way tables with Python}
 \begin{lstlisting}
+import pandas as pd
+df = pd.read_csv("../data/Default.csv")                   # n = 10 000 customers
 tab = pd.crosstab(df.student, df.default, margins=True)   # counts + totals
 print(tab)
 print(pd.crosstab(df.student, df.default, normalize="index").round(4))
@@ -431,9 +435,10 @@ Yes      0.9569  0.0431
       \end{tabular}
     \end{column}
   \end{columns}
-  \medskip
-  \inworten{\texttt{normalize="index"} conditions on the row variable (here:
-  student status), \texttt{"columns"} on the column variable.}
+  \smallskip
+  \inworten{\texttt{"index"} conditions on the row variable (student
+  status), \texttt{"columns"} on the column variable.}
+  \trynotebook{section 1.2 ``Two-way tables and conditional probability''}
 \end{frame}
 
 \begin{frame}{Exercise -- newsletter and purchases}
@@ -502,6 +507,31 @@ Yes      0.9569  0.0431
     Confusing $P(A\mid B)$ with $P(B\mid A)$ -- and reading the association
     as an effect: loyal customers may simply be more likely to subscribe.
   \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Conditional probability and independence with Python}
+  \textbf{Default data:} conditional probability, the two rules,
+  independence:
+\begin{lstlisting}
+d = df.default == "Yes"                    # True for the defaulters
+s = df.student == "Yes"                    # True for the students
+p_d, p_s, p_ds = d.mean(), s.mean(), (d & s).mean()   # 0.0333  0.2944  0.0127
+print(p_ds / p_s)                          # P(default | student) = 0.0431
+print(p_ds / p_s * p_s)                    # multiplication rule: back to 0.0127
+print(p_d + p_s - p_ds)                    # addition rule: P(default or student) = 0.3150
+print(p_d * p_s)                           # 0.0098 != 0.0127 -> not independent
+\end{lstlisting}
+  \textbf{Default rate by balance class} (slide ``Classification $=$
+  estimating $P(Y=1\mid x)$''):
+\begin{lstlisting}
+import numpy as np
+bal_class = pd.cut(df.balance, [0, 500, 1000, 1500, 2000, np.inf], right=False)
+print(pd.crosstab(bal_class, df.default, normalize="index").round(3))
+# column "Yes": 0.000  0.002  0.025  0.220  0.764 -- the S-shape
+\end{lstlisting}
+  \inworten{the mean of a True/False column is the share of \texttt{True}
+  values; \texttt{d \& s} means ``$A$ and $B$''.}
+  \trynotebook{section 1.2 ``Two-way tables and conditional probability''}
 \end{frame}
 
 \begin{frame}{Exercise -- streaming and gaming (exam style)}
@@ -591,6 +621,41 @@ Yes      0.9569  0.0431
   $(0,1)$ -- the \textbf{logistic regression}.}
 \end{frame}
 
+\begin{frame}[fragile]{Linear regression on a $0/1$ variable with Python}
+\begin{lstlisting}
+import statsmodels.formula.api as smf
+import matplotlib.pyplot as plt
+df["y"] = (df.default == "Yes").astype(int)     # 1 = default, 0 = no
+lpm = smf.ols("y ~ balance", data=df).fit()     # the regression of Part 4
+print(lpm.params)                               # -0.0752, 0.000130
+print((lpm.fittedvalues < 0).sum())             # 3123 negative "probabilities"
+print(df.balance[lpm.fittedvalues < 0].max())   # all balances below 579 $
+plt.scatter(df.balance, df.y, s=3)              # the 0/1 data
+plt.plot(df.balance, lpm.fittedvalues, "r")     # fitted straight line
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+\begin{lstlisting}[style=Pyout]
+Intercept   -0.075192
+balance      0.000130
+dtype: float64
+3123
+578.836277403294
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.62\textwidth}
+      \small
+      \begin{itemize}\setlength{\itemsep}{2pt}
+        \item $\hat y=-0.0752+0.000130\cdot\text{balance}<0$ for every
+              balance below $0.0752/0.000130\approx579$\,\$.
+        \item Python fits the line without any warning -- checking the
+              model is our job.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \trynotebook{section 1.3 ``Why not linear regression?''}
+\end{frame}
+
 \begin{frame}{Exercise -- why not linear regression?}
   \begin{block}{Problem statement}
     A colleague wants to predict the emergency diagnosis of a patient. She
@@ -668,6 +733,42 @@ Yes      0.9569  0.0431
     \item The logistic function (a) is the inverse of the logit (b): it maps
           every log-odds value back into $(0,1)$.
   \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Odds and log-odds with Python}
+\begin{lstlisting}
+p = np.array([0.1, 0.2, 0.5, 0.8, 0.9])
+odds = p / (1 - p)                       # 0.111  0.25  1  4  9
+logodds = np.log(odds)                   # natural log: -2.197 ... 2.197
+print(pd.DataFrame({"p": p, "odds": odds, "logodds": logodds}).round(3))
+print(odds / (1 + odds))                 # back to p: 0.1 0.2 0.5 0.8 0.9
+eta = np.linspace(-6, 6, 200)            # a grid of log-odds values
+plt.plot(eta, np.exp(eta) / (1 + np.exp(eta)))   # logistic function, panel (a)
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.34\textwidth}
+\begin{lstlisting}[style=Pyout]
+     p   odds  logodds
+0  0.1  0.111   -2.197
+1  0.2  0.250   -1.386
+2  0.5  1.000    0.000
+3  0.8  4.000    1.386
+4  0.9  9.000    2.197
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.64\textwidth}
+      \small
+      \begin{itemize}\setlength{\itemsep}{2pt}
+        \item The same table as on the slide ``Odds'' -- every operation
+              works element by element on the whole array.
+        \item \texttt{np.log} is the \textbf{natural} logarithm (base $e$),
+              \texttt{np.exp} its inverse.
+        \item \texttt{np.exp(eta) / (1 + np.exp(eta))} turns log-odds into a
+              probability -- we need it again for $\hat p(x)$.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \trynotebook{section 2.1 ``Probability, odds and log-odds''}
 \end{frame}
 
 \begin{frame}{Exercise -- probability, odds and log-odds}
@@ -797,7 +898,7 @@ Yes      0.9569  0.0431
   \end{block}
 \end{frame}
 
-\begin{frame}{Solution -- which parameters are more plausible?}
+\begin{frame}{Solution (1/2) -- which parameters are more plausible?}
   Example: $\eta(2000)=-10.65+0.0055\cdot2000=0.35$,
   $p=e^{0.35}/(1+e^{0.35})=0.5866$.
   \begin{center}
@@ -824,10 +925,31 @@ Yes      0.9569  0.0431
   \end{exampleblock}
 \end{frame}
 
+\begin{frame}[fragile]{Solution (2/2) -- which parameters are more plausible?}
+  \textbf{The same calculation in Python} -- one function, two parameter sets:
+\begin{lstlisting}
+x = np.array([1000, 1500, 2000, 2500]); y = np.array([0, 0, 1, 1])
+def likelihood(b0, b1):
+    p = np.exp(b0 + b1 * x) / (1 + np.exp(b0 + b1 * x))   # p(x_i)
+    return np.prod(np.where(y == 1, p, 1 - p))            # product of contributions
+print(likelihood(-10.65, 0.0055))      # (A) 0.5117
+print(likelihood(-5, 0.002))           # (B) 0.1128
+print(np.log(likelihood(-10.65, 0.0055)))   # log-likelihood of (A): -0.6701
+\end{lstlisting}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item \texttt{np.where(y == 1, p, 1 - p)}: each defaulter contributes
+          $p(x_i)$, each non-defaulter $1-p(x_i)$ -- the formula of the
+          likelihood slide.
+    \item Maximum likelihood searches \emph{all} pairs $(\beta_0,\beta_1)$
+          for the largest $L$ (in practice: the largest $\log L$).
+          \texttt{smf.logit} does this numerically -- next slide.
+  \end{itemize}
+  \trynotebook{section 2.3 ``Estimation''}
+\end{frame}
+
 \begin{frame}[fragile]{Logistic regression with Python}
   \begin{block}{Fitting the model}
 \begin{lstlisting}
-import pandas as pd
 import statsmodels.formula.api as smf
 df = pd.read_csv("../data/Default.csv")
 df["y"] = (df.default == "Yes").astype(int)     # 1 = default, 0 = no
@@ -842,11 +964,11 @@ balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
 \end{lstlisting}
   \begin{itemize}\setlength{\itemsep}{2pt}
     \item \texttt{smf.logit} fits a logistic regression by maximum
-          likelihood ($y$ coded $0/1$).
-    \item Estimated model: $\hat\eta=-10.65+0.0055\cdot\text{balance}$.
+          likelihood ($y$ coded $0/1$): $\hat\eta=-10.65+0.0055\cdot\text{balance}$.
     \item The output looks like \texttt{smf.ols} -- with $z$- instead of
           $t$-values (see ``Inference'').
   \end{itemize}
+  \trynotebook{section 2.3 ``Estimation''}
 \end{frame}
 
 \subsection{Interpretation}
@@ -895,6 +1017,28 @@ balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
     ``The odds multiply by $245$'' does \emph{not} mean the probability is
     $245$ times as large -- probabilities can never exceed $1$.
   \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Odds ratios and predicted probabilities with Python}
+\begin{lstlisting}
+print(np.exp(g1.params["balance"]))           # odds ratio per 1 $:     1.0055
+print(np.exp(1000 * g1.params["balance"]))    # odds ratio per 1000 $:  244.4
+new = pd.DataFrame({"balance": [1000, 1500, 2000, 2500]})
+eta = g1.predict(new, which="linear")         # log-odds: -5.152 -2.403 0.347 3.096
+print(np.exp(eta) / (1 + np.exp(eta)))        # by hand:  0.0058 0.0829 0.5858 0.9567
+print(g1.predict(new))                        # the same probabilities in one step
+\end{lstlisting}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item \texttt{new} needs a column with the \textbf{same name} as in the
+          formula (\texttt{balance}); one row per customer.
+    \item \texttt{which="linear"} returns the log-odds $\hat\eta$; without it,
+          \texttt{predict} returns $\hat p(x)$ -- the pipeline
+          $x\to\hat\eta\to\hat p$.
+    \item Python uses the unrounded coefficients: odds ratio $244.4$ instead
+          of $e^{5.5}\approx245$; the probabilities agree with the table of
+          the worked example.
+  \end{itemize}
+  \trynotebook{section 2.4 ``Interpretation''}
 \end{frame}
 
 \begin{frame}{Exercise -- computing $\hat p(x)$ from the coefficients}
@@ -980,6 +1124,28 @@ balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
     the two-way table: $\hat\beta_0=-3.504$ is the log-odds of the
     non-students and $1.50$ the odds ratio (exercise on odds).
   \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Inference with Python}
+  \textbf{Balance} ($z$-test and CIs by hand and built in):
+\begin{lstlisting}
+from scipy import stats
+z = g1.params / g1.bse                       # balance: z = 24.95
+print(2 * stats.norm.cdf(-abs(z)))           # p = 2 Phi(-|z|) = 2.0e-137 (= g1.pvalues)
+print(g1.conf_int())                         # beta +- 1.96 SE: [0.005067, 0.005931]
+print(np.exp(100 * g1.conf_int().loc["balance"]))   # OR per 100 $: [1.660, 1.810]
+\end{lstlisting}
+  \textbf{Student status alone:}
+\begin{lstlisting}
+g2 = smf.logit("y ~ student", data=df).fit(disp=0)
+print(g2.pvalues["student[T.Yes]"])          # p = 0.0004
+print(np.exp(g2.params))                     # odds ratio student: 1.50
+print(np.exp(g2.conf_int()))                 # its 95 % CI: [1.20, 1.88]
+\end{lstlisting}
+  \inworten{\texttt{conf\_int()} gives the CI for $\beta_j$;
+  \texttt{np.exp} of the bounds gives the CI for the odds ratio
+  $e^{\beta_j}$. For $99\,\%$: \texttt{conf\_int(alpha=0.01)}.}
+  \trynotebook{section 2.5 ``Inference for the coefficients''}
 \end{frame}
 
 \begin{frame}{Exercise -- coefficients on the odds scale}
@@ -1073,6 +1239,7 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
     \item \textbf{Student:} significant and now \emph{negative}:
           $e^{-0.6468}=0.524$.
   \end{itemize}
+  \trynotebook{section 3.1 ``The model''}
 \end{frame}
 
 \subsection{Confounding: the student paradox}
@@ -1128,6 +1295,30 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
   \end{block}
   \kernaussage{Always ask \emph{which variables are held fixed} before
   interpreting a coefficient -- in linear and in logistic regression.}
+\end{frame}
+
+\begin{frame}[fragile]{The student paradox with Python}
+\begin{lstlisting}
+print(df.groupby("student").balance.mean())   # No 771.77, Yes 987.82
+print(g2.params["student[T.Yes]"])            # alone:              +0.4049
+print(g3.params["student[T.Yes]"])            # balance, income too: -0.6468
+same = pd.DataFrame({"balance": 1500, "income": 40000, "student": ["No", "Yes"]})
+print(g3.predict(same))                       # same balance: 0.1050 vs 0.0579
+grid = pd.DataFrame({"balance": np.linspace(500, 2650, 100), "income": 40000})
+for st in ["No", "Yes"]:                      # curves as in panel (a)
+    plt.plot(grid.balance, g3.predict(grid.assign(student=st)), label=st)
+plt.legend()
+\end{lstlisting}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item \textbf{Confounder check:} students carry larger balances
+          (\texttt{groupby}), and balance drives default.
+    \item \textbf{Same balance and income} ($1500$\,\$, $40\,000$\,\$): a
+          non-student defaults with $\hat p=0.105$, a student with only
+          $0.058$ -- the multiple model compares like with like.
+    \item \texttt{grid.assign(student=st)} sets the student column for all
+          rows of the grid.
+  \end{itemize}
+  \trynotebook{section 3.2 ``Confounding: the student paradox''}
 \end{frame}
 
 \subsection{Exercises}
@@ -1216,6 +1407,7 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
   \end{exampleblock}
   \textbf{(2)} $\;e^{0.00574\cdot100}=e^{0.574}=\textbf{1.78}$: $100$\,\$ more
   balance raises the odds by $78\,\%$ -- whatever the starting point.
+  \trynotebook{section 3.3 ``Exercises''}
 \end{frame}
 
 \begin{frame}{Solution (2/2) -- logistic regression from A to Z}
@@ -1280,6 +1472,28 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
   \kernaussage{The threshold is not a statistical but a \textbf{business
   decision}: it depends on the cost of a missed defaulter compared with the
   cost of a rejected good customer.}
+\end{frame}
+
+\begin{frame}[fragile]{The classification rule with Python}
+  \textbf{Decision boundary on the balance scale} (model \texttt{g1}):
+\begin{lstlisting}
+b0, b1 = g1.params                            # -10.6513, 0.005499
+print(-b0 / b1)                               # t = 0.5: boundary 1937 $
+print((np.log(0.2 / 0.8) - b0) / b1)          # t = 0.2: boundary 1685 $
+\end{lstlisting}
+  \textbf{From probabilities to classes:}
+\begin{lstlisting}
+phat1 = g1.predict(df)                        # P(default) for every customer
+yhat = (phat1 > 0.5).astype(int)              # rule: 1 = "default" if p-hat > t
+print(yhat.sum(), (phat1 > 0.2).sum())        # flagged: 142 (t = 0.5), 462 (t = 0.2)
+\end{lstlisting}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Unrounded coefficients: boundaries $1937$ and $1685$\,\$
+          (previous slide, rounded: $1936$ and $1684$\,\$).
+    \item Lowering $t$ from $0.5$ to $0.2$ flags $462$ instead of $142$
+          customers. How many of them really default? $\to$ Section~5.
+  \end{itemize}
+  \trynotebook{section 4 ``From Probabilities to Decisions''}
 \end{frame}
 
 \begin{frame}{Exercise -- from probability to decision}
@@ -1432,6 +1646,7 @@ phat = g3.predict(df)                                # P(default = Yes), model g
 pred = phat > 0.5                                    # True = "default" predicted
 print(pd.crosstab(df.default, pred, normalize="index").round(4))    # given y
 print(pd.crosstab(df.default, pred, normalize="columns").round(4))  # given y-hat
+print((pred == df.y).mean())                         # accuracy 0.9732
 \end{lstlisting}
   \begin{columns}[T]
     \begin{column}{0.36\textwidth}
@@ -1444,9 +1659,11 @@ col_0     False   True
 default
 No       0.9769  0.2759
 Yes      0.0231  0.7241
+0.9732
 \end{lstlisting}
     \end{column}
     \begin{column}{0.62\textwidth}
+      \small
       \begin{itemize}\setlength{\itemsep}{3pt}
         \item \textbf{Rows} sum to $1$: row ``Yes'' gives the sensitivity
               $0.3153$ (and the miss rate $0.6847$), row ``No'' the
@@ -1454,9 +1671,11 @@ Yes      0.0231  0.7241
         \item \textbf{Columns} sum to $1$: column ``True'' gives the
               precision $0.7241$; column ``False'': $97.7\,\%$ of the
               customers predicted ``no default'' really do not default.
+        \item \textbf{Accuracy}: the share of customers with $\hat y=y$.
       \end{itemize}
     \end{column}
   \end{columns}
+  \trynotebook{section 5.1 ``Confusion matrix''}
 \end{frame}
 
 \begin{frame}{Exercise -- reading a confusion matrix}
@@ -1594,6 +1813,39 @@ Yes      0.0231  0.7241
   precision also depends on the \textbf{base rate} (Appendix~A.1).}
 \end{frame}
 
+\begin{frame}[fragile]{Base rates with Python}
+\begin{lstlisting}
+def precision(pi, sens, spec):
+    """Share of correct alarms among all alarms at base rate pi."""
+    return sens * pi / (sens * pi + (1 - spec) * (1 - pi))
+
+sens, spec = 203 / 333, 9390 / 9667          # rule t = 0.2: 0.6096, 0.9713
+print(round(10000 * 0.01 * sens), round(10000 * 0.99 * (1 - spec)))  # 61 TP, 284 FP
+for pi in [0.01, 0.0333, 0.10]:
+    print(pi, round(precision(pi, sens, spec), 3))       # 0.177  0.423  0.703
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.3\textwidth}
+\begin{lstlisting}[style=Pyout]
+61 284
+0.01 0.177
+0.0333 0.423
+0.1 0.703
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.68\textwidth}
+      \small
+      \begin{itemize}\setlength{\itemsep}{3pt}
+        \item The function is the formula of the previous slide; a
+              \texttt{for} loop evaluates it for several base rates.
+        \item Natural frequencies: $10\,000$ customers $\times$ base rate
+              $\times$ conditional rate -- the counts of the tree.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \trynotebook{section 5.2 ``Base rates and precision''}
+\end{frame}
+
 \begin{frame}{Exercise -- rapid test and base rate}
   \begin{block}{Problem statement}
     A rapid test is designed to detect a disease that affects $1\,\%$ of the
@@ -1656,7 +1908,9 @@ Yes      0.0231  0.7241
   Precision $=180/(180+80)=180/260=\textbf{0.692}$.
   \kernaussage{Same test, different base rate -- a completely different
   meaning of a positive result. Python check:
-  \texttt{0.9*pi/(0.9*pi + 0.1*(1-pi))} gives $0.083$ and $0.692$.}
+  \texttt{precision(0.01, 0.9, 0.9)} and \texttt{precision(0.20, 0.9, 0.9)}
+  give $0.083$ and $0.692$.}
+  \trynotebook{section 5.2 ``Base rates and precision''}
 \end{frame}
 
 \subsection{ROC curve and AUC}
@@ -1713,6 +1967,28 @@ Yes      0.0231  0.7241
   \end{itemize}
   \kernaussage{The ROC curve and AUC evaluate the \emph{model}; the
   confusion matrix evaluates one \emph{decision rule} (one threshold).}
+\end{frame}
+
+\begin{frame}[fragile]{ROC curve and AUC with Python}
+  \textbf{Sensitivity and specificity for several thresholds}
+  (\texttt{phat} from the model \texttt{g3}):
+\begin{lstlisting}
+for t in [0.1, 0.2, 0.5]:          # sensitivity, specificity
+    print(t, (phat[df.y == 1] > t).mean(), (phat[df.y == 0] <= t).mean())
+# 0.1: 0.7447 0.9421   0.2: 0.6096 0.9713   0.5: 0.3153 0.9959
+\end{lstlisting}
+  \textbf{ROC curve and AUC:}
+\begin{lstlisting}
+from sklearn.metrics import roc_curve, roc_auc_score
+fpr, tpr, thr = roc_curve(df.y, phat)   # one point per threshold
+plt.plot(fpr, tpr)                      # ROC curve
+plt.plot([0, 1], [0, 1], "--")          # diagonal: random guessing
+plt.xlabel("1 - specificity"); plt.ylabel("sensitivity")
+print(roc_auc_score(df.y, phat))        # AUC 0.950
+\end{lstlisting}
+  \inworten{\texttt{phat[df.y == 1]} keeps the defaulters; the mean of
+  \texttt{> t} is the share of them that are flagged.}
+  \trynotebook{section 5.3 ``ROC curve and AUC''}
 \end{frame}
 
 \begin{frame}{Exercise -- threshold, ROC and AUC}
@@ -1841,6 +2117,7 @@ print(pd.crosstab(test.default, p_te > 0.5))   # 2878 10 / 78 34
 print(roc_auc_score(test.y, p_te))             # test AUC 0.956
 \end{lstlisting}
   \end{block}
+  \trynotebook{section 5.4 ``Training and test data''}
 \end{frame}
 
 % ============================================================================
@@ -2231,6 +2508,27 @@ test = df.drop(train.index)
   $5$ come from the many green taxis. The witness raises the probability from
   $\frac{5}{30}=17\,\%$ (prior) to $44\,\%$ (posterior) -- still less than
   $50\,\%$.}
+\end{frame}
+
+\begin{frame}[fragile]{Bayes' theorem with Python}
+  \textbf{Night-time taxi} -- one array entry per case $B_i$ (blue, green):
+\begin{lstlisting}
+prior = np.array([5, 25]) / 30         # P(blue), P(green):         0.1667 0.8333
+lik = np.array([0.8, 0.2])             # P(says "blue" | colour)
+joint = prior * lik                    # multiplication rule:       0.1333 0.1667
+print(joint.sum())                     # total probability P(W):    0.3
+print(joint / joint.sum())             # posterior P(colour | W):   0.4444 0.5556
+\end{lstlisting}
+  \textbf{The same steps as a function} -- rapid test of Section~5:
+\begin{lstlisting}
+def bayes(prior, lik):
+    joint = prior * lik                # prior x likelihood
+    return joint / joint.sum()         # divided by the total probability
+print(bayes(np.array([0.01, 0.99]), np.array([0.9, 0.1])))   # P(ill | +) 0.0833
+\end{lstlisting}
+  \inworten{works for any number of cases: put all priors and likelihoods
+  into arrays; the posteriors always add up to $1$.}
+  \trynotebook{section A.1 ``Bayes' theorem''}
 \end{frame}
 
 \begin{frame}{Exercise -- three suppliers}
@@ -2640,6 +2938,7 @@ nb = GaussianNB().fit(X, df.default)       # normal f_kj for every feature
 print(pd.crosstab(df.default, nb.predict(X)))
 \end{lstlisting}
   \end{block}
+  \trynotebook{section A.5 ``Comparison''}
 \end{frame}
 
 \begin{frame}{Appendix summary -- Bayes' theorem and Bayes classifiers}

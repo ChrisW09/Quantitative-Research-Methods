@@ -2,6 +2,7 @@
 
 \newcommand{\currentpart}{3}
 \input{../common/preamble.tex}
+\newcommand{\notebookpath}{Part_3_Statistical_Inference/Part_3_Statistical_Inference.ipynb}
 
 \subtitle{Part 3: Statistical Inference}
 \newcommand{\overviewleft}{1-4}
@@ -31,6 +32,7 @@
       \tableofcontents[hideallsubsections,sections={5-7}]
     \end{column}
   \end{columns}
+  \trynotebook{all examples and exercises of this part}
 \end{frame}
 
 % ============================================================================
@@ -382,6 +384,7 @@ EX = np.sum(x * p); VarX = np.sum(x ** 2 * p) - EX ** 2
 print(round(EX, 2), round(VarX, 2))                               # a)  -> 1.3 0.81
 print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -> 2.7 0.3
 \end{lstlisting}
+  \trynotebook{section 1.1 ``From data to models''}
 \end{frame}
 
 \subsection{Normal distribution}
@@ -553,6 +556,7 @@ stats.norm.cdf(997, loc=1000, scale=3)   # P(X <= 997), N(1000,9) -> 0.1587
 \end{lstlisting}
   \kernaussage{The famous $1.96$ is the $0.975$-quantile of $N(0,1)$: the
   central $95\,\%$ of the area lies between $\pm1.96$.}
+  \trynotebook{section 1.2 ``Normal distribution''}
 \end{frame}
 \note{Talk track: forwards = look up the margin, read inside; backwards =
 look up inside, read the margin. Let students find $1.96$ themselves in the
@@ -632,16 +636,23 @@ print(f"b) {X.cdf(1015) - X.cdf(990):.4f}")
 print(f"c) {X.ppf(0.95):.2f}")
 print(f"d) {985 - stats.norm.ppf(0.01) * 10:.2f}")   # mu = 985 - z_0.01 * sigma
 \end{lstlisting}
-  \begin{block}{Output}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+      \begin{block}{Output}
 \begin{lstlisting}[style=Pyout]
 a) 0.0668
 b) 0.7745
 c) 1016.45
 d) 1008.26
 \end{lstlisting}
-  \end{block}
-  \footnotesize The table answers differ only by rounding ($z_{0.99}=2.33$
-  instead of $2.3263$ in d).
+      \end{block}
+    \end{column}
+    \begin{column}{0.60\textwidth}
+      \footnotesize The table answers differ only by rounding
+      ($z_{0.99}=2.33$ instead of $2.3263$ in d).
+    \end{column}
+  \end{columns}
+  \trynotebook{section 1.2 ``Normal distribution''}
 \end{frame}
 
 \subsection{Sampling distribution and CLT}
@@ -765,6 +776,34 @@ standardises $\bar X$ like $Z_n$; the CLT is the licence to do so for non-normal
 $n\gtrsim30$ (assumptions checklist later). Typical exam trap: ``by the CLT
 the data are normal'' -- no, only the mean is.}
 
+% ---- CLT with Python (simulation) ---------------------------------------------
+\begin{frame}[fragile]{The central limit theorem with Python}
+  \textbf{Simulation:} $20\,000$ shifts with $n=36$ right-skewed processing
+  times each (gamma distribution with $\mu=12$, $\sigma=6$ minutes, as on the
+  simulation slide).
+\begin{lstlisting}
+import numpy as np
+from scipy import stats
+rng = np.random.default_rng(42)                          # fixed seed
+times = rng.gamma(shape=4, scale=3, size=(20_000, 36))   # 20 000 shifts x 36 orders
+means = times.mean(axis=1)                               # one mean per shift
+times.mean(), times.std()                     # single values:  12.0, 6.0
+means.mean(), means.std()                     # shift means:    12.003, 0.99
+stats.skew(times.ravel()), stats.skew(means)  # skewness:       1.0, 0.15
+np.mean(means > 13.5)                         # share of shifts above 13.5 min: 0.0698
+stats.norm.sf(13.5, loc=12, scale=6 / np.sqrt(36))      # CLT approximation:  0.0668
+\end{lstlisting}
+  \inworten{The shift means are centred at $\mu=12$, spread with
+  $\sigma/\sqrt n=1$ and are almost symmetric (skewness $1.0\to0.15$),
+  although every single time is right-skewed. The simulated share above
+  $13.5$ minutes is close to the CLT value.}
+  \trynotebook{section 1.3 ``Sampling distribution and CLT''}
+\end{frame}
+\note{Talk track: the simulation slide in code. Point at the three pairs of
+numbers -- centre stays, spread shrinks by $\sqrt{36}=6$, skewness almost
+vanishes. Students can change $n$ in the notebook (e.g.\ $n=4$) and watch the
+skewness come back.}
+
 % ---- Exercise: CLT --------------------------------------------------------------
 \begin{frame}{Exercise -- central limit theorem: processing times}
   \begin{block}{Problem statement}
@@ -858,6 +897,7 @@ print(f"b) {stats.norm.sf(13.5, loc=12, scale=6 / np.sqrt(36)):.4f}")  # mean
 print(f"c) {stats.norm.sf(13.5, loc=12, scale=6):.4f}")   # single value, IF normal
 print(f"d) {(6 / 0.5) ** 2:.0f}")
 \end{lstlisting}
+  \trynotebook{section 1.3 ``Sampling distribution and CLT''}
 \end{frame}
 
 % ============================================================================
@@ -1475,6 +1515,7 @@ print(n_required(0.95, 3, 1), n_required(0.99, 3, 1), n_required(0.95, 3, 0.5))
 35 60 139
 \end{lstlisting}
   \end{block}
+  \trynotebook{section 2.3 ``Length of the confidence interval''}
 \end{frame}
 
 \subsection{Unknown variance}
@@ -1558,6 +1599,41 @@ print(n_required(0.95, 3, 1), n_required(0.99, 3, 1), n_required(0.95, 3, 0.5))
           ($t_{n-1}\approx N(0,1)$).
     \item For small samples it is clearly noticeable.
   \end{itemize}
+\end{frame}
+
+% ---- Confidence intervals with Python -------------------------------------------
+\begin{frame}[fragile]{Confidence intervals with Python}
+\begin{lstlisting}
+import numpy as np
+from scipy import stats
+milk = np.array([1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009])
+xbar, n, s = milk.mean(), len(milk), milk.std(ddof=1)    # 1001.0, 9, 3.7749
+stats.norm.ppf(0.975), stats.t.ppf(0.975, df=n - 1)     # quantiles: 1.9600, 2.3060
+for conf in (0.90, 0.95, 0.99):                          # sigma = 3 known -> N(0,1)
+    lo, hi = stats.norm.interval(conf, loc=xbar, scale=3 / np.sqrt(n))
+    print(f"z, {conf:.0%}: [{lo:.2f}, {hi:.2f}]")
+lo, hi = stats.t.interval(0.95, df=n - 1, loc=xbar, scale=s / np.sqrt(n))
+print(f"t, 95%: [{lo:.2f}, {hi:.2f}]")                   # sigma estimated -> t_(n-1)
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.42\textwidth}
+      \begin{block}{Output}
+\begin{lstlisting}[style=Pyout]
+z, 90%: [999.36, 1002.64]
+z, 95%: [999.04, 1002.96]
+z, 99%: [998.42, 1003.58]
+t, 95%: [998.10, 1003.90]
+\end{lstlisting}
+      \end{block}
+    \end{column}
+    \begin{column}{0.54\textwidth}
+      \footnotesize \texttt{interval(conf, ...)} $=$ $\bar x\pm$ quantile
+      $\cdot$ SE: \texttt{loc} $=\bar x$, \texttt{scale} $=$ standard error
+      ($\sigma/\sqrt n$ or $s/\sqrt n$), for $t$ also \texttt{df} $=n-1$.
+      Same numbers as on the milk slides.
+    \end{column}
+  \end{columns}
+  \trynotebook{section 2.4 ``Unknown variance''}
 \end{frame}
 
 % ---- Exercise: filling cream, part 2 (unknown variance) -------------------------
@@ -1939,7 +2015,6 @@ direction-after-data doubles the true $\alpha$.}
 \begin{lstlisting}
 import numpy as np
 from scipy import stats
-
 milk = np.array([1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009])
 res = stats.ttest_1samp(milk, popmean=1000)    # two-sided by default
 ci = res.confidence_interval(confidence_level=0.95)
@@ -1955,6 +2030,7 @@ t = 0.7947, df = 8, p = 0.4497
   \footnotesize By default \texttt{stats.ttest\_1samp} performs a
   \textbf{two-sided} $t$-test with \textbf{unknown} variance; the result holds
   $t$, df and $p$-value, \texttt{.confidence\_interval()} adds the CI.
+  \trynotebook{section 3.5 ``Tests with Python''}
 \end{frame}
 
 \subsection{Exercises}
@@ -2137,16 +2213,23 @@ ci = res.confidence_interval(confidence_level=0.95)
 print(f"t = {res.statistic:.4f}, df = {res.df}, p = {res.pvalue:.4f}")
 print(f"95% CI: [{ci.low:.2f}, {ci.high:.2f}]")
 \end{lstlisting}
-  \begin{block}{Output ($\bar x$, $s$, critical value; test; CI)}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Output ($\bar x$, $s$, critical value; test; CI)}
 \begin{lstlisting}[style=Pyout]
 45.0 4.0 2.3646
 t = -2.1213, df = 7, p = 0.0716
 95% CI: [41.66, 48.34]
 \end{lstlisting}
-  \end{block}
-  \footnotesize $t$, df and CI agree with the hand calculation. The reported
-  $p=0.0716>0.05$ leads to the same decision -- what it means exactly is the
-  topic of the next section.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \footnotesize $t$, df and CI agree with the hand calculation. The
+      reported $p=0.0716>0.05$ leads to the same decision -- what it means
+      exactly is the topic of the next section.
+    \end{column}
+  \end{columns}
+  \trynotebook{section 3.6 ``Exercises''}
 \end{frame}
 \note{Talk track: this is the complete exam workflow on raw data -- table of
 deviations, $s$ with $n-1$, standard error, statistic, critical value, CI,
@@ -2417,6 +2500,38 @@ exam error (dedicated slide follows).}
   $\Rightarrow$ $0.05<p<0.10$. Both brackets give the same decisions.
 \end{frame}
 
+% ---- p-values with Python ---------------------------------------------------------
+\begin{frame}[fragile]{$p$-values with Python}
+\begin{lstlisting}
+import numpy as np
+from scipy import stats
+milk = np.array([1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009])
+cream = np.array([251, 248, 248, 249, 250, 251, 247, 246,
+                  252, 251, 248, 247, 246, 249, 248, 252])
+for x, mu0, sigma in [(milk, 1000, 3), (cream, 250, 2)]:
+    n = len(x)
+    z = (x.mean() - mu0) / (sigma / np.sqrt(n))           # sigma known
+    t = (x.mean() - mu0) / (x.std(ddof=1) / np.sqrt(n))   # sigma estimated
+    p_z = 2 * stats.norm.sf(abs(z))                       # 2 * (1 - Phi(|z|))
+    p_t = 2 * stats.t.sf(abs(t), df=n - 1)                # 2 * (1 - F_t,n-1(|t|))
+    print(f"z = {z:.4f}, p = {p_z:.4f} | t = {t:.4f}, p = {p_t:.4f}")
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \textbf{Output} (milk, cream):
+\begin{lstlisting}[style=Pyout]
+z = 1.0000, p = 0.3173 | t = 0.7947, p = 0.4497
+z = -2.1250, p = 0.0336 | t = -2.1086, p = 0.0522
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \footnotesize \texttt{sf} $=1-F$ (survival function). The $t$-row
+      equals \texttt{ttest\_1samp(x, mu0)}.
+    \end{column}
+  \end{columns}
+  \trynotebook{section 4.2 ``Calculation''}
+\end{frame}
+
 \begin{frame}{$p$-value -- typical misconceptions}
   \begin{alertblock}{What the $p$-value is \emph{not}}
     \begin{itemize}
@@ -2533,15 +2648,12 @@ for the students: $p$-value for evidence, CI for magnitude -- always read both.}
   \begin{block}{c) exactly, with Python}
 \begin{lstlisting}
 from scipy import stats
-print(round(2 * stats.t.cdf(-2.1213, df=7), 4))        # exact two-sided p-value
-\end{lstlisting}
-\begin{lstlisting}[style=Pyout]
-0.0716
+print(round(2 * stats.t.cdf(-2.1213, df=7), 4))        # exact two-sided p-value: 0.0716
 \end{lstlisting}
   \end{block}
   \kernaussage{The table yields only an \emph{interval} for $p$ -- enough for
-  the decision, which only asks ``$p<\alpha$?''. Critical value and $p$-value
-  always lead to the same verdict.}
+  the decision ``$p<\alpha$?''; critical value and $p$-value always agree.}
+  \trynotebook{section 4.3 ``Exercises''}
 \end{frame}
 \note{Talk track: exam-relevant skill. Draw the df $=7$ row as a ruler, mark
 $2.121$ between $1.895$ and $2.365$, read the tail areas $0.05$ and $0.025$
@@ -2619,6 +2731,7 @@ print(z, round(2 * stats.norm.sf(abs(z)), 4))           # z and two-sided p-valu
   \]
   {\small $1000\notin$ CI $\Rightarrow$ $H_0$ is rejected -- consistent with
   $|Z_n|>1.96$ and $p<0.05$ (duality).}
+  \trynotebook{section 4.3 ``Exercises''}
 \end{frame}
 
 \begin{frame}{Solution (3/3) -- coffee roastery: estimated $\sigma$}
@@ -3245,14 +3358,22 @@ ci = res.confidence_interval(0.95)                        # one-sided CI
 print(f"t = {res.statistic:.4f}, df = {res.df}, p = {res.pvalue:.4f}")
 print(f"95% CI: [{ci.low}, {ci.high:.2f}]")
 \end{lstlisting}
-  \begin{block}{Cream, left-sided -- output}
+  \begin{columns}[T]
+    \begin{column}{0.44\textwidth}
+      \begin{block}{Cream, left-sided -- output}
 \begin{lstlisting}[style=Pyout]
 t = -2.1086, df = 15, p = 0.0261
 95% CI: [-inf, 249.82]
 \end{lstlisting}
-  \end{block}
-  \footnotesize The argument \texttt{alternative} controls the direction
-  (\texttt{"two-sided"} (default), \texttt{"less"}, \texttt{"greater"}).
+      \end{block}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \footnotesize The argument \texttt{alternative} controls the
+      direction (\texttt{"two-sided"} (default), \texttt{"less"},
+      \texttt{"greater"}).
+    \end{column}
+  \end{columns}
+  \trynotebook{section 5.3 ``One-sided $p$-value''}
 \end{frame}
 
 \begin{frame}{Exercise -- one- vs.\ two-sided on the same data}
@@ -3408,6 +3529,7 @@ print(f"{t:.2f} {stats.t.sf(t, df=24):.4f} {stats.norm.sf(t):.4f}")
   Normal approximation: $p\approx1-\Phi(2.60)=1-0.9953=\mathbf{0.0047}$ --
   smaller than the exact $0.0079$, because the $t$-distribution has heavier
   tails. Both are far below $0.05$: same decision.
+  \trynotebook{section 5.5 ``Exercises''}
 \end{frame}
 
 \begin{frame}{Solution (3/3) -- muesli: CI and duality}
@@ -3494,13 +3616,19 @@ print(f"{t:.2f} {stats.t.cdf(t, df=15):.4f}")           # T_n, left-sided p-valu
 print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sided CI
 \end{lstlisting}
   \vspace{-4pt}
+  \begin{columns}[T]
+    \begin{column}{0.22\textwidth}
 \begin{lstlisting}[style=Pyout]
 -2.00 0.0320
 47.80
 \end{lstlisting}
-  \vspace{-2pt}
-  {\footnotesize With raw data: \texttt{stats.ttest\_1samp(x, 48,
-  alternative="less")} and \texttt{.confidence\_interval(0.95)}.}
+    \end{column}
+    \begin{column}{0.74\textwidth}
+      \footnotesize With raw data: \texttt{stats.ttest\_1samp(x, 48,
+      alternative="less")} and \texttt{.confidence\_interval(0.95)}.
+    \end{column}
+  \end{columns}
+  \trynotebook{section 5.5 ``Exercises''}
 \end{frame}
 \note{Talk track: the punchline of this task is the duality rule ``like with
 like'': one-sided test $\leftrightarrow$ one-sided CI, two-sided test
@@ -3688,6 +3816,39 @@ $\sigma$: partly the lab (better instruments); $\alpha$: the convention, and
 raising it is usually unacceptable. So in practice power planning $=$ sample
 size planning. Connect back to the CI length slide: same logic,
 $1/\sqrt n$.}
+
+% ---- beta and power with Python ----------------------------------------------------
+\begin{frame}[fragile]{$\beta$ and power with Python}
+\begin{lstlisting}
+import numpy as np
+from scipy import stats
+from statsmodels.stats.power import NormalIndPower
+for n in (9, 36):                        # milk: mu0 = 1000, true mu1 = 1002, sigma = 3
+    se = 3 / np.sqrt(n)
+    lo, hi = 1000 - 1.96 * se, 1000 + 1.96 * se         # acceptance region (H0 world)
+    beta = stats.norm.cdf(hi, 1002, se) - stats.norm.cdf(lo, 1002, se)  # mu1 world
+    print(f"n = {n}: beta = {beta:.3f}, power = {1 - beta:.3f}")
+pw = NormalIndPower()                    # power of the z-test; ratio=0: one sample
+pw.power(effect_size=2/3, nobs1=9, alpha=0.05, ratio=0)              # 0.516
+pw.solve_power(effect_size=2/3, power=0.80, alpha=0.05, ratio=0)     # 17.66 -> n = 18
+\end{lstlisting}
+  \begin{columns}[T]
+    \begin{column}{0.44\textwidth}
+      \begin{block}{Output}
+\begin{lstlisting}[style=Pyout]
+n = 9: beta = 0.484, power = 0.516
+n = 36: beta = 0.021, power = 0.979
+\end{lstlisting}
+      \end{block}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \footnotesize Effect size $d=|\mu_1-\mu_0|/\sigma=2/3$.
+      \texttt{solve\_power} does the power analysis: $80\,\%$ power needs
+      at least $n=18$ bottles.
+    \end{column}
+  \end{columns}
+  \trynotebook{section 6.2 ``$\alpha$, $\beta$ and power''}
+\end{frame}
 \subsection{Exercises}
 
 \begin{frame}{Exercise -- compute $\beta$ and power (two-sided)}
@@ -3871,6 +4032,7 @@ math.ceil((1.96 * sigma / e)**2)  # n
   \texttt{"less"} or \texttt{"greater"}; \texttt{scale} in \texttt{stats.norm}
   is the \emph{standard deviation}; \texttt{confidence\_interval} returns the
   CI that matches the chosen direction.
+  \trynotebook{``Key Python commands'' at the end}
 \end{frame}
 
 \begin{frame}{Which procedure? -- decision tree}
@@ -4135,12 +4297,19 @@ print(np.round([A.mean(), B.mean(), C.mean(), D.mean()], 2))
 print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
 \end{lstlisting}
   \vspace{-4pt}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
 \begin{lstlisting}[style=Pyout]
 [49.95 49.95 49.95 37.47]
 [ 6.14 12.52  6.87  4.52]
 \end{lstlisting}
-  Simulation and theory agree: means $\approx50$ (except $D$: $37.5$),
-  variances $\approx6.25$, $12.5$, $7$, $4.69$.
+    \end{column}
+    \begin{column}{0.60\textwidth}
+      Simulation and theory agree: means $\approx50$ (except $D$:
+      $37.5$), variances $\approx6.25$, $12.5$, $7$, $4.69$.
+    \end{column}
+  \end{columns}
+  \trynotebook{section A.1 ``Properties of estimators''}
 \end{frame}
 
 \subsection{A.2 Law of large numbers}
