@@ -3,7 +3,7 @@
 
 Every number shown in a figure is computed here from the lecture data
 (lamp example, ../data/Advertising.csv, ../data/Credit.csv); simulated
-figures use a fixed seed. The colours are the HSBI palette of the shared
+figures use a fixed seed. The colours are the course palette of the shared
 preamble. Run from anywhere:
 
     python3 make_figures.py

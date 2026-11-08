@@ -5,7 +5,7 @@
 # Statistical Inference" (foundations: normal distribution and central
 # limit theorem; confidence intervals, hypothesis tests, p-values,
 # one-sided tests, types of error; appendix: law of large numbers) with
-# the HSBI colour palette.
+# the course colour palette.
 #
 # Output: images/*.png  (referenced by Part_3_Statistical_Inference.tex)
 #
@@ -24,7 +24,7 @@ from matplotlib.lines import Line2D
 from scipy import stats
 
 # --------------------------------------------------------------------
-# HSBI colour palette (matches the LaTeX \definecolor commands)
+# Course colour palette (matches the LaTeX \definecolor commands)
 # --------------------------------------------------------------------
 BLUE       = "#3333B2"   # hsbiblau
 BLUE_DARK  = "#1C1C6E"   # hsbiblaudunkel
