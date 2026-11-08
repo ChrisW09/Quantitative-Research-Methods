@@ -383,7 +383,7 @@ show("  margin of error 2.0639 * 8", stats.t.ppf(0.975, 24) * 8, ".2f")         
 # =====================================================================
 # 5 One-sided tests
 # =====================================================================
-header("5 One-sided tests")
+header("Appendix A.3-A.7 -- one-sided tests (moved to the appendix)")
 
 # Slides "Critical values" / t-table hint
 show("z_0.95", norm.ppf(0.95))                                 # 1.6449 (slides: 1.645)
@@ -483,9 +483,9 @@ show("one-sided 95% CI: upper bound 46.4 + 1.7531 * 0.8",
 show("two-sided p (for comparison)", 2 * stats.t.cdf(t_l, 15))  # 0.0639
 
 # =====================================================================
-# 6 Types of error: beta and power
+# 5 Types of error (beta and power: Appendix A.8)
 # =====================================================================
-header("6 Types of error")
+header("5 Types of error (power: Appendix A.8)")
 
 # Slide "Computing beta concretely -- milk":
 # H0 mu = 1000, sigma = 3, n = 9 (SE = 1), true mu1 = 1002

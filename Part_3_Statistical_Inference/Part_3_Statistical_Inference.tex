@@ -5,8 +5,8 @@
 \newcommand{\notebookpath}{Part_3_Statistical_Inference/Part_3_Statistical_Inference.ipynb}
 
 \subtitle{Part 3: Statistical Inference}
-\newcommand{\overviewleft}{1-4}
-\newcommand{\overviewright}{5-7}
+\newcommand{\overviewleft}{1-3}
+\newcommand{\overviewright}{4-6}
 
 \begin{document}
 
@@ -29,10 +29,10 @@
 \begin{frame}{Contents -- Part 3}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
-      \tableofcontents[hideallsubsections,sections={1-4}]
+      \tableofcontents[hideallsubsections,sections={1-3}]
     \end{column}
     \begin{column}{0.5\textwidth}
-      \tableofcontents[hideallsubsections,sections={5-7}]
+      \tableofcontents[hideallsubsections,sections={4-6}]
     \end{column}
   \end{columns}
   \trynotebook{all examples and exercises}
@@ -87,15 +87,14 @@
         \item compute and correctly interpret a \textbf{confidence interval}
               for $\mu$ -- and plan the \textbf{sample size} it needs,
         \item carry out a \textbf{hypothesis test} (known/unknown
-              variance, one-/two-sided),
+              variance),
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{itemize}\setlength{\itemsep}{0pt}
         \item compute the \textbf{$p$-value} and read it as a measure of
               evidence,
-        \item distinguish \textbf{Type I and Type II errors} as well as the
-              \textbf{power} of a test,
+        \item distinguish \textbf{Type I and Type II errors},
         \item read \textbf{critical values} from the $z$- and $t$-tables and
               link them to the $p$-value,
         \item implement every procedure in Python
@@ -105,7 +104,7 @@
   \end{columns}
   \kernaussage{Common thread: infer from a sample -- and report the
   uncertainty honestly.}
-  \appendixnote{properties of estimators, law of large numbers}
+  \appendixnote{estimators, law of large numbers, one-sided tests, power}
 \end{frame}
 
 % ============================================================================
@@ -226,7 +225,7 @@
   \kernaussage{The sample figures serve as \textbf{estimates} of the model
   parameters: $\hat\mu=\bar x$, \ $\hat\sigma^2=s^2$. Inference asks how far
   such an estimate can be off.}
-  \appendixnote{properties of estimators, law of large numbers}
+  \appendixnote{estimators, law of large numbers, one-sided tests, power}
 \end{frame}
 \note{Talk track: everything in Parts 1--2 lived in the left box. This part
 needs the right box, because the question ``how far can $\bar x$ be from
@@ -273,7 +272,6 @@ come back in regression ($\hat\beta_1$).}
   \begin{columns}[T]
     \begin{column}{0.44\textwidth}
       \begin{block}{Linear transformation}
-        \vspace{-4pt}
         \begin{align*}
           E(a+bX)&=a+b\,E(X)\\
           \mathrm{Var}(a+bX)&=b^2\,\mathrm{Var}(X)
@@ -283,7 +281,6 @@ come back in regression ($\hat\beta_1$).}
     \end{column}
     \begin{column}{0.52\textwidth}
       \begin{block}{Sums}
-        \vspace{-4pt}
         \begin{align*}
           E(X+Y)&=E(X)+E(Y) && \text{\scriptsize always}\\
           \mathrm{Var}(X+Y)&=\mathrm{Var}(X)+\mathrm{Var}(Y) && \text{\scriptsize if independent}
@@ -292,7 +289,6 @@ come back in regression ($\hat\beta_1$).}
       \end{block}
     \end{column}
   \end{columns}
-  \medskip
   \textbf{Applied to the sample mean} of i.i.d.\ $X_1,\dots,X_n$ with
   $E(X_i)=\mu$, $\mathrm{Var}(X_i)=\sigma^2$:
   \[
@@ -399,7 +395,6 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -> 2.7 0
   \begin{columns}[T]
     \begin{column}{0.46\textwidth}
       \begin{block}{Density of $X\sim N(\mu,\sigma^2)$}
-        \vspace{-2pt}
         \[ f(x)=\frac{1}{\sqrt{2\pi}\,\sigma}\;e^{-\frac{(x-\mu)^2}{2\sigma^2}},
            \quad x\in\mathbb{R} \]
         \vspace{-12pt}
@@ -435,7 +430,6 @@ the second argument is the variance; scipy's \texttt{scale} is $\sigma$.}
     \]
   \end{block}
   \begin{exampleblock}{Milk: a single bottle, $X\sim N(1000,\,3^2)$}
-    \vspace{-6pt}
     \[
       P(X\le 997)=P\Bigl(Z\le\tfrac{997-1000}{3}\Bigr)=\Phi(-1)
       =1-\Phi(1)=1-0.8413=\mathbf{0.1587}
@@ -1295,27 +1289,6 @@ interpretation.}
   one} interval: $\mu$ is fixed, the \textbf{interval} is what is random.}
 \end{frame}
 
-\begin{frame}{Do not confuse: CI vs.\ fluctuation interval}
-  \begin{columns}[T]
-    \begin{column}{0.60\textwidth}
-      \includegraphics[width=\textwidth,height=0.64\textheight,keepaspectratio]{images/ci_vs_fluctuation.png}
-    \end{column}
-    \begin{column}{0.38\textwidth}
-      \small
-      \begin{itemize}\setlength{\itemsep}{5pt}
-        \item \textbf{Fluctuation interval:} spread of \emph{individual} values
-              $X_i$ around $\mu$ -- uses $\sigma$ (wide).
-        \item \textbf{Confidence interval:} uncertainty about $\mu$ -- uses
-              $\sigma/\sqrt{n}$ (narrow). It is exactly as wide as the
-              fluctuation of $\bar X$ (blue arrow), but centred at $\bar x$,
-              not at $\mu$.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \inworten{Same width as the blue arrow, but a different question: ``Where is
-  $\mu$?'' instead of ``How much does a single value scatter?''}
-\end{frame}
-
 % ---- Exercise: reading a CI correctly (SfOe Teil 6) ------------------------------
 \begin{frame}{Exercise -- reading a confidence interval correctly}
   \begin{block}{Problem statement}
@@ -2011,7 +1984,7 @@ bar. Anchor: the acceptance region is everything inside the bar(s).}
 calibration. Point 1 is the one most often violated in practice (convenience
 samples, duplicated units). For point 2, with $n=9$ as in the milk example we
 genuinely rely on approximate normality of fill volumes; mention a histogram
-or QQ-plot as the quick diagnostic. Point 4 anticipates the one-sided section:
+or QQ-plot as the quick diagnostic. Point 4 anticipates the one-sided tests (appendix):
 direction-after-data doubles the true $\alpha$.}
 
 \subsection{Tests with Python}
@@ -2117,7 +2090,7 @@ from memory, they have understood the classical test.}
     \emph{Outlook:} had the question -- \emph{before} collecting the data --
     declared only a \emph{shorter} reaction time relevant, a left-sided test
     would have been appropriate, and it would decide differently here (see the
-    one-sided exercises). The direction must never be chosen \emph{afterwards}
+    one-sided exercises in the appendix). The direction must never be chosen \emph{afterwards}
     because $\bar x<\mu_0$.
   \end{exampleblock}
 \end{frame}
@@ -2771,11 +2744,574 @@ the $p$-value; forgetting $\sqrt n$ ($Z_n=12/40=0.3$); reading the CI as
 ``$\mu$ lies inside with $95\,\%$ probability''.}
 
 % ============================================================================
-% SECTION 5: ONE-SIDED TESTS
+% SECTION 5: TYPES OF ERROR
 % ============================================================================
-\section[One-sided]{One-Sided Tests}
+\section[Errors]{Types of Error}
 
-\subsection{Motivation}
+\subsection{The two types of error}
+
+\begin{frame}{Two ways to be wrong}
+  \begin{block}{Intuition}
+    Like a smoke detector, we can be wrong in two ways:
+    \textbf{false alarm} or \textbf{missed fire}.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{lcc}
+      \toprule
+       \textbf{Decision} & \textbf{$H_0$ true} & \textbf{$H_0$ false}\\
+      \midrule
+      reject $H_0$
+        & \cellcolor{hsbirot!20}\,Type I error ($\alpha$)\,
+        & \cellcolor{green!18}\,correct (power $1-\beta$)\,\\
+      keep $H_0$
+        & \cellcolor{green!18}\,correct ($1-\alpha$)\,
+        & \cellcolor{hsbiorange!28}\,Type II error ($\beta$)\,\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \footnotesize \textbf{Type I error} = false alarm (reject although $H_0$ is
+  true). \quad \textbf{Type II error} = miss (keep although $H_1$ is true).
+\end{frame}
+\note{Talk track: build the table column by column -- ``first fix the TRUE
+state of the world (column), then look at what our test DID (row).'' Smoke
+detector: too sensitive = many false alarms (Type I); too sluggish = missed
+fire (Type II). Make students say which error the milk test could have made
+(it kept $H_0$, so only a Type II is possible). Common confusion: thinking
+both errors can occur in the same test run -- only one column is ever real.}
+
+\begin{frame}{$\alpha$ and $\beta$ in a picture}
+  \begin{columns}[T]
+    \begin{column}{0.62\textwidth}
+      \includegraphics[width=\textwidth,height=0.64\textheight,keepaspectratio]{images/error_alpha_beta.png}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      \footnotesize
+      \begin{itemize}\setlength{\itemsep}{4pt}
+        \item The two curves show the \emph{standardised} $\bar X$ in each
+              ``world'': left centred at $\mu_0$ (value $0$, if $H_0$ holds),
+              right at the true $\mu_1$ (here $2.6$ standard errors above
+              $\mu_0$, if $H_1$); the red line is the critical value of a
+              right-sided test ($1.645$).
+        \item \textcolor{hsbiorange!85!black}{$\alpha$}: $H_0$ true, but
+              beyond the critical value.
+        \item \textcolor{hsbiblau}{$\beta$}: $H_1$ true, but on this side.
+        \item The distributions overlap -- both errors cannot be $0$ at once.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\subsection{\texorpdfstring{$\alpha$ and $\beta$}{alpha and beta}}
+
+\begin{frame}{Type I error ($\alpha$) -- controllable}
+  \begin{block}{Definition}
+    \[
+      P(\text{reject } H_0 \mid H_0 \text{ true}) = \alpha
+    \]
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Directly controllable} through the choice of $\alpha$
+          (typically $0.05$).
+    \item In $5\,\%$ of cases a \emph{true} $H_0$ is wrongly rejected.
+  \end{itemize}
+  \begin{exampleblock}{Milk}
+    $H_0:\mu=1000$ is true, yet the test rejects (false alarm) --
+    probability $=\alpha$.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Type II error ($\beta$) -- only indirectly influenced}
+  \begin{block}{Definition (at a specific alternative $\mu_1$)}
+    \[
+      P(\text{keep } H_0 \mid \mu = \mu_1) = \beta
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item No \emph{direct} lever; $\beta$ depends on:
+          \begin{itemize}\footnotesize
+            \item $\alpha$, sample size $n$, spread $\sigma^2$,
+            \item true deviation $|\mu-\mu_0|$ (effect size).
+          \end{itemize}
+    \item At a fixed $\mu_1$: smaller $\alpha$ $\Rightarrow$ higher bar
+          $\Rightarrow$ more misses ($\beta$ \emph{rises}); \ larger $n$
+          $\Rightarrow$ smaller SE $\Rightarrow$ $\beta$ \emph{falls}.
+  \end{itemize}
+  \kernaussage{Power $=1-\beta$: the ability to actually reject a
+  \emph{false} $H_0$.}
+\end{frame}
+
+\begin{frame}{Only one error is controllable}
+  \textbf{Question:} Which error can we only make when we \emph{reject} $H_0$?
+  \begin{block}{Answer}
+    The Type I error -- and that is exactly the one we control via $\alpha$.
+  \end{block}
+  \begin{alertblock}{Consequence for the choice of hypotheses}
+    This is why the claim you want to \emph{establish} goes into $H_1$ (rule of
+    thumb from above): wrongly declaring it ``established'' -- rejecting $H_0$
+    although $H_0$ holds -- is the costly mistake, and exactly this one is the
+    controllable Type~I error.
+  \end{alertblock}
+\end{frame}
+
+% ---- beta and power with Python ----------------------------------------------------
+% ============================================================================
+% SECTION 7: SUMMARY
+% ============================================================================
+\section[Summary]{Summary}
+
+\begin{frame}{Summary 1 -- foundations}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Normal distribution}
+        $X\sim N(\mu,\sigma^2)$ \ $\Rightarrow$ \
+        $Z=\dfrac{X-\mu}{\sigma}\sim N(0,1)$\\[4pt]
+        $P(X\le x)=\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$, \quad
+        $\Phi(-z)=1-\Phi(z)$\\[4pt]
+        quantile: $x_p=\mu+\sigma\,z_p$, \quad $z_{0.975}=1.96$
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Sampling distribution of $\bar X$}
+        $E(\bar X)=\mu$, \quad $\mathrm{Var}(\bar X)=\sigma^2/n$, \quad
+        $\mathrm{SE}=\sigma/\sqrt n$\\[4pt]
+        normal data: $\bar X\sim N(\mu,\sigma^2/n)$ exactly;\\[2pt]
+        otherwise (CLT, $n\gtrsim30$): approximately.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \kernaussage{Every interval and test in this part \emph{standardises}
+  $\bar X$ with its standard error -- and the CLT makes this work even for
+  non-normal data.}
+\end{frame}
+
+\begin{frame}{Summary 2 -- confidence intervals}
+  \begin{block}{Known variance $\sigma$ \quad ($Z_n\sim N(0,1)$)}
+    \[
+      \text{CI}_{1-\alpha} =
+      \left[\bar{X}-z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}},\;
+            \bar{X}+z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}}\right]
+    \]
+  \end{block}
+  \begin{block}{Unknown variance \quad ($T_n\sim t_{n-1}$)}
+    \[
+      \text{CI}_{1-\alpha} =
+      \left[\bar{X}-t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}},\;
+            \bar{X}+t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}}\right]
+    \]
+  \end{block}
+  \textbf{Sample size} for a margin of error $e$ (known $\sigma$):
+  \ $n\ge\bigl(z_{1-\alpha/2}\,\sigma/e\bigr)^2$, rounded up.
+\end{frame}
+
+\begin{frame}{Summary 3 -- hypothesis test (two-sided)}
+  $H_0:\mu=\mu_0$ vs.\ $H_1:\mu\ne\mu_0$
+  \begin{block}{Test statistics}
+    \[
+      Z_n = \frac{\bar{X}-\mu_0}{\sigma/\sqrt{n}}\sim N(0,1),\qquad
+      T_n = \frac{\bar{X}-\mu_0}{s/\sqrt{n}}\sim t_{n-1}
+      \qquad(\text{under } H_0)
+    \]
+  \end{block}
+  \begin{alertblock}{Decision}
+    Reject if $|Z_n|>z_{1-\alpha/2}$ ($\sigma$ known) or
+    $|T_n|>t_{1-\alpha/2,\,n-1}$ ($\sigma$ unknown).
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Summary 4 -- the $p$-value}
+  \begin{block}{One idea behind every formula}
+    $p$ = probability, \emph{if $H_0$ were true}, of a value \textbf{at least as
+    extreme as observed} -- in the direction(s) that $H_1$ allows.
+  \end{block}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{4.2cm}c}
+      \toprule
+      \textbf{If $H_1$ is\ldots} & \textbf{add up the\ldots} & \textbf{$p$ \ (unknown $\sigma$)}\\
+      \midrule
+      $\mu\neq\mu_0$ & \emph{both} tails beyond $|T_n|$ & $2\,F_{t,n-1}(-|T_n|)$\\
+      $\mu<\mu_0$ (left)  & \emph{lower} tail below $T_n$ & $F_{t,n-1}(T_n)$\\
+      $\mu>\mu_0$ (right) & \emph{upper} tail above $T_n$ & $1-F_{t,n-1}(T_n)$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \footnotesize \textbf{Known $\sigma$?} Just replace $T_n\to Z_n$ and
+  $F_{t,n-1}\to\Phi$. \quad \textbf{Decide:} $p<\alpha \Rightarrow$ reject $H_0$.
+\end{frame}
+
+\begin{frame}{Summary 5 -- types of error}
+  \begin{block}{Types of error}
+    $P(\text{reject } H_0\mid \mu=\mu_0)= \alpha$ \quad
+    $P(\text{keep } H_0\mid \mu=\mu_1)= \beta$ \\
+    $\alpha$ is \emph{controllable}; $\beta$ falls with $n\uparrow$ and $\alpha\uparrow$;
+    power $=1-\beta$.
+  \end{block}
+  {\footnotesize One-sided tests and the power of a test: Appendix A.3--A.8.\par}
+\end{frame}
+
+\begin{frame}[fragile]{Summary 6 -- important Python commands}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Distributions}
+\begin{lstlisting}
+from scipy import stats
+stats.norm.cdf(1.96)          # Phi(z)
+stats.norm.sf(1.96)           # 1 - Phi(z)
+stats.norm.ppf(0.975)         # z_p
+stats.norm.cdf(997, 1000, 3)  # P(X<=x)
+stats.t.cdf(-2.11, df=15)     # F_t,df(t)
+stats.t.ppf(0.975, df=8)      # t_p,df
+\end{lstlisting}
+      \end{block}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Tests, intervals, sample size}
+\begin{lstlisting}
+res = stats.ttest_1samp(x, popmean=1000)
+res = stats.ttest_1samp(x, 1000,
+                        alternative="less")
+res.statistic, res.df, res.pvalue
+res.confidence_interval(0.95)   # CI
+2 * stats.norm.sf(abs(z))       # z-test p
+math.ceil((1.96 * sigma / e)**2)  # n
+\end{lstlisting}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \footnotesize \texttt{alternative} is \texttt{"two-sided"} (default),
+  \texttt{"less"} or \texttt{"greater"}; \texttt{scale} in \texttt{stats.norm}
+  is the \emph{standard deviation}; \texttt{confidence\_interval} returns the
+  CI that matches the chosen direction.
+  \trynotebook{Key Python commands}
+\end{frame}
+
+\begin{frame}{Which procedure? -- decision tree}
+  \centering
+  \begin{tikzpicture}[node distance=5mm and 9mm]
+    \node[flowbox, text width=2.7cm] (q) {\footnotesize \textbf{Question?}};
+    \node[flowboxo, text width=3.3cm, above right=3mm and 12mm of q] (ki)
+      {\footnotesize \textbf{Range for $\mu$}\\ $\Rightarrow$ confidence interval};
+    \node[flowboxo, text width=2.9cm, below right=3mm and 12mm of q] (test)
+      {\footnotesize \textbf{Is $\mu_0$ compatible?}\\ $\Rightarrow$ hypothesis test};
+    \node[flowboxg, text width=3.4cm, right=10mm of test] (sub)
+      {\footnotesize $\sigma$ known $\to z$, else $t$;\\ two-sided\\ (one-sided: appendix)};
+    \node[flowboxg, text width=3.4cm, right=10mm of ki] (nn)
+      {\footnotesize precision fixed in advance?\\ plan $n\ge(z_{1-\alpha/2}\,\sigma/e)^2$};
+    \draw[flowarr] (q) -- (ki); \draw[flowarr] (q) -- (test);
+    \draw[flowarr] (test) -- (sub); \draw[flowarr] (ki) -- (nn);
+  \end{tikzpicture}
+  \par\vspace{0.4em}
+  {\footnotesize The same logic -- \emph{standardise}, then ask whether the
+  deviation is extreme \emph{in the $H_1$ direction} -- underlies essentially
+  every classical test: $z$, $t$, proportion, regression coefficient, ANOVA
+  $F$.}
+  \kernaussage{First clarify the \emph{question}, then choose the tool.}
+\end{frame}
+
+% ---- Final checklist: classic pitfalls --------------------------------------
+\begin{frame}{Five classic pitfalls -- final checklist}
+  \small
+  \begin{center}
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.7cm}@{}}
+      \toprule
+      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
+      \textbf{Correct version \ \textcolor{green!55!black}{$\checkmark$}}\\
+      \midrule
+      ``$p$ is the probability that $H_0$ is true.'' &
+        $p = P(\text{data at least this extreme} \mid H_0)$.\\
+      ``$\mu$ lies in \emph{this} CI with $95\,\%$ probability.'' &
+        The \emph{procedure} covers $\mu$ in $95\,\%$ of samples.\\
+      ``$p > \alpha$, so $H_0$ is proven/accepted.'' &
+        No contradiction found -- $H_0$ is \emph{kept}, not proven.\\
+      ``The data point left, so I test left-sided.'' &
+        Direction and $\alpha$ are fixed \emph{before} the data.\\
+      ``Significant, hence large and important.'' &
+        Significance $\neq$ size: judge magnitude by the CI.\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+\note{Talk track: close the lecture with this table -- each row condenses one
+dedicated slide of this part. Exam relevance: these five formulations are
+exactly the distractors used in multiple-choice questions. Have students
+correct each forbidden sentence aloud in their own words.}
+
+\begin{frame}{Outlook: Part 4 -- Regression}
+  \begin{block}{What we have so far}
+    Confidence intervals and tests for \textbf{one} population mean $\mu$:
+    estimate, standard error, critical value -- and the $p$-value.
+  \end{block}
+  \begin{block}{Next part}
+    We study the \textbf{relationship between variables}. The regression
+    slope $\hat\beta_1$ is again an estimator with a standard error, so
+    the \emph{same} recipe gives its $t$-test, its confidence interval and
+    its $p$-value:
+    \[
+      T=\frac{\text{estimate}-\text{hypothesised value}}{\text{standard error}}.
+    \]
+  \end{block}
+  \kernaussage{Everything in this part carries over one-to-one to the
+  coefficients of a regression model.}
+\end{frame}
+
+
+% ============================================================================
+% APPENDIX: ESTIMATORS AND THE LAW OF LARGE NUMBERS
+% ============================================================================
+\appendix
+\let\overviewleft\undefined
+\section[Appendix]{Appendix: Optional and Advanced Material}
+
+\begin{frame}{Appendix -- what is in here, and why}
+  \begin{block}{Optional material}
+    The main part of this deck is self-contained. The appendix adds theory
+    behind it and two extensions of the test: one-sided tests and power.
+  \end{block}
+  \begin{center}
+    \small\renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{9.4cm}@{}}
+      \toprule
+      \textbf{Topic} & \textbf{Content}\\
+      \midrule
+      A.1 Estimators & What makes a good estimator: unbiasedness, efficiency,
+        consistency; why $s^2$ divides by $n-1$; exercise\\
+      A.2 Law of large numbers & Why $\bar x$ settles down at $\mu$ -- and why
+        relative frequencies justify the frequentist view\\
+      A.3--A.7 One-sided tests & Direction, critical values, one-sided
+        $p$-values and CIs; exercises\\
+      A.8 Power & $\beta$ and power $1-\beta$, levers for more power; exercises\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\subsection{A.1 Properties of estimators}
+
+\begin{frame}{What makes a good estimator? -- the target picture}
+  \begin{center}
+    \resizebox{!}{0.70\textheight}{%
+    \begin{tikzpicture}[font=\scriptsize,
+        shot/.style={fill=hsbiblau,draw=hsbiblaudunkel,circle,inner sep=1pt}]
+      \foreach \cx/\cy/\ttl in {%
+          0/0/{unbiased \& efficient},
+          5.4/0/{biased \& efficient},
+          0/-3.9/{unbiased \& inefficient},
+          5.4/-3.9/{biased \& inefficient}}{
+        \begin{scope}[shift={(\cx,\cy)}]
+          \foreach \r in {0.45,0.9,1.35}{\draw[hsbigrau] (0,0) circle (\r);}
+          \draw[hsbirot,thick] (-0.18,0)--(0.18,0) (0,-0.18)--(0,0.18);
+          \node[anchor=base,font=\footnotesize\bfseries] at (0,-1.83) {\ttl};
+        \end{scope}
+      }
+      \foreach \x/\y in {0.05/0.08,-0.1/0.02,0.08/-0.06,-0.04/-0.12,0.12/0.05,0/-0.02}{\node[shot] at (\x,\y){};}
+      \begin{scope}[shift={(5.4,0)}]
+        \foreach \x/\y in {0.55/0.5,0.66/0.42,0.58/0.6,0.7/0.5,0.5/0.42,0.62/0.55}{\node[shot] at (\x,\y){};}
+      \end{scope}
+      \begin{scope}[shift={(0,-3.9)}]
+        \foreach \x/\y in {0.35/0.55,-0.55/0.2,0.1/-0.6,-0.35/-0.35,0.6/-0.1,-0.1/0.45}{\node[shot] at (\x,\y){};}
+      \end{scope}
+      \begin{scope}[shift={(5.4,-3.9)}]
+        \foreach \x/\y in {0.4/0.85,0.95/0.3,0.3/0.15,0.85/0.7,1.05/0.5,0.5/0.55}{\node[shot] at (\x,\y){};}
+      \end{scope}
+    \end{tikzpicture}}
+  \end{center}
+  {\footnotesize Each dot $=$ the estimate from \emph{one} sample; red cross
+  $=$ the true value $\theta$. Unbiased $=$ centred on the cross; efficient $=$
+  tightly clustered.}
+\end{frame}
+
+\begin{frame}{Properties of estimators -- the formal criteria}
+  \small
+  An \textbf{estimator} $\hat\theta=\hat\theta(X_1,\dots,X_n)$ is a random
+  variable; its value for the observed sample is the \emph{estimate}.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}p{3.7cm}l@{}}
+      \toprule
+      \textbf{Property} & \textbf{Formal definition}\\
+      \midrule
+      Unbiasedness & $E(\hat\theta)=\theta$\\
+      Bias & $\mathrm{Bias}(\hat\theta)=E(\hat\theta)-\theta$\\
+      Asymptotic unbiasedness & $\lim_{n\to\infty}E(\hat\theta_n)=\theta$\\
+      Efficiency & $\mathrm{Var}(\hat\theta)<\mathrm{Var}(\hat\theta^{*})$
+        \quad (both unbiased)\\
+      Consistency & $\hat\theta_n\xrightarrow{P}\theta$, i.e.\
+        $\lim_{n\to\infty}P\bigl(|\hat\theta_n-\theta|>c\bigr)=0$ for every $c>0$\\
+      \quad sufficient for it & $\lim_{n\to\infty}E(\hat\theta_n)=\theta$ \ and \
+        $\lim_{n\to\infty}\mathrm{Var}(\hat\theta_n)=0$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{\textbf{unbiased} $=$ right on average; \textbf{efficient} $=$
+  small spread; \textbf{consistent} $=$ arbitrarily precise as $n$ grows. The
+  sample mean $\bar X$ is unbiased and consistent, and the most efficient of
+  all unbiased weighted averages $\sum a_iX_i$.}
+\end{frame}
+
+\begin{frame}{Why divide by $n-1$ in $s^2$?}
+  \begin{block}{Sample variance -- unbiased}
+    \[
+      s^2=\frac{1}{n-1}\sum_{i=1}^n\bigl(X_i-\bar X\bigr)^2,
+      \qquad E(s^2)=\sigma^2 .
+    \]
+  \end{block}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item We measure the spread around the \emph{estimated} mean $\bar X$,
+          which sits in the middle of the data -- so the squared deviations
+          come out \textbf{systematically too small}.
+    \item Dividing by $n$ would give
+          $E\bigl(\tfrac1n\sum(X_i-\bar X)^2\bigr)=\tfrac{n-1}{n}\,\sigma^2$
+          -- biased downwards; dividing by $n-1$ corrects exactly this.
+    \item Estimating $\mu$ ``uses up'' one degree of freedom -- the same $n-1$
+          as in $t_{n-1}$.
+  \end{itemize}
+  \begin{exampleblock}{Simulation: $100\,000$ samples of size $n=4$ from
+    $N(50,\,5^2)$, i.e.\ $\sigma^2=25$}
+    Average of $s^2$ with $n-1$: $\mathbf{24.97}$ \quad vs.\quad with $n$:
+    $\mathbf{18.73}$ \ ($\approx\tfrac34\cdot25=18.75$).
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Exercise -- properties of estimators: egg weight}
+  \begin{block}{Problem statement}
+    A farmer draws $n=4$ eggs randomly and independently from a flock with
+    $\mu=50$\,g and $\sigma^2=25$\,g$^2$. Four estimators of $\mu$ are
+    proposed:
+    \[
+      \hat\mu_A=\frac{X_1+X_2+X_3+X_4}{4},\qquad
+      \hat\mu_B=\frac{X_1+X_4}{2},
+    \]
+    \[
+      \hat\mu_C=\frac{X_1+2X_2+X_3+X_4}{5},\qquad
+      \hat\mu_D=\frac{X_1+X_2+X_3}{4}.
+    \]
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item[a)] Which estimators are unbiased? Give the expected value and, if
+              any, the bias.
+    \item[b)] Compute the variance of the four estimators.
+    \item[c)] Which estimator should the farmer use? Argue with the criteria.
+    \item[d)] Let $n$ grow ($\hat\mu_A=\bar X_n$, $\hat\mu_B=\tfrac{X_1+X_n}{2}$):
+              which of the two is consistent?
+  \end{enumerate}
+\end{frame}
+\note{Talk track (optional material): the rules for $E$ and $\mathrm{Var}$
+from the foundations are all that is needed. The lesson of c): unbiasedness
+comes first, then efficiency -- a tiny variance does not help an estimator
+that aims at the wrong value.}
+
+\begin{frame}{Solution (1/2) -- egg weight: expected values and variances}
+  \textbf{Rules:} $E\bigl(\sum a_iX_i\bigr)=\mu\sum a_i$; \ for independent
+  $X_i$: $\mathrm{Var}\bigl(\sum a_iX_i\bigr)=\sigma^2\sum a_i^2$ \ (here
+  $\mu=50$, $\sigma^2=25$).
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{@{}lllll@{}}
+      \toprule
+      & \textbf{weights $a_i$} & \textbf{$E(\hat\mu)$} & \textbf{Bias}
+        & \textbf{$\mathrm{Var}(\hat\mu)$}\\
+      \midrule
+      $\hat\mu_A$ & $\tfrac14,\tfrac14,\tfrac14,\tfrac14$ & $50$ & $0$
+        & $\tfrac{4}{16}\cdot25=\mathbf{6.25}$\\
+      $\hat\mu_B$ & $\tfrac12,0,0,\tfrac12$ & $50$ & $0$
+        & $\tfrac{2}{4}\cdot25=\mathbf{12.5}$\\
+      $\hat\mu_C$ & $\tfrac15,\tfrac25,\tfrac15,\tfrac15$ & $50$ & $0$
+        & $\tfrac{1+4+1+1}{25}\cdot25=\mathbf{7}$\\
+      $\hat\mu_D$ & $\tfrac14,\tfrac14,\tfrac14,0$ & $\tfrac34\cdot50=37.5$
+        & $\mathbf{-12.5}$ & $\tfrac{3}{16}\cdot25=\mathbf{4.6875}$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \inworten{a) $A$, $B$, $C$ are unbiased (weights sum to $1$); $D$
+  underestimates the egg weight \emph{systematically} by $12.5$\,g (weights
+  sum to only $\tfrac34$).}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/2) -- egg weight: choice and consistency}
+  \small
+  \textbf{c)} Among the \emph{unbiased} estimators, $\hat\mu_A=\bar X_4$ has
+  the smallest variance -- it is \textbf{efficient}. $\hat\mu_D$ scatters even
+  less but aims systematically at the wrong value: \textbf{use $\bar X_4$.}\\[2pt]
+  \textbf{d)} $\bar X_n$: unbiased and $\mathrm{Var}=\sigma^2/n\to0$
+  $\Rightarrow$ \textbf{consistent}. \ $\tfrac{X_1+X_n}{2}$: unbiased, but
+  $\mathrm{Var}=\sigma^2/2=12.5$ for \emph{every} $n$ (ignores $n-2$ eggs)
+  $\Rightarrow$ \textbf{not consistent}.
+\begin{lstlisting}
+import numpy as np
+rng = np.random.default_rng(1)
+m = rng.normal(50, 5, size=(10_000, 4))       # 10 000 samples of 4 eggs
+A = m.mean(axis=1)
+B = (m[:, 0] + m[:, 3]) / 2
+C = (m[:, 0] + 2 * m[:, 1] + m[:, 2] + m[:, 3]) / 5
+D = (m[:, 0] + m[:, 1] + m[:, 2]) / 4
+print(np.round([A.mean(), B.mean(), C.mean(), D.mean()], 2))
+print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
+\end{lstlisting}
+  \vspace{-4pt}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+\begin{lstlisting}[style=Pyout]
+[49.95 49.95 49.95 37.47]
+[ 6.14 12.52  6.87  4.52]
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.60\textwidth}
+      Simulation and theory agree: means $\approx50$ (except $D$:
+      $37.5$), variances $\approx6.25$, $12.5$, $7$, $4.69$.
+    \end{column}
+  \end{columns}
+  \trynotebook{section A.1}
+\end{frame}
+
+\subsection{A.2 Law of large numbers}
+
+\begin{frame}{The law of large numbers -- intuition}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+      \small
+      \textbf{Die example:} a fair die has $E(X)=3.5$. After a few rolls the
+      running mean $\bar x_n$ still jumps around; after many rolls it settles
+      down at $3.5$.
+      \kernaussage{The sample mean $\bar X_n$ gets ever more
+      \textbf{reliably close} to the expected value as $n$ grows.}
+    \end{column}
+    \begin{column}{0.62\textwidth}
+      \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{images/lln_running_mean.png}
+    \end{column}
+  \end{columns}
+  \vspace{2pt}
+  {\footnotesize Twelve sequences of die rolls (grey), one highlighted (blue).
+  The funnel $\mu\pm1.96\,\sigma/\sqrt n$ narrows: $\pm1.06$ at $n=10$,
+  $\pm0.33$ at $n=100$, $\pm0.11$ at $n=1000$.}
+\end{frame}
+
+\begin{frame}{The law of large numbers -- formal statement}
+  \begin{block}{Weak law of large numbers}
+    For i.i.d.\ $X_i$ with $E(X_i)=\mu$ and $\mathrm{Var}(X_i)=\sigma^2<\infty$:
+    \[
+      \lim_{n\to\infty}P\bigl(|\bar X_n-\mu|>c\bigr)=0
+      \quad\text{for every } c>0,
+      \qquad\text{i.e.}\quad \bar X_n\xrightarrow{\;P\;}\mu .
+    \]
+  \end{block}
+  \inworten{Choose any tolerance $c$, however small: the probability that
+  $\bar X_n$ misses $\mu$ by more than $c$ goes to zero.}\par
+  {\small \textbf{Why?} Chebyshev's inequality:
+  $P(|\bar X_n-\mu|>c)\le\mathrm{Var}(\bar X_n)/c^2=\sigma^2/(n\,c^2)\to0$.\par}
+  \begin{exampleblock}{Special case: relative frequencies (Bernoulli)}
+    $X_i=1$ if an event occurs (probability $p$), else $0$: then $\bar X_n$ is
+    the event's \emph{relative frequency}, and $\bar X_n\xrightarrow{P}p$ --
+    the basis of the \textbf{frequentist} view used throughout this part.
+  \end{exampleblock}
+  {\footnotesize LLN: $\bar X_n$ approaches $\mu$. \ CLT: how the remaining
+  fluctuation around $\mu$ is distributed.}
+\end{frame}
+
+% ---- A.3--A.7: one-sided tests (moved from the main part) ----
+
+\subsection{A.3 One-sided tests: motivation}
 
 \begin{frame}{When only one direction matters}
   \begin{block}{The idea}
@@ -3139,7 +3675,7 @@ ability to detect the other way.}
   direction really does not matter.}
 \end{frame}
 
-\subsection{Left- and right-sided}
+\subsection{A.4 Left- and right-sided tests}
 
 \begin{frame}{Left-sided test -- consumer protection}
   \begin{block}{Task}
@@ -3260,7 +3796,7 @@ the acceptance region in the types-of-error section later.}
   \end{alertblock}
 \end{frame}
 
-\subsection{One-sided \texorpdfstring{$p$}{p}-value}
+\subsection{A.5 One-sided \texorpdfstring{$p$}{p}-values}
 
 \begin{frame}{One-sided $p$-value -- formulas}
   \begin{columns}[T]
@@ -3378,7 +3914,7 @@ t = -2.1086, df = 15, p = 0.0261
       \texttt{"greater"}).
     \end{column}
   \end{columns}
-  \trynotebook{section 5.3}
+  \trynotebook{section A.5}
 \end{frame}
 
 \begin{frame}{Exercise -- one- vs.\ two-sided on the same data}
@@ -3410,7 +3946,7 @@ t = -2.1086, df = 15, p = 0.0261
   fixed before seeing the data.}
 \end{frame}
 
-\subsection{One-sided confidence intervals}
+\subsection{A.6 One-sided confidence intervals}
 
 \begin{frame}{One-sided confidence intervals}
   \begin{itemize}
@@ -3445,7 +3981,7 @@ t = -2.1086, df = 15, p = 0.0261
   \end{align*}
   \inworten{If $\mu_0$ lies beyond the single bound, $H_0$ is rejected.}
 \end{frame}
-\subsection{Exercises}
+\subsection{A.7 Exercises on one-sided tests}
 
 \begin{frame}{Exercise -- net weight (left-sided, unknown $\sigma$)}
   \begin{block}{Problem statement}
@@ -3534,7 +4070,7 @@ print(f"{t:.2f} {stats.t.sf(t, df=24):.4f} {stats.norm.sf(t):.4f}")
   Normal approximation: $p\approx1-\Phi(2.60)=1-0.9953=\mathbf{0.0047}$ --
   smaller than the exact $0.0079$, because the $t$-distribution has heavier
   tails. Both are far below $0.05$: same decision.
-  \trynotebook{section 5.5}
+  \trynotebook{section A.7}
 \end{frame}
 
 \begin{frame}{Solution (3/3) -- muesli: CI and duality}
@@ -3633,7 +4169,7 @@ print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sid
       alternative="less")} and \texttt{.confidence\_interval(0.95)}.
     \end{column}
   \end{columns}
-  \trynotebook{section 5.5}
+  \trynotebook{section A.7}
 \end{frame}
 \note{Talk track: the punchline of this task is the duality rule ``like with
 like'': one-sided test $\leftrightarrow$ one-sided CI, two-sided test
@@ -3642,116 +4178,20 @@ rejected 48 -- will the 95\,\% CI exclude 48?'' Many say yes. It is the
 compact version of the earlier ``one- vs.\ two-sided on the same data''
 exercise.}
 
-% ============================================================================
-% SECTION 6: TYPES OF ERROR
-% ============================================================================
-\section[Errors]{Types of Error}
-
-\subsection{The two types of error}
-
-\begin{frame}{Two ways to be wrong}
-  \begin{block}{Intuition}
-    Like a smoke detector, we can be wrong in two ways:
-    \textbf{false alarm} or \textbf{missed fire}.
-  \end{block}
-  \begin{center}
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{lcc}
-      \toprule
-       \textbf{Decision} & \textbf{$H_0$ true} & \textbf{$H_0$ false}\\
-      \midrule
-      reject $H_0$
-        & \cellcolor{hsbirot!20}\,Type I error ($\alpha$)\,
-        & \cellcolor{green!18}\,correct (power $1-\beta$)\,\\
-      keep $H_0$
-        & \cellcolor{green!18}\,correct ($1-\alpha$)\,
-        & \cellcolor{hsbiorange!28}\,Type II error ($\beta$)\,\\
-      \bottomrule
+\begin{frame}{One-sided tests at a glance}
+  \begin{block}{One-sided tests (unknown variance)}
+    \begin{tabular}{ll}
+      \textbf{left:}\ \ \, $H_1:\mu<\mu_0$ & reject if $T_n<-t_{1-\alpha,\,n-1}$\\[2pt]
+      \textbf{right:}\ $H_1:\mu>\mu_0$ & reject if $T_n> t_{1-\alpha,\,n-1}$
     \end{tabular}
-  \end{center}
-  \footnotesize \textbf{Type I error} = false alarm (reject although $H_0$ is
-  true). \quad \textbf{Type II error} = miss (keep although $H_1$ is true).
-\end{frame}
-\note{Talk track: build the table column by column -- ``first fix the TRUE
-state of the world (column), then look at what our test DID (row).'' Smoke
-detector: too sensitive = many false alarms (Type I); too sluggish = missed
-fire (Type II). Make students say which error the milk test could have made
-(it kept $H_0$, so only a Type II is possible). Common confusion: thinking
-both errors can occur in the same test run -- only one column is ever real.}
-
-\begin{frame}{$\alpha$ and $\beta$ in a picture}
-  \begin{columns}[T]
-    \begin{column}{0.62\textwidth}
-      \includegraphics[width=\textwidth,height=0.64\textheight,keepaspectratio]{images/error_alpha_beta.png}
-    \end{column}
-    \begin{column}{0.36\textwidth}
-      \footnotesize
-      \begin{itemize}\setlength{\itemsep}{4pt}
-        \item The two curves show the \emph{standardised} $\bar X$ in each
-              ``world'': left centred at $\mu_0$ (value $0$, if $H_0$ holds),
-              right at the true $\mu_1$ (here $2.6$ standard errors above
-              $\mu_0$, if $H_1$); the red line is the critical value of a
-              right-sided test ($1.645$).
-        \item \textcolor{hsbiorange!85!black}{$\alpha$}: $H_0$ true, but
-              beyond the critical value.
-        \item \textcolor{hsbiblau}{$\beta$}: $H_1$ true, but on this side.
-        \item The distributions overlap -- both errors cannot be $0$ at once.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\subsection{\texorpdfstring{$\alpha$, $\beta$}{alpha, beta} and power}
-
-\begin{frame}{Type I error ($\alpha$) -- controllable}
-  \begin{block}{Definition}
-    \[
-      P(\text{reject } H_0 \mid H_0 \text{ true}) = \alpha
-    \]
   \end{block}
-  \begin{itemize}
-    \item \textbf{Directly controllable} through the choice of $\alpha$
-          (typically $0.05$).
-    \item In $5\,\%$ of cases a \emph{true} $H_0$ is wrongly rejected.
-  \end{itemize}
-  \begin{exampleblock}{Milk}
-    $H_0:\mu=1000$ is true, yet the test rejects (false alarm) --
-    probability $=\alpha$.
-  \end{exampleblock}
+  \kernaussage{Fix the direction \emph{before} looking at the data -- the whole
+  $\alpha$ then sits on one side.}
 \end{frame}
 
-\begin{frame}{Type II error ($\beta$) -- only indirectly influenced}
-  \begin{block}{Definition (at a specific alternative $\mu_1$)}
-    \[
-      P(\text{keep } H_0 \mid \mu = \mu_1) = \beta
-    \]
-  \end{block}
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item No \emph{direct} lever; $\beta$ depends on:
-          \begin{itemize}\footnotesize
-            \item $\alpha$, sample size $n$, spread $\sigma^2$,
-            \item true deviation $|\mu-\mu_0|$ (effect size).
-          \end{itemize}
-    \item At a fixed $\mu_1$: smaller $\alpha$ $\Rightarrow$ higher bar
-          $\Rightarrow$ more misses ($\beta$ \emph{rises}); \ larger $n$
-          $\Rightarrow$ smaller SE $\Rightarrow$ $\beta$ \emph{falls}.
-  \end{itemize}
-  \kernaussage{Power $=1-\beta$: the ability to actually reject a
-  \emph{false} $H_0$.}
-\end{frame}
 
-\begin{frame}{Only one error is controllable}
-  \textbf{Question:} Which error can we only make when we \emph{reject} $H_0$?
-  \begin{block}{Answer}
-    The Type I error -- and that is exactly the one we control via $\alpha$.
-  \end{block}
-  \begin{alertblock}{Consequence for the choice of hypotheses}
-    This is why the claim you want to \emph{establish} goes into $H_1$ (rule of
-    thumb from above): wrongly declaring it ``established'' -- rejecting $H_0$
-    although $H_0$ holds -- is the costly mistake, and exactly this one is the
-    controllable Type~I error.
-  \end{alertblock}
-\end{frame}
+% ---- A.8: power of a test (moved from the main part) ----
+\subsection{A.8 Power of a test}
 
 \begin{frame}{Trade-off and power}
   \begin{columns}[T]
@@ -3822,7 +4262,6 @@ raising it is usually unacceptable. So in practice power planning $=$ sample
 size planning. Connect back to the CI length slide: same logic,
 $1/\sqrt n$.}
 
-% ---- beta and power with Python ----------------------------------------------------
 \begin{frame}[fragile]{$\beta$ and power with Python}
   \lstset{aboveskip=2pt,belowskip=2pt}
 \begin{lstlisting}
@@ -3853,10 +4292,8 @@ n = 36: beta = 0.021, power = 0.979
       at least $n=18$ bottles.
     \end{column}
   \end{columns}
-  \trynotebook{section 6.2}
+  \trynotebook{section A.8}
 \end{frame}
-\subsection{Exercises}
-
 \begin{frame}{Exercise -- compute $\beta$ and power (two-sided)}
   \begin{block}{Problem statement}
     Test $H_0:\mu = 100$ vs.\ $H_1:\mu\neq 100$, known $\sigma = 10$, $n=25$,
@@ -3903,463 +4340,6 @@ n = 36: beta = 0.021, power = 0.979
     powerful} for the same $n$ and $\alpha$, because the whole $\alpha$ sits on
     the relevant side.
   \end{exampleblock}
-\end{frame}
-
-% ============================================================================
-% SECTION 7: SUMMARY
-% ============================================================================
-\section[Summary]{Summary}
-
-\begin{frame}{Summary 1 -- foundations}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Normal distribution}
-        $X\sim N(\mu,\sigma^2)$ \ $\Rightarrow$ \
-        $Z=\dfrac{X-\mu}{\sigma}\sim N(0,1)$\\[4pt]
-        $P(X\le x)=\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$, \quad
-        $\Phi(-z)=1-\Phi(z)$\\[4pt]
-        quantile: $x_p=\mu+\sigma\,z_p$, \quad $z_{0.975}=1.96$
-      \end{block}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Sampling distribution of $\bar X$}
-        $E(\bar X)=\mu$, \quad $\mathrm{Var}(\bar X)=\sigma^2/n$, \quad
-        $\mathrm{SE}=\sigma/\sqrt n$\\[4pt]
-        normal data: $\bar X\sim N(\mu,\sigma^2/n)$ exactly;\\[2pt]
-        otherwise (CLT, $n\gtrsim30$): approximately.
-      \end{block}
-    \end{column}
-  \end{columns}
-  \kernaussage{Every interval and test in this part \emph{standardises}
-  $\bar X$ with its standard error -- and the CLT makes this work even for
-  non-normal data.}
-\end{frame}
-
-\begin{frame}{Summary 2 -- confidence intervals}
-  \begin{block}{Known variance $\sigma$ \quad ($Z_n\sim N(0,1)$)}
-    \[
-      \text{CI}_{1-\alpha} =
-      \left[\bar{X}-z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}},\;
-            \bar{X}+z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}}\right]
-    \]
-  \end{block}
-  \begin{block}{Unknown variance \quad ($T_n\sim t_{n-1}$)}
-    \[
-      \text{CI}_{1-\alpha} =
-      \left[\bar{X}-t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}},\;
-            \bar{X}+t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}}\right]
-    \]
-  \end{block}
-  \textbf{Sample size} for a margin of error $e$ (known $\sigma$):
-  \ $n\ge\bigl(z_{1-\alpha/2}\,\sigma/e\bigr)^2$, rounded up.
-\end{frame}
-
-\begin{frame}{Summary 3 -- hypothesis test (two-sided)}
-  $H_0:\mu=\mu_0$ vs.\ $H_1:\mu\ne\mu_0$
-  \begin{block}{Test statistics}
-    \[
-      Z_n = \frac{\bar{X}-\mu_0}{\sigma/\sqrt{n}}\sim N(0,1),\qquad
-      T_n = \frac{\bar{X}-\mu_0}{s/\sqrt{n}}\sim t_{n-1}
-      \qquad(\text{under } H_0)
-    \]
-  \end{block}
-  \begin{alertblock}{Decision}
-    Reject if $|Z_n|>z_{1-\alpha/2}$ ($\sigma$ known) or
-    $|T_n|>t_{1-\alpha/2,\,n-1}$ ($\sigma$ unknown).
-  \end{alertblock}
-\end{frame}
-
-\begin{frame}{Summary 4 -- the $p$-value}
-  \begin{block}{One idea behind every formula}
-    $p$ = probability, \emph{if $H_0$ were true}, of a value \textbf{at least as
-    extreme as observed} -- in the direction(s) that $H_1$ allows.
-  \end{block}
-  \begin{center}
-    \renewcommand{\arraystretch}{1.4}
-    \begin{tabular}{>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{4.2cm}c}
-      \toprule
-      \textbf{If $H_1$ is\ldots} & \textbf{add up the\ldots} & \textbf{$p$ \ (unknown $\sigma$)}\\
-      \midrule
-      $\mu\neq\mu_0$ & \emph{both} tails beyond $|T_n|$ & $2\,F_{t,n-1}(-|T_n|)$\\
-      $\mu<\mu_0$ (left)  & \emph{lower} tail below $T_n$ & $F_{t,n-1}(T_n)$\\
-      $\mu>\mu_0$ (right) & \emph{upper} tail above $T_n$ & $1-F_{t,n-1}(T_n)$\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \footnotesize \textbf{Known $\sigma$?} Just replace $T_n\to Z_n$ and
-  $F_{t,n-1}\to\Phi$. \quad \textbf{Decide:} $p<\alpha \Rightarrow$ reject $H_0$.
-\end{frame}
-
-\begin{frame}{Summary 5 -- one-sided tests \& types of error}
-  \begin{block}{One-sided tests (unknown variance)}
-    \begin{tabular}{ll}
-      \textbf{left:}\ \ \, $H_1:\mu<\mu_0$ & reject if $T_n<-t_{1-\alpha,\,n-1}$\\[2pt]
-      \textbf{right:}\ $H_1:\mu>\mu_0$ & reject if $T_n> t_{1-\alpha,\,n-1}$
-    \end{tabular}
-  \end{block}
-  \begin{block}{Types of error}
-    $P(\text{reject } H_0\mid \mu=\mu_0)= \alpha$ \quad
-    $P(\text{keep } H_0\mid \mu=\mu_1)= \beta$ \\
-    $\alpha$ is \emph{controllable}; $\beta$ falls with $n\uparrow$ and $\alpha\uparrow$;
-    power $=1-\beta$.
-  \end{block}
-\end{frame}
-
-\begin{frame}[fragile]{Summary 6 -- important Python commands}
-  \begin{columns}[T]
-    \begin{column}{0.46\textwidth}
-      \begin{block}{Distributions}
-\begin{lstlisting}
-from scipy import stats
-stats.norm.cdf(1.96)          # Phi(z)
-stats.norm.sf(1.96)           # 1 - Phi(z)
-stats.norm.ppf(0.975)         # z_p
-stats.norm.cdf(997, 1000, 3)  # P(X<=x)
-stats.t.cdf(-2.11, df=15)     # F_t,df(t)
-stats.t.ppf(0.975, df=8)      # t_p,df
-\end{lstlisting}
-      \end{block}
-    \end{column}
-    \begin{column}{0.52\textwidth}
-      \begin{block}{Tests, intervals, sample size}
-\begin{lstlisting}
-res = stats.ttest_1samp(x, popmean=1000)
-res = stats.ttest_1samp(x, 1000,
-                        alternative="less")
-res.statistic, res.df, res.pvalue
-res.confidence_interval(0.95)   # CI
-2 * stats.norm.sf(abs(z))       # z-test p
-math.ceil((1.96 * sigma / e)**2)  # n
-\end{lstlisting}
-      \end{block}
-    \end{column}
-  \end{columns}
-  \footnotesize \texttt{alternative} is \texttt{"two-sided"} (default),
-  \texttt{"less"} or \texttt{"greater"}; \texttt{scale} in \texttt{stats.norm}
-  is the \emph{standard deviation}; \texttt{confidence\_interval} returns the
-  CI that matches the chosen direction.
-  \trynotebook{Key Python commands}
-\end{frame}
-
-\begin{frame}{Which procedure? -- decision tree}
-  \centering
-  \begin{tikzpicture}[node distance=5mm and 9mm]
-    \node[flowbox, text width=2.7cm] (q) {\footnotesize \textbf{Question?}};
-    \node[flowboxo, text width=3.3cm, above right=3mm and 12mm of q] (ki)
-      {\footnotesize \textbf{Range for $\mu$}\\ $\Rightarrow$ confidence interval};
-    \node[flowboxo, text width=2.9cm, below right=3mm and 12mm of q] (test)
-      {\footnotesize \textbf{Is $\mu_0$ compatible?}\\ $\Rightarrow$ hypothesis test};
-    \node[flowboxg, text width=3.4cm, right=10mm of test] (sub)
-      {\footnotesize $\sigma$ known $\to z$, else $t$;\\ direction per question:\\ one-/two-sided};
-    \node[flowboxg, text width=3.4cm, right=10mm of ki] (nn)
-      {\footnotesize precision fixed in advance?\\ plan $n\ge(z_{1-\alpha/2}\,\sigma/e)^2$};
-    \draw[flowarr] (q) -- (ki); \draw[flowarr] (q) -- (test);
-    \draw[flowarr] (test) -- (sub); \draw[flowarr] (ki) -- (nn);
-  \end{tikzpicture}
-  \par\vspace{0.4em}
-  {\footnotesize The same logic -- \emph{standardise}, then ask whether the
-  deviation is extreme \emph{in the $H_1$ direction} -- underlies essentially
-  every classical test: $z$, $t$, proportion, regression coefficient, ANOVA
-  $F$.}
-  \kernaussage{First clarify the \emph{question}, then choose the tool.}
-\end{frame}
-
-% ---- Final checklist: classic pitfalls --------------------------------------
-\begin{frame}{Five classic pitfalls -- final checklist}
-  \small
-  \begin{center}
-    \renewcommand{\arraystretch}{1.45}
-    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.7cm}@{}}
-      \toprule
-      \textbf{Forbidden sentence \ \textcolor{hsbirot}{$\times$}} &
-      \textbf{Correct version \ \textcolor{green!55!black}{$\checkmark$}}\\
-      \midrule
-      ``$p$ is the probability that $H_0$ is true.'' &
-        $p = P(\text{data at least this extreme} \mid H_0)$.\\
-      ``$\mu$ lies in \emph{this} CI with $95\,\%$ probability.'' &
-        The \emph{procedure} covers $\mu$ in $95\,\%$ of samples.\\
-      ``$p > \alpha$, so $H_0$ is proven/accepted.'' &
-        No contradiction found -- $H_0$ is \emph{kept}, not proven.\\
-      ``The data point left, so I test left-sided.'' &
-        Direction and $\alpha$ are fixed \emph{before} the data.\\
-      ``Significant, hence large and important.'' &
-        Significance $\neq$ size: judge magnitude by the CI.\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-\end{frame}
-\note{Talk track: close the lecture with this table -- each row condenses one
-dedicated slide of this part. Exam relevance: these five formulations are
-exactly the distractors used in multiple-choice questions. Have students
-correct each forbidden sentence aloud in their own words.}
-
-\begin{frame}{Outlook: Part 4 -- Regression}
-  \begin{block}{What we have so far}
-    Confidence intervals and tests for \textbf{one} population mean $\mu$:
-    estimate, standard error, critical value -- and the $p$-value.
-  \end{block}
-  \begin{block}{Next part}
-    We study the \textbf{relationship between variables}. The regression
-    slope $\hat\beta_1$ is again an estimator with a standard error, so
-    the \emph{same} recipe gives its $t$-test, its confidence interval and
-    its $p$-value:
-    \[
-      T=\frac{\text{estimate}-\text{hypothesised value}}{\text{standard error}}.
-    \]
-  \end{block}
-  \kernaussage{Everything in this part carries over one-to-one to the
-  coefficients of a regression model.}
-\end{frame}
-
-
-% ============================================================================
-% APPENDIX: ESTIMATORS AND THE LAW OF LARGE NUMBERS
-% ============================================================================
-\appendix
-\let\overviewleft\undefined
-\section[Appendix]{Appendix: Estimators and the Law of Large Numbers}
-
-\begin{frame}{Appendix -- what is in here, and why}
-  \begin{block}{Optional material}
-    The main part of this deck is self-contained. The appendix adds two pieces
-    of theory behind it -- not needed for the exercises of the main part, but
-    useful for regression (Part 4), where estimators are everywhere.
-  \end{block}
-  \begin{center}
-    \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{8.6cm}@{}}
-      \toprule
-      \textbf{Topic} & \textbf{Content}\\
-      \midrule
-      A.1 Estimators & What makes a good estimator: unbiasedness, efficiency,
-        consistency; why $s^2$ divides by $n-1$; exercise\\
-      A.2 Law of large numbers & Why $\bar x$ settles down at $\mu$ -- and why
-        relative frequencies justify the frequentist view\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-\end{frame}
-
-\subsection{A.1 Properties of estimators}
-
-\begin{frame}{What makes a good estimator? -- the target picture}
-  \begin{center}
-    \resizebox{!}{0.70\textheight}{%
-    \begin{tikzpicture}[font=\scriptsize,
-        shot/.style={fill=hsbiblau,draw=hsbiblaudunkel,circle,inner sep=1pt}]
-      \foreach \cx/\cy/\ttl in {%
-          0/0/{unbiased \& efficient},
-          5.4/0/{biased \& efficient},
-          0/-3.9/{unbiased \& inefficient},
-          5.4/-3.9/{biased \& inefficient}}{
-        \begin{scope}[shift={(\cx,\cy)}]
-          \foreach \r in {0.45,0.9,1.35}{\draw[hsbigrau] (0,0) circle (\r);}
-          \draw[hsbirot,thick] (-0.18,0)--(0.18,0) (0,-0.18)--(0,0.18);
-          \node[anchor=base,font=\footnotesize\bfseries] at (0,-1.83) {\ttl};
-        \end{scope}
-      }
-      \foreach \x/\y in {0.05/0.08,-0.1/0.02,0.08/-0.06,-0.04/-0.12,0.12/0.05,0/-0.02}{\node[shot] at (\x,\y){};}
-      \begin{scope}[shift={(5.4,0)}]
-        \foreach \x/\y in {0.55/0.5,0.66/0.42,0.58/0.6,0.7/0.5,0.5/0.42,0.62/0.55}{\node[shot] at (\x,\y){};}
-      \end{scope}
-      \begin{scope}[shift={(0,-3.9)}]
-        \foreach \x/\y in {0.35/0.55,-0.55/0.2,0.1/-0.6,-0.35/-0.35,0.6/-0.1,-0.1/0.45}{\node[shot] at (\x,\y){};}
-      \end{scope}
-      \begin{scope}[shift={(5.4,-3.9)}]
-        \foreach \x/\y in {0.4/0.85,0.95/0.3,0.3/0.15,0.85/0.7,1.05/0.5,0.5/0.55}{\node[shot] at (\x,\y){};}
-      \end{scope}
-    \end{tikzpicture}}
-  \end{center}
-  {\footnotesize Each dot $=$ the estimate from \emph{one} sample; red cross
-  $=$ the true value $\theta$. Unbiased $=$ centred on the cross; efficient $=$
-  tightly clustered.}
-\end{frame}
-
-\begin{frame}{Properties of estimators -- the formal criteria}
-  \small
-  An \textbf{estimator} $\hat\theta=\hat\theta(X_1,\dots,X_n)$ is a random
-  variable; its value for the observed sample is the \emph{estimate}.
-  \begin{center}
-    \renewcommand{\arraystretch}{1.25}
-    \begin{tabular}{@{}p{3.7cm}l@{}}
-      \toprule
-      \textbf{Property} & \textbf{Formal definition}\\
-      \midrule
-      Unbiasedness & $E(\hat\theta)=\theta$\\
-      Bias & $\mathrm{Bias}(\hat\theta)=E(\hat\theta)-\theta$\\
-      Asymptotic unbiasedness & $\lim_{n\to\infty}E(\hat\theta_n)=\theta$\\
-      Efficiency & $\mathrm{Var}(\hat\theta)<\mathrm{Var}(\hat\theta^{*})$
-        \quad (both unbiased)\\
-      Consistency & $\hat\theta_n\xrightarrow{P}\theta$, i.e.\
-        $\lim_{n\to\infty}P\bigl(|\hat\theta_n-\theta|>c\bigr)=0$ for every $c>0$\\
-      \quad sufficient for it & $\lim_{n\to\infty}E(\hat\theta_n)=\theta$ \ and \
-        $\lim_{n\to\infty}\mathrm{Var}(\hat\theta_n)=0$\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \inworten{\textbf{unbiased} $=$ right on average; \textbf{efficient} $=$
-  small spread; \textbf{consistent} $=$ arbitrarily precise as $n$ grows. The
-  sample mean $\bar X$ is unbiased and consistent, and the most efficient of
-  all unbiased weighted averages $\sum a_iX_i$.}
-\end{frame}
-
-\begin{frame}{Why divide by $n-1$ in $s^2$?}
-  \begin{block}{Sample variance -- unbiased}
-    \[
-      s^2=\frac{1}{n-1}\sum_{i=1}^n\bigl(X_i-\bar X\bigr)^2,
-      \qquad E(s^2)=\sigma^2 .
-    \]
-  \end{block}
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item We measure the spread around the \emph{estimated} mean $\bar X$,
-          which sits in the middle of the data -- so the squared deviations
-          come out \textbf{systematically too small}.
-    \item Dividing by $n$ would give
-          $E\bigl(\tfrac1n\sum(X_i-\bar X)^2\bigr)=\tfrac{n-1}{n}\,\sigma^2$
-          -- biased downwards; dividing by $n-1$ corrects exactly this.
-    \item Estimating $\mu$ ``uses up'' one degree of freedom -- the same $n-1$
-          as in $t_{n-1}$.
-  \end{itemize}
-  \begin{exampleblock}{Simulation: $100\,000$ samples of size $n=4$ from
-    $N(50,\,5^2)$, i.e.\ $\sigma^2=25$}
-    Average of $s^2$ with $n-1$: $\mathbf{24.97}$ \quad vs.\quad with $n$:
-    $\mathbf{18.73}$ \ ($\approx\tfrac34\cdot25=18.75$).
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}{Exercise -- properties of estimators: egg weight}
-  \begin{block}{Problem statement}
-    A farmer draws $n=4$ eggs randomly and independently from a flock with
-    $\mu=50$\,g and $\sigma^2=25$\,g$^2$. Four estimators of $\mu$ are
-    proposed:
-    \[
-      \hat\mu_A=\frac{X_1+X_2+X_3+X_4}{4},\qquad
-      \hat\mu_B=\frac{X_1+X_4}{2},
-    \]
-    \[
-      \hat\mu_C=\frac{X_1+2X_2+X_3+X_4}{5},\qquad
-      \hat\mu_D=\frac{X_1+X_2+X_3}{4}.
-    \]
-  \end{block}
-  \begin{enumerate}\setlength{\itemsep}{2pt}
-    \item[a)] Which estimators are unbiased? Give the expected value and, if
-              any, the bias.
-    \item[b)] Compute the variance of the four estimators.
-    \item[c)] Which estimator should the farmer use? Argue with the criteria.
-    \item[d)] Let $n$ grow ($\hat\mu_A=\bar X_n$, $\hat\mu_B=\tfrac{X_1+X_n}{2}$):
-              which of the two is consistent?
-  \end{enumerate}
-\end{frame}
-\note{Talk track (optional material): the rules for $E$ and $\mathrm{Var}$
-from the foundations are all that is needed. The lesson of c): unbiasedness
-comes first, then efficiency -- a tiny variance does not help an estimator
-that aims at the wrong value.}
-
-\begin{frame}{Solution (1/2) -- egg weight: expected values and variances}
-  \textbf{Rules:} $E\bigl(\sum a_iX_i\bigr)=\mu\sum a_i$; \ for independent
-  $X_i$: $\mathrm{Var}\bigl(\sum a_iX_i\bigr)=\sigma^2\sum a_i^2$ \ (here
-  $\mu=50$, $\sigma^2=25$).
-  \begin{center}
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{@{}lllll@{}}
-      \toprule
-      & \textbf{weights $a_i$} & \textbf{$E(\hat\mu)$} & \textbf{Bias}
-        & \textbf{$\mathrm{Var}(\hat\mu)$}\\
-      \midrule
-      $\hat\mu_A$ & $\tfrac14,\tfrac14,\tfrac14,\tfrac14$ & $50$ & $0$
-        & $\tfrac{4}{16}\cdot25=\mathbf{6.25}$\\
-      $\hat\mu_B$ & $\tfrac12,0,0,\tfrac12$ & $50$ & $0$
-        & $\tfrac{2}{4}\cdot25=\mathbf{12.5}$\\
-      $\hat\mu_C$ & $\tfrac15,\tfrac25,\tfrac15,\tfrac15$ & $50$ & $0$
-        & $\tfrac{1+4+1+1}{25}\cdot25=\mathbf{7}$\\
-      $\hat\mu_D$ & $\tfrac14,\tfrac14,\tfrac14,0$ & $\tfrac34\cdot50=37.5$
-        & $\mathbf{-12.5}$ & $\tfrac{3}{16}\cdot25=\mathbf{4.6875}$\\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \inworten{a) $A$, $B$, $C$ are unbiased (weights sum to $1$); $D$
-  underestimates the egg weight \emph{systematically} by $12.5$\,g (weights
-  sum to only $\tfrac34$).}
-\end{frame}
-
-\begin{frame}[fragile]{Solution (2/2) -- egg weight: choice and consistency}
-  \small
-  \textbf{c)} Among the \emph{unbiased} estimators, $\hat\mu_A=\bar X_4$ has
-  the smallest variance -- it is \textbf{efficient}. $\hat\mu_D$ scatters even
-  less but aims systematically at the wrong value: \textbf{use $\bar X_4$.}\\[2pt]
-  \textbf{d)} $\bar X_n$: unbiased and $\mathrm{Var}=\sigma^2/n\to0$
-  $\Rightarrow$ \textbf{consistent}. \ $\tfrac{X_1+X_n}{2}$: unbiased, but
-  $\mathrm{Var}=\sigma^2/2=12.5$ for \emph{every} $n$ (ignores $n-2$ eggs)
-  $\Rightarrow$ \textbf{not consistent}.
-\begin{lstlisting}
-import numpy as np
-rng = np.random.default_rng(1)
-m = rng.normal(50, 5, size=(10_000, 4))       # 10 000 samples of 4 eggs
-A = m.mean(axis=1)
-B = (m[:, 0] + m[:, 3]) / 2
-C = (m[:, 0] + 2 * m[:, 1] + m[:, 2] + m[:, 3]) / 5
-D = (m[:, 0] + m[:, 1] + m[:, 2]) / 4
-print(np.round([A.mean(), B.mean(), C.mean(), D.mean()], 2))
-print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
-\end{lstlisting}
-  \vspace{-4pt}
-  \begin{columns}[T]
-    \begin{column}{0.36\textwidth}
-\begin{lstlisting}[style=Pyout]
-[49.95 49.95 49.95 37.47]
-[ 6.14 12.52  6.87  4.52]
-\end{lstlisting}
-    \end{column}
-    \begin{column}{0.60\textwidth}
-      Simulation and theory agree: means $\approx50$ (except $D$:
-      $37.5$), variances $\approx6.25$, $12.5$, $7$, $4.69$.
-    \end{column}
-  \end{columns}
-  \trynotebook{section A.1}
-\end{frame}
-
-\subsection{A.2 Law of large numbers}
-
-\begin{frame}{The law of large numbers -- intuition}
-  \begin{columns}[T]
-    \begin{column}{0.36\textwidth}
-      \small
-      \textbf{Die example:} a fair die has $E(X)=3.5$. After a few rolls the
-      running mean $\bar x_n$ still jumps around; after many rolls it settles
-      down at $3.5$.
-      \kernaussage{The sample mean $\bar X_n$ gets ever more
-      \textbf{reliably close} to the expected value as $n$ grows.}
-    \end{column}
-    \begin{column}{0.62\textwidth}
-      \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{images/lln_running_mean.png}
-    \end{column}
-  \end{columns}
-  \vspace{2pt}
-  {\footnotesize Twelve sequences of die rolls (grey), one highlighted (blue).
-  The funnel $\mu\pm1.96\,\sigma/\sqrt n$ narrows: $\pm1.06$ at $n=10$,
-  $\pm0.33$ at $n=100$, $\pm0.11$ at $n=1000$.}
-\end{frame}
-
-\begin{frame}{The law of large numbers -- formal statement}
-  \begin{block}{Weak law of large numbers}
-    For i.i.d.\ $X_i$ with $E(X_i)=\mu$ and $\mathrm{Var}(X_i)=\sigma^2<\infty$:
-    \[
-      \lim_{n\to\infty}P\bigl(|\bar X_n-\mu|>c\bigr)=0
-      \quad\text{for every } c>0,
-      \qquad\text{i.e.}\quad \bar X_n\xrightarrow{\;P\;}\mu .
-    \]
-  \end{block}
-  \inworten{Choose any tolerance $c$, however small: the probability that
-  $\bar X_n$ misses $\mu$ by more than $c$ goes to zero.}\par
-  {\small \textbf{Why?} Chebyshev's inequality:
-  $P(|\bar X_n-\mu|>c)\le\mathrm{Var}(\bar X_n)/c^2=\sigma^2/(n\,c^2)\to0$.\par}
-  \begin{exampleblock}{Special case: relative frequencies (Bernoulli)}
-    $X_i=1$ if an event occurs (probability $p$), else $0$: then $\bar X_n$ is
-    the event's \emph{relative frequency}, and $\bar X_n\xrightarrow{P}p$ --
-    the basis of the \textbf{frequentist} view used throughout this part.
-  \end{exampleblock}
-  {\footnotesize LLN: $\bar X_n$ approaches $\mu$. \ CLT: how the remaining
-  fluctuation around $\mu$ is distributed.}
 \end{frame}
 
 \end{document}
