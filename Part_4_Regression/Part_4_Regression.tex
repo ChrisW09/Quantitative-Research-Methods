@@ -235,7 +235,7 @@
       \tableofcontents[hideallsubsections,sections={4-6}]
     \end{column}
   \end{columns}
-  \trynotebook{all examples and exercises of this part}
+  \trynotebook{all examples and exercises}
 \end{frame}
 
 % ============================================================================
@@ -279,23 +279,22 @@
   After this part you will be able to \ldots
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \small\begin{itemize}\setlength{\itemsep}{1pt}
+      \small\begin{itemize}\setlength{\itemsep}{0pt}
         \item compute and interpret \textbf{covariance} and
               \textbf{correlation},
-        \item explain why least squares squares the residuals and
-              how the \textbf{OLS estimators} follow (four steps),
+        \item explain \textbf{least squares} and how the OLS estimators
+              follow,
         \item fit a \textbf{simple regression} by hand and in Python;
               interpret it (units, extrapolation),
-        \item assess the fit with $R^2$ and know its limits
-              (residual analysis: appendix),
+        \item assess the fit with $R^2$ and know its limits,
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \small\begin{itemize}\setlength{\itemsep}{1pt}
+      \small\begin{itemize}\setlength{\itemsep}{0pt}
         \item carry out \textbf{$t$-tests}, \textbf{confidence intervals}
               and \textbf{$p$-values} for regression coefficients,
-        \item distinguish a \textbf{confidence interval} for the mean from
-              a \textbf{prediction interval} for a single value,
+        \item distinguish \textbf{confidence} and \textbf{prediction
+              intervals},
         \item interpret a \textbf{multiple regression} (``holding the
               others fixed'') and recognise \textbf{confounding},
         \item use the \textbf{$F$-test}, adjusted $R^2$ and dummy
@@ -303,8 +302,8 @@
       \end{itemize}
     \end{column}
   \end{columns}
-  \kernaussage{Common thread: a regression coefficient is an
-  \emph{estimate} -- report it together with its uncertainty.}
+  \kernaussage{Common thread: a coefficient is an \emph{estimate} --
+  report it with its uncertainty.}
 \appendixnote{derivation of OLS, residual analysis, leverage, QQ-plot, interactions, diagnostics}
 \end{frame}
 
@@ -878,7 +877,7 @@ df["price"].cov(df["quantity"])     # -83.75  (divides by n-1)
 df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
 \end{lstlisting}
   \end{block}
-  \trynotebook{section 1.2 ``Covariance and correlation''}
+  \trynotebook{section 1.2}
 \end{frame}
 
 % ============================================================================
@@ -1743,6 +1742,7 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
 \end{frame}
 
 \begin{frame}[fragile]{Solution -- online shop (5): the OLS line of the online shop}
+  \lstset{aboveskip=2pt,belowskip=2pt}
   \vspace{-8pt}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
@@ -1758,13 +1758,11 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     \begin{column}{0.48\textwidth}
       \small
       \begin{exampleblock}{(3) Line 2 is the OLS line}
-        $\hat{y} = 20 + 2\,x$ is line 2 of exercise (3). Its sum of squares
-        $14$ is the \textbf{smallest possible}: no line through the five
-        months does better (line 1: $24$).
+        Line 2 of exercise (3): its sum of squares $14$ is the
+        \textbf{smallest possible} (line 1: $24$).
       \end{exampleblock}
       \begin{exampleblock}{(4) The slope in words}
-        $1000$ EUR more advertising goes along with $2000$ EUR more revenue
-        on average.
+        $+1000$ EUR advertising: $+2000$ EUR revenue on average.
       \end{exampleblock}
     \end{column}
   \end{columns}
@@ -1776,7 +1774,7 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
 ((y - (20 + 2 * x))**2).sum(), ((y - (23 + x))**2).sum()   # 14  24: OLS line, line 1
 \end{lstlisting}
   \end{exampleblock}
-  \trynotebook{section 2.2 ``Least squares''}
+  \trynotebook{section 2.2}
 \end{frame}
 
 \begin{frame}{Intercept, OLS line and the answer}
@@ -2199,6 +2197,7 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
 \end{frame}
 
 \begin{frame}[fragile]{Linear regression with Python}
+  \lstset{aboveskip=2pt,belowskip=2pt}
   \vspace{-4pt}
   \begin{block}{Coefficients by hand (steps 2 to 5)}
 \begin{lstlisting}
@@ -2219,7 +2218,7 @@ plt.axline((0, reg.params["Intercept"]), slope=reg.params["price"])
   \end{block}
   \inworten{\texttt{smf.ols()} solves the minimisation problem of this
   section; \texttt{"y $\sim$ x"} reads ``$y$ explained by $x$''.}
-  \trynotebook{section 2.3 ``Interpretation''}
+  \trynotebook{section 2.3}
 \end{frame}
 
 \begin{frame}{Can you answer these questions?}
@@ -2364,6 +2363,7 @@ plt.axline((0, reg.params["Intercept"]), slope=reg.params["price"])
 \end{frame}
 
 \begin{frame}[fragile]{Solution (3/3) -- interpreting coefficients and making predictions}
+  \lstset{aboveskip=2pt,belowskip=2pt}
   \small
   \vspace{-6pt}
   \begin{block}{(4) Rule: the unit of $x$ changes the slope, the unit of $y$ both coefficients}
@@ -2389,7 +2389,7 @@ smf.ols("revenue ~ I(1000 * adv)", data=fs).fit().params   # 40.0  0.0025
   \vspace{-8pt}
   \kernaussage{The number $\hat{\beta}_1$ depends on the units -- the
     substantive statement does not.}
-  \trynotebook{section 2.4 ``Exercises''}
+  \trynotebook{section 2.4}
 \end{frame}
 
 \begin{frame}{Exercise -- a falling price--demand line}
@@ -2441,6 +2441,7 @@ smf.ols("revenue ~ I(1000 * adv)", data=fs).fit().params   # 40.0  0.0025
 \end{frame}
 
 \begin{frame}[fragile]{Solution (2/2) -- a falling price--demand line}
+  \lstset{aboveskip=2pt,belowskip=2pt}
   \vspace{-6pt}
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
@@ -2468,7 +2469,7 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
     The new data frame needs a column with the \emph{same name} as the
     explanatory variable in the formula.
   \end{block}
-  \trynotebook{section 2.4 ``Exercises''}
+  \trynotebook{section 2.4}
 \end{frame}
 
 % ============================================================================
@@ -2976,7 +2977,7 @@ reg.ssr, reg.centered_tss, reg.rsquared      # 14.0  54.0  0.7407 (RSS, TSS, R^2
   \end{block}
   \inworten{The residuals sum to zero -- a property of every least-squares
   line with intercept: $-1+2-2+2-1=0$.}
-  \trynotebook{section 3.2 ``Coefficient of determination''}
+  \trynotebook{section 3.2}
 \end{frame}
 
 \begin{frame}{Coefficient of determination -- lamp example}
@@ -3032,7 +3033,7 @@ df["price"].corr(df["quantity"])**2                        # simple regression o
   \end{exampleblock}
   \inworten{\texttt{summary()} reports further quantities (standard errors,
   $t$-values, $p$-values) -- they follow in Section ``Inference''.}
-  \trynotebook{section 3.2 ``Coefficient of determination''}
+  \trynotebook{section 3.2}
 \end{frame}
 
 \begin{frame}{Exercise -- from sums of squares to the correlation coefficient}
@@ -3117,7 +3118,7 @@ reg.ssr, reg.ess              # 190.0  810.0  (careful: ssr = RSS, ess = ESS)
 
   \inworten{TSS and RSS give ESS and $R^{2}$; with the sign of
   $\hat{\beta}_1$ also $r_{xy}$.}
-  \trynotebook{section 3.2 ``Coefficient of determination''}
+  \trynotebook{section 3.2}
 \end{frame}
 
 \subsection{Useful transformations}
@@ -3322,7 +3323,7 @@ reg = smf.ols("revenue ~ adv", data=stores).fit() # TSS = ESS + RSS, R^2:
 reg.centered_tss, reg.ess, reg.ssr, reg.rsquared  # 288.0 = 223.2 + 64.8; R^2 = 0.775
 \end{lstlisting}
   \end{block}
-  \trynotebook{section 3.3 ``Useful transformations''}
+  \trynotebook{section 3.3}
 \end{frame}
 
 \begin{frame}{Can you answer these questions?}
@@ -4102,7 +4103,7 @@ price         -0.4467      0.040    -11.189      0.000      -0.541      -0.352
       \bottomrule
     \end{tabular}
   \end{center}
-  \trynotebook{section 4.5 ``$p$-values and Python output''}
+  \trynotebook{section 4.5}
 \end{frame}
 
 \begin{frame}{Significant $\neq$ important}
@@ -4215,7 +4216,7 @@ T = (reg.params["price"] - (-0.5)) / se_b1       # H0: beta1 = -0.5
 stats.t.ppf(0.975, df=7)                         # critical value 2.3646
 \end{lstlisting}
   \end{block}
-  \trynotebook{section 4.6 ``Prediction''}
+  \trynotebook{section 4.6}
 \end{frame}
 
 \begin{frame}[fragile]{Inference in simple regression with Python (2/2)}
@@ -4233,7 +4234,7 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
     \texttt{price}). \texttt{mean\_ci\_*} is the confidence interval for the
     mean, \texttt{obs\_ci\_*} the prediction interval for one observation.
   \end{exampleblock}
-  \trynotebook{section 4.6 ``Prediction''}
+  \trynotebook{section 4.6}
 \end{frame}
 
 \subsection{Exercises}
@@ -4507,6 +4508,7 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
 \end{frame}
 
 \begin{frame}[fragile]{Multiple regression with Python}
+  \lstset{aboveskip=2pt,belowskip=2pt}
   \begin{block}{Fitting the model}
 \begin{lstlisting}
 ad = pd.read_csv("../data/Advertising.csv", index_col=0)
@@ -4527,7 +4529,7 @@ radio          0.1885      0.009     21.893      0.000       0.172       0.206
 newspaper     -0.0010      0.006     -0.177      0.860      -0.013       0.011
 1.685510373414744
 \end{lstlisting}
-  \trynotebook{section 5.1 ``From one to many explanatory variables''}
+  \trynotebook{section 5.1}
 \end{frame}
 
 \subsection{Interpreting the coefficients}
@@ -4751,7 +4753,7 @@ stats.f.sf(F, p, n - p - 1)                     # p-value 1.58e-96
   \end{block}
   \inworten{\texttt{stats.f.sf()} is the area to the \emph{right} of $F$:
   the $F$-test is right-sided.}
-  \trynotebook{section 5.4 ``$F$-test''}
+  \trynotebook{section 5.4}
 \end{frame}
 
 \begin{frame}{Exercise -- the $F$-test}
@@ -4934,7 +4936,7 @@ smf.ols("Balance ~ Region", data=cr).fit().params
 \end{lstlisting}
   \end{block}
   \inworten{Baseline: the first category in alphabetical order (No, East).}
-  \trynotebook{section 5.6 ``Qualitative explanatory variables''}
+  \trynotebook{section 5.6}
 \end{frame}
 
 \begin{frame}{Exercise -- dummy coding}
@@ -5071,6 +5073,7 @@ Limit              0.2675      0.004     72.069      0.000       0.260       0.2
 
 
 \begin{frame}[fragile]{Multiple regression with Python -- overview}
+  \lstset{aboveskip=2pt,belowskip=2pt}
   \vspace{-8pt}
   \begin{block}{Fitting, testing, comparing}
 \begin{lstlisting}
@@ -5092,8 +5095,7 @@ plt.scatter(m2.fittedvalues, m2.resid); plt.axhline(0)   # residual plot
 \end{lstlisting}
   \end{block}
   \appendixnote{interactions, diagnostics in multiple regression, collinearity}
-  \vspace{2.8ex}
-  \trynotebook{section 5.7 ``Exercise: reading a full output''}
+  \trynotebook{section 5.7}
 \end{frame}
 
 % ============================================================================
@@ -5191,7 +5193,7 @@ sm.stats.anova_lm(small, large) # F-test
       \end{block}
     \end{column}
   \end{columns}
-  \trynotebook{last cell ``Key Python commands''}
+  \trynotebook{Key Python commands}
 \end{frame}
 
 \begin{frame}{Five classic pitfalls -- final checklist}
@@ -5500,7 +5502,7 @@ np.linalg.solve(A, [130, 410])
       (4/7) and (5/7) do in general.}
     \end{column}
   \end{columns}
-  \trynotebook{section A.1 ``Derivation of the OLS estimators''}
+  \trynotebook{section A.1}
 \end{frame}
 
 \begin{frame}{Appendix: derivation (6/7) -- back to the deviation form}
@@ -6024,7 +6026,7 @@ plt.xlabel("fitted values"); plt.ylabel("residuals"); plt.title("Residual plot")
 reg.resid.sum()      # practically 0 (rounding): first-order condition
 \end{lstlisting}
   \end{exampleblock}
-  \trynotebook{section A.3 ``Residual analysis''}
+  \trynotebook{section A.3}
 \end{frame}
 
 \begin{frame}{Exercise -- diagnosing residual plots}
@@ -6196,7 +6198,7 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
 # -0.4590: slope without the store at 95 EUR (with it: -0.4467)
 \end{lstlisting}
   \end{block}
-  \trynotebook{section A.4 ``Outliers and leverage''}
+  \trynotebook{section A.4}
 \end{frame}
 
 \begin{frame}{Exercise -- online shop (C): a month with a big campaign}
@@ -6574,7 +6576,7 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
   \footnotesize Note: the residual plot ($2,0,-2,-4,4$ over $\hat y$) shows an
   \textbf{arc} -- costs rise faster for old machines. A QQ-plot does not check
   linearity.
-  \trynotebook{section A.5 ``QQ-plot''}
+  \trynotebook{section A.5}
 \end{frame}
 
 \begin{frame}{Typical deviations in the QQ-plot}
@@ -6640,7 +6642,7 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
   \footnotesize \texttt{sm.qqplot()} computes $p_i=(i-0.5)/n$ (\texttt{a=0.5};
   default $i/(n+1)$) and $z_i=\Phi^{-1}(p_i)$ and plots $(z_i,\hat u_{(i)})$;
   \texttt{line="q"}: reference line through the (interpolated) quartiles.
-  \trynotebook{section A.5 ``QQ-plot''}
+  \trynotebook{section A.5}
 \end{frame}
 
 \begin{frame}{Exercise -- body heights and shoe sizes: residual plot and QQ-plot}
@@ -7070,7 +7072,7 @@ X = sm.add_constant(cr[["Age", "Limit", "Rating"]])
 [variance_inflation_factor(X.values, j) for j in (1, 2, 3)]  # 1.01 160.6 160.7
 \end{lstlisting}
   \end{block}
-  \trynotebook{section A.7 ``Diagnostics in multiple regression''}
+  \trynotebook{section A.7}
 \end{frame}
 
 \begin{frame}{Appendix summary}

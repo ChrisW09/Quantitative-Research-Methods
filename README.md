@@ -1,7 +1,7 @@
 # Quantitative Research
 
-Lecture slides (LaTeX Beamer), companion Jupyter notebooks, a mock exam and a
-separate **Python course** by Prof. Dr. Christoph Weisser.
+Lecture slides (LaTeX Beamer), companion Jupyter notebooks and a separate
+**Python course** by Prof. Dr. Christoph Weisser.
 
 | Part | Folder | Topic |
 |------|--------|-------|
@@ -96,38 +96,10 @@ twenty-one notebooks, all Colab-ready.
 Full descriptions for every notebook and a suggested path alongside Parts 1–5:
 [`Python_Course/README.md`](./Python_Course/README.md).
 
-## Mock exam
+## Mock exams
 
-`Mock_Exams/Mock_Exam_1/` contains a mock exam on Parts 3–5 (an English
-counterpart of the *Statistik für Ökonomen* mock exams):
-
-| Task | Topic | Points |
-|------|-------|--------|
-| 1 | Part 3 -- Statistical inference (test, p-value, confidence interval) | 20 |
-| 2 | Part 4 -- Regression (least squares, R², reading a `statsmodels` output) | 20 |
-| 3 | Part 5 -- Classification (odds, logistic regression, confusion matrix) | 20 |
-
-Each task has 10 subtasks worth 2 points (60 points, 120 minutes). Every subtask
-asks for exactly **one** result and can be solved on its own, so grading is quick
-and an error does not carry over. Three PDFs are provided:
-
-- `Quantitative Research Mock Exam 1.pdf` -- the exam, with the standard normal
-  table and the t-table appended,
-- `Quantitative Research Mock Exam 1 Solutions.pdf` -- worked solutions, grading
-  key (2-point rubric per subtask) and a results overview,
-- `Quantitative Research Mock Exam 1 Slides.pdf` -- slides for discussing the
-  solutions in class.
-
-All three are generated from one source in `Mock_Exams/_Generator/` -- edit
-`spec_qrm1.py` there, never the generated `.tex` files (see
-`Mock_Exams/_Generator/README.md`):
-
-```sh
-cd Mock_Exams/_Generator
-python3 figures.py     # figures
-python3 verify.py      # recompute all 30 results
-python3 build.py 1     # .tex files, automatic checks, PDFs
-```
+Three mock exams on Parts 3--5 (with detailed solutions) are handed out
+separately; they are not part of this repository.
 
 ## Building
 
