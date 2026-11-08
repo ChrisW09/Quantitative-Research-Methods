@@ -13,8 +13,8 @@
 #                                shop" (1)-(2): covariance, correlation)
 #   2  Simple regression        (twelve stores: the best line, least squares;
 #                                lamp; online shop (3)-(6): residuals of two
-#                                lines, squares, normal equations, second
-#                                shop; exercises: furniture store, price-demand)
+#                                lines, squares, OLS line, second shop;
+#                                exercises: furniture store, price-demand)
 #   3  Goodness of fit          (variance decomposition, R^2, three sums;
 #                                online shop (7)-(8); exercises: heating
 #                                costs, study hours -- statsmodels output)
@@ -24,8 +24,9 @@
 #   5  Inference                (SE, t-test, CI, p-value, prediction;
 #                                online shop (11))
 #   6  Multiple regression      (Advertising, Credit)
-#   Appendix                    (minimum property of OLS, interactions,
-#                                diagnostics, collinearity / VIF)
+#   Appendix                    (derivation of OLS with exercise online
+#                                shop (A), minimum property of OLS,
+#                                interactions, diagnostics, collinearity / VIF)
 # =====================================================================
 import warnings
 from pathlib import Path
@@ -162,7 +163,11 @@ print("yhat(7) =", round(30 + 1.2 * 7, 4))                 # 38.4
 # slide 'Interpretation at a glance -- and predictions'
 print("yhat(9.5), yhat(25):", round(30 + 1.2 * 9.5, 4), round(30 + 1.2 * 25, 4), " 1.2 * 5 =", 1.2 * 5)  # 41.4, 60, 6
 
-header("2 Exercise -- online shop (5): solving the normal equations")
+header("2 Exercise -- online shop (5): the OLS line of the online shop")
+print("b1 = s_xy/s_x^2 = 5/2.5 =", 5 / 2.5, " = S_xy/S_xx = 20/10 =", 20 / 10,
+      " b0 = 26 - 2*3 =", 26 - 2 * 3, " centroid check:", 20 + 2 * 3)   # 2, 2, 20, 26
+
+header("Appendix A.1 -- exercise online shop (A): solving the normal equations")
 n_s, Sx, Sy, Sxx_raw, Sxy_raw = 5, xs_.sum(), ys_.sum(), (xs_**2).sum(), (xs_ * ys_).sum()
 print("sums:", n_s, Sx, Sy, Sxx_raw, Sxy_raw, " products:", (xs_ * ys_).tolist())  # 5 15 130 55 410
 b1_ne, b0_ne = np.linalg.solve([[n_s, Sx], [Sx, Sxx_raw]], [Sy, Sxy_raw])[::-1]

@@ -277,8 +277,8 @@
       \small\begin{itemize}\setlength{\itemsep}{1pt}
         \item compute and interpret \textbf{covariance} and
               \textbf{correlation},
-        \item explain why least squares squares the residuals;
-              \textbf{derive} the OLS estimators,
+        \item explain why least squares squares the residuals and
+              how the \textbf{OLS estimators} follow (four steps),
         \item fit a \textbf{simple regression} by hand and in Python;
               interpret it (units, extrapolation),
         \item assess the fit with $R^2$; read \textbf{residual plots},
@@ -300,7 +300,7 @@
   \end{columns}
   \kernaussage{Common thread: a regression coefficient is an
   \emph{estimate} -- report it together with its uncertainty.}
-\appendixnote{minimum property of OLS, interactions, diagnostics, collinearity}
+\appendixnote{derivation of the OLS estimators, minimum property, interactions, diagnostics}
 \end{frame}
 
 % ============================================================================
@@ -880,9 +880,10 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
 % Story (as in "Statistik fuer Oekonomen", Teil 3, version 2): correlation is
 %   not enough -> starting question -> many lines -> equation of a line ->
 %   residuals of two lines cancel (exercise 3) -> square them (exercise 4) ->
-%   Gauss: least squares -> objective function -> four steps -> normal
-%   equations (exercise 5) -> OLS estimators -> second shop (exercise 6) ->
-%   interpretation. After every step an exercise on the running online shop.
+%   Gauss: least squares -> objective function -> four steps (every
+%   calculation step in Appendix A.1) -> OLS estimators -> OLS line of the
+%   shop (exercise 5) -> second shop (exercise 6) -> interpretation. After
+%   every step an exercise on the running online shop.
 % ============================================================================
 \section[Simple regression]{Simple Linear Regression}
 
@@ -1568,46 +1569,13 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     \vspace{-8pt}
   \end{block}
   \inworten{The coefficient values with the smallest sum of squared
-  residuals.}
+  residuals.}\\[2pt]
+  {\footnotesize At the minimum the derivative with respect to $\beta_0$
+  ($\beta_1$ fixed) and with respect to $\beta_1$ ($\beta_0$ fixed) is zero:
+  the \emph{partial} derivatives.\par}
 \end{frame}
 
-\begin{frame}{How can the problem be solved?}
-  \begin{columns}[T]
-    \begin{column}{0.4\textwidth}
-      \begin{tikzpicture}[font=\footnotesize, baseline=(current bounding box.north)]
-        \begin{axis}[regbasis, height=4.8cm, width=5.8cm,
-            xlabel={coefficient $\beta$}, ylabel={$S(\beta)$},
-            xmin=-0.5, xmax=4.5, ymin=-1.6, ymax=10, xtick=\empty, ytick=\empty,
-            grid=none]
-          \addplot[hsbiblau, thick, domain=-0.3:4.3, samples=60] {1.2 + 1.6*(x-2)^2};
-          \addplot[only marks, mark=*, mark size=2.6pt, hsbirot] coordinates {(2,1.2)};
-          \draw[hsbirot, thick] (axis cs:1.2,1.2) -- (axis cs:2.8,1.2);
-          \node[hsbirot, anchor=north] at (axis cs:2,1.0) {slope $0$};
-          \node[anchor=south, hsbiblaudunkel] at (axis cs:2,2.1) {$\hat{\beta}$};
-        \end{axis}
-      \end{tikzpicture}
-      \begin{center}\footnotesize
-        Sketch: an upward-opening parabola; at the minimum the derivative is
-        zero.
-      \end{center}
-    \end{column}
-    \begin{column}{0.58\textwidth}
-      \begin{block}{Observation}
-        $S(\beta_0,\beta_1)$ is a \textbf{quadratic function} of the two
-        unknowns: an upward-opening ``bowl'' with exactly one minimum (as long
-        as the $x_i$ are not all equal).
-      \end{block}
-      \begin{block}{Solution with calculus}
-        At the minimum the derivative is zero -- in \emph{both} directions:
-        with respect to $\beta_0$ ($\beta_1$ fixed) and with respect to
-        $\beta_1$ ($\beta_0$ fixed). These are the \emph{partial}
-        derivatives. The way to the solution takes four steps.
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{From the minimisation problem to the OLS estimator in four steps}
+\begin{frame}[label=solutionpath]{From the minimisation problem to the OLS estimator in four steps}
   \begin{center}
     \begin{tikzpicture}[>=Latex, font=\small,
         box/.style={draw=hsbiblaudunkel, fill=hsbiblau!8, rounded corners=3pt,
@@ -1635,145 +1603,9 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     Insert $\beta_0 = \bar{y} - \beta_1\bar{x}$ from step 3: \
     $\sum x_i\,\bigl(y_i - (\bar{y} - \beta_1\bar{x}) - \beta_1 x_i\bigr) = 0$\\[2pt]
     Only $\beta_1$ is left $\Rightarrow$ solve for $\beta_1$: the formula top
-    right. The next slides show every step.
+    right.
   \end{block}
-\end{frame}
-
-\begin{frame}{First-order conditions}
-  \begin{block}{Differentiate with the chain rule}
-    For a single term,
-    $\frac{\partial}{\partial \beta_0}\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)^{2}
-      = 2\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)\cdot(-1)$;
-    for $\beta_1$ the inner derivative is $-x_i$.
-  \end{block}
-
-  \begin{block}{Add up and set equal to zero}
-    \vspace{-8pt}
-    \begin{align*}
-      \frac{\partial S}{\partial \beta_0} &= -2\sum_{i=1}^{n}\bigl(y_i - \beta_0 - \beta_1 x_i\bigr) \;=\; 0 \\
-      \frac{\partial S}{\partial \beta_1} &= -2\sum_{i=1}^{n} x_i\bigl(y_i - \beta_0 - \beta_1 x_i\bigr) \;=\; 0
-    \end{align*}
-  \end{block}
-
-  \inworten{At the minimum both partial derivatives vanish. The brackets are
-  the residuals: the best line has residuals that sum to zero,
-  $\sum \hat{u}_i = 0$, and in addition $\sum x_i \hat{u}_i = 0$.}
-\end{frame}
-
-\begin{frame}{From the derivatives to the normal equations}
-  \begin{block}{First condition: divide by $-2$, split the sum}
-    \[
-      \sum_{i=1}^{n} y_i \;=\; n\,\beta_0 + \beta_1 \sum_{i=1}^{n} x_i
-      \qquad\Longrightarrow\qquad
-      \beta_0 \;=\; \bar{y} - \beta_1\,\bar{x}
-    \]
-    \vspace{-2pt}\footnotesize (both sides divided by $n$; $\bar{x} = \frac{1}{n}\sum x_i$,
-    $\bar{y} = \frac{1}{n}\sum y_i$)
-  \end{block}
-
-  \begin{block}{Second condition: in the same way}
-    \[
-      \sum_{i=1}^{n} x_i y_i \;=\; \beta_0 \sum_{i=1}^{n} x_i + \beta_1 \sum_{i=1}^{n} x_i^{2}
-    \]
-  \end{block}
-
-  \begin{exampleblock}{Normal equations}
-    Two linear equations for the two unknowns $\beta_0$ and $\beta_1$. The
-    first one gives the intercept as soon as the slope is known.
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}{Exercise -- online shop (5): solving the normal equations}
-  \begin{columns}[T]
-    \begin{column}{0.49\textwidth}
-      \begin{block}{Sums of the online shop}
-        $n = 5$, \quad $\sum x_i = 15$, \quad $\sum y_i = 130$\\[2pt]
-        $\sum x_i^{2} = 1 + 4 + 9 + 16 + 25 = 55$\\[2pt]
-        $\sum x_i y_i = 21 + 52 + 72 + 120 + 145 = 410$
-      \end{block}
-    \end{column}
-    \begin{column}{0.49\textwidth}
-      \begin{block}{Normal equations (previous slide)}
-        \renewcommand{\arraystretch}{1.6}
-        \begin{tabular}{@{}l@{\ \ }l@{}}
-          I:  & $\sum y_i = n\,\beta_0 + \beta_1 \sum x_i$ \\
-          II: & $\sum x_i y_i = \beta_0 \sum x_i + \beta_1 \sum x_i^{2}$
-        \end{tabular}
-      \end{block}
-    \end{column}
-  \end{columns}
-
-  \medskip
-
-  \begin{block}{Problem statement}
-    \begin{enumerate}
-      \setlength{\itemsep}{2pt}
-      \item Write down both normal equations with these sums.
-      \item Solve the system of equations for $\beta_0$ and $\beta_1$.
-      \item Compare the result with the two lines of exercise (3).
-    \end{enumerate}
-  \end{block}
-\end{frame}
-
-\begin{frame}{Solution -- online shop (5): solving the normal equations}
-  \begin{columns}[T]
-    \begin{column}{0.44\textwidth}
-      \begin{block}{(1) Insert the sums}
-        \renewcommand{\arraystretch}{1.5}
-        \begin{tabular}{@{}l@{\ \ }l@{}}
-          I:  & $130 = 5\,\beta_0 + 15\,\beta_1$ \\
-          II: & $410 = 15\,\beta_0 + 55\,\beta_1$
-        \end{tabular}
-      \end{block}
-      \begin{exampleblock}{(3) Comparison}
-        $\hat{y} = 20 + 2\,x$ is \textbf{line 2} of exercise (3): no other
-        line has a smaller sum of squares than its $14$.
-      \end{exampleblock}
-    \end{column}
-    \begin{column}{0.54\textwidth}
-      \begin{block}{(2) Rule: solve I for $\beta_0$, insert into II}
-        \renewcommand{\arraystretch}{1.5}
-        \begin{tabular}{@{}l@{}}
-          I divided by $5$: \ $\beta_0 = 26 - 3\,\beta_1$ \\
-          into II: \ $410 = 15\,(26 - 3\,\beta_1) + 55\,\beta_1$ \\
-          \phantom{into II: \ }$410 = 390 - 45\,\beta_1 + 55\,\beta_1 = 390 + 10\,\beta_1$ \\
-          $10\,\beta_1 = 20 \ \Rightarrow\ \hat{\beta}_1 = \mathbf{2}$ \\
-          $\hat{\beta}_0 = 26 - 3 \cdot 2 = \mathbf{20}$
-        \end{tabular}
-      \end{block}
-      \inworten{Step 3 gives the intercept as a function of the slope, step 4
-      the slope -- exactly the general derivation on the next slide.}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Solving for the slope}
-  \begin{block}{Insert the intercept}
-    Insert $\beta_0 = \bar{y} - \beta_1 \bar{x}$ into the second normal
-    equation and use $\sum x_i = n\bar{x}$:
-    \vspace{-6pt}
-    \begin{align*}
-      \sum x_i y_i &= (\bar{y} - \beta_1 \bar{x})\, n\bar{x} + \beta_1 \sum x_i^{2} \\
-      \sum x_i y_i - n\,\bar{x}\bar{y} &= \beta_1 \Bigl(\sum x_i^{2} - n\,\bar{x}^{2}\Bigr)
-    \end{align*}
-  \end{block}
-
-  \begin{block}{Result}
-    With $\sum x_i y_i - n\bar{x}\bar{y} = \sum (x_i - \bar{x})(y_i - \bar{y})$ and
-    $\sum x_i^{2} - n\bar{x}^{2} = \sum (x_i - \bar{x})^{2}$ (multiply out):
-    \vspace{-4pt}
-    \[
-      \hat{\beta}_1 \;=\; \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}
-                              {\sum_{i=1}^{n} (x_i - \bar{x})^{2}}
-      \qquad\text{and}\qquad
-      \hat{\beta}_0 \;=\; \bar{y} - \hat{\beta}_1\,\bar{x}.
-    \]
-    \vspace{-10pt}
-  \end{block}
-
-  \footnotesize Requirement: the $x_i$ are not all equal (else the denominator
-  is $0$). As $S$ opens upwards, this is the minimum.
-  \appendixnote{why no other line can beat the OLS line}
+  \hfill\hyperlink{derivation}{\beamergotobutton{Every step: derivation in Appendix A.1}}
 \end{frame}
 
 \begin{frame}{The OLS estimator of the slope}
@@ -1882,6 +1714,56 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
   \end{columns}
 \end{frame}
 
+\begin{frame}{Exercise -- online shop (5): the OLS line of the online shop}
+  \begin{block}{Known from exercises (1) and (2)}
+    $\bar{x} = 3$, \ $\bar{y} = 26$, \ $s_{xy} = 5$, \ $s_x^{2} = 2.5$
+    \qquad ($S_{xy} = 20$, \ $S_{xx} = 10$)
+  \end{block}
+
+  \medskip
+
+  \begin{block}{Problem statement}
+    \begin{enumerate}
+      \setlength{\itemsep}{3pt}
+      \item Compute the slope $\hat{\beta}_1 = s_{xy}/s_x^{2}$ and check it with
+            $S_{xy}/S_{xx}$.
+      \item Compute the intercept $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\,\bar{x}$
+            (step 3) and write down the OLS line.
+      \item Which of the two lines of exercise (3) is the OLS line? What does
+            this mean for its sum of squared residuals $14$?
+      \item Interpret the slope in words.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- online shop (5): the OLS line of the online shop}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{(1) Rule: $\hat{\beta}_1 = s_{xy}/s_x^{2} = S_{xy}/S_{xx}$}
+        $\hat{\beta}_1 = \dfrac{5}{2.5} = \mathbf{2}$, \qquad
+        check: $\dfrac{20}{10} = 2$ \checkmark
+      \end{block}
+      \begin{block}{(2) Rule: $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\,\bar{x}$}
+        $\hat{\beta}_0 = 26 - 2 \cdot 3 = \mathbf{20}$
+        \ $\Rightarrow$ \ $\hat{y} = 20 + 2\,x$
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{exampleblock}{(3) Line 2 is the OLS line}
+        $\hat{y} = 20 + 2\,x$ is line 2 of exercise (3). Its sum of squares
+        $14$ is the \textbf{smallest possible}: no line through the five
+        months does better (line 1: $24$).
+      \end{exampleblock}
+      \begin{exampleblock}{(4) The slope in words}
+        $1000$ EUR more advertising goes along with $2000$ EUR more revenue
+        on average.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+  \inworten{Check: the line passes through the centroid $(\bar{x},\bar{y}) = (3,\,26)$,
+  as $20 + 2 \cdot 3 = 26$.}
+\end{frame}
+
 \begin{frame}{Intercept, OLS line and the answer}
   \begin{columns}[T]
     \begin{column}{0.44\textwidth}
@@ -1951,6 +1833,7 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
   \footnotesize Properties: through $(\bar{x},\bar{y})$; $\sum \hat{u}_i = 0$
   and $\sum x_i\,\hat{u}_i = 0$ (first-order conditions); slope with the sign
   of $s_{xy}$, $0$ exactly if $s_{xy} = 0$.
+  \hfill\hyperlink{derivation}{\beamergotobutton{Derivation}}
 \end{frame}
 
 \begin{frame}{Step by step to the regression line}
@@ -2117,8 +2000,8 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
         \end{center}
       \end{block}
       \begin{exampleblock}{For comparison: the first shop}
-        \small $\hat{\beta}_1 = 20/10 = 2$, \ $\hat{\beta}_0 = 26 - 2 \cdot 3 = 20$:
-        \ $\hat{y} = 20 + 2\,x$ -- line 2 of exercise (3).
+        \small $\hat{y} = 20 + 2\,x$ (exercise (5)): there $1000$ EUR more
+        advertising goes with $2000$ EUR, here with $3000$ EUR more revenue.
       \end{exampleblock}
     \end{column}
   \end{columns}
@@ -2342,7 +2225,7 @@ plt.axline((0, reg.params["Intercept"]), slope=reg.params["price"])
         \setcounter{enumi}{5}
         \setlength{\itemsep}{2pt}
         \item Which minimisation problem does least squares solve?
-        \item How does calculus deliver the OLS estimators?
+        \item Which four steps lead to the OLS estimators?
         \item Why is the slope the ratio of covariance and variance?
         \item How do you compute a regression line by hand for a few
               observations?
@@ -3327,7 +3210,7 @@ reg.ssr, reg.ess              # 190.0  810.0  (careful: ssr = RSS, ess = ESS)
 \end{frame}
 
 \begin{frame}{Sums without a deviation table: the shift theorem}
-  \begin{block}{Shift theorem (computational formula; used in the derivation of the slope)}
+  \begin{block}{Shift theorem (computational formula; used in the derivation of the slope, Appendix A.1)}
     \vspace{-3pt}
     \[
       S_{xy} = \sum x_i y_i - n\,\bar{x}\,\bar{y}
@@ -4107,7 +3990,7 @@ reg.resid.sum()      # practically 0 (rounding): first-order condition
       \item[Small samples] Higher threshold $h_i > \dfrac{6}{n}$.
     \end{description}
     (In multiple regression with $p$ explanatory variables:
-    $h_i>2(p+1)/n$ -- see Appendix A.3.)
+    $h_i>2(p+1)/n$ -- see Appendix A.4.)
   \end{alertblock}
 
   \begin{exampleblock}{Caution}
@@ -6424,22 +6307,326 @@ sm.stats.anova_lm(small, large) # F-test
     part, but useful for projects with real data.
   \end{block}
   \begin{center}
-    \renewcommand{\arraystretch}{1.35}
+    \renewcommand{\arraystretch}{1.2}
     \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{8.6cm}@{}}
       \toprule
       \textbf{Topic} & \textbf{Content}\\
       \midrule
-      A.1 Minimum property of OLS & Why the least-squares line is the unique minimum -- a
-        check without calculus (the derivation itself is in Section~2)\\
-      A.2 Interactions & When the effect of one variable depends on another\\
-      A.3 Diagnostics & Residual plots, outliers and leverage in multiple
+      A.1 Derivation of OLS & Every calculation step from the minimisation
+        problem to the OLS estimators, with an exercise\\
+      A.2 Minimum property of OLS & Why the least-squares line is the unique
+        minimum -- a check without calculus\\
+      A.3 Interactions & When the effect of one variable depends on another\\
+      A.4 Diagnostics & Residual plots, outliers and leverage in multiple
         regression, collinearity and the VIF, a case study\\
       \bottomrule
     \end{tabular}
   \end{center}
 \end{frame}
 
-\subsection{A.1 Minimum property of OLS}
+\subsection{A.1 Derivation of the OLS estimators}
+
+\begin{frame}[label=derivation]{Appendix: derivation (1/7) -- starting point and plan}
+  \begin{block}{Where do $\hat{\beta}_1 = S_{xy}/S_{xx}$ and $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}$ come from? \ Starting point:}
+    \[
+      S(\beta_0,\beta_1) = \sum_{i=1}^{n}\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)^{2} \;\to\; \min
+      \qquad\Longrightarrow\qquad
+      \frac{\partial S}{\partial \beta_0} = 0, \quad \frac{\partial S}{\partial \beta_1} = 0
+    \]
+    \vspace{-8pt}
+
+    \footnotesize $\beta_0$, $\beta_1$: arbitrary candidates; the solution:
+    $\hat{\beta}_0$, $\hat{\beta}_1$. \emph{Partial}: differentiate with respect
+    to $\beta_0$ and treat $\beta_1$ as a fixed number (and vice versa).
+  \end{block}
+
+  \begin{columns}[T]
+    \begin{column}{0.6\textwidth}
+      \begin{exampleblock}{Plan -- the four steps of the main part}
+        \footnotesize
+        \begin{tabular}{@{}ll@{}}
+          (2), (3) & step 1: form both partial derivatives \\
+          (4), (5) & steps 2--4: set to zero, solve for $\beta_0$, insert \\
+          (6)      & bring the result into deviation form \\
+          (7)      & check that it really is a minimum
+        \end{tabular}
+      \end{exampleblock}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \begin{center}
+        \begin{tikzpicture}[font=\footnotesize]
+          \begin{axis}[regbasis, height=3.0cm, width=4.6cm,
+              xlabel={coefficient $\beta$}, ylabel={$S(\beta)$},
+              xmin=-0.5, xmax=4.5, ymin=-1.6, ymax=10, xtick=\empty, ytick=\empty,
+              grid=none]
+            \addplot[hsbiblau, thick, domain=-0.3:4.3, samples=60] {1.2 + 1.6*(x-2)^2};
+            \addplot[only marks, mark=*, mark size=2.2pt, hsbirot] coordinates {(2,1.2)};
+            \draw[hsbirot, thick] (axis cs:1.0,1.2) -- (axis cs:3.0,1.2);
+            \node[hsbirot, anchor=north, font=\scriptsize] at (axis cs:2,0.9) {slope $0$};
+          \end{axis}
+        \end{tikzpicture}
+      \end{center}
+    \end{column}
+  \end{columns}
+  \hfill\hyperlink{solutionpath}{\beamerreturnbutton{back}}
+\end{frame}
+
+\begin{frame}{Appendix: derivation (2/7) -- derivative with respect to $\beta_0$}
+  \begin{block}{A single term: chain rule}
+    \vspace{-6pt}
+    \begin{align*}
+      \frac{\partial}{\partial \beta_0}\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)^{2}
+        &= \underbrace{2\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)}_{\text{outer}}
+           \cdot \underbrace{(-1)}_{\text{inner}}
+         \;=\; -2\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)
+    \end{align*}
+    \vspace{-10pt}
+
+    \footnotesize Inner function $y_i - \beta_0 - \beta_1 x_i$: differentiated
+    with respect to $\beta_0$ it leaves $-1$, because $y_i$ and $\beta_1 x_i$
+    do not depend on $\beta_0$.
+  \end{block}
+
+  \medskip
+
+  \begin{block}{All terms: sum rule}
+    \[
+      \frac{\partial S}{\partial \beta_0}
+      \;=\; \sum_{i=1}^{n} -2\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)
+      \;=\; -2\sum_{i=1}^{n}\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)
+    \]
+    \vspace{-8pt}
+
+    \footnotesize The derivative of a sum is the sum of the derivatives; the
+    constant factor $-2$ moves in front of the sum.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Appendix: derivation (3/7) -- derivative with respect to $\beta_1$}
+  \begin{block}{A single term: chain rule}
+    \vspace{-6pt}
+    \begin{align*}
+      \frac{\partial}{\partial \beta_1}\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)^{2}
+        &= \underbrace{2\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)}_{\text{outer}}
+           \cdot \underbrace{(-x_i)}_{\text{inner}}
+         \;=\; -2\,x_i\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)
+    \end{align*}
+    \vspace{-10pt}
+
+    \footnotesize Differentiated with respect to $\beta_1$:
+    $\partial(-\beta_1 x_i)/\partial \beta_1 = -x_i$; $y_i$ and $\beta_0$ do
+    not depend on $\beta_1$.
+  \end{block}
+
+  \medskip
+
+  \begin{block}{All terms: sum rule}
+    \[
+      \frac{\partial S}{\partial \beta_1}
+      \;=\; -2\sum_{i=1}^{n} x_i\bigl(y_i - \beta_0 - \beta_1 x_i\bigr)
+    \]
+    \vspace{-8pt}
+  \end{block}
+
+  \medskip
+
+  \begin{exampleblock}{Interim result}
+    Both derivatives contain the residuals $y_i - \beta_0 - \beta_1 x_i$ of
+    the respective line.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Appendix: derivation (4/7) -- first condition: the intercept}
+  \begin{block}{$\partial S / \partial \beta_0 = 0$ \ step by step}
+    \vspace{-8pt}
+    \begin{align*}
+      -2\tsum (y_i - \beta_0 - \beta_1 x_i) &= 0
+        && \mid\ \text{divide by } (-2) \\
+      \tsum (y_i - \beta_0 - \beta_1 x_i) &= 0
+        && \mid\ \text{split the sum} \\
+      \tsum y_i - \tsum \beta_0 - \tsum \beta_1 x_i &= 0
+        && \mid\ \tsum_{i=1}^{n} \beta_0 = n\beta_0, \ \ \tsum \beta_1 x_i = \beta_1 \tsum x_i \\
+      \tsum y_i - n\beta_0 - \beta_1 \tsum x_i &= 0
+        && \mid\ + n\beta_0 \\
+      n\beta_0 &= \tsum y_i - \beta_1 \tsum x_i
+        && \mid\ \text{divide by } n \\
+      \hat{\beta}_0 &= \bar{y} - \hat{\beta}_1\,\bar{x}
+        && \mid\ \text{as } \tfrac{1}{n}\tsum y_i = \bar{y}, \ \tfrac{1}{n}\tsum x_i = \bar{x}
+    \end{align*}
+    \vspace{-14pt}
+  \end{block}
+
+  \footnotesize Line 4 rearranged is the \textbf{first normal equation}
+  $\sum y_i = n\beta_0 + \beta_1 \sum x_i$. Line 2 with the OLS values:
+  $\sum \hat{u}_i = 0$ -- the residuals of the OLS line sum to zero.
+\end{frame}
+
+\begin{frame}{Appendix: derivation (5/7) -- second condition: the slope}
+  \begin{block}{$\partial S / \partial \beta_1 = 0$ \ and insert the intercept}
+    \vspace{-8pt}
+    \small
+    \begin{align*}
+      -2\tsum x_i (y_i - \beta_0 - \beta_1 x_i) &= 0
+        && \mid\ \text{divide by } (-2) \\
+      \tsum x_i (y_i - \beta_0 - \beta_1 x_i) &= 0
+        && \mid\ \text{multiply out, split the sum} \\
+      \tsum x_i y_i - \beta_0 \tsum x_i - \beta_1 \tsum x_i^{2} &= 0
+        && \mid\ \text{rearranged: 2nd normal equation} \\
+      \tsum x_i y_i - (\bar{y} - \beta_1 \bar{x})\, n\bar{x} - \beta_1 \tsum x_i^{2} &= 0
+        && \mid\ \beta_0 = \bar{y} - \beta_1 \bar{x} \ \text{(4/7)}, \ \tsum x_i = n\bar{x} \\
+      \tsum x_i y_i - n\bar{x}\bar{y} + \beta_1 n\bar{x}^{2} - \beta_1 \tsum x_i^{2} &= 0
+        && \mid\ \text{expand the bracket} \\
+      \tsum x_i y_i - n\bar{x}\bar{y} &= \beta_1 \bigl(\tsum x_i^{2} - n\bar{x}^{2}\bigr)
+        && \mid\ \beta_1\text{ terms to the right, factor out} \\
+      \hat{\beta}_1 &= \frac{\tsum x_i y_i - n\bar{x}\bar{y}}{\tsum x_i^{2} - n\bar{x}^{2}}
+        && \mid\ \text{divide by the bracket} \ (= S_{xx} > 0)
+    \end{align*}
+    \vspace{-14pt}
+  \end{block}
+
+  \footnotesize Line 2 with the OLS values: $\sum x_i \hat{u}_i = 0$ (see
+  ``Both estimators at a glance''). \ 2nd normal equation:
+  $\sum x_i y_i = \beta_0 \sum x_i + \beta_1 \sum x_i^{2}$.
+\end{frame}
+
+\begin{frame}{Exercise -- online shop (A): solving the normal equations}
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Sums of the online shop}
+        $n = 5$, \quad $\sum x_i = 15$, \quad $\sum y_i = 130$\\[2pt]
+        $\sum x_i^{2} = 1 + 4 + 9 + 16 + 25 = 55$\\[2pt]
+        $\sum x_i y_i = 21 + 52 + 72 + 120 + 145 = 410$
+      \end{block}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Normal equations ((4/7) and (5/7))}
+        \renewcommand{\arraystretch}{1.6}
+        \begin{tabular}{@{}l@{\ \ }l@{}}
+          I:  & $\sum y_i = n\,\beta_0 + \beta_1 \sum x_i$ \\
+          II: & $\sum x_i y_i = \beta_0 \sum x_i + \beta_1 \sum x_i^{2}$
+        \end{tabular}
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \medskip
+
+  \begin{block}{Problem statement}
+    \begin{enumerate}
+      \setlength{\itemsep}{2pt}
+      \item Write down both normal equations with these sums.
+      \item Solve the system of equations for $\beta_0$ and $\beta_1$.
+      \item Compare the result with exercise (5).
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution -- online shop (A): solving the normal equations}
+  \begin{columns}[T]
+    \begin{column}{0.44\textwidth}
+      \begin{block}{(1) Insert the sums}
+        \renewcommand{\arraystretch}{1.5}
+        \begin{tabular}{@{}l@{\ \ }l@{}}
+          I:  & $130 = 5\,\beta_0 + 15\,\beta_1$ \\
+          II: & $410 = 15\,\beta_0 + 55\,\beta_1$
+        \end{tabular}
+      \end{block}
+      \begin{exampleblock}{(3) Comparison}
+        $\hat{y} = 20 + 2\,x$: the OLS line of exercise (5) -- obtained
+        here without $s_{xy}$ and $s_x^{2}$, directly from the sums.\ \checkmark
+      \end{exampleblock}
+    \end{column}
+    \begin{column}{0.54\textwidth}
+      \begin{block}{(2) Rule: solve I for $\beta_0$, insert into II}
+        \renewcommand{\arraystretch}{1.5}
+        \begin{tabular}{@{}l@{}}
+          I divided by $5$: \ $\beta_0 = 26 - 3\,\beta_1$ \\
+          into II: \ $410 = 15\,(26 - 3\,\beta_1) + 55\,\beta_1$ \\
+          \phantom{into II: \ }$410 = 390 - 45\,\beta_1 + 55\,\beta_1 = 390 + 10\,\beta_1$ \\
+          $10\,\beta_1 = 20 \ \Rightarrow\ \hat{\beta}_1 = \mathbf{2}$ \\
+          $\hat{\beta}_0 = 26 - 3 \cdot 2 = \mathbf{20}$
+        \end{tabular}
+      \end{block}
+      \inworten{Solve (I) for $\beta_0$, insert into (II): exactly what
+      (4/7) and (5/7) do in general.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Appendix: derivation (6/7) -- back to the deviation form}
+  \begin{block}{Numerator from (5/7): multiply out the cross-products}
+    \vspace{-8pt}
+    \footnotesize
+    \begin{align*}
+      \tsum (x_i - \bar{x})(y_i - \bar{y})
+        &= \tsum \bigl(x_i y_i - \bar{y}\,x_i - \bar{x}\,y_i + \bar{x}\bar{y}\bigr)
+         && \mid\ \text{multiply out} \\
+        &= \tsum x_i y_i - \bar{y}\tsum x_i - \bar{x}\tsum y_i + n\,\bar{x}\bar{y}
+         && \mid\ \text{split the sum}, \ \tsum_{i=1}^{n} \bar{x}\bar{y} = n\,\bar{x}\bar{y} \\
+        &= \tsum x_i y_i - n\bar{x}\bar{y} - n\bar{x}\bar{y} + n\bar{x}\bar{y}
+         && \mid\ \tsum x_i = n\bar{x}, \ \tsum y_i = n\bar{y} \\
+        &= \tsum x_i y_i - n\,\bar{x}\bar{y}
+         && \mid\ \text{combine}
+    \end{align*}
+    \vspace{-14pt}
+  \end{block}
+
+  \begin{block}{Denominator: likewise (binomial formula)}
+    \vspace{-8pt}
+    \footnotesize
+    \begin{align*}
+      \tsum (x_i - \bar{x})^{2}
+        = \tsum \bigl(x_i^{2} - 2\bar{x}\,x_i + \bar{x}^{2}\bigr)
+        = \tsum x_i^{2} - 2n\bar{x}^{2} + n\bar{x}^{2}
+        = \tsum x_i^{2} - n\,\bar{x}^{2}
+    \end{align*}
+    \vspace{-14pt}
+  \end{block}
+
+  \begin{exampleblock}{Result (shift theorem)}
+    \[
+      \hat{\beta}_1 = \frac{\tsum x_i y_i - n\bar{x}\bar{y}}{\tsum x_i^{2} - n\bar{x}^{2}}
+                    = \frac{\tsum (x_i - \bar{x})(y_i - \bar{y})}{\tsum (x_i - \bar{x})^{2}}
+                    = \frac{S_{xy}}{S_{xx}}
+    \]
+    \vspace{-10pt}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Appendix: derivation (7/7) -- is it really a minimum?}
+  \begin{block}{Second partial derivatives: differentiate (2) and (3) once more}
+    \vspace{-8pt}
+    \small
+    \begin{align*}
+      \frac{\partial^{2} S}{\partial \beta_0^{2}} &= -2\tsum(-1) = 2n
+      & \frac{\partial^{2} S}{\partial \beta_1^{2}} &= -2\tsum x_i(-x_i) = 2\tsum x_i^{2}
+      & \frac{\partial^{2} S}{\partial \beta_0\,\partial \beta_1} &= -2\tsum (-x_i) = 2\tsum x_i
+    \end{align*}
+    \vspace{-14pt}
+  \end{block}
+
+  \begin{block}{Minimum in two variables: both conditions hold}
+    \vspace{-8pt}
+    \small
+    \begin{align*}
+      &\text{(1)}\quad \frac{\partial^{2} S}{\partial \beta_0^{2}} = 2n > 0 \\
+      &\text{(2)}\quad \frac{\partial^{2} S}{\partial \beta_0^{2}} \cdot \frac{\partial^{2} S}{\partial \beta_1^{2}}
+         - \Bigl(\frac{\partial^{2} S}{\partial \beta_0\,\partial \beta_1}\Bigr)^{2}
+         = 2n \cdot 2\tsum x_i^{2} - \bigl(2\tsum x_i\bigr)^{2} \\
+      &\phantom{\text{(2)}\quad} = 4\bigl(n\tsum x_i^{2} - n^{2}\bar{x}^{2}\bigr)
+         = 4n\bigl(\tsum x_i^{2} - n\bar{x}^{2}\bigr) = 4n\,S_{xx} > 0
+         && \mid\ \tsum x_i = n\bar{x}
+    \end{align*}
+    \vspace{-14pt}
+  \end{block}
+
+  \footnotesize \textbf{In words:} $S$ curves upwards in every direction -- a
+  ``bowl'' with exactly one minimum, as long as the $x_i$ are not all equal
+  ($S_{xx} > 0$). A check without calculus: A.2.
+  \hfill\hyperlink{solutionpath}{\beamerreturnbutton{back}}
+\end{frame}
+
+\subsection{A.2 Minimum property of OLS}
 
 \begin{frame}{Why no other line beats the OLS line}
   \small
@@ -6470,7 +6657,7 @@ sm.stats.anova_lm(small, large) # F-test
   \end{exampleblock}
 \end{frame}
 
-\subsection{A.2 Interactions}
+\subsection{A.3 Interactions}
 
 \begin{frame}{When the effect of one variable depends on another}
   \begin{block}{Interaction model}
@@ -6542,7 +6729,7 @@ sm.stats.anova_lm(small, large) # F-test
   \end{alertblock}
 \end{frame}
 
-\subsection{A.3 Diagnostics in multiple regression}
+\subsection{A.4 Diagnostics in multiple regression}
 
 \begin{frame}{The classical problems -- and how to spot them}
   \begin{center}
@@ -6714,6 +6901,9 @@ X = sm.add_constant(cr[["Age", "Limit", "Rating"]])
 
 \begin{frame}{Appendix summary}
   \begin{itemize}\setlength{\itemsep}{5pt}
+    \item \textbf{Derivation}: chain rule, normal equations,
+          $\hat\beta_0=\bar y-\hat\beta_1\bar x$ and
+          $\hat\beta_1=S_{xy}/S_{xx}$; a minimum, as $4n\,S_{xx}>0$.
     \item \textbf{Least squares}: any other line has
           $S=\text{RSS}+n(a+b\bar x)^2+b^2S_{xx}$ -- the OLS line is the unique
           minimum.
