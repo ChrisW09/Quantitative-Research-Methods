@@ -170,12 +170,17 @@ print("yhat(9.5), yhat(25):", round(30 + 1.2 * 9.5, 4), round(30 + 1.2 * 25, 4),
 header("2 Exercise -- online shop (5): the OLS line of the online shop")
 print("b1 = s_xy/s_x^2 = 5/2.5 =", 5 / 2.5, " = S_xy/S_xx = 20/10 =", 20 / 10,
       " b0 = 26 - 2*3 =", 26 - 2 * 3, " centroid check:", 20 + 2 * 3)   # 2, 2, 20, 26
+# slide 'Solution -- online shop (5)', block 'Check with Python'
+x5, y5 = pd.Series([1, 2, 3, 4, 5]), pd.Series([21, 26, 24, 30, 29])
+print("sum of squares: OLS line", ((y5 - (20 + 2 * x5))**2).sum(),
+      " line 1", ((y5 - (23 + x5))**2).sum())                          # 14, 24
 
 header("Appendix A.1 -- exercise online shop (A): solving the normal equations")
 n_s, Sx, Sy, Sxx_raw, Sxy_raw = 5, xs_.sum(), ys_.sum(), (xs_**2).sum(), (xs_ * ys_).sum()
 print("sums:", n_s, Sx, Sy, Sxx_raw, Sxy_raw, " products:", (xs_ * ys_).tolist())  # 5 15 130 55 410
 b1_ne, b0_ne = np.linalg.solve([[n_s, Sx], [Sx, Sxx_raw]], [Sy, Sxy_raw])[::-1]
 print("I: 130 = 5 b0 + 15 b1, II: 410 = 15 b0 + 55 b1  ->  b1 =", round(b1_ne, 4), " b0 =", round(b0_ne, 4))  # 2, 20
+print("np.linalg.solve(A, [130, 410]) =", np.linalg.solve([[5, 15], [15, 55]], [130, 410]))  # [20. 2.]
 print("15 * 26 =", 15 * 26, " 55 - 45 =", 55 - 45)          # 390, 10
 
 header("2 Simple regression -- lamp example, slide 'Linear regression with Python'")
@@ -271,6 +276,13 @@ print("s_x/s_y (stores) =", round(np.sqrt(155 / 288), 4), " r = 1.2 * s_x/s_y ="
       round(1.2 * np.sqrt(155 / 288), 4))                               # 0.7336, 0.8803
 print("lamp: r * s_y / s_x =", round(df["price"].corr(df["quantity"]) * df["quantity"].std()
                                       / df["price"].std(), 4))           # -0.4467
+# slide 'Three sums with Python' (twelve stores)
+xs12, ys12 = stores["adv"], stores["revenue"]
+print("shift theorem (stores): sum xy - n xbar ybar =", (xs12 * ys12).sum(), "-",
+      len(xs12) * xs12.mean() * ys12.mean(), "=",
+      (xs12 * ys12).sum() - len(xs12) * xs12.mean() * ys12.mean())      # 3696 - 3510 = 186
+print("reg.centered_tss, reg.ess, reg.ssr, reg.rsquared:", reg12.centered_tss,
+      round(reg12.ess, 4), round(reg12.ssr, 4), round(reg12.rsquared, 4))  # 288 223.2 64.8 0.775
 
 header("3 Exercise -- online shop (7): the sum-of-squares decomposition")
 reg_shop = smf.ols("revenue ~ adv", data=shop).fit()
@@ -333,6 +345,9 @@ header("Appendix A.3-A.5 -- residual analysis -- leverage values (lamp)")
 h = reg.get_influence().hat_matrix_diag
 print("leverages:", h.round(3))                    # 0.378 (ends) ... 0.111 (centre)
 print("rules of thumb 4/n, 6/n:", round(4 / n, 3), round(6 / n, 3))   # 0.444, 0.667
+# slide 'Leverage values with Python'
+print("(h > 4/n).sum() =", (h > 4 / n).sum(), " by hand equal:",
+      np.allclose(h, 1 / n + (price - price.mean())**2 / Sxx))       # 0, True
 for p_out in (95, 80):                             # fit without one store
     b_wo = smf.ols("quantity ~ price", data=df[df["price"] != p_out]).fit().params["price"]
     print(f"slope without the store at {p_out} EUR: {b_wo:.4f}")       # -0.4590, -0.4238
@@ -512,8 +527,12 @@ print(ad.corr().round(4))                      # corr(radio, newspaper) = 0.354
 TSS_ad = ((ad["sales"] - ad["sales"].mean())**2).sum()               # 5417.15
 RSS_ad = (m3.resid**2).sum()                                         # 556.83
 print("TSS, RSS:", round(TSS_ad, 2), round(RSS_ad, 2))
-print("F =", round(((TSS_ad - RSS_ad) / 3) / (RSS_ad / (200 - 3 - 1)), 1))   # 570.3
+F_ad = ((TSS_ad - RSS_ad) / 3) / (RSS_ad / (200 - 3 - 1))
+print("F =", round(F_ad, 1))                                         # 570.3
 print("F_0.95;3,196 =", round(stats.f.ppf(0.95, 3, 196), 2))         # 2.65
+# slide 'The F-test with Python'
+print("m3.fvalue, m3.f_pvalue:", round(m3.fvalue, 1), f"{m3.f_pvalue:.3g}",
+      " stats.f.sf(F):", f"{stats.f.sf(F_ad, 3, 196):.3g}")          # 570.3 1.58e-96 1.58e-96
 
 # dropping newspaper (slide 'Model choice -- dropping newspaper')
 m2 = smf.ols("sales ~ TV + radio", data=ad).fit()
@@ -542,6 +561,10 @@ print(mc.get_prediction(new_cr).summary_frame(alpha=0.05).round(1))  # 510.3 [30
 print(smf.ols("Balance ~ Student", data=cr).fit().summary().tables[1])          # 480.37, 396.46
 print(smf.ols("Balance ~ Income + Student", data=cr).fit().summary().tables[1]) # 211.1, 5.98, 382.7
 print(smf.ols("Balance ~ Region", data=cr).fit().summary().tables[1])           # baseline East
+# slide 'Dummy variables with Python'
+for f in ("Balance ~ Student", "Balance ~ Income + Student", "Balance ~ Region"):
+    print(f"{f:28s} params:", smf.ols(f, data=cr).fit().params.round(2).to_dict())
+print("group means:", cr.groupby("Student")["Balance"].mean().round(3).to_dict())   # 480.369, 876.825
 
 # =====================================================================
 # Appendix A.2: Why no other line beats the OLS line

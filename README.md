@@ -1,6 +1,7 @@
 # Quantitative Research
 
-Lecture slides (LaTeX Beamer) and a mock exam by Prof. Dr. Christoph Weisser.
+Lecture slides (LaTeX Beamer), companion Jupyter notebooks, a mock exam and a
+separate **Python course** by Prof. Dr. Christoph Weisser.
 
 | Part | Folder | Topic |
 |------|--------|-------|
@@ -9,6 +10,7 @@ Lecture slides (LaTeX Beamer) and a mock exam by Prof. Dr. Christoph Weisser.
 | 3 | `Part_3_Statistical_Inference` | Foundations (normal distribution, CLT), confidence intervals, sample size, hypothesis tests, p-values, one-sided tests, types of error (appendix: estimator properties, law of large numbers) |
 | 4 | `Part_4_Regression` | Correlation, least squares step by step (running exercise "online shop"), goodness of fit, inference for regression, multiple regression (appendix: derivation of the OLS estimators, minimum property, residual analysis, leverage, QQ-plot, interactions, diagnostics, collinearity) |
 | 5 | `Part_5_Classification` | Two-way tables and conditional probability, logistic regression, classification rules, confusion matrix, base rates and precision, ROC/AUC (appendix: total probability and Bayes' theorem; Bayes classifiers -- naive Bayes, LDA) |
+| Py | `Python_Course` | Separate Python course: a 90-minute introduction (Python basics, pandas, a first chart) and a self-paced track from NumPy, pandas and visualisation to scikit-learn and PyTorch -- see below |
 
 Every section contains exercises (many adapted from the course *Statistik für
 Ökonomen* and its mock exams) with step-by-step solutions -- roughly one
@@ -47,6 +49,22 @@ The notebooks load the data sets from the local `data/` folder when they run
 inside the repository and from GitHub otherwise (e.g. in Colab). Run the cells
 from top to bottom; in the exercise sections, try the "Your turn" cell first and
 then compare with the solution.
+
+## Python course
+
+`Python_Course/` is a separate, self-contained Python course that comes with the
+lecture -- no programming experience needed, every notebook runs in Google Colab.
+
+| Track | Content | Start |
+|-------|---------|-------|
+| 1 -- Introduction (90 min, live) | Python basics, data structures, control flow, functions, first steps with pandas (+ seaborn bonus) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/01_introduction/01_welcome_to_python.ipynb) |
+| 2 -- Advanced & self-learning (~12--14 h) | 15 notebooks: fundamentals in depth, NumPy, pandas, data cleaning, matplotlib, seaborn, EDA, machine learning, scikit-learn, PyTorch, capstone project | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ChrisW09/Quantitative-Research-Methods/blob/main/Python_Course/02_advanced_self_learning/01_python_basics.ipynb) |
+
+All notebooks with their Colab links, timings and a suggested path alongside
+Parts 1--5: [`Python_Course/README.md`](Python_Course/README.md). The course is
+adapted from the
+[Python for Data Science Workshop](https://github.com/BridgingAISocietySummerSchools/Python-for-Data-Science-Workshop)
+(MIT License, see `Python_Course/LICENSE`).
 
 ## Mock exam
 
@@ -96,6 +114,7 @@ Speaker notes (talk tracks in Part 3) can be enabled in `common/preamble.tex`.
 - Python 3 with numpy, pandas, scipy, statsmodels, matplotlib (>= 3.8),
   scikit-learn (Part 5) and Jupyter, e.g. via the Anaconda Distribution or
   `pip install numpy pandas scipy statsmodels matplotlib scikit-learn jupyter`
+  (the Python course additionally uses seaborn and, in one notebook, PyTorch)
   -- or use Google Colab (see above), where everything is preinstalled
 
 Run a script from its folder, e.g. `cd Part_4_Regression && python3 Part_4_Regression.py`.
