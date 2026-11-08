@@ -7,10 +7,14 @@ Writes into images/:
     ecdf_shoe_quantiles.png          shoe sizes: reading off median and 80 % quantile
     ecdf_complaints.png              exercise "complaints per day"
   Section "Histogram"
+    hist_parking.png                 quick exercise "car park" (reading a given
+                                     histogram, last label missing; task figure)
     hist_phone_costs.png             exercise "mobile phone costs" (unequal widths)
     hist_handball.png                exercise "histogram (handball team)"
   Section "Boxplot"
     boxplot_shoe_labelled.png        shoe sizes, boxplot with labels
+    boxplot_revenues.png             quick exercise "daily revenues" (even n,
+                                     outlier at the bottom; solution figure)
     boxplot_teams.png                exercise "processing times" (two teams)
   Section "Exercises" -- body heights
     ecdf_body_heights.png            empirical CDF of the raw data
@@ -167,6 +171,28 @@ ecdf_plot(cv, cc, "Empirical CDF – Complaints per Day", "ecdf_complaints.png",
 # =====================================================================
 # Section "Histogram"
 # =====================================================================
+# Quick exercise "car park": histogram of the parking durations of n = 200
+# tickets, classes [0,1], (1,2], (2,4], (4,10] (hours). Only the densities of the
+# first three bars are printed; the last bar is drawn at its true height 0.025
+# (students get it from "all areas add up to 1").
+edges_p = np.array([0, 1, 2, 4, 10])
+f_p = np.array([0.25, 0.30, 0.30, 0.15])                # areas = shares
+dens_p = f_p / np.diff(edges_p)                          # 0.25 0.3 0.15 0.025
+fig, ax = plt.subplots(figsize=(6.4, 4.4))
+density_bars(ax, edges_p, dens_p, labels=False)
+for a, b, d, lab in zip(edges_p[:-1], edges_p[1:], dens_p, ("0.25", "0.3", "0.15", "?")):
+    ax.text((a + b) / 2, d + 0.004, lab, ha="center", va="bottom", fontsize=15,
+            color=RED if lab == "?" else "black", zorder=4)
+ax.set_ylim(0, 0.35)
+ax.set_xlim(-0.3, 10.3)
+ax.yaxis.set_major_locator(MultipleLocator(0.05))
+ax.set_xlabel("Parking duration (hours)")
+ax.set_ylabel(r"Density $f_j/\Delta x_j$")
+ax.set_title("Histogram – Car Park (n = 200 tickets)")
+tidy(ax)
+fig.tight_layout()
+save(fig, "hist_parking.png")
+
 # Exercise "mobile phone costs" (n = 10), classes [0,10], (10,20], (20,40], (40,80]
 costs = np.array([12, 25, 6, 38, 15, 60, 9, 19, 32, 18])
 edges_c = np.array([0, 10, 20, 40, 80])
@@ -231,6 +257,44 @@ ax.set_xlabel("Shoe size", fontsize=16)
 ax.tick_params(axis="x", labelsize=16)
 fig.tight_layout()
 save(fig, "boxplot_shoe_labelled.png")
+
+# Quick exercise "daily revenues" of the online shop (n = 10 days, in 1000 EUR):
+# even n, outlier at the bottom (day 10)
+revenue = np.array([15, 18, 12, 22, 17, 13, 14, 20, 17, 4])
+st_r = course_box_stats(revenue)               # 12 13 15 18 22, outlier 4
+lo_r = st_r["q1"] - 1.5 * (st_r["q3"] - st_r["q1"])      # 5.5
+hi_r = st_r["q3"] + 1.5 * (st_r["q3"] - st_r["q1"])      # 25.5
+fig, ax = plt.subplots(figsize=(6.2, 3.9))
+ax.bxp([st_r], vert=False, widths=0.5, patch_artist=True,
+       boxprops=dict(facecolor=BOX, edgecolor="black", lw=1.2),
+       medianprops=dict(color="black", lw=2.2),
+       whiskerprops=dict(lw=1.2), capprops=dict(lw=1.2),
+       flierprops=dict(marker="o", markerfacecolor="none", markeredgecolor=RED,
+                       markersize=9, mew=1.8))
+for fence, txt in ((lo_r, "Lower bound\n5.5"), (hi_r, "Upper bound\n25.5")):
+    ax.axvline(fence, color=RED, ls=":", lw=1.6)
+    ax.text(fence, 0.42, txt, ha="center", va="bottom", fontsize=13, color=RED,
+            bbox=dict(facecolor="white", edgecolor="none", pad=1.0))
+# whisker labels just above the caps, box labels above the box (staggered,
+# so that 12 and 13 do not collide)
+for x, y, txt in ((st_r["whislo"], 1.14, "12"), (st_r["q1"], 1.29, "13"),
+                  (st_r["med"], 1.29, "15"), (st_r["q3"], 1.29, "18"),
+                  (st_r["whishi"], 1.14, "22")):
+    ax.text(x, y, txt, ha="center", va="bottom", fontsize=14)
+ax.text(4, 1.12, "Outlier 4\n(day 10)", ha="center", va="bottom", fontsize=13, color=RED)
+ax.set_ylim(0.35, 1.75)
+ax.set_xlim(2, 27)
+ax.xaxis.set_major_locator(MultipleLocator(5))
+ax.xaxis.set_minor_locator(MultipleLocator(1))
+ax.grid(axis="y", visible=False)
+ax.grid(axis="x", which="both", alpha=0.3)
+ax.set_yticks([])
+for sp in ("top", "right", "left"):
+    ax.spines[sp].set_visible(False)
+ax.set_xlabel("Daily revenue (in 1000 EUR)")
+ax.set_title("Boxplot – Daily Revenues (n = 10)")
+fig.tight_layout()
+save(fig, "boxplot_revenues.png")
 
 # Exercise "processing times" (two teams, n = 11 each)
 team_a = np.array([7, 4, 9, 6, 18, 8, 5, 10, 6, 9, 7])

@@ -78,6 +78,30 @@ print("Absolute difference:", round(100 * (new_share - old_share), 2),
 print("Relative change:    ", round((new_share - old_share) / old_share, 4))  # 0.25
 
 # ---------------------------------------------------------------------
+# Slides "Exercise -- Frequencies of a Nominal Variable" /
+#        "Solution (1/2), (2/2)"  (payment methods of n = 10 orders)
+# ---------------------------------------------------------------------
+header('Exercise "Frequencies of a Nominal Variable" (payment methods)')
+pay = pd.Series(["P", "C", "I", "P", "P", "C", "P", "I", "C", "P"])
+h_pay = pay.value_counts()[["I", "P", "C"]]              # invoice, PayPal, card
+f_pay = h_pay / len(pay)
+print(pd.DataFrame({"h_j": h_pay,
+                    "f_j (fraction)": [f"{h}/{len(pay)}" for h in h_pay],
+                    "f_j": f_pay.round(2),
+                    "in %": (100 * f_pay).round(0)}).T)
+# h_j: 2 5 3 | f_j: 0.20 0.50 0.30 | 20 % 50 % 30 %
+print("Checks:", h_pay.sum(), round(f_pay.sum(), 4))                  # 10 1.0
+print("b) not by invoice:", round(f_pay["P"] + f_pay["C"], 2),        # 0.8
+      "= 1 - f_invoice =", round(1 - f_pay["I"], 2),                  # 0.8
+      "|", (pay != "I").sum(), "orders")                              # 8
+print("c) change of the invoice share (25 % -> 20 %):",
+      round(100 * (f_pay["I"] - 0.25), 2), "percentage points |",     # -5.0
+      round((f_pay["I"] - 0.25) / 0.25, 4))                           # -0.2 = -20 %
+print("d) 'cumulative up to PayPal' depends on the column order:",
+      "I, P, C ->", round(f_pay["I"] + f_pay["P"], 2),                # 0.7
+      "| C, P, I ->", round(f_pay["C"] + f_pay["P"], 2))              # 0.8
+
+# ---------------------------------------------------------------------
 # Slides "Column Chart", "Bar Chart", "Pie Chart",
 #        "Empirical Distribution Function"
 # (the slides only show the images; this is the corresponding code)
@@ -181,7 +205,39 @@ print("Median (np.median): ", np.median(data))                     # 39.0
 print("Median (course):    ", course_quantile(data, 0.5))          # 39
 print("Mode:               ", data.mode().tolist())                # [39]
 
+# ---------------------------------------------------------------------
+# Slides "Exercise -- Mean, Median and Mode" / "Solution (1/2), (2/2)"
+# (laptops sold on n = 9 days; service ratings of n = 7 customers)
+# ---------------------------------------------------------------------
+header('Exercise "Mean, Median and Mode" (laptops sold, service ratings)')
+laptops = np.array([4, 7, 3, 5, 4, 6, 4, 2, 10])
+print("a) sorted:", np.sort(laptops).tolist(),                       # 2 3 4 4 4 5 6 7 10
+      "| sum:", laptops.sum(),                                       # 45
+      "| mean:", laptops.mean(),                                     # 5.0
+      "| median x_(5):", course_quantile(laptops, 0.5),              # 4
+      "| mode:", pd.Series(laptops).mode().tolist())                 # [4]
+print("   trimmed mean (alpha = 20 %): floor(0.2 * 9) =", math.floor(0.2 * 9),  # 1
+      "value per end ->", np.sort(laptops)[1:-1].sum(), "/ 7 =",     # 33 / 7
+      round(stats.trim_mean(laptops, 0.20), 4))                      # 4.7143
+laptops_b = np.array([4, 7, 3, 5, 4, 6, 4, 2, 19])                   # day 9: 19
+print("b) sum:", laptops_b.sum(),                                    # 54
+      "| mean:", laptops_b.mean(),                                   # 6.0
+      "| median:", course_quantile(laptops_b, 0.5),                  # 4
+      "| mode:", pd.Series(laptops_b).mode().tolist(),               # [4]
+      "| trimmed mean:", round(stats.trim_mean(laptops_b, 0.20), 4))  # 4.7143
+levels = ["poor", "fair", "good", "very good"]                       # ordinal
+ratings = pd.Series(pd.Categorical(
+    ["good", "very good", "fair", "good", "poor", "good", "very good"],
+    categories=levels, ordered=True))
+print("c) sorted:", ratings.sort_values().tolist())
+print("   median x_(4):", ratings.sort_values().iloc[math.ceil(7 / 2) - 1],  # good
+      "| mode:", ratings.mode().tolist(),                            # ['good']
+      "| frequency of the mode:", (ratings == "good").sum())         # 3
+
+# ---------------------------------------------------------------------
 # Slide "Arithmetic Mean from a Frequency Table"
+# ---------------------------------------------------------------------
+header('Slide "Arithmetic Mean from a Frequency Table"')
 xj, hj = abs_freq.index.to_numpy(), abs_freq.to_numpy()
 print("h_j * x_j:", (hj * xj).tolist(), "sum:", (hj * xj).sum())   # [37, 76, 156, 80, 41, 46] 436
 print("Weighted mean (h_j):", round((hj * xj).sum() / n, 4),       # 39.6364
@@ -216,6 +272,27 @@ print(pd.DataFrame(rows, columns=["quantile", "p", "n*p", "position",
 # Expected values: 38, 39, 40, 38, 40, 37
 # Slide "Quantiles -- Computation": n = 10, p = 0.2 -> n*p = 2 is an integer
 print("n = 10, p = 0.2: n*p =", 10 * 0.2, "-> position", math.ceil(10 * 0.2))  # 2
+
+# ---------------------------------------------------------------------
+# Slides "Exercise -- Quantiles of Hotline Waiting Times" /
+#        "Solution (1/2), (2/2)"  (waiting times in minutes, n = 12)
+# ---------------------------------------------------------------------
+header('Exercise "Quantiles of Hotline Waiting Times"')
+wait = np.array([3, 1, 5, 2, 6, 4, 2, 8, 3, 4, 2, 5])
+n_wait = len(wait)
+print("a) sorted:", np.sort(wait).tolist())       # 1 2 2 2 3 3 4 4 5 5 6 8
+for name, p_ in [("10%-quantile", 0.10), ("Q1", 0.25), ("Median", 0.50),
+                 ("Q3", 0.75), ("90%-quantile", 0.90)]:
+    print(f"b) {name:12s}: n*p = {n_wait * p_:.1f}, position "
+          f"{math.ceil(round(n_wait * p_, 10))}, value {course_quantile(wait, p_)}")
+# Expected: 1.2 -> 2 -> 2 | 3 -> 3 -> 2 | 6 -> 6 -> 3 | 9 -> 9 -> 5 | 10.8 -> 11 -> 6
+print("   number of calls with exactly 2 minutes:", (wait == 2).sum())     # 3
+print("c) F(6) =", round((wait <= 6).mean(), 4), "(= 11/12)",               # 0.9167
+      "| F(5) =", round((wait <= 5).mean(), 4), "(= 10/12)",                # 0.8333
+      "| calls above 6 minutes:", (wait > 6).sum())                         # 1
+print("d) average of x_(6) and x_(7):", np.median(wait),                    # 3.5
+      "| course median x_(6):", course_quantile(wait, 0.5),                 # 3
+      "| F(3) =", (wait <= 3).mean())                                       # 0.5
 
 # ---------------------------------------------------------------------
 # Slide "Quantiles with Python"
@@ -339,6 +416,22 @@ extreme = np.array([0, 0, 0, 5])
 v_ext = np.std(extreme, ddof=1) / np.mean(extreme)
 print("Extreme case [0, 0, 0, 5]: v =", round(v_ext, 4),
       "= sqrt(4) -> v* =", round(v_ext / np.sqrt(4), 4))             # 2.0 -> 1.0
+
+# ---------------------------------------------------------------------
+# Slides "Exercise -- Variance and Standard Deviation" /
+#        "Solution (1/2), (2/2)"  (delivery times in days, n = 5 each)
+# ---------------------------------------------------------------------
+header('Exercise "Variance and Standard Deviation" (two parcel services)')
+service_a = np.array([2, 5, 1, 3, 4])
+service_b = np.array([4, 3, 5, 4, 4])
+for name, x in [("A", service_a), ("B", service_b)]:
+    d = x - x.mean()
+    print(f"{name}: sum {x.sum()}, mean {x.mean()}, range {np.ptp(x)} "
+          f"({x.max()} - {x.min()}), deviations {d.tolist()} (sum {d.sum()}), "
+          f"squares {(d ** 2).tolist()}, sum of squares {(d ** 2).sum()}")
+    print(f"   s^2 = {np.var(x, ddof=1):.4f}, s = {np.std(x, ddof=1):.4f}")
+# A: mean 3, range 4, sum of squares 10, s^2 2.5, s 1.5811
+# B: mean 4, range 2, sum of squares  2, s^2 0.5, s 0.7071
 
 # ---------------------------------------------------------------------
 # Slide "Variance from a Frequency Table" (soccer team)

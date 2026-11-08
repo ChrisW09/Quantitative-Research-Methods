@@ -307,6 +307,83 @@ $\bar X=\tfrac1n(X_1+\dots+X_n)$ on the board, apply ``sum rule'' and
 ($n\sigma$) instead of variances ($n\sigma^2$). The independence assumption
 matters: duplicated or clustered observations break $\sigma^2/n$.}
 
+% ---- Quick exercise: expected value and variance (SfOe Teil 5) -----------------
+\begin{frame}{Exercise -- expected value and variance: warranty claims}
+  \begin{block}{Problem statement}
+    An electronics retailer registers $X$ warranty claims per week. From long
+    experience the distribution is known:
+    \begin{center}
+      \renewcommand{\arraystretch}{1.15}
+      \begin{tabular}{lcccc}
+        \toprule
+        claims per week $x$ & $0$ & $1$ & $2$ & $3$\\
+        \midrule
+        $P(X=x)$ & $0.2$ & $0.4$ & $0.3$ & $0.1$\\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item[a)] Compute $E(X)$, $\mathrm{Var}(X)$ and the standard deviation
+              $\sigma$.
+    \item[b)] Each claim costs $150$ euros; on top come fixed handling costs of
+              $100$ euros per week, i.e.\ $K=100+150\,X$. Find $E(K)$ and the
+              standard deviation of $K$.
+    \item[c)] Weeks are independent. For a quarter of $n=9$ weeks, find the
+              expected value and the standard deviation of the \emph{total}
+              $S=X_1+\dots+X_9$ and of the \emph{mean} $\bar X=S/9$.
+  \end{enumerate}
+\end{frame}
+\note{Talk track: a five-minute warm-up for the two rules. Part c) is the
+point of the exercise: the total of $9$ weeks has standard deviation
+$3\cdot0.9$, not $9\cdot0.9$ -- variances add, standard deviations do not --
+and the mean of $9$ weeks wobbles only a third as much as a single week.}
+
+\begin{frame}{Solution (1/2) -- warranty claims: single week and costs}
+  \textbf{Rules:} $E(X)=\sum_i x_i\,P(X=x_i)$; \
+  $\mathrm{Var}(X)=E(X^2)-\mu^2$; \ $E(a+bX)=a+b\,E(X)$, \
+  $\mathrm{Var}(a+bX)=b^2\,\mathrm{Var}(X)$.
+  \begin{align*}
+    \text{a)}\quad E(X) &= 0\cdot0.2+1\cdot0.4+2\cdot0.3+3\cdot0.1
+      =\mathbf{1.3}\\
+    E(X^2) &= 0\cdot0.2+1\cdot0.4+4\cdot0.3+9\cdot0.1=2.5\\
+    \mathrm{Var}(X) &= 2.5-1.3^2=2.5-1.69=\mathbf{0.81},
+      \qquad \sigma=\sqrt{0.81}=\mathbf{0.9}\\[4pt]
+    \text{b)}\quad E(K) &= 100+150\cdot1.3=100+195=\mathbf{295\ euros}\\
+    \mathrm{Var}(K) &= 150^2\cdot0.81=18\,225,
+      \qquad \sigma_K=150\cdot0.9=\mathbf{135\ euros}
+  \end{align*}
+  \inworten{On average $1.3$ claims and $295$ euros of warranty costs per
+  week, typically fluctuating by about $\pm135$ euros. The fixed $100$ euros
+  shift the costs but do not spread them.}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/2) -- warranty claims: total and mean of 9 weeks}
+  \textbf{Rules:} expected values always add; for \emph{independent} weeks the
+  \emph{variances} add; \ $\bar X=S/n$ $\Rightarrow$
+  $\mathrm{Var}(\bar X)=\sigma^2/n$.
+  \begin{align*}
+    \text{c)}\quad E(S) &= 9\cdot1.3=\mathbf{11.7}, &
+      \mathrm{Var}(S) &= 9\cdot0.81=7.29, &
+      \mathrm{sd}(S) &= \sqrt{7.29}=\mathbf{2.7}\\
+    E(\bar X) &= \mathbf{1.3}, &
+      \mathrm{Var}(\bar X) &= 0.81/9=0.09, &
+      \mathrm{sd}(\bar X) &= 0.9/\sqrt9=\mathbf{0.3}
+  \end{align*}
+  \inworten{The total spreads $\sqrt9=3$ times as much as one week -- not
+  $9$ times ($9\cdot0.9=8.1$ is the typical mistake: variances add, standard
+  deviations do not). The mean spreads only a third as much; this
+  $\sigma/\sqrt n$ returns below as the \textbf{standard error}.}
+  \par\smallskip
+\begin{lstlisting}
+import numpy as np
+x = np.array([0, 1, 2, 3]); p = np.array([0.2, 0.4, 0.3, 0.1])
+EX = np.sum(x * p); VarX = np.sum(x ** 2 * p) - EX ** 2
+print(round(EX, 2), round(VarX, 2))                               # a)  -> 1.3 0.81
+print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -> 2.7 0.3
+\end{lstlisting}
+\end{frame}
+
 \subsection{Normal distribution}
 
 % ---- Normal distribution ----------------------------------------------------
@@ -483,6 +560,90 @@ look up inside, read the margin. Let students find $1.96$ themselves in the
 \texttt{cdf} goes forwards, \texttt{ppf} (percent point function) goes
 backwards.}
 
+% ---- Exercise: fill volume --------------------------------------------------------
+\begin{frame}{Exercise -- normal distribution: fill volume}
+  \begin{block}{Problem statement}
+    A bottling plant fills orange juice into 1-litre bottles. The fill volume
+    $X$ (in ml) is normally distributed with $\mu=1000$ and $\sigma=10$, i.e.\
+    $X\sim N(1000,\,10^2)$. The legal minimum content is $985$\,ml.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item[a)] What share of the bottles is underfilled, $P(X<985)$?
+    \item[b)] With what probability does a bottle contain between $990$ and
+              $1015$\,ml?
+    \item[c)] Which fill volume $x_{0.95}$ is exceeded by only $5\,\%$ of the
+              bottles?
+    \item[d)] The share of underfilled bottles is to be cut to at most
+              $1\,\%$. To which setpoint $\mu$ must the plant be adjusted if
+              $\sigma=10$ stays the same?
+  \end{enumerate}
+  \textbf{Hint:} standardise, $z=(x-\mu)/\sigma$, and use the $\Phi$ table.
+\end{frame}
+\note{Talk track: give 5--7 minutes. Insist on a sketch of the bell curve
+for every part -- a) and b) are areas (forwards), c) and d) are quantiles
+(backwards). Part d) is the business punchline: the safety margin costs juice
+in every single bottle.}
+
+\begin{frame}{Solution (1/3) -- fill volume: probabilities}
+  \textbf{Rules:} $P(X\le x)=\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$; \
+  $\Phi(-z)=1-\Phi(z)$; \ $P(a\le X\le b)=\Phi(z_b)-\Phi(z_a)$.
+  \begin{align*}
+    \text{a)}\quad P(X<985) &= \Phi\Bigl(\tfrac{985-1000}{10}\Bigr)=\Phi(-1.5)
+      =1-\Phi(1.5)=1-0.9332=\mathbf{0.0668}\\[4pt]
+    \text{b)}\quad P(990\le X\le 1015)
+      &=\Phi\Bigl(\tfrac{1015-1000}{10}\Bigr)-\Phi\Bigl(\tfrac{990-1000}{10}\Bigr)
+       =\Phi(1.5)-\Phi(-1)\\
+      &=0.9332-(1-0.8413)=0.9332-0.1587=\mathbf{0.7745}
+  \end{align*}
+  \begin{exampleblock}{Interpretation}
+    About $6.7\,\%$ of the bottles are underfilled; about $77.5\,\%$ contain
+    between $990$ and $1015$\,ml.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/3) -- fill volume: quantile and setpoint}
+  \textbf{Rules:} quantile $x_p=\mu+\sigma z_p$ (search $p$ \emph{inside} the
+  table); \ $z_{1-p}=-z_p$.
+  \begin{align*}
+    \text{c)}\quad &\Phi(z)=0.95\ \Rightarrow\ z_{0.95}=1.645
+       \ \Rightarrow\ x_{0.95}=1000+1.645\cdot10=\mathbf{1016.45\ ml}\\[4pt]
+    \text{d)}\quad &P(X<985)=0.01\ \Rightarrow\
+       \tfrac{985-\mu}{10}=z_{0.01}=-z_{0.99}\approx-2.33
+       \quad(\text{table: }\Phi(2.33)=0.9901)\\
+     &\Rightarrow\ \mu=985+2.33\cdot10=\mathbf{1008.3\ ml}
+       \quad(\text{exact } z_{0.99}=2.3263:\ 1008.26\text{ ml})
+  \end{align*}
+  \begin{exampleblock}{Interpretation}
+    Only $5\,\%$ of the bottles contain more than $1016.45$\,ml. To cut
+    underfilling from $6.7\,\%$ to $1\,\%$, the setpoint must rise by about
+    $8$\,ml -- every bottle gets more juice: the price of safety.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (3/3) -- fill volume: with Python}
+  \textbf{Rule:} \texttt{cdf} gives $P(X\le x)$, \texttt{ppf} the quantile;
+  \texttt{scale} $=\sigma$ is the \emph{standard deviation}.
+\begin{lstlisting}
+from scipy import stats
+
+X = stats.norm(loc=1000, scale=10)          # X ~ N(1000, 10^2)
+print(f"a) {X.cdf(985):.4f}")
+print(f"b) {X.cdf(1015) - X.cdf(990):.4f}")
+print(f"c) {X.ppf(0.95):.2f}")
+print(f"d) {985 - stats.norm.ppf(0.01) * 10:.2f}")   # mu = 985 - z_0.01 * sigma
+\end{lstlisting}
+  \begin{block}{Output}
+\begin{lstlisting}[style=Pyout]
+a) 0.0668
+b) 0.7745
+c) 1016.45
+d) 1008.26
+\end{lstlisting}
+  \end{block}
+  \footnotesize The table answers differ only by rounding ($z_{0.99}=2.33$
+  instead of $2.3263$ in d).
+\end{frame}
+
 \subsection{Sampling distribution and CLT}
 
 % ---- Sampling distribution: estimators are random variables ----------------
@@ -603,92 +764,6 @@ $1/\sqrt n$ (standard error). Seed and code are in \texttt{make\_figures.py}.}
 standardises $\bar X$ like $Z_n$; the CLT is the licence to do so for non-normal data with
 $n\gtrsim30$ (assumptions checklist later). Typical exam trap: ``by the CLT
 the data are normal'' -- no, only the mean is.}
-
-\subsection{Exercises}
-
-% ---- Exercise: fill volume --------------------------------------------------------
-\begin{frame}{Exercise -- normal distribution: fill volume}
-  \begin{block}{Problem statement}
-    A bottling plant fills orange juice into 1-litre bottles. The fill volume
-    $X$ (in ml) is normally distributed with $\mu=1000$ and $\sigma=10$, i.e.\
-    $X\sim N(1000,\,10^2)$. The legal minimum content is $985$\,ml.
-  \end{block}
-  \begin{enumerate}\setlength{\itemsep}{3pt}
-    \item[a)] What share of the bottles is underfilled, $P(X<985)$?
-    \item[b)] With what probability does a bottle contain between $990$ and
-              $1015$\,ml?
-    \item[c)] Which fill volume $x_{0.95}$ is exceeded by only $5\,\%$ of the
-              bottles?
-    \item[d)] The share of underfilled bottles is to be cut to at most
-              $1\,\%$. To which setpoint $\mu$ must the plant be adjusted if
-              $\sigma=10$ stays the same?
-  \end{enumerate}
-  \textbf{Hint:} standardise, $z=(x-\mu)/\sigma$, and use the $\Phi$ table.
-\end{frame}
-\note{Talk track: give 5--7 minutes. Insist on a sketch of the bell curve
-for every part -- a) and b) are areas (forwards), c) and d) are quantiles
-(backwards). Part d) is the business punchline: the safety margin costs juice
-in every single bottle.}
-
-\begin{frame}{Solution (1/3) -- fill volume: probabilities}
-  \textbf{Rules:} $P(X\le x)=\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$; \
-  $\Phi(-z)=1-\Phi(z)$; \ $P(a\le X\le b)=\Phi(z_b)-\Phi(z_a)$.
-  \begin{align*}
-    \text{a)}\quad P(X<985) &= \Phi\Bigl(\tfrac{985-1000}{10}\Bigr)=\Phi(-1.5)
-      =1-\Phi(1.5)=1-0.9332=\mathbf{0.0668}\\[4pt]
-    \text{b)}\quad P(990\le X\le 1015)
-      &=\Phi\Bigl(\tfrac{1015-1000}{10}\Bigr)-\Phi\Bigl(\tfrac{990-1000}{10}\Bigr)
-       =\Phi(1.5)-\Phi(-1)\\
-      &=0.9332-(1-0.8413)=0.9332-0.1587=\mathbf{0.7745}
-  \end{align*}
-  \begin{exampleblock}{Interpretation}
-    About $6.7\,\%$ of the bottles are underfilled; about $77.5\,\%$ contain
-    between $990$ and $1015$\,ml.
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}{Solution (2/3) -- fill volume: quantile and setpoint}
-  \textbf{Rules:} quantile $x_p=\mu+\sigma z_p$ (search $p$ \emph{inside} the
-  table); \ $z_{1-p}=-z_p$.
-  \begin{align*}
-    \text{c)}\quad &\Phi(z)=0.95\ \Rightarrow\ z_{0.95}=1.645
-       \ \Rightarrow\ x_{0.95}=1000+1.645\cdot10=\mathbf{1016.45\ ml}\\[4pt]
-    \text{d)}\quad &P(X<985)=0.01\ \Rightarrow\
-       \tfrac{985-\mu}{10}=z_{0.01}=-z_{0.99}\approx-2.33
-       \quad(\text{table: }\Phi(2.33)=0.9901)\\
-     &\Rightarrow\ \mu=985+2.33\cdot10=\mathbf{1008.3\ ml}
-       \quad(\text{exact } z_{0.99}=2.3263:\ 1008.26\text{ ml})
-  \end{align*}
-  \begin{exampleblock}{Interpretation}
-    Only $5\,\%$ of the bottles contain more than $1016.45$\,ml. To cut
-    underfilling from $6.7\,\%$ to $1\,\%$, the setpoint must rise by about
-    $8$\,ml -- every bottle gets more juice: the price of safety.
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}[fragile]{Solution (3/3) -- fill volume: with Python}
-  \textbf{Rule:} \texttt{cdf} gives $P(X\le x)$, \texttt{ppf} the quantile;
-  \texttt{scale} $=\sigma$ is the \emph{standard deviation}.
-\begin{lstlisting}
-from scipy import stats
-
-X = stats.norm(loc=1000, scale=10)          # X ~ N(1000, 10^2)
-print(f"a) {X.cdf(985):.4f}")
-print(f"b) {X.cdf(1015) - X.cdf(990):.4f}")
-print(f"c) {X.ppf(0.95):.2f}")
-print(f"d) {985 - stats.norm.ppf(0.01) * 10:.2f}")   # mu = 985 - z_0.01 * sigma
-\end{lstlisting}
-  \begin{block}{Output}
-\begin{lstlisting}[style=Pyout]
-a) 0.0668
-b) 0.7745
-c) 1016.45
-d) 1008.26
-\end{lstlisting}
-  \end{block}
-  \footnotesize The table answers differ only by rounding ($z_{0.99}=2.33$
-  instead of $2.3263$ in d).
-\end{frame}
 
 % ---- Exercise: CLT --------------------------------------------------------------
 \begin{frame}{Exercise -- central limit theorem: processing times}
@@ -870,6 +945,60 @@ row 2 it wobbles by $0.4$, so a gap of $2$ is five wobbles away (very
 unusual). This is THE reason every test statistic in this course has the same
 shape: (estimate $-$ hypothesised) / SE.}
 
+% ---- Quick exercise: standard error (SfOe Teil 6) --------------------------------
+\begin{frame}{Exercise -- standard error: packing flour}
+  \begin{block}{Problem statement}
+    A mill packs flour into $500$\,g bags. The single bags scatter with a
+    known standard deviation of $\sigma=8$\,g.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{4pt}
+    \item[a)] What is the standard error of $\bar X$ for $n=16$ and for
+              $n=64$ bags?
+    \item[b)] A sample gives $\bar x=497$\,g. How many standard errors does
+              $\bar x$ lie below the target $\mu_0=500$\,g -- for $n=16$ and
+              for $n=64$? Which finding is conspicuous?
+    \item[c)] How much do the \emph{single} bags scatter if $64$ instead of
+              $16$ bags are drawn?
+  \end{enumerate}
+  \textbf{Hint:} the central $95\,\%$ of $N(0,1)$ lie between $\pm1.96$;
+  $\Phi(1.50)=0.9332$.
+\end{frame}
+\note{Talk track: three minutes, numbers chosen for mental arithmetic. The
+same $3$\,g shortfall is harmless at $n=16$ and alarming at $n=64$ -- exactly
+the message of the previous slide. Part c) catches the classic confusion of
+standard deviation and standard error.}
+
+\begin{frame}{Solution -- standard error: packing flour}
+  \textbf{Rule:} $\mathrm{SE}=\sigma/\sqrt n$; \ distance in standard errors:
+  $z=(\bar x-\mu_0)/\mathrm{SE}$.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lcc}
+      \toprule
+       & $n=16$ & $n=64$\\
+      \midrule
+      a) \ $\mathrm{SE}=\sigma/\sqrt n$
+        & $8/\sqrt{16}=8/4=\mathbf{2\ g}$
+        & $8/\sqrt{64}=8/8=\mathbf{1\ g}$\\
+      b) \ $z=(497-500)/\mathrm{SE}$
+        & $-3/2=\mathbf{-1.5}$
+        & $-3/1=\mathbf{-3.0}$\\
+      \phantom{b) \ }reading
+        & $|z|<1.96$: ordinary fluctuation
+        & \textcolor{hsbirot}{$|z|>1.96$: conspicuous}\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  {\small For $n=16$, a deviation of at least $1.5$ standard errors occurs in
+  $2\,(1-\Phi(1.50))=2\cdot0.0668=0.1336$, i.e.\ in about $13\,\%$ of all
+  samples; $3$ standard errors lie beyond the central $95\,\%$.\par}
+  \smallskip
+  \textbf{c)} Unchanged, $\mathbf{\sigma=8\ g}$ -- a larger $n$ shrinks only
+  the spread of the \emph{mean}, not that of the data.
+  \kernaussage{Same $3$\,g shortfall, opposite verdicts: it is the distance
+  in \textbf{standard errors} that counts.}
+\end{frame}
+
 % ---- Frequentist paradigm --------------------------------------------------
 \begin{frame}{How we read probability: the frequentist view}
   \begin{columns}[T]
@@ -1049,6 +1178,40 @@ interpretation.}
   \end{exampleblock}
 \end{frame}
 
+% ---- Exercise: filling cream, part 1 (known variance) ---------------------------
+\begin{frame}{Exercise -- filling cream (known variance)}
+  \begin{block}{Problem statement}
+    A dairy fills cream into cups (label: $250\,\text{g}$). The variance of the
+    machine is known: $\sigma^{2} = 4\,\text{g}^{2}$. After servicing, $n=16$
+    cups are sampled (in g):
+    \[
+      251,248,248,249,250,251,247,246,252,251,248,247,246,249,248,252
+    \]
+    Confidence level $1-\alpha=0.95$.
+  \end{block}
+  \textbf{Required:} the confidence interval for $\mu$ with \emph{known}
+  variance. Does the target value $250$\,g lie inside -- and what does that
+  say about the machine?\\[2pt]
+  \textbf{Hint:} $z_{0.975}=1.96$. (The same cups return with \emph{unknown}
+  variance at the end of this section.)
+\end{frame}
+
+\begin{frame}{Solution -- filling cream (known variance)}
+  \textbf{Rule:} $\text{CI}=\bigl[\bar x \pm z_{1-\alpha/2}\,\sigma/\sqrt{n}\bigr]$.\\[2pt]
+  \textbf{Intermediate values:} $\bar{x} = 3983/16 = 248.9375$, $\sigma = 2$,
+  $n = 16$, $z_{0.975} = 1.96$.
+  \begin{align*}
+    e &= 1.96\cdot\frac{2}{\sqrt{16}} = 1.96\cdot 0.5 = 0.98\\
+    \text{CI}_{0.95} &= [\,248.9375 \pm 0.98\,]
+       = \mathbf{[\,247.96\,;\,249.92\,]}
+  \end{align*}
+  \begin{alertblock}{Interpretation}
+    The target value $\mu_0 = 250$ lies \emph{outside} the CI $\Rightarrow$ with
+    known variance: indication that the machine is \textbf{not} working
+    correctly.
+  \end{alertblock}
+\end{frame}
+
 % ---- Interpretation: simulation -------------------------------------------
 \begin{frame}{What does ``95\,\% confidence'' mean?}
   \begin{center}
@@ -1087,6 +1250,94 @@ interpretation.}
   \end{enumerate}
   \kernaussage{All three avoid the trap of putting a probability on \emph{this
   one} interval: $\mu$ is fixed, the \textbf{interval} is what is random.}
+\end{frame}
+
+\begin{frame}{Do not confuse: CI vs.\ fluctuation interval}
+  \begin{columns}[T]
+    \begin{column}{0.60\textwidth}
+      \includegraphics[width=\textwidth,height=0.64\textheight,keepaspectratio]{images/ci_vs_fluctuation.png}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \small
+      \begin{itemize}\setlength{\itemsep}{5pt}
+        \item \textbf{Fluctuation interval:} spread of \emph{individual} values
+              $X_i$ around $\mu$ -- uses $\sigma$ (wide).
+        \item \textbf{Confidence interval:} uncertainty about $\mu$ -- uses
+              $\sigma/\sqrt{n}$ (narrow). It is exactly as wide as the
+              fluctuation of $\bar X$ (blue arrow), but centred at $\bar x$,
+              not at $\mu$.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \inworten{Same width as the blue arrow, but a different question: ``Where is
+  $\mu$?'' instead of ``How much does a single value scatter?''}
+\end{frame}
+
+% ---- Exercise: reading a CI correctly (SfOe Teil 6) ------------------------------
+\begin{frame}{Exercise -- reading a confidence interval correctly}
+  \begin{block}{Problem statement}
+    For the cream sample ($n=16$, $\bar x=248.9375$\,g, $\sigma=2$\,g known)
+    the $95\,\%$ CI $[\,247.96\,;\,249.92\,]$ was computed. Which of the
+    following statements are \textbf{true}, which are \textbf{false}? Give a
+    short reason.
+  \end{block}
+  \small
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item ``With $95\,\%$ probability the true mean $\mu$ lies between
+          $247.96$\,g and $249.92$\,g.''
+    \item ``About $95\,\%$ of all filled cups weigh between $247.96$\,g and
+          $249.92$\,g.''
+    \item ``If the sample were repeated very often, about $95\,\%$ of the
+          intervals computed this way would contain the true value $\mu$.''
+    \item ``The target value $250$\,g is \emph{not} compatible with the data
+          at the $95\,\%$ level.''
+    \item ``A $99\,\%$ interval from the same data would be \emph{narrower},
+          because it is more certain.''
+  \end{enumerate}
+\end{frame}
+\note{Talk track: let students vote true/false on each statement before
+showing the solution. Statements 1 and 2 are the two classic misreadings
+(probability of $\mu$; spread of single values); statement 5 tests the
+confidence--precision trade-off. These formulations are typical
+multiple-choice distractors.}
+
+\begin{frame}{Solution (1/2) -- reading a confidence interval correctly}
+  \textbf{Rule:} $\mu$ is a \emph{fixed} number; the \emph{bounds} are random.
+  The confidence level describes the \emph{procedure}, not the one interval.
+  \begin{exampleblock}{Answers 1--3}
+    \begin{enumerate}\setlength{\itemsep}{3pt}
+      \item \textbf{False.} $\mu$ either lies in this particular interval or it
+            does not -- the probability $0.95$ belongs to the procedure across
+            many samples.
+      \item \textbf{False.} The CI describes the uncertainty about $\mu$
+            (spread $\sigma/\sqrt n=0.5$), not the spread of single cups
+            ($\sigma=2$). The fluctuation interval of the cups would be
+            $248.9375\pm1.96\cdot2=\mathbf{[\,245.02\,;\,252.86\,]}$ -- four
+            times as wide.
+      \item \textbf{True.} That is exactly the coverage reading: the procedure
+            hits $\mu$ in $95\,\%$ of the samples.
+    \end{enumerate}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- reading a confidence interval correctly}
+  \begin{exampleblock}{Answers 4--5}
+    \begin{enumerate}\setlength{\itemsep}{2pt}
+      \setcounter{enumi}{3}
+      \item \textbf{True.} $250\notin[\,247.96\,;\,249.92\,]$ -- the target is
+            not among the values compatible with the data (``compatibility''
+            reading). A two-sided test at level $5\,\%$ would reject
+            $H_0:\mu=250$ (next section).
+      \item \textbf{False.} More confidence costs precision:
+            $z_{0.995}=2.576>1.96$, so $e=2.576\cdot\tfrac{2}{\sqrt{16}}=1.288$
+            and $\text{CI}_{0.99}=[\,248.9375\pm1.288\,]
+            =\mathbf{[\,247.65\,;\,250.23\,]}$ -- \emph{wider} than the
+            $95\,\%$ CI, and now $250$ even lies \emph{inside}.
+    \end{enumerate}
+  \end{exampleblock}
+  \kernaussage{A CI is a statement about the \textbf{procedure} and about the
+  values of $\mu$ \textbf{compatible} with the data -- not about single values
+  and not about ``the probability of $\mu$''.}
 \end{frame}
 
 \subsection{Length of the confidence interval}
@@ -1163,6 +1414,68 @@ first: ``we want half the margin -- twice the bottles?'' Most say yes; the
 square says four times. Sample-size planning is the everyday business use of
 this part (surveys, quality control, A/B tests); the same idea returns as
 power analysis in the types-of-error section.}
+
+% ---- Exercise: sample size (SfOe Teil 6) ------------------------------------------
+\begin{frame}{Exercise -- how many bottles? (planning the sample size)}
+  \begin{block}{Problem statement}
+    The dairy (milk, $\sigma=3$\,ml known) wants to estimate the mean fill
+    volume $\mu$ \emph{more precisely}. Quality control asks for a $95\,\%$ CI
+    whose margin of error (half width) is at most $e=1$\,ml.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item[a)] What is the margin of error with the current sample ($n=9$)?
+    \item[b)] At least how many bottles are needed for $e\le1$\,ml?
+    \item[c)] How does $n$ change if the confidence level is to be $99\,\%$?
+    \item[d)] How does $n$ change (at $95\,\%$) if the margin is halved to
+              $e\le0.5$\,ml?
+  \end{enumerate}
+  \textbf{Hint:} $z_{0.975}=1.96$, $z_{0.995}=2.576$; always round $n$
+  \emph{up}.
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- planning the sample size}
+  \textbf{Rule:} solve the margin of error $e=z_{1-\alpha/2}\,\sigma/\sqrt n$
+  for $n$:
+  \[
+    n\ \ge\ \Bigl(\frac{z_{1-\alpha/2}\,\sigma}{e}\Bigr)^{2}
+    \qquad\text{(round up to the next integer).}
+  \]
+  \begin{align*}
+    \text{a)}\quad e &= 1.96\cdot\frac{3}{\sqrt9}=1.96\cdot1=\mathbf{1.96\ ml}
+       \qquad(\text{the CI }[\,999.04\,;\,1002.96\,]\text{ from before})\\[4pt]
+    \text{b)}\quad n &\ge \Bigl(\frac{1.96\cdot3}{1}\Bigr)^{2}=5.88^{2}=34.57
+       \;\Longrightarrow\;\mathbf{n=35}\\[4pt]
+    \text{c)}\quad n &\ge \Bigl(\frac{2.576\cdot3}{1}\Bigr)^{2}=7.728^{2}=59.72
+       \;\Longrightarrow\;\mathbf{n=60}
+  \end{align*}
+  \inworten{b) For $\pm1$\,ml instead of $\pm1.96$\,ml the dairy needs almost
+  four times as many bottles ($35$ instead of $9$). c) More confidence costs
+  sample size ($60$ instead of $35$).}
+\end{frame}
+
+\begin{frame}[fragile]{Solution (2/2) -- planning the sample size}
+  \[
+    \text{d)}\quad n \ge \Bigl(\frac{1.96\cdot3}{0.5}\Bigr)^{2}=11.76^{2}=138.30
+       \;\Longrightarrow\;\mathbf{n=139}
+  \]
+  \inworten{Half the margin $\Rightarrow$ four times the sample
+  ($139\approx4\cdot35$): $n$ grows with the \textbf{square} of $z\sigma/e$.}
+  \par\smallskip
+  {\small The same with Python:\par}
+\begin{lstlisting}
+import math
+from scipy import stats
+def n_required(conf, sigma, e):
+    z = stats.norm.ppf(1 - (1 - conf) / 2)
+    return math.ceil((z * sigma / e) ** 2)
+print(n_required(0.95, 3, 1), n_required(0.99, 3, 1), n_required(0.95, 3, 0.5))
+\end{lstlisting}
+  \begin{block}{Output}
+\begin{lstlisting}[style=Pyout]
+35 60 139
+\end{lstlisting}
+  \end{block}
+\end{frame}
 
 \subsection{Unknown variance}
 
@@ -1247,63 +1560,29 @@ power analysis in the types-of-error section.}
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Do not confuse: CI vs.\ fluctuation interval}
-  \begin{columns}[T]
-    \begin{column}{0.60\textwidth}
-      \includegraphics[width=\textwidth,height=0.64\textheight,keepaspectratio]{images/ci_vs_fluctuation.png}
-    \end{column}
-    \begin{column}{0.38\textwidth}
-      \small
-      \begin{itemize}\setlength{\itemsep}{5pt}
-        \item \textbf{Fluctuation interval:} spread of \emph{individual} values
-              $X_i$ around $\mu$ -- uses $\sigma$ (wide).
-        \item \textbf{Confidence interval:} uncertainty about $\mu$ -- uses
-              $\sigma/\sqrt{n}$ (narrow). It is exactly as wide as the
-              fluctuation of $\bar X$ (blue arrow), but centred at $\bar x$,
-              not at $\mu$.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \inworten{Same width as the blue arrow, but a different question: ``Where is
-  $\mu$?'' instead of ``How much does a single value scatter?''}
-\end{frame}
-
-\subsection{Exercises}
-
-\begin{frame}{Exercise -- filling cream}
+% ---- Exercise: filling cream, part 2 (unknown variance) -------------------------
+\begin{frame}{Exercise -- filling cream (unknown variance)}
   \begin{block}{Problem statement}
-    A dairy fills cream into cups (label: $250\,\text{g}$). The variance of the
-    machine is known: $\sigma^{2} = 4\,\text{g}^{2}$. After servicing, $n=16$
-    cups are sampled (in g):
+    The same $16$ cream cups as in the known-variance exercise (label
+    $250\,\text{g}$, in g):
     \[
       251,248,248,249,250,251,247,246,252,251,248,247,246,249,248,252
     \]
-    Confidence level $1-\alpha=0.95$.
+    This time we do \emph{not} rely on the stated machine variance but
+    estimate $\sigma$ from the sample. Confidence level $1-\alpha=0.95$.
   \end{block}
-  \textbf{Required:} confidence interval for $\mu$ -- (a) with known,
-  (b) with unknown variance.
+  \textbf{Required:} the sample standard deviation $s$ and the confidence
+  interval for $\mu$ with \emph{unknown} variance. Does the verdict on
+  $250$\,g change compared with $[\,247.96\,;\,249.92\,]$ (known variance)?\\[2pt]
+  \textbf{Hint:} $\bar x=248.9375$, \
+  $\sum_{i}(x_i-\bar x)^2=60.9375$, \ $t_{0.975;\,15}=2.1314$.
 \end{frame}
 
-\begin{frame}{Solution (1/2) -- cream, known variance}
-  \textbf{Rule:} $\text{CI}=\bigl[\bar x \pm z_{1-\alpha/2}\,\sigma/\sqrt{n}\bigr]$.\\[2pt]
-  \textbf{Intermediate values:} $\bar{x} = 248.9375$, $\sigma = 2$, $n = 16$,
-  $z_{0.975} = 1.96$.
-  \begin{align*}
-    e &= 1.96\cdot\frac{2}{\sqrt{16}} = 1.96\cdot 0.5 = 0.98\\
-    \text{CI}_{0.95} &= [\,248.9375 \pm 0.98\,]
-       = \mathbf{[\,247.96\,;\,249.92\,]}
-  \end{align*}
-  \begin{alertblock}{Interpretation}
-    The target value $\mu_0 = 250$ lies \emph{outside} the CI $\Rightarrow$ with
-    known variance: indication that the machine is \textbf{not} working
-    correctly.
-  \end{alertblock}
-\end{frame}
-
-\begin{frame}{Solution (2/2) -- cream, unknown variance}
-  \textbf{Rule:} as above, but $z\to t_{1-\alpha/2,\,n-1}$ and $\sigma\to s$.\\[2pt]
-  \textbf{Intermediate values:} $s^{2} = 4.0625\Rightarrow s = 2.0156$,
-  $t_{0.975;\,15} = 2.1314$.
+\begin{frame}{Solution -- filling cream (unknown variance)}
+  \textbf{Rule:} as for known variance, but $z\to t_{1-\alpha/2,\,n-1}$ and
+  $\sigma\to s$.\\[2pt]
+  \textbf{Intermediate values:} $s^{2} = 60.9375/15 = 4.0625\Rightarrow
+  s = 2.0156$, $t_{0.975;\,15} = 2.1314$.
   \begin{align*}
     e &= 2.1314\cdot\frac{2.0156}{\sqrt{16}} = 1.0740\\
     \text{CI}_{0.95} &= [\,248.9375 \pm 1.0740\,]
@@ -1314,135 +1593,6 @@ power analysis in the types-of-error section.}
     \emph{differently} than with known variance. The wider $t$-interval is more
     cautious.
   \end{exampleblock}
-\end{frame}
-
-% ---- Exercise: reading a CI correctly (SfOe Teil 6) ------------------------------
-\begin{frame}{Exercise -- reading a confidence interval correctly}
-  \begin{block}{Problem statement}
-    For the cream sample ($n=16$, $\bar x=248.9375$\,g, $\sigma=2$\,g known)
-    the $95\,\%$ CI $[\,247.96\,;\,249.92\,]$ was computed. Which of the
-    following statements are \textbf{true}, which are \textbf{false}? Give a
-    short reason.
-  \end{block}
-  \small
-  \begin{enumerate}\setlength{\itemsep}{2pt}
-    \item ``With $95\,\%$ probability the true mean $\mu$ lies between
-          $247.96$\,g and $249.92$\,g.''
-    \item ``About $95\,\%$ of all filled cups weigh between $247.96$\,g and
-          $249.92$\,g.''
-    \item ``If the sample were repeated very often, about $95\,\%$ of the
-          intervals computed this way would contain the true value $\mu$.''
-    \item ``The target value $250$\,g is \emph{not} compatible with the data
-          at the $95\,\%$ level.''
-    \item ``A $99\,\%$ interval from the same data would be \emph{narrower},
-          because it is more certain.''
-  \end{enumerate}
-\end{frame}
-\note{Talk track: let students vote true/false on each statement before
-showing the solution. Statements 1 and 2 are the two classic misreadings
-(probability of $\mu$; spread of single values); statement 5 tests the
-confidence--precision trade-off. These formulations are typical
-multiple-choice distractors.}
-
-\begin{frame}{Solution (1/2) -- reading a confidence interval correctly}
-  \textbf{Rule:} $\mu$ is a \emph{fixed} number; the \emph{bounds} are random.
-  The confidence level describes the \emph{procedure}, not the one interval.
-  \begin{exampleblock}{Answers 1--3}
-    \begin{enumerate}\setlength{\itemsep}{3pt}
-      \item \textbf{False.} $\mu$ either lies in this particular interval or it
-            does not -- the probability $0.95$ belongs to the procedure across
-            many samples.
-      \item \textbf{False.} The CI describes the uncertainty about $\mu$
-            (spread $\sigma/\sqrt n=0.5$), not the spread of single cups
-            ($\sigma=2$). The fluctuation interval of the cups would be
-            $248.9375\pm1.96\cdot2=\mathbf{[\,245.02\,;\,252.86\,]}$ -- four
-            times as wide.
-      \item \textbf{True.} That is exactly the coverage reading: the procedure
-            hits $\mu$ in $95\,\%$ of the samples.
-    \end{enumerate}
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}{Solution (2/2) -- reading a confidence interval correctly}
-  \begin{exampleblock}{Answers 4--5}
-    \begin{enumerate}\setlength{\itemsep}{2pt}
-      \setcounter{enumi}{3}
-      \item \textbf{True.} $250\notin[\,247.96\,;\,249.92\,]$ -- the target is
-            not among the values compatible with the data (``compatibility''
-            reading). A two-sided test at level $5\,\%$ would reject
-            $H_0:\mu=250$ (next section).
-      \item \textbf{False.} More confidence costs precision:
-            $z_{0.995}=2.576>1.96$, so $e=2.576\cdot\tfrac{2}{\sqrt{16}}=1.288$
-            and $\text{CI}_{0.99}=[\,248.9375\pm1.288\,]
-            =\mathbf{[\,247.65\,;\,250.23\,]}$ -- \emph{wider} than the
-            $95\,\%$ CI, and now $250$ even lies \emph{inside}.
-    \end{enumerate}
-  \end{exampleblock}
-  \kernaussage{A CI is a statement about the \textbf{procedure} and about the
-  values of $\mu$ \textbf{compatible} with the data -- not about single values
-  and not about ``the probability of $\mu$''.}
-\end{frame}
-
-% ---- Exercise: sample size (SfOe Teil 6) ------------------------------------------
-\begin{frame}{Exercise -- how many bottles? (planning the sample size)}
-  \begin{block}{Problem statement}
-    The dairy (milk, $\sigma=3$\,ml known) wants to estimate the mean fill
-    volume $\mu$ \emph{more precisely}. Quality control asks for a $95\,\%$ CI
-    whose margin of error (half width) is at most $e=1$\,ml.
-  \end{block}
-  \begin{enumerate}\setlength{\itemsep}{2pt}
-    \item[a)] What is the margin of error with the current sample ($n=9$)?
-    \item[b)] At least how many bottles are needed for $e\le1$\,ml?
-    \item[c)] How does $n$ change if the confidence level is to be $99\,\%$?
-    \item[d)] How does $n$ change (at $95\,\%$) if the margin is halved to
-              $e\le0.5$\,ml?
-  \end{enumerate}
-  \textbf{Hint:} $z_{0.975}=1.96$, $z_{0.995}=2.576$; always round $n$
-  \emph{up}.
-\end{frame}
-
-\begin{frame}{Solution (1/2) -- planning the sample size}
-  \textbf{Rule:} solve the margin of error $e=z_{1-\alpha/2}\,\sigma/\sqrt n$
-  for $n$:
-  \[
-    n\ \ge\ \Bigl(\frac{z_{1-\alpha/2}\,\sigma}{e}\Bigr)^{2}
-    \qquad\text{(round up to the next integer).}
-  \]
-  \begin{align*}
-    \text{a)}\quad e &= 1.96\cdot\frac{3}{\sqrt9}=1.96\cdot1=\mathbf{1.96\ ml}
-       \qquad(\text{the CI }[\,999.04\,;\,1002.96\,]\text{ from before})\\[4pt]
-    \text{b)}\quad n &\ge \Bigl(\frac{1.96\cdot3}{1}\Bigr)^{2}=5.88^{2}=34.57
-       \;\Longrightarrow\;\mathbf{n=35}\\[4pt]
-    \text{c)}\quad n &\ge \Bigl(\frac{2.576\cdot3}{1}\Bigr)^{2}=7.728^{2}=59.72
-       \;\Longrightarrow\;\mathbf{n=60}
-  \end{align*}
-  \inworten{b) For $\pm1$\,ml instead of $\pm1.96$\,ml the dairy needs almost
-  four times as many bottles ($35$ instead of $9$). c) More confidence costs
-  sample size ($60$ instead of $35$).}
-\end{frame}
-
-\begin{frame}[fragile]{Solution (2/2) -- planning the sample size}
-  \[
-    \text{d)}\quad n \ge \Bigl(\frac{1.96\cdot3}{0.5}\Bigr)^{2}=11.76^{2}=138.30
-       \;\Longrightarrow\;\mathbf{n=139}
-  \]
-  \inworten{Half the margin $\Rightarrow$ four times the sample
-  ($139\approx4\cdot35$): $n$ grows with the \textbf{square} of $z\sigma/e$.}
-  \par\smallskip
-  {\small The same with Python:\par}
-\begin{lstlisting}
-import math
-from scipy import stats
-def n_required(conf, sigma, e):
-    z = stats.norm.ppf(1 - (1 - conf) / 2)
-    return math.ceil((z * sigma / e) ** 2)
-print(n_required(0.95, 3, 1), n_required(0.99, 3, 1), n_required(0.95, 3, 0.5))
-\end{lstlisting}
-  \begin{block}{Output}
-\begin{lstlisting}[style=Pyout]
-35 60 139
-\end{lstlisting}
-  \end{block}
 \end{frame}
 
 \begin{frame}{Summary and outlook}
@@ -1608,6 +1758,47 @@ CI is centred at $\bar x$, never at $\mu_0$.}
       $H_0$, not that we accept it as true.
     \end{column}
   \end{columns}
+\end{frame}
+
+% ---- Quick exercise: hypotheses + duality (SfOe Teil 6) --------------------------
+\begin{frame}{Exercise -- hypotheses and deciding with the CI}
+  \begin{block}{Problem statement}
+    A bank plans its staff with a mean processing time of $\mu_0=30$\,min per
+    loan application. Longer times (bottlenecks) and shorter times
+    (overcapacity) matter equally. From experience $\sigma=6$\,min is known. A
+    sample of $n=36$ applications gives $\bar x=32.8$\,min; \ $\alpha=0.05$.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item[a)] State $H_0$ and $H_1$.
+    \item[b)] Compute the $95\,\%$ CI for $\mu$.
+    \item[c)] Decide about $H_0$ with the CI.
+    \item[d)] Which of the planning values $\mu_0=31$, $33$ and $35$\,min would
+              a two-sided test at level $5\,\%$ reject?
+  \end{enumerate}
+  \textbf{Hint:} $z_{0.975}=1.96$.
+\end{frame}
+\note{Talk track: four minutes. Part a) practises ``the deviation you want to
+detect goes into $H_1$''; part d) is the payoff of the duality -- one interval
+answers the test for every $\mu_0$ at a glance, without a single new
+calculation.}
+
+\begin{frame}{Solution -- hypotheses and deciding with the CI}
+  \textbf{Rule:} $\mu_0$ inside the $(1-\alpha)$-CI $\Leftrightarrow$
+  $|Z_n|\le z_{1-\alpha/2}$ $\Leftrightarrow$ keep $H_0$.
+  \begin{itemize}\setlength{\itemsep}{4pt}
+    \item[a)] $H_0:\mu=30$ \ vs.\ \ $H_1:\mu\neq30$ -- both directions count;
+          the deviation to be detected goes into $H_1$.
+    \item[b)] $\mathrm{SE}=6/\sqrt{36}=6/6=1$, \ $e=1.96\cdot1=1.96$, \
+          $\text{CI}_{0.95}=[\,32.8\pm1.96\,]=\mathbf{[\,30.84\,;\,34.76\,]}$\,min.
+    \item[c)] $30\notin\text{CI}$ $\Rightarrow$ $H_0$ is \textbf{rejected}: the
+          mean processing time deviates from the planning value. (Cross-check:
+          $|Z_n|=|32.8-30|/1=2.8>1.96$.)
+    \item[d)] One look at the CI suffices: $31$ and $33$ lie inside
+          $[\,30.84\,;\,34.76\,]$ $\Rightarrow$ \textbf{keep}; \ $35$ lies
+          outside $\Rightarrow$ \textbf{reject}.
+  \end{itemize}
+  \kernaussage{A CI answers the two-sided test for \emph{every} hypothesised
+  value $\mu_0$ at once.}
 \end{frame}
 
 \subsection{Known variance}
@@ -1826,7 +2017,7 @@ inside or outside? Milk inside, cream outside. If students can redraw this
 from memory, they have understood the classical test.}
 
 \begin{frame}{Exercise -- reaction time (large sample)}
-  \begin{block}{Problem}
+  \begin{block}{Problem statement}
     A training programme is meant to change the baseline reaction time
     $\mu_0 = 250\,$ms. A sample of $n=50$ gives $\bar x = 242$, $s = 30$. Test
     \emph{two-sided} at $\alpha=0.05$.
@@ -2119,6 +2310,35 @@ exam error (dedicated slide follows).}
   value sits past the bar.}
 \end{frame}
 
+\begin{frame}{Exercise -- $p$-value and the choice of $\alpha$}
+  \begin{block}{Problem statement}
+    A two-sided test with known variance yields $Z_n = 1.85$. Compute the
+    $p$-value and decide at $\alpha = 0.05$ and at $\alpha = 0.10$. Check both
+    decisions with the critical-value rule.
+  \end{block}
+  \textbf{Hint:} $\Phi(1.85) = 0.9678$ (table: row $1.8$, column $.05$);
+  two-sided as in the worked example: $p=2\,\Phi(-|Z_n|)$; \
+  $z_{0.975}=1.96$, \ $z_{0.95}=1.645$.
+\end{frame}
+
+\begin{frame}{Solution -- $p$-value and $\alpha$}
+  \textbf{Rule:} two-sided $p=2\,\Phi(-|Z_n|)=2\,\bigl(1-\Phi(|Z_n|)\bigr)$
+  (symmetry); reject $H_0$ if $p<\alpha$.
+  \[
+    p = 2\,\bigl(1-\Phi(1.85)\bigr) = 2\cdot 0.0322 = \mathbf{0.0644}
+    \qquad(\text{exact, unrounded }\Phi\text{: }0.0643)
+  \]
+  \begin{itemize}
+    \item At $\alpha = 0.05$: \ $0.0644 > 0.05 \Rightarrow$ \textbf{keep} $H_0$.
+          \ Check: $|Z_n|=1.85<1.96=z_{0.975}$.
+    \item At $\alpha = 0.10$: \ $0.0644 < 0.10 \Rightarrow$ \textbf{reject} $H_0$.
+          \ Check: $|Z_n|=1.85>1.645=z_{0.95}$ (two-sided at $10\,\%$ uses
+          $z_{1-0.10/2}=z_{0.95}$).
+  \end{itemize}
+  \kernaussage{The same data can be ``significant'' or not -- $\alpha$ must be
+  fixed \emph{in advance}, never chosen to fit the result.}
+\end{frame}
+
 \subsection{Calculation}
 
 \begin{frame}{Computing the $p$-value (two-sided)}
@@ -2247,27 +2467,6 @@ $0.03$\,ml -- the test becomes a microscope. Flip side (links to power): with
 small $n$, even an important deviation often stays invisible. Practical rule
 for the students: $p$-value for evidence, CI for magnitude -- always read both.}
 \subsection{Exercises}
-
-\begin{frame}{Exercise -- $p$-value and the choice of $\alpha$}
-  \begin{block}{Problem}
-    A two-sided test with known variance yields $Z_n = 1.85$. Compute the
-    $p$-value and decide at $\alpha = 0.05$ and at $\alpha = 0.10$.
-  \end{block}
-  \textbf{Hint:} $\Phi(1.85) = 0.9678$ (table: row $1.8$, column $.05$).
-\end{frame}
-
-\begin{frame}{Solution -- $p$-value and $\alpha$}
-  \[
-    p = 2\,\bigl(1-\Phi(1.85)\bigr) = 2\cdot 0.0322 = \mathbf{0.0644}
-    \qquad(\text{exact, unrounded }\Phi\text{: }0.0643)
-  \]
-  \begin{itemize}
-    \item At $\alpha = 0.05$: \ $0.0644 > 0.05 \Rightarrow$ \textbf{keep} $H_0$.
-    \item At $\alpha = 0.10$: \ $0.0644 < 0.10 \Rightarrow$ \textbf{reject} $H_0$.
-  \end{itemize}
-  \kernaussage{The same data can be ``significant'' or not -- $\alpha$ must be
-  fixed \emph{in advance}, never chosen to fit the result.}
-\end{frame}
 
 \begin{frame}{Exercise -- interpret the $p$-value (concept)}
   \begin{block}{Which statements are correct? \ ($p = 0.03$, $\alpha=0.05$)}
@@ -2692,6 +2891,56 @@ direction). The orange bars in the table are the visual anchor.}
   the $t$-row is $\mathrm{df}=n-1$. As df grows, the $t$-value slides towards $z$.}
 \end{frame}
 
+% ---- Quick exercise: test direction + critical value (SfOe Teil 6) ---------------
+\begin{frame}{Exercise -- test direction and critical value}
+  \begin{block}{Problem statement}
+    For each case, state $H_1$, the test direction and the rejection rule with
+    the critical value from the $N(0,1)$- or $t$-table of the previous slides
+    (always $H_0:\mu=\mu_0$).
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item A parcel service wants to show that its mean delivery time is
+          \emph{below} $24$\,h. \ $\sigma$ unknown, $n=16$, $\alpha=0.05$.
+    \item An energy supplier checks whether the mean annual consumption per
+          household has \emph{risen} above last year's $3\,500$\,kWh. \
+          $\sigma$ known, $\alpha=0.01$.
+    \item A brewery checks whether the mean fill volume \emph{deviates} from
+          the target of $500$\,ml. \ $\sigma$ unknown, $n=10$, $\alpha=0.01$.
+    \item An online shop wants to show that a new layout \emph{increases} the
+          mean time on site from $4$\,min so far. \ $\sigma$ unknown, $n=21$,
+          $\alpha=0.10$.
+  \end{enumerate}
+\end{frame}
+\note{Talk track: five minutes, tables only. Insist on the order of the three
+questions: direction from the wording, then split $\alpha$ or not, then $z$ or
+$t$ with df $=n-1$. Case 3 is the trap: two-sided at $\alpha=0.01$ means the
+upper-tail column $0.005$.}
+
+\begin{frame}{Solution -- test direction and critical value}
+  \textbf{Rule:} (1) direction from the wording $\to H_1$; \ (2) one-sided:
+  quantile $1-\alpha$, two-sided: $1-\alpha/2$; \ (3) $\sigma$ known $\to z$,
+  otherwise $t$ with df $=n-1$.
+  \begin{center}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{clllc}
+      \toprule
+      & $H_1$ & Direction & Table value & Reject $H_0$ if \ldots\\
+      \midrule
+      1 & $\mu<24$     & left-sided  & $t_{0.95;\,15}=1.753$  & $T_n<\mathbf{-1.753}$\\
+      2 & $\mu>3\,500$ & right-sided & $z_{0.99}=2.326$        & $Z_n>\mathbf{2.326}$\\
+      3 & $\mu\neq500$ & two-sided   & $t_{0.995;\,9}=3.250$   & $|T_n|>\mathbf{3.250}$\\
+      4 & $\mu>4$      & right-sided & $t_{0.90;\,20}=1.325$   & $T_n>\mathbf{1.325}$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  {\footnotesize Upper-tail probability in the $t$-table: one-sided the whole
+  $\alpha$ (cases 1 and 4: columns $0.05$ and $0.10$), two-sided
+  $\alpha/2=0.005$ (case 3). Case 2: one-sided $99\,\%$ row of the $N(0,1)$
+  table.\par}
+  \kernaussage{First the direction, then $\alpha$ (split or not), then the
+  table ($z$, or $t$ with df $=n-1$).}
+\end{frame}
+
 \begin{frame}{Why the $t$-table ends in the normal}
   \begin{columns}[T]
     \begin{column}{0.62\textwidth}
@@ -2851,6 +3100,48 @@ points at the rejection tail -- $<$ means the left tail, $>$ means the right
 tail.'' Quick exercise: have students cover the table and rebuild the reject
 rule just from the sign in $H_1$.}
 
+% ---- Quick exercise: right-sided t-test (SfOe Teil 6) ----------------------------
+\begin{frame}{Exercise -- discount campaign (right-sided $t$-test)}
+  \begin{block}{Problem statement}
+    An online shop wants to show that a discount campaign \emph{raises} the
+    mean basket value above its previous level of $\mu_0=48$ EUR. A sample of
+    $n=25$ orders placed during the campaign gives $\bar x=51.20$ EUR and
+    $s=8$ EUR; \ $\alpha=0.05$.
+  \end{block}
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item[a)] State $H_0$ and $H_1$. Which test direction?
+    \item[b)] Determine the critical value and the rejection rule.
+    \item[c)] Compute $T_n$ and decide.
+    \item[d)] From which sample mean $\bar x$ onwards would the shop have
+              rejected $H_0$?
+  \end{enumerate}
+  \textbf{Hint:} $t_{0.95;\,24}=1.7109$.
+\end{frame}
+\note{Talk track: four minutes. Part d) turns the critical value back into
+euros -- the ``critical mean'' $\mu_0+t\cdot\mathrm{SE}$ is the same move as
+the acceptance region in the types-of-error section later.}
+
+\begin{frame}{Solution -- discount campaign (right-sided $t$-test)}
+  \textbf{Rule:} right-sided: reject $H_0$ if $T_n>t_{1-\alpha;\,n-1}$; \
+  $T_n=(\bar x-\mu_0)/(s/\sqrt n)$.
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item[a)] ``raises \ldots\ above'' $\Rightarrow$ $H_0:\mu=48$ \ vs.\ \
+          $H_1:\mu>48$ \ (\textbf{right-sided}).
+    \item[b)] $\sigma$ unknown $\Rightarrow$ $t$-test, df $=25-1=24$: reject if
+          $T_n>t_{0.95;\,24}=\mathbf{1.7109}$.
+    \item[c)] $\mathrm{SE}=s/\sqrt n=8/\sqrt{25}=8/5=1.6$; \
+          $T_n=\dfrac{51.20-48}{1.6}=\dfrac{3.2}{1.6}=\mathbf{2.00}>1.7109$.
+    \item[d)] Solve $T_n>1.7109$ for $\bar x$: \
+          $\bar x_{\text{crit}}=\mu_0+t_{0.95;\,24}\cdot\mathrm{SE}
+          =48+1.7109\cdot1.6=\mathbf{50.74}$ EUR.
+  \end{itemize}
+  \begin{alertblock}{Decision}
+    $H_0$ is \textbf{rejected}: there is evidence that the campaign raises the
+    mean basket value -- any sample mean above $50.74$ EUR would have been
+    enough.
+  \end{alertblock}
+\end{frame}
+
 \subsection{One-sided \texorpdfstring{$p$}{p}-value}
 
 \begin{frame}{One-sided $p$-value -- formulas}
@@ -2964,6 +3255,35 @@ t = -2.1086, df = 15, p = 0.0261
   (\texttt{"two-sided"} (default), \texttt{"less"}, \texttt{"greater"}).
 \end{frame}
 
+\begin{frame}{Exercise -- one- vs.\ two-sided on the same data}
+  \begin{block}{Problem statement}
+    A coating must \emph{exceed} a target thickness. A test gives
+    $T_n = 1.80$ with df $=15$. Compare the right-sided and the two-sided
+    decision at $\alpha = 0.05$ -- with the $p$-value and with the critical
+    value.
+  \end{block}
+  \textbf{Hint:} $1-F_{t,15}(1.80) = 0.0460$; \ $t$-table, row df $=15$.
+\end{frame}
+
+\begin{frame}{Solution -- one- vs.\ two-sided}
+  \textbf{Rule:} one-sided $p$ $=$ the single tail in the $H_1$ direction;
+  two-sided $p$ $=$ both tails $=2\times$ the one-sided value (here $T_n$
+  points in the $H_1$ direction).
+  \begin{align*}
+    \text{right-sided:}\ & p = 1-F_{t,15}(1.80) = \mathbf{0.0460} < 0.05
+       \;\Rightarrow\; \text{reject}\\
+    \text{two-sided:}\ & p = 2\cdot 0.0460 = \mathbf{0.0920} > 0.05
+       \;\Rightarrow\; \text{keep}
+  \end{align*}
+  {\small\textbf{Check with the critical values} ($t$-table, row df $=15$):
+  right-sided $T_n=1.80>1.753=t_{0.95;\,15}$ $\Rightarrow$ reject; \
+  two-sided $|T_n|=1.80<2.131=t_{0.975;\,15}$ $\Rightarrow$ keep -- the same
+  verdicts.\par}
+  \kernaussage{Identical data, opposite decisions. The one-sided test is more
+  powerful \emph{in the chosen direction} -- exactly why the direction must be
+  fixed before seeing the data.}
+\end{frame}
+
 \subsection{One-sided confidence intervals}
 
 \begin{frame}{One-sided confidence intervals}
@@ -3002,7 +3322,7 @@ t = -2.1086, df = 15, p = 0.0261
 \subsection{Exercises}
 
 \begin{frame}{Exercise -- net weight (left-sided, unknown $\sigma$)}
-  \begin{block}{Problem}
+  \begin{block}{Problem statement}
     A package must contain \emph{at least} $\mu_0 = 500\,$g. A sample of
     $n=12$ gives $\bar x = 496$, $s = 6$. Is there evidence of underfilling?
     \ ($\alpha=0.05$.)
@@ -3020,27 +3340,6 @@ t = -2.1086, df = 15, p = 0.0261
     Reject $H_0$: evidence of underfilling.
     $p = F_{t,11}(-2.3094) = \mathbf{0.0207} < 0.05$.
   \end{alertblock}
-\end{frame}
-
-\begin{frame}{Exercise -- one- vs.\ two-sided on the same data}
-  \begin{block}{Problem}
-    A coating must \emph{exceed} a target thickness. A test gives
-    $T_n = 1.80$ with df $=15$. Compare the right-sided and the two-sided
-    decision at $\alpha = 0.05$.
-  \end{block}
-  \textbf{Hint:} $1-F_{t,15}(1.80) = 0.0460$.
-\end{frame}
-
-\begin{frame}{Solution -- one- vs.\ two-sided}
-  \begin{align*}
-    \text{right-sided:}\ & p = 1-F_{t,15}(1.80) = \mathbf{0.0460} < 0.05
-       \;\Rightarrow\; \text{reject}\\
-    \text{two-sided:}\ & p = 2\cdot 0.0460 = \mathbf{0.0920} > 0.05
-       \;\Rightarrow\; \text{keep}
-  \end{align*}
-  \kernaussage{Identical data, opposite decisions. The one-sided test is more
-  powerful \emph{in the chosen direction} -- exactly why the direction must be
-  fixed before seeing the data.}
 \end{frame}
 
 % ---- Exam-style exercise: muesli (mock exam 3, task 3) ------------------------------
@@ -3392,7 +3691,7 @@ $1/\sqrt n$.}
 \subsection{Exercises}
 
 \begin{frame}{Exercise -- compute $\beta$ and power (two-sided)}
-  \begin{block}{Problem}
+  \begin{block}{Problem statement}
     Test $H_0:\mu = 100$ vs.\ $H_1:\mu\neq 100$, known $\sigma = 10$, $n=25$,
     $\alpha=0.05$. The true mean is actually $\mu_1 = 105$. Find the Type~II
     error $\beta$ and the power.
@@ -3417,7 +3716,7 @@ $1/\sqrt n$.}
 \end{frame}
 
 \begin{frame}{Exercise -- power of a one-sided test}
-  \begin{block}{Problem}
+  \begin{block}{Problem statement}
     Now use a \emph{right-sided} test, $H_1:\mu>100$, with $\sigma=10$,
     $n=25$, $\alpha=0.05$, true $\mu_1=105$. Find the power and compare with
     the two-sided value $0.7054$.

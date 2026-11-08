@@ -5,14 +5,19 @@
 # Reproduces the numbers shown on the slides of Part 3 (numpy, scipy,
 # statsmodels). Run headless:  python3 Part_3_Statistical_Inference.py
 # Sections follow the sections of the slide deck:
-#   1  Foundations            (expected value/variance, normal distribution,
-#                              standard-normal table, central limit theorem)
-#   2  Confidence intervals   (milk, cream; known and unknown variance;
-#                              sample-size planning)
-#   3  Hypothesis tests       (z- and t-test, reaction time, delivery time)
+#   1  Foundations            (expected value/variance, warranty claims,
+#                              normal distribution, standard-normal table,
+#                              central limit theorem)
+#   2  Confidence intervals   (standard error, milk, cream; known and unknown
+#                              variance; sample-size planning)
+#   3  Hypothesis tests       (CI duality, z- and t-test, reaction time,
+#                              delivery time)
 #   4  The p-value            (incl. t-table bracketing, coffee roastery)
-#   5  One-sided tests        (one-sided p-values and CIs, net weight,
-#                              muesli, delivery time revisited)
+#   5  One-sided tests        (critical-value tables, test direction, discount
+#                              campaign, one-sided p-values and CIs, net
+#                              weight, muesli, delivery time revisited)
+# Blocks appear in the order of the slides; exercises sit right after the
+# slides they practise.
 #   6  Types of error         (beta and power)
 #   A  Appendix               (estimator properties, why n-1, law of
 #                              large numbers)
@@ -63,6 +68,28 @@ show("E(X^2)", np.sum(x_c ** 2 * p_c), ".2f")                  # 3.70
 show("Var(X) = E(X^2) - E(X)^2", Var_c, ".2f")                  # 0.81
 show("sd(X)", np.sqrt(Var_c), ".2f")                           # 0.90
 
+# Exercise "Expected value and variance: warranty claims" (claims per week,
+# P = 0.2, 0.4, 0.3, 0.1; costs K = 100 + 150 X; n = 9 independent weeks)
+x_w = np.array([0, 1, 2, 3]); p_w = np.array([0.2, 0.4, 0.3, 0.1])
+E_w = np.sum(x_w * p_w)
+EX2_w = np.sum(x_w ** 2 * p_w)
+Var_w = EX2_w - E_w ** 2
+show("a) E(X) warranty claims", E_w, ".2f")                      # 1.30
+show("a) E(X^2)", EX2_w, ".2f")                                 # 2.50
+show("a) Var(X) = 2.5 - 1.3^2", Var_w, ".2f")                   # 0.81
+show("a) sd(X)", np.sqrt(Var_w), ".2f")                         # 0.90
+show("b) E(K) = 100 + 150 * 1.3", 100 + 150 * E_w, ".2f")       # 295.00
+show("b) Var(K) = 150^2 * 0.81", 150 ** 2 * Var_w, ".2f")       # 18225.00
+show("b) sd(K) = 150 * 0.9", 150 * np.sqrt(Var_w), ".2f")       # 135.00
+show("c) E(S), Var(S), sd(S) for S = X1+...+X9",
+     (9 * E_w, 9 * Var_w, np.sqrt(9 * Var_w)), ".2f")           # 11.70, 7.29, 2.70
+show("c) wrong: adding sds 9 * 0.9", 9 * np.sqrt(Var_w), ".2f")  # 8.10
+show("c) E(Xbar), Var(Xbar), sd(Xbar), n = 9",
+     (E_w, Var_w / 9, np.sqrt(Var_w / 9)), ".2f")               # 1.30, 0.09, 0.30
+# Python code shown on the slide (same rounding, the two print lines)
+print("slide output a):", round(E_w, 2), round(Var_w, 2))                      # 1.3 0.81
+print("slide output c):", round(np.sqrt(9 * Var_w), 2), round(np.sqrt(Var_w / 9), 2))  # 2.7 0.3
+
 # Slide "Standardisation": milk bottle, X ~ N(1000, 3^2), P(X <= 997)
 show("P(X <= 997) = Phi((997-1000)/3) = Phi(-1)", norm.cdf(997, loc=1000, scale=3))  # 0.1587
 
@@ -86,16 +113,6 @@ show("z_0.95 = norm.ppf(0.95)", norm.ppf(0.95))                 # 1.6449 -> 1.64
 show("Phi(1.96)", norm.cdf(1.96))                               # 0.9750
 show("z_0.975 = norm.ppf(0.975)", norm.ppf(0.975))              # 1.9600
 
-# Slides "The central limit theorem" (simulation figure): right-skewed
-# processing times, gamma(shape 4, scale 3) => mu = 12, sigma = 6 minutes
-g = stats.gamma(a=4, scale=3)
-show("gamma(4, 3): mean, sd", (g.mean(), g.std()), ".1f")       # 12.0, 6.0
-rng = np.random.default_rng(42)                                 # same seed as make_figures.py
-for n_ in (1, 4, 9, 36):
-    m_ = rng.gamma(4, 3, size=(20_000, n_)).mean(axis=1)
-    print(f"  n = {n_:>2}: mean of 20000 sample means = {m_.mean():.3f}, "
-          f"sd = {m_.std():.3f} (theory SE = {6 / np.sqrt(n_):.3f})")
-
 # Exercise "Normal distribution: fill volume", X ~ N(1000, 10^2), minimum 985 ml
 show("a) P(X < 985) = Phi(-1.5)", norm.cdf(985, 1000, 10))      # 0.0668
 show("   table: 1 - Phi(1.5) = 1 - 0.9332", 1 - 0.9332)
@@ -107,6 +124,16 @@ show("c) table: 1000 + 1.645 * 10", 1000 + 1.645 * 10, ".2f")  # 1016.45
 show("d) Phi(2.33) (table look-up for 0.99)", norm.cdf(2.33))  # 0.9901
 show("d) setpoint mu = 985 + 2.33 * 10 (table)", 985 + 2.33 * 10, ".1f")   # 1008.3
 show("d) setpoint, exact z_0.99 = 2.3263", 985 - norm.ppf(0.01) * 10, ".2f")  # 1008.26
+
+# Slides "The central limit theorem" (simulation figure): right-skewed
+# processing times, gamma(shape 4, scale 3) => mu = 12, sigma = 6 minutes
+g = stats.gamma(a=4, scale=3)
+show("gamma(4, 3): mean, sd", (g.mean(), g.std()), ".1f")       # 12.0, 6.0
+rng = np.random.default_rng(42)                                 # same seed as make_figures.py
+for n_ in (1, 4, 9, 36):
+    m_ = rng.gamma(4, 3, size=(20_000, n_)).mean(axis=1)
+    print(f"  n = {n_:>2}: mean of 20000 sample means = {m_.mean():.3f}, "
+          f"sd = {m_.std():.3f} (theory SE = {6 / np.sqrt(n_):.3f})")
 
 # Exercise "Central limit theorem: processing times" (mu = 12, sigma = 6, n = 36)
 show("a) SE = 6/sqrt(36)", 6 / np.sqrt(36), ".1f")              # 1.0
@@ -124,6 +151,21 @@ show("d) n >= (6/0.5)^2", (6 / 0.5) ** 2, ".0f")                # 144
 # =====================================================================
 header("2 Confidence intervals")
 
+# Slide "Why divide by the standard error?" (xbar = 8, mu0 = 10)
+for sig_, n_ in ((6, 9), (4, 100)):
+    se_ = sig_ / np.sqrt(n_)
+    print(f"sigma = {sig_}, n = {n_:>3}: SE = {se_:.1f}, z = (8 - 10)/SE = {(8 - 10) / se_:.1f}")
+# -> SE = 2.0, z = -1.0;  SE = 0.4, z = -5.0
+
+# Exercise "Standard error: packing flour" (sigma = 8 g, xbar = 497, mu0 = 500)
+for n_ in (16, 64):
+    se_ = 8 / np.sqrt(n_)
+    show(f"a)/b) n = {n_}: SE, z = (497 - 500)/SE", (se_, (497 - 500) / se_), ".1f")
+# -> n = 16: SE = 2, z = -1.5;  n = 64: SE = 1, z = -3.0
+show("n = 16: P(|Z| >= 1.5) = 2 (1 - Phi(1.5)) exact", 2 * norm.sf(1.5))  # 0.1336
+show("        table: 1 - 0.9332, 2 * (1 - 0.9332)",
+     (1 - 0.9332, 2 * (1 - 0.9332)))                                  # 0.0668, 0.1336
+
 # Slide "CI for milk (known variance)"
 xbar_milk = milk.mean()
 z = norm.ppf(1 - alpha / 2)
@@ -132,28 +174,15 @@ show("z_0.975", z)                                             # 1.96
 show("milk 95% CI, sigma = 3", xbar_milk + np.array([-1, 1]) * z * 3 / np.sqrt(9),
      ".2f")                                                    # [999.04, 1002.96]
 
-# Slide "Different confidence levels" (table 90 / 95 / 99 %)
-for lev in (0.90, 0.95, 0.99):
-    z_lev = norm.ppf(1 - (1 - lev) / 2)
-    show(f"milk {lev:.0%} CI (z = {z_lev:.3f})",
-         xbar_milk + np.array([-1, 1]) * z_lev * 3 / np.sqrt(9), ".2f")
-# -> [999.36, 1002.64] for 90 % (unrounded z_0.95 = 1.644854; the rounded
-#    1.645 would give 1002.645 -> 1002.65), [998.42, 1003.58] for 99 %.
-
-# Slide "CI for milk (unknown variance)"
-s_milk = milk.std(ddof=1)
-t_8 = stats.t.ppf(1 - alpha / 2, df=8)
-show("sd(milk)", s_milk)                                       # 3.7749
-show("t_0.975;8", t_8)                                         # 2.3060
-show("milk 95% CI, sigma unknown",
-     xbar_milk + np.array([-1, 1]) * t_8 * s_milk / np.sqrt(9), ".2f")  # [998.10, 1003.90]
-# same via scipy (the slide "Hypothesis test with Python"):
-ci = stats.ttest_1samp(milk, 1000).confidence_interval(0.95)
-show("  ... via ttest_1samp().confidence_interval", (ci.low, ci.high), ".2f")
-
-# Exercise / solution "CI for cream": known (sigma = 2) and unknown variance
+# Exercises "Filling cream (known variance)" and "Filling cream (unknown
+# variance)": CI with sigma = 2 and with s
 xbar_cream = cream.mean()
-show("mean(cream)", xbar_cream)                                # 248.9375
+show("sum(cream)", cream.sum(), ".0f")                         # 3983
+show("mean(cream) = 3983/16", xbar_cream)                      # 248.9375
+show("sum of squared deviations (cream)",
+     np.sum((cream - xbar_cream) ** 2))                        # 60.9375
+show("margin of error, unknown variance 2.1314 * s/4",
+     stats.t.ppf(0.975, 15) * cream.std(ddof=1) / 4)           # 1.0740
 show("cream 95% CI, sigma = 2",
      xbar_cream + np.array([-1, 1]) * 1.96 * 2 / np.sqrt(16), ".2f")  # [247.96, 249.92]
 show("var(cream)", cream.var(ddof=1))                          # 4.0625
@@ -162,6 +191,21 @@ show("sd(cream)", s_cream)                                     # 2.0156
 show("cream 95% CI, sigma unknown",
      xbar_cream + np.array([-1, 1]) * stats.t.ppf(0.975, 15) * s_cream / np.sqrt(16),
      ".2f")                                                    # [247.86, 250.01]
+
+# Exercise "Reading a confidence interval correctly" (cream, sigma = 2, n = 16)
+show("2) fluctuation interval of single cups xbar +- 1.96*2",
+     xbar_cream + np.array([-1, 1]) * 1.96 * 2, ".2f")         # [245.02, 252.86]
+show("5) margin of error at 99 %: 2.576 * 2/4", 2.576 * 2 / 4, ".3f")  # 1.288
+show("5) 99 % CI cream (sigma known)",
+     xbar_cream + np.array([-1, 1]) * 2.576 * 2 / 4, ".2f")    # [247.65, 250.23]
+
+# Slide "Different confidence levels" (table 90 / 95 / 99 %)
+for lev in (0.90, 0.95, 0.99):
+    z_lev = norm.ppf(1 - (1 - lev) / 2)
+    show(f"milk {lev:.0%} CI (z = {z_lev:.3f})",
+         xbar_milk + np.array([-1, 1]) * z_lev * 3 / np.sqrt(9), ".2f")
+# -> [999.36, 1002.64] for 90 % (unrounded z_0.95 = 1.644854; the rounded
+#    1.645 would give 1002.645 -> 1002.65), [998.42, 1003.58] for 99 %.
 
 # Slide "Planning the sample size" and exercise "How many bottles?"
 # (milk, sigma = 3 known): margin of error e = z * sigma / sqrt(n)
@@ -175,17 +219,33 @@ print("   unrounded quantiles:",
       [math.ceil((norm.ppf(q) * 3 / e) ** 2) for q, e in [(0.975, 1), (0.995, 1), (0.975, 0.5)]])
 # -> [35, 60, 139] -- identical
 
-# Exercise "Reading a confidence interval correctly" (cream, sigma = 2, n = 16)
-show("2) fluctuation interval of single cups xbar +- 1.96*2",
-     xbar_cream + np.array([-1, 1]) * 1.96 * 2, ".2f")         # [245.02, 252.86]
-show("5) margin of error at 99 %: 2.576 * 2/4", 2.576 * 2 / 4, ".3f")  # 1.288
-show("5) 99 % CI cream (sigma known)",
-     xbar_cream + np.array([-1, 1]) * 2.576 * 2 / 4, ".2f")    # [247.65, 250.23]
+# Slide "CI for milk (unknown variance)"
+s_milk = milk.std(ddof=1)
+t_8 = stats.t.ppf(1 - alpha / 2, df=8)
+show("sd(milk)", s_milk)                                       # 3.7749
+show("t_0.975;8", t_8)                                         # 2.3060
+show("milk 95% CI, sigma unknown",
+     xbar_milk + np.array([-1, 1]) * t_8 * s_milk / np.sqrt(9), ".2f")  # [998.10, 1003.90]
+# same via scipy (the slide "Hypothesis test with Python"):
+ci = stats.ttest_1samp(milk, 1000).confidence_interval(0.95)
+show("  ... via ttest_1samp().confidence_interval", (ci.low, ci.high), ".2f")
 
 # =====================================================================
 # 3 Hypothesis tests
 # =====================================================================
 header("3 Hypothesis tests")
+
+# Exercise "Hypotheses and deciding with the CI" (bank: mu0 = 30 min,
+# sigma = 6 known, n = 36, xbar = 32.8, two-sided, alpha = 0.05)
+se_b = 6 / np.sqrt(36)
+ci_b = 32.8 + np.array([-1, 1]) * 1.96 * se_b
+show("SE bank, margin of error 1.96 * SE", (se_b, 1.96 * se_b), ".2f")   # 1.00, 1.96
+show("95% CI bank", ci_b, ".2f")                                         # [30.84, 34.76]
+show("cross-check |Z_n| = |32.8 - 30| / 1", abs(32.8 - 30) / se_b, ".2f")  # 2.80
+for mu0_ in (30, 31, 33, 35):
+    print(f"  mu0 = {mu0_}: inside CI? {ci_b[0] <= mu0_ <= ci_b[1]}  "
+          f"(|Z_n| = {abs(32.8 - mu0_) / se_b:.2f})")
+# -> 30: False (reject), 31: True, 33: True (keep), 35: False (reject)
 
 # Slides "Test statistic -- milk / cream" (known and unknown variance)
 Zn_milk = (xbar_milk - 1000) / (3 / np.sqrt(9))
@@ -232,6 +292,16 @@ print(f"ttest_1samp(delivery, 48):  t = {res.statistic:.4f}, df = {res.df}, "
 # =====================================================================
 header("4 The p-value")
 
+# Exercise "p-value from Z_n = 1.85"
+show("Phi(1.85)", norm.cdf(1.85))                              # 0.9678
+show("p = 2 (1 - Phi(1.85))", 2 * norm.sf(1.85))
+# -> 0.0643 exactly; with the table value Phi(1.85) = 0.9678 one gets
+#    2 * 0.0322 = 0.0644 (the slide shows both).
+show("   table: 1 - 0.9678, 2 * (1 - 0.9678)",
+     (1 - 0.9678, 2 * (1 - 0.9678)))                            # 0.0322, 0.0644
+show("   critical values z_0.975, z_0.95 (two-sided 5 %, 10 %)",
+     (norm.ppf(0.975), norm.ppf(0.95)), ".3f")                  # 1.960, 1.645
+
 # Slides "p-value -- milk / cream (two variants)"
 show("p milk, sigma known", 2 * norm.cdf(-abs(Zn_milk)))       # 0.3173
 show("p milk, sigma unknown", 2 * stats.t.cdf(-abs(Tn_milk), df=8))   # 0.4497
@@ -247,12 +317,6 @@ show("cream, Phi-table bracket for p",
      (2 * (1 - round(norm.cdf(2.13), 4)), 2 * (1 - round(norm.cdf(2.12), 4))))   # 0.0332, 0.0340
 show("cream, t-table df = 15: t_0.95;15, t_0.975;15 (-> 0.05 < p < 0.10)",
      (stats.t.ppf(0.95, 15), stats.t.ppf(0.975, 15)), ".3f")                    # 1.753, 2.131
-
-# Exercise "p-value from Z_n = 1.85"
-show("Phi(1.85)", norm.cdf(1.85))                              # 0.9678
-show("p = 2 (1 - Phi(1.85))", 2 * norm.sf(1.85))
-# -> 0.0643 exactly; with the table value Phi(1.85) = 0.9678 one gets
-#    2 * 0.0322 = 0.0644 (the slide shows both).
 
 # Slide "Significant != important -- the large-n trap" (xbar = 1000.2, sigma = 3)
 for n in (9, 10_000):
@@ -290,6 +354,39 @@ header("5 One-sided tests")
 # Slides "Critical values" / t-table hint
 show("z_0.95", norm.ppf(0.95))                                 # 1.6449 (slides: 1.645)
 show("t_0.95;11", stats.t.ppf(0.95, 11))                       # 1.7959
+show("t_0.975;11 (slide '3 steps': 2.20)", stats.t.ppf(0.975, 11))  # 2.2010
+
+# Slides "Critical values of the standard normal" and "... of the t-distribution"
+print("N(0,1): alpha, one-sided z_(1-alpha), two-sided z_(1-alpha/2)")
+for a_ in (0.10, 0.05, 0.02, 0.01, 0.001):
+    print(f"  {a_:<6} {norm.ppf(1 - a_):.3f}  {norm.ppf(1 - a_ / 2):.3f}")
+print("t-table, upper-tail probability 0.10 0.05 0.025 0.01 0.005")
+for df_ in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 60):
+    print(f"  df = {df_:>2}: " + "  ".join(f"{stats.t.isf(a_, df_):6.3f}"
+                                      for a_ in (0.10, 0.05, 0.025, 0.01, 0.005)))
+print("  df = oo: " + "  ".join(f"{norm.isf(a_):6.3f}" for a_ in (0.10, 0.05, 0.025, 0.01, 0.005)))
+
+# Exercise "Test direction and critical value" (table values, 3 decimals)
+show("1) left-sided,  t_0.95;15  (n = 16, alpha = 0.05)", stats.t.ppf(0.95, 15), ".3f")   # 1.753
+show("2) right-sided, z_0.99     (sigma known, alpha = 0.01)", norm.ppf(0.99), ".3f")     # 2.326
+show("3) two-sided,   t_0.995;9  (n = 10, alpha = 0.01)", stats.t.ppf(0.995, 9), ".3f")   # 3.250
+show("4) right-sided, t_0.90;20  (n = 21, alpha = 0.10)", stats.t.ppf(0.90, 20), ".3f")   # 1.325
+
+# Exercise / solution "Substance K": known sigma = 90, n = 9, xbar = 1060,
+# mu0 = 1000 (right-sided)
+Z_K = (1060 - 1000) / (90 / np.sqrt(9))
+show("Z_n substance K", Z_K, ".2f")                            # 2.00
+show("p = 1 - Phi(2.00)", norm.sf(Z_K))                        # 0.0228
+
+# Exercise "Discount campaign (right-sided t-test)": mu0 = 48 EUR, n = 25,
+# xbar = 51.20 EUR, s = 8 EUR, alpha = 0.05
+se_dc = 8 / np.sqrt(25)
+T_dc = (51.20 - 48) / se_dc
+show("SE discount campaign = 8/5", se_dc, ".1f")                # 1.6
+show("T_n discount campaign = 3.2/1.6", T_dc, ".2f")            # 2.00
+show("t_0.95;24", stats.t.ppf(0.95, 24))                        # 1.7109
+show("critical mean 48 + 1.7109 * 1.6 (table value)", 48 + 1.7109 * se_dc, ".2f")       # 50.74
+show("  ... with the unrounded quantile", 48 + stats.t.ppf(0.95, 24) * se_dc, ".2f")   # 50.74
 
 # Slides "One-sided p-value -- milk" and "One-sided test with Python"
 p_less = stats.ttest_1samp(milk, 1000, alternative="less").pvalue
@@ -304,11 +401,10 @@ print(f"ttest_1samp(cream, 250, 'less'):  t = {res.statistic:.4f}, "
       f"df = {res.df}, p = {res.pvalue:.4f}, 95% CI: [{ci.low}, {ci.high:.2f}]")
 # -> t = -2.1086, df = 15, p = 0.0261, 95% CI: [-inf, 249.82]
 
-# Exercise / solution "Substance K": known sigma = 90, n = 9, xbar = 1060,
-# mu0 = 1000 (right-sided)
-Z_K = (1060 - 1000) / (90 / np.sqrt(9))
-show("Z_n substance K", Z_K, ".2f")                            # 2.00
-show("p = 1 - Phi(2.00)", norm.sf(Z_K))                        # 0.0228
+# Exercise / solution "One- vs. two-sided" (T_n = 1.80, df = 15)
+show("right-sided p = 1 - F_t,15(1.80)", stats.t.sf(1.80, 15))  # 0.0460
+show("two-sided p", 2 * stats.t.sf(1.80, 15))                  # 0.0920
+show("check: t_0.95;15, t_0.975;15", (stats.t.ppf(0.95, 15), stats.t.ppf(0.975, 15)), ".3f")  # 1.753, 2.131
 
 # Slide "One-sided CIs -- milk and cream (known)"
 # The slide uses z_0.95 = 1.645; the unrounded 1.644854 changes only the
@@ -323,10 +419,6 @@ show("cream lower bound (right-sided test)", xbar_cream - z95 * 2 / np.sqrt(16))
 T_nw = (496 - 500) / (6 / np.sqrt(12))
 show("T_n net weight", T_nw)                                   # -2.3094
 show("p = F_t,11(T_n)", stats.t.cdf(T_nw, df=11))              # 0.0207
-
-# Exercise / solution "One- vs. two-sided" (T_n = 1.80, df = 15)
-show("right-sided p = 1 - F_t,15(1.80)", stats.t.sf(1.80, 15))  # 0.0460
-show("two-sided p", 2 * stats.t.sf(1.80, 15))                  # 0.0920
 
 # Exam-style exercise "Muesli filling" (right-sided t-test): mu0 = 250 g,
 # n = 25, xbar = 252.6 g, s = 5.0 g, alpha = 0.05

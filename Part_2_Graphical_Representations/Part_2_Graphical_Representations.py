@@ -12,8 +12,10 @@
 #   1. Section "Empirical Cumulative Distribution Function"
 #      1b. Exercise "Complaints per Day"
 #   2. Section "Histogram"
+#      2a. Quick exercise "Car Park" (reading a given histogram)
 #      2b. Exercises "Histogram (Handball Team)" and "Mobile Phone Costs"
 #   3. Section "Boxplot"
+#      3a. Quick exercise "Daily Revenues" (whiskers by hand, even n)
 #      3b. Exercise "Processing Times of Two Teams"
 #   4. Section "Exercises" -- body heights
 #      4b. Exercise "Cafe Chain (Exam Style)" (adapted from mock exam 3, task 1)
@@ -241,6 +243,37 @@ assert tab_u["abs"].iloc[3] == tab_u["abs"].iloc[2] == 1
 print("density (40,41] / density (41,46] =",
       round(tab_u["density"].iloc[2] / tab_u["density"].iloc[3], 4))   # 5
 
+# ---------------------------------------------------------------------
+# 2a. QUICK EXERCISE "CAR PARK" (after "Histogram -- Alternative Class
+#     Partition"): reading shares off a given histogram -- area = share.
+#     Only the densities of the first three bars are given; the last one
+#     follows from "all areas add up to 1".
+# ---------------------------------------------------------------------
+header("2a. Quick exercise -- car park (reading a histogram)")
+n_park = 200
+edges_p = np.array([0, 1, 2, 4, 10])                 # parking duration in hours
+w_p = np.diff(edges_p)                               # class widths 1 1 2 6
+dens_p3 = np.array([0.25, 0.3, 0.15])                # labels of the first three bars
+
+# SLIDE: "Solution (1/2) -- Car Park: Shares from Areas"
+f_p3 = dens_p3 * w_p[:3]                             # area = density * width = f_j
+f_p4 = 1 - f_p3.sum()                                # all areas add up to 1
+f_p = np.round(np.r_[f_p3, f_p4], 10)
+tab_p = pd.DataFrame({"width": w_p, "density": np.round(f_p / w_p, 10), "f_j": f_p,
+                      "h_j": np.round(f_p * n_park).astype(int)},
+                     index=["[0,1]", "(1,2]", "(2,4]", "(4,10]"])
+print(tab_p)         # f_j 0.25 0.3 0.3 0.15 | h_j 50 60 60 30 | last density 0.025
+print(f"f_4 = 1 - {f_p3.sum():.2f} = {f_p4:.2f} | h_4 = {f_p4 * n_park:.0f}"
+      f" | missing height = {f_p4:.2f} / {w_p[3]} = {f_p4 / w_p[3]:.4f}")
+assert np.isclose(tab_p["f_j"].sum(), 1) and tab_p["h_j"].sum() == n_park
+
+# SLIDE: "Solution (2/2) -- Car Park: Heights versus Areas"
+print("height (1,2] / height (2,4] =", round(tab_p["density"].iloc[1] / tab_p["density"].iloc[2], 4),
+      "| tickets:", tab_p["h_j"].iloc[1], "vs", tab_p["h_j"].iloc[2])      # 2.0 | 60 vs 60
+free = tab_p["f_j"].iloc[0] + tab_p["f_j"].iloc[1]     # durations <= 2 h
+print("share of tickets <= 2 h (free):", round(free, 4), "->",
+      round(free * n_park), "tickets")                                      # 0.55 -> 110
+
 # SLIDES: "Histograms in Python" / "Python Commands: Histogram"
 fig, axes = plt.subplots(1, 3, figsize=(13, 3.5))
 for ax, tab, br, title in zip(axes, (tab2, tab3, tab_u), (breaks2, breaks3, breaks_u),
@@ -337,6 +370,36 @@ st_shoe = boxplot_stats(shoe)
 print_box(st_shoe)
 # expected: Q1 38, median 39, Q3 40, IQR 2, bounds 35 / 43,
 #           whiskers 37 / 41, outlier 46
+
+# ---------------------------------------------------------------------
+# 3a. QUICK EXERCISE "DAILY REVENUES" (after "Upper Whisker -- Step by Step";
+#     from SfOe Teil 2, "Tagesumsaetze"): even n, outlier at the bottom.
+#     Same online shop and days as the exercise "Complaints per Day" (compl).
+# ---------------------------------------------------------------------
+header("3a. Quick exercise -- daily revenues of the online shop")
+revenue = np.array([15, 18, 12, 22, 17, 13, 14, 20, 17, 4])   # 1000 EUR, days 1-10
+
+# SLIDE: "Solution (1/2) -- Daily Revenues: Quartiles and Bounds"
+print("Sorted:", np.sort(revenue).tolist())
+for p in (0.25, 0.5, 0.75):              # n*p = 5 is an integer -> position 5
+    print(f"  p = {p}: n*p = {len(revenue) * p:g} -> position "
+          f"{math.ceil(len(revenue) * Fraction(str(p)))}")
+st_rev = boxplot_stats(revenue)
+print("1.5 * IQR =", 1.5 * st_rev["iqr"])
+print_box(st_rev)
+# expected: Q1 13, median 15, Q3 18, IQR 5, 1.5*IQR 7.5, bounds 5.5 / 25.5,
+#           whiskers 12 / 22, outlier 4
+rev = revenue                            # footnote of the slide
+print(np.quantile(rev, [0.25, 0.5, 0.75], method="inverted_cdf"), np.median(rev))  # [13 15 18] 16.0
+
+# SLIDE: "Solution (2/2) -- Daily Revenues: Whiskers, Outlier and Boxplot"
+day_out = int(np.flatnonzero(revenue == st_rev["fliers"][0])[0]) + 1
+print("outlier", st_rev["fliers"].tolist(), "on day", day_out, "| complaints that day:",
+      compl[day_out - 1], "| most complaints of all days:", compl.max())   # day 10, 6, 6
+fig, ax = plt.subplots()
+draw_course_boxplot(ax, st_rev)
+ax.set_xlabel("Daily revenue (in 1000 EUR)")
+finish(fig, "boxplot_revenues.png")
 
 # SLIDE: "Python Commands: Boxplot" -- matplotlib's own quartiles are interpolated
 print("matplotlib/numpy default quartiles:", np.quantile(shoe, [0.25, 0.75]),

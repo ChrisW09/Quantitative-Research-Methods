@@ -9,17 +9,20 @@
 # written to disk; all numbers are printed. The inline (pgfplots) figures
 # of Sections 1-4 use the coordinates printed here.
 # Sections follow the sections of the slide deck:
-#   1  Correlation              (lamp example)
+#   1  Correlation              (lamp example; running exercise "online
+#                                shop" (1)-(2): covariance, correlation)
 #   2  Simple regression        (twelve stores: the best line, least squares;
-#                                lamp; exercises: online shop, furniture
-#                                store, price-demand)
+#                                lamp; online shop (3)-(6): residuals of two
+#                                lines, squares, normal equations, second
+#                                shop; exercises: furniture store, price-demand)
 #   3  Goodness of fit          (variance decomposition, R^2, three sums;
-#                                exercises: online shop, heating costs,
-#                                study hours -- statsmodels output)
+#                                online shop (7)-(8); exercises: heating
+#                                costs, study hours -- statsmodels output)
 #   4  Residual analysis        (saturation example, residual plots, leverage,
-#                                QQ-plots; exercises: maintenance costs,
-#                                body heights and shoe sizes)
-#   5  Inference                (SE, t-test, CI, p-value, prediction)
+#                                QQ-plots; online shop (9)-(10); exercises:
+#                                maintenance costs, body heights and shoe sizes)
+#   5  Inference                (SE, t-test, CI, p-value, prediction;
+#                                online shop (11))
 #   6  Multiple regression      (Advertising, Credit)
 #   Appendix                    (minimum property of OLS, interactions,
 #                                diagnostics, collinearity / VIF)
@@ -104,10 +107,23 @@ print("cov  :", df["price"].cov(df["quantity"]))            # -83.75
 print("corr :", round(df["price"].corr(df["quantity"]), 4))  # -0.9732
 print("sd   :", round(df["price"].std(), 4), round(df["quantity"].std(), 4))  # 13.6931, 6.2849
 
-# Exercise "covariance and correlation by hand"
-xa = pd.Series([2, 4, 5, 6, 8]); ya = pd.Series([10, 14, 17, 16, 23])
-print("Exercise cov/sd/sd/corr:", xa.cov(ya), round(xa.std(), 4),
-      round(ya.std(), 4), round(xa.corr(ya), 4))   # 10.25, 2.2361, 4.7434, 0.9664
+print("lamp: S_xy, S_xx, S_yy:", ((price - 100) * (quantity - 10)).sum(),
+      ((price - 100)**2).sum(), ((quantity - 10)**2).sum())     # -670 1500 316
+print("var: s_x^2 = 1500/8 =", 1500 / 8, " s_y^2 = 316/8 =", 316 / 8)   # 187.5, 39.5
+
+# Running exercise "online shop" (advertising and revenue, both in 1000 EUR)
+shop = pd.DataFrame({"adv": [1, 2, 3, 4, 5], "revenue": [21, 26, 24, 30, 29]})
+xs_, ys_ = shop["adv"].to_numpy(), shop["revenue"].to_numpy()
+header("1 Exercise -- online shop (1): scatter plot and covariance")
+print("means:", xs_.mean(), ys_.mean())                                   # 3, 26
+print("deviations x:", (xs_ - 3).tolist(), " y:", (ys_ - 26).tolist())    # -2..2; -5 0 -2 4 3
+print("products:", ((xs_ - 3) * (ys_ - 26)).tolist(),
+      " S_xy =", ((xs_ - 3) * (ys_ - 26)).sum(), " s_xy =", shop["adv"].cov(shop["revenue"]))  # 20, 5
+header("1 Exercise -- online shop (2): correlation coefficient")
+print("S_xx =", ((xs_ - 3)**2).sum(), " S_yy =", ((ys_ - 26)**2).sum())   # 10, 54
+print("s_x, s_y =", round(shop["adv"].std(), 4), round(shop["revenue"].std(), 4))   # 1.5811, 3.6742
+print("r =", round(shop["adv"].corr(shop["revenue"]), 4),
+      " = S_xy/sqrt(S_xx S_yy) =", round(20 / np.sqrt(10 * 54), 4))       # 0.8607
 
 # =====================================================================
 # 2 Simple linear regression
@@ -115,7 +131,7 @@ print("Exercise cov/sd/sd/corr:", xa.cov(ya), round(xa.std(), 4),
 header("2 Simple regression -- twelve stores: which line is best?")
 print("r_xy (twelve stores) =", round(stores["adv"].corr(stores["revenue"]), 4))   # 0.8803
 # candidate lines of the slides 'Which line describes the data best?' ff.
-lines = {"A": (24, 2), "B": (34.5, 0.6), "C": (35, 1.2), "D": (30, 1.2), "D'": (31.5, 1.0)}
+lines = {"A": (24, 2), "B": (34.5, 0.6), "C": (35, 1.2), "D": (30, 1.2)}
 for name, (a, b) in lines.items():
     u, rss = rss_of_line(x12, y12, a, b)
     print(f"line {name:2s} y = {a} + {b} x: residuals {u.round(2).tolist()}, "
@@ -124,6 +140,12 @@ for name, (a, b) in lines.items():
 print("store 9: yhat =", 30 + 1.2 * 10, " residual =", 45 - (30 + 1.2 * 10))   # 42, 3
 u_D, _ = rss_of_line(x12, y12, 30, 1.2)
 print("squared residuals of D:", (u_D**2).round(2).tolist())
+
+header("2 Exercise -- online shop (3) and (4): residuals of two lines, squared")
+for name, (a, b) in {"line 1": (23, 1), "line 2": (20, 2)}.items():
+    u, rss = rss_of_line(xs_, ys_, a, b)
+    print(f"{name} y = {a} + {b} x: fitted {(a + b * xs_).tolist()}, residuals {u.tolist()}, "
+          f"sum {u.sum():.0f}, squares {(u**2).tolist()}, S = {rss:.0f}")   # 0, 24 / 0, 14
 
 header("2 Simple regression -- least squares (twelve stores)")
 b0_12, b1_12 = ols_by_hand(x12, y12, "twelve stores")    # S_xy 186, S_xx 155, b1 1.2, b0 30
@@ -135,6 +157,17 @@ print("sum u =", round(reg12.resid.sum(), 10), " sum x*u =", round((x12 * reg12.
 print("fitted values:", reg12.fittedvalues.round(2).tolist())
 # slide 'How do we interpret the slope?': advertising 5 -> 10
 print("yhat(5), yhat(10):", 30 + 1.2 * 5, 30 + 1.2 * 10)   # 36, 42
+# slide 'Intercept, OLS line and the answer': answer to the starting question
+print("yhat(7) =", round(30 + 1.2 * 7, 4))                 # 38.4
+# slide 'Interpretation at a glance -- and predictions'
+print("yhat(9.5), yhat(25):", round(30 + 1.2 * 9.5, 4), round(30 + 1.2 * 25, 4), " 1.2 * 5 =", 1.2 * 5)  # 41.4, 60, 6
+
+header("2 Exercise -- online shop (5): solving the normal equations")
+n_s, Sx, Sy, Sxx_raw, Sxy_raw = 5, xs_.sum(), ys_.sum(), (xs_**2).sum(), (xs_ * ys_).sum()
+print("sums:", n_s, Sx, Sy, Sxx_raw, Sxy_raw, " products:", (xs_ * ys_).tolist())  # 5 15 130 55 410
+b1_ne, b0_ne = np.linalg.solve([[n_s, Sx], [Sx, Sxx_raw]], [Sy, Sxy_raw])[::-1]
+print("I: 130 = 5 b0 + 15 b1, II: 410 = 15 b0 + 55 b1  ->  b1 =", round(b1_ne, 4), " b0 =", round(b0_ne, 4))  # 2, 20
+print("15 * 26 =", 15 * 26, " 55 - 45 =", 55 - 45)          # 390, 10
 
 header("2 Simple regression -- lamp example, slide 'Linear regression with Python'")
 beta1 = df["price"].cov(df["quantity"]) / df["price"].var()
@@ -157,17 +190,17 @@ xc = price - price.mean(); yc = quantity - quantity.mean()
 Sxx, Sxy, Syy = (xc**2).sum(), (xc * yc).sum(), (yc**2).sum()
 print("Sxx, Sxy, Syy:", Sxx, Sxy, Syy)                          # 1500 -670 316
 
-header("2 Exercise -- a regression line by hand (online shop)")
-shop = pd.DataFrame({"adv": [1, 2, 3, 4, 5], "revenue": [21, 26, 24, 30, 29]})
-xs_, ys_ = shop["adv"].to_numpy(), shop["revenue"].to_numpy()
-print("deviations x:", (xs_ - xs_.mean()).tolist(), " y:", (ys_ - ys_.mean()).tolist())
-print("products:", ((xs_ - 3) * (ys_ - 26)).tolist(), " squares:", ((xs_ - 3)**2).tolist())
-b0_s, b1_s = ols_by_hand(xs_, ys_, "online shop")       # S_xy 20, S_xx 10, s_xy 5, s_x^2 2.5, b 2, 20
-print("prediction yhat(6) =", b0_s + b1_s * 6)          # 32
+header("2 Exercise -- online shop (6): the OLS line for a second shop")
+shopB = pd.DataFrame({"adv": [2, 4, 5, 6, 8], "revenue": [12, 20, 19, 23, 31]})
+xB, yB = shopB["adv"].to_numpy(), shopB["revenue"].to_numpy()
+print("deviations x:", (xB - xB.mean()).tolist(), " y:", (yB - yB.mean()).tolist())  # -3 -1 0 1 3; -9 -1 -2 2 10
+print("products:", ((xB - 5) * (yB - 21)).tolist(), " squares:", ((xB - 5)**2).tolist())
+b0_B, b1_B = ols_by_hand(xB, yB, "second shop")          # xbar 5, ybar 21, S_xy 60, S_xx 20; b1 3, b0 6
+print("fitted:", (b0_B + b1_B * xB).tolist(), " residuals:", (yB - (b0_B + b1_B * xB)).tolist())  # 0 2 -2 -1 1
+# first shop for comparison (and for the later exercises)
+b0_s, b1_s = ols_by_hand(xs_, ys_, "first shop")         # S_xy 20, S_xx 10; b1 2, b0 20
 u_shop, rss_shop = rss_of_line(xs_, ys_, 20, 2)
-print("residuals:", u_shop.tolist(), " sum =", u_shop.sum(), " RSS =", rss_shop)   # -1 2 -2 2 -1; 14
-for a, b in [(19, 2), (20, 2.5)]:
-    print(f"other line {a} + {b} x: sum of squares =", rss_of_line(xs_, ys_, a, b)[1])  # 19, 27.75
+print("first shop residuals:", u_shop.tolist(), " sum =", u_shop.sum(), " RSS =", rss_shop)   # -1 2 -2 2 -1; 14
 
 header("2 Exercise -- interpreting coefficients and making predictions (furniture)")
 fs = pd.DataFrame({"adv": [2, 4, 6, 8, 10, 12], "revenue": [44, 49, 58, 62, 61, 71]})
@@ -230,11 +263,16 @@ print("s_x/s_y (stores) =", round(np.sqrt(155 / 288), 4), " r = 1.2 * s_x/s_y ="
 print("lamp: r * s_y / s_x =", round(df["price"].corr(df["quantity"]) * df["quantity"].std()
                                       / df["price"].std(), 4))           # -0.4467
 
-header("3 Exercise -- R^2 and the residual sum of squares (online shop)")
+header("3 Exercise -- online shop (7): the sum-of-squares decomposition")
 reg_shop = smf.ols("revenue ~ adv", data=shop).fit()
-print("TSS =", ((ys_ - 26)**2).sum(), " RSS =", rss_shop, " ESS = 2^2*10 =", 4 * 10)    # 54, 14, 40
-print("R^2 =", round(1 - 14 / 54, 4), " r =", round(20 / np.sqrt(10 * 54), 4),
-      " r^2 =", round((20 / np.sqrt(10 * 54))**2, 4))                   # 0.7407, 0.8607
+yhat_s = reg_shop.fittedvalues.to_numpy()
+print("(y-ybar)^2:", ((ys_ - 26)**2).tolist(), " TSS =", ((ys_ - 26)**2).sum())          # 25 0 4 16 9; 54
+print("yhat-ybar:", (yhat_s - 26).round(4).tolist(), " (yhat-ybar)^2:", ((yhat_s - 26)**2).round(4).tolist(),
+      " ESS =", round(((yhat_s - 26)**2).sum(), 4))                                      # 16 4 0 4 16; 40
+print("u^2:", (u_shop**2).tolist(), " RSS =", rss_shop, " ESS = 2^2*10 =", 4 * 10)      # 1 4 4 4 1; 14
+header("3 Exercise -- online shop (8): computing and assessing R^2")
+print("R^2 = 40/54 =", round(40 / 54, 4), " = 1 - 14/54 =", round(1 - 14 / 54, 4),
+      " r^2 = 0.8607^2 =", round(0.8607**2, 4))                         # 0.7407, 0.7408
 print("reg.ssr, reg.centered_tss, reg.rsquared:", round(reg_shop.ssr, 4),
       reg_shop.centered_tss, round(reg_shop.rsquared, 4))               # 14.0 54.0 0.7407
 
@@ -323,8 +361,18 @@ def qq_reference_line(resid):
 print("lamp QQ reference line: intercept, slope =",
       [round(float(v), 4) for v in qq_reference_line(reg.resid)])               # 0.5833, 0.5189
 
-header("4 Exercise -- draw a residual plot yourself (online shop)")
+header("4 Exercise -- online shop (9): draw the residual plot")
 print("fitted:", (20 + 2 * xs_).tolist(), " residuals:", u_shop.tolist())   # 22..30; -1 2 -2 2 -1
+
+header("4 Exercise -- online shop (10): a month with a big campaign (leverage)")
+x8 = np.array([1, 2, 3, 4, 5, 6, 7, 20])
+Sxx8 = ((x8 - x8.mean())**2).sum()
+h8 = 1 / len(x8) + (x8 - x8.mean())**2 / Sxx8
+print("xbar =", x8.mean(), " deviations:", (x8 - x8.mean()).tolist(), " S_xx =", Sxx8)   # 6, 252
+print("h_1, h_6, h_8 =", h8[0].round(4), h8[5].round(4), h8[7].round(4),
+      " (25/252, 196/252 =", round(25 / 252, 4), round(196 / 252, 4), ")")              # 0.2242 0.125 0.9028
+print("all h:", h8.round(4).tolist(), " sum =", round(h8.sum(), 4),
+      " 4/n, 6/n =", 4 / len(x8), 6 / len(x8))                                           # sum 2; 0.5, 0.75
 
 header("4 Exercise -- a QQ-plot by hand (maintenance costs; mock exam 2, task 2)")
 mc5 = pd.DataFrame({"age": [1, 2, 3, 4, 5], "cost": [17, 21, 25, 29, 43]})
@@ -390,7 +438,15 @@ print("left-sided p =", f"{stats.t.cdf(T, df=n - 2):.3g}")             # 5.1e-06
 T2 = (reg.params["price"] - (-0.5)) / reg.bse["price"]                 # 1.336
 print("T2 =", round(T2, 3), " p =", round(2 * stats.t.sf(abs(T2), df=n - 2), 3))  # 0.223
 
-# confidence intervals
+header("5 Exercise -- online shop (11): is the slope significant?")
+sig_s = np.sqrt(rss_shop / (5 - 2)); se_s = sig_s / np.sqrt(10); T_s = 2 / se_s
+print("sigma_hat =", round(sig_s, 4), " SE(b1) =", round(se_s, 4), " sqrt(10) =", round(np.sqrt(10), 4),
+      " T =", round(T_s, 4))                                         # 2.1602 0.6831 3.1623 2.9277
+print("t_0.975;3 =", round(stats.t.ppf(0.975, 3), 4), " p =", round(2 * stats.t.sf(T_s, 3), 4))   # 3.1824, 0.0611
+print("statsmodels:", reg_shop.bse.round(4).tolist(), reg_shop.tvalues.round(4).tolist(),
+      reg_shop.pvalues.round(4).tolist())
+
+# confidence intervals (lamp)
 print(reg.conf_int(alpha=0.05).round(4))       # beta1: [-0.5411, -0.3523], beta0: [45.15, 64.18]
 print("by hand:", (beta1 + np.array([-1, 1]) * stats.t.ppf(0.975, n - 2) * se_b1).round(4))
 

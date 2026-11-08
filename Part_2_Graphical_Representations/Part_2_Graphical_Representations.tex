@@ -459,6 +459,75 @@ plt.ecdf(compl)                                               # step function
   \end{center}
 \end{frame}
 
+% ----- Quick exercise: reading shares off a given histogram (areas!) -----
+\begin{frame}{Exercise -- Car Park}
+  \begin{block}{Problem statement}
+    Histogram of the parking durations (in hours) of $n = 200$ tickets of a
+    car park. The bar labels are the densities; the last label is missing.
+    \begin{columns}[T]
+      \begin{column}{0.47\textwidth}
+        \includegraphics[width=\textwidth,height=0.54\textheight,keepaspectratio]{images/hist_parking.png}
+      \end{column}
+      \begin{column}{0.51\textwidth}
+        \begin{enumerate}\setlength{\itemsep}{1pt}
+          \item Determine the share $f_j$ and the number $h_j$ of tickets in
+                each of the first three classes.
+          \item All bar areas add up to $1$. Use this to determine $f_4$,
+                $h_4$ and the missing bar height.
+          \item The bar over $(1,2]$ is twice as high as the bar over
+                $(2,4]$. Does $(1,2]$ contain twice as many tickets?
+          \item The first $2$ hours are free of charge. What share of the
+                tickets parked for free? How many tickets is that?
+        \end{enumerate}
+      \end{column}
+    \end{columns}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- Car Park: Shares from Areas}
+  \textbf{Rule:} area $=$ density $\cdot$ class width $= f_j$ (share of the
+  class); number $h_j = f_j \cdot n$. All areas together add up to $1$.
+  \begin{center}
+    \small
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{lcccc}
+      \toprule
+      Class & $\Delta x_j$ & Density & $f_j = \text{density} \cdot \Delta x_j$ & $h_j = f_j \cdot 200$ \\
+      \midrule
+      $[0,1]$  & 1 & $0.25$ & $0.25 \cdot 1 = \mathbf{0.25}$ & $\mathbf{50}$ \\
+      $(1,2]$  & 1 & $0.3$  & $0.3 \cdot 1 = \mathbf{0.3}$   & $\mathbf{60}$ \\
+      $(2,4]$  & 2 & $0.15$ & $0.15 \cdot 2 = \mathbf{0.3}$  & $\mathbf{60}$ \\
+      $(4,10]$ & 6 & $\mathbf{0.025}$ & $\mathbf{0.15}$ (see below) & $\mathbf{30}$ \\
+      \midrule
+      Total    &   &        & $1$ & $200$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{exampleblock}{2.\ Last class from ``all areas add up to 1''}
+    $f_4 = 1 - (0.25 + 0.3 + 0.3) = 1 - 0.85 = \mathbf{0.15}$
+    \quad $\Rightarrow$ \quad $h_4 = 0.15 \cdot 200 = \mathbf{30}$ \\
+    missing height $= f_4 / \Delta x_4 = 0.15 / 6 = \mathbf{0.025}$
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- Car Park: Heights versus Areas}
+  \begin{exampleblock}{3.\ Twice as high $\neq$ twice as many}
+    \textbf{No.} Both classes have the share $0.3$, i.e.\ $\mathbf{60}$ tickets
+    each. The class $(2,4]$ is twice as wide ($2$ hours instead of $1$), so the
+    same area needs only half the height: $0.3 / 2 = 0.15$.
+  \end{exampleblock}
+  \begin{exampleblock}{4.\ Free parking: at most 2 hours}
+    Durations $\le 2$ hours $=$ classes $[0,1]$ and $(1,2]$:
+    $f_1 + f_2 = 0.25 + 0.3 = \mathbf{0.55}$, i.e.\ $55\,\%$ of the tickets
+    $= 0.55 \cdot 200 = \mathbf{110}$ tickets.
+    A ticket of exactly $2$ hours lies in $(1,2]$ and is therefore counted as
+    free.
+  \end{exampleblock}
+  \kernaussage{Read a histogram by its \textbf{areas}, not by its heights:
+  share $=$ height $\cdot$ width. The height only says how densely the tickets
+  lie per hour.}
+\end{frame}
+
 \begin{frame}[fragile]{Histograms in Python}
   \begin{block}{Class width 2}
     \begin{lstlisting}
@@ -900,6 +969,94 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
   \end{alertblock}
 \end{frame}
 
+% ----- Quick exercise: boxplot values by hand -- even n, outlier at the
+%       bottom (adapted from SfOe Teil 2, "Tagesumsaetze") -----
+\begin{frame}{Exercise -- Daily Revenues}
+  \begin{block}{Problem statement}
+    The online shop from the exercise ``Complaints per Day'' also records its
+    daily revenue (in 1000~EUR) on the same $n = 10$ days:
+    \begin{center}
+      \renewcommand{\arraystretch}{1.05}
+      \begin{tabular}{l*{10}{c}}
+        \toprule
+        Day $i$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+        \midrule
+        Revenue $x_i$ & 15 & 18 & 12 & 22 & 17 & 13 & 14 & 20 & 17 & 4 \\
+        Complaints & 2 & 0 & 3 & 1 & 2 & 5 & 1 & 3 & 2 & 6 \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+    \vspace{-0.15cm}
+    \begin{enumerate}
+      \item Sort the revenues and determine $x_{0.25}$, the median $\tilde{x}$
+        and $x_{0.75}$.
+      \item Compute the IQR and the bounds $x_{0.25} - 1.5 \cdot \text{IQR}$ and
+        $x_{0.75} + 1.5 \cdot \text{IQR}$. Determine the lower and the upper
+        whisker and possible outliers.
+      \item Draw the boxplot. Compare a possible outlier with the number of
+        complaints on the same day.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Solution (1/2) -- Daily Revenues: Quartiles and Bounds}
+  \textbf{Rule:} position $= \lceil n \cdot p \rceil$ in the sorted data; if
+  $n \cdot p$ is already an integer, it is \textbf{not} rounded up.
+  \begin{center}
+    \small
+    \begin{tabular}{l*{10}{c}}
+      \toprule
+      Position & 1 & 2 & \textbf{3} & 4 & \textbf{5} & 6 & 7 & \textbf{8} & 9 & 10 \\
+      Revenue, sorted & 4 & 12 & \textbf{13} & 14 & \textbf{15} & 17 & 17 & \textbf{18} & 20 & 22 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \vspace{-0.2cm}
+  \begin{block}{Quartiles ($n = 10$)}
+    $x_{0.25}$: $10 \cdot 0.25 = 2.5 \rightarrow$ position 3 $\rightarrow \mathbf{13}$ \\
+    $\tilde{x}$: $10 \cdot 0.5 = 5$ (integer) $\rightarrow$ position 5
+    $\rightarrow \mathbf{15}$ \quad (not the average of the 5th and 6th value) \\
+    $x_{0.75}$: $10 \cdot 0.75 = 7.5 \rightarrow$ position 8 $\rightarrow \mathbf{18}$
+  \end{block}
+  \begin{block}{IQR and bounds ($k = 1.5$)}
+    $\text{IQR} = x_{0.75} - x_{0.25} = 18 - 13 = \mathbf{5}$ \qquad
+    $1.5 \cdot \text{IQR} = 1.5 \cdot 5 = 7.5$ \\
+    lower bound: $13 - 7.5 = \mathbf{5.5}$ \qquad
+    upper bound: $18 + 7.5 = \mathbf{25.5}$
+  \end{block}
+  \vspace{-0.1cm}
+  \footnotesize Python check (\texttt{rev} $=$ the ten revenues):
+  \texttt{np.quantile(rev, [0.25, 0.5, 0.75], method="inverted\_cdf")}
+  $\rightarrow$ \texttt{[13 15 18]}, but \texttt{np.median(rev)} $\rightarrow$
+  \texttt{16.0} (average of the 5th and 6th value).
+\end{frame}
+
+\begin{frame}{Solution (2/2) -- Daily Revenues: Whiskers, Outlier and Boxplot}
+  \textbf{Rule:} lower whisker $=$ smallest value $\ge$ lower bound, upper
+  whisker $=$ largest value $\le$ upper bound; all values outside the bounds
+  are outliers.
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      \begin{block}{Whiskers and outliers}
+        $4 < 5.5$ $\rightarrow$ \textbf{4 is an outlier} \\
+        Lower whisker $=$ smallest value $\ge 5.5$: $\mathbf{12}$ \\
+        Upper whisker $=$ largest value $\le 25.5$: $\mathbf{22}$ \\
+        (the maximum -- no outlier at the top)
+      \end{block}
+      \begin{alertblock}{Outlier $=$ day 10}
+        On day 10 the shop also had the most complaints ($6$) -- a hint at a
+        disruption, e.g.\ a server outage. Check the cause; do not simply
+        delete the value.
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.53\textwidth}
+      \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{images/boxplot_revenues.png}
+      \footnotesize Unlike the shoe sizes, the outlier lies at the
+      \textbf{bottom}: the lower whisker stops at $12$, not at the minimum $4$.
+    \end{column}
+  \end{columns}
+\end{frame}
+
 % Slide 80a: Boxplot Interpretation -- Symmetry and Median
 \begin{frame}{Boxplot -- Interpretation (1/3): Symmetry and Median}
   \begin{block}{Symmetry}
@@ -954,7 +1111,7 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
     \begin{itemize}
       \item Box: $Q_1 = 38$, median $= 39$, $Q_3 = 40$ $\rightarrow$
         the median lies in the centre, the box is symmetric.
-      \item Whiskers: min $= 37$, max $= 41$ $\rightarrow$
+      \item Whiskers: lower whisker $= 37$, upper whisker $= 41$ $\rightarrow$
         both whiskers have the same length (each 1 unit from the box).
       \item Outlier: $46 > 43$ (upper bound) $\rightarrow$
         despite the symmetric box, the overall boxplot is \textbf{not} symmetric.
