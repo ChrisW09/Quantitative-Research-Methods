@@ -153,7 +153,7 @@ Run a script from its folder, e.g. `cd Part_4_Regression && python3 Part_4_Regre
 
 ## 👤 About
 
-<img align="right" alt="Portrait of Prof. Dr. Christoph Weisser" src="https://raw.githubusercontent.com/ChrisW09/Advanced-Quantitative-Research-Methods/main/Chapters/chapter_00/images/ch00_profile.jpg" width="180">
+<img align="right" alt="Portrait of Prof. Dr. Christoph Weisser" src="Weisser_Feed_Portrait_4x5_HighRes.jpg" width="180">
 
 I am Christoph Weisser, Professor of Mathematics, specialising in Business Data
 Science, and former Technical Lead Analytics & Artificial Intelligence at BASF.
