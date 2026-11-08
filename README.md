@@ -148,3 +148,28 @@ Speaker notes (talk tracks in Part 3) can be enabled in `common/preamble.tex`.
   -- or use Google Colab (see above), where everything is preinstalled
 
 Run a script from its folder, e.g. `cd Part_4_Regression && python3 Part_4_Regression.py`.
+
+---
+
+## 👤 About
+
+<img align="right" alt="Portrait of Prof. Dr. Christoph Weisser" src="https://raw.githubusercontent.com/ChrisW09/Advanced-Quantitative-Research-Methods/main/Chapters/chapter_00/images/ch00_profile.jpg" width="180">
+
+I am Christoph Weisser, Professor of Mathematics, specialising in Business Data
+Science, and former Technical Lead Analytics & Artificial Intelligence at BASF.
+My work focuses on Artificial Intelligence, Generative AI, Business Data
+Science, and agentic AI systems that bridge research with real-world industrial
+applications.
+
+Before joining academia, I led international AI initiatives at BASF from strategy
+through production deployment. Today, I combine research, teaching, open-source
+software development, and selected industry collaborations to advance the
+practical application of AI.
+
+I hold two master’s degrees from the University of Oxford and the University of
+St Andrews and completed the PhD Program in Applied Statistics & Empirical
+Methods (summa cum laude) at Georg-August-Universität Göttingen. I was awarded
+scholarships by the Studienstiftung des deutschen Volkes, the
+Konrad-Adenauer-Stiftung, and the Evangelisches Studienwerk Villigst. I
+regularly publish research in leading journals and at international conferences
+and contribute to open-source software.
