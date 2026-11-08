@@ -1,6 +1,6 @@
 # =====================================================================
 # Quantitative Research -- Part 3: Statistical Inference
-# Author:  Prof. Dr. Christoph Weisser (HSBI)
+# Author:  Prof. Dr. Christoph Weisser
 #
 # Reproduces the numbers shown on the slides of Part 3 (numpy, scipy,
 # statsmodels). Run headless:  python3 Part_3_Statistical_Inference.py

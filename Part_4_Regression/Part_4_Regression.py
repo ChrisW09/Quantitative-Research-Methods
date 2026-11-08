@@ -1,6 +1,6 @@
 # =====================================================================
 # Quantitative Research -- Part 4: Regression
-# Author:  Prof. Dr. Christoph Weisser (HSBI)
+# Author:  Prof. Dr. Christoph Weisser
 #
 # Reproduces every number shown on the slides of Part 4. Run it from the
 # folder Part_4_Regression (the data sets are read from ../data):

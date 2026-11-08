@@ -1,7 +1,7 @@
 # =====================================================================
 # Python code for: Part_1_Descriptive_Statistics.tex
 # Title:  Quantitative Research - Part 1: Descriptive Statistics
-# Author: Prof. Dr. Christoph Weisser (HSBI)
+# Author: Prof. Dr. Christoph Weisser
 #
 # Reproduces every number shown on the slides of Part 1 -- including all
 # exercises and the exam-style exercise. The script is organised like the
