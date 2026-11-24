@@ -1391,7 +1391,7 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
     <div class="p3a-ttl" id="p3a-ci20-t" style="font-size:18px">&nbsp;</div>
     <div id="p3a-ci20-lg"></div>
   </div>
-  <div class="viz" id="p3a-ci20" style="height:375px"></div>
+  <div class="viz" id="p3a-ci20" style="height:357px"></div>
   <p class="fs-xs">Of $20$ computed $95\,\%$ intervals, on average $\approx 19$ cover the true value $\mu$ (red line). The confidence
     <em>level</em> refers to the <b>procedure</b> across many samples.</p>
   <p class="p3a-hint">Each row: one sample of $n=9$ bottles and its CI. Draw new samples or run 50 rounds &ndash; the long-run share settles near the confidence level.</p>
@@ -2510,7 +2510,7 @@ table.bt.p3b-mid td { vertical-align: middle; }
       if (side === "two") { tl.show(true).set(...left(-a), "$p/2$"); tr.show(true).set(...right(a), "$p/2$"); }
       else if (side === "left") { tl.show(true).set(...left(z), "$p$"); tr.show(false); }
       else { tr.show(true).set(...right(z), "$p$"); tl.show(false); }
-      lo.set(z, 0.37, `observed: $Z_n = ${P.f(z, 3)}$`);
+      lo.set(P.clamp(z, -3.15, 3.15), 0.37, `observed: $Z_n = ${P.f(z, 3)}$`);   // keep the label inside the figure
       lc1.set(0, 0.2, `$p$-value = ${what}`);
       lc2.set(0, 0.13, `$${form} = ${P.f(p, 4)}$`);
       ro.set(`at $\\alpha = 0.05$: <b>${p < 0.05 ? "reject" : "keep"}</b> $H_0$`);
@@ -3527,8 +3527,13 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
         ch.setRegions(side === "left"
           ? [{ from: xc, color: C.blue, opacity: 0.16 }, { to: xc, color: C.orange, opacity: 0.85 }]
           : [{ to: xc, color: C.blue, opacity: 0.16 }, { from: xc, color: C.orange, opacity: 0.85 }]);
-        cl.set(xc, 0, xc, 0.42);
-        lc.set(xc, 0.012, side === "left" ? `$-t_{1-\\alpha,\\,n-1} = ${P.f(-c, 3)}$` : `$t_{1-\\alpha,\\,n-1} = ${P.f(c, 3)}$`);
+        // for very small df the critical value lies beyond the plotted range (e.g. 6.314 at df = 1):
+        // hide the line and pin the label to the edge with an arrow towards the value
+        const inside = Math.abs(xc) <= 3.95;
+        cl.style("display", inside ? null : "none");
+        if (inside) cl.set(xc, 0, xc, 0.42);
+        const tx = side === "left" ? `-t_{1-\\alpha,\\,n-1} = ${P.f(-c, 3)}` : `t_{1-\\alpha,\\,n-1} = ${P.f(c, 3)}`;
+        lc.set(P.clamp(xc, -2.75, 2.75), 0.012, inside ? `$${tx}$` : side === "left" ? `$\\leftarrow\\; ${tx}$` : `$${tx} \\;\\rightarrow$`);
         lr.set(sx * 2.95, 0.31, `<b>REJECT $H_0$</b><br>(area $=\\alpha$)`);
         const xe = Math.min(c + 0.35, 3.8);
         ar.set(sx * 2.95, 0.265, sx * xe, Math.max(D.tPdf(xe, df) * 0.4, 0.004));

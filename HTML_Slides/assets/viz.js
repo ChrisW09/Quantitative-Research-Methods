@@ -176,6 +176,13 @@
     }
   }
   function fixMinus(sel) { sel.selectAll(".tick text").each(function () { this.textContent = this.textContent.replace("-", "−"); }); }
+  /** Typographic minus for negative numbers in plain text ("-0.5" -> "−0.5"). */
+  const minusText = (s) => String(s).replace(/(^|[\s(\[=:,;\/])-(?=\d|\.\d)/g, "$1−");
+  /** Same for the text nodes of an HTML element (maths rendered by KaTeX is left alone). */
+  function fixMinusDom(el) {
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && n.parentElement.closest(".katex") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    for (let n = w.nextNode(); n; n = w.nextNode()) { const v = minusText(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; }
+  }
 
   // ---------------------------------------------------------------- marks (data coordinates)
   const layerOf = (ch, o) => ch.layer(o.layer || "data");
@@ -321,7 +328,7 @@
     if (o.color) t.style("fill", o.color);
     if (o.size) t.style("font-size", o.size + "px");
     if (o.weight) t.style("font-weight", o.weight);
-    t.set = (a, b, s) => { t.attr("x", ch.px(a) + (o.dx || 0)).attr("y", ch.y(b) + (o.dy || 0)); if (s !== undefined) t.text(s); return t; };
+    t.set = (a, b, s) => { t.attr("x", ch.px(a) + (o.dx || 0)).attr("y", ch.y(b) + (o.dy || 0)); if (s !== undefined) t.text(minusText(s)); return t; };
     t.set(xv, yv, str);
     return t;
   }
@@ -368,8 +375,15 @@
         const sc = r.width / ch.el.offsetWidth || 1;          // the slide is CSS-scaled
         let px = (event.clientX - r.left) / sc + 14, py = (event.clientY - r.top) / sc - 10;
         t.classList.add("on");
-        const tw = t.offsetWidth;
+        const tw = t.offsetWidth, th = t.offsetHeight;
         if (px + tw > ch.el.offsetWidth) px = px - tw - 28;
+        // keep the tooltip inside the slide (between title bar and footer)
+        const slide = ch.el.closest(".slide");
+        if (slide) {
+          const sr = slide.getBoundingClientRect();
+          px = Math.max((sr.left - r.left) / sc + 4, Math.min((sr.right - r.left) / sc - tw - 4, px));
+          py = Math.max((sr.top - r.top) / sc + 34, Math.min((sr.bottom - r.top) / sc - th - 32, py));
+        }
         t.style.left = px + "px"; t.style.top = py + "px";
       },
       hide() { t.classList.remove("on"); },
@@ -446,7 +460,12 @@
     const val = document.createElement("span"); val.className = "val";
     const f = o.fmt || ((v) => String(v));
     lab.appendChild(inp); lab.appendChild(val); row.appendChild(lab);
-    const upd = (fire) => { const v = +inp.value; val.innerHTML = labelHTML(f(v)); if (fire && o.onInput) o.onInput(v); };
+    const upd = (fire) => {
+      const v = +inp.value;
+      inp.style.setProperty("--pct", (100 * (v - +inp.min) / ((+inp.max - +inp.min) || 1)).toFixed(2) + "%");   // filled track
+      val.innerHTML = labelHTML(f(v)); fixMinusDom(val);
+      if (fire && o.onInput) o.onInput(v);
+    };
     inp.addEventListener("input", () => upd(true));
     upd(false);
     return { input: inp, value: () => +inp.value, set(v, fire = true) { inp.value = v; upd(fire); } };
@@ -491,7 +510,7 @@
   /** Live text in a control row. -> {set(html)} (TeX in $...$ is rendered) */
   function readout(row, html = "") {
     const s = document.createElement("span"); s.className = "readout"; row.appendChild(s);
-    const api = { el: s, set(h) { s.innerHTML = labelHTML(h); return api; } };
+    const api = { el: s, set(h) { s.innerHTML = labelHTML(h); fixMinusDom(s); return api; } };
     api.set(html);
     return api;
   }
@@ -501,7 +520,7 @@
     const wrap = document.createElement("div"); wrap.className = "tiles"; wrap.style.setProperty("--n", labels.length);
     const vals = labels.map((l) => { const t = document.createElement("div"); t.className = "tile"; t.innerHTML = `<div class="k">${labelHTML(l)}</div><div class="v">–</div>`; wrap.appendChild(t); return t.querySelector(".v"); });
     if (where === "before") parent.parentNode.insertBefore(wrap, parent); else if (where === "after") parent.parentNode.insertBefore(wrap, parent.nextSibling); else parent.appendChild(wrap);
-    return { el: wrap, set(i, v) { vals[i].innerHTML = labelHTML(String(v)); } };
+    return { el: wrap, set(i, v) { vals[i].innerHTML = labelHTML(String(v)); fixMinusDom(vals[i]); } };
   }
   /** HTML legend. items: [{label, color, type:"swatch"|"line"|"dash"|"dot"}] */
   function legend(parent, items, where = "append") {
@@ -910,7 +929,7 @@
   // ---------------------------------------------------------------- export
   window.QV = {
     mount, _show, _hide, _mountAll, _themeChanged,
-    C, series, textOf, fmt, pct,
+    C, series, textOf, fmt, pct, minusText, fixMinusDom,
     chart, line, setLine, area, setArea, sample, fnLine, fnArea, dots, bars, barPath, rect, vline, hline, segment, text, tex,
     tooltip: tooltipFor, attachTip, hover, drag, anim,
     controls, slider, select, segmented, button, readout, spacer, tiles, legend,

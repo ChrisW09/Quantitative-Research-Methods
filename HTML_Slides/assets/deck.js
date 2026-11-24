@@ -398,11 +398,100 @@
   // ---------------------------------------------------------------- navigation
   function fit() {
     const st = $("#stage");
-    const W = window.innerWidth, H = window.innerHeight;
+    let W = window.innerWidth, H = window.innerHeight, x0 = 0, y0 = 0;
+    if (D.speaker) { W = Math.round(window.innerWidth * 0.62) - 24; H = window.innerHeight - 64; x0 = 16; y0 = 48; }
     const sc = Math.min(W / 1280, H / 720);
     st.style.transform = `scale(${sc})`;
-    st.style.left = ((W - 1280 * sc) / 2) + "px";
-    st.style.top = ((H - 720 * sc) / 2) + "px";
+    st.style.left = (x0 + (D.speaker ? 0 : (W - 1280 * sc) / 2)) + "px";
+    st.style.top = (y0 + (D.speaker ? 0 : (H - 720 * sc) / 2)) + "px";
+    if (D.speaker) layoutSpeaker(sc);
+  }
+
+  // ---------------------------------------------------------------- speaker view
+  // "s" opens a second window for the laptop screen: current slide, next slide, notes, timer.
+  // Both windows stay in sync (postMessage between the deck window and its speaker window).
+  let spkWin = null, spk = null, spkT0 = Date.now(), spkPaused = 0, spkPauseAt = 0;
+  const MSG = "qrm-deck";
+  function send(win, data) { try { if (win && !win.closed) win.postMessage(Object.assign({ [MSG]: true }, data), "*"); } catch (e) { /* closed */ } }
+  function openSpeaker() {
+    if (D.speaker) return;
+    const url = location.href.split("#")[0].split("?")[0] + "?speaker#" + (D.idx + 1);
+    spkWin = window.open(url, "qrm-speaker-" + D.cfg.part, "popup,width=1280,height=760");
+    if (!spkWin) alert("The browser blocked the speaker window. Allow pop-ups for this page and press s again.");
+  }
+  function buildSpeaker() {
+    document.body.classList.add("speaker");
+    spk = el("div", { class: "spk" });
+    spk.innerHTML = `<div class="spk-bar"><b>Speaker view</b> <span class="spk-pos"></span>
+        <span class="sp"></span><span class="spk-clock"></span>
+        <span class="spk-timer" title="Elapsed time">00:00</span>
+        <button data-a="pause" title="Pause / resume the timer">&#10074;&#10074;</button><button data-a="reset" title="Reset the timer">&#8635;</button></div>
+      <div class="spk-next"><div class="spk-lbl">Next</div><div class="spk-thumb"></div><div class="spk-ntitle"></div></div>
+      <div class="spk-notes"><div class="spk-lbl">Notes</div><div class="spk-ntext"></div></div>
+      <div class="spk-help">&larr; &rarr; navigate both windows &middot; the deck window shows what the audience sees</div>`;
+    document.body.appendChild(spk);
+    spk.addEventListener("click", (e) => {
+      const a = e.target.closest("button"); if (!a) return;
+      if (a.dataset.a === "reset") { spkT0 = Date.now(); spkPaused = 0; spkPauseAt = 0; }
+      if (a.dataset.a === "pause") { if (spkPauseAt) { spkPaused += Date.now() - spkPauseAt; spkPauseAt = 0; } else spkPauseAt = Date.now(); }
+      a.blur(); tick();
+    });
+    setInterval(tick, 1000);
+    tick();
+  }
+  function tick() {
+    if (!spk) return;
+    const ms = (spkPauseAt || Date.now()) - spkT0 - spkPaused;
+    const m = Math.floor(ms / 60000), s2 = Math.floor(ms / 1000) % 60;
+    $(".spk-timer", spk).textContent = `${String(m).padStart(2, "0")}:${String(s2).padStart(2, "0")}`;
+    $(".spk-timer", spk).classList.toggle("paused", !!spkPauseAt);
+    const d = new Date();
+    $(".spk-clock", spk).textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  function layoutSpeaker(sc) {
+    if (!spk) return;
+    const left = Math.round(window.innerWidth * 0.62);
+    spk.style.left = left + "px";
+    const th = $(".spk-thumb", spk);
+    const w = window.innerWidth - left - 32;
+    th.style.width = w + "px"; th.style.height = Math.round(w * 720 / 1280) + "px";
+    const inner = th.firstElementChild;
+    if (inner) inner.style.transform = `scale(${w / 1280})`;
+  }
+  function updateSpeaker() {
+    if (!spk) return;
+    $(".spk-pos", spk).textContent = `slide ${D.idx + 1} / ${D.slides.length}`;
+    const n = $("aside.notes", D.slides[D.idx]);
+    const nt = $(".spk-ntext", spk);
+    nt.innerHTML = n ? n.innerHTML : "<i>No notes for this slide.</i>";
+    renderMath(nt);
+    const th = $(".spk-thumb", spk);
+    th.innerHTML = "";
+    const nx = D.slides[D.idx + 1];
+    $(".spk-ntitle", spk).innerHTML = nx ? (nx.querySelector(".ttl h2") || {}).innerHTML || (nx.classList.contains("title-slide") ? "Title" : "") : "<i>End of the deck</i>";
+    if (nx) {
+      // a static copy of the next slide (charts drawn, no interaction)
+      prepare(nx);
+      const shown = nx.classList.contains("active");
+      if (!shown) nx.classList.add("active");
+      if (window.QV) QV._mountAll(nx);
+      fitSlide(nx);
+      const c = nx.cloneNode(true);
+      if (!shown) nx.classList.remove("active");
+      c.querySelectorAll("[id]").forEach((e) => e.removeAttribute("id"));
+      c.removeAttribute("id");
+      c.querySelectorAll("script, .qv-tip").forEach((e) => e.remove());
+      c.classList.add("active", "spk-clone");
+      c.style.position = "absolute"; c.style.left = "0"; c.style.top = "0"; c.style.transformOrigin = "0 0"; c.style.pointerEvents = "none";
+      th.appendChild(c);
+    }
+    layoutSpeaker();
+  }
+  function onMessage(e) {
+    const d = e.data;
+    if (!d || !d[MSG]) return;
+    if (d.type === "go" && typeof d.n === "number" && d.n - 1 !== D.idx) go(d.n - 1, { fromPeer: true });
+    if (d.type === "hello" && !D.speaker) { spkWin = e.source; send(spkWin, { type: "go", n: D.idx + 1 }); }
   }
 
   function prepare(s) {
@@ -417,47 +506,75 @@
   // space above it), as Beamer centres frames vertically. Pointers stay at the bottom.
   const MAXZOOM = 1.35, ZSTEP = 0.05;
   const isPointer = (e) => e.matches("a.trynb, a.pycourse, .apxnote, .srcnote, .pointers");
-  const isInvisible = (e) => e.matches("script, style, aside.notes, template") || getComputedStyle(e).display === "none";
+  const isInvisible = (e) => e.matches("script, style, aside.notes, template, .fit-mark") || getComputedStyle(e).display === "none";
   function fitSlide(s) {
     if (!s || !s.classList.contains("active") || s.classList.contains("title-slide") || s.classList.contains("no-fit")) return;
     const bd = $(":scope > .bd", s);
     if (!bd) return;
+    bd.querySelectorAll(":scope > .fit-mark").forEach((e) => e.remove());
     const kids = Array.from(bd.children).filter((e) => !isInvisible(e));
     const content = kids.filter((e) => !isPointer(e));
     const ptrs = kids.filter(isPointer);
     if (!content.length) return;
+    bd.querySelectorAll(":scope > .fit-mark").forEach((e) => e.remove());
     content.forEach((e) => { e.style.zoom = ""; });
     bd.style.paddingTop = "";
     const cs = getComputedStyle(bd);
     const gap = parseFloat(cs.rowGap) || 0;
     const sc = bd.getBoundingClientRect().height / bd.offsetHeight || 1;      // stage scale
+    // The end of the content is read from an unzoomed marker placed right after it: browsers differ in how they
+    // report the size of a zoomed element (WebKit/Safari gives its unzoomed size), but they all lay out the
+    // element after it correctly. Horizontal overflow is read from scroll widths, which do not depend on zoom.
+    const mark = document.createElement("div");
+    mark.className = "fit-mark";
+    mark.style.cssText = "height:0;margin:0;padding:0;border:0;flex:none;align-self:stretch";
+    const lastContent = content[content.length - 1];
+    lastContent.after(mark);
     const measure = () => {
       const r = bd.getBoundingClientRect();
       const innerTop = r.top + parseFloat(cs.paddingTop) * sc;
       const innerBottom = r.bottom - parseFloat(cs.paddingBottom) * sc;
       const innerRight = r.right - parseFloat(cs.paddingRight) * sc;
-      let top = Infinity, bottom = -Infinity, wide = false;
+      const zoomed = content.some((e) => e.style.zoom && e.style.zoom !== "1");
+      let bottom = mark.getBoundingClientRect().top - gap * sc, wide = bd.scrollWidth > bd.clientWidth + 2;
+      // horizontal overflow from layout sizes (offset/client/scroll widths are in each element's own units,
+      // consistent inside a zoomed subtree in every browser). A block's title bar deliberately bleeds into its
+      // padding (negative margins), so blocks are judged by their content, not by their own scroll width.
+      const tooWide = (d) => {
+        if (d.matches(".block > h4")) return false;
+        // (a block's own scroll width includes its bleeding title bar in WebKit: skip that test for blocks)
+        if (!d.matches(".block") && d.clientWidth > 0 && d.scrollWidth > d.clientWidth + 2) return true;
+        const par = d.parentElement;
+        if (!par || d.offsetWidth === undefined) return false;
+        const st = getComputedStyle(d);
+        if (st.position === "absolute" || st.position === "fixed" || st.display.startsWith("inline")) return false;
+        const ps = getComputedStyle(par);
+        const inner = par.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight);
+        // a zoomed child reports its width in its own (unzoomed) units: convert to the parent's units
+        const z = par === bd ? parseFloat(d.style.zoom) || 1 : 1;
+        return par.clientWidth > 0 && d.offsetWidth * z > inner + 2 && parseFloat(st.marginLeft) >= 0 && parseFloat(st.marginRight) >= 0;
+      };
       content.forEach((e) => {
         const q = e.getBoundingClientRect();
-        top = Math.min(top, q.top); bottom = Math.max(bottom, q.bottom);
-        if (q.right > innerRight + 1) wide = true;
-        // descendants that stick out of their parents (nowrap rows, wide formulas, diagrams)
+        if (!zoomed && q.right > innerRight + 1) wide = true;
+        if (tooWide(e)) wide = true;
+        // descendants that stick out of their parents (nowrap rows, wide formulas, tables, diagrams)
         e.querySelectorAll("*").forEach((d) => {
           // skip tooltips, notes, SVG internals and KaTeX's invisible MathML copy (laid out wider than the visible maths)
-          if (d.closest(".qv-tip, aside.notes, .katex-mathml") || (d.ownerSVGElement && d.tagName !== "svg")) return;
+          if (d.closest(".qv-tip, aside.notes, .katex-mathml, .katex") || (d.ownerSVGElement && d.tagName !== "svg")) return;
+          if (d.tagName !== "svg" && tooWide(d)) wide = true;
+          if (zoomed) return;
           const r2 = d.getBoundingClientRect();
           if (!r2.width && !r2.height) return;
           if (r2.right > innerRight + 1) wide = true;
-          // text overflowing a box that does not grow (white-space: nowrap inside a block)
-          if (d.clientWidth > 0 && d.scrollWidth > d.clientWidth + 2 && !d.closest(".katex")) wide = true;
           if (r2.bottom > bottom) bottom = r2.bottom;
         });
       });
       bd.querySelectorAll("pre").forEach((e) => { if (e.scrollWidth > e.clientWidth + 1) wide = true; });
       // a clipped block (overflow hidden) counts as not fitting
       bd.querySelectorAll(".block, pre").forEach((e) => { if (e.scrollHeight > e.clientHeight + 1) bottom = Infinity; });
-      const ptrH = ptrs.reduce((h, e) => h + e.getBoundingClientRect().height, 0) + (ptrs.length ? gap * sc : 0);
-      return { free: innerBottom - ptrH - bottom, top, bottom, innerTop, wide };
+      const ptrH = ptrs.reduce((h, e) => h + e.getBoundingClientRect().height, 0) + ptrs.length * gap * sc;   // one gap before each pointer
+      return { free: innerBottom - ptrH - bottom, bottom, innerTop, wide };
     };
     let m = measure();
     const textOnly = !bd.querySelector(".viz, .no-zoom, iframe, video, canvas");
@@ -471,6 +588,7 @@
       content.forEach((e) => { e.style.zoom = best > 1 ? best.toFixed(2) : ""; });
       m = measure();
     }
+    mark.remove();
     // optical centring: a third of the free space goes above the content
     if (m.free > 2 && !s.classList.contains("top")) {
       bd.style.paddingTop = (parseFloat(cs.paddingTop) + (m.free / sc) / 3).toFixed(1) + "px";
@@ -503,10 +621,17 @@
     setTimeout(() => { prepare(D.slides[i + 1]); prepare(D.slides[i - 1]); }, 60);
     const back = $(".ftr .back", next);
     if (back) back.classList.toggle("show", D.history.length > 0);
-    const h = "#" + (i + 1);
-    if (location.hash !== h) history.replaceState(null, "", h);
+    // keep the address in sync, but only once navigation pauses: Safari allows at most
+    // 100 replaceState calls per 10 seconds (holding an arrow key would exceed that)
+    clearTimeout(D._hashTimer);
+    D._hashTimer = setTimeout(() => {
+      const h = "#" + (D.idx + 1);
+      try { if (location.hash !== h) history.replaceState(null, "", h); } catch (e) { /* throttled */ }
+    }, 120);
     updateNotes();
     updateOutlineCurrent();
+    if (!opts.fromPeer) send(D.speaker ? window.opener : spkWin, { type: "go", n: i + 1 });
+    if (D.speaker) updateSpeaker();
   }
   D.go = (n) => go(n - 1);
   D.next = () => go(D.idx + 1);
@@ -572,7 +697,8 @@
       <tr><td><kbd>b</kbd></td><td>back (after following a link)</td></tr>
       <tr><td><kbd>d</kbd></td><td>dark / light mode</td></tr>
       <tr><td><kbd>f</kbd></td><td>fullscreen</td></tr>
-      <tr><td><kbd>n</kbd></td><td>speaker notes</td></tr>
+      <tr><td><kbd>n</kbd></td><td>speaker notes (on this screen)</td></tr>
+      <tr><td><kbd>s</kbd></td><td>speaker view in a second window: next slide, notes, timer</td></tr>
       <tr><td><kbd>p</kbd></td><td>print / save as PDF (one slide per page)</td></tr>
       <tr><td><kbd>?</kbd> <kbd>Esc</kbd></td><td>this help / close</td></tr></table>
       <p style="margin:12px 0 0;color:var(--ink-muted)">Interactive figures: drag points and lines, move sliders, hover for values.</p></div>`;
@@ -583,10 +709,10 @@
     document.body.appendChild(notes);
 
     const tb = el("div", { class: "toolbar" });
-    tb.innerHTML = `<button data-act="outline" title="Outline (m)">&#9776; Outline</button><button data-act="theme" title="Dark mode (d)">&#9681; Theme</button><button data-act="fs" title="Fullscreen (f)">&#9974; Fullscreen</button><button data-act="help" title="Keys (?)">?</button>`;
+    tb.innerHTML = `<button data-act="outline" title="Outline (m)">&#9776; Outline</button><button data-act="theme" title="Dark mode (d)">&#9681; Theme</button><button data-act="fs" title="Fullscreen (f)">&#9974; Fullscreen</button><button data-act="speaker" title="Speaker view in a second window (s)">&#128483; Speaker</button><button data-act="help" title="Keys (?)">?</button>`;
     tb.addEventListener("click", (e) => {
       const a = e.target.closest("button"); if (!a) return;
-      ({ outline: () => toggleOutline(), theme: toggleTheme, fs: toggleFS, help: () => help.classList.toggle("open") })[a.dataset.act]();
+      ({ outline: () => toggleOutline(), theme: toggleTheme, fs: toggleFS, speaker: openSpeaker, help: () => help.classList.toggle("open") })[a.dataset.act]();
       a.blur();
     });
     document.body.appendChild(tb);
@@ -644,6 +770,7 @@
       case "d": toggleTheme(); break;
       case "f": toggleFS(); break;
       case "n": notes.classList.toggle("open"); updateNotes(); renderMath(notes); break;
+      case "s": openSpeaker(); break;
       case "p": window.print(); break;
       case "?": help.classList.toggle("open"); break;
       case "Escape": help.classList.remove("open"); toggleOutline(false); notes.classList.remove("open"); break;
@@ -687,6 +814,7 @@
       notebook: b.dataset.notebook || "",
       tocSplit: b.dataset.tocSplit ? +b.dataset.tocSplit : null,
     };
+    D.speaker = /(^|[?&])speaker\b/.test(location.search);
     const saved = store.get("qrm-theme");
     if (saved) document.documentElement.dataset.theme = saved;
 
@@ -701,6 +829,8 @@
     // titles contain math: render them now (outline needs them)
     $$(".ttl h2", deck).forEach(renderMath);
     buildPanels();
+    if (D.speaker) buildSpeaker();
+    window.addEventListener("message", onMessage);
 
     fit();
     window.addEventListener("resize", fit);
@@ -717,6 +847,7 @@
     go(start === null ? 0 : start);
     document.body.classList.add("ready");
     D.ready = true;
+    if (D.speaker && window.opener) send(window.opener, { type: "hello" });
     document.dispatchEvent(new CustomEvent("deck:ready"));
   }
 

@@ -29,12 +29,23 @@ in `assets/`.
 | `b` | back, after following an internal link |
 | `d` | dark / light mode |
 | `f` | fullscreen |
-| `n` | speaker notes |
+| `n` | speaker notes (on the same screen) |
+| `s` | speaker view in a second window: current and next slide, notes, timer; both windows stay in sync |
 | `p` | print, or save as PDF (one slide per page; use "Save as PDF", margins "None") |
 | `?` | all keys |
 
 Every slide has its own address (`…/Part_3_Statistical_Inference.html#42`), so
 you can link to it directly.
+
+**Two screens:**
+1. Put the deck window on the projector (press `f` for fullscreen).
+2. Press `s` to open the speaker view, and keep it on the laptop. Allow pop-ups
+   for the page if the browser asks.
+3. Navigate in either window; the other one follows. Slider and drag states are
+   per window.
+
+**Browsers:** the decks are tested in Chrome and Safari's engine (WebKit). They
+also run in Firefox 126 or later and Edge.
 
 ## Authoring
 
