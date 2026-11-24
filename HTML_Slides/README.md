@@ -42,6 +42,19 @@ Each slide is a fixed 1280 × 720 canvas that is scaled to the window, so a
 slide that fits on one screen fits on every screen. The content area is about
 1184 × 590 px.
 
+The engine fits every slide when it is shown:
+
+- **Text-only slides** (no `.viz`) are enlarged up to 135 %, as far as everything
+  still fits.
+- **Every slide** is then placed optically centred, as Beamer centres frames
+  vertically.
+- **Opt-outs:** `class="no-fit"` on the `<section>` turns both off. `class="top"`
+  keeps the zoom but not the centring, and `class="no-zoom"` on an element stops
+  the zoom on its slide.
+- **Figure slides** get no zoom, so size their figures to use the space.
+- **Line breaks:** inline maths is never separated from the characters that touch
+  it, e.g. "$p$-value" or "$250$&nbsp;g".
+
 ```html
 <section class="slide" data-section="Histogram" data-short="Histogram" data-subsection="Exercises">
   <h2>Slide title</h2>

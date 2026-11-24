@@ -262,7 +262,10 @@
       }
       if (s.dataset.subsection && sec) {
         const m = sec.subs.length + 1;
-        sub = { title: s.dataset.subsection, no: sec.appendix ? "" : `${sec.no}.${m}`, first: s };
+        // appendix subsections carry their own number in the title ("A.1 Properties of estimators")
+        const am = sec.appendix ? s.dataset.subsection.match(/^([A-Z]\.\d+)\s+(.*)$/) : null;
+        sub = am ? { title: am[2], no: am[1], first: s }
+                 : { title: s.dataset.subsection, no: sec.appendix ? "" : `${sec.no}.${m}`, first: s };
         sec.subs.push(sub);
       }
       s._sec = sec; s._sub = sub;
