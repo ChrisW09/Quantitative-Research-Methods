@@ -491,12 +491,12 @@ figcaption { font-size: 16px; color: var(--ink-muted); text-align: center; }
 .viz svg { display: block; overflow: visible; font-family: "Source Sans 3", sans-serif; }
 .viz svg text { fill: var(--ink-2); font-size: 15px; }
 .viz .axis path, .viz .axis line { stroke: var(--axis); }
-.viz .axis text { fill: var(--ink-muted); font-size: 14px; }
-.viz .axis-label { fill: var(--ink-2); font-size: 15px; font-weight: 600; }
+.viz .axis text { fill: var(--ink-muted); font-size: 15px; }
+.viz .axis-label { fill: var(--ink-2); font-size: 16px; font-weight: 600; }
 .viz .grid line { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
 .viz .grid path { display: none; }
 .viz .lbl { fill: var(--ink); font-size: 15px; }
-.viz .lbl-muted { fill: var(--ink-muted); font-size: 14px; }
+.viz .lbl-muted { fill: var(--ink-muted); font-size: 15px; }
 .viz .lbl-strong { fill: var(--ink); font-size: 16px; font-weight: 700; }
 .viz .ring { stroke: var(--surface); stroke-width: 2; }
 .viz .drag { cursor: grab; }
@@ -513,7 +513,7 @@ figcaption { font-size: 16px; color: var(--ink-muted); text-align: center; }
 }
 .viz-ctrl label { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .viz-ctrl input[type=range] { width: 150px; accent-color: var(--brand); }
-.viz-ctrl .val { font-family: "JetBrains Mono", monospace; font-size: 15px; min-width: 3.2em; color: var(--ink); }
+.viz-ctrl .val { font-family: "JetBrains Mono", monospace; font-size: 16px; min-width: 3.2em; color: var(--ink); }
 .viz-ctrl select { font: 16px "Source Sans 3", sans-serif; padding: 2px 6px; border-radius: 5px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
 .viz-ctrl button {
   font: 600 15px "Source Sans 3", sans-serif;
@@ -533,10 +533,10 @@ figcaption { font-size: 16px; color: var(--ink-muted); text-align: center; }
 /* stat tiles (live numbers next to a chart) */
 .tiles { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 10px; }
 .tile { background: var(--surface-2); border-radius: 8px; padding: 6px 12px; }
-.tile .k { font-size: 14px; color: var(--ink-muted); }
+.tile .k { font-size: 15px; color: var(--ink-muted); }
 .tile .v { font-size: 25px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
-.viz-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 15px; color: var(--ink-2); }
+.viz-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 16px; color: var(--ink-2); }
 .viz-legend .key { display: inline-flex; align-items: center; gap: 6px; }
 .viz-legend .sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
 .viz-legend .ln { width: 20px; height: 0; border-top: 3px solid; display: inline-block; }
@@ -548,7 +548,7 @@ figcaption { font-size: 16px; color: var(--ink-muted); text-align: center; }
   background: var(--surface); color: var(--ink);
   border: 1px solid var(--rule); border-radius: 6px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
-  padding: 5px 9px; font-size: 15px; line-height: 1.3; white-space: nowrap;
+  padding: 7px 11px; font-size: 18px; line-height: 1.3; white-space: nowrap;      /* readable from the back row */
   opacity: 0; transition: opacity .08s;
 }
 .qv-tip.on { opacity: 1; }
@@ -719,3 +719,56 @@ body.speaker .toolbar { display: none; }
   background: var(--brand); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--brand);
 }
 .slide input[type=range]:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 4px; }
+
+/* ---------- Touch screens: no tap flash, no accidental text selection while dragging in a figure ---------- */
+.viz .drag { -webkit-tap-highlight-color: transparent; }
+.viz svg { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: none; }   /* a finger on a figure reads values / drags, it does not pan the page */
+
+/* ---------- Footer navigation (mouse and touch) ---------- */
+.ftr .nav { display: inline-flex; align-items: center; gap: 2px; margin-right: -8px; }
+.ftr .nav a { color: rgba(255, 255, 255, .78); text-decoration: none; }
+.ftr .nav .nv { font-size: 24px; font-weight: 600; line-height: 1; height: 26px; padding: 0 12px 3px; border-radius: 4px; display: inline-flex; align-items: center; }
+.ftr .nav .nv:hover, .ftr .nav .cnt:hover { color: #fff; background: rgba(255, 255, 255, .16); }
+.ftr .nav .nv.dis { opacity: .28; pointer-events: none; }
+.ftr .nav .cnt { padding: 2px 6px; border-radius: 4px; font-variant-numeric: tabular-nums; }
+.title-slide .t-start { color: var(--t-blue); font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--rule); border-radius: 999px; }
+.title-slide .t-start:hover { background: var(--c-blue-tint); }
+.panel .allparts { font-size: 14px; color: var(--t-blue); text-decoration: none; }
+.panel .allparts:hover { text-decoration: underline; }
+@media print { .ftr .nav .nv, .title-slide .t-start { display: none; } }
+
+/* ---------- Line breaking ---------- */
+/* no single word on the last line of running text; balanced titles; short formulas stay on one line */
+/* (the longhand text-wrap-style is used on purpose: the shorthand "text-wrap" would also reset
+   white-space: nowrap, which many slides use to keep a formula or a phrase on one line) */
+.bd p, .bd li, .bd dd, .bd td, .bd th, .bd figcaption { text-wrap-style: pretty; }
+.ttl h2, .block > h4 { text-wrap-style: balance; }
+/* an inline formula stays on one line; only long ones (class set by the engine) may break after = or + */
+.katex:not(.wrapok) .katex-html { white-space: nowrap; }   /* long formulas (.wrapok) follow their context instead */
+
+/* ---------- Teaching tools: enlarged figure (z), pointer dot (l), toast ---------- */
+.slide.fig-zoom .bd > *, .slide.fig-zoom .ttl { visibility: hidden; }
+.slide.fig-zoom .fig-zoomed { visibility: visible; position: relative; z-index: 5; }
+.fig-zoomed { transition: transform .16s ease; }
+.laser-dot {
+  position: fixed; z-index: 100; display: none; pointer-events: none;
+  width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%;
+  background: rgba(232, 32, 32, .9); box-shadow: 0 0 0 6px rgba(232, 32, 32, .22), 0 0 20px rgba(232, 32, 32, .6);
+}
+body.laser #stage, body.laser #stage * { cursor: none !important; }
+.toast {
+  position: fixed; z-index: 90; left: 50%; bottom: 46px; transform: translateX(-50%);
+  background: rgba(20, 20, 32, .92); color: #fff; font: 600 15px "Source Sans 3", sans-serif;
+  padding: 7px 14px; border-radius: 999px; opacity: 0; transition: opacity .15s; pointer-events: none;
+}
+.toast.on { opacity: 1; }
+@media print { .laser-dot, .toast { display: none !important; } .slide.fig-zoom .bd > *, .slide.fig-zoom .ttl { visibility: visible; } }
+
+/* ---------- Interaction hints and demo notes ---------- */
+/* <p class="hint">Drag the orange handle ...</p>: one line under an interactive figure; the orange dot means "you can interact here" */
+.hint { font-size: 16px; line-height: 1.3; color: var(--ink-muted); }
+.hint::before { content: ""; display: inline-block; width: .62em; height: .62em; margin-right: .5em; border-radius: 50%; background: var(--c-orange); box-shadow: 0 0 0 2px var(--c-orange-tint); vertical-align: .02em; }
+.notes-pane .demo-notes, .spk-ntext .demo-notes { margin-top: 10px; padding: 8px 12px; border-left: 4px solid var(--c-orange); background: rgba(230, 159, 0, .12); border-radius: 0 6px 6px 0; }
+.demo-notes > b:first-child { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--t-orange); margin-bottom: 2px; }
+.notes-pane .demo-notes > b:first-child { color: #f0b445; }
+.demo-notes ol, .demo-notes ul { margin: 2px 0 0; padding-left: 1.3em; }

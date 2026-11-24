@@ -426,7 +426,7 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       if (o.tip !== false) {
         gAnn.append("rect").attr("class", "hit").attr("x", 0).attr("width", ch.w).attr("y", yb0).attr("height", yb1 - yb0)
           .on("pointermove", (e) => tip.show(`${g.name ? `<b>${g.name}</b><br>` : ""}Q₁ = ${v2(s.q1)} · median <b>${v2(s.median)}</b> · Q₃ = ${v2(s.q3)} · IQR = ${v2(s.iqr)}<br>` +
-            `fences ${v2(s.fenceLo)} and ${v2(s.fenceHi)} (k = ${tr(k, 2)})<br>whiskers ${v2(s.whiskerLo)} and ${v2(s.whiskerHi)}` +
+            `${/bound/i.test((o.fenceNames || [""])[0]) ? "bounds" : "fences"} ${v2(s.fenceLo)} and ${v2(s.fenceHi)} (k = ${tr(k, 2)})<br>whiskers ${v2(s.whiskerLo)} and ${v2(s.whiskerHi)}` +
             `${s.outliers.length ? ` · outliers: ${s.outliers.map(v2).join(", ")}` : " · no outliers"}`, e))
           .on("pointerleave", () => tip.hide());
       }
@@ -1409,7 +1409,7 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
 <section class="slide">
   <h2>Boxplot</h2>
   <div class="viz" id="p2-box-clean" style="height:420px"></div>
-  <p class="fs-xs muted">Boxplot of the shoe sizes. Hover over the box for the exact values; switch on the raw data or the fences.</p>
+  <p class="fs-xs muted">Boxplot of the shoe sizes. Hover over the box for the exact values; switch on the raw data or the bounds.</p>
   <script>
   (() => {
     QV.mount("#p2-box-clean", (el) => {
@@ -1417,7 +1417,7 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
         xLabel: "Shoe size", centers: [0.44], boxH: 96, fenceNames: ["Lower bound", "Upper bound"] });
       const row = QV.controls(el);
       QV.segmented(row, { label: "Raw data", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("points", +v === 1) });
-      QV.segmented(row, { label: "Fences $Q_1 - 1.5\\,\\text{IQR}$, $Q_3 + 1.5\\,\\text{IQR}$", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("fences", +v === 1) });
+      QV.segmented(row, { label: "Bounds $Q_1 - 1.5\\,\\text{IQR}$, $Q_3 + 1.5\\,\\text{IQR}$", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("fences", +v === 1) });
     });
   })();
   </script>

@@ -1075,7 +1075,7 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
   <div class="cols" style="--cols: 46fr 52fr">
     <div>
       <div class="viz" id="p4a-sumres" style="height:380px"></div>
-      <p class="fs-s center" id="p4a-sumres-txt">Line A: residuals $7$, $0$, $5$, $-1$, $2$, $1$, $-1$, $1$, $1$, $-6$, $-6$, $-3$ &ndash; sum $0$</p>
+      <p class="fs-s center" id="p4a-sumres-txt">Line A: residuals $7$, $0$, $5$, $-1$, $2$, $1$, $-1$, $1$, $1$, $-6$, $-6$, $-3$&nbsp;&ndash; sum $0$</p>
     </div>
     <div>
       <table class="bt p4a-tight" id="p4a-sumres-tab" style="font-size:23px">
@@ -1111,7 +1111,9 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
       lab.set(14.2, Math.min(52.5, l.b0 + 14 * l.b1), k).style("fill", QV.textOf(l.c));
       const u = X.map((x, i) => Y[i] - l.b0 - l.b1 * x);
       const s = P.sum(u);
-      txt.innerHTML = `Line ${k}: residuals ` + u.map((v) => Deck.tex(P.t(v, 1))).join(", ") + ' &ndash; <span class="p4a-nw">sum ' + Deck.tex(P.t(Math.abs(s) < 1e-9 ? 0 : s, 1)) + "</span>";
+      const parts = u.map((v) => Deck.tex(P.t(v, 1)));
+      const lastRes = parts.pop();                 // the last residual, the dash and the sum stay on one line
+      txt.innerHTML = `Line ${k}: residuals ` + parts.join(", ") + ', <span class="p4a-nw">' + lastRes + "&nbsp;&ndash; sum " + Deck.tex(P.t(Math.abs(s) < 1e-9 ? 0 : s, 1)) + "</span>";
       rows.forEach((r) => r.querySelectorAll("td").forEach((td) => td.classList.toggle("hl", r.dataset.l === k)));
     };
     QV.segmented(QV.controls(el), { label: "Line", options: [["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], value: "A", onChange: show });

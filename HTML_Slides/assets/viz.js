@@ -33,9 +33,11 @@
   // ---------------------------------------------------------------- registry
   const REG = [];
   function mount(target, fn) {
-    const find = () => (typeof target === "string" ? Array.from(document.querySelectorAll(target)) : [target]);
+    const sel = typeof target === "string" ? target : null;
+    const find = () => (sel ? Array.from(document.querySelectorAll(sel)) : [target]);
     const add = (els) => els.forEach((el) => {
-      const r = { el, fn, inst: null, done: false };
+      if (REG.some((x) => x.el === el && x.fn === fn)) return;
+      const r = { el, fn, sel, inst: null, done: false };
       REG.push(r);
       // the slide may already be on screen (engine initialised before this script ran)
       const s = el.closest && el.closest(".slide.active");
@@ -49,6 +51,11 @@
     REG.forEach((r) => {
       if (!r.done && slide.contains(r.el)) {
         r.done = true;
+        if (!r.el.hasAttribute("role")) {            // screen readers: name the figure after its slide
+          const name = (slide.getAttribute("aria-label") || "").replace(/^Slide \d+ of \d+:?\s*/, "");
+          r.el.setAttribute("role", "figure");
+          r.el.setAttribute("aria-label", "Interactive figure" + (name ? ": " + name : ""));
+        }
         try { r.inst = r.fn(r.el) || null; } catch (e) { console.error("QV chart failed:", r.el.id || r.el, e); r.el.dataset.vizError = String(e); }
       }
     });
@@ -59,6 +66,29 @@
   }
   function _hide(slide) {
     REG.forEach((r) => { if (r.inst && r.inst.hide && slide.contains(r.el)) try { r.inst.hide(); } catch (e) { console.error(e); } });
+  }
+  /** Remove the figures of a slide from the registry (the engine then restores the slide's original HTML). */
+  function _detach(slide) {
+    const out = [];
+    for (let i = REG.length - 1; i >= 0; i--) {
+      const r = REG[i];
+      if (!slide.contains(r.el)) continue;
+      try { if (r.inst && r.inst.hide) r.inst.hide(); if (r.inst && r.inst.destroy) r.inst.destroy(); } catch (e) { console.error(e); }
+      out.unshift(r);
+      REG.splice(i, 1);
+    }
+    return out;
+  }
+  /** Register detached figures again on the restored elements (unless the slide's own script has just done so). */
+  function _reattach(slide, stale) {
+    stale.forEach((r) => {
+      let els = [];
+      try {
+        if (r.sel) els = Array.from(slide.querySelectorAll(r.sel));
+        else if (r.el.id) { const e = slide.querySelector("#" + CSS.escape(r.el.id)); if (e) els = [e]; }
+      } catch (e) { els = []; }
+      els.forEach((el) => { if (!REG.some((x) => x.el === el)) REG.push({ el, fn: r.fn, sel: r.sel, inst: null, done: false }); });
+    });
   }
   function _themeChanged() {
     REG.forEach((r) => { if (r.inst && r.inst.theme) try { r.inst.theme(); } catch (e) { console.error(e); } });
@@ -133,7 +163,7 @@
     ch.layer = (n) => layers[n] || (layers[n] = g.append("g").attr("class", "l-" + n));
     ch.axes = () => drawAxes(ch);
     ch.toData = (event) => {
-      const [px, py] = d3.pointer(event, g.node());
+      const [px, py] = pointOf(event, g.node());   // mouse, pen or touch; also accepts a d3-drag event
       return [x.invert ? x.invert(px) : px, y.invert ? y.invert(py) : py];
     };
     ch.px = (xv) => (x.bandwidth ? x(xv) + x.bandwidth() / 2 : x(xv));
@@ -368,8 +398,15 @@
     const t = document.createElement("div");
     t.className = "qv-tip";
     ch.el.appendChild(t);
+    // On touch screens there is no hover: a tap shows the tooltip and the finger lifts at once.
+    // So after a touch the tooltip stays for a moment instead of vanishing with the "leave" event.
+    let lastType = "mouse", timer = null;
+    ch.el.addEventListener("pointerover", (e) => { lastType = e.pointerType || "mouse"; }, true);
+    ch.el.addEventListener("pointerdown", (e) => { lastType = e.pointerType || "mouse"; }, true);
+    const TOUCH_MS = 2800;
     ch._tip = {
       show(html, event) {
+        clearTimeout(timer); timer = null;
         t.innerHTML = html;
         const r = ch.el.getBoundingClientRect();
         const sc = r.width / ch.el.offsetWidth || 1;          // the slide is CSS-scaled
@@ -386,7 +423,13 @@
         }
         t.style.left = px + "px"; t.style.top = py + "px";
       },
-      hide() { t.classList.remove("on"); },
+      /** hide the tooltip (after a short delay on touch screens); then() runs when it is really hidden */
+      hide(then) {
+        clearTimeout(timer); timer = null;
+        const off = () => { t.classList.remove("on"); if (typeof then === "function") then(); };
+        if (lastType === "touch" && t.classList.contains("on")) timer = setTimeout(off, TOUCH_MS); else off();
+      },
+      isTouch: () => lastType === "touch",
     };
     return ch._tip;
   }
@@ -394,7 +437,7 @@
     const tip = tooltipFor(ch);
     sel.style("cursor", "default")
       .on("pointerenter.tip pointermove.tip", function (event, d) { const i = sel.nodes().indexOf(this); tip.show(fn(d, i), event); d3.select(this).style("filter", "brightness(1.12)"); })
-      .on("pointerleave.tip", function () { tip.hide(); d3.select(this).style("filter", null); });
+      .on("pointerleave.tip", function () { const me = d3.select(this); tip.hide(() => me.style("filter", null)); if (!tip.isTouch()) me.style("filter", null); });
   }
   /** Crosshair + readout on hover over the plot area. fn(xData, yData) -> html (or null to hide). */
   function hover(ch, fn, o = {}) {
@@ -402,14 +445,44 @@
     const vl = ch.layer("front").append("line").style("stroke", C.axis).style("stroke-width", 1).style("display", "none")
       .attr("y1", 0).attr("y2", ch.h).style("pointer-events", "none");
     ch.layer("front").append("rect").attr("class", "hit").attr("width", ch.w).attr("height", ch.h)
-      .on("pointermove", (event) => {
+      .style("touch-action", "none")            // a finger moving over the plot reads values, it does not pan
+      .on("pointerdown pointermove", (event) => {
         const [xv, yv] = ch.toData(event);
         const html = fn(xv, yv);
         if (html === null || html === undefined) { tip.hide(); vl.style("display", "none"); return; }
         if (o.crosshair !== false) vl.style("display", null).attr("x1", ch.x(xv)).attr("x2", ch.x(xv));
         tip.show(html, event);
       })
-      .on("pointerleave", () => { tip.hide(); vl.style("display", "none"); });
+      .on("pointerleave", () => { tip.hide(() => vl.style("display", "none")); if (!tip.isTouch()) vl.style("display", "none"); });
+  }
+  /**
+   * Pointer position of a d3-drag (or any pointer / mouse / touch) event in the coordinates of an SVG node.
+   * Touch events carry their position in a Touch object, not on the event itself.
+   */
+  function pointOf(event, node) {
+    const src = event.sourceEvent || event;
+    let pt = src;
+    if (src.changedTouches || src.touches) {
+      const all = Array.from(src.changedTouches || []).concat(Array.from(src.touches || []));
+      pt = all.find((t) => t.identifier === event.identifier) || all[0] || src;
+    }
+    // The slide is scaled to the window with a CSS transform (and a figure can be enlarged with "z").
+    // d3.pointer relies on getScreenCTM(), which Safari / WebKit computes without such transforms, so
+    // handles would jump there. The bounding box of the <svg> is right in every browser: map through it.
+    const svg = node && (node.ownerSVGElement || (node.tagName && node.tagName.toLowerCase() === "svg" ? node : null));
+    if (svg && pt && pt.clientX !== undefined && svg.createSVGPoint) {
+      const r = svg.getBoundingClientRect();
+      const vb = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width ? svg.viewBox.baseVal : null;
+      const w = vb ? vb.width : svg.width.baseVal.value, h = vb ? vb.height : svg.height.baseVal.value;
+      if (r.width > 0 && r.height > 0 && w > 0 && h > 0) {
+        let q = svg.createSVGPoint();
+        q.x = (vb ? vb.x : 0) + (pt.clientX - r.left) * w / r.width;
+        q.y = (vb ? vb.y : 0) + (pt.clientY - r.top) * h / r.height;
+        if (node !== svg && node.getCTM) { const m = node.getCTM(); if (m) q = q.matrixTransform(m.inverse()); }
+        return [q.x, q.y];
+      }
+    }
+    return d3.pointer(pt, node);
   }
   /**
    * Make a selection draggable in data coordinates.
@@ -419,7 +492,8 @@
     sel.classed("drag", true).call(d3.drag()
       .on("start", function () { d3.select(this).raise(); })
       .on("drag", function (event, d) {
-        const [px, py] = d3.pointer(event.sourceEvent, ch.g.node());
+        const [px, py] = pointOf(event, ch.g.node());          // works for mouse, pen and touch
+        if (!Number.isFinite(px) || !Number.isFinite(py)) return;
         const xv = ch.x.invert ? ch.x.invert(Math.max(0, Math.min(ch.w, px))) : px;
         const yv = ch.y.invert ? ch.y.invert(Math.max(0, Math.min(ch.h, py))) : py;
         fn(xv, yv, d, event);
@@ -926,12 +1000,26 @@
     return ch;
   }
 
+  // ---------------------------------------------------------------- touch screens
+  // Hover read-outs listen to "pointermove". A finger that only taps never moves, so on touch screens a tap
+  // inside a figure also counts as a move at that spot: every hover read-out then answers to a tap.
+  document.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "touch" || e.qvSynthetic || !e.target || !e.target.closest || !e.target.closest(".viz")) return;
+    let ev;
+    try {
+      ev = new PointerEvent("pointermove", { bubbles: true, cancelable: true, clientX: e.clientX, clientY: e.clientY, screenX: e.screenX, screenY: e.screenY,
+        pointerId: e.pointerId, pointerType: "touch", isPrimary: e.isPrimary, view: window });
+    } catch (err) { return; }
+    ev.qvSynthetic = true;
+    e.target.dispatchEvent(ev);
+  }, true);
+
   // ---------------------------------------------------------------- export
   window.QV = {
-    mount, _show, _hide, _mountAll, _themeChanged,
+    mount, _show, _hide, _mountAll, _themeChanged, _detach, _reattach,
     C, series, textOf, fmt, pct, minusText, fixMinusDom,
     chart, line, setLine, area, setArea, sample, fnLine, fnArea, dots, bars, barPath, rect, vline, hline, segment, text, tex,
-    tooltip: tooltipFor, attachTip, hover, drag, anim,
+    tooltip: tooltipFor, attachTip, hover, drag, pointOf, anim,
     controls, slider, select, segmented, button, readout, spacer, tiles, legend,
     stats: { sum, mean, median, quantile, variance, sd, range, iqr, geomean, trimmedMean, freq, ecdf: ecdfFn, fiveNum, cov, corr, ols, sortNum, logistic },
     dist: { normPdf, normCdf, normInv, tPdf, tCdf, tInv, fPdf, fCdf, fInv, chi2Pdf, chi2Cdf, binomPmf, lgamma, betaInc, erf },

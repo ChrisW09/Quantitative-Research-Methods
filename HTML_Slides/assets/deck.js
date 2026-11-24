@@ -93,13 +93,19 @@
   // "level-$\alpha$", "$x_i$)."): browsers would otherwise break the line right next to the formula.
   function glueMath(root) {
     root.querySelectorAll(".katex").forEach((k) => {
+      // inline formulas stay on one line (see deck.css); only long ones may break after = or +, as KaTeX intends
+      if (!k.closest(".katex-display") && !k.parentNode.closest(".katex")) {
+        const a = k.querySelector("annotation");
+        if (a && a.textContent.length > 56) k.classList.add("wrapok");
+      }
       if (k.closest(".katex-display, .glue, svg, pre") || k.parentNode.closest(".katex")) return;
       // auto-render wraps each formula in an anonymous <span>: use that wrapper as the unit
       const w = k.parentNode;
       const unit = w.tagName === "SPAN" && !w.className && w.childNodes.length === 1 ? w : k;
       const prev = unit.previousSibling, next = unit.nextSibling;
       const pm = prev && prev.nodeType === 3 ? prev.nodeValue.match(/[^\s]+$/) : null;
-      const nm = next && next.nodeType === 3 ? next.nodeValue.match(/^[^\s]+/) : null;
+      // characters touching the formula, or a spaced dash right after it (a no-break space alone does not hold next to maths)
+      const nm = next && next.nodeType === 3 ? next.nodeValue.match(/^[^\s]+|^[ \t\n\u00a0]+[–—](?=\s)/) : null;
       if (!pm && !nm) return;
       const g = document.createElement("span");
       g.className = "glue";
@@ -160,8 +166,8 @@
     if (n === 1) {
       const xs = [37, 38, 39, 39, 40, 40, 40, 41, 42, 43, 44];
       const cnt = {};
-      xs.forEach((x) => { cnt[x] = (cnt[x] || 0) + 1; const cx = 120 + (x - 37) * 44, cy = 650 - cnt[x] * 36; g.push(`<circle cx="${cx}" cy="${cy}" r="14" fill="${col}" opacity=".18"/>`); });
-      g.push(`<line x1="${120 + 3.73 * 44}" y1="420" x2="${120 + 3.73 * 44}" y2="670" stroke="${col2}" stroke-width="4" opacity=".35"/>`);
+      xs.forEach((x) => { cnt[x] = (cnt[x] || 0) + 1; const cx = 40 + (x - 37) * 40, cy = 650 - cnt[x] * 36; g.push(`<circle cx="${cx}" cy="${cy}" r="13" fill="${col}" opacity=".18"/>`); });
+      g.push(`<line x1="${40 + 3.73 * 40}" y1="520" x2="${40 + 3.73 * 40}" y2="668" stroke="${col2}" stroke-width="4" opacity=".55"/>`);
     } else if (n === 2) {
       const hs = [2, 5, 9, 14, 11, 7, 3, 1];
       hs.forEach((h, i) => g.push(`<rect x="${880 + i * 44}" y="${660 - h * 18}" width="40" height="${h * 18}" rx="4" fill="${col}" opacity=".16"/>`));
@@ -197,7 +203,7 @@
         <div class="t-sub">${c.subtitle}</div>
       </div>
       <div class="t-author">Prof. Dr. Christoph Weisser</div>
-      <div class="t-hint">&rarr; / space: next &nbsp;&middot;&nbsp; m: outline &nbsp;&middot;&nbsp; d: dark mode &nbsp;&middot;&nbsp; ?: all keys</div>`;
+      <div class="t-hint"><a href="#" class="t-start" data-nav="next">Start &rsaquo;</a> &nbsp;&middot;&nbsp; &rarr; / space: next &nbsp;&middot;&nbsp; m: outline &nbsp;&middot;&nbsp; d: dark mode &nbsp;&middot;&nbsp; ?: all keys</div>`;
     s.dataset.notitle = "1";
   }
 
@@ -363,7 +369,9 @@
       ftr.innerHTML = `<div class="prog" style="width:${(100 * (i + 1) / N).toFixed(2)}%"></div>
         <span>Part ${c.part}${c.revision ? " (revision)" : ""}${secTitle}</span><span class="sp"></span>
         <a class="back" href="#" title="Back to where you came from (b)">&#8617; back</a>
-        <span>${i + 1} / ${N}</span>`;
+        <span class="nav"><a href="#" class="nv${i === 0 ? " dis" : ""}" data-nav="prev" title="Previous slide (&larr;)" aria-label="Previous slide">&lsaquo;</a><a
+          href="#" class="cnt" data-nav="outline" title="Outline and search (m)" aria-label="Slide ${i + 1} of ${N}: open the outline">${i + 1} / ${N}</a><a
+          href="#" class="nv${i === N - 1 ? " dis" : ""}" data-nav="next" title="Next slide (&rarr;)" aria-label="Next slide">&rsaquo;</a></span>`;
 
       if (auto !== "title") s.appendChild(hdr);
       if (h2) s.appendChild(ttl);
@@ -392,8 +400,112 @@
       $$('a[href^="http"]', s).forEach((a) => { if (!a.target) { a.target = "_blank"; a.rel = "noopener"; } });
       // images that may be missing
       $$("img", bd).forEach((im) => { if (!im.getAttribute("onerror")) im.addEventListener("error", () => { im.style.visibility = "hidden"; }); });
+      s._bd0 = bd.innerHTML;            // the untouched slide body: "reset figure" (key r) restores it
+      // screen readers: each slide is a labelled group
+      s.setAttribute("role", "group");
+      s.setAttribute("aria-roledescription", "slide");
+      s.setAttribute("aria-label", `Slide ${i + 1} of ${N}${t ? ": " + t.replace(/[$\\{}]/g, "") : ""}`);
     });
   }
+
+  // ---------------------------------------------------------------- teaching tools: reset, zoom, pointer
+  let toastEl = null, toastTimer = null;
+  function toast(msg) {
+    if (!toastEl) { toastEl = el("div", { class: "toast" }); document.body.appendChild(toastEl); }
+    toastEl.textContent = msg;
+    toastEl.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("on"), 1400);
+  }
+  const hasFigure = (s) => !!$(":scope > .bd .viz, :scope > .bd .viz-ctrl, :scope > .bd input, :scope > .bd button, :scope > .bd select", s);
+
+  /** r: put the interactive figures of the current slide back into their starting state. */
+  function resetSlide(s, quiet) {
+    s = s || D.slides[D.idx];
+    const bd = s && $(":scope > .bd", s);
+    if (!bd || s._bd0 === undefined || !hasFigure(s)) { if (!quiet) toast("Nothing to reset on this slide"); return false; }
+    unzoomFigure();
+    const stale = window.QV ? QV._detach(s) : [];
+    const wasReady = D.ready;
+    D.ready = false;                                   // figures are mounted below, after the maths (as on first show)
+    bd.innerHTML = s._bd0;
+    bd.style.paddingTop = "";
+    // the slide's own inline scripts register its figures again (and re-attach their listeners)
+    $$("script", bd).forEach((old) => { const sc = document.createElement("script"); sc.textContent = old.textContent; old.replaceWith(sc); });
+    if (window.QV) QV._reattach(s, stale);
+    prepCode(bd);
+    s._prepared = false;
+    prepare(s);
+    D.ready = wasReady;
+    if (s.classList.contains("active")) { if (window.QV) QV._show(s); scheduleFit(s); }
+    updateNotes();
+    if (!quiet) toast("Figure reset");
+    return true;
+  }
+  D.reset = resetSlide;
+
+  /** z: enlarge the figure of the current slide (the column that holds it, with its controls) to the full slide. */
+  let zoomed = null, lastViz = null;
+  document.addEventListener("pointerover", (e) => { const v = e.target.closest && e.target.closest(".viz"); if (v) lastViz = v; }, true);
+  function unzoomFigure() {
+    if (!zoomed) return;
+    zoomed.box.style.transform = ""; zoomed.box.style.transformOrigin = "";
+    zoomed.box.classList.remove("fig-zoomed");
+    zoomed.slide.classList.remove("fig-zoom");
+    zoomed = null;
+  }
+  function zoomFigure() {
+    if (zoomed) { unzoomFigure(); return; }
+    const s = D.slides[D.idx], bd = $(":scope > .bd", s);
+    const vizs = bd ? $$(".viz", bd).filter((v) => v.offsetWidth > 0) : [];
+    if (!vizs.length) { toast("No figure on this slide"); return; }
+    const viz = lastViz && vizs.includes(lastViz) ? lastViz : vizs[0];
+    const box = viz.closest(".cols > *");
+    const cs = getComputedStyle(bd);
+    const r = bd.getBoundingClientRect();
+    const sc = r.width / bd.offsetWidth || 1;                                  // stage scale
+    const W = bd.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    // the enlarged figure may cover the title bar: from below the section bar down to the footer
+    const top = s.querySelector(":scope > .hdr").getBoundingClientRect().bottom;
+    const H = (s.querySelector(":scope > .ftr").getBoundingClientRect().top - top) / sc - 24;
+    if (!box || box.offsetWidth > 0.9 * W) { toast("This figure already uses the full width"); return; }
+    const b = box.getBoundingClientRect();
+    const k = Math.min(W / box.offsetWidth, H / box.offsetHeight, 2.6);
+    if (k < 1.1) { toast("This figure is already as large as the slide allows"); return; }
+    const dx = (r.left + parseFloat(cs.paddingLeft) * sc + (W * sc - k * b.width) / 2 - b.left) / sc;
+    const dy = (top + 12 * sc + (H * sc - k * b.height) / 2 - b.top) / sc;
+    box.style.transformOrigin = "0 0";
+    box.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${k.toFixed(3)})`;
+    box.classList.add("fig-zoomed");
+    s.classList.add("fig-zoom");
+    zoomed = { slide: s, box };
+  }
+  D.zoom = zoomFigure;
+
+  /** l: a red pointer dot that follows the mouse (mirrored from the speaker window to the audience window). */
+  let laserDot = null, laserOn = false;
+  function setLaser(on, fromPeer) {
+    laserOn = on;
+    if (!laserDot) { laserDot = el("div", { class: "laser-dot" }); document.body.appendChild(laserDot); }
+    document.body.classList.toggle("laser", on);
+    if (!on) laserDot.style.display = "none";
+    if (!fromPeer) send(D.speaker ? window.opener : spkWin, { type: "laser", on });
+    if (!fromPeer) toast(on ? "Pointer on (l)" : "Pointer off");
+  }
+  function moveLaser(fx, fy) {                       // position as a fraction of the slide
+    if (!laserOn || !laserDot) return;
+    const st = $("#stage").getBoundingClientRect();
+    laserDot.style.display = fx < 0 || fx > 1 || fy < 0 || fy > 1 ? "none" : "block";
+    laserDot.style.left = (st.left + fx * st.width) + "px";
+    laserDot.style.top = (st.top + fy * st.height) + "px";
+  }
+  document.addEventListener("pointermove", (e) => {
+    if (!laserOn) return;
+    const st = $("#stage").getBoundingClientRect();
+    const fx = (e.clientX - st.left) / st.width, fy = (e.clientY - st.top) / st.height;
+    moveLaser(fx, fy);
+    send(D.speaker ? window.opener : spkWin, { type: "laser", on: true, fx, fy });
+  });
 
   // ---------------------------------------------------------------- navigation
   function fit() {
@@ -461,9 +573,8 @@
   function updateSpeaker() {
     if (!spk) return;
     $(".spk-pos", spk).textContent = `slide ${D.idx + 1} / ${D.slides.length}`;
-    const n = $("aside.notes", D.slides[D.idx]);
     const nt = $(".spk-ntext", spk);
-    nt.innerHTML = n ? n.innerHTML : "<i>No notes for this slide.</i>";
+    nt.innerHTML = notesHTML(D.slides[D.idx]) || "<i>No notes for this slide.</i>";
     renderMath(nt);
     const th = $(".spk-thumb", spk);
     th.innerHTML = "";
@@ -492,12 +603,77 @@
     if (!d || !d[MSG]) return;
     if (d.type === "go" && typeof d.n === "number" && d.n - 1 !== D.idx) go(d.n - 1, { fromPeer: true });
     if (d.type === "hello" && !D.speaker) { spkWin = e.source; send(spkWin, { type: "go", n: D.idx + 1 }); }
+    if (d.type === "laser") { if (d.on !== laserOn) setLaser(!!d.on, true); if (typeof d.fx === "number") moveLaser(d.fx, d.fy); }
+  }
+
+  // Typographic finish for the running text of a slide:
+  //  - a spaced dash stays with the word before it (no line starts with "–"),
+  //  - the last two words of a paragraph or list item stay together (no single word on the last line).
+  const ATOMIC = ".katex, code, .glue, kbd";
+  const SKIP_TEXT = "pre, script, style, svg, .viz, .viz-ctrl, .tiles, .viz-legend, aside.notes, .hdr, .ftr, .qv-tip";
+  function tidyText(root) {
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement && n.parentElement.closest(SKIP_TEXT + ", .katex, code") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    const nodes = [];
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) nodes.push(n);
+    nodes.forEach((n) => { if (/\s[–—]\s/.test(n.nodeValue)) n.nodeValue = n.nodeValue.replace(/[ \t\n]+([–—])(?=\s)/g, "\u00a0$1"); });
+    root.querySelectorAll(".bd p, .bd li, .bd dd, .bd td, .bd figcaption").forEach((el) => {
+      if (el._tidy || el.closest(SKIP_TEXT) || el.querySelector("p, li, ul, ol, table, div, pre") || getComputedStyle(el).textAlign === "center") return;
+      el._tidy = true;
+      if (el.textContent.trim().length < 28) return;
+      // the inline pieces of the block, in order: text nodes and atomic boxes (formulas, code)
+      const parts = [];
+      const walk = (node) => {
+        for (const c of node.childNodes) {
+          if (c.nodeType === 3) parts.push(c);
+          else if (c.nodeType === 1) { if (c.matches(ATOMIC)) parts.push(c); else if (!c.matches("script, style, aside")) walk(c); }
+        }
+      };
+      walk(el);
+      let tail = 0;                               // characters after the candidate break
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const part = parts[i];
+        if (part.nodeType === 1) { tail += Math.min(part.textContent.length, 30); if (tail > 13) return; continue; }
+        const v = part.nodeValue;
+        const end = i === parts.length - 1 || tail === 0 ? v.replace(/\s+$/, "").length : v.length;
+        if (tail === 0 && end === 0) continue;                       // trailing whitespace only
+        const m = v.slice(0, end).match(/[ \t\n]+(?=[^ \t\n\u00a0]*$)/);       // last ordinary space before the last word
+        if (!m) { tail += end; if (tail > 13) return; continue; }
+        const lastWord = end - (m.index + m[0].length) + tail;
+        const before = v.slice(0, m.index).match(/[^\s\u00a0]*$/)[0].length;
+        if (lastWord >= 1 && lastWord <= 13 && before <= 14 && (m.index > 0 || i > 0)) {
+          const prevPart = m.index === 0 && i > 0 ? parts[i - 1] : null;
+          if (prevPart && prevPart.nodeType === 1) {
+            // the last word follows a formula or code: a no-break space does not hold next to such a box,
+            // so both go into one unbreakable span (only if the box is short)
+            if (prevPart.textContent.length > 60) return;
+            let unit = prevPart;
+            while (unit.parentNode !== el && unit.parentNode.childNodes.length === 1) unit = unit.parentNode;
+            if (unit.parentNode && unit.parentNode.classList && unit.parentNode.classList.contains("glue")) unit = unit.parentNode;
+            if (unit.nextSibling !== part) return;
+            const g = document.createElement("span");
+            g.className = "glue";
+            unit.parentNode.insertBefore(g, unit);
+            g.appendChild(unit);
+            const rest = part.splitText(end);
+            part.nodeValue = "\u00a0" + part.nodeValue.slice(m[0].length);
+            g.appendChild(part);
+            void rest;
+          } else {
+            part.nodeValue = v.slice(0, m.index) + "\u00a0" + v.slice(m.index + m[0].length);
+          }
+        }
+        return;
+      }
+    });
   }
 
   function prepare(s) {
     if (!s || s._prepared) return;
     s._prepared = true;
     renderMath(s);
+    try { tidyText(s); } catch (e) { console.error(e); }
   }
 
   // ---------------------------------------------------------------- fit: size and vertical balance
@@ -508,7 +684,7 @@
   const isPointer = (e) => e.matches("a.trynb, a.pycourse, .apxnote, .srcnote, .pointers");
   const isInvisible = (e) => e.matches("script, style, aside.notes, template, .fit-mark") || getComputedStyle(e).display === "none";
   function fitSlide(s) {
-    if (!s || !s.classList.contains("active") || s.classList.contains("title-slide") || s.classList.contains("no-fit")) return;
+    if (!s || !s.classList.contains("active") || s.classList.contains("title-slide") || s.classList.contains("no-fit") || s.classList.contains("fig-zoom")) return;
     const bd = $(":scope > .bd", s);
     if (!bd) return;
     bd.querySelectorAll(":scope > .fit-mark").forEach((e) => e.remove());
@@ -611,7 +787,7 @@
     const prev = D.slides[D.idx];
     const next = D.slides[i];
     if (opts.remember && i !== D.idx) D.history.push(D.idx);
-    if (prev && prev !== next) { prev.classList.remove("active"); if (window.QV) QV._hide(prev); }
+    if (prev && prev !== next) { unzoomFigure(); prev.classList.remove("active"); if (window.QV) QV._hide(prev); }
     D.idx = i;
     prepare(next);
     next.classList.add("active");
@@ -676,6 +852,7 @@
       items.push(`<a href="#" data-go-slide="${i + 1}" data-text="${(h2 ? h2.textContent : "").toLowerCase().replace(/"/g, "")}"><span class="n">${i + 1}</span><span>${title}</span></a>`);
     });
     outline.innerHTML = `<header><div class="ph"><span>Part ${D.cfg.part} &ndash; ${D.cfg.partTitle}</span><button class="x" aria-label="Close">&times;</button></div>
+      <a class="allparts" href="index.html">&larr; All parts</a>
       <input type="search" placeholder="Filter slides&hellip;" aria-label="Filter slides"></header><div class="list">${items.join("")}</div>`;
     document.body.appendChild(outline);
     renderMath(outline);
@@ -697,6 +874,9 @@
       <tr><td><kbd>b</kbd></td><td>back (after following a link)</td></tr>
       <tr><td><kbd>d</kbd></td><td>dark / light mode</td></tr>
       <tr><td><kbd>f</kbd></td><td>fullscreen</td></tr>
+      <tr><td><kbd>r</kbd></td><td>reset the figure of this slide to its starting state</td></tr>
+      <tr><td><kbd>z</kbd></td><td>enlarge the figure to the full slide (again or <kbd>Esc</kbd>: back)</td></tr>
+      <tr><td><kbd>l</kbd></td><td>pointer dot (also shown in the other window)</td></tr>
       <tr><td><kbd>n</kbd></td><td>speaker notes (on this screen)</td></tr>
       <tr><td><kbd>s</kbd></td><td>speaker view in a second window: next slide, notes, timer</td></tr>
       <tr><td><kbd>p</kbd></td><td>print / save as PDF (one slide per page)</td></tr>
@@ -709,10 +889,11 @@
     document.body.appendChild(notes);
 
     const tb = el("div", { class: "toolbar" });
-    tb.innerHTML = `<button data-act="outline" title="Outline (m)">&#9776; Outline</button><button data-act="theme" title="Dark mode (d)">&#9681; Theme</button><button data-act="fs" title="Fullscreen (f)">&#9974; Fullscreen</button><button data-act="speaker" title="Speaker view in a second window (s)">&#128483; Speaker</button><button data-act="help" title="Keys (?)">?</button>`;
+    tb.innerHTML = `<button data-act="outline" title="Outline (m)">&#9776; Outline</button><button data-act="theme" title="Dark mode (d)">&#9681; Theme</button><button data-act="fs" title="Fullscreen (f)">&#9974; Fullscreen</button><button data-act="zoom" title="Enlarge the figure of this slide (z)">&#10530; Figure</button><button data-act="reset" title="Reset the figure to its starting state (r)">&#8634; Reset</button><button data-act="laser" title="Pointer dot (l)">&#9679; Pointer</button><button data-act="speaker" title="Speaker view in a second window (s)">&#128483; Speaker</button><button data-act="help" title="Keys (?)">?</button>`;
     tb.addEventListener("click", (e) => {
       const a = e.target.closest("button"); if (!a) return;
-      ({ outline: () => toggleOutline(), theme: toggleTheme, fs: toggleFS, speaker: openSpeaker, help: () => help.classList.toggle("open") })[a.dataset.act]();
+      ({ outline: () => toggleOutline(), theme: toggleTheme, fs: toggleFS, speaker: openSpeaker, help: () => help.classList.toggle("open"),
+        zoom: zoomFigure, reset: () => resetSlide(), laser: () => setLaser(!laserOn) })[a.dataset.act]();
       a.blur();
     });
     document.body.appendChild(tb);
@@ -729,11 +910,17 @@
     const a = $(`.list a[data-go-slide="${D.idx + 1}"]`, outline);
     if (a) { a.classList.add("cur"); if (scroll) a.scrollIntoView({ block: "center" }); }
   }
+  /** Notes of a slide: the lecturer's talk track, then (if present) the demo script for its interactive figure. */
+  function notesHTML(s) {
+    const all = $$("aside.notes", s);
+    if (!all.length) return "";
+    return all.map((a) => (a.hasAttribute("data-demo") ? `<div class="demo-notes"><b>Figure demo</b> ${a.innerHTML}</div>` : `<div>${a.innerHTML}</div>`)).join("");
+  }
   function updateNotes() {
     if (!notes) return;
-    const n = $("aside.notes", D.slides[D.idx]);
-    notes.innerHTML = `<h5>Speaker notes &middot; slide ${D.idx + 1}</h5>` + (n ? n.innerHTML : "<i>No notes for this slide.</i>");
-    if (n && notes.classList.contains("open")) renderMath(notes);
+    const h = notesHTML(D.slides[D.idx]);
+    notes.innerHTML = `<h5>Speaker notes &middot; slide ${D.idx + 1}</h5>` + (h || "<i>No notes for this slide.</i>");
+    if (h && notes.classList.contains("open")) renderMath(notes);
   }
   function toggleTheme() {
     const root = document.documentElement;
@@ -771,9 +958,12 @@
       case "f": toggleFS(); break;
       case "n": notes.classList.toggle("open"); updateNotes(); renderMath(notes); break;
       case "s": openSpeaker(); break;
+      case "r": resetSlide(); break;
+      case "z": zoomFigure(); break;
+      case "l": setLaser(!laserOn); break;
       case "p": window.print(); break;
       case "?": help.classList.toggle("open"); break;
-      case "Escape": help.classList.remove("open"); toggleOutline(false); notes.classList.remove("open"); break;
+      case "Escape": help.classList.remove("open"); toggleOutline(false); notes.classList.remove("open"); unzoomFigure(); if (laserOn) setLaser(false); break;
       default: return;
     }
     e.preventDefault();
@@ -784,6 +974,12 @@
     if (g) { e.preventDefault(); go(+g.dataset.goSlide - 1, { remember: !g.closest(".panel") && !g.closest(".hdr") }); if (g.closest(".panel")) toggleOutline(false); return; }
     const b = e.target.closest(".ftr .back");
     if (b) { e.preventDefault(); D.back(); return; }
+    const nv = e.target.closest("[data-nav]");
+    if (nv) {
+      e.preventDefault();
+      ({ prev: D.prev, next: D.next, outline: () => toggleOutline() })[nv.dataset.nav]();
+      return;
+    }
     const a = e.target.closest('a[href^="#"]');
     if (a && a.getAttribute("href").length > 1) {
       const i = slideIndexForHash(a.getAttribute("href"));
@@ -847,7 +1043,11 @@
     go(start === null ? 0 : start);
     document.body.classList.add("ready");
     D.ready = true;
-    if (D.speaker && window.opener) send(window.opener, { type: "hello" });
+    if (D.speaker && window.opener) {
+      send(window.opener, { type: "hello" });
+      // keep announcing: if the deck window is reloaded it finds its speaker window again
+      setInterval(() => { if (window.opener && !window.opener.closed) send(window.opener, { type: "hello" }); }, 3000);
+    }
     document.dispatchEvent(new CustomEvent("deck:ready"));
   }
 

@@ -29,6 +29,9 @@ in `assets/`.
 | `b` | back, after following an internal link |
 | `d` | dark / light mode |
 | `f` | fullscreen |
+| `r` | reset the figure of the current slide to its starting state |
+| `z` | enlarge the figure to the full slide (again or `Esc`: back) |
+| `l` | pointer dot that follows the mouse (also shown in the other window) |
 | `n` | speaker notes (on the same screen) |
 | `s` | speaker view in a second window: current and next slide, notes, timer; both windows stay in sync |
 | `p` | print, or save as PDF (one slide per page; use "Save as PDF", margins "None") |
@@ -44,8 +47,22 @@ you can link to it directly.
 3. Navigate in either window; the other one follows. Slider and drag states are
    per window.
 
-**Browsers:** the decks are tested in Chrome and Safari's engine (WebKit). They
-also run in Firefox 126 or later and Edge.
+**Mouse and touch:** the footer has previous / next buttons, and a click on the
+slide counter opens the outline. On a tablet, swipe to change slides, drag
+handles with a finger and tap a mark to see its values. The buttons at the
+bottom right (shown when the pointer moves) offer the same tools as the keys.
+
+**Teaching with the figures:**
+- An orange dot in front of a line of small text marks an interaction hint; orange
+  handles in a figure can be dragged.
+- Press `z` to enlarge a figure for the room and `r` to return it to the state
+  shown in the PDF.
+- The speaker view shows a short "Figure demo" script for each interactive
+  figure: a question to ask, what to do, what students should notice.
+
+**Browsers:** the decks are tested in Chrome and Safari's engine (WebKit),
+including dragging at different window sizes. They also run in Firefox 126 or
+later and Edge.
 
 ## Authoring
 
@@ -103,9 +120,16 @@ The engine fits every slide when it is shown:
   `<div class="srcnote">…</div>`.
 - **Exercise and solution slides:** a title that starts with "Exercise" or
   "Solution" gets a badge automatically.
-- **Speaker notes:** `<aside class="notes">…</aside>` inside a slide.
+- **Speaker notes:** `<aside class="notes">…</aside>` inside a slide. A second
+  `<aside class="notes" data-demo>…</aside>` holds the demo script for the
+  slide's interactive figure; it appears under "Figure demo" in the speaker view.
+- **Interaction hints:** `<p class="hint">Drag the orange handle …</p>`, one line
+  next to an interactive figure.
 - **Interactive figures:** `<div class="viz" id="…" style="height:…px"></div>`
-  plus `QV.mount("#id", el => { … })`. The API is documented at the top of
+  plus `QV.mount("#id", el => { … })`. Keep a figure's controls and read-outs in
+  the same column as the figure: `z` enlarges that column. Use `QV.drag` and
+  `ch.toData(event)` for pointer positions; they are correct on a scaled slide
+  in every browser (plain `d3.pointer` is not in Safari). The API is documented at the top of
   `assets/viz.js`. `QV.stats` follows the course definitions: quantile
   x_(⌈n·p⌉), median x_(⌈n/2⌉), variance with n − 1.
 
