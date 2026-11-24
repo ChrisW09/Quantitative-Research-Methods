@@ -1,0 +1,2744 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 2 – Graphical Representations</title>
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="assets/deck.css">
+<script src="assets/vendor/katex/katex.min.js"></script>
+<script src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script src="assets/vendor/d3.min.js"></script>
+<script src="assets/viz.js"></script>
+<script src="assets/deck.js"></script>
+</head>
+<body data-part="2" data-part-title="Graphical Representations" data-subtitle="Part 2: Graphical Representations – Revision Material"
+      data-revision data-notebook="Part_2_Graphical_Representations/Part_2_Graphical_Representations.ipynb">
+<div id="stage"><main id="deck">
+<section class="slide" data-auto="title"></section>
+<section class="slide" data-auto="lecturer"></section>
+<section class="slide" data-auto="course"></section>
+<!-- BEGIN SLIDES -->
+<style>
+/* ---- Part 2 deck-specific styles (prefix p2-) ---- */
+.p2-ytex { position: absolute; font-size: 15px; font-weight: 600; color: var(--ink-2); white-space: nowrap; pointer-events: none; line-height: 1; }
+.p2-ytex .katex { font-size: 1.05em; font-weight: 400; }
+.p2-steps li { border-radius: 6px; padding: 1px 6px; margin-left: -6px; transition: background .2s; }
+.p2-steps li.p2-on { background: var(--c-orange-tint); font-weight: 600; }
+.p2-steps li.p2-done { color: var(--ink-2); }
+table.bt tr.p2-on td { background: var(--c-orange-tint); }
+.p2-cards { position: relative; height: 82px; }
+.p2-card { position: absolute; top: 22px; width: 50px; height: 50px; border-radius: 8px; border: 2px solid var(--rule);
+  background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 600;
+  color: var(--ink); transition: left .6s ease, background .25s, border-color .25s, opacity .25s; font-variant-numeric: tabular-nums; }
+.p2-card.p2-q { border-color: var(--c-orange); background: var(--c-orange-tint); }
+.p2-card.p2-w { border-color: var(--c-green); background: var(--c-green-tint); }
+.p2-card.p2-out { border-color: var(--c-red); background: var(--c-red-tint); }
+.p2-pos { position: absolute; top: 0; width: 50px; text-align: center; font-size: 14px; color: var(--ink-muted); transition: opacity .3s; }
+.p2-explain { min-height: 30px; font-size: 18px; color: var(--ink); }
+.p2-small-gap { gap: 8px !important; }
+.p2-nw { white-space: nowrap; }
+.bd .p2-data { margin: 12px 0 14px; }
+.bd ol.p2-roomy > li, .bd ul.p2-roomy > li { margin-bottom: .55em; }
+table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
+.p2-mini { font-size: 17px; color: var(--ink-muted); }
+.bd .block > h4 code.p2-hc { background: rgba(255, 255, 255, .2); color: #fff; }
+</style>
+<script>
+/* Shared helpers for the Part 2 figures (window.P2): ECDF, histogram and boxplot
+   with the course definitions (quantile x_(ceil(n p)), classes [c0,c1], (c1,c2], ...,
+   whiskers = most extreme values inside Q1 - k IQR and Q3 + k IQR). */
+(() => {
+  const P2 = (window.P2 = window.P2 || {});
+  const S = QV.stats, C = QV.C, fmt = QV.fmt;
+  const tr = (v, d = 4) => fmt(v, d, true);
+  P2.tr = tr;
+  const texHTML = (s) => s.replace(/\$([^$]+)\$/g, (m, t) => (window.Deck && Deck.tex ? Deck.tex(t) : t));
+  P2.texHTML = texHTML;
+
+  /** Rotated y-axis label with KaTeX ("Density $f_j/\Delta x_j$"). */
+  P2.yTex = function (ch, label) {
+    let d = ch._p2y;
+    if (!d) { d = document.createElement("div"); d.className = "p2-ytex"; ch.overlay.appendChild(d); ch._p2y = d; }
+    d.innerHTML = texHTML(label);
+    d.style.left = "17px";
+    d.style.top = (ch.m.top + ch.h / 2) + "px";
+    d.style.transform = "translate(-50%,-50%) rotate(-90deg)";
+    return d;
+  };
+  /** Text halo so labels stay legible on grid lines. */
+  const halo = (t) => t.style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 5).style("stroke-linejoin", "round");
+  P2.halo = halo;
+  /** Multi-line SVG text. */
+  function mtext(g, x, y, lines, o = {}) {
+    const t = g.append("text").attr("class", o.cls || "lbl").attr("text-anchor", o.anchor || "middle").attr("x", x).attr("y", y)
+      .style("pointer-events", "none");
+    if (o.color) t.style("fill", o.color);
+    if (o.size) t.style("font-size", o.size + "px");
+    if (o.weight) t.style("font-weight", o.weight);
+    const SUB = { "₁": "1", "₂": "2", "₃": "3" };
+    lines.forEach((l, i) => {
+      const ts = t.append("tspan").attr("x", x).attr("dy", i ? "1.15em" : 0);
+      const parts = String(l).split(/([₁₂₃])/);
+      if (parts.length === 1) ts.text(l);
+      else {
+        let down = false;   // subscript: shift down by 0.25em (baseline-shift "sub" drops it too far)
+        parts.forEach((q) => { if (!q) return;
+          if (SUB[q]) { ts.append("tspan").attr("dy", "0.25em").style("font-size", "72%").text(SUB[q]); down = true; }
+          else { const t2 = ts.append("tspan").text(q); if (down) { t2.attr("dy", "-0.18em"); down = false; } } });
+      }
+    });
+    if (o.halo) halo(t);
+    return t;
+  }
+  P2.mtext = mtext;
+
+  /* ------------------------------------------------------------------ dot lane */
+  const tieMax = (vals) => { const m = new Map(); vals.forEach((v) => m.set(v, (m.get(v) || 0) + 1)); return Math.max(...m.values()); };
+  P2.laneHeight = (vals, r = 6) => 16 + tieMax(vals) * (2 * r + 3);
+  function lane(ch, vals, o = {}) {
+    const r = o.r || 6, gap = 2 * r + 3;
+    const cnt = new Map();
+    const pts = vals.map((v, i) => { const k = cnt.get(v) || 0; cnt.set(v, k + 1); return { v, k, i }; });
+    const g = ch.layer("front").append("g").attr("class", "p2-lane");
+    const sel = g.selectAll("circle").data(pts).join("circle")
+      .attr("cx", (d) => ch.x(d.v)).attr("cy", (d) => -12 - r - d.k * gap).attr("r", r)
+      .style("fill", o.color || C.blue).style("stroke", C.surface).style("stroke-width", 1.5);
+    sel.place = () => sel.attr("cx", (d) => ch.x(d.v));
+    return sel;
+  }
+
+  /* ------------------------------------------------------------------ ECDF
+     o: data, domain, xLabel, tickValues, refs:[p] (dashed red level lines),
+        markers:[{p, color, side, drag, label(p,xp), ly(p)}], strip (dot lane),
+        onHover(x|null), onP(i, info), one (dashed line at 1), xDigits          */
+  P2.ecdf = function (el, o) {
+    const data = S.sortNum(o.data), n = data.length, F = S.ecdf(data), fr = S.freq(data);
+    const dom = o.domain, r = 6;
+    const laneH = o.strip ? P2.laneHeight(data, r) : 0;
+    const ch = QV.chart(el, {
+      x: { domain: dom, label: o.xLabel || "", tickValues: o.tickValues, ticks: o.ticks || 8, grid: true },
+      y: { domain: [-0.03, 1.07], label: "", tickValues: [0, 0.2, 0.4, 0.6, 0.8, 1], format: ".1f" },
+      margin: Object.assign({ top: 14 + laneH, right: 22, left: 64 }, o.margin || {}),
+    });
+    P2.yTex(ch, "$F(x)$");
+    const col = o.color || C.blue;
+    if (o.one !== false) QV.hline(ch, 1, { color: C.grey, width: 1, dash: "4 4", layer: "data" });
+    (o.refs || []).forEach((p) => {
+      QV.hline(ch, p, { color: C.red, width: 1.6, dash: "7 5", layer: "data" });
+      QV.text(ch, dom[0], p, String(p), { anchor: "start", dx: 6, dy: -7, color: C.tRed, size: 14 });
+    });
+    const steps = [[dom[0], 0]].concat(fr.map((d) => [d.x, d.F]));
+    steps.forEach((st, i) => {
+      const x1 = i + 1 < steps.length ? steps[i + 1][0] : dom[1];
+      QV.segment(ch, st[0], st[1], x1, st[1], { color: col, width: 3, layer: "data" });
+    });
+    fr.forEach((d, i) => QV.segment(ch, d.x, i ? fr[i - 1].F : 0, d.x, d.F, { color: col, width: 1.5, dash: "3 4", layer: "data" }));
+    QV.dots(ch, fr.map((d, i) => [d.x, i ? fr[i - 1].F : 0]), { r: 4, color: C.surface, ring: false }).style("stroke", col).style("stroke-width", 2);
+    QV.dots(ch, fr.map((d) => [d.x, d.F]), { r: 5.5, color: col });
+    const laneSel = o.strip ? lane(ch, o.data, { r, color: col }) : null;
+
+    // hover: crosshair, marker on the step, tooltip with F(x) = H/n
+    const tip = QV.tooltip(ch);
+    const hv = ch.layer("front").append("g").style("pointer-events", "none").style("display", "none");
+    const hvV = hv.append("line").style("stroke", C.axis).style("stroke-width", 1).style("stroke-dasharray", "3 3");
+    const hvH = hv.append("line").style("stroke", C.axis).style("stroke-width", 1).style("stroke-dasharray", "3 3");
+    const hvDot = hv.append("circle").attr("r", 7).style("fill", "none").style("stroke", C.ink).style("stroke-width", 2);
+    const xd = o.xDigits ?? 1;
+    const snapX = (xv) => { let best = null; fr.forEach((d) => { if (Math.abs(ch.x(d.x) - ch.x(xv)) < 8) best = d.x; }); return best ?? xv; };
+    const showX = (xv, event) => {
+      const Fx = F(xv), H = Math.round(Fx * n);
+      hv.style("display", null);
+      hvV.attr("x1", ch.x(xv)).attr("x2", ch.x(xv)).attr("y1", ch.y(Fx)).attr("y2", ch.h);
+      hvH.attr("x1", 0).attr("x2", ch.x(xv)).attr("y1", ch.y(Fx)).attr("y2", ch.y(Fx));
+      hvDot.attr("cx", ch.x(xv)).attr("cy", ch.y(Fx));
+      if (laneSel) laneSel.style("fill", (d) => (d.v <= xv + 1e-9 ? col : C.grey)).style("opacity", (d) => (d.v <= xv + 1e-9 ? 1 : 0.4));
+      if (event) {
+        const xs = fmt(xv, xd, true);
+        tip.show(`$F(${xs}) = ${H}/${n} = $ <b>${tr(Fx, 4)}</b><br>${H} of ${n} values $\\le ${xs}$`.replace(/\$([^$]+)\$/g, (m, t) => Deck.tex(t)), event);
+      }
+      return Fx;
+    };
+    const hideX = () => {
+      hv.style("display", "none"); tip.hide();
+      if (laneSel) laneSel.style("fill", col).style("opacity", 1);
+    };
+    ch.layer("front").append("rect").attr("class", "hit").attr("width", ch.w).attr("height", ch.h)
+      .on("pointermove", (e) => { const xv = snapX(ch.toData(e)[0]); showX(xv, e); if (o.onHover) o.onHover(xv); })
+      .on("pointerleave", () => { hideX(); if (o.onHover) o.onHover(null); });
+
+    // quantile markers x_p = min{x | F(x) >= p}
+    const info = (p) => {
+      const np = n * p, pos = Math.max(1, Math.min(n, Math.ceil(np - 1e-9))), xp = data[pos - 1];
+      const j = fr.findIndex((d) => d.x === xp);
+      return { p, np, pos, xp, Fxp: fr[j].F, Fprev: j > 0 ? fr[j - 1].F : 0, prevX: j > 0 ? fr[j - 1].x : null, H: fr[j].H, Hprev: j > 0 ? fr[j - 1].H : 0, n };
+    };
+    const markers = (o.markers || []).map((m, mi) => {
+      const c = m.color || C.orange;
+      const hl = QV.segment(ch, dom[0], m.p, dom[0], m.p, { color: c, width: 2.2, dash: "7 5", layer: "front" }).style("pointer-events", "none");
+      const vl = QV.segment(ch, dom[0], m.p, dom[0], 0, { color: c, width: 2.2, dash: "7 5", arrow: true, layer: "front" }).style("pointer-events", "none");
+      const lv = QV.text(ch, dom[0], m.p, "", { anchor: "start", dx: 14, dy: -8, color: QV.textOf(c), size: 15 }).style("pointer-events", "none");
+      const lx = QV.tex(ch, dom[0], 0.5, "", { anchor: m.side === "left" ? "end" : "start", dx: m.side === "left" ? -10 : 10, bg: true, color: QV.textOf(c), size: 17 });
+      lx.style.pointerEvents = "none";
+      let handle = null;
+      const obj = { m, p: m.p };
+      if (m.drag) {
+        handle = ch.layer("front").append("circle").datum(obj).attr("r", 9).style("fill", c).style("stroke", C.surface).style("stroke-width", 2.5);
+        QV.drag(ch, handle, (xv, yv) => set(Math.max(0.01, Math.min(1, Math.round(yv * 100) / 100))));
+        QV.attachTip(ch, handle, () => "drag up / down to change $p$".replace(/\$([^$]+)\$/g, (mm, t) => Deck.tex(t)));
+      }
+      const set = (p) => {
+        obj.p = p;
+        const I = info(p);
+        hl.set(dom[0], p, I.xp, p);
+        vl.set(I.xp, p, I.xp, 0.0);
+        lv.set(dom[0], p, tr(p, 2));
+        const lab = m.label ? m.label(p, I.xp) : `x_{${tr(p, 2)}} = ${tr(I.xp, 2)}`;
+        lx.set(I.xp, m.ly ? m.ly(p) : Math.max(0.07, p - 0.12), lab);
+        if (handle) handle.attr("cx", ch.x(dom[0])).attr("cy", ch.y(p));
+        if (o.onP) o.onP(mi, I);
+        return I;
+      };
+      obj.set = set;
+      set(m.p);
+      return obj;
+    });
+    return { ch, F, fr, data, n, info, showX: (x) => showX(x), hideX, markers, setP: (i, p) => markers[i].set(p) };
+  };
+
+  /* ------------------------------------------------------------------ histogram
+     o: data | counts+n, breaks, mode ("density"|"rel"|"abs"), xDomain, xLabel, lane (dot strip),
+        labels (bool), labelFmt(c, mode), areas (bool), yMax {density, rel, abs}, rows (construction
+        table under the axis), stage (1..5), dragBreaks, snap, tip(c, mode), onUpdate(classes, mode)  */
+  P2.hist = function (el, o) {
+    let breaks = o.breaks.slice(), mode = o.mode || "density", stage = o.stage || 5, showAreas = !!o.areas;
+    const data = o.data ? o.data.slice() : null;
+    const n = data ? data.length : o.n;
+    const yLab = { density: "Density $f_j/\\Delta x_j$", rel: "Relative frequency $f_j$", abs: "Absolute frequency $h_j$" };
+    if (o.yLabels) Object.assign(yLab, o.yLabels);
+    const member = (v, i, br) => (i === 0 ? v >= br[0] : v > br[i]) && v <= br[i + 1];
+    const classes = () => {
+      const h = data ? breaks.slice(0, -1).map((_, i) => data.filter((v) => member(v, i, breaks)).length) : o.counts.slice();
+      return h.map((hj, i) => { const w = breaks[i + 1] - breaks[i], f = hj / n; return { i, a: breaks[i], b: breaks[i + 1], w, h: hj, f, dens: f / w }; });
+    };
+    let cls = classes();
+    const val = (c, m = mode) => (m === "density" ? c.dens : m === "rel" ? c.f : c.h);
+    const yMaxFor = (m) => Math.max((o.yMax && o.yMax[m]) || 0, d3.max(cls, (c) => val(c, m)) * 1.16);
+    const r = 6, laneH = data && o.lane ? P2.laneHeight(data, r) : 0;
+    const rowsN = o.rows ? 4 : 0, rowH = 23;
+    const ch = QV.chart(el, {
+      x: { domain: o.xDomain || [breaks[0], breaks[breaks.length - 1]], label: rowsN ? "" : (o.xLabel || ""), tickValues: breaks, format: o.xFormat },
+      y: { domain: [0, yMaxFor(mode)], label: "", format: mode === "abs" ? "d" : undefined, ticks: o.yTicks || 5 },
+      margin: Object.assign({ top: 14 + laneH + (o.labels ? 10 : 0), right: 22, left: rowsN ? 118 : 70, bottom: rowsN ? 34 + rowsN * rowH : 50 }, o.margin || {}),
+    });
+    P2.yTex(ch, yLab[mode]);
+    const gBound = ch.layer("data").append("g");
+    const gBars = ch.layer("data").append("g");
+    const gLab = ch.layer("annot").append("g");
+    const gRows = ch.layer("annot").append("g");
+    const laneSel = data && o.lane ? lane(ch, data, { r }) : null;
+    const gHit = ch.layer("front").append("g");
+    const gHandles = ch.layer("front").append("g");
+    const tip = QV.tooltip(ch);
+    const clsName = (c) => `${c.i === 0 ? "[" : "("}${tr(c.a, 2)}, ${tr(c.b, 2)}]`;
+    const defTip = (c) => `<b>${clsName(c)}</b> &nbsp;width ${tr(c.w, 2)}<br>h = ${c.h}${data ? "" : ""} &nbsp; f = ${tr(c.f, 4)}<br>height f/width = ${tr(c.dens, 4)}` +
+      (mode === "density" ? `<br>area = ${tr(c.dens, 4)} · ${tr(c.w, 2)} = <b>${tr(c.f, 4)}</b>` : `<br>area with this height = ${tr(val(c) * c.w, 4)}`);
+    const labelOf = (c) => (o.labelFmt ? o.labelFmt(c, mode) : mode === "abs" ? String(c.h) : tr(val(c), 4));
+    if (rowsN) {
+      ["Class", "Count h", "Share f", "Density f/Δx"].forEach((t, k) => gRows.append("text").attr("class", "lbl p2-rowlab").style("font-weight", 600).style("font-size", "15px").attr("data-k", k)
+        .attr("x", -12).attr("y", ch.h + 42 + k * rowH).attr("text-anchor", "end").text(t));
+      if (o.xLabel) gRows.append("text").attr("class", "axis-label").attr("x", ch.w).attr("y", ch.h + 42 + 4 * rowH - 2).attr("text-anchor", "end").text(o.xLabel);
+    }
+    const highlight = (c) => {
+      gBars.selectAll("rect").style("filter", (d) => (c && d.i === c.i ? "brightness(1.15)" : null)).style("opacity", (d) => (c && d.i !== c.i ? 0.55 : 1));
+      if (laneSel) laneSel.style("fill", (d) => (c && member(d.v, c.i, breaks) ? C.orange : C.blue)).style("opacity", (d) => (c && !member(d.v, c.i, breaks) ? 0.35 : 1));
+    };
+    function update(anim) {
+      cls = classes();
+      const ym = yMaxFor(mode);
+      ch.y.domain([0, ym]);
+      if (o.autoDomain) ch.x.domain([breaks[0] - o.autoDomain, breaks[breaks.length - 1] + o.autoDomain]);
+      ch.opts.x.tickValues = breaks;
+      ch.opts.y.format = mode === "abs" ? "d" : undefined;
+      ch.opts.y.ticks = mode === "abs" ? Math.min(6, Math.ceil(ym)) : (o.yTicks || 5);
+      ch.axes();
+      P2.yTex(ch, yLab[mode]);
+      const showBars = !rowsN || stage >= 5;
+      const t = anim ? d3.transition().duration(450) : null;
+      const bx = (c) => ch.x(c.a) + 1, bw = (c) => Math.max(0, ch.x(c.b) - ch.x(c.a) - 2);
+      const bars = gBars.selectAll("rect").data(cls, (c) => c.i).join(
+        (en) => en.append("rect").attr("y", ch.y(0)).attr("height", 0).style("fill", o.color || C.blue).attr("rx", 2));
+      bars.attr("x", bx).attr("width", bw);
+      (t ? bars.transition(t) : bars).attr("y", (c) => (showBars ? ch.y(val(c)) : ch.y(0))).attr("height", (c) => (showBars ? ch.y(0) - ch.y(val(c)) : 0));
+      // value labels above the bars
+      gLab.selectAll("*").remove();
+      if (o.labels && showBars) {
+        cls.forEach((c) => {
+          const s = labelOf(c);
+          const tx = gLab.append("text").attr("class", "lbl").attr("text-anchor", "middle").attr("x", ch.x((c.a + c.b) / 2)).attr("y", ch.y(val(c)) - 7).text(s);
+          if (o.labelSize) tx.style("font-size", o.labelSize + "px");
+          if (s === "?") tx.style("fill", C.tRed).style("font-weight", 700).style("font-size", "24px");
+          if (showAreas && mode === "density" && c.h > 0) {
+            const hpx = ch.y(0) - ch.y(val(c)), wpx = bw(c);
+            const txt = (o.areaFmt || ((cc) => `area ${tr(cc.f, 4)}`))(c);
+            const cx = ch.x((c.a + c.b) / 2), cy = ch.y(val(c) / 2);
+            const at = gLab.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("x", cx).attr("y", cy + 5).style("fill", "#fff").text(txt);
+            const tw = at.node().getComputedTextLength();
+            if (wpx >= tw + 10 && hpx > 26) { /* horizontal, inside the bar */ }
+            else if (hpx >= tw + 12 && wpx > 20) at.attr("x", 0).attr("y", 0).attr("transform", `translate(${cx + 5},${cy}) rotate(-90)`);
+            else at.style("fill", null).attr("y", ch.y(val(c)) - 27);
+          }
+        });
+      }
+      // stage 1-4: class boundaries
+      gBound.selectAll("*").remove();
+      if (rowsN && stage < 5) {
+        breaks.forEach((b) => gBound.append("line").attr("x1", ch.x(b)).attr("x2", ch.x(b)).attr("y1", 0).attr("y2", ch.h).style("stroke", C.axis).style("stroke-width", 1.5).style("stroke-dasharray", "5 4"));
+      }
+      // construction rows
+      if (rowsN) {
+        gRows.selectAll(".p2-rowval").remove();
+        gRows.selectAll(".p2-rowlab").style("opacity", function () { return +this.getAttribute("data-k") < stage ? 1 : 0.25; });
+        cls.forEach((c) => {
+          const vals = [clsName(c), String(c.h), tr(c.f, 4), tr(c.dens, 4)];
+          vals.forEach((s, k) => { if (k < stage) gRows.append("text").attr("class", k === stage - 1 && stage < 5 ? "lbl-strong p2-rowval" : "lbl p2-rowval").style("font-size", "16px").attr("text-anchor", "middle").attr("x", ch.x((c.a + c.b) / 2)).attr("y", ch.h + 42 + k * rowH).text(s); });
+        });
+      }
+      // hover columns
+      gHit.selectAll("rect").data(cls, (c) => c.i).join("rect").attr("class", "hit").attr("x", (c) => ch.x(c.a)).attr("width", (c) => Math.max(0, ch.x(c.b) - ch.x(c.a))).attr("y", 0).attr("height", ch.h)
+        .on("pointermove", (e, c) => { tip.show((o.tip || defTip)(c, mode), e); highlight(c); })
+        .on("pointerleave", () => { tip.hide(); highlight(null); });
+      if (laneSel) { laneSel.place(); laneSel.style("stroke", (d) => (breaks.includes(d.v) ? C.orange : C.surface)).style("stroke-width", (d) => (breaks.includes(d.v) ? 3 : 1.5)); }
+      // draggable inner boundaries
+      if (o.dragBreaks) {
+        const onDrag = (xv, yv, d) => {
+          const sn = o.snap || 1, i = d.j;
+          const v = Math.max(breaks[i - 1] + sn, Math.min(breaks[i + 1] - sn, Math.round(xv / sn) * sn));
+          if (v !== breaks[i]) { breaks[i] = v; update(false); }
+        };
+        const hs = gHandles.selectAll("g.p2-h").data(breaks.slice(1, -1).map((b, j) => ({ j: j + 1 })), (d) => d.j)
+          .join((en) => {
+            const e = en.append("g").attr("class", "p2-h");
+            e.append("line").attr("y1", 0).attr("y2", ch.h).style("stroke", C.orange).style("stroke-width", 1.5).style("stroke-dasharray", "4 4");
+            e.append("path").attr("d", "M0,0 L-10,-18 L10,-18 Z").style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 1.5);
+            e.append("rect").attr("x", -12).attr("y", -22).attr("width", 24).attr("height", ch.h + 22).style("fill", "transparent");
+            QV.drag(ch, e, onDrag); e.style("cursor", "ew-resize"); return e;
+          });
+        hs.attr("transform", (d) => `translate(${ch.x(breaks[d.j])},0)`);
+      }
+      if (o.onUpdate) o.onUpdate(cls, mode, breaks);
+    }
+    update(false);
+    return {
+      ch, classes: () => cls, breaks: () => breaks.slice(),
+      setMode(m) { mode = m; update(true); },
+      setBreaks(b) { breaks = b.slice(); gHandles.selectAll("*").remove(); update(true); },
+      setStage(s) { stage = s; update(true); },
+      setAreas(b) { showAreas = b; update(false); },
+      update,
+    };
+  };
+
+  /* ------------------------------------------------------------------ boxplot
+     o: groups [{name, data | stats, color}], domain, xLabel, tickValues, k (1.5),
+        centers [fractions], boxH, annot {above:[keys], below:[keys], arrows, capsLow, text:{key: fn}},
+        show {fences, points, lengths}, fenceNames, drag [{g, i}], snap, minor (unit grid),
+        tip (false to disable), crosshair (fn(x) -> html), onChange(stats, k)            */
+  P2.box = function (el, o) {
+    let k = o.k ?? 1.5;
+    const show = Object.assign({ fences: false, points: false, lengths: false }, o.show || {});
+    const groups = o.groups.map((g, gi) => Object.assign({ color: QV.series[gi % 5] }, g, { data: g.data ? g.data.slice() : null, data0: g.data ? g.data.slice() : null }));
+    const G = groups.length, named = groups.some((g) => g.name);
+    const ch = QV.chart(el, {
+      x: { domain: o.domain, label: o.xLabel || "", tickValues: o.tickValues, ticks: o.ticks || 8, grid: true },
+      y: { domain: [0, 1], hide: true, grid: false },
+      margin: Object.assign({ left: named ? (o.nameW || 92) : 26, right: 26, top: 14 }, o.margin || {}),
+    });
+    if (o.minor) {
+      const [a, b] = o.domain;
+      for (let v = Math.ceil(a); v <= b; v++) {
+        const major = v % (o.minor === true ? 5 : o.minor) === 0;
+        ch.layer("grid").append("line").attr("x1", ch.x(v)).attr("x2", ch.x(v)).attr("y1", 0).attr("y2", ch.h)
+          .style("stroke", major ? C.axis : C.grid).style("stroke-width", major ? 1 : 1).style("opacity", major ? 0.55 : 1);
+      }
+    }
+    const cyOf = (gi) => ch.h * (o.centers ? o.centers[gi] : (gi + 0.5) / G);
+    const bandH = ch.h / G;
+    const bh = o.boxH || Math.min(80, bandH * 0.42);
+    if (named) groups.forEach((g, gi) => ch.layer("axes").append("text").attr("class", "lbl").attr("x", -14).attr("y", cyOf(gi) + 5).attr("text-anchor", "end").style("font-size", "17px").style("font-weight", 600).text(g.name));
+    const gMain = ch.layer("data").append("g");
+    const gAnn = ch.layer("annot").append("g");
+    const gHandles = ch.layer("front").append("g");
+    const tip = QV.tooltip(ch);
+    const drag = (o.drag || []).map((d) => Object.assign({}, d));
+    const isHandle = (gi, j) => drag.some((d) => d.g === gi && d.i === j);
+    const X = (v) => ch.x(v);
+    const v2 = (v) => tr(v, 2);
+    const statsOf = (g) => {
+      if (g.data) return S.fiveNum(g.data, k);
+      const s = Object.assign({}, g.stats);
+      s.iqr = s.q3 - s.q1; s.fenceLo = s.q1 - k * s.iqr; s.fenceHi = s.q3 + k * s.iqr; s.outliers = s.outliers || [];
+      return s;
+    };
+    const defText = {
+      wlo: (s) => ["Lower whisker", v2(s.whiskerLo)], whi: (s) => ["Upper whisker", v2(s.whiskerHi)],
+      q1: (s) => [`Q₁ = ${v2(s.q1)}`], q3: (s) => [`Q₃ = ${v2(s.q3)}`], med: (s) => ["Median", v2(s.median)],
+      out: (s, v) => ["Outlier", v2(v)],
+    };
+    function placeLabels(items, dir) {
+      // items: {x, y (baseline of first line for dir=below, of last line for dir=above), lines, cls, color, target}
+      const placed = [];
+      items.forEach((it) => {
+        const lh = (o.annot.size || 17) + 2, H = it.lines.length * lh;
+        let y = it.y;
+        const tmp = mtext(gAnn, -999, -999, it.lines, { cls: it.cls || "lbl", size: o.annot.size || 17 });
+        const w = tmp.node().getBBox().width; tmp.remove();
+        const box = (yy) => (dir === "above" ? [it.x - w / 2, yy - H, it.x + w / 2, yy] : [it.x - w / 2, yy, it.x + w / 2, yy + H]);
+        const hit = (b) => placed.some((p) => b[0] < p[2] + 8 && b[2] > p[0] - 8 && b[1] < p[3] + 2 && b[3] > p[1] - 2);
+        let guard = 0;
+        while (hit(box(y)) && guard++ < 8) y += dir === "above" ? -(lh + 4) : lh + 4;
+        placed.push(box(y));
+        const top = dir === "above" ? y - H + 14 : y + 14;
+        const t = mtext(gAnn, it.x, top, it.lines, { cls: it.cls || "lbl", size: o.annot.size || 17, color: it.color, halo: true });
+        if (it.target !== undefined && o.annot.arrows) {
+          const y0 = dir === "above" ? y + 4 : y - 2, y1 = it.target;
+          if (Math.abs(y1 - y0) > 8) gAnn.append("line").attr("x1", it.x).attr("x2", it.x).attr("y1", y0).attr("y2", y1 + (dir === "above" ? -3 : 3))
+            .style("stroke", it.color || C.ink2).style("stroke-width", 1.6).attr("marker-end", `url(#${arrowId(it.color || C.ink2)})`);
+        }
+        return t;
+      });
+    }
+    const arrows = {};
+    function arrowId(color) {
+      if (arrows[color]) return arrows[color];
+      const id = ch.id + "p2a" + Object.keys(arrows).length;
+      ch.svg.select("defs").append("marker").attr("id", id).attr("viewBox", "0 0 10 10").attr("refX", 9).attr("refY", 5)
+        .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto-start-reverse")
+        .append("path").attr("d", "M0,0L10,5L0,10z").style("fill", color);
+      arrows[color] = id;
+      return id;
+    }
+    function drawGroup(g, gi) {
+      const s = g.st, cy = cyOf(gi), col = g.color;
+      const ln = (x1, y1, x2, y2, st, w) => gMain.append("line").attr("x1", x1).attr("y1", y1).attr("x2", x2).attr("y2", y2).style("stroke", st).style("stroke-width", w);
+      const yb0 = G === 1 ? 0 : cy - bandH / 2 + 6, yb1 = G === 1 ? ch.h : cy + bandH / 2 - 6;
+      // hover target
+      if (o.tip !== false) {
+        gAnn.append("rect").attr("class", "hit").attr("x", 0).attr("width", ch.w).attr("y", yb0).attr("height", yb1 - yb0)
+          .on("pointermove", (e) => tip.show(`${g.name ? `<b>${g.name}</b><br>` : ""}Q₁ = ${v2(s.q1)} · median <b>${v2(s.median)}</b> · Q₃ = ${v2(s.q3)} · IQR = ${v2(s.iqr)}<br>` +
+            `fences ${v2(s.fenceLo)} and ${v2(s.fenceHi)} (k = ${tr(k, 2)})<br>whiskers ${v2(s.whiskerLo)} and ${v2(s.whiskerHi)}` +
+            `${s.outliers.length ? ` · outliers: ${s.outliers.map(v2).join(", ")}` : " · no outliers"}`, e))
+          .on("pointerleave", () => tip.hide());
+      }
+      if (show.fences) {
+        [s.fenceLo, s.fenceHi].forEach((v, j) => {
+          if (v < o.domain[0] || v > o.domain[1]) return;
+          ln(X(v), yb0, X(v), yb1, C.red, 2).style("stroke-dasharray", "2 4").style("stroke-linecap", "round");
+          const names = o.fenceNames || ["Lower fence", "Upper fence"];
+          const t = gAnn.append("text").attr("class", "lbl").attr("x", X(v) + 6).attr("y", yb1 - 8).attr("text-anchor", "start").style("fill", C.tRed).style("font-size", "15px").text(`${names[j]} ${v2(v)}`);
+          halo(t);
+          const w = t.node().getComputedTextLength();
+          if (X(v) + 6 + w > ch.w + 20) t.attr("x", X(v) - 6).attr("text-anchor", "end");
+        });
+      }
+      ln(X(s.whiskerLo), cy, X(s.q1), cy, C.ink2, 2); ln(X(s.q3), cy, X(s.whiskerHi), cy, C.ink2, 2);
+      ln(X(s.whiskerLo), cy - bh * 0.25, X(s.whiskerLo), cy + bh * 0.25, C.ink2, 2);
+      ln(X(s.whiskerHi), cy - bh * 0.25, X(s.whiskerHi), cy + bh * 0.25, C.ink2, 2);
+      gMain.append("rect").attr("x", X(s.q1)).attr("width", Math.max(1, X(s.q3) - X(s.q1))).attr("y", cy - bh / 2).attr("height", bh).attr("rx", 4)
+        .style("fill", col).style("fill-opacity", 0.32).style("stroke", col).style("stroke-width", 2.5);
+      ln(X(s.median), cy - bh / 2, X(s.median), cy + bh / 2, C.ink, 3.5);
+      // outliers (handles are drawn separately)
+      if (g.data) {
+        g.data.forEach((v, j) => {
+          if ((v < s.fenceLo || v > s.fenceHi) && !isHandle(gi, j)) gMain.append("circle").attr("cx", X(v)).attr("cy", cy).attr("r", 6.5).style("fill", C.red).style("stroke", C.surface).style("stroke-width", 2);
+        });
+      } else {
+        s.outliers.forEach((v) => gMain.append("circle").attr("cx", X(v)).attr("cy", cy).attr("r", 7).style("fill", C.surface).style("stroke", C.red).style("stroke-width", 2.5));
+      }
+      // raw data, stacked below the box
+      if (show.points && g.data) {
+        const cnt = new Map();
+        g.data.forEach((v) => {
+          const kk = cnt.get(v) || 0; cnt.set(v, kk + 1);
+          const out = v < s.fenceLo || v > s.fenceHi;
+          gMain.append("circle").attr("cx", X(v)).attr("cy", cy + bh / 2 + 13 + kk * 10).attr("r", 4.2)
+            .style("fill", out ? C.red : col).style("opacity", 0.85).style("stroke", C.surface).style("stroke-width", 1);
+        });
+      }
+      // labels
+      if (o.annot) {
+        const A = o.annot, T = Object.assign({}, defText, A.text || {});
+        const capTop = cy - bh * 0.25, boxTop = cy - bh / 2, boxBot = cy + bh / 2;
+        const keyX = { wlo: s.whiskerLo, whi: s.whiskerHi, q1: s.q1, q3: s.q3, med: s.median };
+        const above = [], below = [];
+        const mk = (key, v, dir) => {
+          const lines = T[key](s, v);
+          const isOut = key === "out";
+          const it = { x: X(v), lines, color: isOut ? C.tRed : (A.muted && A.muted.includes(key) ? C.tGrey : undefined) };
+          if (dir === "above") {
+            if (A.arrows) { it.y = boxTop - 44; it.target = isOut ? cy - 9 : (key === "wlo" || key === "whi") ? capTop : boxTop; }
+            else it.y = isOut ? cy - 13 : (A.capsLow && (key === "wlo" || key === "whi")) ? capTop - 7 : boxTop - 8;
+            above.push(it);
+          } else { it.y = boxBot + 8; below.push(it); }
+        };
+        (A.above || []).forEach((key) => { if (key === "out") s.outliers.forEach((v) => mk("out", v, "above")); else mk(key, keyX[key], "above"); });
+        (A.below || []).forEach((key) => { if (key === "out") s.outliers.forEach((v) => mk("out", v, "below")); else mk(key, keyX[key], "below"); });
+        placeLabels(above, "above"); placeLabels(below, "below");
+      }
+      // lengths of the box halves and whiskers
+      if (show.lengths) {
+        const yL = cy + bh / 2 + (o.lengthsDy || 74);
+        const segs = [[s.whiskerLo, s.q1, C.grey], [s.q1, s.median, col], [s.median, s.q3, col], [s.q3, s.whiskerHi, C.grey]];
+        segs.forEach(([a, b, c]) => {
+          if (b - a <= 0) return;
+          const l = gAnn.append("line").attr("x1", X(a) + 2).attr("x2", X(b) - 2).attr("y1", yL).attr("y2", yL).style("stroke", c).style("stroke-width", 2.5)
+            .attr("marker-end", `url(#${arrowId(c)})`).attr("marker-start", `url(#${arrowId(c)})`);
+          gAnn.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("x", (X(a) + X(b)) / 2).attr("y", yL - 8).text(v2(b - a));
+        });
+        [s.whiskerLo, s.q1, s.median, s.q3, s.whiskerHi].forEach((v) => gAnn.append("line").attr("x1", X(v)).attr("x2", X(v)).attr("y1", yL - 10).attr("y2", yL + 10).style("stroke", C.axis).style("stroke-width", 1));
+      }
+    }
+    function draw() {
+      gMain.selectAll("*").remove(); gAnn.selectAll("*").remove();
+      groups.forEach((g, gi) => { g.st = statsOf(g); drawGroup(g, gi); });
+      gHandles.selectAll("circle").data(drag).join("circle").attr("r", 9)
+        .attr("cx", (d) => X(groups[d.g].data[d.i])).attr("cy", (d) => cyOf(d.g))
+        .style("fill", (d) => { const v = groups[d.g].data[d.i], s = groups[d.g].st; return v < s.fenceLo || v > s.fenceHi ? C.red : C.orange; })
+        .style("stroke", C.surface).style("stroke-width", 2.5);
+      if (o.onChange) o.onChange(groups.map((g) => g.st), k, groups);
+    }
+    draw();
+    if (drag.length) {
+      const hs = gHandles.selectAll("circle");
+      QV.drag(ch, hs, (xv, yv, d) => {
+        const sn = o.snap || 1;
+        const v = Math.max(o.domain[0], Math.min(o.domain[1], Math.round(xv / sn) * sn));
+        if (v !== groups[d.g].data[d.i]) { groups[d.g].data[d.i] = v; draw(); }
+      });
+      QV.attachTip(ch, hs, (d) => (o.handleTip ? o.handleTip(d, groups[d.g].data[d.i]) : `value ${v2(groups[d.g].data[d.i])} · drag along the axis`));
+    }
+    if (o.crosshair) {
+      const vl = ch.layer("front").insert("line", ":first-child").style("stroke", C.ink2).style("stroke-width", 1.2).style("display", "none").attr("y1", 0).attr("y2", ch.h).style("pointer-events", "none");
+      ch.layer("front").insert("rect", ":first-child").attr("class", "hit").attr("width", ch.w).attr("height", ch.h)
+        .on("pointermove", (e) => { const xv = Math.round(ch.toData(e)[0]); vl.style("display", null).attr("x1", X(xv)).attr("x2", X(xv)); tip.show(o.crosshair(xv), e); })
+        .on("pointerleave", () => { vl.style("display", "none"); tip.hide(); });
+    }
+    return {
+      ch, groups, draw,
+      setK(v) { k = v; draw(); },
+      set(key, b) { show[key] = b; draw(); },
+      reset() { groups.forEach((g) => { if (g.data0) g.data = g.data0.slice(); }); draw(); },
+      stats: () => groups.map((g) => g.st),
+    };
+  };
+})();
+</script>
+
+<section class="slide">
+  <h2>Contents &ndash; Part 2</h2>
+  <div class="cols mid" style="--cols: 62fr 36fr">
+    <div class="toc" data-mode="sections"></div>
+    <div class="block alert"><h4>Revision material</h4>
+      <p>Parts&nbsp;1 and&nbsp;2 revise the descriptive statistics that Parts&nbsp;3&ndash;5
+      build on. Use them to refresh your knowledge &ndash; with the exercises
+      and the notebook.</p></div>
+  </div>
+  <a class="trynb" data-sec="all examples and exercises"></a>
+</section>
+
+<section class="slide">
+  <h2>Learning objectives &ndash; Part 2</h2>
+  <p>After this part you will be able to &hellip;</p>
+  <div class="cols" style="--cols: 1fr 1fr">
+    <div>
+      <ul>
+        <li>construct the <b>empirical CDF</b> and read off shares
+          and quantiles from it,</li>
+        <li>build a <b>histogram</b> with equal and unequal class
+          widths (densities!) and read shares off a given
+          histogram (areas!),</li>
+        <li>construct a <b>boxplot</b> step by step, including the
+          whiskers and outliers,</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><b>read and interpret</b> given graphics (symmetry,
+          skewness, outliers) and compare groups with boxplots,</li>
+        <li>combine the numbers of Part&nbsp;1 with the pictures of Part&nbsp;2,</li>
+        <li>create every graphic in Python (<code>matplotlib</code>).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="block key"><p>The running story continues: the <b>shoe sizes of the
+    soccer team</b> from Part&nbsp;1 &ndash; now drawn instead of computed.</p></div>
+</section>
+
+<section class="slide">
+  <h2>List of Symbols (1)</h2>
+  <table class="bt">
+    <thead><tr><th>Symbol</th><th class="l">Meaning</th><th>Symbol</th><th class="l">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>$\omega$</td><td class="l">Statistical unit</td><td>$h_j$</td><td class="l">Absolute frequency</td></tr>
+      <tr><td>$n$</td><td class="l">Number of statistical units</td><td>$f_j$</td><td class="l">Relative frequency</td></tr>
+      <tr><td>$X$</td><td class="l">Variable (characteristic)</td><td>$H_j$</td><td class="l">Cumulative absolute frequency</td></tr>
+      <tr><td>$x$</td><td class="l">Value of the variable</td><td>$F(x)$</td><td class="l">Empirical CDF</td></tr>
+      <tr><td>$x_i$</td><td class="l">Observed value</td><td>$a_j$</td><td class="l">Class midpoint (class $j$)</td></tr>
+      <tr><td>$x_{(i)}$</td><td class="l">$i$-th value of the ordered sample</td><td>$\tilde{x}$</td><td class="l">Median</td></tr>
+      <tr><td>$\bar{x}$</td><td class="l">Arithmetic mean</td><td>$\bar{x}_{\text{geo}}$</td><td class="l">Geometric mean</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>List of Symbols (2)</h2>
+  <table class="bt">
+    <thead><tr><th>Symbol</th><th class="l">Meaning</th><th>Symbol</th><th class="l">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>$s^2$</td><td class="l">Sample variance</td><td>$v$</td><td class="l">Coefficient of variation</td></tr>
+      <tr><td>$s$</td><td class="l">Standard deviation</td><td>$v^*$</td><td class="l">Normalised coeff.&nbsp;of variation</td></tr>
+      <tr><td>$R$</td><td class="l">Range</td><td>$\Delta x_j$</td><td class="l">Class width (class $j$)</td></tr>
+      <tr><td>$\text{IQR}$</td><td class="l">Interquartile range</td><td>$f_j/\Delta x_j$</td><td class="l">Density (histogram)</td></tr>
+      <tr><td>$x_{0.25},\,x_{0.75}$</td><td class="l">25&thinsp;% and 75&thinsp;% quantile</td><td>$k$</td><td class="l">Whisker factor (here $1.5$)</td></tr>
+      <tr><td>$Q_1,\,Q_3$</td><td class="l">1st and 3rd quartile</td><td>$x_{p}$</td><td class="l">$p$-quantile $=\min\{x \mid F(x)\ge p\}$</td></tr>
+      <tr><td>$\lceil\cdot\rceil$</td><td class="l">Rounding up</td><td>$c_0,\ldots,c_k$</td><td class="l">Class boundaries</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== SECTION: EMPIRICAL CDF ===== -->
+<section class="slide" data-section="Empirical Cumulative Distribution Function" data-short="ECDF">
+  <h2>Empirical CDF &ndash; Construction</h2>
+  <div class="block guiding"><p>What share of the soccer players wear shoe size $39$ or
+    smaller? And up to which size do we find at least half of the players?</p></div>
+  <p><b>Construction:</b> The observed values are plotted to scale on the $x$-axis; the corresponding $y$-values are given by the cumulative relative frequencies. The result is a step function whose $y$-values lie between 0 and 1.</p>
+  <ul>
+    <li>The height of each step depends on how often the value was observed</li>
+    <li>Higher frequencies $\to$ taller steps</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Frequency Table</h2>
+  <table class="bt" style="margin-top: 30px">
+    <thead><tr><th class="l">Shoe size</th><th>37</th><th>38</th><th>39</th><th>40</th><th>41</th><th>46</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Absolute frequency</td><td>1</td><td>2</td><td>4</td><td>2</td><td>1</td><td>1</td><td>11</td></tr>
+      <tr><td class="l">Relative frequency</td><td>$0.0909$</td><td>$0.1818$</td><td>$0.3636$</td><td>$0.1818$</td><td>$0.0909$</td><td>$0.0909$</td><td>1</td></tr>
+      <tr><td class="l">Relative frequency in %</td><td>$9.1\,\%$</td><td>$18.2\,\%$</td><td>$36.4\,\%$</td><td>$18.2\,\%$</td><td>$9.1\,\%$</td><td>$9.1\,\%$</td><td>$100\,\%$</td></tr>
+      <tr><td class="l">Relative frequency</td><td>$\tfrac{1}{11}$</td><td>$\tfrac{2}{11}$</td><td>$\tfrac{4}{11}$</td><td>$\tfrac{2}{11}$</td><td>$\tfrac{1}{11}$</td><td>$\tfrac{1}{11}$</td><td>1</td></tr>
+      <tr><td class="l">Cum.&nbsp;rel.&nbsp;frequency</td><td>$0.0909$</td><td>$0.2727$</td><td>$0.6364$</td><td>$0.8182$</td><td>$0.9091$</td><td>1</td><td></td></tr>
+      <tr><td class="l">Cum.&nbsp;rel.&nbsp;frequency</td><td>$\tfrac{1}{11}$</td><td>$\tfrac{3}{11}$</td><td>$\tfrac{7}{11}$</td><td>$\tfrac{9}{11}$</td><td>$\tfrac{10}{11}$</td><td>1</td><td></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>Empirical CDF</h2>
+  <div class="viz" id="p2-ecdf-shoe" style="height:520px"></div>
+  <p class="fs-xs muted center">Empirical CDF &ndash; shoe sizes. Each dot at the top is one player. Hover over the chart: the
+    players with a size $\le x$ light up, and $F(x)$ is their share.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-ecdf-shoe", (el) => {
+      P2.ecdf(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], domain: [35, 48], tickValues: [36, 38, 40, 42, 44, 46, 48],
+        xLabel: "Shoe size", strip: true });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Empirical CDF &ndash; Definition</h2>
+  <div class="block"><h4>Definition (the &ldquo;empirical distribution function&rdquo; of Part&nbsp;1)</h4>
+    <p>\[ F(x) \;=\; \sum_{x_i \leq x} f(x_i) \;=\; \frac{\text{number of observations} \le x}{n} \]</p>
+    <p>(the sum runs over the <em>distinct</em> observed values $x_i \le x$)</p>
+  </div>
+  <p class="inwords">$F(x)$ is the share of observations that are <b>at most</b> $x$.
+    Example: $F(39) = \tfrac{7}{11} = 0.6364$ &ndash; $63.6\,\%$ of the players wear
+    size $39$ or smaller.</p>
+  <ul>
+    <li>Computing the cumulative relative frequency for every observed value
+      yields the empirical CDF</li>
+    <li>Between two observed values $F$ stays constant; at each observed value
+      it <span class="p2-nw">jumps up by $f(x_i)$</span></li>
+    <li>Quantiles can therefore be read off directly from it</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Empirical CDF &ndash; Reading Off Quantiles</h2>
+  <p><b>Example: Median.</b> The median is the smallest value at which the
+    empirical CDF <b>reaches or exceeds</b> $0.5$:</p>
+  <p>\[ \tilde{x} = x_{0.5} = F^{-1}(0.5) = \min\{x \mid F(x) \geq 0.5\} \]</p>
+  <p>Shoe sizes: $F(38) = 0.2727 &lt; 0.5$, but $F(39) = 0.6364 \ge 0.5$
+    $\;\Rightarrow\; \tilde{x} = 39$.</p>
+  <div class="block"><h4>Generalisation</h4>
+    <p>Every $p$-quantile ($0 &lt; p \leq 1$) can be obtained from the empirical CDF:</p>
+    <p>\[ x_{p} = F^{-1}(p) = \min\{x \mid F(x) \geq p\} \]</p>
+    <p class="inwords">go up to the height $p$, move right until you hit the step
+      function and read off the <span class="p2-nw">$x$-value</span> there.</p>
+  </div>
+  <p><b>Why &ldquo;$\ge p$&rdquo; and not &ldquo;$= p$&rdquo;?</b> $F$ jumps &ndash; here
+    it never takes the value $0.5$.</p>
+</section>
+
+<section class="slide">
+  <h2>Empirical CDF &ndash; Reading Off Quantiles Graphically</h2>
+  <div class="viz" id="p2-ecdf-q" style="height:340px"></div>
+  <div class="fs-xs" id="p2-ecdf-q-read" style="line-height:1.45"></div>
+  <div class="fs-xs">
+    <p>$80\,\%$ quantile: $F(39) = 0.6364 &lt; 0.8 \le F(40) = 0.8182$
+      $\Rightarrow x_{0.8} = 40$.<br>
+      Same values as with the position rule $x_p = x_{(\lceil n \cdot p \rceil)}$ of Part&nbsp;1:
+      $\lceil 11 \cdot 0.5 \rceil = 6 \rightarrow 39$ and
+      $\lceil 11 \cdot 0.8 \rceil = 9 \rightarrow 40$.</p>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-ecdf-q", (el) => {
+      const out = document.getElementById("p2-ecdf-q-read");
+      const lines = ["", ""];
+      const T = (p) => P2.tr(p, 2);
+      const write = (i, I) => {
+        const left = I.prevX === null ? `0 < ${T(I.p)}` : `F(${I.prevX}) = ${P2.tr(I.Fprev, 4)} < ${T(I.p)}`;
+        lines[i] = `<span class="${i ? "c-orange" : "c-red"}">&#9679;</span> $p = ${T(I.p)}$: $${left} \\le F(${I.xp}) = ${P2.tr(I.Fxp, 4)} \\Rightarrow x_{${T(I.p)}} = ${I.xp}$` +
+          ` &nbsp;&middot;&nbsp; position $\\lceil 11 \\cdot ${T(I.p)} \\rceil = \\lceil ${P2.tr(I.np, 2)} \\rceil = ${I.pos}$`;
+        out.innerHTML = P2.texHTML(lines.join("<br>"));
+      };
+      const e = P2.ecdf(el, {
+        data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], domain: [35, 48], tickValues: [36, 38, 40, 42, 44, 46, 48], xLabel: "Shoe size", one: false,
+        markers: [
+          { p: 0.5, color: QV.C.red, side: "left", drag: true, ly: (p) => Math.max(0.07, p - 0.12),
+            label: (p, xp) => (p === 0.5 ? `\\tilde{x} = x_{0.5} = ${xp}` : `x_{${P2.tr(p, 2)}} = ${xp}`) },
+          { p: 0.8, color: QV.C.orange, side: "right", drag: true, ly: (p) => Math.max(0.07, p - 0.09) },
+        ],
+        onP: write,
+      });
+      const row = QV.controls(el);
+      QV.readout(row, "Drag the two handles on the $F(x)$ axis: the rule $\\min\\{x \\mid F(x) \\ge p\\}$ is applied live.");
+      QV.spacer(row);
+      QV.button(row, "Reset", () => { e.setP(0, 0.5); e.setP(1, 0.8); });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Empirical CDF in Python</h2>
+  <div class="block tight"><h4>Computing</h4>
+<pre class="py">
+import numpy as np, matplotlib.pyplot as plt
+from statsmodels.distributions.empirical_distribution import ECDF
+shoe = np.array([40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39])
+F = ECDF(shoe)    # F is a function of x
+</pre></div>
+  <div class="block tight"><h4>Evaluating</h4>
+<pre class="py">
+F(39)             # value of the empirical CDF at x = 39: 0.6364 (= 7/11)
+</pre></div>
+  <div class="block tight"><h4>Plotting</h4>
+<pre class="py">
+plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib &gt;= 3.8)
+</pre></div>
+  <a class="trynb" data-sec="section 1"></a>
+</section>
+
+<section class="slide" data-subsection="Exercises">
+  <h2>Exercise &ndash; Complaints per Day</h2>
+  <div class="block problem">
+    <p>An online shop records the number of customer complaints per day on
+      $n = 10$ days:</p>
+    <p class="center p2-data">2, 0, 3, 1, 2, 5, 1, 3, 2, 6</p>
+    <ol>
+      <li>Set up the frequency table with absolute frequencies $h_j$, relative
+        frequencies $f_j$ and cumulative relative frequencies $F(x)$, and draw
+        the empirical CDF.</li>
+      <li>Read off: What share of the days had at most 2 complaints? At most
+        4 complaints? More than 1 but at most 3 complaints?</li>
+      <li>Determine the median and the $80\,\%$ quantile from the empirical CDF.</li>
+      <li>Which Python commands check your results?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/4) &ndash; Complaints: Frequency Table and Empirical CDF</h2>
+  <div class="cols" style="--cols: 44fr 54fr; --gap: 24px">
+    <div>
+      <p><b>Sorted:</b> 0, 1, 1, 2, 2, 2, 3, 3, 5, 6</p>
+      <table class="bt" id="p2-compl-tab" style="font-size: 23px">
+        <thead><tr><th>$x$</th><th>$h_j$</th><th>$f_j = h_j/n$</th><th>$F(x)$</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>1</td><td>$0.1$</td><td>$0.1$</td></tr>
+          <tr><td>1</td><td>2</td><td>$0.2$</td><td>$0.3$</td></tr>
+          <tr><td>2</td><td>3</td><td>$0.3$</td><td>$0.6$</td></tr>
+          <tr><td>3</td><td>2</td><td>$0.2$</td><td>$0.8$</td></tr>
+          <tr><td>5</td><td>1</td><td>$0.1$</td><td>$0.9$</td></tr>
+          <tr><td>6</td><td>1</td><td>$0.1$</td><td>$1.0$</td></tr>
+          <tr class="mid"><td>Total</td><td>10</td><td>1</td><td></td></tr>
+        </tbody>
+      </table>
+      <p><b>Rule:</b> $F(x) = \sum_{x_i \le x} f(x_i)$ &ndash; at every
+        observed value $F$ jumps up by $f_j$.</p>
+    </div>
+    <div>
+      <div class="viz" id="p2-ecdf-compl" style="height:480px"></div>
+      <p class="fs-xs muted">Empirical CDF &ndash; complaints per day. Hover over the chart: the matching table row lights up.</p>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-ecdf-compl", (el) => {
+      const rows = Array.from(document.querySelectorAll("#p2-compl-tab tbody tr")).slice(0, 6);
+      const xs = [0, 1, 2, 3, 5, 6];
+      P2.ecdf(el, { data: [2, 0, 3, 1, 2, 5, 1, 3, 2, 6], domain: [-1, 7.5], tickValues: [-1, 0, 1, 2, 3, 4, 5, 6, 7],
+        xLabel: "Complaints per day", refs: [0.5, 0.8], one: false,
+        onHover: (x) => { let j = -1; xs.forEach((v, i) => { if (x !== null && v <= x + 1e-9) j = i; }); rows.forEach((r, i) => r.classList.toggle("p2-on", i === j)); } });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/4) &ndash; Complaints: Reading Off Shares</h2>
+  <p><b>Rule:</b> $F(x)$ is the share of observations that are <b>at most</b>
+    $x$. The share in the interval $(a, b]$ is the difference $F(b) - F(a)$.</p>
+  <div class="block example"><h4>At most 2 complaints</h4>
+    <p>$F(2) = 0.1 + 0.2 + 0.3 = \mathbf{0.6}$ $\rightarrow$ on $60\,\%$ of the days
+      there were at most 2 complaints.</p></div>
+  <div class="block example"><h4>At most 4 complaints</h4>
+    <p>The value 4 was never observed &ndash; the step function stays constant between
+      3 and 5: $F(4) = F(3) = \mathbf{0.8}$ $\rightarrow$ $80\,\%$ of the days.</p></div>
+  <div class="block example"><h4>More than 1 but at most 3 complaints</h4>
+    <p>$F(3) - F(1) = 0.8 - 0.3 = \mathbf{0.5}$ $\rightarrow$ on half of the days
+      there were 2 or 3 complaints.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/4) &ndash; Complaints: Reading Off Quantiles</h2>
+  <p><b>Rule:</b> $x_{p} = \min\{x \mid F(x) \ge p\}$ &ndash; the first value
+    at which the step function reaches or exceeds the height $p$.</p>
+  <div class="block example"><h4>Median ($p = 0.5$)</h4>
+    <p>$F(1) = 0.3 &lt; 0.5$, but $F(2) = 0.6 \ge 0.5$ $\rightarrow$
+      $\tilde{x} = x_{0.5} = \mathbf{2}$ complaints.</p></div>
+  <div class="block example"><h4>$80\,\%$ quantile ($p = 0.8$)</h4>
+    <p>$F(2) = 0.6 &lt; 0.8$, but $F(3) = 0.8 \ge 0.8$ $\rightarrow$
+      $x_{0.8} = \mathbf{3}$: on at least $80\,\%$ of the days there were at most
+      3 complaints.</p></div>
+  <div class="block"><h4>Check with the position rule $x_{(\lceil n \cdot p \rceil)}$</h4>
+    <p>Median: $\lceil 10 \cdot 0.5 \rceil = 5$ $\rightarrow$ 5th sorted value $= 2$.
+      &emsp;
+      $80\,\%$: $10 \cdot 0.8 = 8$ is already an <span class="p2-nw">integer $\rightarrow$</span>
+      position $8$ $\rightarrow 3$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (4/4) &ndash; Complaints: Python</h2>
+  <div class="block"><h4>Shares, quantiles and plot</h4>
+<pre class="py">
+from statsmodels.distributions.empirical_distribution import ECDF
+compl = np.array([2, 0, 3, 1, 2, 5, 1, 3, 2, 6])
+F = ECDF(compl)
+print(F(2), F(4), F(3) - F(1))                                # shares
+print(np.quantile(compl, [0.5, 0.8], method="inverted_cdf"))  # quantiles
+plt.ecdf(compl)                                               # step function
+</pre>
+<pre class="out">
+0.6 0.8 0.5
+[2 3]
+</pre></div>
+  <ul>
+    <li><code>F(x)</code> is the share of observations $\le x$ &ndash; also for
+      unobserved values such as $x = 4$.</li>
+    <li><code>method="inverted_cdf"</code> is the course definition
+      $x_{(\lceil n\cdot p \rceil)}$; the default interpolates.</li>
+  </ul>
+  <a class="trynb" data-sec="section 1.1"></a>
+</section>
+
+<!-- ===== SECTION: HISTOGRAM ===== -->
+<section class="slide" data-section="Histogram" data-short="Histogram">
+  <h2>Histogram</h2>
+  <div class="fs-s stack">
+    <p>The histogram is a special type of bar chart used to visualise the distribution of metric data. What makes it special is that the observed values are not displayed individually but are grouped into <b>classes (bins/intervals)</b>.</p>
+    <div class="block"><h4>Density</h4>
+      <p>For each class, the <b>relative frequency</b> is computed and divided by the class width:</p>
+      <p>\[ \text{density} = \frac{\text{relative frequency of the class}}{\text{class width}} \]</p>
+      <p>The bar height equals this density, so that the <b>area of each bar</b> represents the proportion of observations in the corresponding class.</p>
+    </div>
+    <ul>
+      <li>Classes are defined by interval boundaries</li>
+      <li>The choice of class width has a strong effect on the shape of the histogram</li>
+      <li>Classes of different widths are also possible</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Histogram &ndash; Example</h2>
+  <div class="viz" id="p2-hist-ex" style="height:440px"></div>
+  <p class="fs-xs muted">Histogram &ndash; shoe sizes (class width 2). Each dot at the top is one player; dots with an orange ring lie
+    exactly on a class boundary. Hover over a bar: its players light up.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-hist-ex", (el) => {
+      let ro = null;
+      const h = P2.hist(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], breaks: [37, 39, 41, 43, 45, 47], xDomain: [36, 48],
+        xLabel: "Shoe size", lane: true, yMax: { density: 0.34, rel: 0.7, abs: 7.6 },
+        onUpdate: (cls, mode) => { if (ro) ro.set(`Total area $= \\sum$ height $\\cdot$ width $=$ <b>${P2.tr(d3.sum(cls, (c) => (mode === "density" ? c.dens : mode === "rel" ? c.f : c.h) * c.w), 4)}</b>`); } });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Bar height", options: [["density", "density $f_j/\\Delta x_j$"], ["rel", "rel. frequency $f_j$"], ["abs", "abs. frequency $h_j$"]],
+        value: "density", onChange: (m) => h.setMode(m) });
+      QV.spacer(row);
+      ro = QV.readout(row, "");
+      h.update(false);
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Histogram &ndash; Construction (Steps)</h2>
+  <ol class="fs-s">
+    <li><b>Define the classes</b>
+      <ul>
+        <li>Notation: $[$ = inclusive, $($ = exclusive
+          <ul>
+            <li>$[37,39]$: both 37 and 39 belong to the class</li>
+            <li>$(39,41]$: 39 does <b>not</b> belong, 41 does</li>
+          </ul></li>
+        <li>Each class is open on the left and closed on the right: $(a, b]$</li>
+        <li>This way every value is assigned to <b>exactly one</b> class</li>
+        <li>Exception: the <b>first</b> class is closed on both sides $[a, b]$ so that the smallest value is not lost</li>
+        <li>e.g.&nbsp;$[37,39],\;(39,41],\;(41,43],\;(43,45],\;(45,47]$</li>
+      </ul></li>
+    <li><b>Count the observations in each class</b> $\to$ absolute frequencies</li>
+    <li><b>Compute the relative frequencies</b></li>
+    <li><b>Divide the relative frequencies by the class width</b> $=$ density</li>
+    <li><b>Draw the bars</b> with heights equal to these densities</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Histogram &ndash; Construction (Table)</h2>
+  <p>Shoe sizes: 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39 &emsp; ($n = 11$)</p>
+  <table class="bt" style="margin-top: 14px">
+    <thead><tr><th class="l">Class</th><th>$[37,39]$</th><th>$(39,41]$</th><th>$(41,43]$</th><th>$(43,45]$</th><th>$(45,47]$</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Class width</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td><td></td></tr>
+      <tr><td class="l">Abs.&nbsp;frequency</td><td>7</td><td>3</td><td>0</td><td>0</td><td>1</td><td>11</td></tr>
+      <tr><td class="l">Rel.&nbsp;frequency</td><td>$0.6364$</td><td>$0.2727$</td><td>$0$</td><td>$0$</td><td>$0.0909$</td><td>$1$</td></tr>
+      <tr><td class="l">Density $f_j/\Delta x_j$</td><td>$0.3182$</td><td>$0.1364$</td><td>$0$</td><td>$0$</td><td>$0.0455$</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="block example" style="margin-top: 14px"><h4>Example: first class</h4>
+    <p>Density $= \frac{0.6364}{2} = 0.3182$</p></div>
+</section>
+
+<section class="slide">
+  <h2>Histogram &ndash; Example</h2>
+  <div class="viz" id="p2-hist-build" style="height:448px"></div>
+  <p class="fs-xs muted">The five construction steps on the shoe sizes: step through them. The table under the axis fills up row by row.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-hist-build", (el) => {
+      const h = P2.hist(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], breaks: [37, 39, 41, 43, 45, 47], xDomain: [36, 48],
+        xLabel: "Shoe size", lane: true, rows: true, stage: 5, yMax: { density: 0.34 } });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Step", options: [[1, "1 classes"], [2, "2 count"], [3, "3 rel. frequency"], [4, "4 density"], [5, "5 bars"]],
+        value: 5, onChange: (s) => h.setStage(+s) });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Histogram &ndash; Alternative Classes (Class Width 3)</h2>
+  <p>Shoe sizes: 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39 &emsp; ($n = 11$)</p>
+  <table class="bt" style="margin-top: 14px">
+    <thead><tr><th class="l">Class</th><th>$[37,40]$</th><th>$(40,43]$</th><th>$(43,46]$</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Class width</td><td>3</td><td>3</td><td>3</td><td></td></tr>
+      <tr><td class="l">Abs.&nbsp;frequency</td><td>9</td><td>1</td><td>1</td><td>11</td></tr>
+      <tr><td class="l">Rel.&nbsp;frequency</td><td>$0.8182$</td><td>$0.0909$</td><td>$0.0909$</td><td>$1$</td></tr>
+      <tr><td class="l">Density $f_j/\Delta x_j$</td><td>$0.2727$</td><td>$0.0303$</td><td>$0.0303$</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="block example" style="margin-top: 14px"><h4>Example: first class</h4>
+    <p>Density $= \frac{0.8182}{3} = 0.2727$</p></div>
+</section>
+
+<section class="slide">
+  <h2>Histogram &ndash; Unequal Class Widths</h2>
+  <p>Shoe sizes: 40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39 &emsp; ($n = 11$)</p>
+  <table class="bt">
+    <thead><tr><th class="l">Class</th><th>$[37,39]$</th><th>$(39,40]$</th><th>$(40,41]$</th><th>$(41,46]$</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Class width</td><td>2</td><td>1</td><td>1</td><td>5</td><td></td></tr>
+      <tr><td class="l">Abs.&nbsp;frequency</td><td>7</td><td>2</td><td>1</td><td>1</td><td>11</td></tr>
+      <tr><td class="l">Rel.&nbsp;frequency</td><td>$0.6364$</td><td>$0.1818$</td><td>$0.0909$</td><td>$0.0909$</td><td>$1$</td></tr>
+      <tr><td class="l">Density $f_j/\Delta x_j$</td><td>$0.3182$</td><td>$0.1818$</td><td>$0.0909$</td><td>$0.0182$</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="block example"><h4>Example: last class</h4>
+    <p>Density $= \frac{0.0909}{5} = 0.0182$</p></div>
+  <div class="block key"><p>The bar <b>height</b> is the density, the bar <b>area</b> is
+    the share $f_j$: the wide class $(41,46]$ holds as many players as $(40,41]$,
+    but its bar is only a fifth as high.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Histogram &ndash; Alternative Class Partition</h2>
+  <div class="cols" style="--cols: 1fr 1fr; --gap: 24px">
+    <div class="p2-small-gap">
+      <p class="center fs-xs"><b>Class width 3</b></p>
+      <div class="viz" id="p2-hist-alt3" style="height:430px"></div>
+      <p class="center fs-xs" id="p2-hist-alt3-a"></p>
+    </div>
+    <div class="p2-small-gap">
+      <p class="center fs-xs"><b>Unequal class widths</b></p>
+      <div class="viz" id="p2-hist-altu" style="height:430px"></div>
+      <p class="center fs-xs" id="p2-hist-altu-a"></p>
+    </div>
+  </div>
+  <div class="viz-ctrl" id="p2-hist-alt-ctrl"></div>
+  <script>
+  (() => {
+    const SHOE = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
+    const H = {};
+    const areaTxt = (id) => (cls, mode) => {
+      const v = (c) => (mode === "density" ? c.dens : mode === "rel" ? c.f : c.h);
+      const A = d3.sum(cls, (c) => v(c) * c.w);
+      const e = document.getElementById(id);
+      if (e) e.innerHTML = P2.texHTML(`total area $= \\sum$ height $\\cdot\\,\\Delta x_j =$ <b>${P2.tr(A, 4)}</b>` + (Math.abs(A - 1) < 1e-9 ? " &check;" : " &ndash; <span class='c-red'>not the shares!</span>"));
+    };
+    QV.mount("#p2-hist-alt3", (el) => {
+      H.a = P2.hist(el, { data: SHOE, breaks: [37, 40, 43, 46], xDomain: [36, 47], xLabel: "Shoe size", yMax: { density: 0.38, rel: 0.95 },
+        onUpdate: areaTxt("p2-hist-alt3-a") });
+    });
+    QV.mount("#p2-hist-altu", (el) => {
+      H.u = P2.hist(el, { data: SHOE, breaks: [37, 39, 40, 41, 46], xDomain: [36, 47], xLabel: "Shoe size", yMax: { density: 0.38, rel: 0.95 },
+        dragBreaks: true, snap: 1, onUpdate: areaTxt("p2-hist-altu-a") });
+      const row = document.getElementById("p2-hist-alt-ctrl");
+      QV.segmented(row, { label: "Bar height (both charts)", options: [["density", "density $f_j/\\Delta x_j$"], ["rel", "rel. frequency $f_j$"]],
+        value: "density", onChange: (m) => { H.a.setMode(m); H.u.setMode(m); } });
+      QV.readout(row, "Drag the orange triangles (right chart) to move the inner class boundaries.");
+      QV.spacer(row);
+      QV.button(row, "Reset", () => H.u.setBreaks([37, 39, 40, 41, 46]));
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Car Park</h2>
+  <div class="block problem">
+    <p>Histogram of the parking durations (in hours) of $n = 200$ tickets of a
+      car park. The bar labels are the densities; the last label is missing.</p>
+    <div class="cols" style="--cols: 47fr 51fr; --gap: 22px">
+      <div class="p2-small-gap">
+        <div class="viz" id="p2-hist-park" style="height:350px"></div>
+      </div>
+      <div>
+        <ol class="p2-roomy">
+          <li>Determine the share $f_j$ and the number $h_j$ of tickets in
+            each of the first three classes.</li>
+          <li>All bar areas add up to $1$. Use this to determine $f_4$,
+            $h_4$ and the missing bar height.</li>
+          <li>The bar over $(1,2]$ is twice as high as the bar over
+            $(2,4]$. Does $(1,2]$ contain twice as many tickets?</li>
+          <li>The first $2$ hours are free of charge. What share of the
+            tickets parked for free? How many tickets is that?</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-hist-park", (el) => {
+      let solved = false;
+      const h = P2.hist(el, { counts: [50, 60, 60, 30], n: 200, breaks: [0, 1, 2, 4, 10], xDomain: [-0.3, 10.3], xLabel: "Parking duration (hours)",
+        labels: true, yMax: { density: 0.35 }, labelSize: 16,
+        labelFmt: (c) => (c.i === 3 && !solved ? "?" : P2.tr(c.dens, 4)),
+        areaFmt: (c) => `f = ${P2.tr(c.f, 2)}`,
+        tip: (c) => `<b>${c.i ? "(" : "["}${c.a}, ${c.b}]</b> &nbsp;width ${c.w} h` + (c.i === 3 && !solved ? "<br>height: ?" : `<br>height ${P2.tr(c.dens, 4)}`) +
+          (solved ? `<br>area = ${P2.tr(c.dens, 4)} · ${c.w} = <b>${P2.tr(c.f, 2)}</b> → ${c.h} tickets` : "") });
+      const row = QV.controls(el);
+      const b = QV.button(row, "Show the areas (solution)", () => { solved = !solved; h.setAreas(solved); b.setLabel(solved ? "Hide the solution" : "Show the areas (solution)"); });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/3) &ndash; Car Park: Shares from Areas</h2>
+  <p><b>Rule:</b> area $=$ density $\cdot$ class width $= f_j$ (share of the
+    class); number $h_j = f_j \cdot n$. All areas together add up to $1$.</p>
+  <table class="bt fs-s">
+    <thead><tr><th class="l">Class</th><th>$\Delta x_j$</th><th>Density</th><th>$f_j = \text{density} \cdot \Delta x_j$</th><th>$h_j = f_j \cdot 200$</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$[0,1]$</td><td>1</td><td>$0.25$</td><td>$0.25 \cdot 1 = \mathbf{0.25}$</td><td>$\mathbf{50}$</td></tr>
+      <tr><td class="l">$(1,2]$</td><td>1</td><td>$0.3$</td><td>$0.3 \cdot 1 = \mathbf{0.3}$</td><td>$\mathbf{60}$</td></tr>
+      <tr><td class="l">$(2,4]$</td><td>2</td><td>$0.15$</td><td>$0.15 \cdot 2 = \mathbf{0.3}$</td><td>$\mathbf{60}$</td></tr>
+      <tr><td class="l">$(4,10]$</td><td>6</td><td>$\mathbf{0.025}$</td><td>$\mathbf{0.15}$ (see below)</td><td>$\mathbf{30}$</td></tr>
+      <tr class="mid"><td class="l">Total</td><td></td><td></td><td>$1$</td><td>$200$</td></tr>
+    </tbody>
+  </table>
+  <div class="block example"><h4>2.&nbsp;Last class from &ldquo;all areas add up to 1&rdquo;</h4>
+    <p>$f_4 = 1 - (0.25 + 0.3 + 0.3) = 1 - 0.85 = \mathbf{0.15}$
+      &emsp; $\Rightarrow$ &emsp; $h_4 = 0.15 \cdot 200 = \mathbf{30}$<br>
+      missing height $= f_4 / \Delta x_4 = 0.15 / 6 = \mathbf{0.025}$</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/3) &ndash; Car Park: Heights versus Areas</h2>
+  <div class="block example"><h4>3.&nbsp;Twice as high $\neq$ twice as many</h4>
+    <p><b>No.</b> Both classes have the share $0.3$, i.e.&nbsp;$\mathbf{60}$ tickets
+      each. The class $(2,4]$ is twice as wide ($2$ hours instead of $1$), so the
+      same area needs only half the height: $0.3 / 2 = 0.15$.</p></div>
+  <div class="block example"><h4>4.&nbsp;Free parking: at most 2 hours</h4>
+    <p>Durations $\le 2$ hours $=$ classes $[0,1]$ and $(1,2]$:
+      $f_1 + f_2 = 0.25 + 0.3 = \mathbf{0.55}$, i.e.&nbsp;$55\,\%$ of the tickets
+      $= 0.55 \cdot 200 = \mathbf{110}$ tickets.
+      A ticket of exactly $2$ hours lies in $(1,2]$ and is therefore counted as
+      free.</p></div>
+  <div class="block key"><p>Read a histogram by its <b>areas</b>, not by its heights:
+    share $=$ height $\cdot$ width. The height only says how densely the tickets
+    lie per hour.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/3) &ndash; Car Park: Python</h2>
+  <div class="block"><h4>Shares and numbers of tickets from the bar areas</h4>
+<pre class="py">
+w = np.diff([0, 1, 2, 4, 10])          # class widths: 1 1 2 6
+dens = np.array([0.25, 0.3, 0.15])     # heights of the first three bars
+f = dens * w[:3]                       # areas = shares: 0.25 0.3 0.3
+f4 = 1 - f.sum()                       # all areas add up to 1: f4 = 0.15
+print(round(f4 / w[3], 4), np.round(np.r_[f, f4] * 200), round(f[0] + f[1], 4))
+</pre>
+<pre class="out">
+0.025 [50. 60. 60. 30.] 0.55
+</pre></div>
+  <ul>
+    <li>Output: missing bar height, tickets per class ($h_j = f_j \cdot 200$)
+      and the share of free tickets ($\le 2$ hours).</li>
+    <li>Height $\cdot$ width $=$ area $=$ share $f_j$; the missing share is
+      <code>1 - f.sum()</code>.</li>
+  </ul>
+  <a class="trynb" data-sec="section 2"></a>
+</section>
+
+<section class="slide">
+  <h2>Histograms in Python</h2>
+  <div class="block tight"><h4>Class width 2</h4>
+<pre class="py">
+import pandas as pd
+breaks = [37, 39, 41, 43, 45, 47]          # alternative: np.arange(37, 48, 2)
+cls = pd.cut(shoe, breaks, right=True, include_lowest=True)  # [37,39], (39,41], ...
+f = pd.Series(cls).value_counts(normalize=True, sort=False)   # rel. frequencies f_j
+w = np.diff(breaks)                        # class widths
+dens = f.to_numpy() / w                    # densities: 0.3182 0.1364 0 0 0.0455
+plt.bar(breaks[:-1], dens, width=w, align="edge", edgecolor="black")
+</pre></div>
+  <div class="block tight"><h4>Unequal class widths (then the same lines as above)</h4>
+<pre class="py">
+breaks = [37, 39, 40, 41, 46]              # densities: 0.3182 0.1818 0.0909 0.0182
+</pre></div>
+  <p class="fs-xs">Why not simply <code>plt.hist</code>? It uses classes $[a,b)$ &ndash; see
+    the next slide.</p>
+  <a class="trynb" data-sec="section 2"></a>
+</section>
+
+<section class="slide">
+  <h2>Histograms in Python &ndash; Trap: Classes $[a,b)$</h2>
+  <div class="block alert tight"><h4>Trap: <code class="p2-hc">plt.hist</code> and <code class="p2-hc">np.histogram</code> use classes $[a,b)$</h4>
+    <p>Ours: $(a,b]$, first class $[a,b]$. NumPy: a boundary value goes to the class on its <b>right</b>.</p>
+<pre class="py">
+np.histogram(shoe, bins=[37, 39, 41, 43, 45, 47], density=True)[0]
+# [0.1364 0.2727 0.0455 0. 0.0455]   &lt;- not our densities!
+</pre></div>
+  <div class="block tight"><h4>Why?</h4>
+    <p>$39$ (four times) and $41$ lie on class boundaries: $39$ falls into $[39,41)$ instead of
+      $[37,39]$, $41$ into $[41,43)$ instead of $(39,41]$ &ndash; <code>plt.hist</code> draws these wrong bars.</p></div>
+  <div class="block tight"><h4>Remedy</h4>
+    <p>Classes with <code>pd.cut(..., right=True, include_lowest=True)</code>, bars with <code>plt.bar</code> (next slide).</p></div>
+  <a class="trynb" data-sec="section 2"></a>
+</section>
+
+<section class="slide">
+  <h2>Histograms in Python &ndash; with Our Classes</h2>
+  <div class="block tight"><h4>Correct: classes with <code class="p2-hc">pd.cut</code>, bars with <code class="p2-hc">plt.bar</code></h4>
+<pre class="py">
+def density_hist(x, breaks):
+    cls = pd.cut(x, breaks, right=True, include_lowest=True)
+    f = pd.Series(cls).value_counts(normalize=True, sort=False)
+    w = np.diff(breaks)                                  # class widths
+    plt.bar(breaks[:-1], f / w, width=w, align="edge", edgecolor="black")
+    return f / w                                         # densities f_j / w_j
+
+density_hist(shoe, [37, 39, 41, 43, 45, 47])   # 0.3182 0.1364 0 0 0.0455
+density_hist(shoe, [37, 39, 40, 41, 46])       # 0.3182 0.1818 0.0909 0.0182
+</pre></div>
+  <ul class="fs-s">
+    <li><code>right=True</code>: classes $(a,b]$; <code>include_lowest=True</code>: first class closed $[a,b]$.</li>
+    <li>Bar heights $=$ densities $f_j/\Delta x_j$ (as in the tables), so every bar
+      area equals $f_j$.</li>
+  </ul>
+  <a class="trynb" data-sec="section 2"></a>
+</section>
+
+<section class="slide">
+  <h2>Classified Frequencies in Python</h2>
+  <div class="block tight"><h4>Class partition</h4>
+<pre class="py">
+breaks = [37, 39, 41, 43, 45, 47]          # class boundaries c0, c1, ..., ck
+cls = pd.cut(shoe, breaks, right=True, include_lowest=True)
+</pre></div>
+  <div class="block tight"><h4>Absolute and relative classified frequencies</h4>
+<pre class="py">
+pd.Series(cls).value_counts(sort=False)                   # 7 3 0 0 1
+pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.0909
+</pre></div>
+  <p class="fs-xs">pandas labels the first class <code>(36.999, 39.0]</code> &ndash; this is
+    exactly the closed class $[37,39]$.</p>
+  <a class="trynb" data-sec="section 2"></a>
+</section>
+
+<section class="slide" data-subsection="Exercises">
+  <h2>Exercise &ndash; Histogram (Handball Team)</h2>
+  <div class="block problem">
+    <p>Shoe sizes of the handball team from Part&nbsp;1 ($n = 13$):</p>
+    <p class="center p2-data">40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39, 40, 42</p>
+    <ol>
+      <li>Use the classes $[36,38],\ (38,40],\ (40,42],\ (42,44],\ (44,46]$
+        (class width $2$). Assign the values to the classes and compute the
+        absolute and relative frequencies. Careful with values that lie
+        exactly on a class boundary!</li>
+      <li>Compute the densities and sketch the histogram.</li>
+      <li>With the classes of the worked example, $[37,39],\ (39,41],\ \ldots,\ (45,47]$,
+        the same data give the counts $7, 4, 1, 0, 1$. Compare the shapes of
+        the two histograms. What does this tell you about histograms?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Histogram (Handball Team): Table</h2>
+  <p class="fs-s"><b>Rule:</b> the first class is closed, all others are open on the left &ndash; a
+    value on a boundary belongs to the class <em>below</em> it:
+    $38 \to [36,38]$, &ensp;$40 \to (38,40]$, &ensp;$42 \to (40,42]$, &ensp;$46 \to (44,46]$.
+    Here $7$ of the $13$ values lie on a boundary.</p>
+  <table class="bt fs-s">
+    <thead><tr><th class="l">Class</th><th>$[36,38]$</th><th>$(38,40]$</th><th>$(40,42]$</th><th>$(42,44]$</th><th>$(44,46]$</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Values</td><td>37, 38, 38</td><td>$4\times 39$, $3\times 40$</td><td>41, 42</td><td>&ndash;</td><td>46</td><td></td></tr>
+      <tr><td class="l">Class width $\Delta x_j$</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td><td></td></tr>
+      <tr><td class="l">Abs.&nbsp;frequency $h_j$</td><td>3</td><td>7</td><td>2</td><td>0</td><td>1</td><td>13</td></tr>
+      <tr><td class="l">Rel.&nbsp;frequency $f_j$</td><td>$0.2308$</td><td>$0.5385$</td><td>$0.1538$</td><td>$0$</td><td>$0.0769$</td><td>$1$</td></tr>
+      <tr><td class="l">Density $f_j/\Delta x_j$</td><td>$0.1154$</td><td>$0.2692$</td><td>$0.0769$</td><td>$0$</td><td>$0.0385$</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="block example"><h4>Example: second class</h4>
+    <p>$f_2 = 7/13 = 0.5385$, &emsp; density $= 0.5385/2 = \mathbf{0.2692}$</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Histogram (Handball Team): Bars and Comparison</h2>
+  <div class="cols" style="--cols: 48fr 50fr; --gap: 24px">
+    <div class="p2-small-gap">
+      <div class="viz" id="p2-hist-hand" style="height:470px"></div>
+    </div>
+    <div>
+      <p><b>3.</b> Same data, two impressions:</p>
+      <ul>
+        <li>$[37,39],(39,41],\ldots$: counts $7,4,1,0,1$ &ndash; the bars
+          <b>fall from the first class on</b> (&ldquo;the smallest sizes are
+          the most common&rdquo;).</li>
+        <li>$[36,38],(38,40],\ldots$: counts $3,7,2,0,1$ &ndash; the bars
+          <b>rise to a peak</b> at $(38,40]$ and then fall.</li>
+      </ul>
+      <p>Shifting all boundaries by one size regroups the values: the four
+        $39$s now share a class with the three $40$s instead of with $37$
+        and $38$.</p>
+      <div class="block key"><p>The shape of a histogram depends on the choice of classes:
+        choose them deliberately and check whether a feature survives a different
+        partition.</p></div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-hist-hand", (el) => {
+      const B1 = [36, 38, 40, 42, 44, 46], B2 = [37, 39, 41, 43, 45, 47];
+      const h = P2.hist(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39, 40, 42], breaks: B1, xDomain: [35.5, 47.5], xLabel: "Shoe size",
+        lane: true, labels: true, yMax: { density: 0.3 }, labelFmt: (c) => (c.dens > 0 ? P2.tr(c.dens, 4) : "0") });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Classes", options: [["a", "$[36,38], (38,40], \\ldots$"], ["b", "$[37,39], (39,41], \\ldots$"]], value: "a",
+        onChange: (v) => h.setBreaks(v === "a" ? B1 : B2) });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Mobile Phone Costs</h2>
+  <div class="block problem">
+    <p>A survey of $n = 10$ students gives the following monthly mobile phone
+      costs (in EUR):</p>
+    <p class="center p2-data">12, 25, 6, 38, 15, 60, 9, 19, 32, 18</p>
+    <p>The values are to be grouped into the classes $[0,10]$, $(10,20]$,
+      $(20,40]$ and $(40,80]$.</p>
+    <ol>
+      <li>Determine the absolute and relative frequencies of the classes.</li>
+      <li>Compute the class widths and the densities (bar heights) and draw
+        the histogram.</li>
+      <li>Why must the bar height <em>not</em> equal the relative frequency here?
+        Which class is the most densely populated?</li>
+      <li>Which Python commands reproduce the frequencies and densities?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/4) &ndash; Mobile Phone Costs: Class Frequencies</h2>
+  <p><b>Sorted:</b> 6, 9, 12, 15, 18, 19, 25, 32, 38, 60 &emsp; ($n = 10$)</p>
+  <table class="bt">
+    <thead><tr><th class="l">Class</th><th class="l">Values in the class</th><th>$h_j$</th><th>$f_j = h_j/n$</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$[0,10]$</td><td class="l">6, 9</td><td>2</td><td>$0.2$</td></tr>
+      <tr><td class="l">$(10,20]$</td><td class="l">12, 15, 18, 19</td><td>4</td><td>$0.4$</td></tr>
+      <tr><td class="l">$(20,40]$</td><td class="l">25, 32, 38</td><td>3</td><td>$0.3$</td></tr>
+      <tr><td class="l">$(40,80]$</td><td class="l">60</td><td>1</td><td>$0.1$</td></tr>
+      <tr class="mid"><td class="l">Total</td><td></td><td>10</td><td>$1$</td></tr>
+    </tbody>
+  </table>
+  <div class="block example"><h4>Assigning values to classes</h4>
+    <p>The first class is closed on both sides, all others are open on the left:
+      a value of $10$ would belong to $[0,10]$, a value of $20$ to $(10,20]$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/4) &ndash; Mobile Phone Costs: Densities and Histogram</h2>
+  <p><b>Rule:</b> density $= f_j / \Delta x_j$ (class width) &ndash; this is the bar
+    height, not the frequency.</p>
+  <div class="cols" style="--cols: 1fr 1fr; --gap: 24px">
+    <div>
+      <table class="bt fs-s">
+        <thead><tr><th class="l">Class</th><th>$\Delta x_j$</th><th>$f_j$</th><th class="l">Density</th></tr></thead>
+        <tbody>
+          <tr><td class="l">$[0,10]$</td><td>10</td><td>$0.2$</td><td class="l">$0.2/10 = \mathbf{0.02}$</td></tr>
+          <tr><td class="l">$(10,20]$</td><td>10</td><td>$0.4$</td><td class="l">$0.4/10 = \mathbf{0.04}$</td></tr>
+          <tr><td class="l">$(20,40]$</td><td>20</td><td>$0.3$</td><td class="l">$0.3/20 = \mathbf{0.015}$</td></tr>
+          <tr><td class="l">$(40,80]$</td><td>40</td><td>$0.1$</td><td class="l">$0.1/40 = \mathbf{0.0025}$</td></tr>
+        </tbody>
+      </table>
+      <p class="fs-s"><b>Check:</b> area $=$ density $\cdot\,\Delta x_j = f_j$,
+        e.g.&nbsp;$0.015 \cdot 20 = 0.3$; all areas add up to $1$.</p>
+    </div>
+    <div class="p2-small-gap">
+      <div class="viz" id="p2-hist-phone" style="height:460px"></div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-hist-phone", (el) => {
+      let ro = null;
+      const h = P2.hist(el, { data: [12, 25, 6, 38, 15, 60, 9, 19, 32, 18], breaks: [0, 10, 20, 40, 80], xDomain: [-2, 82], xLabel: "Monthly costs (EUR)",
+        labels: true, yMax: { density: 0.046, rel: 0.48 },
+        onUpdate: (cls, mode) => { if (ro) ro.set(`total area <b>${P2.tr(d3.sum(cls, (c) => (mode === "density" ? c.dens : c.f) * c.w), 4)}</b>`); } });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Height", options: [["density", "density"], ["rel", "$f_j$ (wrong)"]], value: "density", onChange: (m) => h.setMode(m) });
+      QV.spacer(row);
+      ro = QV.readout(row, "");
+      h.update(false);
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/4) &ndash; Mobile Phone Costs: Interpretation</h2>
+  <div class="block alert"><h4>Why not the relative frequency as height?</h4>
+    <p>In a histogram the <b>area</b> of a bar is the share of the class. With
+      height $f_j$, the bar over $(20,40]$ would have the area $0.3 \cdot 20 = 6$, the
+      bar over $(10,20]$ only $0.4 \cdot 10 = 4$ &ndash; the wide class with <em>fewer</em>
+      observations would look bigger. Dividing by the class width makes classes
+      of different widths comparable.</p></div>
+  <div class="block example"><h4>Most densely populated class</h4>
+    <p>$(10,20]$ with density $\mathbf{0.04}$: per euro of class width, $4\,\%$ of
+      the students lie in this class.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (4/4) &ndash; Mobile Phone Costs: Python</h2>
+  <div class="block"><h4>Frequencies, densities and bars</h4>
+<pre class="py">
+costs = np.array([12, 25, 6, 38, 15, 60, 9, 19, 32, 18])
+breaks = [0, 10, 20, 40, 80]
+cls = pd.cut(costs, breaks, right=True, include_lowest=True)
+h = pd.Series(cls).value_counts(sort=False).to_numpy()   # absolute frequencies
+print(h, h / len(costs) / np.diff(breaks))               # h_j and densities
+density_hist(costs, breaks)              # bars (function from "with Our Classes")
+</pre>
+<pre class="out">
+[2 4 3 1] [0.02   0.04   0.015  0.0025]
+</pre></div>
+  <ul>
+    <li><code>np.diff(breaks)</code> gives the unequal class widths $10, 10, 20, 40$.</li>
+    <li>No value lies on a class boundary here, so <code>plt.hist</code> happens
+      to give the same bars &ndash; <code>pd.cut</code> is right in every case.</li>
+  </ul>
+  <a class="trynb" data-sec="section 2.1"></a>
+</section>
+
+<!-- ===== SECTION: BOXPLOT ===== -->
+<section class="slide" data-section="Boxplot" data-short="Boxplot">
+  <h2>Boxplot</h2>
+  <div class="block guiding"><p>How can we see the centre, the spread, the skewness and the
+    outliers of a dataset at one glance &ndash; and compare several groups side by side?</p></div>
+  <div class="block"><h4>Definition</h4>
+    <p>A graphical display that highlights only the most important summary values of a dataset and thereby visualises the distribution of the data.</p></div>
+  <ul>
+    <li>Building blocks: the quartiles $Q_1$, $\tilde{x}$, $Q_3$ of Part&nbsp;1,
+      two whiskers and the outliers</li>
+    <li>Example: the shoe sizes of the soccer team (next slides)</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Boxplot</h2>
+  <div class="viz" id="p2-box-clean" style="height:420px"></div>
+  <p class="fs-xs muted">Boxplot of the shoe sizes. Hover over the box for the exact values; switch on the raw data or the fences.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-box-clean", (el) => {
+      const b = P2.box(el, { groups: [{ data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39] }], domain: [34.5, 47], tickValues: [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
+        xLabel: "Shoe size", centers: [0.44], boxH: 96, fenceNames: ["Lower bound", "Upper bound"] });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Raw data", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("points", +v === 1) });
+      QV.segmented(row, { label: "Fences $Q_1 - 1.5\\,\\text{IQR}$, $Q_3 + 1.5\\,\\text{IQR}$", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("fences", +v === 1) });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; with Labels</h2>
+  <div class="viz" id="p2-box-lab" style="height:410px"></div>
+  <p class="fs-xs muted">Drag the outlier (red point) along the axis &ndash; below the upper bound $43$ it becomes the new upper whisker.
+    The slider changes the whisker factor $k$.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-box-lab", (el) => {
+      let ro = null;
+      const b = P2.box(el, { groups: [{ data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39] }], domain: [34.5, 47], tickValues: [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
+        xLabel: "Shoe size", centers: [0.5], boxH: 72, fenceNames: ["Lower bound", "Upper bound"],
+        annot: { above: ["wlo", "whi", "out"], below: ["q1", "med", "q3"], arrows: true, muted: ["wlo", "whi"] },
+        drag: [{ g: 0, i: 4 }], snap: 1,
+        onChange: (st, k) => { const s = st[0], T = (v) => P2.tr(v, 2);
+          if (ro) ro.set(`IQR $= ${T(s.iqr)}$ · bounds $${T(s.fenceLo)}$ and $${T(s.fenceHi)}$ · whiskers $${T(s.whiskerLo)}$ and $${T(s.whiskerHi)}$ · ${s.outliers.length ? `outlier: $${s.outliers.map(T).join(", ")}$` : "no outlier"}`); } });
+      const row = QV.controls(el);
+      const ks = QV.slider(row, { label: "$k$", min: 0.5, max: 3, step: 0.25, value: 1.5, width: 110, fmt: (v) => P2.tr(v, 2), onInput: (v) => b.setK(v) });
+      QV.segmented(row, { label: "Bounds", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("fences", +v === 1) });
+      ro = QV.readout(row, "");
+      QV.spacer(row);
+      QV.button(row, "Reset", () => { b.reset(); ks.set(1.5); });
+      b.draw();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; Construction</h2>
+  <div class="cols" style="--cols: 30fr 70fr; --gap: 26px">
+    <ol class="p2-steps p2-roomy" id="p2-bx-steps">
+      <li>Sort the data</li>
+      <li>Determine the median</li>
+      <li>Determine the 1st quartile</li>
+      <li>Determine the 3rd quartile</li>
+      <li>Determine the lower whisker</li>
+      <li>Determine the upper whisker</li>
+      <li>Are there any outliers?</li>
+      <li>Draw the boxplot</li>
+    </ol>
+    <div class="p2-small-gap">
+      <div class="p2-cards" id="p2-bx-cards"></div>
+      <div class="p2-explain" id="p2-bx-explain" style="min-height:52px"></div>
+      <div class="viz" id="p2-bx-build" style="height:300px"></div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-bx-build", (el) => {
+      const C = QV.C;
+      const RAW = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
+      const order = RAW.map((v, i) => i).sort((a, b) => RAW[a] - RAW[b] || a - b);
+      const rank = []; order.forEach((ri, pos) => { rank[ri] = pos; });
+      const cardsEl = document.getElementById("p2-bx-cards");
+      const slot = 62, off = Math.max(0, (cardsEl.clientWidth - 11 * slot) / 2) + 6;
+      const posEls = [];
+      for (let p = 0; p < 11; p++) { const d = document.createElement("div"); d.className = "p2-pos"; d.style.left = (off + p * slot) + "px"; d.textContent = "(" + (p + 1) + ")"; cardsEl.appendChild(d); posEls.push(d); }
+      const cards = RAW.map((v) => { const d = document.createElement("div"); d.className = "p2-card"; d.textContent = v; cardsEl.appendChild(d); return d; });
+      const steps = Array.from(document.querySelectorAll("#p2-bx-steps li"));
+      const explain = document.getElementById("p2-bx-explain");
+      const ch = QV.chart(el, { x: { domain: [34.5, 47.5], label: "Shoe size", tickValues: [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47], grid: true },
+        y: { domain: [0, 1], hide: true, grid: false }, margin: { left: 18, right: 18, top: 8 } });
+      const cy = ch.h * 0.36, bh = 54;
+      const g = ch.layer("data").append("g"), ga = ch.layer("annot").append("g");
+      const X = (v) => ch.x(v);
+      const TXT = [
+        "Raw data of the 11 players, in the order in which they were recorded. Press <b>Next step</b>.",
+        "Sorted from small to large: $x_{(1)} \\le x_{(2)} \\le \\dots \\le x_{(11)}$ &ndash; the small numbers are the positions.",
+        "Median: $n \\cdot p = 11 \\cdot 0.5 = 5.5 \\to$ position $6$ $\\Rightarrow \\tilde{x} = 39$",
+        "1st quartile: $11 \\cdot 0.25 = 2.75 \\to$ position $3$ $\\Rightarrow x_{0.25} = 38$",
+        "3rd quartile: $11 \\cdot 0.75 = 8.25 \\to$ position $9$ $\\Rightarrow x_{0.75} = 40$; the box spans $[38, 40]$",
+        "$\\text{IQR} = 40 - 38 = 2$; lower bound $38 - 1.5 \\cdot 2 = 35$; smallest value $\\ge 35$: lower whisker $= 37$",
+        "Upper bound $40 + 1.5 \\cdot 2 = 43$; largest value $\\le 43$: upper whisker $= 41$",
+        "$46 > 43$ $\\Rightarrow$ $46$ is an outlier and is drawn as a single point",
+        "Finished: box from $Q_1 = 38$ to $Q_3 = 40$, median $39$, whiskers $37$ and $41$, outlier $46$",
+      ];
+      let step = 0;
+      const ln = (x1, y1, x2, y2, c, w) => g.append("line").attr("x1", x1).attr("y1", y1).attr("x2", x2).attr("y2", y2).style("stroke", c).style("stroke-width", w);
+      const lab = (x, y, t, c) => P2.halo(ga.append("text").attr("class", "lbl").attr("x", x).attr("y", y).attr("text-anchor", "middle").style("font-size", "15px").style("fill", c || C.ink).text(t));
+      function render() {
+        // cards and positions
+        const cls = (pos) => (step >= 7 && pos === 10 ? "p2-out" : (step >= 5 && pos === 0) || (step >= 6 && pos === 9) ? "p2-w"
+          : (step >= 2 && pos === 5) || (step >= 3 && pos === 2) || (step >= 4 && pos === 8) ? "p2-q" : "");
+        cards.forEach((c, i) => { const pos = step >= 1 ? rank[i] : i; c.style.left = (off + pos * slot) + "px"; c.className = "p2-card " + (step >= 1 ? cls(pos) : ""); });
+        posEls.forEach((p) => { p.style.opacity = step >= 1 ? 1 : 0; });
+        steps.forEach((li, i) => { li.classList.toggle("p2-on", i === step - 1); li.classList.toggle("p2-done", i < step - 1); });
+        explain.innerHTML = P2.texHTML(TXT[step]);
+        readout.set(`step <b>${step}</b> / 8`);
+        // chart
+        g.selectAll("*").remove(); ga.selectAll("*").remove();
+        const col = C.blue;
+        // dot plot of the data at the bottom
+        const cnt = new Map();
+        RAW.slice().sort((a, b) => a - b).forEach((v, pos) => {
+          const k = cnt.get(v) || 0; cnt.set(v, k + 1);
+          const c = step >= 1 ? cls(pos) : "";
+          g.append("circle").attr("cx", X(v)).attr("cy", ch.h - 9 - k * 12).attr("r", 5)
+            .style("fill", c === "p2-out" ? C.red : c === "p2-w" ? C.green : c === "p2-q" ? C.orange : C.grey).style("stroke", C.surface).style("stroke-width", 1.5);
+        });
+        if (step >= 5 && step < 8) { ln(X(35), 0, X(35), ch.h, C.red, 2).style("stroke-dasharray", "2 4"); lab(X(35) + 5, ch.h - 30, "lower bound 35", C.tRed).attr("text-anchor", "start"); }
+        if (step >= 6 && step < 8) { ln(X(43), 0, X(43), ch.h, C.red, 2).style("stroke-dasharray", "2 4"); lab(X(43) + 5, ch.h - 30, "upper bound 43", C.tRed).attr("text-anchor", "start"); }
+        if (step >= 4) g.append("rect").attr("x", X(38)).attr("width", X(40) - X(38)).attr("y", cy - bh / 2).attr("height", bh).attr("rx", 4)
+          .style("fill", col).style("fill-opacity", step >= 8 ? 0.32 : 0).style("stroke", col).style("stroke-width", 2.5);
+        if (step >= 3 && step < 4) ln(X(38), cy - bh / 2, X(38), cy + bh / 2, col, 2.5);
+        if (step >= 2) ln(X(39), cy - bh / 2, X(39), cy + bh / 2, C.ink, 3.5);
+        if (step >= 5) { ln(X(37), cy, X(38), cy, C.ink2, 2); ln(X(37), cy - bh / 4, X(37), cy + bh / 4, C.ink2, 2); }
+        if (step >= 6) { ln(X(40), cy, X(41), cy, C.ink2, 2); ln(X(41), cy - bh / 4, X(41), cy + bh / 4, C.ink2, 2); }
+        if (step >= 7) g.append("circle").attr("cx", X(46)).attr("cy", cy).attr("r", 7).style("fill", C.red).style("stroke", C.surface).style("stroke-width", 2);
+        // labels of the newest element
+        if (step === 2) lab(X(39), cy - bh / 2 - 8, "median 39");
+        if (step === 3) lab(X(38), cy - bh / 2 - 8, "Q₁ = 38");
+        if (step === 4) { lab(X(38), cy - bh / 2 - 8, "Q₁ = 38"); lab(X(40), cy - bh / 2 - 8, "Q₃ = 40"); }
+        if (step === 5) lab(X(37), cy - bh / 2 - 8, "lower whisker 37");
+        if (step === 6) lab(X(41), cy - bh / 2 - 8, "upper whisker 41");
+        if (step === 7) lab(X(46), cy - 16, "outlier 46", C.tRed);
+      }
+      const row = QV.controls(el);
+      QV.button(row, "&#9664; Back", () => { step = Math.max(0, step - 1); render(); });
+      QV.button(row, "Next step &#9654;", () => { step = Math.min(8, step + 1); render(); }, { primary: true });
+      QV.button(row, "Reset", () => { step = 0; render(); });
+      QV.spacer(row);
+      const readout = QV.readout(row, "");
+      render();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; Construction (Data)</h2>
+  <table class="bt fs-s">
+    <thead><tr><th class="r">Player</th><th class="r">Shoe size</th><th class="r">Sorted</th><th class="l"></th></tr></thead>
+    <tbody>
+      <tr><td class="r">1</td><td class="r">40</td><td class="r">37</td><td class="l">Lower whisker</td></tr>
+      <tr><td class="r">2</td><td class="r">39</td><td class="r">38</td><td class="l"></td></tr>
+      <tr><td class="r">3</td><td class="r">38</td><td class="r">38</td><td class="l">1st quartile</td></tr>
+      <tr><td class="r">4</td><td class="r">41</td><td class="r">39</td><td class="l"></td></tr>
+      <tr><td class="r">5</td><td class="r">46</td><td class="r">39</td><td class="l"></td></tr>
+      <tr><td class="r">6</td><td class="r">39</td><td class="r">39</td><td class="l">Median</td></tr>
+      <tr><td class="r">7</td><td class="r">39</td><td class="r">39</td><td class="l"></td></tr>
+      <tr><td class="r">8</td><td class="r">38</td><td class="r">40</td><td class="l"></td></tr>
+      <tr><td class="r">9</td><td class="r">37</td><td class="r">40</td><td class="l">3rd quartile</td></tr>
+      <tr><td class="r">10</td><td class="r">40</td><td class="r">41</td><td class="l">Upper whisker</td></tr>
+      <tr><td class="r">11</td><td class="r">39</td><td class="r">46</td><td class="l">Outlier</td></tr>
+      <tr class="mid"><td class="r"><b>Sum</b></td><td class="r"><b>436</b></td><td class="r"><b>436</b></td><td class="l"></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; Construction (Quartiles)</h2>
+  <p>$n = 11$</p>
+  <div class="cols" style="--cols: 70fr 26fr; --gap: 30px; margin-top: 16px">
+    <div><table class="bt">
+      <thead><tr><th class="l"></th><th>$p$</th><th>$n \cdot p$</th><th>$\lceil n \cdot p \rceil$ = position</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td class="l">1st quartile</td><td>$0.25$</td><td>$2.75$</td><td>3</td><td>38</td></tr>
+        <tr><td class="l">2nd quartile (median)</td><td>$0.50$</td><td>$5.50$</td><td>6</td><td>39</td></tr>
+        <tr><td class="l">3rd quartile</td><td>$0.75$</td><td>$8.25$</td><td>9</td><td>40</td></tr>
+      </tbody>
+    </table></div>
+    <div><table class="bt">
+      <tbody>
+        <tr><td class="l">Lower whisker</td><td class="r">37</td></tr>
+        <tr><td class="l">$Q_1$</td><td class="r">38</td></tr>
+        <tr><td class="l">Median</td><td class="r">39</td></tr>
+        <tr><td class="l">$Q_3$</td><td class="r">40</td></tr>
+        <tr><td class="l">Upper whisker</td><td class="r">41</td></tr>
+        <tr><td class="l">Outlier</td><td class="r">46</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Lower Whisker &ndash; Computation</h2>
+  <p>The lower whisker is the <b>smallest data point that is not yet an outlier</b>.
+    To find it, compute a lower bound &ndash; every value below it is classified as an outlier.</p>
+  \begin{align*}
+    \text{Whisker}_{\min} &= \min\{x_i \mid x_i \ge x_{0.25} - k(x_{0.75} - x_{0.25})\} \\
+    &\text{with } k = 1.5 \\
+    &= \min\{x_i \mid x_i \ge 38 - 1.5(40 - 38)\} \\
+    &= \min\{x_i \mid x_i \ge 38 - 3\} \\
+    &= \min\{x_i \mid x_i \ge 35\} = 37
+  \end{align*}
+  <p>Since $37$ is the smallest data value $\ge 35$, the lower whisker ends at $37$.</p>
+</section>
+
+<section class="slide">
+  <h2>Lower Whisker &ndash; Step by Step</h2>
+  <ol>
+    <li><b>Compute the IQR:</b> the interquartile range is the difference
+      between the 3rd and 1st quartile: <span class="p2-nw">$\text{IQR} = x_{0.75} - x_{0.25} = 40 - 38 = 2$</span></li>
+    <li><b>Compute the lower bound:</b> subtract $1.5$ times the IQR from
+      the 1st quartile: <span class="p2-nw">$38 - 1.5 \cdot 2 = 38 - 3 = 35$</span></li>
+    <li><b>Check the data:</b> every data point <b>below</b> $35$
+      would be an outlier.</li>
+    <li><b>Determine the lower whisker:</b> the smallest data value still
+      $\ge 35$ becomes the lower whisker. In our dataset this is $37$.</li>
+  </ol>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>The lower whisker extends down to $37$ &ndash; the smallest value that is not classified as an outlier.
+      If a value $&lt; 35$ existed, it would be shown separately as an outlier in the boxplot.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Upper Whisker &ndash; Computation</h2>
+  <p>The upper whisker is the <b>largest data point that is not yet an outlier</b>.
+    To find it, compute an upper bound &ndash; every value above it is classified as an outlier.</p>
+  \begin{align*}
+    \text{Whisker}_{\max} &= \max\{x_i \mid x_i \le x_{0.75} + k(x_{0.75} - x_{0.25})\} \\
+    &\text{with } k = 1.5 \\
+    &= \max\{x_i \mid x_i \le 40 + 1.5(40 - 38)\} \\
+    &= \max\{x_i \mid x_i \le 43\} = 41
+  \end{align*}
+  <p>Since $46 &gt; 43$, the value $46$ is an outlier!</p>
+</section>
+
+<section class="slide">
+  <h2>Upper Whisker &ndash; Step by Step</h2>
+  <ol>
+    <li><b>Compute the IQR:</b> the interquartile range is the difference
+      between the 3rd and 1st quartile: <span class="p2-nw">$\text{IQR} = x_{0.75} - x_{0.25} = 40 - 38 = 2$</span></li>
+    <li><b>Compute the upper bound:</b> add $1.5$ times the IQR to
+      the 3rd quartile: <span class="p2-nw">$40 + 1.5 \cdot 2 = 40 + 3 = 43$</span></li>
+    <li><b>Check the data:</b> every data point <b>above</b> $43$
+      would be an outlier.</li>
+    <li><b>Determine the upper whisker:</b> the largest data value still
+      $\le 43$ becomes the upper whisker. In our dataset this is $41$.</li>
+  </ol>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>The upper whisker extends up to $41$ &ndash; the largest value that is not classified as an outlier.
+      Since $46 &gt; 43$, the value $46$ lies above the upper bound and is shown as a separate point in the boxplot.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Daily Revenues</h2>
+  <div class="block problem fs-s">
+    <p>The online shop from the exercise &ldquo;Complaints per Day&rdquo; also records its
+      daily revenue (in 1000&nbsp;EUR) on the same $n = 10$ days:</p>
+    <table class="bt" style="margin-bottom: 10px">
+      <thead><tr><th class="l">Day $i$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead>
+      <tbody>
+        <tr><td class="l">Revenue $x_i$</td><td>15</td><td>18</td><td>12</td><td>22</td><td>17</td><td>13</td><td>14</td><td>20</td><td>17</td><td>4</td></tr>
+        <tr><td class="l">Complaints</td><td>2</td><td>0</td><td>3</td><td>1</td><td>2</td><td>5</td><td>1</td><td>3</td><td>2</td><td>6</td></tr>
+      </tbody>
+    </table>
+    <ol>
+      <li>Sort the revenues and determine $x_{0.25}$, the median $\tilde{x}$
+        and $x_{0.75}$.</li>
+      <li>Compute the IQR and the bounds $x_{0.25} - 1.5 \cdot \text{IQR}$ and
+        $x_{0.75} + 1.5 \cdot \text{IQR}$. Determine the lower and the upper
+        whisker and possible outliers.</li>
+      <li>Draw the boxplot. Compare a possible outlier with the number of
+        complaints on the same day.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Daily Revenues: Quartiles and Bounds</h2>
+  <div class="fs-s stack" style="gap:10px">
+    <p><b>Rule:</b> position $= \lceil n \cdot p \rceil$ in the sorted data; if
+      $n \cdot p$ is already an integer, it is <b>not</b> rounded up.<br>
+      <b>Sorted:</b> 4, 12, <b>13</b>, 14, <b>15</b>, 17, 17, <b>18</b>, 20, 22
+      &emsp; (positions 3, 5 and 8 in bold)</p>
+    <div class="block"><h4>Quartiles ($n = 10$)</h4>
+      <p>$x_{0.25}$: $10 \cdot 0.25 = 2.5 \rightarrow$ position 3 $\rightarrow \mathbf{13}$<br>
+        $\tilde{x}$: $10 \cdot 0.5 = 5$ (integer) $\rightarrow$ position 5
+        $\rightarrow \mathbf{15}$ &emsp; (not the average of the 5th and 6th value)<br>
+        $x_{0.75}$: $10 \cdot 0.75 = 7.5 \rightarrow$ position 8 $\rightarrow \mathbf{18}$</p></div>
+    <div class="block"><h4>IQR and bounds ($k = 1.5$)</h4>
+      <p>$\text{IQR} = x_{0.75} - x_{0.25} = 18 - 13 = \mathbf{5}$ &emsp;&emsp;
+        $1.5 \cdot \text{IQR} = 1.5 \cdot 5 = 7.5$<br>
+        lower bound: $13 - 7.5 = \mathbf{5.5}$ &emsp;&emsp;
+        upper bound: $18 + 7.5 = \mathbf{25.5}$</p></div>
+    <p class="fs-xs">Python check (<code>rev</code> $=$ the ten revenues):
+      <code>np.quantile(rev, [0.25, 0.5, 0.75], method="inverted_cdf")</code>
+      $\rightarrow$ <code>[13 15 18]</code>, but <code>np.median(rev)</code> $\rightarrow$
+      <code>16.0</code> (average of the 5th and 6th value).</p>
+  </div>
+  <a class="trynb" data-sec="section 3"></a>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Daily Revenues: Whiskers, Outlier and Boxplot</h2>
+  <p><b>Rule:</b> lower whisker $=$ smallest value $\ge$ lower bound, upper
+    whisker $=$ largest value $\le$ upper bound; all values outside the bounds
+    are outliers.</p>
+  <div class="cols" style="--cols: 45fr 53fr; --gap: 22px">
+    <div>
+      <div class="block"><h4>Whiskers and outliers</h4>
+        <p>$4 &lt; 5.5$ $\rightarrow$ <b>4 is an outlier</b><br>
+          Lower whisker $=$ smallest value $\ge 5.5$: $\mathbf{12}$<br>
+          Upper whisker $=$ largest value $\le 25.5$: $\mathbf{22}$<br>
+          (the maximum &ndash; no outlier at the top)</p></div>
+      <div class="block alert"><h4>Outlier $=$ day 10</h4>
+        <p>On day 10 the shop also had the most complaints ($6$) &ndash; a hint at a
+          disruption, e.g.&nbsp;a server outage. Check the cause; do not simply
+          delete the value.</p></div>
+    </div>
+    <div class="p2-small-gap">
+      <div class="viz" id="p2-box-rev" style="height:360px"></div>
+      <p class="fs-xs">Unlike the shoe sizes, the outlier lies at the
+        <b>bottom</b>: the lower whisker stops at $12$, not at the minimum $4$.</p>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-box-rev", (el) => {
+      const REV = [15, 18, 12, 22, 17, 13, 14, 20, 17, 4], COMPL = [2, 0, 3, 1, 2, 5, 1, 3, 2, 6];
+      const T = (v) => P2.tr(v, 2);
+      let b = null;
+      b = P2.box(el, { groups: [{ data: REV }], domain: [2, 27], tickValues: [5, 10, 15, 20, 25], minor: 5, xLabel: "Daily revenue (in 1000 EUR)",
+        centers: [0.52], boxH: 54, show: { fences: true }, fenceNames: ["Lower bound", "Upper bound"],
+        annot: { above: ["wlo", "q1", "med", "q3", "whi", "out"], capsLow: true,
+          text: { wlo: (s) => [T(s.whiskerLo)], whi: (s) => [T(s.whiskerHi)], q1: (s) => [T(s.q1)], q3: (s) => [T(s.q3)], med: (s) => [T(s.median)],
+            out: (s, v) => (!b || b.groups[0].data[9] === v ? [`Outlier ${T(v)}`, "(day 10)"] : [`Outlier ${T(v)}`]) } },
+        drag: [{ g: 0, i: 9 }], snap: 0.5,
+        handleTip: (d, v) => `day 10: revenue ${T(v)}, complaints 6<br>drag along the axis`,
+        margin: { top: 10, bottom: 46 } });
+      const row = QV.controls(el);
+      QV.readout(row, "Drag day&nbsp;10 (red point).");
+      QV.spacer(row);
+      QV.button(row, "Reset", () => b.reset());
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; Interpretation (1/3): Symmetry and Median</h2>
+  <div class="block"><h4>Symmetry</h4>
+    <p>A boxplot is <b>symmetric</b> when the median lies in the centre of the box
+      and both whiskers have the same length. This indicates that the data are
+      evenly distributed around the centre.</p></div>
+  <div class="block"><h4>Position of the median</h4>
+    <p>The median splits the box into two halves. If it does <b>not</b> lie in the
+      middle, the distribution is <b>skewed</b>:</p>
+    <ul>
+      <li>Median in the <b>left</b> half of the box $\rightarrow$
+        <b>right-skewed</b> (positively skewed): many small values,
+        a few large values pull the distribution to the right.</li>
+      <li>Median in the <b>right</b> half of the box $\rightarrow$
+        <b>left-skewed</b> (negatively skewed): many large values,
+        a few small values pull the distribution to the left.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; Interpretation (2/3): Box and Whiskers</h2>
+  <div class="block"><h4>Length of the box (IQR)</h4>
+    <p>The box contains the middle $50\,\%$ of the data &ndash; from the 1st quartile ($Q_1$)
+      to the 3rd quartile ($Q_3$). A <b>wide box</b> indicates that these middle
+      values are widely spread. A <b>narrow box</b> shows that half of the data
+      lie close together.</p></div>
+  <div class="block"><h4>Length of the whiskers</h4>
+    <p>The whiskers extend from the box to the smallest and largest value that is
+      not an outlier. If both whiskers are <b>equally long</b>, the distribution
+      is symmetric in the tails.
+      <b>Different whisker lengths</b> indicate that the data are more spread
+      out in one direction than in the other.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; Interpretation (3/3): Outliers</h2>
+  <div class="block"><h4>Outliers</h4>
+    <p>Values that lie beyond the whiskers are shown individually as
+      <b>outliers</b>. A value is considered an outlier if it lies more than
+      $1.5$ times the IQR below $Q_1$ or above $Q_3$.
+      Outliers can indicate measurement errors, special cases, or a strongly
+      skewed distribution.</p></div>
+  <div class="block example"><h4>Example: shoe-size data</h4>
+    <ul>
+      <li>Box: $Q_1 = 38$, median $= 39$, $Q_3 = 40$ $\rightarrow$
+        the median lies in the centre, the box is symmetric.</li>
+      <li>Whiskers: lower whisker $= 37$, upper whisker $= 41$ $\rightarrow$
+        both whiskers have the same length (each 1 unit from the box).</li>
+      <li>Outlier: $46 &gt; 43$ (upper bound) $\rightarrow$
+        despite the symmetric box, the overall boxplot is <b>not</b> symmetric.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; with Labels</h2>
+  <div class="viz" id="p2-box-lab2" style="height:430px"></div>
+  <p class="fs-xs muted">Switch on the lengths: both box halves and both whiskers are $1$ long &ndash; only the outlier breaks the symmetry.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-box-lab2", (el) => {
+      const b = P2.box(el, { groups: [{ data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39] }], domain: [34.5, 47], tickValues: [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
+        xLabel: "Shoe size", centers: [0.42], boxH: 72, fenceNames: ["Lower bound", "Upper bound"], lengthsDy: 84,
+        annot: { above: ["wlo", "whi", "out"], below: ["q1", "med", "q3"], arrows: true, muted: ["wlo", "whi"] } });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Lengths", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("lengths", +v === 1) });
+      QV.segmented(row, { label: "Bounds $35$ and $43$", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("fences", +v === 1) });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Boxplot &ndash; Conclusion</h2>
+  <div class="block"><h4>Advantages of the boxplot</h4>
+    <ul>
+      <li>Compact display of the <b>most important summary statistics</b>
+        at a glance: median, quartiles, range and outliers.</li>
+      <li>Allows a quick assessment of the <b>symmetry</b>
+        and <b>skewness</b> of a distribution.</li>
+      <li>Especially useful for <b>comparing several groups</b>
+        side by side &ndash; e.g.&nbsp;shoe sizes of different teams.</li>
+      <li><b>Outliers</b> are automatically detected
+        and made visible.</li>
+    </ul>
+  </div>
+  <div class="block alert"><h4>Limitation</h4>
+    <p>The boxplot reveals no information about the exact shape of the
+      distribution inside the box &ndash; two very different datasets can produce
+      the same boxplot. To study the shape, a histogram is a useful complement.</p></div>
+</section>
+
+<section class="slide" data-subsection="Exercises">
+  <h2>Exercise &ndash; Processing Times of Two Teams</h2>
+  <div class="block problem">
+    <p>Two service teams handle customer requests. For $n = 11$ requests each,
+      the processing time (in minutes) was recorded:</p>
+    <table class="bt">
+      <tbody>
+        <tr><td class="l">Team A</td><td class="l">7, 4, 9, 6, 18, 8, 5, 10, 6, 9, 7</td></tr>
+        <tr><td class="l">Team B</td><td class="l">12, 8, 15, 5, 14, 10, 16, 8, 11, 14, 7</td></tr>
+      </tbody>
+    </table>
+    <ol>
+      <li>Team A: determine the quartiles, the IQR, the bounds
+        <span class="p2-nw">$x_{0.25} - 1.5 \cdot \text{IQR}$</span> and <span class="p2-nw">$x_{0.75} + 1.5 \cdot \text{IQR}$,</span>
+        the whiskers and possible outliers.</li>
+      <li>Carry out the same computations for team B.</li>
+      <li>Draw both boxplots above a common axis.</li>
+      <li>Compare median, IQR and outliers. What does the position of the
+        median in the box say about skewness? Which team works faster and more
+        consistently?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/5) &ndash; Processing Times: Team A</h2>
+  <p><b>Sorted:</b> 4, 5, <b>6</b>, 6, 7, <b>7</b>, 8, 9, <b>9</b>, 10, 18 &emsp; ($n = 11$)</p>
+  <div class="block"><h4>Quartiles (position $\lceil n \cdot p \rceil$ in the sorted data)</h4>
+    <p>$x_{0.25}$: $11 \cdot 0.25 = 2.75 \rightarrow$ position 3 $\rightarrow \mathbf{6}$<br>
+      $\tilde{x}$: $11 \cdot 0.5 = 5.5 \rightarrow$ position 6 $\rightarrow \mathbf{7}$<br>
+      $x_{0.75}$: $11 \cdot 0.75 = 8.25 \rightarrow$ position 9 $\rightarrow \mathbf{9}$</p></div>
+  <div class="block"><h4>IQR and bounds ($k = 1.5$)</h4>
+    <p>$\text{IQR} = 9 - 6 = \mathbf{3}$ &emsp;&emsp;
+      lower bound: $6 - 1.5 \cdot 3 = \mathbf{1.5}$ &emsp;&emsp;
+      <span class="p2-nw">upper bound: $9 + 1.5 \cdot 3 = \mathbf{13.5}$</span></p></div>
+  <div class="block"><h4>Whiskers and outliers</h4>
+    <p>Lower whisker $=$ smallest value $\ge 1.5$: $\mathbf{4}$ &emsp;&emsp;
+      Upper whisker $=$ largest value $\le 13.5$: $\mathbf{10}$<br>
+      $18 &gt; 13.5$ $\rightarrow$ <b>18 is an outlier</b> (one unusually long request).</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/5) &ndash; Processing Times: Team B</h2>
+  <p><b>Sorted:</b> 5, 7, <b>8</b>, 8, 10, <b>11</b>, 12, 14, <b>14</b>, 15, 16 &emsp; ($n = 11$)</p>
+  <div class="block"><h4>Quartiles (same positions as for team A: 3, 6, 9)</h4>
+    <p>$x_{0.25} = \mathbf{8}$ &emsp;&emsp; $\tilde{x} = \mathbf{11}$ &emsp;&emsp; $x_{0.75} = \mathbf{14}$</p></div>
+  <div class="block"><h4>IQR and bounds ($k = 1.5$)</h4>
+    <p>$\text{IQR} = 14 - 8 = \mathbf{6}$ &emsp;&emsp;
+      lower bound: $8 - 1.5 \cdot 6 = \mathbf{-1}$ &emsp;&emsp;
+      <span class="p2-nw">upper bound: $14 + 1.5 \cdot 6 = \mathbf{23}$</span></p></div>
+  <div class="block"><h4>Whiskers and outliers</h4>
+    <p>Lower whisker $=$ smallest value $\ge -1$: $\mathbf{5}$ &emsp;&emsp;
+      Upper whisker $=$ largest value $\le 23$: $\mathbf{16}$<br>
+      All values lie within the bounds $\rightarrow$ <b>no outlier</b>;
+      the whiskers reach the minimum and the maximum.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/5) &ndash; Processing Times: Boxplots</h2>
+  <div class="cols" style="--cols: 36fr 61fr; --gap: 24px">
+    <div><table class="bt fs-s">
+      <thead><tr><th class="l"></th><th>Team A</th><th>Team B</th></tr></thead>
+      <tbody>
+        <tr><td class="l">Lower whisker</td><td>4</td><td>5</td></tr>
+        <tr><td class="l">$x_{0.25}$</td><td>6</td><td>8</td></tr>
+        <tr><td class="l">Median</td><td>7</td><td>11</td></tr>
+        <tr><td class="l">$x_{0.75}$</td><td>9</td><td>14</td></tr>
+        <tr><td class="l">Upper whisker</td><td>10</td><td>16</td></tr>
+        <tr><td class="l">Outliers</td><td>18</td><td>&ndash;</td></tr>
+        <tr class="mid"><td class="l">IQR</td><td>3</td><td>6</td></tr>
+      </tbody>
+    </table></div>
+    <div class="p2-small-gap">
+      <div class="viz" id="p2-box-teams" style="height:410px"></div>
+    </div>
+  </div>
+  <p class="fs-s">Common axis: box from $x_{0.25}$ to $x_{0.75}$, line at the median,
+    whiskers to the lower and upper whisker, outliers as single points.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-box-teams", (el) => {
+      const b = P2.box(el, { groups: [{ name: "Team A", data: [7, 4, 9, 6, 18, 8, 5, 10, 6, 9, 7] }, { name: "Team B", data: [12, 8, 15, 5, 14, 10, 16, 8, 11, 14, 7] }],
+        domain: [3, 19], tickValues: [4, 6, 8, 10, 12, 14, 16, 18], minor: 2, xLabel: "Processing time (minutes)", centers: [0.72, 0.26], boxH: 50,
+        fenceNames: ["Lower bound", "Upper bound"], drag: [{ g: 0, i: 4 }], snap: 0.5, nameW: 76 });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Raw data", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("points", +v === 1) });
+      QV.segmented(row, { label: "Bounds", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("fences", +v === 1) });
+      QV.spacer(row);
+      QV.button(row, "Reset", () => b.reset());
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Solution (4/5) &ndash; Processing Times: Comparison</h2>
+  <div class="block example fs-s"><h4>Comparing the two boxplots</h4>
+    <ul>
+      <li><b>Median:</b> team B ($11$) $&gt;$ team A ($7$) &ndash; team A typically
+        handles requests faster.</li>
+      <li><b>IQR:</b> team B ($6$) $&gt;$ team A ($3$) &ndash; the middle $50\,\%$
+        of B&rsquo;s times are spread twice as widely; team A works more consistently.</li>
+      <li><b>Outliers:</b> only team A ($18$ minutes) &ndash; a single case,
+        e.g.&nbsp;a particularly complex request.</li>
+      <li><b>Skewness:</b> at A the median ($7$) lies in the left half of the
+        box $[6,9]$ ($7-6=1 &lt; 9-7=2$) and the outlier lies far to the right
+        $\rightarrow$ right-skewed (the whiskers alone, $2$ vs.&nbsp;$1$ minute,
+        would not show this). At B the median ($11$) lies exactly in the middle
+        of $[8,14]$, the whiskers are $3$ and $2$ minutes long $\rightarrow$
+        roughly symmetric.</li>
+    </ul>
+  </div>
+  <div class="block alert fs-s"><h4>Conclusion</h4>
+    <p>Team A is faster and more consistent (apart from one outlier); team B is
+      slower and its processing times spread more.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (5/5) &ndash; Processing Times: Python</h2>
+  <div class="block tight"><h4>Boxplot statistics with the course quartiles, then <code class="p2-hc">bxp</code></h4>
+<pre class="py">
+def box_stats(x, k=1.5):                    # course quartiles + 1.5 IQR rule
+    q1, med, q3 = np.quantile(x, [0.25, 0.5, 0.75], method="inverted_cdf")
+    lo, hi = q1 - k * (q3 - q1), q3 + k * (q3 - q1)
+    inside = x[(x &gt;= lo) &amp; (x &lt;= hi)]
+    return dict(q1=q1, med=med, q3=q3, whislo=inside.min(), whishi=inside.max(),
+                fliers=x[(x &lt; lo) | (x &gt; hi)])
+team_a = np.array([7, 4, 9, 6, 18, 8, 5, 10, 6, 9, 7])
+team_b = np.array([12, 8, 15, 5, 14, 10, 16, 8, 11, 14, 7])
+stats = [box_stats(team_a), box_stats(team_b)]
+# whislo q1 med q3 whishi fliers   A: 4 6 7 9 10 [18]   B: 5 8 11 14 16 []
+fig, ax = plt.subplots(); ax.bxp(stats, vert=False)   # boxplots, common axis
+ax.set_yticks([1, 2], ["Team A", "Team B"])
+</pre></div>
+  <p class="fs-xs"><code>plt.boxplot</code> interpolates the quartiles &ndash; for these data it
+    happens to give the same result, but not in general.</p>
+  <a class="trynb" data-sec="section 3.1"></a>
+</section>
+
+<!-- ===== SECTION: EXERCISES ===== -->
+<section class="slide" data-section="Exercises" data-short="Exercises" data-subsection="Body Heights">
+  <h2>Exercise: Body Heights &ndash; Problem Statement</h2>
+  <p>The body heights (in cm) of $n = 15$ persons are studied:</p>
+  <p class="center p2-data">164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168</p>
+  <p><b>Sorted:</b></p>
+  <p class="center p2-data">151, 160, 160, 162, 164, 166, 166, 168, 168, 168, 175, 175, 180, 192, 198</p>
+  <ol>
+    <li>Compute the mean, median, quartiles and the $17\,\%$ quantile.</li>
+    <li>Compute the measures of dispersion: range, IQR, sample variance,
+      standard deviation, coefficient of variation and normalised coefficient
+      of variation.</li>
+    <li>Draw the empirical CDF, a histogram (class width $10$&thinsp;cm)
+      and a boxplot.</li>
+    <li>Draw the empirical CDF for the classified data (class midpoints).</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; The Data</h2>
+  <div class="cols mid" style="--cols: 66fr 30fr; --gap: 30px">
+    <div><table class="bt fs-xs p2-tt">
+      <thead><tr><th>Person</th><th>Height</th><th>Sorted</th><th>Abs.&nbsp;freq.</th><th>Rel.&nbsp;freq.</th><th>Cum.&nbsp;freq.</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>164</td><td>151</td><td>1</td><td>$0.0\overline{6}$</td><td>$0.0\overline{6}$</td></tr>
+        <tr><td>2</td><td>162</td><td>160</td><td>2</td><td>$0.1\overline{3}$</td><td>$0.2$</td></tr>
+        <tr><td>3</td><td>168</td><td>160</td><td></td><td></td><td></td></tr>
+        <tr><td>4</td><td>198</td><td>162</td><td>1</td><td>$0.0\overline{6}$</td><td>$0.2\overline{6}$</td></tr>
+        <tr><td>5</td><td>166</td><td>164</td><td>1</td><td>$0.0\overline{6}$</td><td>$0.3\overline{3}$</td></tr>
+        <tr><td>6</td><td>166</td><td>166</td><td>2</td><td>$0.1\overline{3}$</td><td>$0.4\overline{6}$</td></tr>
+        <tr><td>7</td><td>192</td><td>166</td><td></td><td></td><td></td></tr>
+        <tr><td>8</td><td>160</td><td>168</td><td>3</td><td>$0.2$</td><td>$0.\overline{6}$</td></tr>
+        <tr><td>9</td><td>151</td><td>168</td><td></td><td></td><td></td></tr>
+        <tr><td>10</td><td>175</td><td>168</td><td></td><td></td><td></td></tr>
+        <tr><td>11</td><td>180</td><td>175</td><td>2</td><td>$0.1\overline{3}$</td><td>$0.8$</td></tr>
+        <tr><td>12</td><td>160</td><td>175</td><td></td><td></td><td></td></tr>
+        <tr><td>13</td><td>168</td><td>180</td><td>1</td><td>$0.0\overline{6}$</td><td>$0.8\overline{6}$</td></tr>
+        <tr><td>14</td><td>175</td><td>192</td><td>1</td><td>$0.0\overline{6}$</td><td>$0.9\overline{3}$</td></tr>
+        <tr><td>15</td><td>168</td><td>198</td><td>1</td><td>$0.0\overline{6}$</td><td>$1$</td></tr>
+        <tr class="mid"><td><b>Sum</b></td><td><b>2553</b></td><td><b>2553</b></td><td><b>15</b></td><td><b>1</b></td><td></td></tr>
+      </tbody>
+    </table></div>
+    <div class="fs-xs">
+      <p><b>Note:</b> $\overline{6}$ denotes a repeating decimal, e.g.</p>
+      <p>\[ 0.0\overline{6} = 0.0666\ldots = \tfrac{1}{15} \]</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Results</h2>
+  <table class="bt fs-xs p2-tt">
+    <thead><tr><th class="l">Statistic</th><th class="r">Value</th><th class="r">Bound</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Sum</td><td class="r">$2553$</td><td class="r"></td></tr>
+      <tr><td class="l">Arithmetic mean</td><td class="r">$170.2$</td><td class="r"></td></tr>
+      <tr><td class="l">Median</td><td class="r">$168$</td><td class="r"></td></tr>
+      <tr><td class="l">Mode</td><td class="r">$168$</td><td class="r"></td></tr>
+      <tr><td class="l">1st quartile</td><td class="r">$162$</td><td class="r"></td></tr>
+      <tr><td class="l">3rd quartile</td><td class="r">$175$</td><td class="r"></td></tr>
+      <tr><td class="l">$17\,\%$ quantile</td><td class="r">$160$</td><td class="r"></td></tr>
+      <tr><td class="l">Lower whisker</td><td class="r">$151$</td><td class="r">$142.5$</td></tr>
+      <tr><td class="l">Upper whisker</td><td class="r">$192$</td><td class="r">$194.5$</td></tr>
+      <tr class="mid"><td class="l">Sample variance</td><td class="r">$151.60$</td><td class="r"></td></tr>
+      <tr><td class="l">Standard deviation</td><td class="r">$12.3126$</td><td class="r"></td></tr>
+      <tr><td class="l">Coefficient of variation</td><td class="r">$0.0723$</td><td class="r"></td></tr>
+      <tr><td class="l">Normalised coeff.&nbsp;of variation</td><td class="r">$0.0187$</td><td class="r"></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Mean (Step by Step)</h2>
+  <div class="block"><h4>Formula</h4>
+    <p>\[ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i \]</p></div>
+  <p><b>Step 1:</b> Sum all values:</p>
+  \begin{align*}
+    \sum x_i &= 164 + 162 + 168 + 198 + 166 + 166 + 192 \\
+             &\quad + 160 + 151 + 175 + 180 + 160 + 168 + 175 + 168 \\
+             &= 2553
+  \end{align*}
+  <p><b>Step 2:</b> Divide by $n = 15$:</p>
+  <p>\[ \bar{x} = \frac{2553}{15} = 170.2\,\text{cm} \]</p>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Median and Mode</h2>
+  <p><b>Sorted data:</b></p>
+  <p class="center fs-s">151, 160, 160, 162, 164, 166, 166, <b>168</b>, 168, 168, 175, 175, 180, 192, 198</p>
+  <div class="block"><h4>Median ($p = 0.5$)</h4>
+    <p>$n \cdot p = 15 \cdot 0.5 = 7.5$ &ndash; not an integer $\rightarrow$ round up to position $8$</p>
+    <p>The 8th value in the sorted sequence is the median: $\tilde{x} = x_{0.5} = \textbf{168}$&thinsp;cm.</p></div>
+  <div class="block"><h4>Mode</h4>
+    <p>The most frequent value: $168$ occurs $3$ times $\rightarrow \textbf{168}$&thinsp;cm.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Quartiles and Quantile</h2>
+  <p><b>Rule:</b> position $= \lceil n \cdot p \rceil$ &ndash; compute $n \cdot p$ and
+    round up (if $n \cdot p$ is an integer, it is already the position).</p>
+  <div class="block example"><h4>$17\,\%$ quantile ($p = 0.17$)</h4>
+    <p>$n \cdot p = 15 \cdot 0.17 = 2.55$ $\rightarrow$ round up to position $3$
+      $\rightarrow x_{0.17} = 160$&thinsp;cm</p></div>
+  <div class="block example"><h4>1st quartile ($p = 0.25$)</h4>
+    <p>$n \cdot p = 15 \cdot 0.25 = 3.75$ $\rightarrow$ round up to position $4$
+      $\rightarrow x_{0.25} = 162$&thinsp;cm</p></div>
+  <div class="block example"><h4>3rd quartile ($p = 0.75$)</h4>
+    <p>$n \cdot p = 15 \cdot 0.75 = 11.25$ $\rightarrow$ round up to position $12$
+      $\rightarrow x_{0.75} = 175$&thinsp;cm</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Range and IQR</h2>
+  <div class="block"><h4>Range</h4>
+    <p>$R = x_{\max} - x_{\min} = 198 - 151 = \textbf{47}$&thinsp;cm</p></div>
+  <div class="block"><h4>Interquartile range (IQR)</h4>
+    <p>$\text{IQR} = x_{0.75} - x_{0.25} = 175 - 162 = \textbf{13}$&thinsp;cm</p></div>
+  <p>The range reacts strongly to outliers (here: $198$),
+    whereas the IQR is unaffected by them because it only considers the middle $50\,\%$ of the data.</p>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Variance and Standard Deviation</h2>
+  <div class="block"><h4>Sample variance</h4>
+    <p>\[ s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 \]</p></div>
+  <p><b>Step 1:</b> Square the deviations from the mean:</p>
+  <p>\[ (151 - 170.2)^2 = 368.64, \quad (160 - 170.2)^2 = 104.04, \quad \ldots \]</p>
+  <p><b>Step 2:</b> Sum of squared deviations:
+    $\sum(x_i - \bar{x})^2 = 2122.40$</p>
+  <p><b>Step 3:</b> Divide by $n - 1 = 14$:
+    $s^2 = \dfrac{2122.40}{14} = \textbf{151.60}$&thinsp;cm$^2$</p>
+  <div class="block"><h4>Standard deviation</h4>
+    <p>$s = \sqrt{s^2} = \sqrt{151.60} = \textbf{12.3126}$&thinsp;cm</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Coefficient of Variation</h2>
+  <div class="block"><h4>Coefficient of variation</h4>
+    <p>$v = \dfrac{s}{\bar{x}} = \dfrac{12.3126}{170.2} = \textbf{0.0723}$</p></div>
+  <p>The coefficient of variation expresses the dispersion relative to the mean
+    &ndash; here the values scatter by about $7.2\,\%$ of the mean.</p>
+  <div class="block"><h4>Normalised coefficient of variation</h4>
+    <p>$v^* = \dfrac{v}{\sqrt{n}} = \dfrac{0.0723}{\sqrt{15}} = \dfrac{0.0723}{3.8730} = \textbf{0.0187}$</p></div>
+  <p>The normalised coefficient of variation additionally takes the sample size
+    into account: $v$ is divided by $\sqrt{n}$, its largest possible value for
+    non-negative data, so that $0 \le v^* \le 1$.</p>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Whisker Computation</h2>
+  <div class="block"><h4>Lower bound</h4>
+    <p>$x_{0.25} - 1.5 \cdot \text{IQR} = 162 - 1.5 \cdot 13 = 162 - 19.5 = \textbf{142.5}$</p>
+    <p>Smallest value $\ge 142.5$: lower whisker $= 151$</p></div>
+  <div class="block"><h4>Upper bound</h4>
+    <p>$x_{0.75} + 1.5 \cdot \text{IQR} = 175 + 1.5 \cdot 13 = 175 + 19.5 = \textbf{194.5}$</p>
+    <p>Largest value $\le 194.5$: upper whisker $= 192$</p></div>
+  <div class="block alert"><h4>Outlier</h4>
+    <p>$198 &gt; 194.5$ $\rightarrow$ the value $198$ lies above the upper
+      bound and is therefore an outlier.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Empirical CDF</h2>
+  <div class="cols" style="--cols: 58fr 40fr; --gap: 24px">
+    <div class="p2-small-gap">
+      <div class="viz" id="p2-ecdf-bh" style="height:470px"></div>
+    </div>
+    <div class="fs-xs">
+      <p>Step function from the column &ldquo;Cum.&nbsp;freq.&rdquo; of the data table: at every
+        observed value it jumps up by $f_j$ (e.g.&nbsp;by $0.2$ at $168$&thinsp;cm, which
+        occurs $3$ times).</p>
+      <div class="block example"><h4>Reading off quantiles</h4>
+        <p>$x_{p} = \min\{x \mid F(x) \ge p\}$</p>
+        <ul>
+          <li>$x_{0.17}$: $F(160) = 0.2 \ge 0.17 \rightarrow 160$</li>
+          <li>$x_{0.25}$: $F(162) = 0.2\overline{6} \ge 0.25 \rightarrow 162$</li>
+          <li>$\tilde{x}$: $F(168) = 0.\overline{6} \ge 0.5 \rightarrow 168$</li>
+          <li>$x_{0.75}$: $F(175) = 0.8 \ge 0.75 \rightarrow 175$</li>
+        </ul>
+        <p>Same results as with the position rule.</p>
+      </div>
+      <p class="p2-mini" id="p2-ecdf-bh-read"></p>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-ecdf-bh", (el) => {
+      const out = document.getElementById("p2-ecdf-bh-read");
+      const e = P2.ecdf(el, { data: [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168], domain: [145, 205],
+        tickValues: [150, 160, 170, 180, 190, 200], xLabel: "Body height (cm)", one: false,
+        markers: [{ p: 0.5, color: QV.C.red, side: "right", drag: true, ly: (p) => Math.max(0.07, p - 0.1) }],
+        onP: (i, I) => { out.innerHTML = P2.texHTML(`Marker: $p = ${P2.tr(I.p, 2)}$, $\\lceil 15 \\cdot ${P2.tr(I.p, 2)} \\rceil = ${I.pos}$, $F(${I.xp}) = ${I.H}/15 \\ge ${P2.tr(I.p, 2)}$ $\\Rightarrow x_{${P2.tr(I.p, 2)}} = ${I.xp}$`); } });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "$p$", options: [[0.17, "0.17"], [0.25, "0.25"], [0.5, "0.5"], [0.75, "0.75"]], value: 0.5, onChange: (p) => e.setP(0, +p) });
+      QV.readout(row, "or drag the red handle");
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Histogram (Table)</h2>
+  <p>Class width $10$&thinsp;cm, first class closed on both sides &emsp; ($n = 15$)</p>
+  <table class="bt fs-s">
+    <thead><tr><th class="l">Class</th><th>$[150,160]$</th><th>$(160,170]$</th><th>$(170,180]$</th><th>$(180,190]$</th><th>$(190,200]$</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Class width</td><td>10</td><td>10</td><td>10</td><td>10</td><td>10</td><td></td></tr>
+      <tr><td class="l">Abs.&nbsp;frequency</td><td>3</td><td>7</td><td>3</td><td>0</td><td>2</td><td>15</td></tr>
+      <tr><td class="l">Rel.&nbsp;frequency</td><td>$0.2$</td><td>$0.4\overline{6}$</td><td>$0.2$</td><td>$0$</td><td>$0.1\overline{3}$</td><td>$1$</td></tr>
+      <tr><td class="l">Density $f_j/\Delta x_j$</td><td>$0.02$</td><td>$0.0467$</td><td>$0.02$</td><td>$0$</td><td>$0.0133$</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="block example"><h4>Example: second class $(160,170]$</h4>
+    <p>Values 162, 164, 166, 166, 168, 168, 168 $\rightarrow$ $h_2 = 7$,
+      $f_2 = \frac{7}{15} = 0.4\overline{6}$, density $= \frac{0.4\overline{6}}{10} = 0.0467$</p></div>
+  <div class="block alert"><h4>Boundary values</h4>
+    <p>$160$ (twice) belongs to $[150,160]$ and $180$ to $(170,180]$ &ndash; classes are
+      closed on the <b>right</b>.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Histogram (Class Width 10&thinsp;cm)</h2>
+  <div class="viz" id="p2-hist-bh" style="height:452px"></div>
+  <p class="fs-xs muted">Each dot at the top is one person (orange ring: on a class boundary). Change the class width and compare the shapes.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-hist-bh", (el) => {
+      const H = [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168];
+      const br = (w) => { const out = [150]; while (out[out.length - 1] < 198) out.push(out[out.length - 1] + w); return out; };
+      let ro = null;
+      const h = P2.hist(el, { data: H, breaks: br(10), xDomain: [147, 203], autoDomain: 3, xLabel: "Body height (cm)", lane: true, yMax: { density: 0.052 },
+        onUpdate: (cls) => { if (ro) ro.set(`${cls.length} classes · counts ${cls.map((c) => c.h).join(", ")}`); } });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Class width (cm)", options: [[5, "5"], [10, "10"], [15, "15"], [20, "20"], [25, "25"]], value: 10, onChange: (w) => h.setBreaks(br(+w)) });
+      QV.segmented(row, { label: "Height", options: [["density", "density"], ["abs", "abs. frequency"]], value: "density", onChange: (m) => h.setMode(m) });
+      QV.spacer(row);
+      ro = QV.readout(row, "");
+      h.update(false);
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Boxplot</h2>
+  <div class="viz" id="p2-box-bh" style="height:440px"></div>
+  <p class="fs-xs muted">Hover over the box for the values; switch on the raw data and the bounds $142.5$ and $194.5$; drag the outlier $198$.</p>
+  <script>
+  (() => {
+    QV.mount("#p2-box-bh", (el) => {
+      const b = P2.box(el, { groups: [{ data: [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168] }], domain: [140, 203],
+        tickValues: [140, 150, 160, 170, 180, 190, 200], xLabel: "Body height (cm)", centers: [0.42], boxH: 96,
+        fenceNames: ["Lower bound", "Upper bound"], drag: [{ g: 0, i: 3 }], snap: 1 });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Raw data", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("points", +v === 1) });
+      QV.segmented(row, { label: "Bounds", options: [[0, "off"], [1, "on"]], value: 0, onChange: (v) => b.set("fences", +v === 1) });
+      QV.spacer(row);
+      QV.button(row, "Reset", () => b.reset());
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Classified Data (Class Width 10&thinsp;cm)</h2>
+  <table class="bt fs-s">
+    <thead><tr><th class="l">Class</th><th>$[150,160]$</th><th>$(160,170]$</th><th>$(170,180]$</th><th>$(180,190]$</th><th>$(190,200]$</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Class midpoint $a_j$</td><td>$155$</td><td>$165$</td><td>$175$</td><td>$185$</td><td>$195$</td><td></td></tr>
+      <tr><td class="l">Abs.&nbsp;frequency $h_j$</td><td>$3$</td><td>$7$</td><td>$3$</td><td>$0$</td><td>$2$</td><td>$15$</td></tr>
+      <tr><td class="l">Rel.&nbsp;frequency $f_j$</td><td>$0.2$</td><td>$0.4\overline{6}$</td><td>$0.2$</td><td>$0$</td><td>$0.1\overline{3}$</td><td>$1$</td></tr>
+      <tr><td class="l p2-nw">Cum.&nbsp;frequency $F(a_j)$</td><td>$0.2$</td><td>$0.\overline{6}$</td><td>$0.8\overline{6}$</td><td>$0.8\overline{6}$</td><td>$1$</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="block example"><h4>Construction</h4>
+    <p>All observations of a class are placed at its <b>class midpoint</b>
+      $a_j$; the empirical CDF then jumps by $f_j$ at each midpoint.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Empirical CDF of the Classified Data</h2>
+  <div class="cols" style="--cols: 1fr 1fr; --gap: 20px">
+    <div class="p2-small-gap">
+      <p class="center fs-xs"><b>Raw data (10 different values)</b></p>
+      <div class="viz" id="p2-ecdf-raw" style="height:300px"></div>
+    </div>
+    <div class="p2-small-gap">
+      <p class="center fs-xs"><b>Classified data (class midpoints)</b></p>
+      <div class="viz" id="p2-ecdf-cls" style="height:300px"></div>
+    </div>
+  </div>
+  <div class="viz-ctrl" id="p2-ecdf-cmp-ctrl"></div>
+  <div class="cols" style="--cols: 52fr 46fr; --gap: 22px">
+    <ul class="fs-s">
+      <li>Only $4$ steps instead of $10$ &ndash; the classified CDF is much
+        <b>coarser</b>, but its overall shape is similar.</li>
+      <li>It reaches $0.5$ at $a_2 = 165$, whereas the exact median is
+        $168$&thinsp;cm.</li>
+    </ul>
+    <div class="block alert fs-s"><h4>Interpretation</h4>
+      <p>Classifying the data simplifies the picture but
+        <b>loses information</b> within the classes.</p></div>
+  </div>
+  <script>
+  (() => {
+    const RAW = [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168];
+    const CLS = [155, 155, 155, 165, 165, 165, 165, 165, 165, 165, 175, 175, 175, 195, 195];
+    const E = {};
+    let ro = null;
+    const link = (src) => (x) => {
+      const other = src === "raw" ? E.cls : E.raw;
+      if (!other) return;
+      if (x === null) { other.hideX(); if (ro) ro.set("Hover over either chart: the crosshair is linked."); return; }
+      other.showX(x);
+      if (ro) ro.set(`$x = ${P2.tr(x, 1)}$: &nbsp; raw $F(x) = ${P2.tr(E.raw.F(x), 4)}$ &nbsp;&middot;&nbsp; classified $F(x) = ${P2.tr(E.cls.F(x), 4)}$`);
+    };
+    const opts = { domain: [145, 205], tickValues: [150, 160, 170, 180, 190, 200], xLabel: "Body height (cm)", refs: [0.5], one: false, margin: { bottom: 46 } };
+    QV.mount("#p2-ecdf-raw", (el) => { E.raw = P2.ecdf(el, Object.assign({ data: RAW, onHover: link("raw") }, opts)); });
+    QV.mount("#p2-ecdf-cls", (el) => {
+      E.cls = P2.ecdf(el, Object.assign({ data: CLS, onHover: link("cls") }, opts));
+      ro = QV.readout(document.getElementById("p2-ecdf-cmp-ctrl"), "Hover over either chart: the crosshair is linked.");
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise: Body Heights &ndash; Python</h2>
+<pre class="py">
+heights = np.array([164, 162, 168, 198, 166, 166, 192, 160, 151, 175,
+                    180, 160, 168, 175, 168])
+np.quantile(heights, [0.17, 0.25, 0.5, 0.75], method="inverted_cdf")  # 160 162 168 175
+breaks = [150, 160, 170, 180, 190, 200]
+cls = pd.cut(heights, breaks, right=True, include_lowest=True)
+h = pd.Series(cls).value_counts(sort=False).to_numpy()   # 3 7 3 0 2
+density_hist(heights, breaks)                            # 0.02 0.0467 0.02 0 0.0133
+plt.figure(); plt.ecdf(heights)                          # new figure: raw-data ECDF
+classified = np.repeat([155, 165, 175, 185, 195], h)     # each value -&gt; class midpoint
+plt.ecdf(classified)                                     # classified ECDF, same axes
+np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 168)
+</pre>
+  <div class="block alert"><h4>Trap again: <code class="p2-hc">plt.hist(heights, bins=breaks)</code></h4>
+    <p>Classes $[a,b)$ put $160$ and $180$ into the next class: counts
+      $1, 9, 2, 1, 2$ instead of $3, 7, 3, 0, 2$.</p></div>
+  <a class="trynb" data-sec="section 4.1"></a>
+</section>
+
+<section class="slide" data-subsection="Café Chain (Exam Style)">
+  <h2>Exercise &ndash; Caf&eacute; Chain (Exam Style): Reading a Boxplot</h2>
+  <div class="block"><h4>Problem statement (Part A): boxplot of the $n = 60$ daily revenues of a caf&eacute;</h4>
+    <div class="viz" id="p2-box-cafe" style="height:290px"></div>
+    <ol>
+      <li>Read off the median, $Q_1$, $Q_3$ and the whisker ends; compute the IQR.</li>
+      <li>On at least how many days was the revenue at most 2800 EUR?</li>
+      <li>Compute the fences. Why is $62$ drawn as a point, and why does the
+        upper whisker end at $50$?</li>
+      <li>Assess the skewness. Is the mean above or below the median?</li>
+    </ol>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-box-cafe", (el) => {
+      P2.box(el, { groups: [{ stats: { whiskerLo: 15, q1: 24, median: 28, q3: 36, whiskerHi: 50, outliers: [62] }, color: QV.C.blue }],
+        domain: [4, 66], tickValues: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65], minor: true, xLabel: "Daily revenue (in 100 EUR)",
+        centers: [0.5], boxH: 60, tip: false, crosshair: (x) => `x = ${x} &nbsp;(${x * 100} EUR)` });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Caf&eacute; Chain (Exam Style): Histogram and Robust Measures</h2>
+  <div class="block"><h4>Problem statement (Parts B and C)</h4>
+    <p><b>B:</b> Histogram of the values (in EUR) of $n = 50$ orders; the bar
+      labels are the densities.</p>
+    <div class="cols" style="--cols: 46fr 51fr; --gap: 22px">
+      <div class="viz" id="p2-hist-cafe" style="height:290px"></div>
+      <ol start="5">
+        <li>Determine the relative frequency and the number of orders of
+          every class.</li>
+        <li>Which class contains the most orders? Is it the class with
+          the highest bar?</li>
+        <li>What share of the orders is worth more than 10 EUR?</li>
+      </ol>
+    </div>
+    <p style="margin-top: 10px"><b>C:</b> Repair times of the espresso machine (minutes):
+      &ensp;2, 3, 3, 4, 5, 6, 26.</p>
+    <ol start="8">
+      <li>Compute the mean, the median and the trimmed mean (smallest and
+        largest value removed). Is $26$ an outlier by the
+        $1.5 \cdot \text{IQR}$ rule? Which measure would you report?</li>
+    </ol>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p2-hist-cafe", (el) => {
+      P2.hist(el, { counts: [10, 15, 20, 5], n: 50, breaks: [0, 5, 10, 20, 40], xDomain: [-1.5, 41], xLabel: "Order value (EUR)",
+        labels: true, labelSize: 16, yMax: { density: 0.072 }, yLabels: { density: "Density" }, yTicks: 4, margin: { bottom: 44 },
+        tip: (c) => `<b>${c.i ? "(" : "["}${c.a}, ${c.b}]</b> &nbsp;width ${c.w}<br>height ${P2.tr(c.dens, 4)}` });
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/5) &ndash; Caf&eacute; Chain: Reading Off the Boxplot</h2>
+  <p><b>Rule:</b> box edges $= Q_1$ and $Q_3$, line in the box $=$ median, whisker
+    ends $=$ the most extreme <em>data values</em> inside the fences.</p>
+  <div class="viz" id="p2-box-cafe2" style="height:330px"></div>
+  <ol>
+    <li>Median $= \mathbf{28}$ (2800 EUR), $Q_1 = \mathbf{24}$, $Q_3 = \mathbf{36}$,
+      whiskers at $\mathbf{15}$ and $\mathbf{50}$;
+      $\text{IQR} = 36 - 24 = \mathbf{12}$: the middle $50\,\%$ of the days
+      lie within a range of 1200 EUR.</li>
+  </ol>
+  <script>
+  (() => {
+    QV.mount("#p2-box-cafe2", (el) => {
+      const T = (v) => P2.tr(v, 2);
+      const b = P2.box(el, { groups: [{ stats: { whiskerLo: 15, q1: 24, median: 28, q3: 36, whiskerHi: 50, outliers: [62] }, color: QV.C.blue }],
+        domain: [4, 66], tickValues: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65], minor: true, xLabel: "Daily revenue (in 100 EUR)",
+        centers: [0.5], boxH: 62, show: { fences: true }, fenceNames: ["Lower fence", "Upper fence"],
+        annot: { above: ["wlo", "q1", "q3", "whi", "out"], below: ["med"],
+          text: { med: (s) => [`Median ${T(s.median)}`], out: (s, v) => [`Outlier ${T(v)}`] } } });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Fences $Q_1 - 1.5\\,\\text{IQR}$ and $Q_3 + 1.5\\,\\text{IQR}$", options: [[0, "off"], [1, "on"]], value: 1, onChange: (v) => b.set("fences", +v === 1) });
+      QV.readout(row, "Hover over the box for all values.");
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/5) &ndash; Caf&eacute; Chain: Share of Days and Fences</h2>
+  <ol start="2">
+    <li><b>Rule:</b> median $= x_{(\lceil n \cdot 0.5 \rceil)}$ (Part&nbsp;1).
+      <p>\[ \tilde{x} = x_{(\lceil 60 \cdot 0.5 \rceil)} = x_{(30)} = 28 \]</p>
+      The $30$ smallest revenues are all $\le 28$ $\rightarrow$ on <b>at
+      least 30 days</b> (half of the days) the revenue was at most 2800 EUR,
+      i.e.&nbsp;$F(28) \ge 0.5$. (Ties may make it more days.)</li>
+    <li><b>Rule:</b> fences $Q_1 - 1.5 \cdot \text{IQR}$ and
+      $Q_3 + 1.5 \cdot \text{IQR}$.
+      <p>\[ 24 - 1.5 \cdot 12 = 24 - 18 = \mathbf{6}, \qquad
+         36 + 1.5 \cdot 12 = 36 + 18 = \mathbf{54} \]</p>
+      <ul>
+        <li>$62 &gt; 54$ $\rightarrow$ <b>outlier</b>, drawn as a single point.</li>
+        <li>The upper whisker ends at the largest <em>observed</em> value
+          $\le 54$, which is $50$ &ndash; the fence $54$ itself is no data value.</li>
+        <li>$15 \ge 6$: no outlier at the bottom; the lower whisker is the
+          minimum.</li>
+      </ul></li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/5) &ndash; Caf&eacute; Chain: Skewness</h2>
+  <ol start="4">
+    <li>Three indications point in the same direction:
+      <ul>
+        <li>$\text{median} - Q_1 = 28 - 24 = 4 \;&lt;\; Q_3 - \text{median} = 36 - 28 = 8$:
+          the median lies in the left half of the box,</li>
+        <li>lower whisker $24 - 15 = 9$ $&lt;$ upper whisker $50 - 36 = 14$,</li>
+        <li>the only outlier ($62$) lies at the top.</li>
+      </ul>
+      $\rightarrow$ <b>right-skewed</b>: a few days with very high revenue
+      stretch the right tail. They pull the mean upwards, so we expect
+      $\bar{x} &gt; \tilde{x} = 28$, i.e.&nbsp;the mean <b>above</b> the median.</li>
+  </ol>
+  <div class="block key"><p>Reading a boxplot: the box edges are quartiles, the whisker ends
+    are observed values (not the fences). Skewness shows in the position of the
+    median in the box, the whisker lengths and the side of the outliers.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (4/5) &ndash; Caf&eacute; Chain: Reading the Histogram</h2>
+  <p><b>5.</b>&nbsp;<b>Rule:</b> area $=$ density $\cdot$ class width $= f_j$ (relative
+    frequency); number of orders <span class="p2-nw">$h_j = f_j \cdot n$.</span></p>
+  <table class="bt fs-s">
+    <thead><tr><th class="l">Class</th><th>$\Delta x_j$</th><th>Density</th><th>$f_j = \text{density} \cdot \Delta x_j$</th><th>$h_j = f_j \cdot 50$</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$[0,5]$</td><td>5</td><td>$0.04$</td><td>$0.2$</td><td>10</td></tr>
+      <tr><td class="l">$(5,10]$</td><td>5</td><td>$0.06$</td><td>$0.3$</td><td>15</td></tr>
+      <tr><td class="l">$(10,20]$</td><td>10</td><td>$0.04$</td><td>$0.4$</td><td>20</td></tr>
+      <tr><td class="l">$(20,40]$</td><td>20</td><td>$0.005$</td><td>$0.1$</td><td>5</td></tr>
+      <tr class="mid"><td class="l">Total</td><td></td><td></td><td>$1$</td><td>50</td></tr>
+    </tbody>
+  </table>
+  <ol start="6" class="fs-s">
+    <li>Most orders: $\mathbf{(10,20]}$ with $20$ orders ($40\,\%$) &ndash; although
+      its bar ($0.04$) is <em>lower</em> than that of <span class="p2-nw">$(5,10]$ ($0.06$):</span> it is
+      twice as wide. The highest bar shows where the orders lie most
+      <em>densely</em> (per euro), not where most of them lie.</li>
+    <li>More than 10 EUR: $f_3 + f_4 = 0.4 + 0.1 = \mathbf{0.5}$, i.e.&nbsp;$50\,\%$ of the orders ($25$ orders).</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Solution (5/5) &ndash; Caf&eacute; Chain: Robust Measures of Location</h2>
+  <div class="fs-s stack" style="gap:10px">
+    <p><b>Sorted:</b> 2, 3, 3, 4, 5, 6, 26 &emsp; ($n = 7$)</p>
+    <ol start="8">
+      <li><b>Mean</b> $\bar{x} = 49/7 = \mathbf{7}$; &emsp;
+        <b>median</b> $= x_{(\lceil 3.5 \rceil)} = x_{(4)} = \mathbf{4}$; &emsp;
+        <span class="p2-nw"><b>trimmed mean</b> $= (3+3+4+5+6)/5 = 21/5 = \mathbf{4.2}$.</span><br>
+        Outlier check: $Q_1 = x_{(\lceil 1.75 \rceil)} = x_{(2)} = 3$,
+        $Q_3 = x_{(\lceil 5.25 \rceil)} = x_{(6)} = 6$, $\text{IQR} = 3$,
+        upper fence $6 + 4.5 = 10.5$ $\rightarrow$ $26$ is an <b>outlier</b>.</li>
+    </ol>
+    <div class="block alert"><h4>Which measure to report?</h4>
+      <p>The mean ($7$) exceeds six of the seven values &ndash; the outlier pulls it up.
+        Median ($4$) and trimmed mean ($4.2$) are robust $\rightarrow$ report the
+        <b>median</b> (or the trimmed mean).</p></div>
+<pre class="py">
+rep = np.array([2, 3, 3, 4, 5, 6, 26])
+print(rep.mean(), np.quantile(rep, 0.5, method="inverted_cdf"), np.sort(rep)[1:-1].mean())
+</pre>
+<pre class="out">
+7.0 4 4.2
+</pre>
+  </div>
+  <a class="trynb" data-sec="section 4.2"></a>
+</section>
+
+<!-- ===== SECTION: PYTHON COMMANDS ===== -->
+<section class="slide" data-section="Python Commands" data-short="Python">
+  <h2>Python Commands: Frequencies and Measures of Central Tendency</h2>
+  <div class="block"><h4>Absolute frequencies</h4>
+<pre class="py">
+import numpy as np, pandas as pd
+shoe = np.array([40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39])
+tab = pd.Series(shoe).value_counts().sort_index()   # sorted by shoe size
+print(tab)                                          # 37:1 38:2 39:4 40:2 41:1 46:1
+</pre></div>
+  <div class="block"><h4>Mean, median and quantiles</h4>
+<pre class="py">
+np.mean(shoe)     # arithmetic mean: 39.6364
+np.median(shoe)   # 39.0 -- note: averages for even n, not our definition!
+# Better: method="inverted_cdf" matches our definition x_(ceil(n*p)):
+np.quantile(shoe, 0.8, method="inverted_cdf")                # 80% quantile: 40
+np.quantile(shoe, [0.25, 0.5, 0.75], method="inverted_cdf")  # quartiles: 38 39 40
+</pre></div>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<section class="slide">
+  <h2>Python Commands: Measures of Dispersion</h2>
+  <div class="block"><h4>Sample variance and standard deviation</h4>
+<pre class="py">
+np.var(shoe, ddof=1)    # s^2 = 5.6545   (ddof=1: divide by n - 1)
+np.std(shoe, ddof=1)    # s   = 2.3779
+</pre></div>
+  <div class="block"><h4>Coefficient of variation and normalised coefficient of variation</h4>
+<pre class="py">
+v = np.std(shoe, ddof=1) / np.mean(shoe)   # 0.0600
+vstar = v / np.sqrt(len(shoe))             # 0.0181
+</pre></div>
+  <p class="fs-xs">Without <code>ddof=1</code>, NumPy divides by $n$ ($5.1405$ instead of
+    $s^2 = 5.6545$); pandas&rsquo; <code>.var()</code> and <code>.std()</code> already use <code>ddof=1</code>.</p>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<section class="slide">
+  <h2>Python Commands: Empirical CDF</h2>
+  <div class="block"><h4>Computing and evaluating: shares and quantiles</h4>
+<pre class="py">
+from statsmodels.distributions.empirical_distribution import ECDF
+F = ECDF(shoe)
+F(39)           # value of the ECDF at x = 39: 0.6364
+F(40) - F(38)   # share in (38, 40], i.e. sizes 39 and 40: 0.5455 (= 6/11)
+np.quantile(shoe, [0.5, 0.8], method="inverted_cdf")   # min{x | F(x) &gt;= p}: 39 40
+</pre></div>
+  <div class="block"><h4>Plotting</h4>
+<pre class="py">
+import matplotlib.pyplot as plt
+plt.ecdf(shoe)  # step function with vertical jumps
+plt.show()
+</pre></div>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<section class="slide">
+  <h2>Python Commands: Histogram</h2>
+  <div class="block"><h4>Equal class widths (here: 2)</h4>
+<pre class="py">
+density_hist(shoe, [37, 39, 41, 43, 45, 47])   # 0.3182 0.1364 0 0 0.0455
+density_hist(shoe, np.arange(37, 48, 2))       # same breaks, generated
+</pre></div>
+  <div class="block"><h4>Unequal class widths</h4>
+<pre class="py">
+density_hist(shoe, [37, 39, 40, 41, 46])       # 0.3182 0.1818 0.0909 0.0182
+</pre></div>
+  <p class="fs-xs"><code>density_hist</code> (<code>pd.cut</code> + <code>plt.bar</code>) is defined in the
+    Histogram section. Do <b>not</b> use <code>plt.hist(shoe, bins=breaks, density=True)</code>:
+    its classes are $[a,b)$, so $39$ and $41$ would be counted in the wrong class.</p>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<section class="slide">
+  <h2>Python Commands: Classified Frequencies</h2>
+  <div class="block tight"><h4>Absolute frequencies</h4>
+<pre class="py">
+pd.Series(shoe).value_counts().sort_index()
+</pre></div>
+  <div class="block tight"><h4>Class partition</h4>
+<pre class="py">
+cls = pd.cut(shoe, bins=[37, 39, 41, 43, 45, 47], right=True, include_lowest=True)
+</pre></div>
+  <div class="block tight"><h4>Absolute and relative classified frequencies</h4>
+<pre class="py">
+pd.Series(cls).value_counts(sort=False)                   # 7 3 0 0 1
+pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.0909
+</pre></div>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<section class="slide">
+  <h2>Python Commands: Boxplot</h2>
+  <div class="block tight"><h4>Standard boxplot (Tukey)</h4>
+<pre class="py">
+plt.boxplot(shoe, vert=False, whis=1.5)   # horizontal, whiskers at k = 1.5
+</pre>
+    <p class="fs-s"><code>whis</code> can be omitted for the default $k = 1.5$.</p></div>
+  <div class="block alert tight"><h4>Trap: matplotlib interpolates the quartiles</h4>
+    <p class="fs-s"><code>plt.boxplot</code> uses NumPy&rsquo;s default (linear interpolation), not our definition
+      $x_{(\lceil n\cdot p\rceil)}$:</p>
+<pre class="py">
+np.quantile(shoe, [0.25, 0.75])                          # [38.5 40.] interpolated
+np.quantile(shoe, [0.25, 0.75], method="inverted_cdf")   # [38 40]    our definition
+</pre>
+    <p class="fs-s">The box would start at $38.5$ instead of $Q_1 = 38$ &ndash; next slide: boxplot with our quartiles.</p></div>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<section class="slide">
+  <h2>Python Commands: Boxplot with Our Quartile Definition</h2>
+  <div class="block tight"><h4>Quartiles, whisker bounds, whiskers and outliers</h4>
+<pre class="py">
+q1, med, q3 = np.quantile(shoe, [0.25, 0.5, 0.75], method="inverted_cdf")  # 38 39 40
+iqr = q3 - q1                                    # IQR = 2
+lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr          # bounds: 35.0  43.0
+inside = shoe[(shoe &gt;= lo) &amp; (shoe &lt;= hi)]
+whislo, whishi = inside.min(), inside.max()      # whiskers: 37  41
+outliers = shoe[(shoe &lt; lo) | (shoe &gt; hi)]       # outlier: [46]
+</pre></div>
+  <div class="block tight"><h4>Drawing the boxplot from exactly these statistics</h4>
+<pre class="py">
+stats = dict(q1=q1, med=med, q3=q3, whislo=whislo, whishi=whishi, fliers=outliers)
+plt.gca().bxp([stats], vert=False)
+plt.show()
+</pre></div>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<section class="slide">
+  <h2>Python Commands: Boxplots of Several Groups</h2>
+  <div class="block tight"><h4>Boxplot statistics with our quartiles &ndash; for any number of groups</h4>
+<pre class="py">
+def box_stats(x, k=1.5):
+    q1, med, q3 = np.quantile(x, [0.25, 0.5, 0.75], method="inverted_cdf")
+    lo, hi = q1 - k * (q3 - q1), q3 + k * (q3 - q1)     # fences
+    inside = x[(x &gt;= lo) &amp; (x &lt;= hi)]
+    return dict(q1=q1, med=med, q3=q3, whislo=inside.min(), whishi=inside.max(),
+                fliers=x[(x &lt; lo) | (x &gt; hi)])
+
+fig, ax = plt.subplots()                      # several boxplots, common axis
+ax.bxp([box_stats(team_a), box_stats(team_b)], vert=False)
+ax.set_yticks([1, 2], ["Team A", "Team B"])    # labels of the groups
+</pre></div>
+  <p class="fs-xs">Example: processing times of two teams (exercise in the Boxplot
+    section). <code>box_stats(shoe)</code> reproduces the shoe-size boxplot.</p>
+  <a class="trynb" data-sec="section 5"></a>
+</section>
+
+<!-- ===== SECTION: SUMMARY ===== -->
+<section class="slide" data-section="Summary" data-short="Summary">
+  <h2>Summary (1/4) &ndash; Empirical CDF</h2>
+  <div class="block"><h4>Definition</h4>
+    <p>\[ F(x) \;=\; \sum_{x_i \leq x} f(x_i) \qquad \text{with values in } [0,1] \]</p></div>
+  <div class="block"><h4>Reading off quantiles</h4>
+    <p>\[ x_{p} = F^{-1}(p) = \min\{x \mid F(x) \geq p\}, \qquad 0 &lt; p \leq 1 \]</p>
+    <p>Special case: $F^{-1}(0.5) = \tilde{x}$ (median); same as the position rule
+      $x_{(\lceil n \cdot p \rceil)}$.</p></div>
+  <ul>
+    <li>Step function showing the cumulative relative frequency; jump height at
+      <span class="p2-nw">$x_i$ equals $f(x_i)$.</span></li>
+    <li>Shares: $F(x)$ = share of values $\le x$; share in $(a,b]$ $= F(b) - F(a)$.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Summary (2/4) &ndash; Histogram</h2>
+  <div class="block"><h4>Density of a class</h4>
+    <p>\[ \text{density}_j \;=\; \frac{f_j}{\Delta x_j} \;=\; \frac{\text{rel.\ frequency of class } j}{\text{class width}} \]</p></div>
+  <div class="block"><h4>Area = relative frequency</h4>
+    <p>\[ \text{area}_j \;=\; \text{density}_j \cdot \Delta x_j \;=\; f_j, \qquad \sum_j f_j = 1 \]</p></div>
+  <ul>
+    <li>Suitable for metric, classified data.</li>
+    <li>Classes $[c_0,c_1],\,(c_1,c_2],\,\ldots,\,(c_{k-1},c_k]$ with
+      boundaries $c_0 &lt; \ldots &lt; c_k$.</li>
+    <li>The choice of class width strongly affects the shape.</li>
+    <li>Unequal class widths are possible &ndash; heights remain densities; the
+      highest bar need not hold the most values.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Summary (3/4) &ndash; Boxplot</h2>
+  <div class="block"><h4>Five-number summary</h4>
+    <p>\[ x_{\min}\ \text{(or lower whisker)},\ x_{0.25},\ \tilde{x},\ x_{0.75},\ x_{\max}\ \text{(or upper whisker)} \]</p>
+    <p>\[ \text{IQR} \;=\; x_{0.75} - x_{0.25} \]</p></div>
+  <div class="block"><h4>Whisker bounds (Tukey, $k = 1.5$)</h4>
+    \begin{align*}
+      \text{Whisker}_{\min} &\;=\; \min\!\bigl\{x_i \mid x_i \geq x_{0.25} - k \cdot \text{IQR}\bigr\} \\
+      \text{Whisker}_{\max} &\;=\; \max\!\bigl\{x_i \mid x_i \leq x_{0.75} + k \cdot \text{IQR}\bigr\}
+    \end{align*}
+  </div>
+  <div class="block alert"><h4>Outliers</h4>
+    <p>All values $&lt; x_{0.25} - 1.5 \cdot \text{IQR}$ or $&gt; x_{0.75} + 1.5 \cdot \text{IQR}$
+      are displayed individually as outliers.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Summary (4/4) &ndash; Which Graphic for Which Question?</h2>
+  <table class="bt left fs-s">
+    <thead><tr><th style="width:400px">Question</th><th>Graphic</th><th style="width:480px">Read off</th></tr></thead>
+    <tbody>
+      <tr><td>What share of the values is at most <span class="p2-nw">$x$?</span> Up to which value lie at least
+        <span class="p2-nw">$p \cdot 100\,\%$</span> of them?</td><td class="p2-nw">Empirical CDF</td>
+        <td>$F(x)$, $F(b) - F(a)$, <span class="p2-nw">$x_{p} = \min\{x \mid F(x) \ge p\}$</span></td></tr>
+      <tr><td>What does the distribution look like (peaks, gaps, tails)?</td><td>Histogram</td>
+        <td>Height $=$ density $f_j/\Delta x_j$, area $=$ share $f_j$</td></tr>
+      <tr><td>Centre, spread, skewness, outliers &ndash; and comparison of groups?</td><td>Boxplot</td>
+        <td>$Q_1$, $\tilde{x}$, $Q_3$, IQR, whisker ends, points beyond the fences</td></tr>
+    </tbody>
+  </table>
+  <div class="block key"><p>Course conventions: quantiles $x_{(\lceil n \cdot p \rceil)}$ and classes
+    $(a,b]$, first class closed &ndash; in Python <code>method="inverted_cdf"</code> and
+    <code>pd.cut(..., include_lowest=True)</code>.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Outlook: Part 3 &ndash; Statistical Inference</h2>
+  <div class="block"><h4>What we have so far</h4>
+    <p>Parts&nbsp;1 and&nbsp;2 <b>describe</b> the data at hand &ndash; in numbers and in
+      pictures.</p></div>
+  <div class="block"><h4>Next part</h4>
+    <p>We treat the data as a <b>sample</b> and infer back to the
+      <b>population</b>: confidence intervals and hypothesis tests. The
+      mean $\bar x$ and the standard deviation $s$ of Part&nbsp;1 become the
+      building blocks of every interval and every test.</p></div>
+  <div class="block key"><p>From describing a sample to drawing conclusions about the
+    population &ndash; honestly reporting the uncertainty.</p></div>
+</section>
+<!-- END SLIDES -->
+</main></div>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slide Template</title>
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="assets/deck.css">
+<script src="assets/vendor/katex/katex.min.js"></script>
+<script src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script src="assets/vendor/d3.min.js"></script>
+<script src="assets/viz.js"></script>
+<script src="assets/deck.js"></script>
+</head>
+<!-- Template / style guide for the QRM HTML decks: every building block once. -->
+<body data-part="1" data-part-title="Template" data-subtitle="Template: every building block of the HTML decks"
+      data-revision data-notebook="Part_1_Descriptive_Statistics/Part_1_Descriptive_Statistics.ipynb">
+<div id="stage"><main id="deck">
+
+<!-- generated: title page, lecturer, course overview -->
+<section class="slide" data-auto="title"></section>
+<section class="slide" data-auto="lecturer"></section>
+<section class="slide" data-auto="course"></section>
+
+<section class="slide">
+  <h2>Contents &ndash; Template</h2>
+  <div class="cols mid" style="--cols: 55fr 42fr">
+    <div class="toc" data-mode="sections"></div>
+    <div class="block alert"><h4>Revision material</h4>
+      <p>Parts 1 and 2 revise the descriptive statistics that Parts 3&ndash;5 build on.</p></div>
+  </div>
+  <a class="trynb" data-sec="all examples and exercises"></a>
+</section>
+
+<!-- ===== SECTION: TEXT ===== -->
+<section class="slide" data-section="Text Building Blocks" data-short="Text" data-subsection="Blocks">
+  <h2>Blocks, lists and the shortcuts</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>A bullet with <b>bold</b> and <span class="c-blue">blue</span> text, inline math $\bar{x} = \frac{1}{n}\sum x_i$</li>
+        <li>Second bullet
+          <ul><li>nested bullet</li></ul></li>
+      </ul>
+      <div class="block"><h4>Definition (block)</h4>
+        <p>$$ s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 $$</p></div>
+    </div>
+    <div>
+      <div class="block example"><h4>Example (exampleblock)</h4><p>$\omega$ = a player ($n = 11$), $X$ = shoe size.</p></div>
+      <div class="block guiding"><p>How do we summarise eleven shoe sizes with one number?</p></div>
+      <div class="block key"><p>The median is robust, the mean is not.</p></div>
+    </div>
+  </div>
+  <p class="inwords">count $\lceil n \cdot p \rceil$ values from the bottom of the sorted list.</p>
+</section>
+
+<section class="slide">
+  <h2>Description list and booktabs table</h2>
+  <dl>
+    <dt>Statistical unit ($\omega$):</dt><dd>Individual object being observed.</dd>
+    <dt>Sample:</dt><dd>The collected set of statistical units.</dd>
+  </dl>
+  <table class="bt">
+    <thead><tr><th class="l">Value $x_j$</th><th>37</th><th>38</th><th>39</th><th>40</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$h_j$</td><td>1</td><td>2</td><td class="hl">4</td><td>3</td><td>10</td></tr>
+      <tr><td class="l">$f_j$</td><td>0.1</td><td>0.2</td><td class="hl">0.4</td><td>0.3</td><td>1.0</td></tr>
+    </tbody>
+  </table>
+  <div class="apxnote">derivation of OLS, residual analysis</div>
+</section>
+
+<section class="slide" data-subsection="Python">
+  <h2>Code and output</h2>
+  <pre class="py">
+import numpy as np
+shoe = np.array([40, 42, 41, 43, 40, 39, 44, 40, 41, 38, 42])   # n = 11
+print(np.mean(shoe), np.median(shoe))
+  </pre>
+  <pre class="out">
+40.9090909 41.0
+  </pre>
+  <div class="block alert"><h4>Pitfall</h4><p><code>np.median</code> averages the two middle values for even $n$.</p></div>
+  <a class="trynb" data-sec="section 1.2"></a>
+  <a class="pycourse" data-what="Track 1 (90 min)"></a>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Levels of Measurement</h2>
+  <div class="block problem">
+    <p>An online retailer records the following variables for every order:</p>
+    <ol class="alpha">
+      <li>Assign each variable its level of measurement.</li>
+      <li>For the metric variables: interval or ratio scale?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Levels of Measurement</h2>
+  <p>Aligned computation:</p>
+  \begin{align*}
+    \bar{x} &= \frac{1}{11}\,(40 + 42 + \dots + 42) = \frac{450}{11} = \blue{40.91} \\
+    \tilde{x} &= x_{(\lceil 11/2 \rceil)} = x_{(6)} = \orange{41}
+  \end{align*}
+  <aside class="notes">Speaker notes go here; press <b>n</b> to show them.</aside>
+</section>
+
+<!-- ===== SECTION: VISUALISATIONS ===== -->
+<section class="slide" data-section="Interactive Figures" data-short="Figures" data-subsection="Distributions">
+  <h2>Frequency bars and the mean as balance point</h2>
+  <div class="cols" style="--cols: 60fr 40fr">
+    <div>
+      <div class="viz" id="t-freq" style="height:330px"></div>
+    </div>
+    <div>
+      <p class="fs-s">Drag the <b>orange</b> marker: the sum of signed deviations is zero only at the mean.</p>
+      <div class="tiles" id="t-freq-tiles"></div>
+    </div>
+  </div>
+  <script>
+  QV.mount("#t-freq", (el) => {
+    const data = [40, 42, 41, 43, 40, 39, 44, 40, 41, 38, 42];
+    const ch = QV.freqBars(el, { data, xLabel: "Shoe size", labels: true, highlight: [40] });
+    const t = QV.tiles(document.getElementById("t-freq-tiles"), ["Mean $\\bar x$", "Median $\\tilde x$", "$\\sum (x_i - c)$"]);
+    const S = QV.stats;
+    t.set(0, QV.fmt(S.mean(data), 2)); t.set(1, S.median(data));
+    const row = QV.controls(el);
+    QV.slider(row, { label: "$c$", min: 38, max: 44, step: 0.01, value: 40, fmt: (v) => QV.fmt(v, 2),
+      onInput: (c) => t.set(2, QV.fmt(S.sum(data.map((x) => x - c)), 2)) });
+    t.set(2, QV.fmt(S.sum(data.map((x) => x - 40)), 2));
+  });
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Histogram, boxplot and ECDF</h2>
+  <div class="cols" style="--cols: 1fr 1fr 1fr; --gap: 18px">
+    <div class="viz" id="t-hist" style="height:300px"></div>
+    <div class="viz" id="t-box" style="height:300px"></div>
+    <div class="viz" id="t-ecdf" style="height:300px"></div>
+  </div>
+  <p class="fs-s center muted">Hover over the bars, the box and the step function.</p>
+  <script>
+  (() => {   // rule: every inline script is wrapped, so no top-level names clash
+    const SHOE = [40, 42, 41, 43, 40, 39, 44, 40, 41, 38, 42, 47];
+    QV.mount("#t-hist", (el) => QV.histogram(el, { data: SHOE, breaks: [37, 39, 41, 43, 45, 47], xLabel: "Shoe size" }));
+    QV.mount("#t-box", (el) => QV.boxplot(el, { data: SHOE, xLabel: "Shoe size", annotate: true }));
+    QV.mount("#t-ecdf", (el) => QV.ecdf(el, { data: SHOE, xLabel: "Shoe size", quantile: 0.25 }));
+  })();
+  </script>
+</section>
+
+<section class="slide" data-subsection="Normal distribution">
+  <h2>Normal distribution explorer</h2>
+  <div class="viz" id="t-norm" style="height:360px"></div>
+  <script>
+  QV.mount("#t-norm", (el) => {
+    const D = QV.dist;
+    let mu = 0, sd = 1, a = -1, b = 1;
+    const ch = QV.density(el, { pdf: (x) => D.normPdf(x, mu, sd), domain: [-6, 6], yMax: 0.85, xLabel: "x", ticks: 12 });
+    const lab = QV.tex(ch, 0, 0.6, "", { bg: true });
+    const update = () => {
+      ch.setPdf((x) => D.normPdf(x, mu, sd));
+      ch.setRegions([{ from: a, to: b, color: QV.C.orange }]);
+      const p = D.normCdf(b, mu, sd) - D.normCdf(a, mu, sd);
+      lab.set((a + b) / 2, 0.62, `P(${QV.fmt(a, 1)} \\le X \\le ${QV.fmt(b, 1)}) = ${QV.fmt(p, 4)}`);
+    };
+    const row = QV.controls(el);
+    QV.slider(row, { label: "$\\mu$", min: -2, max: 2, step: 0.1, value: 0, fmt: (v) => QV.fmt(v, 1), onInput: (v) => { mu = v; update(); } });
+    QV.slider(row, { label: "$\\sigma$", min: 0.5, max: 2.5, step: 0.1, value: 1, fmt: (v) => QV.fmt(v, 1), onInput: (v) => { sd = v; update(); } });
+    QV.slider(row, { label: "$a$", min: -5, max: 5, step: 0.1, value: -1, fmt: (v) => QV.fmt(v, 1), onInput: (v) => { a = v; update(); } });
+    QV.slider(row, { label: "$b$", min: -5, max: 5, step: 0.1, value: 1, fmt: (v) => QV.fmt(v, 1), onInput: (v) => { b = v; update(); } });
+    update();
+  });
+  </script>
+</section>
+
+<section class="slide" data-subsection="Regression">
+  <h2>Least squares: drag the line</h2>
+  <div class="cols" style="--cols: 62fr 38fr">
+    <div class="viz" id="t-ols" style="height:420px"></div>
+    <div>
+      <p class="fs-s">Drag the two <b>handles</b>. The red squares are the squared residuals; their total area is the RSS.</p>
+      <div class="tiles" id="t-ols-tiles" style="--n:2"></div>
+      <div class="viz-ctrl" id="t-ols-ctrl"></div>
+    </div>
+  </div>
+  <script>
+  QV.mount("#t-ols", (el) => {
+    const x = [1, 2, 3, 4, 5], y = [21, 26, 24, 30, 29];
+    const ch = QV.scatter(el, { x, y, xDomain: [0, 6], yDomain: [15, 35], xLabel: "Advertising (100 EUR)", yLabel: "Sales", residuals: true, squares: true });
+    const t = QV.tiles(document.getElementById("t-ols-tiles"), ["RSS (your line)", "RSS (OLS)"]);
+    const fit = ch.fit;
+    const ends = [[0.5, 23], [5.5, 27]];
+    const handles = QV.dots(ch, ends, { r: 9, color: QV.C.orange, layer: "front" });
+    const redraw = () => {
+      const b1 = (ends[1][1] - ends[0][1]) / (ends[1][0] - ends[0][0]), b0 = ends[0][1] - b1 * ends[0][0];
+      t.set(0, QV.fmt(ch.setLine(b0, b1), 2));
+      handles.attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
+    };
+    QV.drag(ch, handles, (xv, yv, d) => { d[1] = yv; redraw(); });
+    t.set(1, QV.fmt(fit.rss, 2));
+    const row = document.getElementById("t-ols-ctrl");
+    QV.button(row, "Show OLS line", () => { ends[0][1] = fit.predict(0.5); ends[1][1] = fit.predict(5.5); redraw(); }, { primary: true });
+    redraw();
+  });
+  </script>
+</section>
+
+<section class="slide" data-subsection="Diagrams">
+  <h2>Concept diagram without TikZ</h2>
+  <div class="flow">
+    <div class="fbox">Python<small>language</small></div><span class="farr">&rarr;</span>
+    <div class="fbox">NumPy / pandas<small>data</small></div><span class="farr">&rarr;</span>
+    <div class="fbox o">SciPy / statsmodels<small>statistics</small></div><span class="farr">&rarr;</span>
+    <div class="fbox g">matplotlib<small>plots</small></div>
+  </div>
+</section>
+
+<section class="slide" data-section="Appendix: Optional Material" data-short="Appendix" data-appendix data-subsection="A.1 Example appendix subsection">
+  <h2>An appendix slide</h2>
+  <p>Appendix slides get letters (A) in the outline and the headline.</p>
+  <p><a href="#2">Link to slide 2</a> &middot; press <b>b</b> to come back.</p>
+</section>
+
+</main></div>
+</body>
+</html>

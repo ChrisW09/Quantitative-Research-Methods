@@ -1,0 +1,2386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 1 – Descriptive Statistics</title>
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="assets/deck.css">
+<script src="assets/vendor/katex/katex.min.js"></script>
+<script src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script src="assets/vendor/d3.min.js"></script>
+<script src="assets/viz.js"></script>
+<script src="assets/deck.js"></script>
+</head>
+<body data-part="1" data-part-title="Descriptive Statistics" data-subtitle="Part 1: Descriptive Statistics – Revision Material"
+      data-revision data-notebook="Part_1_Descriptive_Statistics/Part_1_Descriptive_Statistics.ipynb">
+<div id="stage"><main id="deck">
+<section class="slide" data-auto="title"></section>
+<section class="slide" data-auto="lecturer"></section>
+<section class="slide" data-auto="course"></section>
+<!-- BEGIN SLIDES -->
+<style>
+  /* ---- Part 1 deck-specific styles (prefix p1-) ---- */
+  .p1-divider { margin: auto 0 !important; text-align: center; font-size: 30px; line-height: 1.5; color: var(--brand-ink); }
+  .p1-values { text-align: center; font-size: 30px; letter-spacing: .02em; }
+  table.bt.p1-t24 { font-size: 24px; }
+  table.bt.p1-t19 { font-size: 19px; }
+  table.bt.p1-t17 { font-size: 17px; }
+  table.bt.p1-t15 { font-size: 15px; }
+  table.bt.p1-pad th, table.bt.p1-pad td { padding: 3px 9px; }
+  table.bt.p1-padl th, table.bt.p1-padl td { padding: 6px 13px; }
+  table.bt.p1-padxl th, table.bt.p1-padxl td { padding: 9px 14px; }
+  table.bt.p1-colhl td.p1-on, table.bt.p1-colhl th.p1-on { background: var(--c-blue-tint); }
+  table.bt.p1-colhl td, table.bt.p1-colhl th { cursor: default; }
+  table.bt .p1-wrap { white-space: normal; text-align: left; }
+  table.bt tr.p1-qrow { cursor: pointer; }
+  table.bt tr.p1-qrow:hover td { background: var(--surface-2); }
+  table.bt tr.p1-qrow.p1-sel td { background: var(--c-orange-tint); }
+  .p1-vflow { display: grid; grid-template-columns: 250px auto; align-items: center; column-gap: 12px; row-gap: 4px; justify-content: center; }
+  .p1-vflow .fbox { width: 250px; }
+  .p1-vflow .farr { text-align: center; font-size: 24px; }
+  .p1-vflow .fnote { font-size: 16px; }
+  .p1-side { display: flex; flex-direction: column; gap: 8px; }
+  .p1-sw { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
+  .p1-sw.dash { border-top-style: dashed; }
+  .p1-twin { display: flex; gap: 24px; }
+  .p1-twin > div { flex: 1 1 0; min-width: 0; position: relative; }
+  .p1-mid { align-self: center; }
+  .p1-big { font-size: 27px; }
+  .p1-ex { display: flex; flex-direction: column; justify-content: center; }
+  .p1-tiles2 .tile .v { font-size: 23px; }
+  pre.p1-code { font-variant-ligatures: none; }
+  pre.py.p1-cl { font-size: 18px; }
+  .p1-vflow .fbox { font-size: 22px; padding: 9px 16px; }
+  .p1-nw { white-space: nowrap; }
+  .fbox small code { background: none; padding: 0; }
+</style>
+
+<!-- ======================================================= INTRO -->
+<section class="slide">
+  <h2>Software: Python</h2>
+  <div class="cols mid" style="--cols: 52fr 44fr">
+    <div>
+      <p>All software used in this course is <b>free and open source</b>.</p>
+      <p style="margin-top:1em">No Python yet? The separate <b>Python course</b> (folder <code>Python_Course</code>) starts from zero &ndash; all notebooks run in Google Colab.</p>
+    </div>
+    <div class="p1-vflow">
+      <div class="fbox"><b>Python</b></div><span class="fnote">language</span>
+      <span class="farr">&darr;</span><span></span>
+      <div class="fbox">NumPy / pandas</div><span class="fnote">data</span>
+      <span class="farr">&darr;</span><span></span>
+      <div class="fbox o">SciPy / statsmodels</div><span class="fnote">statistics</span>
+      <span class="farr">&darr;</span><span></span>
+      <div class="fbox g">matplotlib</div><span class="fnote">plots</span>
+    </div>
+  </div>
+  <a class="pycourse" data-what="Track 1 (90 min)"></a>
+</section>
+
+<section class="slide">
+  <h2>Contents &ndash; Part 1</h2>
+  <div class="cols mid" style="--cols: 55fr 42fr">
+    <div class="toc" data-mode="sections"></div>
+    <div class="block alert"><h4>Revision material</h4>
+      <p>Parts&nbsp;1 and&nbsp;2 revise the descriptive statistics that <span class="p1-nw">Parts&nbsp;3&ndash;5</span> build on. Use them to refresh your knowledge &ndash; with the exercises and the notebook.</p></div>
+  </div>
+  <a class="trynb" data-sec="all examples and exercises"></a>
+</section>
+
+<section class="slide">
+  <h2>Learning objectives &ndash; Part 1</h2>
+  <p>After this part you will be able to &hellip;</p>
+  <div class="cols">
+    <ul>
+      <li>name the <b>basic concepts</b> (statistical unit, variable, value, observation) and the <b>levels of measurement</b>,</li>
+      <li>compute <b>absolute, relative and cumulative frequencies</b> and read off shares (&ldquo;at most&rdquo;, &ldquo;at least&rdquo;),</li>
+      <li>compute and interpret <b>measures of central tendency</b> (means, median, mode, quantiles),</li>
+    </ul>
+    <ul>
+      <li>average <b>growth rates</b> with the geometric mean,</li>
+      <li>compute and compare <b>measures of dispersion</b> ($R$, IQR, $s^2$, $s$, $v$, $v^*$),</li>
+      <li>choose the <b>right measure</b> for a given comparison,</li>
+      <li>carry out every computation in <b>Python</b>.</li>
+    </ul>
+  </div>
+  <div class="block key"><p>Running story: the <b>shoe sizes of a soccer team</b> &ndash; in numbers (Part&nbsp;1), in pictures (Part&nbsp;2). <b>Exercises</b> follow every topic; an <b>exam-style exercise</b> closes the part.</p></div>
+</section>
+
+<section class="slide">
+  <h2>List of Symbols (1)</h2>
+  <table class="bt p1-t24 p1-padl p1-nw">
+    <thead><tr><th>Symbol</th><th class="l">Meaning</th><th style="padding-left:34px">Symbol</th><th class="l">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>$\omega$</td><td class="l">Statistical unit</td><td style="padding-left:34px">$h_j$</td><td class="l">Absolute frequency</td></tr>
+      <tr><td>$n$</td><td class="l">Number of statistical units</td><td style="padding-left:34px">$f_j$</td><td class="l">Relative frequency</td></tr>
+      <tr><td>$X$</td><td class="l">Variable</td><td style="padding-left:34px">$H_j$</td><td class="l">Cumulative absolute frequency</td></tr>
+      <tr><td>$x$</td><td class="l">Value (category)</td><td style="padding-left:34px">$F(x)$</td><td class="l">Empirical distribution function</td></tr>
+      <tr><td>$x_i$</td><td class="l">Observation</td><td style="padding-left:34px">$x_j$</td><td class="l">Value (class $j$)</td></tr>
+      <tr><td>$x_{(i)}$</td><td class="l">$i$-th value of the ordered sample</td><td style="padding-left:34px">$k$</td><td class="l">Number of distinct values</td></tr>
+      <tr><td>$\sum$</td><td class="l">Sum (summation sign)</td><td style="padding-left:34px">$\prod$</td><td class="l">Product (product sign)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>List of Symbols (2)</h2>
+  <table class="bt p1-t24 p1-padl p1-nw">
+    <thead><tr><th>Symbol</th><th class="l">Meaning</th><th style="padding-left:34px">Symbol</th><th class="l">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>$\bar{x}$</td><td class="l">Arithmetic mean</td><td style="padding-left:34px">$s^2$</td><td class="l">Variance (sample)</td></tr>
+      <tr><td>$\bar{x}_{\text{trim}}$</td><td class="l">Trimmed mean</td><td style="padding-left:34px">$s$</td><td class="l">Standard deviation</td></tr>
+      <tr><td>$\bar{x}_{\text{geo}}$</td><td class="l">Geometric mean</td><td style="padding-left:34px">$R$</td><td class="l">Range</td></tr>
+      <tr><td>$r_i$</td><td class="l">Growth rate in period $i$</td><td style="padding-left:34px">$\text{IQR}$</td><td class="l">Interquartile range</td></tr>
+      <tr><td>$1 + r_i$</td><td class="l">Growth factor in period $i$</td><td style="padding-left:34px">$v$</td><td class="l">Coefficient of variation</td></tr>
+      <tr><td>$\tilde{x}$</td><td class="l">Median</td><td style="padding-left:34px">$v^*$</td><td class="l">Normalised coeff. of variation</td></tr>
+      <tr><td>$x_{p}$</td><td class="l">$p$-quantile</td><td style="padding-left:34px">$\lceil\cdot\rceil$, $\lfloor\cdot\rfloor$</td><td class="l">Rounding up / down to an integer</td></tr>
+      <tr><td>$Q_1,\,Q_3$</td><td class="l">1st and 3rd quartile</td><td style="padding-left:34px">$x_{0.25},\,x_{0.75}$</td><td class="l">25&thinsp;%- and 75&thinsp;%-quantile</td></tr>
+    </tbody>
+  </table>
+  <p class="center fs-xxs">Symbols for regression ($s_{xy}$, $r$, $\beta_0,\beta_1$, $R^2$, &hellip;) are introduced in Part&nbsp;4.</p>
+</section>
+
+<!-- ======================================================= SECTION: FUNDAMENTALS -->
+<section class="slide" data-section="Fundamentals" data-subsection="Basic Concepts">
+  <h2>Basic Concepts</h2>
+  <dl style="row-gap:20px">
+    <dt>Statistical unit ($\omega$):</dt><dd>Individual object being observed. Must be delimited in terms of subject matter, time and location, e.g. a particular day at a particular weather station (variable: the daily maximum temperature).</dd>
+    <dt>$n$:</dt><dd>The number of statistical units</dd>
+    <dt>Sample:</dt><dd>The collected set of statistical units</dd>
+    <dt>Population:</dt><dd>The overarching set from which the sample was drawn</dd>
+  </dl>
+</section>
+
+<section class="slide">
+  <h2>Basic Concepts: Variable and Observed Values</h2>
+  <dl style="row-gap:22px">
+    <dt>Variable ($X$):</dt><dd>A characteristic of the statistical unit. There may be several characteristics; which one is examined must be specified.</dd>
+    <dt>Values ($x$):</dt><dd>Possible values that the variable can take.</dd>
+    <dt>Observation ($x_i$):</dt><dd>The value that was actually observed for the variable at the $i$-th statistical unit.</dd>
+  </dl>
+</section>
+
+<section class="slide">
+  <h2>Basic Concepts &ndash; Summary</h2>
+  <table class="bt p1-pad" style="width:100%">
+    <thead><tr><th class="l" style="width:16%">Term</th><th style="width:9%">Symbol</th><th class="l" style="width:35%">Explanation</th><th class="l">Example</th></tr></thead>
+    <tbody>
+      <tr><td class="l p1-nw">Statistical unit</td><td>$\omega$</td><td class="l">Unit of analysis</td><td class="l">Persons, institutions, objects</td></tr>
+      <tr><td class="l">Variable</td><td>$X$</td><td class="l">Characteristic of interest of a statistical unit</td><td class="l">Age, market value, weight, height, costs, rating, product count, colour</td></tr>
+      <tr><td class="l">Value</td><td>$x$</td><td class="l">Possible values, states or categories that a variable can take</td><td class="l">18, 19, 20, &hellip; years; grades 1 to 5; yes or no; black, white, blue, &hellip;</td></tr>
+      <tr><td class="l">Observation</td><td>$x_i$</td><td class="l">The value actually observed at the <span class="p1-nw">$i$-th</span> statistical unit</td><td class="l">31&nbsp;years, 1300&nbsp;euros, 23&nbsp;cm, 73&nbsp;kg, black</td></tr>
+    </tbody>
+  </table>
+  <div class="block example"><h4>Running example of this part</h4>
+    <p><span class="p1-nw">$\omega$ = a player ($n = 11$),</span> &ensp; <span class="p1-nw">$X$ = shoe size,</span> &ensp; <span class="p1-nw">values $x$: 37, 38, &hellip;,</span> &ensp; <span class="p1-nw">observation of player&nbsp;1: $x_1 = 40$</span></p></div>
+</section>
+
+<section class="slide">
+  <h2>Data Collection and Survey Types</h2>
+  <div class="block"><h4>Data Collection</h4>
+    <ul>
+      <li><b>Primary data:</b> Data collected specifically for this study</li>
+      <li><b>Secondary data:</b> Data taken from existing statistics</li>
+    </ul></div>
+  <div class="block"><h4>Survey Types</h4>
+    <ul>
+      <li>Observation</li>
+      <li>Interview / Questionnaire</li>
+      <li>Experiment</li>
+    </ul></div>
+</section>
+
+<section class="slide">
+  <h2>Data Protection</h2>
+  <ul>
+    <li>Regulated by law, e.g. the GDPR</li>
+    <li>Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data, on the free movement of such data, and repealing Directive 95/46/EC</li>
+    <li>As well as further national legislation</li>
+  </ul>
+  <div class="block alert" style="margin-top:18px"><h4>Important</h4>
+    <p>Compliance with data protection is a prerequisite for data analysis!</p></div>
+</section>
+
+<section class="slide" data-subsection="Levels of Measurement">
+  <h2>Levels of Measurement (1)</h2>
+  <table class="bt p1-t24 p1-padxl" style="width:100%">
+    <thead><tr><th class="l" style="width:17%">Term</th><th class="l" style="width:31%">Explanation</th><th class="l" style="width:22%">Meaningful operations</th><th class="l">Example</th></tr></thead>
+    <tbody>
+      <tr><td class="l p1-nw">Nominal scale</td><td class="l">Category only, no ordering</td><td class="l">$=$, $\neq$</td><td class="l">Colour, gender, origin, occupation</td></tr>
+      <tr><td class="l p1-nw">Ordinal scale</td><td class="l">Ranking possible, differences not meaningful</td><td class="l">additionally $&lt;$, $&gt;$</td><td class="l">Attitudes, well-being, grades</td></tr>
+      <tr><td class="l p1-nw">Metric scale</td><td class="l">Ranking possible, differences meaningful</td><td class="l">additionally $+$, $-$</td><td class="l">Monetary units, temperatures</td></tr>
+    </tbody>
+  </table>
+  <p class="inwords" style="margin-top:10px">Each level allows everything the level above it in the table allows &ndash; and one thing more. The higher the level, the more we may compute with the data.</p>
+</section>
+
+<section class="slide">
+  <h2>Levels of Measurement (2)</h2>
+  <div class="diagram" style="align-self:stretch">
+    <svg viewBox="0 0 1000 212" style="width:100%;max-width:1000px;height:auto;margin:0 auto" role="img" aria-label="Categorical splits into nominal and ordinal, metric into interval and ratio scale">
+      <defs><marker id="p1-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" style="fill:var(--brand-ink)"/></marker></defs>
+      <g style="stroke:var(--brand-ink);stroke-width:2.2" marker-end="url(#p1-arr)">
+        <line x1="230" y1="52" x2="160" y2="92" marker-end="url(#p1-arr)"/>
+        <line x1="270" y1="52" x2="340" y2="92" marker-end="url(#p1-arr)"/>
+        <line x1="730" y1="52" x2="650" y2="92" marker-end="url(#p1-arr)"/>
+        <line x1="770" y1="52" x2="850" y2="92" marker-end="url(#p1-arr)"/>
+      </g>
+      <rect x="130" y="8" width="240" height="44" rx="9" style="fill:var(--blk-grey-body);stroke:var(--c-grey);stroke-width:2.5"/>
+      <text x="250" y="37" text-anchor="middle" style="font-size:20px;font-weight:700">Categorical</text>
+      <rect x="630" y="8" width="240" height="44" rx="9" style="fill:var(--blk-blue-body);stroke:var(--brand-ink);stroke-width:2.5"/>
+      <text x="750" y="37" text-anchor="middle" style="font-size:20px;font-weight:700">Metric</text>
+      <rect x="70" y="94" width="180" height="40" rx="9" style="fill:var(--blk-grey-body);stroke:var(--c-grey);stroke-width:2.5"/>
+      <text x="160" y="120" text-anchor="middle" style="font-size:19px">Nominal</text>
+      <rect x="260" y="94" width="180" height="40" rx="9" style="fill:var(--blk-grey-body);stroke:var(--c-grey);stroke-width:2.5"/>
+      <text x="350" y="120" text-anchor="middle" style="font-size:19px">Ordinal</text>
+      <rect x="555" y="94" width="190" height="40" rx="9" style="fill:var(--blk-blue-body);stroke:var(--brand-ink);stroke-width:2.5"/>
+      <text x="650" y="120" text-anchor="middle" style="font-size:19px">Interval scale</text>
+      <rect x="760" y="94" width="190" height="40" rx="9" style="fill:var(--blk-blue-body);stroke:var(--brand-ink);stroke-width:2.5"/>
+      <text x="855" y="120" text-anchor="middle" style="font-size:19px">Ratio scale</text>
+      <g style="font-size:15px">
+        <text x="650" y="157" text-anchor="middle">no natural zero,</text>
+        <text x="650" y="176" text-anchor="middle">differences meaningful</text>
+        <text x="650" y="195" text-anchor="middle">(&#176;C, calendar dates)</text>
+        <text x="855" y="157" text-anchor="middle">natural zero,</text>
+        <text x="855" y="176" text-anchor="middle">ratios meaningful too</text>
+        <text x="855" y="195" text-anchor="middle">(euros, kg, counts, days)</text>
+      </g>
+    </svg>
+  </div>
+  <ul>
+    <li>Categorical data includes nominal and ordinal data.</li>
+    <li>The metric level splits into the interval and the ratio scale: &ldquo;twice as expensive&rdquo; makes sense for prices, &ldquo;twice as warm&rdquo; does not for &deg;C.</li>
+  </ul>
+  <div class="block alert"><h4>Important</h4>
+    <p>A metric level of measurement is a prerequisite for most of the statistical analyses covered in this course!</p></div>
+</section>
+
+<section class="slide">
+  <h2>Levels of Measurement with Python</h2>
+  <pre class="p1-code py">
+import pandas as pd
+# Nominal: categories without an order -&gt; data type "category"
+colour = pd.Series(["black", "white", "blue", "black"], dtype="category")
+print((colour == "black").tolist())    # [True, False, False, True]   (=, != only)
+# Ordinal: categories WITH an order (clothing sizes S &lt; M &lt; L &lt; XL)
+size = pd.Series(pd.Categorical(["M", "S", "XL", "M"],
+                 categories=["S", "M", "L", "XL"], ordered=True))
+print(size.max(), (size &gt; "S").sum())  # XL 3                         (additionally &lt;, &gt;)
+# Metric: numbers -&gt; differences (and means) are meaningful
+price = pd.Series([19.90, 24.90, 29.90, 19.90])   # euros
+print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.65
+  </pre>
+  <div class="block alert fs-s"><h4>Pitfall: numbers used as codes</h4>
+    <p>pandas treats every number column as metric. Codes such as customer IDs must be converted with <code>.astype("category")</code> &ndash; otherwise <code>.mean()</code> returns a meaningless value.</p></div>
+  <a class="trynb" data-sec="section 1.2"></a>
+</section>
+
+<section class="slide" data-subsection="Exercise">
+  <h2>Exercise &ndash; Levels of Measurement</h2>
+  <div class="block problem">
+    <p>An online retailer records the following variables for every order (statistical unit):</p>
+    <table class="bt p1-pad" style="margin-top:4px;margin-bottom:8px">
+      <thead><tr><th></th><th class="l">Variable</th><th style="padding-left:30px"></th><th class="l">Variable</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td class="l">Postcode of the delivery address</td><td style="padding-left:30px">5</td><td class="l">Order value in euros</td></tr>
+        <tr><td>2</td><td class="l">Payment method (invoice, PayPal, card)</td><td style="padding-left:30px">6</td><td class="l">Delivery time in days</td></tr>
+        <tr><td>3</td><td class="l">Customer rating (1 to 5 stars)</td><td style="padding-left:30px">7</td><td class="l">Customer status (new / regular / premium)</td></tr>
+        <tr><td>4</td><td class="l">Number of items ordered</td><td style="padding-left:30px">8</td><td class="l">Order date (calendar date)</td></tr>
+      </tbody>
+    </table>
+    <ol class="alpha">
+      <li>Assign each variable its level of measurement (nominal, ordinal, metric); give a brief reason.</li>
+      <li>For the metric variables: interval or ratio scale? (Is &ldquo;twice as much&rdquo; meaningful?)</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; Levels of Measurement</h2>
+  <p class="fs-s"><span class="p1-nw"><b>Rule:</b> nominal $\to$ categories; &ensp; ordinal $\to$ $+$ ranking; &ensp; metric $\to$ $+$ differences; &ensp; ratio $\to$ $+$ natural zero.</span></p>
+  <table class="bt p1-t19 p1-pad">
+    <thead><tr><th></th><th class="l">Variable</th><th class="l">Level</th><th class="l">Reason</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="l">Postcode</td><td class="l"><b>nominal</b></td><td class="l">the number is only a code, no ranking</td></tr>
+      <tr><td>2</td><td class="l">Payment method</td><td class="l"><b>nominal</b></td><td class="l">categories without an order</td></tr>
+      <tr><td>3</td><td class="l">Customer rating</td><td class="l"><b>ordinal</b></td><td class="l">clear ranking, but distances between stars not comparable</td></tr>
+      <tr><td>4</td><td class="l">Number of items</td><td class="l"><b>metric (ratio)</b></td><td class="l">differences (3 items more) and ratios meaningful</td></tr>
+      <tr><td>5</td><td class="l">Order value</td><td class="l"><b>metric (ratio)</b></td><td class="l">natural zero (0 euros); &ldquo;twice as expensive&rdquo; meaningful</td></tr>
+      <tr><td>6</td><td class="l">Delivery time</td><td class="l"><b>metric (ratio)</b></td><td class="l">differences (2 days longer) and ratios meaningful</td></tr>
+      <tr><td>7</td><td class="l">Customer status</td><td class="l"><b>ordinal</b></td><td class="l">new $&lt;$ regular $&lt;$ premium, but no measurable distance</td></tr>
+      <tr><td>8</td><td class="l">Order date</td><td class="l"><b>metric (interval)</b></td><td class="l">distances in days meaningful, but no natural zero</td></tr>
+    </tbody>
+  </table>
+  <div class="block alert fs-s"><h4>Remember</h4>
+    <p>Numbers used as codes say nothing about the level of measurement: postcodes are nominal &ndash; an &ldquo;average postcode&rdquo; is meaningless.</p></div>
+</section>
+
+<!-- ======================================================= SECTION: DESCRIPTIVE STATISTICS -->
+<section class="slide" data-section="Descriptive Statistics" data-subsection="Frequencies">
+  <h2>Frequencies</h2>
+  <div class="p1-divider">Frequencies &ndash; Absolute, Relative, Cumulative</div>
+</section>
+
+<section class="slide">
+  <h2>Frequencies</h2>
+  <p>For each distinct value $x_j$ ($j = 1, \ldots, k$) of the variable, sorted in ascending order:</p>
+  <table class="bt p1-t24 p1-padxl">
+    <thead><tr><th class="l">Frequency</th><th class="l">Formula</th><th class="l">Answers the question &hellip;</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Absolute</td><td class="l">$h_j = \#\{ i \mid x_i = x_j \}$</td><td class="l">How often does the value $x_j$ occur?</td></tr>
+      <tr><td class="l">Relative</td><td class="l">$f_j = \dfrac{h_j}{n}$</td><td class="l">Which share of the observations equals $x_j$?</td></tr>
+      <tr><td class="l">Cumulative absolute</td><td class="l">$H_j = \sum_{l \le j} h_l$</td><td class="l">How many observations are $\le x_j$?</td></tr>
+      <tr><td class="l">Cumulative relative</td><td class="l">$F(x) = \sum_{x_j \le x} f_j$</td><td class="l">Which share of the observations is $\le x$?</td></tr>
+    </tbody>
+  </table>
+  <p class="inwords" style="margin-top:6px">Count, divide by $n$, add up from the left. Checks: $\sum_j h_j = n$ and $\sum_j f_j = 1$; the last cumulative values are $H_k = n$ and $F = 1$.</p>
+</section>
+
+<section class="slide">
+  <h2>The Data &ndash; an Example (1)</h2>
+  <div class="cols mid" style="--cols: 1fr 1fr">
+    <p><b>The statistical units:</b> the players of a soccer team</p>
+    <div style="align-items:center"><img src="../Part_1_Descriptive_Statistics/images/image_003.jpg" alt="Cartoon of eleven soccer players with shirt numbers 1 to 11" style="height:440px;width:auto"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>The Data &ndash; an Example (2)</h2>
+  <p><b>The variable:</b> The shoe sizes of a soccer team with the following observations:</p>
+  <p class="p1-values">40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39</p>
+  <div class="viz" id="p1-sort" style="height:362px"></div>
+  <p class="fs-xs muted" style="margin-top:-4px">One token per player. Sort the observations, then stack equal values: the stacks are the absolute frequencies of the next slide.</p>
+  <script>
+  (() => {
+    QV.mount("#p1-sort", (el) => {
+      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], n = X.length, R = 27;
+      const ch = QV.chart(el, { x: { domain: [36, 47], hide: true }, y: { domain: [0, 1], hide: true }, margin: { top: 10, right: 24, bottom: 48, left: 24 } });
+      const W = ch.w, H = ch.h;
+      const items = X.map((v, i) => ({ v, p: i + 1 }));
+      const srt = items.slice().sort((a, b) => a.v - b.v || a.p - b.p);
+      srt.forEach((d, k) => { d.k = k + 1; });
+      const cnt = {};
+      srt.forEach((d) => { cnt[d.v] = (cnt[d.v] || 0) + 1; d.lev = cnt[d.v]; });
+      const slot = (k) => W * (k - 0.5) / n;
+      const yRow = H * 0.52;
+      const base = H - R - 3;
+      const P = {
+        raw: (d) => [slot(d.p), yRow],
+        sorted: (d) => [slot(d.k), yRow],
+        stack: (d) => [ch.x(d.v), base - (d.lev - 1) * (2 * R + 3)],
+      };
+      // axis + counts for the stacked view
+      const ax = ch.layer("axes").append("g").attr("class", "axis x").attr("transform", `translate(0,${H})`)
+        .call(d3.axisBottom(ch.x).tickValues(d3.range(37, 47)).tickFormat(d3.format("d")).tickSizeOuter(0)).style("opacity", 0);
+      const axl = ch.layer("axes").append("text").attr("class", "axis-label").attr("x", W / 2).attr("y", H + 42).attr("text-anchor", "middle").text("Shoe size").style("opacity", 0);
+      const fr = QV.stats.freq(X);
+      const cl = ch.layer("front").append("g").style("opacity", 0);
+      fr.forEach((r) => cl.append("text").attr("class", "lbl-muted").attr("text-anchor", "middle")
+        .attr("x", ch.x(r.x)).attr("y", base - (r.h - 1) * (2 * R + 3) - R - 8).text(`h = ${r.h}`));
+      const g = ch.layer("annot").selectAll("g.tok").data(items).join("g").attr("class", "tok")
+        .attr("transform", (d) => `translate(${P.raw(d)})`);
+      const circ = g.append("circle").attr("r", R).style("fill", QV.C.blue).style("stroke", QV.C.surface).style("stroke-width", 2);
+      g.append("text").attr("text-anchor", "middle").attr("dy", 7).style("fill", "#fff").style("font-size", "21px").style("font-weight", 700).style("pointer-events", "none").text((d) => d.v);
+      const lab = g.append("text").attr("class", "lbl").attr("text-anchor", "middle").attr("y", -R - 11).style("font-size", "17px").style("pointer-events", "none");
+      QV.attachTip(ch, circ, (d) => `<b>Player ${d.p}</b>: shoe size ${d.v}<br>position ${d.k} in the sorted list`);
+      const setLab = (mode) => lab.each(function (d) {
+        const t = d3.select(this); t.selectAll("*").remove(); t.text(null);
+        if (mode === "raw") { t.append("tspan").style("font-style", "italic").text("x"); t.append("tspan").attr("dy", 5).style("font-size", "13px").text(d.p); }
+        else if (mode === "sorted") { t.append("tspan").style("font-style", "italic").text("x"); t.append("tspan").attr("dy", 5).style("font-size", "13px").text(`(${d.k})`); }
+      });
+      const row = QV.controls(el);
+      let out = null;
+      const msg = {
+        raw: "Observation order: $x_1 = 40,\\ x_2 = 39,\\ \\ldots,\\ x_{11} = 39$",
+        sorted: "Sorted: $x_{(1)} = 37 \\le x_{(2)} = 38 \\le \\cdots \\le x_{(11)} = 46$",
+        stack: "Stacked: the height of each stack is the absolute frequency $h_j$ (size 39: $h = 4$)",
+      };
+      const setMode = (m) => {
+        g.transition().duration(750).attr("transform", (d) => `translate(${P[m](d)})`);
+        const on = m === "stack" ? 1 : 0;
+        ax.transition().duration(500).style("opacity", on); axl.transition().duration(500).style("opacity", on);
+        cl.transition().delay(on ? 500 : 0).duration(300).style("opacity", on);
+        setLab(m);
+        out.set(msg[m]);
+      };
+      QV.segmented(row, { label: "Show", options: [["raw", "Observation order"], ["sorted", "Sorted"], ["stack", "Stacked by value"]], value: "raw", onChange: setMode });
+      out = QV.readout(row, msg.raw);
+      setLab("raw");
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Frequency Table</h2>
+  <table class="bt p1-t24 p1-colhl p1-padl" style="margin-top:20px">
+    <thead><tr><th class="l">Shoe size</th><th>37</th><th>38</th><th>39</th><th>40</th><th>41</th><th>46</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Absolute frequency</td><td>1</td><td>2</td><td>4</td><td>2</td><td>1</td><td>1</td><td>11</td></tr>
+      <tr><td class="l">Relative frequency (decimal)</td><td>$0.0909$</td><td>$0.1818$</td><td>$0.3636$</td><td>$0.1818$</td><td>$0.0909$</td><td>$0.0909$</td><td>1</td></tr>
+      <tr><td class="l">Relative frequency in %</td><td>$9.1\,\%$</td><td>$18.2\,\%$</td><td>$36.4\,\%$</td><td>$18.2\,\%$</td><td>$9.1\,\%$</td><td>$9.1\,\%$</td><td>$100\,\%$</td></tr>
+      <tr><td class="l">Relative frequency (fraction)</td><td>$\tfrac{1}{11}$</td><td>$\tfrac{2}{11}$</td><td>$\tfrac{4}{11}$</td><td>$\tfrac{2}{11}$</td><td>$\tfrac{1}{11}$</td><td>$\tfrac{1}{11}$</td><td>1</td></tr>
+      <tr><td class="l">Cumulative absolute frequency</td><td>1</td><td>3</td><td>7</td><td>9</td><td>10</td><td>11</td><td></td></tr>
+      <tr><td class="l">Cumulative rel. freq. (decimal)</td><td>$0.0909$</td><td>$0.2727$</td><td>$0.6364$</td><td>$0.8182$</td><td>$0.9091$</td><td>1</td><td></td></tr>
+      <tr><td class="l">Cumulative rel. freq. (fraction)</td><td>$\tfrac{1}{11}$</td><td>$\tfrac{3}{11}$</td><td>$\tfrac{7}{11}$</td><td>$\tfrac{9}{11}$</td><td>$\tfrac{10}{11}$</td><td>1</td><td></td></tr>
+    </tbody>
+  </table>
+  <p class="fs-xs muted center">Hover over a column to follow one shoe size through all rows.</p>
+  <script>
+  (() => {
+    const init = () => document.querySelectorAll("table.p1-colhl").forEach((t) => {
+      if (t.dataset.p1hl) return;
+      t.dataset.p1hl = "1";
+      const clear = () => t.querySelectorAll(".p1-on").forEach((c) => c.classList.remove("p1-on"));
+      t.addEventListener("pointerover", (e) => {
+        const c = e.target.closest("td, th");
+        clear();
+        if (!c || c.cellIndex === 0) return;
+        t.querySelectorAll("tr").forEach((r) => { const k = r.cells[c.cellIndex]; if (k) k.classList.add("p1-on"); });
+      });
+      t.addEventListener("pointerleave", clear);
+    });
+    // later tables (e.g. the exam-style solution) are parsed after this script: attach once the page is complete
+    init();
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Comparing Relative Frequencies: Percent vs. Percentage Points</h2>
+  <p><b>Example:</b> In a customer survey, the share of 5-star ratings <span id="p1-pp-ex">rises from <span class="p1-nw">$f = 40\,\%$</span> last year to <span class="p1-nw">$f = 50\,\%$</span> this year</span>.</p>
+  <div class="cols stretch">
+    <div class="block"><h4>Absolute difference of two shares</h4>
+      <div class="p1-ex grow center"><span class="p1-nw" id="p1-pp-abs">$\displaystyle 50\,\% - 40\,\% = \mathbf{10}$ <b>percentage points</b></span></div></div>
+    <div class="block"><h4>Relative change of the share</h4>
+      <div class="p1-ex grow center" id="p1-pp-rel">$\dfrac{50\,\% - 40\,\%}{40\,\%} = 0.25 = \mathbf{25\,\%}$</div></div>
+  </div>
+  <div class="viz-ctrl" id="p1-pp-ctrl"></div>
+  <p class="inwords">&ldquo;The share <span id="p1-pp-w1">rose by 10 percentage points</span>&rdquo; and &ldquo;the share <span id="p1-pp-w2">rose by 25&thinsp;%</span>&rdquo; describe the <em>same</em> change &ndash; once as a difference, once relative to the starting level.</p>
+  <div class="block key"><p>Percentage points = <b>absolute</b> difference of two percentages; percent = <b>relative</b> change. The two are often confused in business news!</p></div>
+  <script>
+  (() => {
+    QV.mount("#p1-pp-ctrl", (row) => {
+      let a = 40, b = 50;
+      const T = (s) => Deck.tex(s);
+      const tf = (x, d) => { let s = (+x).toFixed(d); if (s.includes(".")) s = s.replace(/0+$/, "").replace(/\.$/, ""); return s === "-0" ? "0" : s; };
+      const pc = (v) => `${tf(v, 0)}\\,\\%`;
+      const ex = document.getElementById("p1-pp-ex"), abs = document.getElementById("p1-pp-abs"), rel = document.getElementById("p1-pp-rel");
+      const upd = () => {
+        const r = (b - a) / a;
+        const verb = b > a ? "rises" : b < a ? "falls" : "stays the same, moving";
+        ex.innerHTML = `${verb} from <span class="p1-nw">${T(`f = ${pc(a)}`)}</span> last year to <span class="p1-nw">${T(`f = ${pc(b)}`)}</span> this year`;
+        const v2 = b > a ? "rose" : b < a ? "fell" : "changed";
+        document.getElementById("p1-pp-w1").innerHTML = `${v2} by ${tf(Math.abs(b - a), 0)} percentage points`;
+        document.getElementById("p1-pp-w2").innerHTML = `${v2} by ${tf(Math.abs(100 * r), 2)}&thinsp;%`;
+        abs.innerHTML = T(`\\displaystyle ${pc(b)} - ${pc(a)} = \\mathbf{${tf(b - a, 0)}}`) + " <b>percentage points</b>";
+        rel.innerHTML = T(`\\dfrac{${pc(b)} - ${pc(a)}}{${pc(a)}} = ${tf(r, 4)} = \\mathbf{${tf(100 * r, 2)}\\,\\%}`);
+      };
+      QV.slider(row, { label: "Share last year", min: 5, max: 95, step: 1, value: a, fmt: (v) => v + " %", onInput: (v) => { a = v; upd(); } });
+      QV.slider(row, { label: "Share this year", min: 5, max: 95, step: 1, value: b, fmt: (v) => v + " %", onInput: (v) => { b = v; upd(); } });
+      QV.readout(row, "<span class='muted'>Move the sliders: both blocks update.</span>");
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Frequencies of a Nominal Variable</h2>
+  <div class="block problem">
+    <p>The online retailer from the exercise on levels of measurement records the payment method of $n = 10$ orders (I = invoice, P = PayPal, C = card):</p>
+    <p>\[ \text{P,\ C,\ I,\ P,\ P,\ C,\ P,\ I,\ C,\ P} \]</p>
+    <ol class="alpha">
+      <li>Determine the absolute frequencies $h_j$ and the relative frequencies $f_j$ (fraction, decimal, %).</li>
+      <li>Which share of the orders is <b>not</b> paid by invoice? How many orders is that?</li>
+      <li>Last month, $25\,\%$ of the orders were paid by invoice. By how many percentage points and by how many percent has this share changed?</li>
+      <li>Does a cumulative relative frequency $F(x)$ make sense here? Give a reason.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Frequencies of a Nominal Variable</h2>
+  <div class="block fs-s"><h4>Rule</h4>
+    <p>$h_j$ = number of values equal to $x_j$; &emsp; $f_j = h_j / n$; &emsp; checks: $\sum_j h_j = n$ and $\sum_j f_j = 1$.</p></div>
+  <p><b>a)</b> Count the $n = 10$ orders (I: 2 times, P: 5 times, C: 3 times); column &ldquo;Total&rdquo; = check:</p>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l">Payment method $x_j$</th><th>Invoice</th><th>PayPal</th><th>Card</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Absolute frequency $h_j$</td><td>$2$</td><td>$5$</td><td>$3$</td><td>$10$</td></tr>
+      <tr><td class="l">Relative frequency $f_j$ (fraction)</td><td>$\tfrac{2}{10}$</td><td>$\tfrac{5}{10}$</td><td>$\tfrac{3}{10}$</td><td>$1$</td></tr>
+      <tr><td class="l">Relative frequency $f_j$ (decimal)</td><td>$\mathbf{0.20}$</td><td>$\mathbf{0.50}$</td><td>$\mathbf{0.30}$</td><td>$1$</td></tr>
+      <tr><td class="l">Relative frequency in %</td><td>$20\,\%$</td><td>$50\,\%$</td><td>$30\,\%$</td><td>$100\,\%$</td></tr>
+    </tbody>
+  </table>
+  <p><span class="p1-nw"><b>b)</b> &ldquo;Not by invoice&rdquo; = PayPal or card: &ensp; $f_{\text{PayPal}} + f_{\text{card}} = 0.50 + 0.30 = \mathbf{0.80}$ &ensp; ($= 1 - f_{\text{invoice}}$),</span><br>
+    <span style="padding-left:1.2em"></span>i.e. $0.80 \cdot 10 = \mathbf{8}$ orders &ensp; (check: $h_{\text{PayPal}} + h_{\text{card}} = 5 + 3 = 8$).</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Frequencies of a Nominal Variable</h2>
+  <div class="stack" style="gap:8px">
+    <p><b>c)</b> Share paid by invoice: last month $25\,\%$, now $f_{\text{invoice}} = 20\,\%$:</p>
+    <ul>
+      <li>absolute difference: $20\,\% - 25\,\% = \mathbf{-5}$ <b>percentage points</b></li>
+      <li>relative change: $(20\,\% - 25\,\%) / 25\,\% = -0.20 = \mathbf{-20\,\%}$</li>
+    </ul>
+    <p style="margin-top:8px"><b>d)</b> <b>No:</b> the payment method is <b>nominal</b> &ndash; there is no ordering, so &ldquo;$x_j \leq x$&rdquo; is not defined. A cumulative value &ldquo;up to PayPal&rdquo; would depend on the arbitrary order of the columns:</p>
+    <ul>
+      <li>order invoice, PayPal, card: &ensp; $0.20 + 0.50 = 0.70$</li>
+      <li>order card, PayPal, invoice: &ensp; $0.30 + 0.50 = 0.80$</li>
+    </ul>
+  </div>
+  <div class="block alert"><h4>Remember</h4>
+    <p>$h_j$ and $f_j$ exist for every level of measurement, $F(x)$ only from the <b>ordinal</b> level upwards.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Why Statistics Software?</h2>
+  <div class="cols mid" style="--cols: 60fr 35fr; --gap: 44px">
+    <div>
+      <div class="block"><h4>Advantages of Modern Software</h4>
+        <ul>
+          <li>Complex calculations in seconds</li>
+          <li>Reproducible analyses through scripts</li>
+          <li>Professional visualisations</li>
+          <li>Ability to handle large datasets</li>
+        </ul></div>
+      <p style="margin-top:12px"><b>In this course:</b> We use <b>Python</b> with <b>Jupyter</b> notebooks or <b>VS Code</b></p>
+    </div>
+    <div style="align-items:center">
+      <div class="flow v">
+        <div class="fbox g" style="width:260px">Data</div>
+        <span class="farr">&darr;</span>
+        <div class="fbox" style="width:260px">Python script<small>(<code>.py</code> / <code>.ipynb</code>)</small></div>
+        <span class="farr">&darr;</span>
+        <div class="fbox o" style="width:260px">Tables &amp; figures</div>
+      </div>
+      <p class="fs-s muted">www.python.org</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>What is Python?</h2>
+  <ul>
+    <li><b>Python</b> is a programming language for statistics, data analysis and much more.</li>
+    <li style="margin-top:10px">Typical application areas:
+      <ul><li>Data Science</li><li>Statistics</li><li>Machine Learning</li><li>Scientific research</li></ul></li>
+    <li style="margin-top:10px">Strengths of Python:
+      <ul>
+        <li>Easy-to-read syntax, huge community, free and open source</li>
+        <li>Large selection of packages (<code>numpy</code>, <code>pandas</code>, <code>scipy</code>, <code>statsmodels</code>, <code>matplotlib</code>)</li>
+        <li>Same language from data analysis to machine learning and production</li>
+      </ul></li>
+    <li style="margin-top:10px"><b>Important:</b> Python + packages are the <i>computation engine</i> (perform calculations).</li>
+  </ul>
+  <a class="pycourse" data-what="Welcome to Python"></a>
+</section>
+
+<section class="slide">
+  <h2>Working Environment: Jupyter and VS Code</h2>
+  <ul>
+    <li><b>Jupyter notebooks</b> (<code>.ipynb</code>) and <b>VS Code</b> are the working environments (IDEs) for Python.</li>
+    <li style="margin-top:10px">They provide a user-friendly interface:
+      <ul>
+        <li>Jupyter: code cells with tables and plots directly below, plus text for explanations</li>
+        <li>VS Code: editor for scripts (<code>.py</code>) and notebooks, integrated terminal</li>
+        <li>Plot windows, variable explorer, package management</li>
+      </ul></li>
+    <li style="margin-top:10px"><b>Analogy:</b>
+      <ul><li>Python = Engine of a car</li><li>Jupyter / VS Code = Dashboard and steering wheel</li></ul></li>
+    <li style="margin-top:10px"><b>Important:</b> Jupyter and VS Code only work if Python is installed.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Installation (Mac &amp; Windows)</h2>
+  <ul>
+    <li><b>Step 1: Install Python</b>
+      <ul>
+        <li>Recommended: <b>Anaconda Distribution</b> (<code>https://www.anaconda.com/download</code>) &ndash; bundles Python, all packages and Jupyter</li>
+        <li>Alternative: Python from <code>https://www.python.org</code>, then in a terminal:<br>
+          <code style="font-size:.78em">pip install numpy pandas scipy statsmodels matplotlib jupyter</code></li>
+      </ul></li>
+    <li style="margin-top:6px"><b>Step 2: Choose a working environment</b>
+      <ul>
+        <li>Jupyter: start <b>JupyterLab</b> (included in Anaconda) or run <code>jupyter lab</code></li>
+        <li>VS Code: <code>https://code.visualstudio.com</code> + extensions &ldquo;Python&rdquo; and &ldquo;Jupyter&rdquo;</li>
+      </ul></li>
+    <li style="margin-top:6px"><b>Step 3: First test</b> &ndash; run in a notebook cell; no error message means you are ready:</li>
+  </ul>
+  <pre class="p1-code py" style="margin-left:2.2em">
+import numpy, pandas, scipy, statsmodels, matplotlib
+print(numpy.__version__, pandas.__version__)
+  </pre>
+  <a class="trynb" data-sec="setup cell"></a>
+</section>
+
+<section class="slide">
+  <h2>Frequencies with Python</h2>
+  <pre class="p1-code py p1-cl">
+import pandas as pd
+
+# Soccer team – shoe sizes of the 11 players
+data = pd.Series([40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39])
+
+# Frequency table (absolute frequencies), sorted by shoe size
+print(data.value_counts().sort_index())
+# Relative frequencies
+print(data.value_counts(normalize=True).sort_index())
+# Cumulative (relative) frequencies
+print(data.value_counts(normalize=True).sort_index().cumsum())
+# Percentage points vs. percent (share of 5-star ratings: 40 % -&gt; 50 %)
+print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
+  </pre>
+  <p class="fs-s"><b>Note:</b> <code>value_counts()</code> sorts by frequency; <code>sort_index()</code> orders by shoe size (needed for <code>cumsum()</code>).</p>
+  <a class="trynb" data-sec="section 2.1"></a>
+</section>
+
+<section class="slide">
+  <h2>Column Chart</h2>
+  <div class="viz" id="p1-col" style="height:460px"></div>
+  <p class="fs-xs muted">Hover over a column for $h_j$ and $f_j$. Switch the x-axis to categories: the gap between 41 and 46 disappears &ndash; and with it the visible outlier.</p>
+  <script>
+  (() => {
+    QV.mount("#p1-col", (el) => {
+      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
+      const tab = QV.stats.freq(X);
+      let axis = "num", rel = false;
+      const draw = () => {
+        el.querySelectorAll(":scope > *").forEach((c) => c.remove());
+        const yo = rel
+          ? { domain: [0, 0.42], label: "Relative frequency", tickValues: [0, 0.1, 0.2, 0.3, 0.4], format: ".1f" }
+          : { domain: [0, 4.4], label: "Absolute frequency", tickValues: [0, 1, 2, 3, 4], format: "d" };
+        const ch = axis === "num"
+          ? QV.chart(el, { x: { domain: [36, 47], label: "Shoe size", tickValues: tab.map((r) => r.x), format: "d" }, y: yo })
+          : QV.chart(el, { x: { domain: tab.map((r) => String(r.x)), type: "band", label: "Shoe size", padding: 0.4 }, y: yo });
+        const data = tab.map((r) => ({ x: axis === "num" ? r.x : String(r.x), y: rel ? r.f : r.h, r }));
+        QV.bars(ch, data, {
+          width: 0.6, maxWidth: 110,
+          tip: (d) => `<b>Shoe size ${d.r.x}</b><br>h = ${d.r.h} &nbsp; f = ${d.r.h}/11 = ${QV.fmt(d.r.f, 4)} (${QV.fmt(100 * d.r.f, 1)} %)`,
+          labels: (d) => (rel ? QV.fmt(d.y, 4) : d.y),
+        });
+      };
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "x-axis", options: [["num", "numeric (true distances)"], ["cat", "categories"]], value: "num", onChange: (v) => { axis = v; draw(); } });
+      QV.segmented(row, { label: "Height", options: [["abs", "absolute $h_j$"], ["rel", "relative $f_j$"]], value: "abs", onChange: (v) => { rel = v === "rel"; draw(); } });
+      draw();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Bar Chart</h2>
+  <div class="viz" id="p1-barh" style="height:460px"></div>
+  <p class="fs-xs muted">Horizontal bars: the length is the absolute frequency. Sorted by frequency, the axis becomes categorical and the most frequent size comes first.</p>
+  <script>
+  (() => {
+    QV.mount("#p1-barh", (el) => {
+      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
+      const tab = QV.stats.freq(X);
+      let order = "size";
+      const hbar = (x0, yc, len, th, r = 4) => {
+        r = Math.max(0, Math.min(r, th / 2, len));
+        const y0 = yc - th / 2;
+        return `M${x0},${y0}H${x0 + len - r}Q${x0 + len},${y0} ${x0 + len},${y0 + r}V${y0 + th - r}Q${x0 + len},${y0 + th} ${x0 + len - r},${y0 + th}H${x0}Z`;
+      };
+      const draw = () => {
+        el.querySelectorAll(":scope > *").forEach((c) => c.remove());
+        const byF = tab.slice().sort((a, b) => a.h - b.h || b.x - a.x).map((r) => String(r.x));
+        const ch = order === "size"
+          ? QV.chart(el, { x: { domain: [0, 4.2], label: "Absolute frequency", ticks: 8, grid: true, format: ".1f" }, y: { domain: [36.2, 46.8], label: "Shoe size", tickValues: tab.map((r) => r.x), format: "d", grid: false } })
+          : QV.chart(el, { x: { domain: [0, 4.2], label: "Absolute frequency", ticks: 8, grid: true, format: ".1f" }, y: { domain: byF, type: "band", label: "Shoe size", padding: 0.35, grid: false } });
+        const yc = (r) => (order === "size" ? ch.y(r.x) : ch.y(String(r.x)) + ch.y.bandwidth() / 2);
+        const th = order === "size" ? Math.abs(ch.y(36.2) - ch.y(36.8)) : ch.y.bandwidth();
+        const sel = ch.layer("data").append("g").selectAll("path").data(tab).join("path")
+          .attr("d", (r) => hbar(ch.x(0), yc(r), ch.x(r.h) - ch.x(0), th))
+          .style("fill", QV.C.blue);
+        QV.attachTip(ch, sel, (r) => `<b>Shoe size ${r.x}</b><br>h = ${r.h} &nbsp; f = ${r.h}/11 = ${QV.fmt(r.f, 4)}`);
+        ch.layer("annot").selectAll("text").data(tab).join("text").attr("class", "lbl").attr("dominant-baseline", "middle")
+          .attr("x", (r) => ch.x(r.h) + 8).attr("y", (r) => yc(r)).text((r) => r.h);
+      };
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Order", options: [["size", "by shoe size (numeric axis)"], ["freq", "by frequency"]], value: "size", onChange: (v) => { order = v; draw(); } });
+      draw();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Pie Chart</h2>
+  <div class="cols mid" style="--cols: 58fr 38fr">
+    <div class="viz" id="p1-pie" style="height:540px"></div>
+    <div class="p1-side">
+      <div id="p1-pie-tiles"></div>
+      <p class="fs-s">Each slice stands for one shoe size; its angle is proportional to the share: &ensp;$\text{angle}_j = f_j \cdot 360^\circ$.</p>
+      <p class="fs-xs muted">Hover over a slice, or click it to keep it selected.</p>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p1-pie", (el) => {
+      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
+      const tab = QV.stats.freq(X);
+      const W = el.clientWidth, H = el.clientHeight;
+      const svg = d3.select(el).append("svg").attr("width", W).attr("height", H).attr("viewBox", `0 0 ${W} ${H}`);
+      const g = svg.append("g").attr("transform", `translate(${W / 2},${H / 2})`);
+      const R = Math.min(W, H) / 2 - 56;
+      const arcs = d3.pie().value((d) => d.h).sort(null).startAngle(0).endAngle(-2 * Math.PI)(tab);
+      const arc = d3.arc().innerRadius(0).outerRadius(R);
+      const op = [0.42, 0.54, 0.66, 0.78, 0.89, 1];
+      const t = QV.tiles(document.getElementById("p1-pie-tiles"), ["Shoe size $x_j$", "Absolute $h_j$", "Share $f_j$", "Angle $f_j \\cdot 360^\\circ$"]);
+      t.el.style.setProperty("--n", 2); t.el.classList.add("p1-tiles2");
+      let pinned = null;
+      const show = (d) => {
+        const r = d.data;
+        t.set(0, r.x); t.set(1, r.h); t.set(2, `${r.h}/11 = ${QV.fmt(r.f, 4)}`); t.set(3, `${QV.fmt(360 * r.f, 1)}°`);
+      };
+      const off = (d) => { const a = (d.startAngle + d.endAngle) / 2; return [Math.sin(a) * 12, -Math.cos(a) * 12]; };
+      const sl = g.selectAll("path").data(arcs).join("path").attr("d", arc)
+        .style("fill", QV.C.blue).style("fill-opacity", (d, i) => op[i])
+        .style("stroke", QV.C.surface).style("stroke-width", 3).style("cursor", "pointer");
+      const place = () => sl.attr("transform", (d) => (d === pinned ? `translate(${off(d)})` : null));
+      const tip = QV.tooltip({ el });
+      sl.on("pointerenter pointermove", function (e, d) { show(d); d3.select(this).style("filter", "brightness(1.1)"); tip.show(`<b>Shoe size ${d.data.x}</b><br>h = ${d.data.h} &nbsp; f = ${QV.fmt(100 * d.data.f, 1)} %<br>angle = ${QV.fmt(360 * d.data.f, 1)}°`, e); })
+        .on("pointerleave", function () { d3.select(this).style("filter", null); tip.hide(); if (pinned) show(pinned); })
+        .on("click", (e, d) => { pinned = pinned === d ? null : d; place(); if (pinned) show(pinned); });
+      // outside labels: size (bold) and share
+      const lab = d3.arc().innerRadius(R + 30).outerRadius(R + 30);
+      const lg = g.append("g");
+      arcs.forEach((d) => {
+        const [x, y] = lab.centroid(d);
+        const tx = lg.append("text").attr("x", x).attr("y", y - 2).attr("text-anchor", "middle").style("font-size", "17px").style("font-weight", 700).style("fill", "var(--ink)").text(d.data.x);
+        lg.append("text").attr("x", x).attr("y", y + 16).attr("text-anchor", "middle").style("font-size", "15px").style("fill", "var(--ink-muted)").text(`${QV.fmt(100 * d.data.f, 1)} %`);
+      });
+      show(arcs[2]);
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Empirical Distribution Function (Empirical CDF, ECDF)</h2>
+  <div class="viz" id="p1-ecdf" style="height:455px"></div>
+  <p class="fs-xs muted">Choose a shoe size $x$: &ldquo;at most $x$&rdquo; is read off as the height $F(x)$, &ldquo;at least $x$&rdquo; as the rest above the step just before $x$.</p>
+  <script>
+  (() => {
+    QV.mount("#p1-ecdf", (el) => {
+      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], n = X.length;
+      const ch = QV.ecdf(el, { data: X, xLabel: "Shoe size", domain: [35.5, 48], chart: { y: { domain: [0, 1.08], label: "F(x)", tickValues: [0, 0.2, 0.4, 0.6, 0.8, 1], format: ".1f" } } });
+      const C = QV.C;
+      let x = 39, mode = "most";
+      const band = QV.rect(ch, 35.5, 35.85, 0, 1, { fill: C.orange, opacity: 0.55, layer: "annot" });
+      const hl = QV.segment(ch, 35.5, 0, 39, 0, { color: C.orange, width: 2, dash: "6 4" });
+      const vl = QV.segment(ch, 39, 0, 39, 0, { color: C.orange, width: 2, dash: "6 4" });
+      const pt = QV.dots(ch, [[39, 0]], { r: 7, color: C.orange, layer: "front" });
+      const lab = QV.tex(ch, 36, 0.5, "", { anchor: "start", bg: true, size: 17 });
+      const row = QV.controls(el);
+      let out = null;
+      const cnt = (f) => X.filter(f).length;
+      const upd = () => {
+        const le = cnt((v) => v <= x), lt = cnt((v) => v < x);
+        if (mode === "most") {
+          const F = le / n;
+          band.set(35.5, 35.85, 0, F);
+          hl.set(35.5, F, x, F); vl.set(x, 0, x, F);
+          pt.attr("cx", ch.x(x)).attr("cy", ch.y(F));
+          lab.set(35.95, F / 2, `F(${x}) = \\tfrac{${le}}{11}`);
+          out.set(`Share with shoe size at most ${x}: $F(${x}) = \\tfrac{${le}}{11} = ${QV.fmt(F, 4)}$`);
+        } else {
+          const F0 = lt / n;
+          band.set(35.5, 35.85, F0, 1);
+          hl.set(35.5, F0, x, F0); vl.set(x, 0, x, F0);
+          pt.attr("cx", ch.x(x)).attr("cy", ch.y(F0));
+          lab.set(35.95, (F0 + 1) / 2, `1 - F(${x - 1}) = \\tfrac{${n - lt}}{11}`);
+          out.set(`Share with shoe size at least ${x}: $1 - F(${x - 1}) = 1 - \\tfrac{${lt}}{11} = ${QV.fmt(1 - F0, 4)}$`);
+        }
+      };
+      QV.slider(row, { label: "$x$", min: 36, max: 47, step: 1, value: x, onInput: (v) => { x = v; upd(); } });
+      QV.segmented(row, { label: "", options: [["most", "at most $x$"], ["least", "at least $x$"]], value: "most", onChange: (v) => { mode = v; upd(); } });
+      out = QV.readout(row, "");
+      upd();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Charts with Python</h2>
+  <pre class="p1-code py p1-cl">
+import matplotlib.pyplot as plt
+counts = data.value_counts().sort_index()        # h_j: 37:1, 38:2, 39:4, 40:2, 41:1, 46:1
+
+plt.bar(counts.index, counts.values)             # column chart (numeric axis: gap 41-46)
+plt.xlabel("Shoe size"); plt.ylabel("Absolute frequency")
+plt.show()
+plt.barh(counts.index, counts.values)            # bar chart (horizontal bars)
+plt.show()
+plt.pie(counts.values, labels=counts.index)      # pie chart: slice = share f_j
+plt.show()
+plt.ecdf(data)                                   # empirical distribution function F(x)
+plt.show()
+  </pre>
+  <p class="fs-s"><b>Note:</b> <code>plt.ecdf()</code> needs matplotlib 3.8 or newer (included in Anaconda and Colab); <code>plt.show()</code> displays each chart below the cell.</p>
+  <a class="trynb" data-sec="section 2.1"></a>
+</section>
+
+<section class="slide" data-subsection="Exercises">
+  <h2>Exercise &ndash; Frequency Table</h2>
+  <div class="block problem">
+    <p>A café has received $n = 12$ ratings (1 to 5 stars) on a review platform:</p>
+    <p>\[ 4,\ 5,\ 3,\ 4,\ 5,\ 5,\ 2,\ 4,\ 5,\ 3,\ 4,\ 5 \]</p>
+    <ol class="alpha">
+      <li>Set up the frequency table with absolute frequencies $h_j$, relative frequencies $f_j$ (as fraction and decimal) and cumulative relative frequencies $F(x_j)$.</li>
+      <li>What share of the ratings has <b>at most</b> 3 stars?</li>
+      <li>What share of the ratings has <b>at least</b> 4 stars? How many ratings is that?</li>
+      <li>Read from the table: which rating is the most frequent one?</li>
+      <li>Last year, 30&thinsp;% of the ratings had 5 stars. By how many percentage points and by how many percent has this share changed?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Frequency Table</h2>
+  <div class="block"><h4>Rule</h4>
+    <p>$h_j$ = number of values equal to $x_j$; &ensp; $f_j = h_j / n$; &ensp; $F(x_j)$ = sum of all $f_l$ with $x_l \leq x_j$.</p></div>
+  <p><b>a)</b> Count the $n = 12$ values (check: the $h_j$ add up to $12$, the $f_j$ to $1$):</p>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l">Stars $x_j$</th><th>2</th><th>3</th><th>4</th><th>5</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Absolute frequency $h_j$</td><td>1</td><td>2</td><td>4</td><td>5</td><td>12</td></tr>
+      <tr><td class="l">Relative frequency $f_j$ (fraction)</td><td>$\tfrac{1}{12}$</td><td>$\tfrac{2}{12}$</td><td>$\tfrac{4}{12}$</td><td>$\tfrac{5}{12}$</td><td>1</td></tr>
+      <tr><td class="l">Relative frequency $f_j$ (decimal)</td><td>$0.0833$</td><td>$0.1667$</td><td>$0.3333$</td><td>$0.4167$</td><td>1</td></tr>
+      <tr><td class="l">Cumulative rel. frequency $F(x_j)$</td><td>$0.0833$</td><td>$\mathbf{0.2500}$</td><td>$0.5833$</td><td>$1$</td><td></td></tr>
+    </tbody>
+  </table>
+  <p><b>b)</b> &ldquo;At most 3 stars&rdquo; = cumulative relative frequency at $x = 3$: <span class="p1-nw">$F(3) = f_1 + f_2 = \tfrac{1}{12} + \tfrac{2}{12} = \tfrac{3}{12} = \mathbf{0.25}$</span> &ensp; <span class="p1-nw">($x_1 = 2$, $x_2 = 3$)</span> $\to$ a quarter of the ratings.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Frequency Table</h2>
+  <div class="fs-s stack" style="gap:6px">
+    <p><b>c)</b> &ldquo;At least 4 stars&rdquo; = complement of &ldquo;at most 3&rdquo;: $1 - F(3) = 1 - 0.25 = \mathbf{0.75}$, i.e. $h_3 + h_4 = 4 + 5 = \mathbf{9}$ ratings.</p>
+    <p><b>d)</b> Largest absolute frequency $h_4 = 5$ at $x_4 = 5$ $\to$ the most frequent rating is $\mathbf{5}$ stars.</p>
+    <p><b>e)</b> This year $f_4 = \tfrac{5}{12} = 41.67\,\%$ (last year: $30\,\%$):</p>
+    <ul>
+      <li>absolute difference: $41.67\,\% - 30\,\% = \mathbf{11.67}$ <b>percentage points</b></li>
+      <li>relative change: $(41.67\,\% - 30\,\%) / 30\,\% = 0.389 = \mathbf{38.9\,\%}$</li>
+    </ul>
+  </div>
+  <pre class="p1-code py">
+stars = pd.Series([4, 5, 3, 4, 5, 5, 2, 4, 5, 3, 4, 5])
+print(stars.value_counts().sort_index().tolist())     # [1, 2, 4, 5]
+F = stars.value_counts(normalize=True).sort_index().cumsum()
+print(F.round(4).tolist())                            # [0.0833, 0.25, 0.5833, 1.0]
+print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
+  </pre>
+  <div class="block alert tight fs-s"><h4>Interpretation</h4>
+    <p>Three quarters of the guests give 4 or 5 stars; the share of top ratings has grown.</p></div>
+  <a class="trynb" data-sec="section 2.2"></a>
+</section>
+
+<!-- ======================================================= MEASURES OF CENTRAL TENDENCY -->
+<section class="slide" data-subsection="Measures of Central Tendency">
+  <h2>Measures of Central Tendency</h2>
+  <div class="p1-divider">Measures of Central Tendency &ndash; Means, Median and Quantiles</div>
+</section>
+
+<section class="slide">
+  <h2>Measures of Central Tendency</h2>
+  <div class="block guiding"><p>Which shoe size is &ldquo;typical&rdquo; for the soccer team &ndash; and how do we summarise eleven values in a single number?</p></div>
+  <div class="cols mid" style="--cols: 42fr 58fr">
+    <ul>
+      <li>Where is the middle?</li>
+      <li>Where is the centre of gravity of the distribution?</li>
+      <li>At which value is one quarter of the values reached?</li>
+      <li>At which value are three quarters of the values reached?</li>
+    </ul>
+    <div>
+      <div class="viz" id="p1-ctq" style="height:340px"></div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p1-ctq", (el) => {
+      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], S = QV.stats, C = QV.C;
+      const ch = QV.chart(el, { x: { domain: [36, 47], label: "Shoe size (soccer team, sorted and stacked)", tickValues: d3.range(37, 47), format: "d" }, y: { domain: [0, 1], hide: true }, margin: { top: 6, right: 16, bottom: 48, left: 16 } });
+      const H = ch.h, r = 13, gap = 29, base = H - 32;
+      const cnt = {};
+      const pts = S.sortNum(X).map((v, k) => { cnt[v] = (cnt[v] || 0) + 1; return { v, k: k + 1, lev: cnt[v] }; });
+      const cy = (d) => base - (d.lev - 1) * gap;
+      const mean = S.mean(X);
+      // balance beam with the fulcrum at the mean
+      const ful = ch.layer("annot").append("g").style("display", "none");
+      ful.append("line").attr("x1", ch.x(36.6)).attr("x2", ch.x(46.4)).attr("y1", H - 16).attr("y2", H - 16).style("stroke", C.ink2).style("stroke-width", 3);
+      ful.append("path").attr("d", `M${ch.x(mean)},${H - 15}L${ch.x(mean) - 12},${H}L${ch.x(mean) + 12},${H}Z`).style("fill", C.orange);
+      const marks = [
+        { key: "med", label: "Middle", v: S.median(X), color: C.green, y: 16, anchor: "middle", k: 6, tex: "\\tilde{x} = 39 \\ \\text{(median)}" },
+        { key: "mean", label: "Centre of gravity", v: mean, color: C.orange, y: 50, anchor: "start", tex: "\\bar{x} = 39.64 \\ \\text{(mean, balance point)}" },
+        { key: "q1", label: "One quarter", v: S.quantile(X, 0.25), color: C.violet, y: 84, anchor: "end", k: 3, tex: "Q_1 = 38" },
+        { key: "q3", label: "Three quarters", v: S.quantile(X, 0.75), color: C.violet, y: 84, anchor: "start", k: 9, tex: "Q_3 = 40" },
+      ];
+      const ringG = ch.layer("annot").append("g");
+      const lineG = ch.layer("data").append("g");
+      ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle")
+        .attr("cx", (d) => ch.x(d.v)).attr("cy", cy).attr("r", r)
+        .style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 2)
+        .call((sel) => QV.attachTip(ch, sel, (d) => `x<sub>(${d.k})</sub> = ${d.v}`));
+      marks.forEach((m) => {
+        m.g = lineG.append("g").style("display", "none");
+        m.g.append("line").attr("x1", ch.x(m.v)).attr("x2", ch.x(m.v)).attr("y1", m.y + 12).attr("y2", H)
+          .style("stroke", m.color).style("stroke-width", 2.5).style("stroke-dasharray", m.key === "mean" ? "6 4" : null);
+        if (m.k) {
+          const d = pts[m.k - 1];
+          m.ring = ringG.append("circle").attr("cx", ch.x(d.v)).attr("cy", cy(d)).attr("r", r + 4).style("fill", "none").style("stroke", m.color).style("stroke-width", 3).style("display", "none");
+        }
+        m.lab = QV.tex(ch, m.v, ch.y.invert(m.y), m.tex, { anchor: m.anchor, dx: m.anchor === "start" ? 6 : m.anchor === "end" ? -6 : 0, bg: true, size: 16 });
+        m.lab.style.display = "none";
+      });
+      const row = QV.controls(el);
+      marks.forEach((m) => {
+        m.on = false;
+        const b = QV.button(row, m.label, () => {
+          m.on = !m.on; b.classList.toggle("primary", m.on);
+          m.g.style("display", m.on ? null : "none"); m.lab.style.display = m.on ? "" : "none";
+          if (m.ring) m.ring.style("display", m.on ? null : "none");
+          if (m.key === "mean") ful.style("display", m.on ? null : "none");
+        });
+      });
+    });
+  })();
+  </script>
+  <p class="fs-xs muted" style="margin-top:-4px">Click a question in the control row to show the measure that answers it.</p>
+</section>
+
+<section class="slide">
+  <h2>Refresher: Summation and Product Signs</h2>
+  <p><b>Example data</b> (first three players): &ensp; $x_1 = 40$, &ensp; $x_2 = 39$, &ensp; $x_3 = 38$</p>
+  <div class="cols stretch">
+    <div class="block"><h4>Summation sign $\Sigma$</h4>
+      <p>\[ \sum_{i=1}^{n} x_i = x_1 + x_2 + \cdots + x_n \]</p>
+      <p>Read: &ldquo;sum of the $x_i$ for $i$ from $1$ to $n$&rdquo;</p>
+      <p>Example: $\sum_{i=1}^{3} x_i = 40 + 39 + 38 = 117$</p></div>
+    <div class="block"><h4>Product sign $\Pi$</h4>
+      <p>\[ \prod_{i=1}^{n} x_i = x_1 \cdot x_2 \cdots x_n \]</p>
+      <p>Read: &ldquo;product of the $x_i$ for $i$ from $1$ to $n$&rdquo;</p>
+      <p>Example: $\prod_{i=1}^{3} x_i = 40 \cdot 39 \cdot 38 = 59\,280$</p></div>
+  </div>
+  <div class="block alert"><h4>Common mistake</h4>
+    <p>$\sum x_i^2 \neq \bigl(\sum x_i\bigr)^2$, &ensp; e.g. $1^2 + 2^2 = 5 \neq (1+2)^2 = 9$: first square, then add (as in the variance later)!</p></div>
+</section>
+
+<section class="slide">
+  <h2>Means (1): Arithmetic Mean and Trimmed Mean</h2>
+  <div class="block fs-s"><h4>Arithmetic mean</h4>
+    <p>Sum of all values divided by $n$: &emsp; $\displaystyle \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$</p></div>
+  <p class="inwords">the value every unit would have if the total were shared out equally.</p>
+  <p class="fs-s"><b>Advantage:</b> easy to compute. &emsp; <b>Disadvantage:</b> sensitive to extreme values (outliers).</p>
+  <div class="block fs-s"><h4>Trimmed mean $\bar{x}_{\text{trim}}$</h4>
+    <p>Choose a share $\alpha$ (e.g. $10\,\%$) to cut off at each end: remove the $\lfloor \alpha \cdot n \rfloor$ smallest and the $\lfloor \alpha \cdot n \rfloor$ largest values ($\lfloor\cdot\rfloor$ = round down), then take the arithmetic mean of the rest.</p></div>
+  <p class="fs-s"><b>Example</b> (shoe sizes, $\alpha = 10\,\%$): $\lfloor 0.1 \cdot 11 \rfloor = 1$ value per end $\to$ remove $37$ and $46$:</p>
+  <p class="fs-s">\[ \bar{x}_{\text{trim}} = \frac{436 - 37 - 46}{9} = \frac{353}{9} = 39.2222 \]</p>
+</section>
+
+<section class="slide">
+  <h2>Means (2): Geometric Mean &ndash; Averaging Growth Rates</h2>
+  <div class="block tight fs-s"><h4>Geometric mean (only for positive values)</h4>
+    <p>Product of all values, $n$-th root: &emsp; $\bar{x}_{\text{geo}} = \bigl(\prod_{i=1}^{n} x_i\bigr)^{1/n} = \sqrt[n]{x_1 \cdot x_2 \cdots x_n}$</p></div>
+  <div class="cols" style="--cols: 50fr 50fr; --gap: 22px">
+    <div class="fs-s stack" style="gap:10px">
+      <p><b>Motivation:</b> revenue grows by <span class="p1-nw">$r_1 = +20\,\%$</span> in year 1 and by <span class="p1-nw">$r_2 = -10\,\%$</span> in year 2. Is the average growth <span class="p1-nw">$(20\,\% - 10\,\%)/2 = 5\,\%$</span> per year? &ensp; <b>No!</b></p>
+      <ul>
+        <li>Growth rate $r_i$ $\to$ <b>growth factor</b> $1 + r_i$: &ensp; $1.20$ and $0.90$</li>
+        <li>Factors <b>multiply</b>: $1.20 \cdot 0.90 = 1.08$, i.e. $+8\,\%$ in total</li>
+        <li>Average factor: $\bar{x}_{\text{geo}} = \sqrt{1.08} = 1.0392$ $\to$ $\mathbf{+3.92\,\%}$ per year</li>
+        <li>Check: $1.0392^2 \approx 1.08$ $\checkmark$, &ensp; whereas $1.05^2 = 1.1025 \neq 1.08$</li>
+      </ul>
+    </div>
+    <div style="gap:6px">
+      <div class="viz" id="p1-geo" style="height:228px"></div>
+    </div>
+  </div>
+  <div class="block key fs-s"><p>Average growth rate $= \bar{x}_{\text{geo}}$ of the growth factors $1 + r_i$, minus $1$. $\bar{x}_{\text{geo}}$ is the <em>constant</em> factor that produces the same total growth.</p></div>
+  <script>
+  (() => {
+    QV.mount("#p1-geo", (el) => {
+      const C = QV.C;
+      let r1 = 0.2, r2 = -0.1;
+      const ch = QV.chart(el, { x: { domain: [0, 2], label: "Year", tickValues: [0, 1, 2], format: "d" }, y: { domain: [95, 125], label: "Revenue (year 0 = 100)", ticks: 5 }, margin: { top: 10, right: 64, left: 58, bottom: 44 } });
+      const lM = QV.line(ch, [], { color: C.green, width: 2.5, dash: true });
+      const lG = QV.line(ch, [], { color: C.orange, width: 2.5 });
+      const lA = QV.line(ch, [], { color: C.blue, width: 3 });
+      const dG = ch.layer("annot").append("g");
+      const tA = QV.text(ch, 2, 100, "", { anchor: "start", dx: 9, baseline: "middle" });
+      const tM = QV.text(ch, 2, 100, "", { anchor: "start", dx: 9, baseline: "middle" });
+      const leg = QV.legend(el, [
+        { label: "actual", color: C.blue, type: "line" },
+        { label: "constant geometric mean", color: C.orange, type: "line" },
+        { label: "constant arithmetic mean", color: C.green, type: "dash" },
+      ], "after");
+      const row = QV.controls(leg);
+      const out = document.createElement("p"); out.className = "fs-xs"; row.parentNode.insertBefore(out, row.nextSibling);
+      const pc = (v) => (v >= 0 ? "+" : "") + QV.fmt(100 * v, 2) + " %";
+      const upd = () => {
+        const f1 = 1 + r1, f2 = 1 + r2, tot = f1 * f2, g = Math.sqrt(tot), m = 1 + (r1 + r2) / 2;
+        const A = [[0, 100], [1, 100 * f1], [2, 100 * tot]], G = [[0, 100], [1, 100 * g], [2, 100 * tot]], M = [[0, 100], [1, 100 * m], [2, 100 * m * m]];
+        const all = A.concat(G, M).map((p) => p[1]);
+        const lo = Math.min(...all), hi = Math.max(...all), pad = (hi - lo) * 0.1 + 2;
+        ch.y.domain([lo - pad, hi + pad]).nice(); ch.axes();
+        QV.setLine(ch, lA, A); QV.setLine(ch, lG, G); QV.setLine(ch, lM, M);
+        dG.selectAll("circle").data(A).join("circle").attr("r", 5).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]))
+          .style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 2);
+        const yA = ch.y(100 * tot), yM = ch.y(100 * m * m);
+        let dA = 0, dM = 0;
+        if (Math.abs(yA - yM) < 18) { const s = (18 - Math.abs(yA - yM)) / 2; if (yA >= yM) { dA = s; dM = -s; } else { dA = -s; dM = s; } }
+        tA.set(2, 100 * tot, QV.fmt(100 * tot, 2)).attr("y", yA + dA);
+        tM.set(2, 100 * m * m, QV.fmt(100 * m * m, 2)).attr("y", yM + dM);
+        out.innerHTML = Deck.tex(`\\bar{x}_{\\text{geo}} = \\sqrt{${QV.fmt(f1, 2)} \\cdot ${QV.fmt(f2, 2)}} = ${QV.fmt(g, 4)}`) +
+          ` &rarr; <b>${pc(g - 1)}</b> per year; arithmetic mean of the rates: ${pc(m - 1)}` + (m - g > 1e-12 ? " (too high)" : " (equal rates: both agree)");
+      };
+      QV.slider(row, { label: "$r_1$", min: -40, max: 60, step: 1, value: 20, width: 120, fmt: (v) => (v > 0 ? "+" : "") + v + " %", onInput: (v) => { r1 = v / 100; upd(); } });
+      QV.slider(row, { label: "$r_2$", min: -40, max: 60, step: 1, value: -10, width: 120, fmt: (v) => (v > 0 ? "+" : "") + v + " %", onInput: (v) => { r2 = v / 100; upd(); } });
+      upd();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Median</h2>
+  <div class="block"><h4>Definition</h4><p>At or below which observation do at least 50&thinsp;% of the values lie?</p></div>
+  <dl><dt>Computation:</dt><dd>sort the data; the median is the value at position $\lceil n/2 \rceil$: &ensp; $\tilde{x} = x_{(\lceil n/2 \rceil)}$</dd></dl>
+  <div class="block alert"><h4>Note: alternative definition</h4>
+    <p>In some textbooks, the median for even $n$ is defined as the average of the two middle values (the &ldquo;middle value&rdquo;). In this course, we use the $\lceil n/2 \rceil$ definition.</p></div>
+  <div class="cols" style="--cols: 50fr 48fr">
+    <div><p><b>Advantages of the $\lceil n/2 \rceil$ definition:</b></p>
+      <ul><li>The median is always an actual observation</li>
+        <li>Consistent with the quantile definition: Median = 50&thinsp;%-quantile $= x_{(\lceil 0.5 \cdot n \rceil)}$</li></ul></div>
+    <div><p><b>Advantages of the median in general:</b></p>
+      <ul><li>Robust to outliers</li><li>Also suitable for ordinal data</li></ul></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Mode</h2>
+  <div class="block"><h4>Definition</h4><p>The most frequent value in the distribution</p></div>
+  <ul style="margin-top:6px">
+    <li><b>Advantage:</b> suitable for both ordinal and nominal data</li>
+    <li><b>Disadvantage:</b> often not unique</li>
+    <li><b>Disadvantage:</b> may not represent the &ldquo;centre&rdquo; of the distribution</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Which Measure for Which Level of Measurement?</h2>
+  <table class="bt p1-t24 p1-padl">
+    <thead><tr><th class="l">Level</th><th>Mode</th><th>Median, quantiles</th><th>Arithmetic mean</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Nominal</td><td>&#10003;</td><td>&ndash;</td><td>&ndash;</td></tr>
+      <tr><td class="l">Ordinal</td><td>&#10003;</td><td>&#10003;</td><td>&ndash;</td></tr>
+      <tr><td class="l">Metric</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Median and quantiles need a <b>ranking</b>, the mean needs meaningful <b>differences</b>.</li>
+    <li>The geometric mean needs positive values on a ratio scale (e.g. growth factors).</li>
+  </ul>
+  <div class="block example"><h4>Back to the online retailer (exercise in the Fundamentals)</h4>
+    <p><b>Mean</b> (and median, mode): number of items, order value, delivery time, order date<br>
+    <b>Median</b> (and mode), no mean: customer rating, customer status<br>
+    <b>Only the mode:</b> postcode, payment method</p></div>
+</section>
+
+<section class="slide">
+  <h2>Measures of Central Tendency &ndash; Example</h2>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l">Player</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th></tr></thead>
+    <tbody><tr><td class="l">Shoe size</td><td>40</td><td>39</td><td>38</td><td>41</td><td id="p1-cte-p5">46</td><td>39</td><td>39</td><td>38</td><td>37</td><td>40</td><td>39</td></tr></tbody>
+  </table>
+  <div class="cols mid" style="--cols: 40fr 60fr; --gap: 24px">
+    <div><table class="bt p1-pad">
+      <thead><tr><th class="l">Measure</th><th class="r">Value</th></tr></thead>
+      <tbody>
+        <tr><td class="l">Sum</td><td class="r" id="p1-cte-sum">436</td></tr>
+        <tr><td class="l">Arithmetic mean</td><td class="r" id="p1-cte-mean">39.6364</td></tr>
+        <tr><td class="l">Geometric mean</td><td class="r" id="p1-cte-geo">39.5755</td></tr>
+        <tr><td class="l" id="p1-cte-tl">Trimmed mean (10&thinsp;% per end)</td><td class="r" id="p1-cte-trim">39.2222</td></tr>
+        <tr><td class="l">Median</td><td class="r" id="p1-cte-med">39</td></tr>
+        <tr><td class="l">Mode</td><td class="r" id="p1-cte-mode">39</td></tr>
+      </tbody>
+    </table></div>
+    <div style="gap:6px">
+      <div class="viz" id="p1-cte" style="height:320px"></div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p1-cte", (el) => {
+      const S = QV.stats, C = QV.C, X0 = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], n = 11;
+      const pts = X0.map((v, i) => ({ i, v }));
+      let alpha = 0.1;
+      const ch = QV.chart(el, { x: { domain: [35, 60], label: "Shoe size", tickValues: d3.range(35, 61, 5), format: "d", grid: true }, y: { domain: [0, 1], hide: true }, margin: { top: 8, right: 16, bottom: 46, left: 16 } });
+      const H = ch.h, r = 11, gap = 25;
+      const specs = [{ k: "mean", color: C.orange }, { k: "geo", color: C.orange, dash: "3 4" }, { k: "trim", color: C.violet }, { k: "med", color: C.green }];
+      const L = {};
+      specs.forEach((s) => { L[s.k] = ch.layer("data").append("line").attr("y1", 0).attr("y2", H).style("stroke", s.color).style("stroke-width", 2.5).style("stroke-dasharray", s.dash || null); });
+      const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", (d) => (d.i === 4 ? 13 : r)).style("stroke-width", (d) => (d.i === 4 ? 3 : 2));
+      QV.attachTip(ch, sel, (d) => `Player ${d.i + 1}: ${d.v}${d.trim ? " (trimmed)" : ""}`);
+      const tag = QV.text(ch, 46, 0.5, "player 5: drag", { cls: "lbl-muted" });
+      const $ = (id) => document.getElementById(id);
+      const f4 = (v) => QV.fmt(v, 4);
+      const upd = () => {
+        const X = pts.map((d) => d.v);
+        const srt = pts.slice().sort((a, b) => a.v - b.v || a.i - b.i), k = Math.floor(alpha * n + 1e-9);
+        const c = {};
+        srt.forEach((d, j) => { d.trim = j < k || j >= n - k; c[d.v] = (c[d.v] || 0) + 1; d.lev = c[d.v]; });
+        const cy = (d) => H - 16 - (d.lev - 1) * gap;
+        sel.attr("cx", (d) => ch.x(d.v)).attr("cy", cy)
+          .style("fill", (d) => (d.trim ? C.surface : C.blue))
+          .style("stroke", (d) => (d.i === 4 ? C.ink : d.trim ? C.grey : C.surface));
+        const h = pts[4];
+        tag.set(h.v, ch.y.invert(cy(h) - 24));
+        const m = { mean: S.mean(X), geo: S.geomean(X), trim: S.trimmedMean(X, alpha), med: S.median(X) };
+        Object.keys(L).forEach((key) => L[key].attr("x1", ch.x(m[key])).attr("x2", ch.x(m[key])));
+        const cnt = {}; X.forEach((v) => { cnt[v] = (cnt[v] || 0) + 1; });
+        const mx = Math.max(...Object.values(cnt));
+        const modes = Object.keys(cnt).filter((v) => cnt[v] === mx).map(Number).sort((a, b) => a - b);
+        $("p1-cte-p5").textContent = h.v;
+        $("p1-cte-sum").textContent = S.sum(X);
+        $("p1-cte-mean").textContent = f4(m.mean);
+        $("p1-cte-geo").textContent = f4(m.geo);
+        $("p1-cte-trim").textContent = f4(m.trim);
+        $("p1-cte-tl").innerHTML = `Trimmed mean (${Math.round(alpha * 100)}&thinsp;% per end)`;
+        $("p1-cte-med").textContent = m.med;
+        $("p1-cte-mode").textContent = modes.join(", ");
+      };
+      QV.drag(ch, sel.filter((d) => d.i === 4), (xv, yv, d) => { const v = Math.max(36, Math.min(60, Math.round(xv))); if (v !== d.v) { d.v = v; upd(); } });
+      const leg = QV.legend(el, [
+        { label: "mean $\\bar{x}$", color: C.orange, type: "line" },
+        { label: "geometric mean", color: C.orange, type: "dash" },
+        { label: "trimmed mean", color: C.violet, type: "line" },
+        { label: "median", color: C.green, type: "line" },
+      ], "after");
+      const row = QV.controls(leg);
+      const sl = QV.slider(row, { label: "Trim $\\alpha$", min: 0, max: 0.4, step: 0.05, value: 0.1, width: 130, fmt: (v) => `${Math.round(v * 100)} % (${Math.floor(v * n + 1e-9)} per end)`, onInput: (v) => { alpha = v; upd(); } });
+      QV.button(row, "Reset", () => { pts[4].v = 46; sl.set(0.1); upd(); });
+      upd();
+    });
+  })();
+  </script>
+  <p class="fs-xs muted">Drag player 5 (ringed dot) and move $\alpha$: the mean follows the outlier, median and trimmed mean hardly move. Hollow dots are cut off by trimming.</p>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Mean, Median and Mode</h2>
+  <div class="block problem">
+    <p>An electronics shop records the number of laptops sold on $n = 9$ days:</p>
+    <p>\[ 4,\ 7,\ 3,\ 5,\ 4,\ 6,\ 4,\ 2,\ 10 \]</p>
+    <ol class="alpha">
+      <li>Compute the arithmetic mean, the median, the mode and the trimmed mean with $\alpha = 20\,\%$.</li>
+      <li>On day&nbsp;9 the shop actually sold $19$ laptops (a large company order), not $10$. Which of the four measures change, and to which value?</li>
+      <li>$n = 7$ customers rate the service: &ensp; good, very good, fair, good, poor, good, very&nbsp;good.<br>Which of the measures may be used for this variable? Determine them.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Mean, Median and Mode</h2>
+  <div class="block fs-s"><h4>Rule</h4>
+    <p>Sort first; &ensp; $\bar{x} = \frac{1}{n}\sum x_i$; &emsp; median $= x_{(\lceil n/2 \rceil)}$; &emsp; mode = most frequent value;<br>trimmed mean: drop $\lfloor \alpha \cdot n \rfloor$ values at each end, then average the rest.</p></div>
+  <p class="fs-s"><b>a)</b> Sorted data: &ensp; $2,\ 3,\ 4,\ 4,\ 4,\ 5,\ 6,\ 7,\ 10$ &emsp; (sum $= 45$)</p>
+  <div class="block example fs-s"><h4>Calculation</h4>
+    \begin{align*}
+      \bar{x} &= \frac{45}{9} = \mathbf{5}, \qquad
+      \tilde{x} = x_{(\lceil 9/2 \rceil)} = x_{(5)} = \mathbf{4}, \qquad
+      \text{mode} = \mathbf{4} \ (\text{occurs 3 times}) \\[10pt]
+      \bar{x}_{\text{trim}} &= \frac{45 - 2 - 10}{7} = \frac{33}{7} = \mathbf{4.7143}
+      \qquad (\lfloor 0.2 \cdot 9 \rfloor = \lfloor 1.8 \rfloor = 1 \text{ value removed per end})
+    \end{align*}
+  </div>
+  <p class="fs-s"><b>b)</b> With $19$ instead of $10$ the sum grows by $9$ to $54$ $\to$ $\bar{x} = 54 / 9 = \mathbf{6}$ (up by $1$). The order is unchanged <span class="p1-nw">($19$ is</span> still the largest value) $\to$ median $= \mathbf{4}$, mode $= \mathbf{4}$ and $\bar{x}_{\text{trim}} = (54 - 2 - 19) / 7 = \mathbf{4.7143}$ stay the same.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Mean, Median and Mode</h2>
+  <p><b>c)</b> The service rating is <b>ordinal</b>: the categories have a ranking (poor $&lt;$ fair $&lt;$ good $&lt;$ very good), but the distances between them are not meaningful.</p>
+  <ul>
+    <li>Sorted: &ensp; poor, fair, good, good, good, very good, very good</li>
+    <li>Median: $x_{(\lceil 7/2 \rceil)} = x_{(4)} = $ <b>good</b></li>
+    <li>Mode: <b>good</b> (3 of the 7 ratings)</li>
+    <li>Arithmetic (and trimmed) mean: <b>not meaningful</b> &ndash; &ldquo;(good + poor)&thinsp;/&thinsp;2&rdquo; is not defined, and the step from poor to fair need not equal the step from good to very good.</li>
+  </ul>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>A single extreme day moves the mean ($5 \to 6$), but not the median, the mode or the trimmed mean: these are <b>robust</b> to outliers. For ordinal data, use the median and the mode.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Arithmetic Mean from a Frequency Table</h2>
+  <p><b>Idea:</b> if the data are given as a frequency table, each value $x_j$ enters the sum $h_j$ times.</p>
+  <div class="block"><h4>Rule</h4>
+    <p>\[ \bar{x} = \frac{1}{n}\sum_{j=1}^{k} h_j \cdot x_j = \sum_{j=1}^{k} f_j \cdot x_j \qquad (k = \text{number of distinct values}) \]</p></div>
+  <table class="bt p1-t24 p1-padl p1-colhl">
+    <thead><tr><th class="l">Shoe size $x_j$</th><th>37</th><th>38</th><th>39</th><th>40</th><th>41</th><th>46</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$h_j$</td><td>1</td><td>2</td><td>4</td><td>2</td><td>1</td><td>1</td><td>11</td></tr>
+      <tr><td class="l">$h_j \cdot x_j$</td><td>37</td><td>76</td><td>156</td><td>80</td><td>41</td><td>46</td><td>436</td></tr>
+    </tbody>
+  </table>
+  <p>$\bar{x} = \frac{436}{11} = \mathbf{39.6364}$ &ndash; the same result as from the raw data.</p>
+  <p class="inwords" style="margin-top:6px">a <em>weighted</em> mean: every value counts as often as it occurs; the weights are the relative frequencies $f_j$.</p>
+</section>
+
+<section class="slide">
+  <h2>Measures of Central Tendency with Python (1)</h2>
+  <pre class="p1-code py p1-cl">
+import numpy as np
+from scipy import stats
+# Sum
+print(data.sum())                  # 436
+# Arithmetic mean
+print(data.mean())                 # 39.6364
+# Geometric mean
+# Step 1: Calculate the product of all values
+product = np.prod(data)
+# Step 2: Determine the number of observations
+n = len(data)
+# Step 3: Take the n-th root
+gmean = product ** (1 / n)         # 39.5755
+print(stats.gmean(data))           # same result in one step
+  </pre>
+  <a class="trynb" data-sec="section 2.3"></a>
+</section>
+
+<section class="slide">
+  <h2>Measures of Central Tendency with Python (2)</h2>
+  <pre class="p1-code py p1-cl">
+# Trimmed mean: 10% of the values are removed at EACH end
+print(stats.trim_mean(data, 0.10))  # 39.2222
+
+# Median
+print(np.median(data))              # 39.0
+
+# Mode (all most frequent values, as a list)
+print(data.mode().tolist())         # [39]
+
+# Mean from a frequency table: weighted mean
+print(np.average([37, 38, 39, 40, 41, 46], weights=[1, 2, 4, 2, 1, 1]))  # 39.6364
+  </pre>
+  <div class="block alert fs-s"><h4>Note: NumPy's median definition</h4>
+    <p>For even $n$, <code>np.median()</code> averages the two middle values &ndash; the course definition $x_{(\lceil n/2 \rceil)}$ is obtained with <code>np.quantile(data, 0.5, method="inverted_cdf")</code>.</p></div>
+  <a class="trynb" data-sec="section 2.3"></a>
+</section>
+
+<section class="slide">
+  <h2>Quantiles</h2>
+  <p><b>First, the values must be sorted!</b></p>
+  <dl style="row-gap:14px">
+    <dt>1st quartile:</dt><dd><span class="p1-nw">At or below which value do at least 25&thinsp;% of the values lie?</span></dd>
+    <dt>2nd quartile:</dt><dd><span class="p1-nw">= Median (at or below which value do at least 50&thinsp;% of the values lie?)</span></dd>
+    <dt>3rd quartile:</dt><dd><span class="p1-nw">At or below which value do at least 75&thinsp;% of the values lie?</span></dd>
+    <dt>Arbitrary $p$-quantile:</dt><dd><span class="p1-nw">At or below which value do at least $p \cdot 100\,\%$ of the values lie?</span></dd>
+  </dl>
+</section>
+
+<section class="slide">
+  <h2>Quantiles &ndash; Computation</h2>
+  <div class="block"><h4>Rule (course definition)</h4>
+    <p>\[ x_p = x_{(\lceil n \cdot p \rceil)} \]</p>
+    <p>Compute $n \cdot p$ and round <b>up</b> to the next integer: this is the position in the sorted data. If $n \cdot p$ is already an integer, it stays as it is.</p></div>
+  <p class="inwords">count $\lceil n \cdot p \rceil$ values from the bottom of the sorted list &ndash; at least $p \cdot 100\,\%$ of the observations lie at or below this value.</p>
+  <p style="margin-top:14px"><b>Example</b> 80&thinsp;%-quantile ($n = 11$): $n \cdot 0.8 = 11 \cdot 0.8 = 8.8$, round up to position 9 $\to$ $x_{0.8} = x_{(9)} = 40$.</p>
+  <p><b>Example</b> $n = 10$, $p = 0.2$: $n \cdot p = 2$ is already an integer $\to$ position 2.</p>
+</section>
+
+<section class="slide">
+  <h2>Quantiles &ndash; Computation Example</h2>
+  <div class="cols mid" style="--cols: 42fr 58fr; --gap: 24px">
+    <div><table class="bt p1-padl" id="p1-q-tab" style="white-space:nowrap">
+      <thead><tr><th class="l">Quantile</th><th>$p$</th><th>$n \cdot p$</th><th>Position</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr class="p1-qrow" data-p="0.25"><td class="l">1st quartile</td><td>0.25</td><td>2.75</td><td>3</td><td>38</td></tr>
+        <tr class="p1-qrow" data-p="0.5"><td class="l">2nd quartile</td><td>0.50</td><td>5.50</td><td>6</td><td>39</td></tr>
+        <tr class="p1-qrow" data-p="0.75"><td class="l">3rd quartile</td><td>0.75</td><td>8.25</td><td>9</td><td>40</td></tr>
+        <tr class="p1-qrow" data-p="0.17"><td class="l">17&thinsp;%-quantile</td><td>0.17</td><td>1.87</td><td>2</td><td>38</td></tr>
+        <tr class="p1-qrow" data-p="0.8"><td class="l">80&thinsp;%-quantile</td><td>0.80</td><td>8.80</td><td>9</td><td>40</td></tr>
+        <tr class="p1-qrow" data-p="0.05"><td class="l">5&thinsp;%-quantile</td><td>0.05</td><td>0.55</td><td>1</td><td>37</td></tr>
+      </tbody>
+    </table></div>
+    <div style="gap:6px">
+      <div class="viz" id="p1-q" style="height:380px"></div>
+    </div>
+  </div>
+  <p class="fs-xs muted">Click a row or move $p$: position $k$ covers the interval $(k-1,\,k]$ of the $n \cdot p$ line, so $n \cdot p$ is rounded <b>up</b>; an integer $n \cdot p$ stays.</p>
+  <script>
+  (() => {
+    QV.mount("#p1-q", (el) => {
+      const SX = [37, 38, 38, 39, 39, 39, 39, 40, 40, 41, 46], n = 11, C = QV.C;
+      const ch = QV.chart(el, { x: { domain: [0, 11], hide: true }, y: { domain: [0, 1], tickValues: [], grid: false }, margin: { top: 6, right: 14, bottom: 6, left: 44 } });
+      const X = ch.x, H = ch.h, Y = (px) => ch.y.invert(px);
+      const yLine = 84, yTok = 136, hTok = 58, uw = X(1) - X(0);
+      const ax = ch.layer("axes");
+      ax.append("line").attr("x1", X(0)).attr("x2", X(11)).attr("y1", yLine).attr("y2", yLine).style("stroke", C.axis).style("stroke-width", 1.5);
+      d3.range(0, 12).forEach((i) => {
+        ax.append("line").attr("x1", X(i)).attr("x2", X(i)).attr("y1", yLine - 5).attr("y2", yLine + 5).style("stroke", C.axis).style("stroke-width", 1.5);
+        ax.append("text").attr("class", "lbl-muted").attr("x", X(i)).attr("y", yLine + 21).attr("text-anchor", "middle").text(i);
+        if (i > 0) ax.append("line").attr("x1", X(i)).attr("x2", X(i)).attr("y1", yLine + 26).attr("y2", yTok - 2).style("stroke", C.grid).style("stroke-width", 1);
+      });
+      ax.append("text").attr("class", "lbl").attr("x", X(0) - 10).attr("y", yLine + 5).attr("text-anchor", "end").text("n·p");
+      const toks = ch.layer("data").append("g").selectAll("g").data(SX.map((v, i) => ({ v, k: i + 1 }))).join("g");
+      const rects = toks.append("rect").attr("x", (d) => X(d.k - 1) + 3).attr("width", uw - 6).attr("y", yTok).attr("height", hTok).attr("rx", 7)
+        .style("stroke-width", 2);
+      toks.append("text").attr("x", (d) => X(d.k - 0.5)).attr("y", yTok + 37).attr("text-anchor", "middle").style("font-size", "21px").style("font-weight", 600).style("fill", "var(--ink)").text((d) => d.v);
+      toks.append("text").attr("class", "lbl-muted").attr("x", (d) => X(d.k - 0.5)).attr("y", yTok + hTok + 20).attr("text-anchor", "middle")
+        .call((t) => { t.append("tspan").style("font-style", "italic").text("x"); t.append("tspan").attr("dy", 5).style("font-size", "13px").text((d) => `(${d.k})`); });
+      const mk = ch.layer("front").append("path").style("fill", C.orange);
+      const mkLab = ch.layer("front").append("text").attr("class", "lbl-strong").attr("text-anchor", "middle");
+      const arr = QV.segment(ch, 0, 0, 0, 0, { color: C.orange, width: 2.5, arrow: true, layer: "front" });
+      const res = QV.tex(ch, 5.5, Y(H - 54), "", { size: 21, bg: true });
+      const cov = QV.tex(ch, 5.5, Y(H - 16), "", { size: 16 });
+      let p = 0.8;
+      const rows = Array.from(document.querySelectorAll("#p1-q-tab tr.p1-qrow"));
+      const upd = () => {
+        const np = n * p, k = Math.max(1, Math.ceil(np - 1e-9)), v = SX[k - 1];
+        rects.style("fill", (d) => (d.k <= k ? C.orangeT : C.blueT)).style("stroke", (d) => (d.k === k ? C.orange : d.k < k ? "transparent" : "transparent"))
+          .style("stroke-width", (d) => (d.k === k ? 3.5 : 0));
+        const px = X(np);
+        mk.attr("d", `M${px},${yLine - 2}L${px - 8},${yLine - 16}L${px + 8},${yLine - 16}Z`);
+        mkLab.attr("x", Math.max(X(0) + 40, Math.min(X(11) - 40, px))).attr("y", yLine - 24).text(`n·p = ${QV.fmt(np, 2)}`);
+        arr.set(np, Y(yLine + 4), k - 0.5, Y(yTok - 4));
+        const ps = QV.fmt(p, 2);
+        res.set(5.5, Y(H - 54), `x_{${ps}} = x_{(\\lceil ${QV.fmt(np, 2)} \\rceil)} = x_{(${k})} = \\mathbf{${v}}`);
+        cov.set(5.5, Y(H - 16), `\\text{at or below } ${v}\\text{: } ${k} \\text{ of } 11 = ${QV.fmt(100 * k / n, 1)}\\,\\% \\ \\ge \\ ${QV.fmt(100 * p, 0)}\\,\\%`);
+        rows.forEach((r) => r.classList.toggle("p1-sel", Math.abs(+r.dataset.p - p) < 1e-9));
+      };
+      const row = QV.controls(el);
+      const sl = QV.slider(row, { label: "$p$", min: 0.01, max: 1, step: 0.01, value: p, width: 230, fmt: (v) => v.toFixed(2), onInput: (v) => { p = v; upd(); } });
+      rows.forEach((r) => r.addEventListener("click", () => sl.set(+r.dataset.p)));
+      upd();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Quantiles &ndash; Worked Example</h2>
+  <p>Sorted data: 37, 38, 38, 39, 39, 39, 39, 40, 40, 41, 46</p>
+  <table class="bt p1-t24 p1-pad" style="margin-top:6px">
+    <tbody>
+      <tr><th class="l">Position $i$</th><td>1</td><td>2</td><td class="hlb">3</td><td>4</td><td>5</td><td class="hl">6</td><td>7</td><td>8</td><td class="hlg">9</td><td>10</td><td>11</td></tr>
+      <tr><th class="l">$x_{(i)}$</th><td>37</td><td>38</td><td class="hlb">38</td><td>39</td><td>39</td><td class="hl">39</td><td>39</td><td>40</td><td class="hlg">40</td><td>41</td><td>46</td></tr>
+    </tbody>
+  </table>
+  \begin{align*}
+    \text{Median} &= x_{(\lceil 0.5 \cdot 11 \rceil)} = x_{(6)} = 39 \\
+    Q_1 &= x_{(\lceil 0.25 \cdot 11 \rceil)} = x_{(3)} = 38 \\
+    Q_3 &= x_{(\lceil 0.75 \cdot 11 \rceil)} = x_{(9)} = 40
+  \end{align*}
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Quantiles of Hotline Waiting Times</h2>
+  <div class="block problem">
+    <p>A customer hotline measures the waiting time (in minutes, rounded) of $n = 12$ calls:</p>
+    <p>\[ 3,\ 1,\ 5,\ 2,\ 6,\ 4,\ 2,\ 8,\ 3,\ 4,\ 2,\ 5 \]</p>
+    <ol class="alpha">
+      <li>Sort the data.</li>
+      <li>Determine the $10\,\%$-quantile, $Q_1$, the median, $Q_3$ and the $90\,\%$-quantile.</li>
+      <li>The hotline wants to promise: &ldquo;At least $90\,\%$ of our callers wait at most $x$ minutes.&rdquo; What is the smallest $x$ supported by the data?</li>
+      <li>A colleague reports a median of $3.5$ minutes. How did they obtain this value, and what is the median according to the course definition?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Quantiles of Hotline Waiting Times</h2>
+  <div class="block fs-s"><h4>Rule</h4>
+    <p>$x_p = x_{(\lceil n \cdot p \rceil)}$: round $n \cdot p$ <b>up</b> (an integer stays as it is); take the value at this position.</p></div>
+  <p class="fs-s"><b>a)</b> Sorted data ($x_{(1)}, \ldots, x_{(12)}$): &emsp; $1,\ 2,\ 2,\ 2,\ 3,\ 3,\ 4,\ 4,\ 5,\ 5,\ 6,\ 8$</p>
+  <p class="fs-s"><b>b)</b> Quantiles for $n = 12$:</p>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l">Quantile</th><th>$p$</th><th>$n \cdot p$</th><th>Position</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$10\,\%$-quantile</td><td>$0.10$</td><td>$1.2$</td><td>$2$</td><td>$x_{(2)} = \mathbf{2}$</td></tr>
+      <tr><td class="l">$Q_1$</td><td>$0.25$</td><td>$3.0$</td><td>$3$</td><td>$x_{(3)} = \mathbf{2}$</td></tr>
+      <tr><td class="l">Median</td><td>$0.50$</td><td>$6.0$</td><td>$6$</td><td>$x_{(6)} = \mathbf{3}$</td></tr>
+      <tr><td class="l">$Q_3$</td><td>$0.75$</td><td>$9.0$</td><td>$9$</td><td>$x_{(9)} = \mathbf{5}$</td></tr>
+      <tr><td class="l">$90\,\%$-quantile</td><td>$0.90$</td><td>$10.8$</td><td>$11$</td><td>$x_{(11)} = \mathbf{6}$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-s">Note: $x_{0.1} = Q_1 = 2$ because of ties (three calls of exactly $2$ minutes) &ndash; only the position counts.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Quantiles of Hotline Waiting Times</h2>
+  <p><b>c)</b> The promise asks for the $90\,\%$-quantile: &ensp; $x_{0.9} = x_{(11)} = \mathbf{6}$ minutes.</p>
+  <ul>
+    <li>Check with the cumulative relative frequency: &ensp; $F(6) = \tfrac{11}{12} = 0.9167 \geq 0.9$ $\checkmark$</li>
+    <li>$5$ minutes are not enough: &ensp; $F(5) = \tfrac{10}{12} = 0.8333 &lt; 0.9$</li>
+  </ul>
+  <p style="margin-top:10px"><b>d)</b> The colleague averaged the two middle values $x_{(6)} = 3$ and $x_{(7)} = 4$: <span class="p1-nw">$(3 + 4) / 2 = 3.5$</span> &ndash; the alternative textbook definition for even $n$. The course definition gives &ensp; <span class="p1-nw">$\tilde{x} = x_{(\lceil 12/2 \rceil)} = x_{(6)} = \mathbf{3}$ minutes.</span></p>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>At least half of the callers wait at most $3$ minutes and at least $90\,\%$ at most $6$ minutes &ndash; only the single caller with $8$ minutes waits longer.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Quantiles with Python</h2>
+  <pre class="p1-code py p1-cl">
+# Course definition x_(ceil(n*p)): method="inverted_cdf"
+# All standard quantiles at once (0, 25, 50, 75, 100 %)
+p = [0, 0.25, 0.50, 0.75, 1]
+print(np.quantile(data, p, method="inverted_cdf"))   # [37 38 39 40 46]
+
+# 1st quartile (25%-quantile)
+print(np.quantile(data, 0.25, method="inverted_cdf"))  # 38
+
+# 80%-quantile
+print(np.quantile(data, 0.80, method="inverted_cdf"))  # 40
+  </pre>
+  <div class="block alert fs-s"><h4>Pitfall: the default method interpolates</h4>
+    <p><code>np.quantile(data, 0.25)</code> and <code>data.quantile(0.25)</code> use linear interpolation and return $38.5$ &ndash; always pass <code>method="inverted_cdf"</code> to get the course definition.</p></div>
+  <a class="trynb" data-sec="section 2.3"></a>
+</section>
+
+<section class="slide" data-subsection="Exercises">
+  <h2>Exercise &ndash; Measures of Central Tendency and Quantiles</h2>
+  <div class="block problem">
+    <p>Annual salaries (in thousand euros) of the $n = 10$ employees of a department, including the head of department:</p>
+    <p>\[ 34,\ 42,\ 28,\ 120,\ 36,\ 31,\ 45,\ 34,\ 50,\ 39 \]</p>
+    <ol class="alpha">
+      <li>Sort the data and compute the arithmetic mean, the median and the mode.</li>
+      <li>Compute the trimmed mean (remove $10\,\%$ of the values at each end).</li>
+      <li>Determine $Q_1$, $Q_3$ and the $20\,\%$- and $90\,\%$-quantiles.</li>
+      <li>Which measure best describes the &ldquo;typical&rdquo; salary in the department? Give reasons.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/4) &ndash; Measures of Central Tendency and Quantiles</h2>
+  <div class="block fs-s"><h4>Rule</h4>
+    <p>Sort first; &ensp; $\bar{x} = \frac{1}{n}\sum x_i$; &emsp; median $= x_{(\lceil n/2 \rceil)}$; &emsp; mode = most frequent value.</p></div>
+  <p><b>a)</b> Sorted data ($x_{(1)}, \ldots, x_{(10)}$): &emsp; $28,\ 31,\ 34,\ 34,\ 36,\ 39,\ 42,\ 45,\ 50,\ 120$</p>
+  <div class="block example"><h4>Calculation</h4>
+    \begin{align*}
+      \bar{x} &= \frac{28 + 31 + 34 + 34 + 36 + 39 + 42 + 45 + 50 + 120}{10} = \frac{459}{10} = \mathbf{45.9} \\[8pt]
+      \tilde{x} &= x_{(\lceil 0.5 \cdot 10 \rceil)} = x_{(5)} = \mathbf{36} \\[6pt]
+      \text{Mode} &= \mathbf{34} \quad (\text{the only value that occurs twice})
+    \end{align*}
+  </div>
+  <p>The arithmetic mean ($45.9$) lies far above the median ($36$): $8$ of the $10$ employees earn less than the average.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/4) &ndash; Measures of Central Tendency and Quantiles</h2>
+  <p><b>b)</b> Trimmed mean: $\lfloor 0.1 \cdot 10 \rfloor = 1$ value per end $\to$ remove $28$ and $120$, average the rest:</p>
+  <p>\[ \bar{x}_{\text{trim}} = \frac{31 + 34 + 34 + 36 + 39 + 42 + 45 + 50}{8} = \frac{311}{8} = \mathbf{38.875} \]</p>
+  <p><b>c)</b> Rule: position $= \lceil n \cdot p \rceil$ in the sorted data; if $n \cdot p$ is already an integer, it <span class="p1-nw">is not rounded up.</span></p>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l">Quantile</th><th>$p$</th><th>$n \cdot p$</th><th>Position</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$20\,\%$-quantile</td><td>$0.20$</td><td>$2.0$</td><td>$2$</td><td>$x_{(2)} = \mathbf{31}$</td></tr>
+      <tr><td class="l">$Q_1$</td><td>$0.25$</td><td>$2.5$</td><td>$3$</td><td>$x_{(3)} = \mathbf{34}$</td></tr>
+      <tr><td class="l">$Q_3$</td><td>$0.75$</td><td>$7.5$</td><td>$8$</td><td>$x_{(8)} = \mathbf{45}$</td></tr>
+      <tr><td class="l">$90\,\%$-quantile</td><td>$0.90$</td><td>$9.0$</td><td>$9$</td><td>$x_{(9)} = \mathbf{50}$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-s">Note: $x_{(3)} = x_{(4)} = 34$ &ndash; ties (equal values) do not change the rule; only the position counts.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/4) &ndash; Measures of Central Tendency and Quantiles</h2>
+  <p><b>d)</b> The salary of the head of department ($120$) is an outlier and pulls the mean up to $45.9$ &ndash; a salary hardly anyone in the department earns. The <b>median ($36$)</b> and the trimmed mean ($38.9$) are robust to the outlier and describe the typical salary better.</p>
+  <div class="viz" id="p1-sal" style="height:270px"></div>
+  <p class="fs-xs muted" style="margin-top:-6px">Drag the head of department (ringed dot): the mean follows, median and trimmed mean stay put.</p>
+  <div class="block key"><p>For skewed data with outliers (salaries, wealth, sales) always report the median <b>and</b> the mean &ndash; the gap between them reveals the skewness.</p></div>
+  <script>
+  (() => {
+    QV.mount("#p1-sal", (el) => {
+      const S = QV.stats, C = QV.C;
+      const pts = [34, 42, 28, 120, 36, 31, 45, 34, 50, 39].map((v, i) => ({ v, i, head: i === 3 }));
+      const ch = QV.chart(el, { x: { domain: [25, 160], label: "thousand euros", tickValues: d3.range(30, 161, 10), format: "d" }, y: { domain: [0, 1.6], hide: true }, margin: { top: 4, right: 20, bottom: 46, left: 20 } });
+      const mk = (color, top, anchor, dx) => ({ ln: QV.segment(ch, 0, 0, 0, top, { color, width: 3, layer: "data" }), tx: QV.text(ch, 0, top, "", { anchor, dx, dy: -6, cls: "lbl" }), top });
+      const M = { med: mk(C.green, 0.9, "end", -4), trim: mk(C.violet, 1.35, "start", 4), mean: mk(C.orange, 0.9, "start", 4) };
+      const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle")
+        .attr("r", (d) => (d.head ? 11 : 9)).style("fill", C.blue).style("stroke", (d) => (d.head ? C.ink : C.surface)).style("stroke-width", (d) => (d.head ? 3 : 2));
+      QV.attachTip(ch, sel, (d) => `${d.head ? "head of department" : "employee"}: ${d.v} thousand euros`);
+      const tag = QV.text(ch, 120, 0.2, "head of department", { cls: "lbl", dy: -20 });
+      const ft = (v) => QV.fmt(v, 3, true);
+      const upd = () => {
+        const X = pts.map((d) => d.v);
+        const c = {};
+        pts.slice().sort((a, b) => a.v - b.v || a.i - b.i).forEach((d) => { c[d.v] = (c[d.v] || 0) + 1; d.lev = c[d.v]; });
+        const yy = (d) => 0.2 + 0.26 * (d.lev - 1);
+        sel.attr("cx", (d) => ch.x(d.v)).attr("cy", (d) => ch.y(yy(d)));
+        const h = pts[3];
+        tag.set(h.v, yy(h)).attr("text-anchor", h.v > 140 ? "end" : h.v < 45 ? "start" : "middle");
+        const m = { med: S.median(X), trim: S.trimmedMean(X, 0.1), mean: S.mean(X) };
+        const name = { med: "median", trim: "trimmed mean", mean: "mean" };
+        Object.keys(M).forEach((k) => { M[k].ln.set(m[k], 0, m[k], M[k].top); M[k].tx.set(m[k], M[k].top, `${name[k]} ${ft(m[k])}`); });
+      };
+      QV.drag(ch, sel.filter((d) => d.head), (xv, yv, d) => { const v = Math.max(25, Math.min(160, Math.round(xv))); if (v !== d.v) { d.v = v; upd(); } });
+      upd();
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Solution (4/4) &ndash; Measures of Central Tendency and Quantiles</h2>
+  <pre class="p1-code py p1-cl">
+# Python check; course quantiles need method="inverted_cdf"
+salary = np.array([34, 42, 28, 120, 36, 31, 45, 34, 50, 39])
+print(np.sort(salary))
+print(salary.mean(), stats.trim_mean(salary, 0.10))
+print(pd.Series(salary).mode().tolist())
+print(np.quantile(salary, 0.5, method="inverted_cdf"), np.median(salary))
+print(np.quantile(salary, [0.2, 0.25, 0.75, 0.9], method="inverted_cdf"))
+  </pre>
+  <pre class="p1-code out">
+[ 28  31  34  34  36  39  42  45  50 120]
+45.9 38.875
+[34]
+36 37.5
+[31 34 45 50]
+  </pre>
+  <div class="block alert fs-s"><h4>Pitfall: even $n$</h4>
+    <p><code>np.median()</code> returns $37.5 = (x_{(5)} + x_{(6)})/2$; the course median is $x_{(\lceil 10/2 \rceil)} = x_{(5)} = 36$.</p></div>
+  <a class="trynb" data-sec="section 2.4"></a>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Geometric Mean</h2>
+  <div class="block problem">
+    <p>The revenue of a start-up was exactly $200$ thousand euros in year&nbsp;0. In the following three years it changed by</p>
+    <p>\[ +10\,\%, \qquad -5\,\%, \qquad +20\,\%. \]</p>
+    <ol class="alpha">
+      <li>What is the revenue after three years?</li>
+      <li>Compute the arithmetic mean of the three growth rates. Which revenue after three years would you obtain if revenue had grown by this mean every year?</li>
+      <li>Compute the average annual growth rate via the geometric mean of the growth factors and check the result.</li>
+      <li>Why does the arithmetic mean in b) give a wrong result?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Geometric Mean</h2>
+  <div class="block"><h4>Rule</h4>
+    <p>Growth rate $r_i$ $\to$ growth factor $1 + r_i$. Several periods: <b>multiply</b> the factors.</p></div>
+  <p><b>a)</b> Growth factors: $1.10$; &ensp; $0.95$; &ensp; $1.20$</p>
+  <p>\[ \text{Revenue}_3 = 200 \cdot 1.10 \cdot 0.95 \cdot 1.20 = 200 \cdot 1.254 = \mathbf{250.8} \text{ thousand euros} \]</p>
+  <p><b>b)</b> Arithmetic mean of the rates:</p>
+  <p>\[ \bar{r} = \frac{0.10 - 0.05 + 0.20}{3} = \frac{0.25}{3} = 0.0833 = \mathbf{8.33\,\%} \]</p>
+  <p><span class="p1-nw">With this mean: $200 \cdot 1.0833^3 = 200 \cdot 1.2714 = \mathbf{254.3}$ thousand euros $\neq 250.8$ $\to$ <b>too high!</b></span></p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Geometric Mean</h2>
+  <p><b>c)</b> Geometric mean of the growth factors:</p>
+  <p>\[ \bar{x}_{\text{geo}} = \left(1.10 \cdot 0.95 \cdot 1.20\right)^{1/3} = 1.254^{1/3} = \mathbf{1.0784} \quad\Rightarrow\quad \bar{r}_{\text{geo}} = 1.0784 - 1 = \mathbf{7.84\,\%} \]</p>
+  <p>Check: $200 \cdot 1.0784^3 \approx 200 \cdot 1.254 = 250.8$ thousand euros $\checkmark$</p>
+  <p><b>d)</b> Growth acts <b>multiplicatively</b>: the $+20\,\%$ applies to a different base than the $+10\,\%$. The arithmetic mean of the rates is never smaller than the geometric one &ndash; it overstates growth.</p>
+  <pre class="p1-code py">
+factors = np.array([1.10, 0.95, 1.20])
+print(200 * np.prod(factors))       # 250.8
+print(factors.mean() - 1)           # 0.0833  (arithmetic: wrong)
+print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
+  </pre>
+  <div class="block key fs-s"><p>Average growth rates, returns, price increases: <b>geometric mean of the growth factors</b>.</p></div>
+  <a class="trynb" data-sec="section 2.4"></a>
+</section>
+
+<!-- ======================================================= MEASURES OF DISPERSION -->
+<section class="slide" data-subsection="Measures of Dispersion">
+  <h2>Measures of Dispersion</h2>
+  <div class="p1-divider">Measures of Dispersion &ndash; Range, Interquartile Range,<br>Variance, Standard Deviation,<br>Coefficient of Variation, Normalised Coefficient of Variation</div>
+</section>
+
+<section class="slide">
+  <h2>Measures of Dispersion &ndash; Why?</h2>
+  <p><i>Example: Shoe sizes of two women's rowing fours (without coxswain)</i></p>
+  <table class="bt p1-t24 p1-padl" style="margin-top:10px">
+    <thead><tr><th class="l"></th><th>Four A</th><th>Four B</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Data</td><td>34, 37, 40, 41</td><td>36, 37, 39, 40</td></tr>
+      <tr><td class="l">Mean</td><td>38</td><td>38</td></tr>
+      <tr><td class="l">Median</td><td>37</td><td>37</td></tr>
+    </tbody>
+  </table>
+  <div class="block" style="margin-top:24px"><h4>Question</h4>
+    <p>The mean and median are identical. Does that mean the data sets are equivalent?</p></div>
+</section>
+
+<section class="slide">
+  <h2>Measures of Dispersion &ndash; Visualisation</h2>
+  <div class="viz" id="p1-disp" style="height:352px"></div>
+  <ul style="margin-top:-4px">
+    <li>Mean and median are identical &ndash; but the <b>dispersion</b> differs considerably</li>
+    <li>Four A: Data farther from the mean $\to$ greater dispersion</li>
+    <li>Four B: Data closely concentrated around the mean $\to$ less dispersion</li>
+  </ul>
+  <script>
+  (() => {
+    QV.mount("#p1-disp", (el) => {
+      const C = QV.C, S = QV.stats;
+      const groups = [{ name: "Four A", x: [34, 37, 40, 41] }, { name: "Four B", x: [36, 37, 39, 40] }];
+      el.classList.add("p1-twin");
+      const legend = QV.legend(el, [
+        { label: "mean $\\bar{x} = 38$", color: C.orange, type: "dash" },
+        { label: "median $\\tilde{x} = 37$", color: C.green, type: "line" },
+        { label: "deviation $x_i - \\bar{x}$ / squared deviation", color: C.red, type: "swatch" },
+      ], "before");
+      legend.style.justifyContent = "flex-end";
+      const P = groups.map((g) => { const d = document.createElement("div"); el.appendChild(d); return { g, el: d }; });
+      const fmtSum = (arr) => arr.map((v, i) => (i === 0 ? String(v) : v < 0 ? ` - ${-v}` : ` + ${v}`)).join("");
+      P.forEach((p) => {
+        const ch = QV.chart(p.el, { x: { domain: [33, 42], label: "Shoe size", tickValues: d3.range(33, 43), format: "d", grid: true }, y: { domain: [0, 1], hide: true }, margin: { top: 50, right: 30, bottom: 44, left: 30 } });
+        const ux = ch.x(1) - ch.x(0), base = ch.h - 18, Y = (px) => ch.y.invert(px);
+        const xs = p.g.x, m = S.mean(xs), med = S.median(xs), dev = xs.map((v) => v - m), n = xs.length;
+        ch.svg.append("text").attr("class", "lbl-strong").attr("x", ch.m.left + ch.w / 2).attr("y", 18).attr("text-anchor", "middle").text(p.g.name);
+        QV.vline(ch, m, { color: C.orange, dash: "7 5", width: 2.5, layer: "data" });
+        QV.vline(ch, med, { color: C.green, dash: "10 4 2 4", width: 2.5, layer: "data" });
+        const sq = ch.layer("data").append("g").style("display", "none");
+        xs.forEach((v, i) => {
+          const side = Math.abs(dev[i]) * ux;
+          sq.append("rect").attr("x", ch.x(Math.min(v, m))).attr("width", side).attr("y", base - side).attr("height", side)
+            .style("fill", C.red).style("fill-opacity", 0.1).style("stroke", C.red).style("stroke-width", 1.5);
+          if (side > 26) sq.append("text").attr("class", "lbl-muted").attr("text-anchor", "middle").attr("x", ch.x((v + m) / 2)).attr("y", base - side + 17).style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 4).text(`${dev[i] * dev[i]}`);
+        });
+        const dv = ch.layer("annot").append("g").style("display", "none");
+        xs.forEach((v, i) => {
+          const yy = base - 40 - i * 30;
+          QV.segment(ch, m, Y(yy), v, Y(yy), { color: C.red, width: 2.5, arrow: true }).remove().each(function () { dv.node().appendChild(this); });
+          dv.append("text").attr("class", "lbl").attr("text-anchor", "middle").attr("x", ch.x((v + m) / 2)).attr("y", yy - 7).text((dev[i] > 0 ? "+" : "−") + Math.abs(dev[i]));
+          dv.append("line").attr("x1", ch.x(v)).attr("x2", ch.x(v)).attr("y1", yy).attr("y2", base).style("stroke", C.red).style("stroke-width", 1).style("stroke-dasharray", "2 3");
+        });
+        const mid = Math.round(ch.h * 0.5);
+        const dots = ch.layer("front").append("g");
+        const circ = dots.selectAll("circle").data(xs).join("circle").attr("cx", (v) => ch.x(v)).attr("cy", base).attr("r", 9)
+          .style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 2)
+          .call((s) => QV.attachTip(ch, s, (v) => `x = ${v}<br>x − x̄ = ${v - m > 0 ? "+" : ""}${QV.fmt(v - m, 0)}<br>(x − x̄)² = ${(v - m) ** 2}`));
+        const vl = dots.append("g");
+        xs.forEach((v) => vl.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("x", ch.x(v)).attr("y", base - 16).style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 5).style("stroke-linejoin", "round").text(v));
+        const lab = QV.tex(ch, 37.5, Y(-14), "", { size: 15 });
+        const ss = dev.reduce((a, d) => a + d * d, 0);
+        p.set = (mode, instant) => {
+          const y = mode === "pts" ? mid : base;
+          (instant ? circ : circ.transition().duration(450)).attr("cy", y);
+          (instant ? vl : vl.transition().duration(450)).attr("transform", `translate(0,${y - base})`);
+          sq.style("display", mode === "sq" ? null : "none");
+          dv.style("display", mode === "dev" ? null : "none");
+          vl.style("display", mode === "sq" ? "none" : null);
+          if (mode === "pts") lab.set(37.5, Y(-14), `\\bar{x} = ${QV.fmt(m, 0)}, \\quad \\tilde{x} = ${med}`);
+          if (mode === "dev") lab.set(37.5, Y(-14), `\\textstyle\\sum (x_i - \\bar{x}) = ${fmtSum(dev)} = 0`);
+          if (mode === "sq") lab.set(37.5, Y(-14), `\\textstyle\\sum (x_i - \\bar{x})^2 = ${fmtSum(dev.map((d) => d * d))} = ${ss},\\ s^2 = \\tfrac{${ss}}{${n - 1}} = ${QV.fmt(ss / (n - 1), 2, true)}`);
+        };
+      });
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Show", options: [["pts", "data"], ["dev", "deviations from the mean"], ["sq", "squared deviations"]], value: "pts", onChange: (v) => P.forEach((p) => p.set(v)) });
+      QV.readout(row, "<span class='muted'>Squares have side $|x_i - \\bar{x}|$; their total area is $\\sum (x_i - \\bar{x})^2$.</span>");
+      P.forEach((p) => p.set("pts", true));
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Range and Interquartile Range</h2>
+  <div class="block"><h4>Definitions</h4>
+    <p><b>Range:</b> &emsp; $R = x_{(n)} - x_{(1)}$ &ensp; (largest minus smallest value)</p>
+    <p><b>Interquartile range:</b> &emsp; $\text{IQR} = Q_3 - Q_1 = x_{0.75} - x_{0.25}$</p></div>
+  <p class="inwords">$R$ is the width of the whole data set, the IQR the width of its middle 50&thinsp;%.</p>
+  <p><b>Example</b> (soccer team, sorted): &ensp; 37, 38, <b>38</b>, 39, 39, 39, 39, 40, <b>40</b>, 41, 46</p>
+  <ul>
+    <li>$R = 46 - 37 = \mathbf{9}$, &emsp; $\text{IQR} = x_{(9)} - x_{(3)} = 40 - 38 = \mathbf{2}$</li>
+    <li>Rowing fours: <span class="p1-nw">$R_A = 41 - 34 = 7 &gt; R_B = 40 - 36 = 4$ &ensp; and</span> &ensp; <span class="p1-nw">$\text{IQR}_A = 40 - 34 = 6 &gt; \text{IQR}_B = 39 - 36 = 3$</span></li>
+  </ul>
+  <div class="block alert"><h4>Range vs. IQR</h4>
+    <p>$R$ depends only on the two most extreme values: the player with size 46 alone makes $R = 9$. The IQR ignores the outer 25&thinsp;% on each side and is <b>robust</b> to outliers.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Sample Variance</h2>
+  <div class="block"><h4>Definition</h4>
+    <p>Mean squared deviation from the mean (corrected with $n-1$):</p>
+    <p>\[ s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 \qquad 0 \leq s^2 &lt; \infty \]</p></div>
+  <p class="inwords">roughly the average squared distance of the values from their mean.</p>
+  <ul>
+    <li><b>Why square?</b> &ndash; The deviations from the mean always cancel out exactly, $\sum_{i=1}^{n}(x_i - \bar{x}) = 0$. Squaring makes every deviation count positively.</li>
+    <li><b>Why divide by $n-1$ only?</b> &ndash; Because using the mean leaves only $n-1$ degrees of freedom: if the mean and $n-1$ values are known, the $n$-th value can be computed.</li>
+    <li>The dimension has changed, e.g. cm becomes cm$^2$.</li>
+    <li>Comparison requires the same units. With different $n$, the precision of the estimates may differ.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Sample Variance &ndash; Worked Example</h2>
+  <table class="bt p1-t24 p1-pad">
+    <thead><tr><th class="l"></th><th>Four A</th><th>Four B</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Data</td><td>34, 37, 40, 41</td><td>36, 37, 39, 40</td></tr>
+      <tr><td class="l">Mean $\bar{x}$</td><td>38</td><td>38</td></tr>
+      <tr><td class="l">Deviations $x_i - \bar{x}$</td><td>$-4,\ -1,\ +2,\ +3$</td><td>$-2,\ -1,\ +1,\ +2$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-s">Check: the deviations sum to $0$ in both cases.</p>
+  <div class="block example"><h4>Calculation</h4>
+    \begin{align*}
+      s^2_A &= \frac{1}{4-1}\bigl[(34-38)^2 + (37-38)^2 + (40-38)^2 + (41-38)^2\bigr] = \frac{30}{3} = 10 \\[12pt]
+      s^2_B &= \frac{1}{4-1}\bigl[(36-38)^2 + (37-38)^2 + (39-38)^2 + (40-38)^2\bigr] = \frac{10}{3} \approx 3.33
+    \end{align*}
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Standard Deviation</h2>
+  <div class="block"><h4>Definition</h4>
+    <p>The standard deviation is the square root of the variance:</p>
+    <p>\[ s = +\sqrt{s^2} \qquad 0 \leq s &lt; \infty \]</p></div>
+  <ul>
+    <li>By taking the square root, the measure of dispersion is again in the <b>dimension of the original values</b></li>
+    <li>If $s = 0$: no dispersion &ndash; all values are equal and equal the mean</li>
+    <li>Same unit as the original values, therefore <b>more intuitive</b> than the sample variance</li>
+    <li>Comparison requires the same units. With different $n$, the precision of the estimates may differ.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Standard Deviation &ndash; Worked Example</h2>
+  <div class="block example"><h4>Calculation</h4>
+    \begin{align*}
+      s_A &= +\sqrt{s^2_A} = +\sqrt{10} = 3.1623 \\[8pt]
+      s_B &= +\sqrt{s^2_B} = +\sqrt{3.\overline{3}} = 1.8257
+    \end{align*}
+  </div>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>The values of Four A scatter around the mean with a standard deviation of about $3.16$ shoe sizes, the values of Four B only with about $1.83$.</p>
+    <p>$\to$ The dispersion is now expressed in the <b>same unit</b> as the original data.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Variance and Standard Deviation</h2>
+  <div class="block problem">
+    <p>The online retailer compares two parcel services. Delivery times (in days) of $n = 5$ orders each:</p>
+    <table class="bt p1-pad">
+      <thead><tr><th class="l">Order $i$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+      <tbody>
+        <tr><td class="l">Parcel service A</td><td>2</td><td>5</td><td>1</td><td>3</td><td>4</td></tr>
+        <tr><td class="l">Parcel service B</td><td>4</td><td>3</td><td>5</td><td>4</td><td>4</td></tr>
+      </tbody>
+    </table>
+    <ol class="alpha">
+      <li>Compute the mean $\bar{x}$ and the range $R$ for both services.</li>
+      <li>Compute the sample variance $s^2$ and the standard deviation $s$ (with units).</li>
+      <li>Which service delivers faster on average, which more reliably? Give reasons.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; Variance and Standard Deviation</h2>
+  <div class="block fs-s"><h4>Rule</h4>
+    <p>Deviations from the mean, square them, add them up, divide by $n - 1 = 4$: &ensp; <span class="p1-nw">$s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2$; &emsp; $s = +\sqrt{s^2}$.</span></p></div>
+  <p class="fs-s"><b>a)</b> Means: &ensp; $\bar{x}_A = \frac{2 + 5 + 1 + 3 + 4}{5} = \frac{15}{5} = \mathbf{3}$ days, &emsp; $\bar{x}_B = \frac{4 + 3 + 5 + 4 + 4}{5} = \frac{20}{5} = \mathbf{4}$ days<br>
+    <span style="padding-left:1.2em"></span>Ranges: &ensp; $R_A = 5 - 1 = \mathbf{4}$ days, &emsp; $R_B = 5 - 3 = \mathbf{2}$ days</p>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l">Order $i$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">A: $x_i - 3$</td><td>$-1$</td><td>$2$</td><td>$-2$</td><td>$0$</td><td>$1$</td><td>$0$</td></tr>
+      <tr><td class="l">A: $(x_i - 3)^2$</td><td>$1$</td><td>$4$</td><td>$4$</td><td>$0$</td><td>$1$</td><td>$10$</td></tr>
+      <tr class="mid"><td class="l">B: $x_i - 4$</td><td>$0$</td><td>$-1$</td><td>$1$</td><td>$0$</td><td>$0$</td><td>$0$</td></tr>
+      <tr><td class="l">B: $(x_i - 4)^2$</td><td>$0$</td><td>$1$</td><td>$1$</td><td>$0$</td><td>$0$</td><td>$2$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-s">Check: the deviations sum to $0$ for both services $\checkmark$</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; Variance and Standard Deviation</h2>
+  <p class="fs-s"><b>b)</b> Divide the sums of squares by $n - 1 = 4$, then take the square root:</p>
+  <div class="fs-s">
+    \begin{align*}
+      s^2_A &= \frac{10}{4} = \mathbf{2.5} \text{ days}^2, & \qquad s_A &= \sqrt{2.5} = \mathbf{1.5811} \text{ days} \\[8pt]
+      s^2_B &= \frac{2}{4} = \mathbf{0.5} \text{ days}^2, & \qquad s_B &= \sqrt{0.5} = \mathbf{0.7071} \text{ days}
+    \end{align*}
+  </div>
+  <p class="fs-s"><b>c)</b> Comparison:</p>
+  <ul class="fs-s">
+    <li><b>Faster on average:</b> service <b>A</b> ($\bar{x}_A = 3$ days vs. $\bar{x}_B = 4$ days)</li>
+    <li><b>More reliable:</b> service <b>B</b> ($s_B = 0.71$ vs. $s_A = 1.58$ days; $R_B = 2$ vs. $R_A = 4$ days): its delivery times stay close to the mean, those of A range from $1$ to $5$ days</li>
+  </ul>
+  <div class="block alert fs-s"><h4>Interpretation</h4>
+    <p>To promise a fixed delivery date, choose B; to be fast on average, choose A. The standard deviation can be read directly in <b>days</b>, the variance (in days$^2$) cannot.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Variance from a Frequency Table</h2>
+  <div class="block"><h4>Rule: as for the mean, every squared deviation enters the sum $h_j$ times</h4>
+    <p>\[ s^2 = \frac{1}{n-1}\sum_{j=1}^{k} h_j \cdot (x_j - \bar{x})^2 \]</p></div>
+  <table class="bt p1-pad" style="font-size:23px">
+    <thead><tr><th class="l">Soccer team: $x_j$</th><th>37</th><th>38</th><th>39</th><th>40</th><th>41</th><th>46</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$h_j$</td><td>1</td><td>2</td><td>4</td><td>2</td><td>1</td><td>1</td><td>11</td></tr>
+      <tr><td class="l">$x_j - \bar{x}$ &ensp; ($\bar{x} = 39.6364$)</td><td>$-2.6364$</td><td>$-1.6364$</td><td>$-0.6364$</td><td>$0.3636$</td><td>$1.3636$</td><td>$6.3636$</td><td></td></tr>
+      <tr><td class="l">$h_j \cdot (x_j - \bar{x})^2$</td><td>$6.9504$</td><td>$5.3554$</td><td>$1.6198$</td><td>$0.2645$</td><td>$1.8595$</td><td>$40.4959$</td><td>$56.5455$</td></tr>
+    </tbody>
+  </table>
+  <p class="center">$s^2 = 56.5455 / 10 = \mathbf{5.6545}, \qquad s = \sqrt{5.6545} = \mathbf{2.3779}$</p>
+  <div class="viz" id="p1-ss" style="height:50px"></div>
+  <p><span class="c-red"><b>Observation:</b></span> the single value 46 contributes $40.50$ of $56.55$ ($72\,\%$) to the sum of squares $\to$ $s^2$ and $s$ react strongly <span class="p1-nw">to outliers.</span></p>
+  <script>
+  (() => {
+    QV.mount("#p1-ss", (el) => {
+      const C = QV.C, xs = [37, 38, 39, 40, 41, 46], hs = [1, 2, 4, 2, 1, 1], m = 436 / 11;
+      const parts = xs.map((x, j) => ({ x, h: hs[j], c: hs[j] * (x - m) ** 2 }));
+      let acc = 0; parts.forEach((p) => { p.a = acc; acc += p.c; p.b = acc; });
+      const tot = acc;
+      const ch = QV.chart(el, { x: { domain: [0, tot], hide: true }, y: { domain: [0, 1], hide: true, grid: false }, margin: { top: 2, right: 1, bottom: 2, left: 1 } });
+      const sel = ch.layer("data").selectAll("rect").data(parts).join("rect")
+        .attr("x", (p) => ch.x(p.a) + 1).attr("width", (p) => Math.max(1.5, ch.x(p.b) - ch.x(p.a) - 2)).attr("y", 0).attr("height", ch.h).attr("rx", 4)
+        .style("fill", (p) => (p.x === 46 ? C.red : C.blue)).style("fill-opacity", (p) => (p.x === 46 ? 0.9 : 0.3));
+      QV.attachTip(ch, sel, (p) => `<b>x<sub>j</sub> = ${p.x}</b> (h<sub>j</sub> = ${p.h})<br>h<sub>j</sub>·(x<sub>j</sub> − x̄)² = ${QV.fmt(p.c, 4)}<br>share of the sum of squares: ${QV.fmt(100 * p.c / tot, 1)} %`);
+      ch.layer("front").selectAll("text").data(parts.filter((p) => ch.x(p.b) - ch.x(p.a) > 90)).join("text")
+        .attr("x", (p) => (ch.x(p.a) + ch.x(p.b)) / 2).attr("y", ch.h / 2 + 5).attr("text-anchor", "middle")
+        .style("font-size", "15px").style("font-weight", 600).style("pointer-events", "none")
+        .style("fill", (p) => (p.x === 46 ? "#fff" : "var(--ink)"))
+        .text((p) => (p.x === 46 ? `x = 46: ${QV.fmt(p.c, 2)} of ${QV.fmt(tot, 2)} (${QV.fmt(100 * p.c / tot, 0)} %)` : `${p.x}: ${QV.fmt(p.c, 2)}`));
+    });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Coefficient of Variation</h2>
+  <div class="block fs-s"><h4>Definition</h4>
+    <p>The coefficient of variation is a <b>relative</b> measure of dispersion:</p>
+    <p>\[ v = \frac{s}{\bar{x}} \qquad \text{for data with } x_i &gt; 0 \text{ for all } i \text{ (hence } \bar{x} &gt; 0) \]</p></div>
+  <ul class="fs-s">
+    <li><b>Relative</b> means: independent of the scale (order of magnitude)</li>
+    <li>The values must all be positive (ratio scale with a natural zero)
+      <ul>
+        <li>Mathematically: $\bar{x} &gt; 0$, since otherwise division by zero or a negative $v$</li>
+        <li>Substantively: $\bar{x}$ must reflect a meaningful <b>level</b> of the data</li>
+        <li>With mixed signs, $\bar{x} \approx 0$ is possible &ndash; then $v$ becomes extremely large, even though the dispersion is not unusual</li>
+        <li>Example: $-10, -5, +5, +11 \Rightarrow \bar{x} = 0.25$, $v$ loses its interpretive value</li>
+      </ul></li>
+    <li>Typical applications: incomes, weights, prices</li>
+    <li>However: with very different sample sizes, the precision of the estimates differs, so comparisons should be interpreted with caution</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Coefficient of Variation &ndash; Worked Example</h2>
+  <div class="block example"><h4>Calculation</h4>
+    \begin{align*}
+      v_A &= \frac{s_A}{\bar{x}_A} = \frac{3.1623}{38} = 0.0832 \\[4pt]
+      v_B &= \frac{s_B}{\bar{x}_B} = \frac{1.8257}{38} = 0.0480
+    \end{align*}
+  </div>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>The standard deviation of Four A amounts to about $8.3\,\%$ of its mean, that of Four B to only about $4.8\,\%$.</p>
+    <p>$\to$ As a relative measure, $v$ allows comparison of dispersions <b>regardless of the scale</b> of the data.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Normalised Coefficient of Variation</h2>
+  <div class="block"><h4>Definition</h4>
+    <p>The normalised coefficient of variation is a relative measure of dispersion <b>normalised</b> to the interval $[0, 1]$:</p>
+    <p>\[ v^* = \frac{s}{\bar{x}} \cdot \frac{1}{\sqrt{n}} = \frac{v}{\sqrt{n}} \qquad 0 \leq v^* \leq 1 \]</p></div>
+  <ul class="fs-s">
+    <li>Same prerequisites as for the coefficient of variation $v$</li>
+    <li><b>Background:</b> for non-negative data, $v$ is at most $\sqrt{n}$ (extreme case: all values but one are $0$). Dividing by $\sqrt{n}$ therefore puts $v$ on a scale from $0$ to $1$.</li>
+    <li><b>Advantage over $v$:</b> $v^* = 0$ means no dispersion, $v^* = 1$ the maximum possible dispersion $\to$ one can judge whether the relative dispersion is small or large <b>in absolute terms</b></li>
+    <li><b>Caution:</b> $v^*$ is <b>not</b> suitable for comparing samples of different size: with the same dispersion, $v^*$ gets smaller just because $n$ is larger ($\propto 1/\sqrt{n}$)</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Normalised Coefficient of Variation &ndash; Worked Example</h2>
+  <div class="block example"><h4>Calculation</h4>
+    \begin{align*}
+      v^*_A &= \frac{v_A}{\sqrt{n}} = \frac{0.0832}{\sqrt{4}} = \frac{0.0832}{2} = 0.0416 \\[4pt]
+      v^*_B &= \frac{v_B}{\sqrt{n}} = \frac{0.0480}{\sqrt{4}} = \frac{0.0480}{2} = 0.0240
+    \end{align*}
+  </div>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>On the scale from $0$ to $1$ both values are close to $0$ $\to$ the relative dispersion is very low in both fours; the sizes in Four A vary relatively more than in Four B.</p>
+    <p>$\to$ Since both fours have the same $n = 4$, normalising does not change the comparison: $v^*_A / v^*_B = v_A / v_B$. With different $n$, a comparison via $v^*$ would not be meaningful.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Overview of Measures of Dispersion</h2>
+  <div class="cols mid" style="--cols: 50fr 50fr; --gap: 26px">
+    <div><table class="bt p1-padl" id="p1-ovw-tab" style="font-size:23px">
+      <thead><tr><th class="l"></th><th class="r" style="white-space:nowrap">Four A</th><th class="r" style="white-space:nowrap">Four B</th></tr></thead>
+      <tbody>
+        <tr><td class="l">Mean</td><td class="r" id="p1-ovw-a-mean">38</td><td class="r" id="p1-ovw-b-mean">38</td></tr>
+        <tr><td class="l">Median</td><td class="r" id="p1-ovw-a-med">37</td><td class="r" id="p1-ovw-b-med">37</td></tr>
+        <tr><td class="l">Range</td><td class="r" id="p1-ovw-a-R">7</td><td class="r" id="p1-ovw-b-R">4</td></tr>
+        <tr><td class="l">Interquartile range</td><td class="r" id="p1-ovw-a-iqr">6</td><td class="r" id="p1-ovw-b-iqr">3</td></tr>
+        <tr><td class="l">Sample variance</td><td class="r" id="p1-ovw-a-var">10</td><td class="r" id="p1-ovw-b-var">3.3333</td></tr>
+        <tr><td class="l">Standard deviation</td><td class="r" id="p1-ovw-a-sd">3.1623</td><td class="r" id="p1-ovw-b-sd">1.8257</td></tr>
+        <tr><td class="l">Coefficient of variation</td><td class="r" id="p1-ovw-a-v">0.0832</td><td class="r" id="p1-ovw-b-v">0.0480</td></tr>
+        <tr><td class="l">Normalised coefficient of variation</td><td class="r" id="p1-ovw-a-vs">0.0416</td><td class="r" id="p1-ovw-b-vs">0.0240</td></tr>
+      </tbody>
+    </table></div>
+    <div style="gap:6px">
+      <div class="viz" id="p1-ovw" style="height:340px"></div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    QV.mount("#p1-ovw", (el) => {
+      const S = QV.stats, C = QV.C;
+      const G = [{ key: "a", name: "Four A", x0: [34, 37, 40, 41] }, { key: "b", name: "Four B", x0: [36, 37, 39, 40] }];
+      const pts = [];
+      G.forEach((g, gi) => g.x0.forEach((v, i) => pts.push({ gi, i, v })));
+      const ch = QV.chart(el, { x: { domain: [30, 46], label: "Shoe size", tickValues: d3.range(30, 47, 2), format: "d", grid: true }, y: { domain: G.map((g) => g.name).reverse(), type: "band", padding: 0.3 }, margin: { left: 74, top: 8, right: 16, bottom: 46 } });
+      ch.layers.axes.selectAll(".axis.y .tick text").style("font-size", "16px").style("fill", C.ink2);
+      const bw = ch.y.bandwidth();
+      const cy0 = (gi) => ch.y(G[gi].name) + bw / 2;
+      const lines = G.map((g, gi) => ({
+        mean: ch.layer("data").append("line").attr("y1", ch.y(g.name)).attr("y2", ch.y(g.name) + bw).style("stroke", C.orange).style("stroke-width", 2.5).style("stroke-dasharray", "7 5"),
+        med: ch.layer("data").append("line").attr("y1", ch.y(g.name)).attr("y2", ch.y(g.name) + bw).style("stroke", C.green).style("stroke-width", 2.5),
+      }));
+      const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", 10)
+        .style("fill", (d) => QV.series[d.gi === 0 ? 0 : 0]).style("stroke", C.surface).style("stroke-width", 2);
+      QV.attachTip(ch, sel, (d) => `${G[d.gi].name}, rower ${d.i + 1}: ${d.v}`);
+      const f = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : v.toFixed(4));
+      const upd = () => {
+        G.forEach((g, gi) => {
+          const P = pts.filter((d) => d.gi === gi), X = P.map((d) => d.v);
+          const c = {};
+          P.slice().sort((a, b) => a.v - b.v || a.i - b.i).forEach((d) => { c[d.v] = (c[d.v] || 0) + 1; d.lev = c[d.v]; });
+          const mean = S.mean(X), med = S.median(X), sd = S.sd(X), v = sd / mean;
+          lines[gi].mean.attr("x1", ch.x(mean)).attr("x2", ch.x(mean));
+          lines[gi].med.attr("x1", ch.x(med)).attr("x2", ch.x(med));
+          const val = { mean, med, R: S.range(X), iqr: S.iqr(X), var: S.variance(X), sd, v, vs: v / Math.sqrt(X.length) };
+          Object.keys(val).forEach((k) => { document.getElementById(`p1-ovw-${g.key}-${k}`).textContent = f(val[k]); });
+        });
+        sel.attr("cx", (d) => ch.x(d.v)).attr("cy", (d) => cy0(d.gi) + 8 - (d.lev - 1) * 18);
+      };
+      QV.drag(ch, sel, (xv, yv, d) => { const v = Math.max(30, Math.min(46, Math.round(xv))); if (v !== d.v) { d.v = v; upd(); } });
+      const leg = QV.legend(el, [{ label: "mean", color: C.orange, type: "dash" }, { label: "median", color: C.green, type: "line" }], "after");
+      const row = QV.controls(leg);
+      QV.button(row, "Reset", () => { pts.forEach((d) => { d.v = G[d.gi].x0[d.i]; }); upd(); });
+      QV.readout(row, "<span class='muted'>Drag a dot: the table updates.</span>");
+      upd();
+    });
+  })();
+  </script>
+  <p class="fs-xs muted">Drag one rower to an extreme size: range, variance and standard deviation jump, the median and the IQR react less.</p>
+</section>
+
+<section class="slide">
+  <h2>Measures of Dispersion with Python</h2>
+  <pre class="p1-code py p1-cl">
+four_a = np.array([34, 37, 40, 41])
+# Range and interquartile range (course quantiles)
+print(np.ptp(four_a))                                   # 7
+q1, q3 = np.quantile(four_a, [0.25, 0.75], method="inverted_cdf")
+print(q3 - q1)                                          # 6
+# Sample variance (ddof=1: divide by n-1) and standard deviation
+print(np.var(four_a, ddof=1), np.std(four_a, ddof=1))   # 10.0 3.1623
+# Coefficient of variation and normalised coefficient of variation
+v = np.std(four_a, ddof=1) / np.mean(four_a)            # 0.0832
+vstar = v / np.sqrt(len(four_a))                        # 0.0416
+  </pre>
+  <div class="block alert fs-s"><h4>Pitfall: NumPy divides by $n$ by default</h4>
+    <p><code>np.var(four_a)</code> uses <code>ddof=0</code> and returns $7.5$ instead of $s^2 = 10$ &ndash; always pass <code>ddof=1</code>. pandas' <code>.var()</code> and <code>.std()</code> already use <code>ddof=1</code>.</p></div>
+  <a class="trynb" data-sec="section 2.5"></a>
+</section>
+
+<section class="slide" data-subsection="Exercises">
+  <h2>Exercise &ndash; Which Measure of Dispersion for Which Comparison?</h2>
+  <div class="block problem">
+    <p>Which measures of dispersion ($s^2$, $s$, $v$, $v^*$) are suitable for comparing</p>
+    <ol>
+      <li>the shoe sizes of the rowing four and the rowing eight?</li>
+      <li>the shoe sizes of the women's four and the men's four?</li>
+      <li>the shoe sizes of the women's four and the women's four with coxswain?</li>
+      <li>the shoe sizes of the women's four and the men's eight?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Hint &ndash; Which Measure of Dispersion?</h2>
+  <div class="block"><h4>When is which measure suitable?</h4>
+    <p>The sample size affects $s^2$, $s$ and $v$ only through the <b>precision of the estimate</b>, not the measure itself &ndash; an eight with the same dispersion as a four has (apart from random fluctuations) the same $s$ and the same $v$. Only $v^*$ gets smaller just because $n$ is larger.</p></div>
+  <table class="bt p1-t24 p1-padl" style="margin-top:10px">
+    <thead><tr><th class="l">Measure of dispersion</th><th>Scale (order of magnitude)</th><th>Sample size $n$</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Sample variance $s^2$</td><td>dependent</td><td>measure independent of $n$</td></tr>
+      <tr><td class="l">Standard deviation $s$</td><td>dependent</td><td>measure independent of $n$</td></tr>
+      <tr><td class="l">Coefficient of variation $v$</td><td>independent</td><td>measure independent of $n$</td></tr>
+      <tr><td class="l">Norm. coeff. of variation $v^*$</td><td>independent</td><td>decreases with $n$ ($\propto 1/\sqrt{n}$)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/3) &ndash; Which Measure of Dispersion?</h2>
+  <p><b>1. Four vs. eight</b> (same unit, same scale, <b>different $n$</b>)</p>
+  <ul>
+    <li>$s^2$, $s$, $v$: <b>yes</b> &ndash; the measures do not depend on $n$; the different $n$ ($4$ vs. $8$) only affects the precision of the estimate</li>
+    <li>$v^*$: <b>no</b> &ndash; the eight would get a smaller $v^*$ just because $\sqrt{8} &gt; \sqrt{4}$, even with the same dispersion</li>
+  </ul>
+  <p style="margin-top:14px"><b>2. Women's four vs. men's four</b> (same unit, <b>different scale</b>, same $n$)</p>
+  <ul>
+    <li>$s^2$, $s$: less suitable, since men's shoe sizes are systematically larger</li>
+    <li>$v$: <b>yes</b> &ndash; not affected by the scale</li>
+    <li>$v^*$: <b>yes</b> &ndash; with equal $n$ only a rescaling of $v$</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/3) &ndash; Which Measure of Dispersion?</h2>
+  <p><b>3. Women's four vs. women's four with coxswain</b> (same unit, same scale, <b>different $n$</b>)</p>
+  <ul>
+    <li>$s^2$, $s$, $v$: <b>yes</b> &ndash; measures independent of $n$; the different $n$ ($4$ vs. $5$) only affects the precision of the estimate</li>
+    <li>$v^*$: <b>no</b> &ndash; divided by $\sqrt{5}$ instead of $\sqrt{4}$, the comparison is distorted</li>
+  </ul>
+  <p style="margin-top:14px"><b>4. Women's four vs. men's eight</b> (<b>different scale</b> and <b>different $n$</b>)</p>
+  <ul>
+    <li>$s^2$, $s$: less suitable, the scale differs</li>
+    <li>$v$: <b>yes</b> &ndash; not affected by the scale and independent of $n$</li>
+    <li>$v^*$: <b>no</b> &ndash; the different $n$ distorts the comparison</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/3) &ndash; Which Measure of Dispersion?</h2>
+  <ol>
+    <li>The shoe sizes of the rowing four and the rowing eight.</li>
+    <li>The shoe sizes of the women's four and the men's four.</li>
+    <li>The shoe sizes of the women's four and the women's four with coxswain.</li>
+    <li>The shoe sizes of the women's four and the men's eight.</li>
+  </ol>
+  <table class="bt p1-t24 p1-padl" style="margin-top:12px">
+    <thead><tr><th class="l"></th><th>1.</th><th>2.</th><th>3.</th><th>4.</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Sample variance</td><td>yes</td><td>no</td><td>yes</td><td>no</td></tr>
+      <tr><td class="l">Standard deviation</td><td>yes</td><td>no</td><td>yes</td><td>no</td></tr>
+      <tr><td class="l">Coefficient of variation</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr>
+      <tr><td class="l">Normalised coefficient of variation</td><td>no</td><td>yes</td><td>no</td><td>no</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Measures of Dispersion of the Handball Team</h2>
+  <div class="block problem">
+    <p>Shoe sizes of the handball team ($n = 13$): &ensp; $40,\ 39,\ 38,\ 41,\ 46,\ 39,\ 39,\ 38,\ 37,\ 40,\ 39,\ 40,\ 42$</p>
+    <p style="margin-top:8px">Calculate the following measures:</p>
+    <table class="bt p1-padl">
+      <thead><tr><th class="l">Measure</th><th class="l">Formula</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td class="l">Mean $\bar{x}$</td><td class="l">$\frac{1}{n}\sum_{i=1}^{n} x_i$</td><td>?</td></tr>
+        <tr><td class="l">Sample variance $s^2$</td><td class="l">$\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2$</td><td>?</td></tr>
+        <tr><td class="l">Standard deviation $s$</td><td class="l">$+\sqrt{s^2}$</td><td>?</td></tr>
+        <tr><td class="l">Coefficient of variation $v$</td><td class="l">$s / \bar{x}$</td><td>?</td></tr>
+        <tr><td class="l">Norm. coeff. of variation $v^*$</td><td class="l">$v / \sqrt{n}$</td><td>?</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; Measures of Dispersion of the Handball Team</h2>
+  <p><b>Intermediate values:</b> &ensp; $\sum x_i = 518$, &emsp; $\sum (x_i - \bar{x})^2 = 61.6923$</p>
+  <table class="bt p1-t24 p1-padl">
+    <thead><tr><th class="l">Measure</th><th class="l">Calculation</th><th class="l">Value</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Mean $\bar{x}$</td><td class="l">$518 / 13$</td><td class="l">$\mathbf{39.8462}$</td></tr>
+      <tr><td class="l">Sample variance $s^2$</td><td class="l">$61.6923 / 12$</td><td class="l">$\mathbf{5.1410}$</td></tr>
+      <tr><td class="l">Standard deviation $s$</td><td class="l">$\sqrt{5.1410}$</td><td class="l">$\mathbf{2.2674}$</td></tr>
+      <tr><td class="l">Coefficient of variation $v$</td><td class="l">$2.2674 / 39.8462$</td><td class="l">$\mathbf{0.0569}$</td></tr>
+      <tr><td class="l">Norm. coeff. of variation $v^*$</td><td class="l">$0.0569 / \sqrt{13}$</td><td class="l">$\mathbf{0.0158}$</td></tr>
+    </tbody>
+  </table>
+  <div class="block alert"><h4>Interpretation</h4>
+    <p>Soccer team: $s = 2.3779$, $v = 2.3779 / 39.6364 = 0.0600$ $\to$ the shoe sizes of both teams vary similarly. Their $v^*$ <span style="white-space:nowrap">($0.0158$ vs. $0.0181$)</span> must <b>not</b> be compared: $n$ differs ($13$ vs. $11$).</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; Comparing the Dispersion of Two Branches</h2>
+  <div class="block problem">
+    <p>Monthly revenues (thousand euros) of two bakery branches over the last $n = 6$ months:</p>
+    <table class="bt p1-pad">
+      <thead><tr><th class="l">Month</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+      <tbody>
+        <tr><td class="l">City branch</td><td>120</td><td>130</td><td>125</td><td>135</td><td>115</td><td>125</td></tr>
+        <tr><td class="l">Rural branch</td><td>20</td><td>24</td><td>22</td><td>26</td><td>18</td><td>22</td></tr>
+      </tbody>
+    </table>
+    <ol class="alpha">
+      <li>Compute the mean $\bar{x}$ and the sample variance $s^2$ for both branches.</li>
+      <li>Compute the standard deviation $s$.</li>
+      <li>Compute the coefficient of variation $v$ and the normalised coefficient of <span class="p1-nw">variation $v^*$.</span></li>
+      <li>Which branch has the stronger revenue fluctuations? Which measure is suitable for this comparison, and why?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/3) &ndash; Comparing the Dispersion of Two Branches</h2>
+  <div class="block fs-s"><h4>Rule</h4>
+    <p>$s^2 = \frac{1}{n-1}\sum (x_i - \bar{x})^2$: square the deviations from the mean, add them up, divide by $n - 1 = 5$.</p></div>
+  <p><b>a)</b> Means: $\bar{x}_{\text{city}} = \frac{750}{6} = \mathbf{125}$, &emsp; $\bar{x}_{\text{rural}} = \frac{132}{6} = \mathbf{22}$ &emsp; (check: the deviations sum to $0$)</p>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l">Month $i$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">City: $x_i - 125$</td><td>$-5$</td><td>$5$</td><td>$0$</td><td>$10$</td><td>$-10$</td><td>$0$</td><td>$0$</td></tr>
+      <tr><td class="l">City: $(x_i - 125)^2$</td><td>$25$</td><td>$25$</td><td>$0$</td><td>$100$</td><td>$100$</td><td>$0$</td><td>$250$</td></tr>
+      <tr class="mid"><td class="l">Rural: $x_i - 22$</td><td>$-2$</td><td>$2$</td><td>$0$</td><td>$4$</td><td>$-4$</td><td>$0$</td><td>$0$</td></tr>
+      <tr><td class="l">Rural: $(x_i - 22)^2$</td><td>$4$</td><td>$4$</td><td>$0$</td><td>$16$</td><td>$16$</td><td>$0$</td><td>$40$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-s">\[ s^2_{\text{city}} = \frac{250}{5} = \mathbf{50}, \qquad s^2_{\text{rural}} = \frac{40}{5} = \mathbf{8} \]</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/3) &ndash; Comparing the Dispersion of Two Branches</h2>
+  <p><b>b)</b> Standard deviation $s = +\sqrt{s^2}$:</p>
+  <p>\[ s_{\text{city}} = \sqrt{50} = \mathbf{7.0711}, \qquad s_{\text{rural}} = \sqrt{8} = \mathbf{2.8284} \quad \text{(both in thousand euros)} \]</p>
+  <p><b>c)</b> Coefficient of variation $v = s / \bar{x}$ and normalised coefficient of variation <span class="p1-nw">$v^* = v / \sqrt{n}$</span> with <span class="p1-nw">$\sqrt{6} = 2.4495$:</span></p>
+  <div>
+    \begin{align*}
+      v_{\text{city}}  &= \frac{7.0711}{125} = \mathbf{0.0566} & \qquad v^*_{\text{city}}  &= \frac{0.0566}{2.4495} = \mathbf{0.0231} \\[10pt]
+      v_{\text{rural}} &= \frac{2.8284}{22}  = \mathbf{0.1286} & \qquad v^*_{\text{rural}} &= \frac{0.1286}{2.4495} = \mathbf{0.0525}
+    \end{align*}
+  </div>
+  <div class="block alert fs-s"><h4>Observation</h4>
+    <p>In absolute terms the city branch fluctuates more ($s = 7.07 &gt; 2.83$), relative to the revenue level the rural branch does ($v = 12.9\,\% &gt; 5.7\,\%$). Both $v^*$ are close to $0$ on the scale from $0$ to $1$ &ndash; and since $n$ is equal, $v^*$ gives the same ranking as $v$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/3) &ndash; Comparing the Dispersion of Two Branches</h2>
+  <p class="fs-s"><b>d)</b> The branches operate on a <b>different scale</b> ($\bar{x} = 125$ vs. $22$), so the <b>relative</b> measure $v$ is suitable: $v_{\text{rural}} = 0.1286 &gt; v_{\text{city}} = 0.0566$ $\Rightarrow$ <b>the rural branch has the stronger (relative) revenue fluctuations.</b></p>
+  <pre class="p1-code py">
+city  = np.array([120, 130, 125, 135, 115, 125])
+rural = np.array([20, 24, 22, 26, 18, 22])
+for x in (city, rural):
+    s = x.std(ddof=1)
+    print(x.mean(), x.var(ddof=1), round(s, 4), round(s / x.mean(), 4))
+  </pre>
+  <pre class="p1-code out">
+125.0 50.0 7.0711 0.0566
+22.0 8.0 2.8284 0.1286
+  </pre>
+  <div class="block alert fs-s"><h4>Interpretation</h4>
+    <p>$s = 7.07$ at a level of $125$ weighs less than $s = 2.83$ at $22$: the rural branch fluctuates by almost $13\,\%$ of its level, the city branch by less than $6\,\%$ &ndash; harder to plan for.</p></div>
+  <a class="trynb" data-sec="section 2.6"></a>
+</section>
+
+<!-- ======================================================= EXAM-STYLE EXERCISE -->
+<section class="slide exercise" data-subsection="Exam-Style Exercise">
+  <h2>Exam-Style Exercise &ndash; Books per Order</h2>
+  <div class="block problem">
+    <p>An online bookshop analyses the number of books per order for $n = 25$ orders:</p>
+    <table class="bt p1-pad" style="font-size:1em">
+      <tbody>
+        <tr><td class="l">Books per order $x_j$</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+        <tr><td class="l">Number of orders $h_j$</td><td>3</td><td>5</td><td>9</td><td>5</td><td>3</td></tr>
+      </tbody>
+    </table>
+    <ol class="alpha">
+      <li>Complete the frequency table with $f_j$, $H_j$ and $F(x_j)$.</li>
+      <li>Which share of the orders contains at most 2 books? Which share at least 4 books?</li>
+      <li>Determine the mode, the median, $Q_1$, $Q_3$ (use $H_j$) and the IQR.</li>
+      <li>Level of measurement of &ldquo;number of books&rdquo;? Why is the mean meaningful here &ndash; unlike for star ratings?</li>
+      <li>Compute the arithmetic mean from the frequency table.</li>
+      <li>Compute $s^2$, $s$ and $v$ from the frequency table.</li>
+      <li>Compare mean, median and mode: what do they say about the shape of the distribution?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/4) &ndash; Books per Order</h2>
+  <div class="block"><h4>Rule</h4>
+    <p>$f_j = h_j / n$; &ensp; $H_j$ and $F(x_j)$: add up the $h_j$ or the $f_j$ from the left; &ensp; <span class="p1-nw">&ldquo;at least 4&rdquo; $= 1 - F(3)$.</span></p></div>
+  <p><b>a)</b> Frequency table ($n = 25$; check: $H_5 = 25$, $F(5) = 1$):</p>
+  <table class="bt p1-pad p1-colhl">
+    <thead><tr><th class="l">Books $x_j$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$h_j$</td><td>3</td><td>5</td><td>9</td><td>5</td><td>3</td><td>25</td></tr>
+      <tr><td class="l">$f_j = h_j / 25$</td><td>$0.12$</td><td>$0.20$</td><td>$0.36$</td><td>$0.20$</td><td>$0.12$</td><td>$1$</td></tr>
+      <tr><td class="l">$H_j$</td><td>3</td><td>8</td><td>17</td><td>22</td><td>25</td><td></td></tr>
+      <tr><td class="l">$F(x_j)$</td><td>$0.12$</td><td>$\mathbf{0.32}$</td><td>$0.68$</td><td>$0.88$</td><td>$1$</td><td></td></tr>
+    </tbody>
+  </table>
+  <p><b>b)</b> At most 2 books: $F(2) = \frac{3 + 5}{25} = \mathbf{0.32}$ &ensp; (32&thinsp;% of the orders).<br>
+  At least 4 books: $1 - F(3) = 1 - 0.68 = \mathbf{0.32}$ &ensp; ($= \frac{5 + 3}{25}$, also 32&thinsp;%).</p>
+  <p class="fs-xs muted">Hover over a column to follow one value through all rows.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/4) &ndash; Books per Order</h2>
+  <p class="fs-s"><b>c)</b> Mode: largest frequency $h_3 = 9$ $\to$ $\mathbf{3}$ books.</p>
+  <p class="fs-s">Quantiles: position $m = \lceil n \cdot p \rceil$; the value at position $m$ is the first $x_j$ with $H_j \geq m$.</p>
+  <table class="bt p1-pad">
+    <thead><tr><th class="l"></th><th>$p$</th><th>$n \cdot p$</th><th>Position</th><th class="l">Value</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$Q_1$</td><td>$0.25$</td><td>$6.25$</td><td>$7$</td><td class="l">$H_1 = 3 &lt; 7 \leq H_2 = 8$ $\to$ $\mathbf{2}$ books</td></tr>
+      <tr><td class="l">Median</td><td>$0.50$</td><td>$12.5$</td><td>$13$</td><td class="l">$H_2 = 8 &lt; 13 \leq H_3 = 17$ $\to$ $\mathbf{3}$ books</td></tr>
+      <tr><td class="l">$Q_3$</td><td>$0.75$</td><td>$18.75$</td><td>$19$</td><td class="l">$H_3 = 17 &lt; 19 \leq H_4 = 22$ $\to$ $\mathbf{4}$ books</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-s">$\text{IQR} = Q_3 - Q_1 = 4 - 2 = \mathbf{2}$ books.</p>
+  <p class="fs-s" style="margin-top:6px"><b>d)</b> A count is <b>metric (ratio scale)</b> and discrete: natural zero, equal steps (1 to 2 books $=$ 4 to 5 books), 4 books are twice as many as 2 $\to$ averaging is meaningful. Star ratings are only <b>ordinal</b>: the step from 1 to 2 stars need not equal that from 4 to 5, so &ldquo;3.6 stars on average&rdquo; has no exact meaning.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/4) &ndash; Books per Order</h2>
+  <div class="block fs-s"><h4>Rule</h4>
+    <p>$\bar{x} = \frac{1}{n}\sum_j h_j \cdot x_j$; &emsp; $s^2 = \frac{1}{n-1}\sum_j h_j \cdot (x_j - \bar{x})^2$; &emsp; $v = s / \bar{x}$</p></div>
+  <table class="bt p1-pad p1-colhl">
+    <thead><tr><th class="l">Books $x_j$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td class="l">$h_j$</td><td>3</td><td>5</td><td>9</td><td>5</td><td>3</td><td>25</td></tr>
+      <tr><td class="l">$h_j \cdot x_j$</td><td>3</td><td>10</td><td>27</td><td>20</td><td>15</td><td>75</td></tr>
+      <tr><td class="l">$h_j \cdot (x_j - 3)^2$</td><td>12</td><td>5</td><td>0</td><td>5</td><td>12</td><td>34</td></tr>
+    </tbody>
+  </table>
+  <div class="fs-s stack" style="gap:6px">
+    <p><b>e)</b> $\bar{x} = \frac{75}{25} = \mathbf{3}$ books</p>
+    <p><b>f)</b> $s^2 = \frac{34}{24} = \mathbf{1.4167}$ (divide by $n - 1 = 24$), &emsp; $s = \sqrt{1.4167} = \mathbf{1.1902}$ books,<br>
+    <span style="padding-left:1.2em"></span>$v = \frac{1.1902}{3} = \mathbf{0.3967}$ (the standard deviation is about 40&thinsp;% of the mean)</p>
+    <p><b>g)</b> Mean $=$ median $=$ mode $= 3$; the frequencies $3, 5, 9, 5, 3$ mirror around $3$ $\to$ <b>symmetric</b> distribution (unlike the salaries, where an outlier pulls the mean above the median).</p>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (4/4) &ndash; Books per Order</h2>
+  <p><b>Python check:</b> <code>np.repeat</code> expands the table into the $25$ raw values.</p>
+  <pre class="p1-code py p1-cl">
+books = np.repeat([1, 2, 3, 4, 5], [3, 5, 9, 5, 3])       # expand the table
+print(len(books), (books &lt;= 2).mean(), (books &gt;= 4).mean())
+print(pd.Series(books).mode().tolist(),
+      np.quantile(books, [0.25, 0.5, 0.75], method="inverted_cdf"))
+s = books.std(ddof=1)
+print(books.mean(), round(s**2, 4), round(s, 4), round(s / books.mean(), 4))
+  </pre>
+  <pre class="p1-code out">
+25 0.32 0.32
+[3] [2 3 4]
+3.0 1.4167 1.1902 0.3967
+  </pre>
+  <div class="block key"><p>Exam routine: frequency table first ($f_j$, $H_j$, $F$) &ndash; then read off shares and quantiles, and compute $\bar{x}$, $s^2$, $s$, $v$ with the weights $h_j$.</p></div>
+  <a class="trynb" data-sec="section 2.7"></a>
+</section>
+
+<!-- ======================================================= SECTION: SUMMARY -->
+<section class="slide" data-section="Summary">
+  <h2>Summary 1: Key Concepts</h2>
+  <div class="block"><h4>Fundamentals</h4>
+    <ul>
+      <li>Statistical unit ($\omega$): object being observed, delimited by subject, time, location</li>
+      <li>Variable ($X$): characteristic of interest; Observation ($x_i$): actually observed value</li>
+      <li>Levels of measurement: nominal (categories) $\to$ ordinal (ranking) $\to$ metric (differences meaningful; interval scale, or ratio scale with a natural zero)</li>
+      <li>Metric data is required for most statistical analyses in this course</li>
+    </ul></div>
+  <div class="block"><h4>Frequencies</h4>
+    <ul>
+      <li>$h_j = \#\{i \mid x_i = x_j\}$, &emsp; $f_j = h_j / n$, &emsp; $H_j = \sum_{l \le j} h_l$, &emsp; $F(x) = \sum_{x_j \leq x} f_j$</li>
+      <li>&ldquo;At most $x$&rdquo; $= F(x)$; &ensp; &ldquo;more than $x$&rdquo; $= 1 - F(x)$</li>
+      <li>Percentage points = absolute difference of two shares; percent = relative change</li>
+    </ul></div>
+</section>
+
+<section class="slide">
+  <h2>Summary 2: Measures of Central Tendency</h2>
+  <table class="bt p1-padl">
+    <thead><tr><th class="l">Measure</th><th class="l">Formula</th><th class="l">Properties</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Arithmetic mean</td><td class="l">$\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i = \frac{1}{n}\sum_{j=1}^{k} h_j x_j$</td><td class="l">Easy to compute; sensitive to outliers</td></tr>
+      <tr><td class="l">Trimmed mean</td><td class="l">Mean without $\lfloor \alpha n \rfloor$ values per end</td><td class="l">Robust to outliers</td></tr>
+      <tr><td class="l">Geometric mean</td><td class="l">$\bar{x}_{\text{geo}} = \left(\prod_{i=1}^{n} x_i\right)^{1/n}$</td><td class="l">Growth factors: rate $= \bar{x}_{\text{geo}} - 1$</td></tr>
+      <tr><td class="l">Median</td><td class="l">$\tilde{x} = x_{(\lceil 0.5 \cdot n \rceil)}$</td><td class="l">Robust to outliers; also ordinal data</td></tr>
+      <tr><td class="l">Mode</td><td class="l">Most frequent value</td><td class="l">Also nominal data; often not unique</td></tr>
+    </tbody>
+  </table>
+  <div class="block"><h4>Quantiles</h4>
+    <p>For the $p$-quantile: position $= \lceil n \cdot p \rceil$ in the sorted data <span class="p1-nw">(no rounding if $n \cdot p$ is an integer).</span></p>
+    <p>Quartiles: $Q_1 = x_{(\lceil 0.25n \rceil)}$, &emsp; $Q_2 = x_{(\lceil 0.5n \rceil)}$ (Median), &emsp; $Q_3 = x_{(\lceil 0.75n \rceil)}$</p></div>
+</section>
+
+<section class="slide">
+  <h2>Summary 3: Measures of Dispersion</h2>
+  <table class="bt p1-padl">
+    <thead><tr><th class="l">Measure</th><th class="l">Formula</th><th class="l">Key property</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Range $R$</td><td class="l">$x_{(n)} - x_{(1)}$</td><td class="l">Determined by the two extreme values</td></tr>
+      <tr><td class="l">Interquartile range</td><td class="l">$Q_3 - Q_1$</td><td class="l">Width of the middle 50&thinsp;%; robust</td></tr>
+      <tr><td class="l">Variance $s^2$</td><td class="l">$\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2$</td><td class="l">Dimension changes (e.g. cm$^2$)</td></tr>
+      <tr><td class="l">Std. deviation $s$</td><td class="l">$+\sqrt{s^2}$</td><td class="l">Same unit as original data</td></tr>
+      <tr><td class="l">Coeff. of variation $v$</td><td class="l">$s / \bar{x}$</td><td class="l">Scale-independent (positive data)</td></tr>
+      <tr><td class="l">Norm. coeff. $v^*$</td><td class="l">$v / \sqrt{n}$</td><td class="l">Normalised to $[0, 1]$; decreases with $n$</td></tr>
+    </tbody>
+  </table>
+  <div class="block"><h4>Which measure for which comparison?</h4>
+    <ul>
+      <li>Same scale: $s^2$ or $s$ sufficient ($n$ only affects the precision)</li>
+      <li>Different scale: use $v$</li>
+      <li>$v^*$: rates the relative dispersion between $0$ and $1$; <b>not</b> for different $n$</li>
+    </ul></div>
+</section>
+
+<section class="slide">
+  <h2>Summary 4: Key Python Commands (1)</h2>
+  <div class="block tight"><h4>Frequencies</h4>
+    <pre class="p1-code py p1-cl">
+data.value_counts().sort_index()                    # Absolute frequencies
+data.value_counts(normalize=True).sort_index()      # Relative frequencies
+data.value_counts(normalize=True).sort_index().cumsum()  # Cumulative
+    </pre></div>
+  <div class="block tight"><h4>Measures of Central Tendency</h4>
+    <pre class="p1-code py p1-cl">
+np.mean(data)                                   # Arithmetic mean
+stats.trim_mean(data, 0.10)                     # Trimmed mean (10% per end)
+stats.gmean(factors) - 1                        # Average growth rate
+np.median(data)                                 # Median (even n: averages!)
+data.mode()                                     # Mode
+np.quantile(data, 0.25, method="inverted_cdf")  # Quantiles (e.g. Q1)
+    </pre></div>
+</section>
+
+<section class="slide">
+  <h2>Summary 4: Key Python Commands (2)</h2>
+  <div class="block tight"><h4>Imports and frequency tables</h4>
+    <pre class="p1-code py p1-cl">
+import numpy as np
+import pandas as pd
+from scipy import stats
+np.average(values, weights=counts)      # Mean from a frequency table
+np.repeat(values, counts)               # Frequency table -&gt; raw data
+    </pre></div>
+  <div class="block tight"><h4>Measures of Dispersion</h4>
+    <pre class="p1-code py p1-cl">
+np.ptp(data)                            # Range
+q1, q3 = np.quantile(data, [0.25, 0.75], method="inverted_cdf")
+q3 - q1                                 # Interquartile range
+np.var(data, ddof=1)                    # Sample variance (ddof=1!)
+np.std(data, ddof=1)                    # Standard deviation
+np.std(data, ddof=1) / np.mean(data)    # Coefficient of variation
+np.std(data, ddof=1) / np.mean(data) / np.sqrt(len(data))  # Norm. coeff.
+    </pre></div>
+  <a class="trynb" data-sec="section 3"></a>
+</section>
+
+<section class="slide">
+  <h2>Outlook: Part 2 &ndash; Graphical Representations</h2>
+  <div class="block"><h4>What we have so far</h4>
+    <p>The shoe sizes are now described by <b>numbers</b>: frequencies, measures of central tendency and measures of dispersion.</p></div>
+  <div class="block"><h4>Next part</h4>
+    <p>The same data are described by <b>pictures</b>: the empirical cumulative distribution function, the histogram and the boxplot &ndash; the quartiles and the IQR of this part reappear as the building blocks of the boxplot.</p></div>
+  <div class="block key"><p>Numbers and pictures complement each other: a good description of data always uses both.</p></div>
+</section>
+<!-- END SLIDES -->
+</main></div>
+</body>
+</html>

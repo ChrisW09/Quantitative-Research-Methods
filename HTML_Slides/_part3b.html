@@ -1,0 +1,2071 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 3 – Statistical Inference (second half)</title>
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="assets/deck.css">
+<script src="assets/vendor/katex/katex.min.js"></script>
+<script src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script src="assets/vendor/d3.min.js"></script>
+<script src="assets/viz.js"></script>
+<script src="assets/deck.js"></script>
+</head>
+<body data-part="3" data-part-title="Statistical Inference" data-subtitle="Part 3: Statistical Inference"
+      data-toc-split="3" data-notebook="Part_3_Statistical_Inference/Part_3_Statistical_Inference.ipynb">
+<div id="stage"><main id="deck">
+<!-- BEGIN SLIDES -->
+<!-- ===== Part 3, second half (p-value, types of error, summary, appendix): deck-specific styles and helpers (prefix p3b-) ===== -->
+<style>
+.p3b-pt { font-size: 17px; font-weight: 600; color: var(--brand-ink); text-align: center; line-height: 1.25; min-height: 22px; }
+.p3b-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.p3b-panels > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.viz .p3b-lbl { line-height: 1.22; }
+.viz .p3b-lbl.muted { color: var(--ink-muted); }
+.viz .p3b-lbl.p3b-axl { color: var(--ink-2); font-weight: 600; }
+.p3b-legend { position: absolute; background: var(--surface); border: 1px solid var(--grid); border-radius: 6px; padding: 4px 9px; flex-direction: column; gap: 2px; font-size: 14px; }
+.p3b-tree { display: grid; grid-template-columns: 230px 96px 290px 54px 300px; grid-template-rows: 100px 100px; row-gap: 28px; align-items: center; justify-content: center; }
+.p3b-tree .fbox { font-size: 19px; }
+.p3b-tree .farr { text-align: center; }
+.p3b-tree svg { display: block; overflow: visible; }
+.p3b-gr { display: grid; grid-template-columns: auto 330px auto; align-items: center; column-gap: 20px; row-gap: 6px; justify-content: center; font-size: 19px; }
+.p3b-gr svg { display: block; overflow: visible; }
+.p3b-gr svg text { fill: var(--ink-2); font-size: 18px; font-family: "Source Sans 3", sans-serif; }
+table.bt.p3b-tight th, table.bt.p3b-tight td { padding: 0 12px; line-height: 1.28; }
+table.bt.p3b-mid td { vertical-align: middle; }
+.p3b-nw { white-space: nowrap; }
+/* formula lines that must not wrap: the columns grow to fit them, so the auto-zoom stops before they overflow */
+.cols.p3b-fit > * { min-width: auto; }
+.p3b-fit .block > p { white-space: nowrap; }
+/* a), b) label on the baseline of a line with a tall fraction (instead of at its top) */
+.bd ol.alpha > li.p3b-bl::before { position: static; display: inline-block; width: 1.6em; margin-left: -1.6em; }
+.p3b-sig .viz-ctrl { margin-top: 6px; background: var(--surface); }
+</style>
+<script>
+(() => {
+  window.P3B = window.P3B || {};
+  const P = window.P3B;
+  /** Render $...$ inside an HTML string. */
+  P.tx = (s) => (window.Deck && /\$/.test(s) ? s.replace(/\$([^$]+)\$/g, (m, t) => Deck.tex(t)) : s);
+  P.html = (node, s) => { if (node && node._last !== s) { node.innerHTML = P.tx(s); node._last = s; } };
+  /** Number for TeX (ASCII minus). */
+  P.f = (x, d = 3) => { let s = (+x).toFixed(d); if (/^-0\.?0*$/.test(s)) s = s.slice(1); return s; };
+  /** Trimmed number for TeX (0.950 -> 0.95). */
+  P.ft = (x, d = 3) => P.f(x, d).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+  P.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  /** HTML label (text with $TeX$) at data coordinates in the chart overlay. o: {anchor, baseline, dx, dy, size, bg, cls, color, center} */
+  P.lbl = (ch, xv, yv, html, o = {}) => {
+    const d = document.createElement("div");
+    d.className = "fo-tex p3b-lbl" + (o.cls ? " " + o.cls : "");
+    d.style.position = "absolute";
+    d.style.fontSize = (o.size || 16) + "px";
+    if (o.color) d.style.color = o.color;
+    if (o.bg) { d.style.background = "var(--surface)"; d.style.padding = "1px 5px"; d.style.borderRadius = "4px"; }
+    if (o.center) d.style.textAlign = "center";
+    const place = (an, bl) => {
+      const tx = { start: "0%", middle: "-50%", end: "-100%" }[an || "middle"];
+      const ty = { top: "0%", middle: "-50%", bottom: "-100%" }[bl || "middle"];
+      d.style.transform = `translate(${tx},${ty})`;
+    };
+    place(o.anchor, o.baseline);
+    ch.overlay.appendChild(d);
+    let last = null, dx = o.dx || 0;
+    d.set = (a, b, h) => {
+      if (h !== undefined && h !== last) { d.innerHTML = P.tx(h); last = h; }
+      d.style.left = (ch.m.left + ch.px(a) + dx) + "px";
+      d.style.top = (ch.m.top + ch.y(b) + (o.dy || 0)) + "px";
+      return d;
+    };
+    d.anchor = (an, ddx) => { place(an, o.baseline); dx = ddx ?? dx; return d; };
+    d.show = (v) => { d.style.display = v ? "" : "none"; return d; };
+    d.set(xv, yv, html);
+    return d;
+  };
+  /** TeX axis titles (centred under the x axis / rotated left of the y axis). */
+  P.xlab = (ch, latex) => P.lbl(ch, ch.x.invert ? ch.x.invert(ch.w / 2) : (ch.x.domain()[0] + ch.x.domain()[1]) / 2, ch.y.domain()[0], latex, { dy: 37, size: 15, cls: "p3b-axl" });
+  P.ylab = (ch, latex) => {
+    const d = P.lbl(ch, ch.x.domain()[0], (ch.y.domain()[0] + ch.y.domain()[1]) / 2, latex, { dx: -(ch.m.left - 16), size: 15, cls: "p3b-axl" });
+    d.style.transform = "translate(-50%,-50%) rotate(-90deg)";
+    return d;
+  };
+  /** Legend box inside the chart. pos: {left|right, top|bottom} in px from the plot area. */
+  P.legendIn = (ch, items, pos = {}) => {
+    const lg = QV.legend(ch.overlay, items.map((it) => Object.assign({}, it, { label: `<span>${it.label}</span>` })));
+    lg.classList.add("p3b-legend");
+    if (pos.right !== undefined) lg.style.right = (ch.m.right + pos.right) + "px"; else lg.style.left = (ch.m.left + (pos.left ?? 8)) + "px";
+    if (pos.bottom !== undefined) lg.style.bottom = (ch.m.bottom + pos.bottom) + "px"; else lg.style.top = (ch.m.top + (pos.top ?? 4)) + "px";
+    return lg;
+  };
+  /** Vertical marker line with a draggable handle at the top. o: {color, dash, width, yTop, y0, min, max, step, onMove, drag} */
+  P.marker = (ch, x0, o = {}) => {
+    const [a, b] = ch.x.domain();
+    const y0 = o.y0 ?? 0, yTop = o.yTop ?? ch.y.domain()[1] * 0.9;
+    let col = o.color || QV.C.blue;
+    const ln = QV.segment(ch, x0, y0, x0, yTop, { color: col, width: o.width || 2.5, dash: o.dash, layer: "annot" });
+    const api = { x: x0 };
+    let h = null;
+    api.set = (x) => { api.x = x; ln.set(x, y0, x, yTop); if (h) h.attr("cx", ch.x(x)); return api; };
+    api.color = (c) => { if (c !== col) { col = c; ln.style("stroke", c); if (h) h.style("fill", c); } return api; };
+    if (o.drag !== false) {
+      h = QV.dots(ch, [[x0, yTop]], { r: 9, color: col, layer: "front" });
+      QV.drag(ch, h, (xv) => {
+        let v = P.clamp(xv, o.min ?? a, o.max ?? b);
+        if (o.step) v = Math.round(v / o.step) * o.step;
+        api.set(v);
+        if (o.onMove) o.onMove(v);
+      });
+    }
+    api.line = ln; api.handle = h;
+    return api;
+  };
+  /** Move an overlay label (from P.lbl, baseline "middle") to the first candidate that keeps clear of the curve f
+      and of the chart edges. cands: [{x, y, anchor, dx, dy}] (x, y in data units; dx, dy in px). */
+  P.avoid = (ch, d, f, cands) => {
+    const W = d.offsetWidth, H = d.offsetHeight;
+    const cost = (c) => {
+      const ax = { start: 0, middle: -0.5, end: -1 }[c.anchor || "middle"];
+      const x0 = ch.px(c.x) + (c.dx || 0) + ax * W, x1 = x0 + W;
+      const yc = ch.y(c.y) + (c.dy || 0), y0 = yc - H / 2, y1 = yc + H / 2;
+      if (x0 < -ch.m.left + 2 || x1 > ch.w + ch.m.right || y0 < -ch.m.top) return 2;
+      let lo = Infinity, hi = -Infinity;
+      for (let px = Math.max(0, x0); px <= Math.min(ch.w, x1); px += 3) { const v = ch.y(f(ch.x.invert(px))); lo = Math.min(lo, v); hi = Math.max(hi, v); }
+      return lo > y1 + 2 || hi < y0 - 2 ? 0 : 1;
+    };
+    let best = cands[0], bc = 9;
+    for (const c of cands) { const k = cost(c); if (k < bc) { bc = k; best = c; } if (!k) break; }
+    const yv = ch.y.invert(ch.y(best.y) + (best.dy || 0));
+    d.anchor(best.anchor || "middle", best.dx || 0).set(best.x, yv);
+    return d;
+  };
+  P.pdf = (df) => (df ? (x) => QV.dist.tPdf(x, df) : (x) => QV.dist.normPdf(x));
+  P.cdf = (df) => (df ? (x) => QV.dist.tCdf(x, df) : (x) => QV.dist.normCdf(x));
+  P.inv = (df) => (df ? (p) => QV.dist.tInv(p, df) : (p) => QV.dist.normInv(p));
+})();
+</script>
+
+<!-- ===== SECTION: THE p-VALUE ===== -->
+<section class="slide" data-section="The $p$-Value" data-short="$p$-value" data-subsection="Concept">
+  <h2>The $p$-value &ndash; intuition</h2>
+  <div class="block"><h4>A single question</h4>
+    <p>&ldquo;How <b>surprising</b> are my data if $H_0$ were true?&rdquo;</p></div>
+  <ul>
+    <li><b>Small $p$-value</b> ($\approx 0$): such an extreme result would be very rare under $H_0$ $\Rightarrow$ doubt about $H_0$.</li>
+    <li><b>Large $p$-value</b> ($\approx 1$): the data are unsurprising under $H_0$ $\Rightarrow$ no reason to doubt it (but <em>not</em> positive proof of $H_0$).</li>
+  </ul>
+  <div class="block key"><p>The $p$-value measures <em>how surprising</em> the data are if $H_0$ holds &ndash; the smaller, the stronger the evidence <b>against</b> $H_0$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>The $p$-value &ndash; graphically</h2>
+  <div class="viz" id="p3b-pv2" style="height:400px"></div>
+  <p class="fs-xs">The (two-sided) $p$-value is the <b>total area</b> in both tails that is <em>at least as extreme</em> as the observed value.
+    <span class="muted">Drag the blue handle; switch $H_1$ to see the one&#8209;sided tail.</span></p>
+  <script>
+  (() => {
+  QV.mount("#p3b-pv2", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B, f = D.normPdf, Phi = D.normCdf;
+    let z = 2.125, side = "two";
+    const ch = QV.density(el, { pdf: f, domain: [-4, 4], yMax: 0.43, xLabel: "", yLabel: "Density", ticks: 8, chart: { margin: { bottom: 50 } } });
+    P.xlab(ch, "$Z$ under $H_0$");
+    const mir = QV.segment(ch, -z, 0, -z, 0.35, { color: C.blue, width: 1.6, dash: "6 4", layer: "annot" });
+    const m = P.marker(ch, z, { color: C.blue, yTop: 0.35, min: -3.8, max: 3.8, step: 0.005, onMove: (v) => { z = v; upd(); } });
+    const tl = P.lbl(ch, 0, 0, "", { size: 17, color: C.tOrange }), tr = P.lbl(ch, 0, 0, "", { size: 17, color: C.tOrange });
+    const lo = P.lbl(ch, z, 0.37, "", { baseline: "bottom", bg: true, size: 15 });
+    const lc1 = P.lbl(ch, 0, 0.19, "", { size: 16, center: true });
+    const lc2 = P.lbl(ch, 0, 0.12, "", { size: 18, bg: true });
+    const row = QV.controls(el);
+    QV.segmented(row, { label: "$H_1$:", options: [["two", "$\\mu\\neq\\mu_0$ (two-sided)"], ["left", "$\\mu<\\mu_0$ (left)"], ["right", "$\\mu>\\mu_0$ (right)"]], value: "two", onChange: (v) => { side = v; upd(); } });
+    QV.spacer(row);
+    const ro = QV.readout(row);
+    const right = (t) => [P.clamp(t + 0.6, -3.55, 3.55), f(t + 0.3) + 0.035];
+    const left = (t) => [P.clamp(t - 0.6, -3.55, 3.55), f(t - 0.3) + 0.035];
+    const upd = () => {
+      const a = Math.abs(z);
+      let regs, p, form, what;
+      if (side === "two") { regs = [{ to: -a }, { from: a }]; p = 2 * Phi(-a); form = "p = 2\\,\\Phi(-|Z_n|)"; what = "sum of both tail areas"; }
+      else if (side === "left") { regs = [{ to: z }]; p = Phi(z); form = "p = \\Phi(Z_n)"; what = "area below $Z_n$"; }
+      else { regs = [{ from: z }]; p = 1 - Phi(z); form = "p = 1-\\Phi(Z_n)"; what = "area above $Z_n$"; }
+      ch.setRegions(regs.map((r) => Object.assign({ color: C.orange, opacity: 0.8 }, r)));
+      mir.style("display", side === "two" ? null : "none").set(-z, 0, -z, 0.35);
+      if (side === "two") { tl.show(true).set(...left(-a), "$p/2$"); tr.show(true).set(...right(a), "$p/2$"); }
+      else if (side === "left") { tl.show(true).set(...left(z), "$p$"); tr.show(false); }
+      else { tr.show(true).set(...right(z), "$p$"); tl.show(false); }
+      lo.set(z, 0.37, `observed: $Z_n = ${P.f(z, 3)}$`);
+      lc1.set(0, 0.2, `$p$-value = ${what}`);
+      lc2.set(0, 0.13, `$${form} = ${P.f(p, 4)}$`);
+      ro.set(`at $\\alpha = 0.05$: <b>${p < 0.05 ? "reject" : "keep"}</b> $H_0$`);
+    };
+    upd();
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>The $p$-value &ndash; definition</h2>
+  <div class="block"><h4>Definition</h4>
+    <p>The $p$-value is the probability, under the validity of $H_0$, of observing a test statistic that is <b>at least as extreme</b> as the one actually observed.</p></div>
+  <ul>
+    <li><b>&ldquo;At least as extreme&rdquo; is set by $H_1$:</b> two-sided ($\mu\neq\mu_0$) $=$ both tails $|Z|\ge|Z_n|$; one-sided $=$ only the tail in the $H_1$ direction. Same statistic, different $p$.</li>
+    <li>$0 \le p \le 1$; software (e.g. <code>scipy.stats</code>) always reports it.</li>
+    <li><b>Advantage:</b> more informative than a bare yes/no &ndash; it quantifies the <em>strength</em> of the evidence.</li>
+  </ul>
+  <aside class="notes">Talk track: read the definition twice, slowly &ndash; every word carries weight. &ldquo;Under the validity of $H_0$&rdquo; = we compute in the $H_0$ world. &ldquo;At least as extreme&rdquo; = the observed value or anything further out, where &ldquo;out&rdquo; is defined by $H_1$. Warn explicitly: the $p$-value is NOT the probability that $H_0$ is true &ndash; that misreading is the single most common exam error (dedicated slide follows).</aside>
+</section>
+
+<section class="slide">
+  <h2>Decision rule</h2>
+  <div class="block alert"><h4>One rule for all tests</h4>
+    <p>\[ p &lt; \alpha \;\Longrightarrow\; \text{reject } H_0 \qquad\qquad p \ge \alpha \;\Longrightarrow\; \text{keep } H_0 \]</p></div>
+  <div class="cols" style="--cols: 64fr 34fr; --gap: 22px">
+    <div class="p3b-panels">
+      <div><div class="p3b-pt" id="p3b-dr1-t"></div><div class="viz" id="p3b-dr1" style="height:390px"></div></div>
+      <div><div class="p3b-pt" id="p3b-dr2-t"></div><div class="viz" id="p3b-dr2" style="height:390px"></div></div>
+    </div>
+    <div class="fs-xs">
+      <ul>
+        <li>Left: $p$ large, value in the acceptance region.</li>
+        <li>Right: $p$ small, value in the rejection region.</li>
+        <li>$\alpha$ is the &ldquo;benchmark&rdquo;.</li>
+      </ul>
+      <div id="p3b-dr-ctrl" style="margin-top:10px"></div>
+      <p class="fs-xxs muted">Drag either handle across the grey critical value; move $\alpha$ to shift the benchmark.</p>
+    </div>
+  </div>
+  <script>
+  (() => {
+  QV.mount("#p3b-dr1", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B;
+    let alpha = 0.05;
+    const mk = (node, tnode, z0) => {
+      let z = z0;
+      const ch = QV.density(node, { pdf: D.normPdf, domain: [-4, 4], yMax: 0.43, xLabel: "", yLabel: "Density", ticks: 5, chart: { margin: { left: 56, right: 12, bottom: 50 } } });
+      P.xlab(ch, "$Z$");
+      const cl = QV.segment(ch, -2, 0, -2, 0.43, { color: C.grey, width: 1.6, dash: "5 4", layer: "annot" });
+      const cr = QV.segment(ch, 2, 0, 2, 0.43, { color: C.grey, width: 1.6, dash: "5 4", layer: "annot" });
+      const lc = P.lbl(ch, 2, 0.41, "crit. value", { size: 13, cls: "muted", bg: true });
+      const m = P.marker(ch, z, { yTop: 0.3, min: -3.9, max: 3.9, step: 0.01, onMove: (v) => { z = v; upd(); } });
+      const lo = P.lbl(ch, z, 0.3, "", { size: 13, bg: true, center: true });
+      const upd = () => {
+        const c = D.normInv(1 - alpha / 2), a = Math.abs(z), p = 2 * D.normCdf(-a), rej = p < alpha;
+        const col = rej ? C.orange : C.blue;
+        ch.setRegions([{ to: -c, color: C.grey, opacity: 0.3 }, { from: c, color: C.grey, opacity: 0.3 },
+          { to: -a, color: col, opacity: rej ? 0.85 : 0.3 }, { from: a, color: col, opacity: rej ? 0.85 : 0.3 }]);
+        cl.set(-c, 0, -c, 0.43); cr.set(c, 0, c, 0.43);
+        lc.set(z >= 0 ? -c : c, 0.41);
+        m.color(col).set(z);
+        // label next to the handle: outside, above or inside -- whichever keeps clear of the curve
+        lo.set(z, 0.3, rej ? "$p$ small<br>(value extreme)" : "$p$ large<br>(value not extreme)");
+        const o = z >= 0 ? 1 : -1;
+        P.avoid(ch, lo, D.normPdf, [
+          { x: z, y: 0.3, anchor: o > 0 ? "start" : "end", dx: 11 * o },
+          { x: z, y: 0.3, anchor: "middle", dy: -(13 + lo.offsetHeight / 2) },
+          { x: z, y: 0.3, anchor: o > 0 ? "end" : "start", dx: -11 * o },
+        ]);
+        P.html(tnode, `$p = ${P.f(p, 3)} ${rej ? "<" : ">"} \\alpha$ $\\;\\rightarrow\\;$ ${rej ? "reject" : "keep"} $H_0$`);
+      };
+      return { upd };
+    };
+    const A = mk(el, document.getElementById("p3b-dr1-t"), 1.0);
+    const B = mk(document.getElementById("p3b-dr2"), document.getElementById("p3b-dr2-t"), 2.5);
+    const row = QV.controls(null, document.getElementById("p3b-dr-ctrl"));
+    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.01, value: 0.05, fmt: (v) => v.toFixed(2), onInput: (v) => { alpha = v; A.upd(); B.upd(); ro.set(`critical value $z_{1-\\alpha/2} = ${P.f(D.normInv(1 - v / 2), 3)}$`); } });
+    const ro = QV.readout(row, `critical value $z_{1-\\alpha/2} = 1.960$`);
+    A.upd(); B.upd();
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Two rules, one decision: critical value $\leftrightarrow$ $p$-value</h2>
+  <div class="cols" style="--cols: 62fr 36fr; --gap: 22px">
+    <div class="p3b-panels">
+      <div><div class="p3b-pt" id="p3b-cp1-t"></div><div class="viz" id="p3b-cp1" style="height:330px"></div></div>
+      <div><div class="p3b-pt" id="p3b-cp2-t"></div><div class="viz" id="p3b-cp2" style="height:330px"></div></div>
+    </div>
+    <div class="fs-xs">
+      <ul>
+        <li>$\alpha$ = tail area beyond the <b>critical value</b> (fixed in advance).</li>
+        <li>$p$ = tail area beyond your <b>observed</b> statistic.</li>
+        <li>Statistic past the bar $\Leftrightarrow$ its tail is smaller $\Leftrightarrow p&lt;\alpha$.</li>
+        <li>Picture: <em>right-sided</em> test ($z_{0.95}=1.645$); two-sided: both tails, $z_{0.975}=1.96$.</li>
+      </ul>
+      <div id="p3b-cp-ctrl" style="margin-top:6px"></div>
+    </div>
+  </div>
+  <div class="block key"><p>The two decision rules are <b>identical</b>: &ldquo;test statistic beyond the critical value&rdquo; and &ldquo;$p&lt;\alpha$&rdquo; always agree &ndash; the critical value is simply the statistic whose tail area equals $\alpha$.</p></div>
+  <script>
+  (() => {
+  QV.mount("#p3b-cp1", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B, f = D.normPdf;
+    let alpha = 0.05;
+    const mk = (node, tnode, z0) => {
+      let z = z0;
+      const ch = QV.density(node, { pdf: f, domain: [-1, 4.2], yMax: 0.48, xLabel: "test statistic", yLabel: "Density", ticks: 5, chart: { margin: { left: 56, right: 12 } } });
+      const cl = QV.segment(ch, 1.645, 0, 1.645, 0.48, { color: C.red, width: 2, dash: "6 4", layer: "annot" });
+      const m = P.marker(ch, z, { yTop: 0.43, min: -0.9, max: 4.1, step: 0.01, color: C.blue, onMove: (v) => { z = v; upd(); } });
+      const lcv = P.lbl(ch, 0, 0.47, "critical value", { size: 13, color: C.tRed, baseline: "top" });
+      const lob = P.lbl(ch, 0, 0.47, "observed", { size: 13, color: C.tBlue, baseline: "top" });
+      const la = P.lbl(ch, 0, 0, "", { size: 16, bg: true }), lp = P.lbl(ch, 0, 0, "", { size: 16, bg: true });
+      const upd = () => {
+        const c = D.normInv(1 - alpha), p = 1 - D.normCdf(z), rej = z > c;
+        ch.setRegions([{ from: Math.min(c, z), color: C.orange, opacity: 0.28 }, { from: Math.max(c, z), color: C.orange, opacity: 0.95 }]);
+        cl.set(c, 0, c, 0.48); m.set(z);
+        // names next to the two lines (outer one to the outside)
+        lcv.anchor(rej ? "end" : "start", rej ? -5 : 5).set(c, 0.47);
+        lob.anchor(rej ? "start" : "end", rej ? 14 : -14).set(z, 0.47);
+        // area labels: the outer (smaller) tail is the dark one
+        const inner = (lo, hi) => { const x = (lo + hi) / 2; return [x, f(x) + 0.04]; };
+        // the outer label sits over the dark tail, to the right of its line, clear of the curve
+        const outer = (d, t) => P.avoid(ch, d, f, [
+          { x: t, y: f(t + 0.25) + 0.045, anchor: "start", dx: 10 },
+          { x: t, y: f(t) + 0.1, anchor: "start", dx: 10 },
+          { x: t, y: Math.max(f(t) + 0.1, 0.2), anchor: "end", dx: -10 },
+        ]);
+        if (rej) { la.set(...inner(c, z), `$\\alpha$`); lp.set(z, 0, `$p = ${P.f(p, 3)}$`); outer(lp, z); }
+        else { lp.set(...inner(z, c), `$p$`); la.set(c, 0, `$\\alpha = ${P.f(alpha, 3)}$`); outer(la, c); }
+        if (rej && z - c < 0.35) la.show(false); else la.show(true);
+        if (!rej && c - z < 0.35) lp.show(false); else lp.show(true);
+        P.html(tnode, rej ? "reject: statistic past the bar $\\Rightarrow p<\\alpha$" : "keep: statistic short of the bar $\\Rightarrow p>\\alpha$");
+      };
+      return { upd };
+    };
+    const A = mk(el, document.getElementById("p3b-cp1-t"), 2.45);
+    const B = mk(document.getElementById("p3b-cp2"), document.getElementById("p3b-cp2-t"), 1.0);
+    const row = QV.controls(null, document.getElementById("p3b-cp-ctrl"));
+    const ro = { set: () => {} };
+    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.005, value: 0.05, fmt: (v) => v.toFixed(3), onInput: (v) => { alpha = v; A.upd(); B.upd(); rd.set(`critical value $z_{1-\\alpha} = ${P.f(D.normInv(1 - v), 3)}$`); } });
+    const rd = QV.readout(row, "critical value $z_{1-\\alpha} = 1.645$");
+    QV.spacer(row);
+    QV.readout(row, '<span class="muted">drag the blue handles</span>');
+    A.upd(); B.upd();
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Both rules, one verdict &ndash; worked example</h2>
+  <p><b>Cream, two-sided, known $\sigma$:</b> &nbsp; $Z_n=-2.125$, &nbsp; $\alpha=0.05$.</p>
+  <div class="cols">
+    <div class="block"><h4>Critical-value rule</h4>
+      <p>\[ |Z_n| = 2.125 \;>\; 1.96 = z_{0.975} \]</p>
+      <p class="center">$\Rightarrow$ <b>reject</b> $H_0$.</p></div>
+    <div class="block"><h4>$p$-value rule</h4>
+      <p>\[ p = 2\,\Phi(-2.125) = 0.034 \]</p>
+      <p class="center">$0.034 &lt; 0.05 \Rightarrow$ <b>reject</b> $H_0$.</p></div>
+  </div>
+  <div class="block key"><p>Same data, same $\alpha$, <b>same decision</b> &ndash; because $|Z_n|>z_{0.975}$ and $p&lt;\alpha$ are just two ways of saying the observed value sits past the bar.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; $p$-value and the choice of $\alpha$</h2>
+  <div class="block problem">
+    <p>A two-sided test with known variance yields $Z_n = 1.85$. Compute the $p$-value and decide at $\alpha = 0.05$ and at $\alpha = 0.10$. Check both decisions with the critical-value rule.</p>
+  </div>
+  <p><b>Hint:</b> $\Phi(1.85) = 0.9678$ (table: row $1.8$, column $.05$); two-sided as in the worked example: $p=2\,\Phi(-|Z_n|)$; &nbsp; $z_{0.975}=1.96$, &nbsp; $z_{0.95}=1.645$.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; $p$-value and $\alpha$</h2>
+  <p><b>Rule:</b> two-sided $p=2\,\Phi(-|Z_n|)=2\,\bigl(1-\Phi(|Z_n|)\bigr)$ (symmetry); reject $H_0$ if $p&lt;\alpha$.</p>
+  <p>\[ p = 2\,\bigl(1-\Phi(1.85)\bigr) = 2\cdot 0.0322 = \mathbf{0.0644} \qquad(\text{exact, unrounded }\Phi\text{: }0.0643) \]</p>
+  <ul>
+    <li>At $\alpha = 0.05$: &nbsp; $0.0644 > 0.05 \Rightarrow$ <b>keep</b> $H_0$. &nbsp; Check: $|Z_n|=1.85&lt;1.96=z_{0.975}$.</li>
+    <li>At $\alpha = 0.10$: &nbsp; $0.0644 &lt; 0.10 \Rightarrow$ <b>reject</b> $H_0$. &nbsp; Check: $|Z_n|=1.85>1.645=z_{0.95}$ (two&#8209;sided at $10\,\%$ uses $z_{1-0.10/2}=z_{0.95}$).</li>
+  </ul>
+  <div class="block key"><p>The same data can be &ldquo;significant&rdquo; or not &ndash; $\alpha$ must be fixed <em>in advance</em>, never chosen to fit the result.</p></div>
+</section>
+
+<section class="slide" data-subsection="Calculation">
+  <h2>Computing the $p$-value (two-sided)</h2>
+  <div class="block"><h4>Known variance</h4>
+    <p>\[ p = 2\cdot\Phi\!\bigl(-|Z_n|\bigr) = P\!\bigl(|Z| > |Z_n|\bigr), \quad Z\sim N(0,1) \]</p></div>
+  <div class="block"><h4>Unknown variance</h4>
+    <p>\[ p = 2\cdot F_{t,n-1}\!\bigl(-|T_n|\bigr) \]</p></div>
+  <p class="inwords"><b>Why double?</b> With $H_1:\mu\neq\mu_0$ a deviation in <em>either</em> direction counts, so &ldquo;at least as extreme&rdquo; means <em>both</em> tails $|Z|>|Z_n|$; by symmetry each has area $\Phi(-|Z_n|)$ &ndash; hence the factor $2$. (One-sided: a single tail, no doubling.)</p>
+</section>
+
+<section class="slide">
+  <h2>$p$-value &ndash; milk (two variants)</h2>
+  <div class="cols">
+    <div class="block"><h4>Known variance, $Z_n=1.000$</h4>
+      \begin{align*} p &= 2\cdot\Phi(-1.00)\\ &= 2\cdot 0.15866 = 0.3173 \end{align*}</div>
+    <div class="block"><h4>Unknown variance, $T_n=0.7947$</h4>
+      \begin{align*} p &= 2\cdot F_{t,8}(-0.7947)\\ &= 2\cdot 0.22485 = 0.4497 \end{align*}</div>
+  </div>
+  <div class="block example"><h4>Decision</h4>
+    <p>Both $p$-values $> 0.05 \Rightarrow H_0:\mu=1000$ not rejected. The value $0.4497$ matches the <code>ttest_1samp</code> output.</p></div>
+  <p class="fs-xs"><b>Exact vs. table:</b> the values above use the unrounded $\Phi$ and $F_{t,8}$ (software). From the printed $\Phi$ table, $\Phi(1.00)=0.8413$ gives $p=2\cdot0.1587=0.3174$. The $t$-table can only bracket: $0.7947&lt;1.397=t_{0.90;\,8}$ $\Rightarrow$ $p>2\cdot0.10=0.20$.</p>
+</section>
+
+<section class="slide">
+  <h2>$p$-value &ndash; cream (two variants)</h2>
+  <div class="cols">
+    <div class="block"><h4>Known variance, $Z_n=-2.125$</h4>
+      \begin{align*} p &= 2\cdot\Phi(-2.125)\\ &= 2\cdot 0.0168 = \mathbf{0.0336} \end{align*}
+      <p>$0.0336 &lt; 0.05 \Rightarrow$ reject.</p></div>
+    <div class="block"><h4>Unknown variance, $T_n=-2.1086$</h4>
+      \begin{align*} p &= 2\cdot F_{t,15}(-2.1086)\\ &= 2\cdot 0.0261 = \mathbf{0.0522} \end{align*}
+      <p>$0.0522 > 0.05 \Rightarrow$ keep.</p></div>
+  </div>
+  <div class="block key"><p>The same data set can be just <em>significant</em> or just <em>not significant</em> depending on the assumption about $\sigma$.</p></div>
+  <p class="fs-xs"><b>Exact vs. table:</b> exact values (software). With the printed tables: $\Phi(2.12)=0.9830$, $\Phi(2.13)=0.9834$ $\Rightarrow$ $0.0332&lt;p&lt;0.0340$; &nbsp; $t$-table, df&nbsp;$=15$: $1.753&lt;2.1086&lt;2.131$ $\Rightarrow$ $0.05&lt;p&lt;0.10$. Both brackets give the same decisions.</p>
+</section>
+
+<section class="slide">
+  <h2>$p$-values with Python</h2>
+  <pre class="py">
+import numpy as np
+from scipy import stats
+milk = np.array([1005, 1001, 997, 1000, 1001, 998, 999, 999, 1009])
+cream = np.array([251, 248, 248, 249, 250, 251, 247, 246,
+                  252, 251, 248, 247, 246, 249, 248, 252])
+for x, mu0, sigma in [(milk, 1000, 3), (cream, 250, 2)]:
+    n = len(x)
+    z = (x.mean() - mu0) / (sigma / np.sqrt(n))           # sigma known
+    t = (x.mean() - mu0) / (x.std(ddof=1) / np.sqrt(n))   # sigma estimated
+    p_z = 2 * stats.norm.sf(abs(z))                       # 2 * (1 - Phi(|z|))
+    p_t = 2 * stats.t.sf(abs(t), df=n - 1)                # 2 * (1 - F_t,n-1(|t|))
+    print(f"z = {z:.4f}, p = {p_z:.4f} | t = {t:.4f}, p = {p_t:.4f}")
+  </pre>
+  <div class="cols" style="--cols: 56fr 40fr">
+    <div style="gap:4px">
+      <p class="fs-s"><b>Output</b> (milk, cream):</p>
+      <pre class="out">
+z = 1.0000, p = 0.3173 | t = 0.7947, p = 0.4497
+z = -2.1250, p = 0.0336 | t = -2.1086, p = 0.0522
+      </pre>
+    </div>
+    <div><p class="fs-xs"><code>sf</code> $=1-F$ (survival function). The $t$-row equals <code>ttest_1samp(x, mu0)</code>.</p></div>
+  </div>
+  <a class="trynb" data-sec="section 4.2"></a>
+</section>
+
+<section class="slide">
+  <h2>$p$-value &ndash; typical misconceptions</h2>
+  <div class="block alert"><h4>What the $p$-value is <em>not</em></h4>
+    <ul>
+      <li><b>Not</b> the probability that $H_0$ is true.</li>
+      <li>A large $p$-value does <b>not prove</b> $H_0$ &ndash; it only shows <em>no contradiction</em>.</li>
+    </ul></div>
+  <div class="block"><h4>Correct &ndash; mind the direction</h4>
+    <p>The $p$-value is the probability <em>of the data (or more extreme)</em> <b>assuming</b> $H_0$ (chance) holds: $P(\text{data}\mid H_0)$. It <em>conditions on</em> chance; it does <b>not</b> give the probability that chance was the <em>cause</em>, $P(H_0\mid\text{data})$.</p></div>
+  <aside class="notes">Talk track: use the courtroom again &ndash; $P(\text{evidence}\mid\text{innocent})$ is not $P(\text{innocent}\mid\text{evidence})$. Concrete anchor: &ldquo;the probability that a randomly tested person has these symptoms IF healthy&rdquo; vs. &ldquo;the probability the person is healthy GIVEN the symptoms&rdquo; &ndash; clearly different. Also stress the second bullet: a large $p$ means the data cannot distinguish $H_0$ from nearby alternatives &ndash; absence of evidence, not evidence of absence.</aside>
+</section>
+
+<section class="slide">
+  <h2>Significant $\neq$ important &ndash; the large-$n$ trap</h2>
+  <div class="block"><h4>The $p$-value measures evidence, not size</h4>
+    <p>With enough data, <em>any</em> tiny deviation from $\mu_0$ becomes statistically significant &ndash; even one that is practically irrelevant.</p></div>
+  <div class="block example"><h4>Milk machine, observed $\bar x = 1000.2$ ml ($\mu_0=1000$, $\sigma=3$)</h4>
+    <table class="bt fs-s">
+      <thead><tr><th></th><th>$Z_n$</th><th>$p$ (two-sided)</th><th class="l">verdict at $\alpha=0.05$</th></tr></thead>
+      <tbody>
+        <tr><td class="l">$n=9$</td><td>$0.20$</td><td>$0.84$</td><td class="l">not significant</td></tr>
+        <tr><td class="l">$n=10\,000$</td><td>$6.67$</td><td>$&lt;0.0001$</td><td class="l"><b>highly</b> significant</td></tr>
+      </tbody>
+    </table>
+    <div class="p3b-sig" id="p3b-sig"></div>
+  </div>
+  <div class="block key"><p>The same irrelevant $0.2$ ml deviation &ndash; invisible at $n=9$, &ldquo;highly significant&rdquo; at $n=10\,000$. So report the <b>effect size and the CI</b>, not just $p$.</p></div>
+  <aside class="notes">Talk track: significance answers &ldquo;is there evidence of ANY deviation?&rdquo;, not &ldquo;is the deviation large enough to matter?&rdquo;. With $n=10\,000$ the SE is $0.03$ ml &ndash; the test becomes a microscope. Flip side (links to power): with small $n$, even an important deviation often stays invisible. Practical rule for the students: $p$-value for evidence, CI for magnitude &ndash; always read both.</aside>
+  <script>
+  (() => {
+  QV.mount("#p3b-sig", (el) => {
+    const D = QV.dist, P = window.P3B;
+    const row = QV.controls(null, el);
+    const ro = QV.readout(row);
+    const upd = (v) => {
+      const n = Math.round(Math.pow(10, v)), se = 3 / Math.sqrt(n), z = 0.2 / se, p = 2 * D.normCdf(-z);
+      ro.set(`$n = ${n}$: &nbsp; $\\mathrm{SE} = ${P.f(se, 3)}$, &nbsp; $Z_n = ${P.f(z, 2)}$, &nbsp; $p = ${p < 0.0001 ? "< 0.0001" : P.f(p, 4)}$ &nbsp;&rarr; <b>${p < 0.05 ? "significant" : "not significant"}</b>`);
+    };
+    QV.slider(row, { label: "try $n$ (log scale)", min: Math.log10(9), max: 4, step: 0.01, value: Math.log10(9), width: 220, fmt: (v) => String(Math.round(Math.pow(10, v))), onInput: upd });
+    row.appendChild(ro.el);
+    upd(Math.log10(9));
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide" data-subsection="Exercises">
+  <h2>Exercise &ndash; interpret the $p$-value (concept)</h2>
+  <div class="block"><h4>Which statements are correct? &nbsp; ($p = 0.03$, $\alpha=0.05$)</h4>
+    <ol>
+      <li>&ldquo;There is a $3\,\%$ probability that $H_0$ is true.&rdquo;</li>
+      <li>&ldquo;If $H_0$ were true, data this extreme occur in $3\,\%$ of samples.&rdquo;</li>
+      <li>&ldquo;We reject $H_0$ at $\alpha=0.05$.&rdquo;</li>
+      <li>&ldquo;The effect is large and important.&rdquo;</li>
+    </ol></div>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; interpret the $p$-value</h2>
+  <div class="block example"><h4>Answers</h4>
+    <ol>
+      <li><b>Wrong</b>: $p$ is $P(\text{data}\mid H_0)$, not $P(H_0\mid \text{data})$.</li>
+      <li><b>Correct</b>: that is exactly the definition.</li>
+      <li><b>Correct</b>: $0.03 &lt; 0.05$.</li>
+      <li><b>Wrong</b>: significance $\neq$ effect size; a tiny effect can be significant with large $n$.</li>
+    </ol></div>
+  <div class="block key"><p>A small $p$-value signals <em>evidence against $H_0$</em> &ndash; not the probability of $H_0$, and not the size or importance of the effect.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; bracketing the $p$-value with the $t$-table</h2>
+  <div class="block problem">
+    <p>Delivery-time exercise (section &ldquo;Hypothesis tests&rdquo;): two-sided $t$-test with <span class="p3b-nw">$T_n=-2.1213$</span> and <span class="p3b-nw">df&nbsp;$=7$</span>. In the exam there is no software &ndash; only the row <span class="p3b-nw">df&nbsp;$=7$</span> of the <span class="p3b-nw">$t$-table</span>:</p>
+    <table class="bt fs-s">
+      <thead><tr><th class="l">upper-tail probability $P(T>t)$</th><th class="vsep">$0.10$</th><th>$0.05$</th><th>$0.025$</th><th>$0.01$</th><th>$0.005$</th></tr></thead>
+      <tbody><tr><td class="l">$t$ (df&nbsp;$=7$)</td><td class="vsep">$1.415$</td><td>$1.895$</td><td>$2.365$</td><td>$2.998$</td><td>$3.499$</td></tr></tbody>
+    </table>
+  </div>
+  <ol class="alpha">
+    <li>Bracket the two-sided $p$-value from below and above.</li>
+    <li>Decide at $\alpha=0.05$ and at $\alpha=0.10$.</li>
+    <li>Which Python command gives the exact value?</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; bracketing the $p$-value with the $t$-table</h2>
+  <div class="stack" style="gap:10px">
+    <p><b>Rule:</b> two-sided $p=2\cdot P(T>|T_n|)$; the table gives $P(T>t)$ only at a few points &ndash; so <em>bracket</em>.</p>
+    <p>\[ \textbf{a)}\quad 1.895&lt;|T_n|=2.121&lt;2.365 \;\Longrightarrow\; 0.025&lt;P(T>2.121)&lt;0.05 \;\Longrightarrow\; \mathbf{0.05&lt;p&lt;0.10} \]</p>
+    <p><b>b)</b> $\alpha=0.05$: $p>0.05\Rightarrow$ <b>keep</b> $H_0$ (as $|T_n|&lt;2.365$). &nbsp;&nbsp; $\alpha=0.10$: $p&lt;0.10\Rightarrow$ <b>reject</b> $H_0$ <span class="p3b-nw">(as $|T_n|>1.895$).</span></p>
+    <div class="block"><h4>c) exactly, with Python</h4>
+      <pre class="py">
+from scipy import stats
+print(round(2 * stats.t.cdf(-2.1213, df=7), 4))        # exact two-sided p-value: 0.0716
+      </pre></div>
+    <div class="block key"><p>The table yields only an <em>interval</em> for $p$ &ndash; enough for the decision &ldquo;$p&lt;\alpha$?&rdquo;; critical value and $p$-value always agree.</p></div>
+  </div>
+  <a class="trynb" data-sec="section 4.3"></a>
+  <aside class="notes">Talk track: exam-relevant skill. Draw the df&nbsp;$=7$ row as a ruler, mark $2.121$ between $1.895$ and $2.365$, read the tail areas $0.05$ and $0.025$ above them &ndash; then DOUBLE for two-sided. Most common error: forgetting the factor $2$ (giving $0.025&lt;p&lt;0.05$ and the wrong decision at $\alpha=0.05$).</aside>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; coffee roastery (exam-style, from A to Z)</h2>
+  <div class="block problem">
+    <p>A coffee roastery fills tins with a target net weight of $\mu_0=1000$ g. From long-term process monitoring the standard deviation is <em>known</em>: $\sigma=40$ g. After a refit, a sample of $n=64$ tins gives $\bar x=1012$ g. Test two-sided at $\alpha=0.05$.</p>
+  </div>
+  <ol class="alpha">
+    <li>State the hypotheses.</li>
+    <li>Compute the standard error $\sigma/\sqrt n$ and the test statistic $Z_n$.</li>
+    <li>Give the critical value and make the test decision.</li>
+    <li>Compute the $p$-value with the $\Phi$-table. Which Python command gives it?</li>
+    <li>Compute the $95\,\%$ CI for $\mu$. What does it imply for $H_0:\mu=1000$?</li>
+    <li>A second check sample gives $n=25$, $\bar x=1012$ g and an <em>estimated</em> $s=40$ g. Compute the $95\,\%$ CI ($t_{0.975;\,24}=2.0639$). Would $H_0$ be rejected now?</li>
+  </ol>
+  <aside class="notes">Talk track: an exam task in miniature &ndash; let students work in pairs for 10 minutes with the $\Phi$-table only. The final part f) is the comparison that matters: same $\bar x$, but estimated $\sigma$ and smaller $n$ flip the decision.</aside>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/3) &ndash; coffee roastery: test with the critical value</h2>
+  <div class="stack" style="gap:8px">
+    <p><b>a)</b> Deviations in <em>both</em> directions matter (too little: consumer protection; too much: cost):</p>
+    <p>\[ H_0:\mu=1000 \qquad\text{vs.}\qquad H_1:\mu\neq1000 \]</p>
+    <p><b>b)</b> $\sigma$ known $\Rightarrow$ $z$-test (Gauss test):</p>
+    <p>\[ \mathrm{SE}=\frac{\sigma}{\sqrt n}=\frac{40}{\sqrt{64}}=\frac{40}{8}=\mathbf{5\ g}, \qquad Z_n=\frac{\bar x-\mu_0}{\mathrm{SE}}=\frac{1012-1000}{5}=\mathbf{2.40} \]</p>
+    <p><b>c)</b> Two-sided: $\alpha/2=0.025$ in each tail, critical value $z_{0.975}=1.96$ <span class="p3b-nw">(table: $\Phi(1.96)=0.9750$).</span></p>
+    <div class="block alert"><h4>Decision</h4>
+      <p>$|Z_n|=2.40>1.96$ $\Rightarrow$ $H_0$ is <b>rejected</b>: the mean fill weight deviates significantly from $1000$ g &ndash; upwards. Readjusting the machine saves coffee.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/3) &ndash; coffee roastery: $p$-value and CI</h2>
+  <div class="stack" style="gap:6px">
+    <p><b>d)</b> Table: $\Phi(2.40)=0.9918$, so</p>
+    <p>\[ p=2\,\bigl(1-\Phi(2.40)\bigr)=2\cdot0.0082=\mathbf{0.0164}&lt;0.05 \;\Rightarrow\;\text{reject } H_0 . \]</p>
+    <p class="fs-s">If the machine were set correctly, a deviation at least this large would occur in only $1.64\,\%$ of all samples.</p>
+    <pre class="py">
+from scipy import stats
+z = (1012 - 1000) / (40 / 64 ** 0.5)
+print(z, round(2 * stats.norm.sf(abs(z)), 4))           # z and two-sided p-value
+    </pre>
+    <pre class="out">
+2.4 0.0164
+    </pre>
+    <p>\[ \textbf{e)}\quad 1012\pm1.96\cdot5=1012\pm9.8\ \Rightarrow\ \text{CI}_{0.95}=\mathbf{[\,1002.2\,;\,1021.8\,]}\ \text{g} \]</p>
+    <p class="fs-s">$1000\notin$ CI $\Rightarrow$ $H_0$ is rejected &ndash; consistent with $|Z_n|>1.96$ and $p&lt;0.05$ (duality).</p>
+  </div>
+  <a class="trynb" data-sec="section 4.3"></a>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/3) &ndash; coffee roastery: estimated $\sigma$</h2>
+  <p><b>f)</b> Now $\sigma$ is <em>estimated</em> $\Rightarrow$ $t$-quantile with df&nbsp;$=24$:</p>
+  <p>\[ \frac{s}{\sqrt n}=\frac{40}{5}=8,\qquad 1012\pm2.0639\cdot8=1012\pm16.51 \ \Rightarrow\ \mathbf{[\,995.49\,;\,1028.51\,]}\ \text{g} \]</p>
+  <table class="bt fs-s">
+    <thead><tr><th></th><th>$\sigma=40$ known, $n=64$</th><th>$s=40$ estimated, $n=25$</th></tr></thead>
+    <tbody>
+      <tr><td class="l">standard error</td><td>$40/8=5$</td><td>$40/5=8$</td></tr>
+      <tr><td class="l">quantile</td><td>$z_{0.975}=1.96$</td><td>$t_{0.975;\,24}=2.0639$</td></tr>
+      <tr><td class="l">$95\,\%$ CI</td><td>$[\,1002.2\,;\,1021.8\,]$</td><td>$[\,995.49\,;\,1028.51\,]$</td></tr>
+      <tr><td class="l">contains $\mu_0=1000$?</td><td>no $\to$ reject</td><td>yes $\to$ keep</td></tr>
+    </tbody>
+  </table>
+  <div class="block key"><p>The second interval is wider for <b>two</b> reasons: the smaller sample <em>and</em> the larger $t$-quantile for the estimated spread. Now $1000$ lies inside &ndash; $H_0$ would <em>not</em> be rejected.</p></div>
+  <aside class="notes">Talk track: this is a complete exam task (adapted from the mock exams). Typical errors to name: $t$ instead of $z$ although $\sigma$ is known; $1.645$ instead of $1.96$ for a two-sided test; forgetting the factor $2$ in the $p$-value; forgetting $\sqrt n$ ($Z_n=12/40=0.3$); reading the CI as &ldquo;$\mu$ lies inside with $95\,\%$ probability&rdquo;.</aside>
+</section>
+
+<!-- ===== SECTION: TYPES OF ERROR ===== -->
+<section class="slide" data-section="Types of Error" data-short="Errors" data-subsection="The two types of error">
+  <h2>Two ways to be wrong</h2>
+  <div class="block"><h4>Intuition</h4>
+    <p>Like a smoke detector, we can be wrong in two ways: <b>false alarm</b> or <b>missed fire</b>.</p></div>
+  <table class="bt p3b-mid" style="font-size:22px">
+    <thead><tr><th class="l">Decision</th><th>$H_0$ true</th><th>$H_0$ false</th></tr></thead>
+    <tbody>
+      <tr><td class="l" style="padding:12px 13px">reject $H_0$</td><td class="hlr">Type I error ($\alpha$)</td><td class="hlg">correct (power $1-\beta$)</td></tr>
+      <tr><td class="l" style="padding:12px 13px">keep $H_0$</td><td class="hlg">correct ($1-\alpha$)</td><td class="hl">Type II error ($\beta$)</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-xs"><b>Type I error</b> = false alarm (reject although $H_0$ is true). &nbsp;&nbsp; <b>Type II error</b> = miss (keep although $H_1$ is true).</p>
+  <aside class="notes">Talk track: build the table column by column &ndash; &ldquo;first fix the TRUE state of the world (column), then look at what our test DID (row).&rdquo; Smoke detector: too sensitive = many false alarms (Type I); too sluggish = missed fire (Type II). Make students say which error the milk test could have made (it kept $H_0$, so only a Type II is possible). Common confusion: thinking both errors can occur in the same test run &ndash; only one column is ever real.</aside>
+</section>
+
+<section class="slide">
+  <h2>$\alpha$ and $\beta$ in a picture</h2>
+  <div class="cols" style="--cols: 63fr 35fr; --gap: 22px">
+    <div><div class="viz" id="p3b-ab" style="height:445px"></div></div>
+    <div class="fs-xs">
+      <ul>
+        <li>The two curves show the <em>standardised</em> $\bar X$ in each &ldquo;world&rdquo;: left centred at $\mu_0$ (value $0$, if $H_0$ holds), right at the true $\mu_1$ (here $2.6$ standard errors above $\mu_0$, if $H_1$); the red line is the critical value of a right-sided test ($1.645$).</li>
+        <li><span class="c-orange">$\alpha$</span>: $H_0$ true, but beyond the critical value.</li>
+        <li><span class="c-blue">$\beta$</span>: $H_1$ true, but on this side.</li>
+        <li>The distributions overlap &ndash; both errors cannot be $0$ at once.</li>
+      </ul>
+      <p class="fs-xxs muted">Sliders: a smaller $\alpha$ moves the red line right ($\beta$ grows); a larger effect or a larger $n$ pulls the $H_1$ curve away ($\beta$ shrinks).</p>
+    </div>
+  </div>
+  <script>
+  (() => {
+  QV.mount("#p3b-ab", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B;
+    let alpha = 0.05, d = 1.3, n = 4;
+    const X0 = -4.3, X1 = 7.3;
+    const ch = QV.chart(el, { x: { domain: [X0, X1], label: "", ticks: 8 }, y: { domain: [0, 0.54], label: "Density", tickValues: [0, 0.1, 0.2, 0.3, 0.4] }, margin: { bottom: 50, right: 14 } });
+    P.xlab(ch, "standardised sample mean &nbsp;$(\\bar X-\\mu_0)/\\mathrm{SE}$");
+    const aB = QV.area(ch, [], { color: C.blue, opacity: 0.28 });
+    const aA = QV.area(ch, [], { color: C.orange, opacity: 0.8 });
+    QV.line(ch, QV.sample(D.normPdf, X0, X1, 300), { color: C.ink2, width: 2.6 });
+    const l1 = QV.line(ch, [], { color: C.blue, width: 2.6 });
+    QV.segment(ch, X0, 0, X1, 0, { color: C.axis, width: 1, layer: "data" });
+    const cv = QV.segment(ch, 1.645, 0, 1.645, 0.5, { color: C.red, width: 2.2, layer: "annot" });
+    const lcv = P.lbl(ch, 1.645, 0.53, "", { anchor: "start", dx: 7, baseline: "top", size: 14, color: C.tRed });
+    const lb = P.lbl(ch, -2.7, 0.33, "", { size: 16, bg: true, color: C.tBlue });
+    const ab = QV.segment(ch, 0, 0, 0, 0, { color: C.blue, width: 1.5, arrow: true });
+    const la = P.lbl(ch, 5.3, 0.33, "", { size: 16, bg: true, color: C.tOrange });
+    const aa = QV.segment(ch, 0, 0, 0, 0, { color: C.orange, width: 1.5, arrow: true });
+    P.legendIn(ch, [{ label: "$H_0$ true ($\\mu=\\mu_0$)", color: C.ink2, type: "line" }, { label: "$H_1$ true ($\\mu=\\mu_1$)", color: C.blue, type: "line" }], { left: 6, top: 2 });
+    const row = QV.controls(el);
+    QV.slider(row, { label: "$\\alpha$", min: 0.005, max: 0.2, step: 0.005, value: alpha, width: 100, fmt: (v) => v.toFixed(3), onInput: (v) => { alpha = v; upd(); } });
+    QV.slider(row, { label: "effect $(\\mu_1-\\mu_0)/\\sigma$", min: 0, max: 2.5, step: 0.05, value: d, width: 100, fmt: (v) => v.toFixed(2), onInput: (v) => { d = v; upd(); } });
+    QV.slider(row, { label: "$n$", min: 1, max: 36, step: 1, value: n, width: 100, fmt: (v) => String(v), onInput: (v) => { n = v; upd(); } });
+    const ro = QV.readout(row);
+    const upd = () => {
+      const c = D.normInv(1 - alpha), del = d * Math.sqrt(n), f1 = (x) => D.normPdf(x, del);
+      const beta = D.normCdf(c - del);
+      QV.setLine(ch, l1, QV.sample(f1, X0, X1, 300));
+      QV.setArea(ch, aB, QV.sample(f1, X0, c, 160));
+      QV.setArea(ch, aA, QV.sample(D.normPdf, c, X1, 160));
+      cv.set(c, 0, c, 0.5);
+      lcv.set(c, 0.53, `critical value ${c.toFixed(3)}<br>(right-sided)`);
+      lb.set(-2.7, 0.33, `$\\beta$ (Type II error) $= ${P.f(beta, 3)}$`);
+      const xb = c - 0.4, xa = c + 0.35;
+      ab.set(-2.7, 0.312, xb, Math.max(f1(xb) * 0.45, 0.004));
+      la.set(5.3, 0.33, `$\\alpha$ (Type I error) $= ${P.f(alpha, 3)}$`);
+      aa.set(5.3, 0.312, xa, D.normPdf(xa) * 0.45);
+      ro.set(`$\\mu_1$ is $${P.f(del, 2)}$ SE above $\\mu_0$ &nbsp;&middot;&nbsp; power $1-\\beta =$ <b>${P.f(1 - beta, 3)}</b>`);
+    };
+    upd();
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide" data-subsection="$\alpha$ and $\beta$">
+  <h2>Type I error ($\alpha$) &ndash; controllable</h2>
+  <div class="block"><h4>Definition</h4>
+    <p>\[ P(\text{reject } H_0 \mid H_0 \text{ true}) = \alpha \]</p></div>
+  <ul>
+    <li><b>Directly controllable</b> through the choice of $\alpha$ (typically $0.05$).</li>
+    <li>In $5\,\%$ of cases a <em>true</em> $H_0$ is wrongly rejected.</li>
+  </ul>
+  <div class="block example"><h4>Milk</h4>
+    <p>$H_0:\mu=1000$ is true, yet the test rejects (false alarm) &ndash; probability $=\alpha$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Type II error ($\beta$) &ndash; only indirectly influenced</h2>
+  <div class="block"><h4>Definition (at a specific alternative $\mu_1$)</h4>
+    <p>\[ P(\text{keep } H_0 \mid \mu = \mu_1) = \beta \]</p></div>
+  <ul>
+    <li>No <em>direct</em> lever; $\beta$ depends on:
+      <ul class="fs-xs">
+        <li>$\alpha$, sample size $n$, spread $\sigma^2$,</li>
+        <li>true deviation $|\mu-\mu_0|$ (effect size).</li>
+      </ul></li>
+    <li>At a fixed $\mu_1$: smaller $\alpha$ $\Rightarrow$ higher bar $\Rightarrow$ more misses ($\beta$ <em>rises</em>); &nbsp; larger $n$ $\Rightarrow$ smaller SE $\Rightarrow$ $\beta$ <em>falls</em>.</li>
+  </ul>
+  <div class="block key"><p>Power $=1-\beta$: the ability to actually reject a <em>false</em> $H_0$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Only one error is controllable</h2>
+  <p><b>Question:</b> Which error can we only make when we <em>reject</em> $H_0$?</p>
+  <div class="block"><h4>Answer</h4>
+    <p>The Type I error &ndash; and that is exactly the one we control via $\alpha$.</p></div>
+  <div class="block alert"><h4>Consequence for the choice of hypotheses</h4>
+    <p>This is why the claim you want to <em>establish</em> goes into $H_1$ (rule of thumb from above): wrongly declaring it &ldquo;established&rdquo; &ndash; rejecting $H_0$ although $H_0$ holds &ndash; is the costly mistake, and exactly this one is the controllable Type I error.</p></div>
+</section>
+
+<!-- ===== SECTION: SUMMARY ===== -->
+<section class="slide" data-section="Summary" data-short="Summary">
+  <h2>Summary 1 &ndash; foundations</h2>
+  <div class="cols p3b-fit">
+    <div class="block"><h4>Normal distribution</h4>
+      <p>$X\sim N(\mu,\sigma^2)$ &nbsp; $\Rightarrow$ &nbsp; $Z=\dfrac{X-\mu}{\sigma}\sim N(0,1)$</p>
+      <p>$P(X\le x)=\Phi\bigl(\tfrac{x-\mu}{\sigma}\bigr)$, &nbsp;&nbsp; $\Phi(-z)=1-\Phi(z)$</p>
+      <p>quantile: $x_p=\mu+\sigma\,z_p$, &nbsp;&nbsp; $z_{0.975}=1.96$</p></div>
+    <div class="block"><h4>Sampling distribution of $\bar X$</h4>
+      <p>$E(\bar X)=\mu$, &nbsp;&nbsp; $\mathrm{Var}(\bar X)=\sigma^2/n$, &nbsp;&nbsp; $\mathrm{SE}=\sigma/\sqrt n$</p>
+      <p>normal data: $\bar X\sim N(\mu,\sigma^2/n)$ exactly;</p>
+      <p>otherwise (CLT, $n\gtrsim30$): approximately.</p></div>
+  </div>
+  <div class="block key"><p>Every interval and test in this part <em>standardises</em> $\bar X$ with its standard error &ndash; and the CLT makes this work even for non-normal data.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Summary 2 &ndash; confidence intervals</h2>
+  <div class="block"><h4>Known variance $\sigma$ &nbsp;&nbsp; ($Z_n\sim N(0,1)$)</h4>
+    <p>\[ \text{CI}_{1-\alpha} = \left[\bar{X}-z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}},\; \bar{X}+z_{1-\alpha/2}\frac{\sigma}{\sqrt{n}}\right] \]</p></div>
+  <div class="block"><h4>Unknown variance &nbsp;&nbsp; ($T_n\sim t_{n-1}$)</h4>
+    <p>\[ \text{CI}_{1-\alpha} = \left[\bar{X}-t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}},\; \bar{X}+t_{1-\alpha/2,\,n-1}\frac{s}{\sqrt{n}}\right] \]</p></div>
+  <p><b>Sample size</b> for a margin of error $e$ (known $\sigma$): &nbsp; $n\ge\bigl(z_{1-\alpha/2}\,\sigma/e\bigr)^2$, rounded up.</p>
+</section>
+
+<section class="slide">
+  <h2>Summary 3 &ndash; hypothesis test (two-sided)</h2>
+  <p>$H_0:\mu=\mu_0$ vs. $H_1:\mu\ne\mu_0$</p>
+  <div class="block"><h4>Test statistics</h4>
+    <p>\[ Z_n = \frac{\bar{X}-\mu_0}{\sigma/\sqrt{n}}\sim N(0,1),\qquad T_n = \frac{\bar{X}-\mu_0}{s/\sqrt{n}}\sim t_{n-1} \qquad(\text{under } H_0) \]</p></div>
+  <div class="block alert"><h4>Decision</h4>
+    <p>Reject if $|Z_n|>z_{1-\alpha/2}$ ($\sigma$ known) or $|T_n|>t_{1-\alpha/2,\,n-1}$ ($\sigma$ unknown).</p></div>
+</section>
+
+<section class="slide">
+  <h2>Summary 4 &ndash; the $p$-value</h2>
+  <div class="block"><h4>One idea behind every formula</h4>
+    <p>$p$ = probability, <em>if $H_0$ were true</em>, of a value <b>at least as extreme as observed</b> &ndash; in the direction(s) that $H_1$ allows.</p></div>
+  <table class="bt left p3b-mid">
+    <thead><tr><th>If $H_1$ is&hellip;</th><th>add up the&hellip;</th><th class="center" style="text-align:center">$p$ &nbsp; (unknown $\sigma$)</th></tr></thead>
+    <tbody>
+      <tr><td style="padding:8px 13px">$\mu\neq\mu_0$</td><td><em>both</em> tails beyond $|T_n|$</td><td style="text-align:center">$2\,F_{t,n-1}(-|T_n|)$</td></tr>
+      <tr><td style="padding:8px 13px">$\mu&lt;\mu_0$ (left)</td><td><em>lower</em> tail below $T_n$</td><td style="text-align:center">$F_{t,n-1}(T_n)$</td></tr>
+      <tr><td style="padding:8px 13px">$\mu>\mu_0$ (right)</td><td><em>upper</em> tail above $T_n$</td><td style="text-align:center">$1-F_{t,n-1}(T_n)$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-xs"><b>Known $\sigma$?</b> Just replace $T_n\to Z_n$ and $F_{t,n-1}\to\Phi$. &nbsp;&nbsp; <b>Decide:</b> $p&lt;\alpha \Rightarrow$ reject $H_0$.</p>
+</section>
+
+<section class="slide">
+  <h2>Summary 5 &ndash; types of error</h2>
+  <div class="block"><h4>Types of error</h4>
+    <p>$P(\text{reject } H_0\mid \mu=\mu_0)= \alpha$ &nbsp;&nbsp;&nbsp; $P(\text{keep } H_0\mid \mu=\mu_1)= \beta$</p>
+    <p>$\alpha$ is <em>controllable</em>; $\beta$ falls with $n\uparrow$ and $\alpha\uparrow$; power $=1-\beta$.</p></div>
+  <p class="fs-xs">One-sided tests and the power of a test: Appendix A.3&ndash;A.8.</p>
+</section>
+
+<section class="slide">
+  <h2>Summary 6 &ndash; important Python commands</h2>
+  <div class="cols" style="--cols: 46fr 52fr; --gap: 22px">
+    <div class="block"><h4>Distributions</h4>
+      <pre class="py">
+from scipy import stats
+stats.norm.cdf(1.96)          # Phi(z)
+stats.norm.sf(1.96)           # 1 - Phi(z)
+stats.norm.ppf(0.975)         # z_p
+stats.norm.cdf(997, 1000, 3)  # P(X&lt;=x)
+stats.t.cdf(-2.11, df=15)     # F_t,df(t)
+stats.t.ppf(0.975, df=8)      # t_p,df
+      </pre></div>
+    <div class="block"><h4>Tests, intervals, sample size</h4>
+      <pre class="py">
+res = stats.ttest_1samp(x, popmean=1000)
+res = stats.ttest_1samp(x, 1000,
+                        alternative="less")
+res.statistic, res.df, res.pvalue
+res.confidence_interval(0.95)   # CI
+2 * stats.norm.sf(abs(z))       # z-test p
+math.ceil((1.96 * sigma / e)**2)  # n
+      </pre></div>
+  </div>
+  <p class="fs-xs"><code>alternative</code> is <code>"two-sided"</code> (default), <code>"less"</code> or <code>"greater"</code>; <code>scale</code> in <code>stats.norm</code> is the <em>standard deviation</em>; <code>confidence_interval</code> returns the CI that matches the chosen direction.</p>
+  <a class="trynb" data-sec="Key Python commands"></a>
+</section>
+
+<section class="slide">
+  <h2>Which procedure? &ndash; decision tree</h2>
+  <div class="p3b-tree" style="margin-top:14px">
+    <div class="fbox" style="grid-row: 1 / span 2; grid-column: 1"><b>Question?</b></div>
+    <svg style="grid-row: 1 / span 2; grid-column: 2" width="96" height="228" viewBox="0 0 96 228" aria-hidden="true">
+      <defs><marker id="p3b-tree-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" style="fill:var(--brand-ink)"/></marker></defs>
+      <line x1="4" y1="114" x2="88" y2="52" style="stroke:var(--brand-ink);stroke-width:2.5" marker-end="url(#p3b-tree-arr)"/>
+      <line x1="4" y1="114" x2="88" y2="176" style="stroke:var(--brand-ink);stroke-width:2.5" marker-end="url(#p3b-tree-arr)"/>
+    </svg>
+    <div class="fbox o" style="grid-row:1; grid-column:3"><b>Range for $\mu$</b><br>$\Rightarrow$ confidence interval</div>
+    <svg class="farr" style="grid-row:1; grid-column:4" width="54" height="20" viewBox="0 0 54 20" aria-hidden="true"><line x1="4" y1="10" x2="46" y2="10" style="stroke:var(--brand-ink);stroke-width:2.5" marker-end="url(#p3b-tree-arr)"/></svg>
+    <div class="fbox g" style="grid-row:1; grid-column:5">precision fixed in advance?<br>plan $n\ge(z_{1-\alpha/2}\,\sigma/e)^2$</div>
+    <div class="fbox o" style="grid-row:2; grid-column:3"><b>Is $\mu_0$ compatible?</b><br>$\Rightarrow$ hypothesis test</div>
+    <svg class="farr" style="grid-row:2; grid-column:4" width="54" height="20" viewBox="0 0 54 20" aria-hidden="true"><line x1="4" y1="10" x2="46" y2="10" style="stroke:var(--brand-ink);stroke-width:2.5" marker-end="url(#p3b-tree-arr)"/></svg>
+    <div class="fbox g" style="grid-row:2; grid-column:5">$\sigma$ known $\to z$, else $t$;<br>two-sided<br>(one-sided: appendix)</div>
+  </div>
+  <p class="fs-xs center" style="margin-top:10px">The same logic &ndash; <em>standardise</em>, then ask whether the deviation is extreme <em>in the $H_1$ direction</em> &ndash; underlies essentially every classical test: $z$, $t$, proportion, regression coefficient, ANOVA $F$.</p>
+  <div class="block key"><p>First clarify the <em>question</em>, then choose the tool.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Five classic pitfalls &ndash; final checklist</h2>
+  <table class="bt left" style="width:100%; font-size:22px">
+    <thead><tr><th style="width:47%">Forbidden sentence &nbsp;<span class="c-red">$\times$</span></th><th>Correct version &nbsp;<span class="c-green">$\checkmark$</span></th></tr></thead>
+    <tbody>
+      <tr><td style="padding:9px 13px">&ldquo;$p$ is the probability that $H_0$ is true.&rdquo;</td><td style="padding:9px 13px">$p = P(\text{data at least this extreme} \mid H_0)$.</td></tr>
+      <tr><td style="padding:9px 13px">&ldquo;$\mu$ lies in <em>this</em> CI with $95\,\%$ probability.&rdquo;</td><td style="padding:9px 13px">The <em>procedure</em> covers $\mu$ in $95\,\%$ of samples.</td></tr>
+      <tr><td style="padding:9px 13px">&ldquo;$p > \alpha$, so $H_0$ is proven/accepted.&rdquo;</td><td style="padding:9px 13px">No contradiction found &ndash; $H_0$ is <em>kept</em>, not proven.</td></tr>
+      <tr><td style="padding:9px 13px">&ldquo;The data point left, so I test left-sided.&rdquo;</td><td style="padding:9px 13px">Direction and $\alpha$ are fixed <em>before</em> the data.</td></tr>
+      <tr><td style="padding:9px 13px">&ldquo;Significant, hence large and important.&rdquo;</td><td style="padding:9px 13px">Significance $\neq$ size: judge magnitude by the CI.</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">Talk track: close the lecture with this table &ndash; each row condenses one dedicated slide of this part. Exam relevance: these five formulations are exactly the distractors used in multiple-choice questions. Have students correct each forbidden sentence aloud in their own words.</aside>
+</section>
+
+<section class="slide">
+  <h2>Outlook: Part 4 &ndash; Regression</h2>
+  <div class="block"><h4>What we have so far</h4>
+    <p>Confidence intervals and tests for <b>one</b> population mean $\mu$: estimate, standard error, critical value &ndash; and the $p$-value.</p></div>
+  <div class="block"><h4>Next part</h4>
+    <p>We study the <b>relationship between variables</b>. The regression slope $\hat\beta_1$ is again an estimator with a standard error, so the <em>same</em> recipe gives its $t$-test, its confidence interval and its $p$-value:</p>
+    <p>\[ T=\frac{\text{estimate}-\text{hypothesised value}}{\text{standard error}}. \]</p></div>
+  <div class="block key"><p>Everything in this part carries over one-to-one to the coefficients of a regression model.</p></div>
+</section>
+
+<!-- ===== APPENDIX ===== -->
+<section class="slide" data-section="Appendix: Optional and Advanced Material" data-short="Appendix" data-appendix>
+  <h2>Appendix &ndash; what is in here, and why</h2>
+  <div class="block"><h4>Optional material</h4>
+    <p>The main part of this deck is self-contained. The appendix adds theory behind it and two extensions of the test: one-sided tests and power.</p></div>
+  <table class="bt left fs-s">
+    <thead><tr><th>Topic</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td class="p3b-nw">A.1 Estimators</td><td>What makes a good estimator: unbiasedness, efficiency, consistency; why $s^2$ divides by $n-1$; exercise</td></tr>
+      <tr><td class="p3b-nw">A.2 Law of large numbers</td><td>Why $\bar x$ settles down at $\mu$ &ndash; and why relative frequencies justify the frequentist view</td></tr>
+      <tr><td class="p3b-nw">A.3&ndash;A.7 One-sided tests</td><td>Direction, critical values, one-sided $p$-values and CIs; exercises</td></tr>
+      <tr><td class="p3b-nw">A.8 Power</td><td>$\beta$ and power $1-\beta$, levers for more power; exercises</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="slide" data-subsection="A.1 Properties of estimators">
+  <h2>What makes a good estimator? &ndash; the target picture</h2>
+  <div class="viz" id="p3b-tgt" style="height:410px; width:640px; margin:0 auto"></div>
+  <p class="fs-xs">Each dot $=$ the estimate from <em>one</em> sample; red cross $=$ the true value $\theta$. Unbiased $=$ centred on the cross; efficient $=$ tightly clustered.
+    <span class="muted">Draw more samples: the orange ring (average of all estimates) stays on the cross only for the unbiased estimators. Hover over a target for its bias and spread.</span></p>
+  <script>
+  (() => {
+  QV.mount("#p3b-tgt", (el) => {
+    const C = QV.C, P = window.P3B;
+    const W = el.clientWidth, H = el.clientHeight;
+    const cxm = 2.7, cym = -2.27;
+    const s = Math.min((W - 20) / 8.8, (H - 20) / 7.4);
+    const hx = (W - 20) / (2 * s), hy = (H - 20) / (2 * s);
+    const ch = QV.chart(el, { x: { domain: [cxm - hx, cxm + hx], hide: true }, y: { domain: [cym - hy, cym + hy], hide: true, grid: false }, margin: { top: 10, right: 10, bottom: 10, left: 10 } });
+    const T = [
+      { cx: 0, cy: 0, t: "unbiased & efficient", m: [0, 0], sd: 0.08, base: [[0.05, 0.08], [-0.1, 0.02], [0.08, -0.06], [-0.04, -0.12], [0.12, 0.05], [0, -0.02]] },
+      { cx: 5.4, cy: 0, t: "biased & efficient", m: [0.6, 0.5], sd: 0.07, base: [[0.55, 0.5], [0.66, 0.42], [0.58, 0.6], [0.7, 0.5], [0.5, 0.42], [0.62, 0.55]] },
+      { cx: 0, cy: -3.9, t: "unbiased & inefficient", m: [0, 0], sd: 0.45, base: [[0.35, 0.55], [-0.55, 0.2], [0.1, -0.6], [-0.35, -0.35], [0.6, -0.1], [-0.1, 0.45]] },
+      { cx: 5.4, cy: -3.9, t: "biased & inefficient", m: [0.68, 0.5], sd: 0.3, base: [[0.4, 0.85], [0.95, 0.3], [0.3, 0.15], [0.85, 0.7], [1.05, 0.5], [0.5, 0.55]] },
+    ];
+    const g = ch.layer("data");
+    const tip = QV.tooltip(ch);
+    let rng = QV.rng(11);
+    T.forEach((tg) => {
+      [0.45, 0.9, 1.35].forEach((r) => g.append("circle").attr("cx", ch.x(tg.cx)).attr("cy", ch.y(tg.cy)).attr("r", r * s).style("fill", "none").style("stroke", C.grey).style("stroke-width", 1.5));
+      QV.segment(ch, tg.cx - 0.18, tg.cy, tg.cx + 0.18, tg.cy, { color: C.red, width: 2.5, layer: "data" });
+      QV.segment(ch, tg.cx, tg.cy - 0.18, tg.cx, tg.cy + 0.18, { color: C.red, width: 2.5, layer: "data" });
+      QV.text(ch, tg.cx, tg.cy - 1.83, tg.t, { cls: "lbl-strong", size: 17 });
+      tg.gd = ch.layer("annot").append("g");
+      tg.cen = ch.layer("annot").append("circle").attr("r", 7).style("fill", "none").style("stroke", C.orange).style("stroke-width", 2.5);
+      ch.layer("front").append("circle").attr("class", "hit").attr("cx", ch.x(tg.cx)).attr("cy", ch.y(tg.cy)).attr("r", 1.5 * s)
+        .on("pointermove", (e) => {
+          const k = tg.shots.length, mx = QV.stats.mean(tg.shots.map((d) => d[0])), my = QV.stats.mean(tg.shots.map((d) => d[1]));
+          const sp = Math.sqrt(QV.stats.mean(tg.shots.map((d) => (d[0] - mx) ** 2 + (d[1] - my) ** 2)));
+          tip.show(`<b>${tg.t}</b><br>${k} estimates<br>average misses &theta; by ${QV.fmt(Math.hypot(mx, my), 2)} (bias)<br>spread around their average: ${QV.fmt(sp, 2)}`, e);
+        })
+        .on("pointerleave", () => tip.hide());
+    });
+    const draw = () => T.forEach((tg) => {
+      tg.gd.selectAll("circle").data(tg.shots).join("circle")
+        .attr("cx", (d) => ch.x(tg.cx + d[0])).attr("cy", (d) => ch.y(tg.cy + d[1])).attr("r", 5.5)
+        .style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 1.5).style("opacity", 0.9);
+      const mx = QV.stats.mean(tg.shots.map((d) => d[0])), my = QV.stats.mean(tg.shots.map((d) => d[1]));
+      tg.cen.attr("cx", ch.x(tg.cx + mx)).attr("cy", ch.y(tg.cy + my));
+    });
+    const reset = () => { rng = QV.rng(11); T.forEach((tg) => { tg.shots = tg.base.map((d) => d.slice()); }); draw(); ro.set("6 samples per estimator"); };
+    const row = QV.controls(el);
+    row.style.width = "640px"; row.style.alignSelf = "center";
+    QV.button(row, "Draw 10 more samples", () => {
+      T.forEach((tg) => { for (let i = 0; i < 10; i++) tg.shots.push([rng.normal(tg.m[0], tg.sd), rng.normal(tg.m[1], tg.sd)]); });
+      draw(); ro.set(`${T[0].shots.length} samples per estimator`);
+    }, { primary: true });
+    QV.button(row, "Reset", reset);
+    const ro = QV.readout(row);
+    reset();
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Properties of estimators &ndash; the formal criteria</h2>
+  <div class="stack fs-s" style="gap:10px">
+    <p>An <b>estimator</b> $\hat\theta=\hat\theta(X_1,\dots,X_n)$ is a random variable; its value for the observed sample is the <em>estimate</em>.</p>
+    <table class="bt left">
+      <thead><tr><th>Property</th><th>Formal definition</th></tr></thead>
+      <tbody>
+        <tr><td>Unbiasedness</td><td>$E(\hat\theta)=\theta$</td></tr>
+        <tr><td>Bias</td><td>$\mathrm{Bias}(\hat\theta)=E(\hat\theta)-\theta$</td></tr>
+        <tr><td>Asymptotic unbiasedness</td><td>$\lim_{n\to\infty}E(\hat\theta_n)=\theta$</td></tr>
+        <tr><td>Efficiency</td><td>$\mathrm{Var}(\hat\theta)&lt;\mathrm{Var}(\hat\theta^{*})$ &nbsp;&nbsp; (both unbiased)</td></tr>
+        <tr><td>Consistency</td><td>$\hat\theta_n\xrightarrow{P}\theta$, i.e. $\lim_{n\to\infty}P\bigl(|\hat\theta_n-\theta|>c\bigr)=0$ for every $c>0$</td></tr>
+        <tr><td style="padding-left:28px">sufficient for it</td><td>$\lim_{n\to\infty}E(\hat\theta_n)=\theta$ &nbsp; and &nbsp; $\lim_{n\to\infty}\mathrm{Var}(\hat\theta_n)=0$</td></tr>
+      </tbody>
+    </table>
+    <p class="inwords"><b>unbiased</b> $=$ right on average; <b>efficient</b> $=$ small spread; <b>consistent</b> $=$ arbitrarily precise as $n$ grows. The sample mean $\bar X$ is unbiased and consistent, and the most efficient of all unbiased weighted averages $\sum a_iX_i$.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Why divide by $n-1$ in $s^2$?</h2>
+  <div class="cols" style="--cols: 53fr 45fr; --gap: 22px">
+    <div class="fs-s">
+      <div class="block"><h4>Sample variance &ndash; unbiased</h4>
+        <p>\[ s^2=\frac{1}{n-1}\sum_{i=1}^n\bigl(X_i-\bar X\bigr)^2, \qquad E(s^2)=\sigma^2 . \]</p></div>
+      <ul>
+        <li>We measure the spread around the <em>estimated</em> mean $\bar X$, which sits in the middle of the data &ndash; so the squared deviations come out <b>systematically too small</b>.</li>
+        <li>Dividing by $n$ would give $E\bigl(\tfrac1n\sum(X_i-\bar X)^2\bigr)=\tfrac{n-1}{n}\,\sigma^2$ &ndash; biased downwards; dividing by $n-1$ corrects exactly this.</li>
+        <li>Estimating $\mu$ &ldquo;uses up&rdquo; one degree of freedom &ndash; the same $n-1$ as in $t_{n-1}$.</li>
+      </ul>
+    </div>
+    <div style="gap:4px">
+      <div class="viz" id="p3b-s2" style="height:340px"></div>
+    </div>
+  </div>
+  <div class="block example"><h4>Simulation: $100\,000$ samples of size $n=4$ from $N(50,\,5^2)$, i.e. $\sigma^2=25$</h4>
+    <p>Average of $s^2$ with $n-1$: $\mathbf{24.97}$ &nbsp;&nbsp; vs. &nbsp;&nbsp; with $n$: $\mathbf{18.73}$ &nbsp; ($\approx\tfrac34\cdot25=18.75$).</p></div>
+  <script>
+  (() => {
+  QV.mount("#p3b-s2", (el) => {
+    const C = QV.C, P = window.P3B;
+    const N = 100000, n = 4;
+    let seed = 14, pts1 = [], pts0 = [], anim = null;
+    const fmtN = (v) => d3.format(",")(v).replace(/,/g, " ");
+    const ch = QV.chart(el, { x: { domain: [10, N], type: "log", label: "number of simulated samples (log scale)", tickValues: [10, 100, 1000, 10000, 100000], format: fmtN },
+      y: { domain: [10, 35], label: "average of s²", tickValues: [10, 15, 20, 25, 30, 35] }, margin: { right: 84, left: 56 } });
+    QV.hline(ch, 25, { color: C.blue, dash: "6 4", width: 1.5 });
+    QV.hline(ch, 18.75, { color: C.orange, dash: "6 4", width: 1.5 });
+    P.lbl(ch, N, 25, "$\\sigma^2=25$", { anchor: "start", dx: 6, size: 14 });
+    P.lbl(ch, N, 18.75, "$\\tfrac34\\sigma^2=18.75$", { anchor: "start", dx: 6, size: 14 });
+    const l1 = QV.line(ch, [], { color: C.blue, width: 2.4 }), l0 = QV.line(ch, [], { color: C.orange, width: 2.4 });
+    P.legendIn(ch, [{ label: "divide by $n-1$", color: C.blue, type: "line" }, { label: "divide by $n$", color: C.orange, type: "line" }], { right: 8, top: 4 });
+    const simulate = () => {
+      const r = QV.rng(seed); let s1 = 0, s0 = 0; pts1 = []; pts0 = [];
+      const marks = new Set(d3.range(0, 241).map((i) => Math.round(Math.pow(10, 1 + 4 * i / 240))));
+      for (let k = 1; k <= N; k++) {
+        let a = 0, b = 0;
+        const x = [r.normal(50, 5), r.normal(50, 5), r.normal(50, 5), r.normal(50, 5)];
+        const m = (x[0] + x[1] + x[2] + x[3]) / 4;
+        for (let i = 0; i < n; i++) a += (x[i] - m) ** 2;
+        s1 += a / (n - 1); s0 += a / n;
+        if (marks.has(k)) { pts1.push([k, s1 / k]); pts0.push([k, s0 / k]); }
+      }
+    };
+    const draw = (j) => {
+      QV.setLine(ch, l1, pts1.slice(0, j)); QV.setLine(ch, l0, pts0.slice(0, j));
+      const a = pts1[j - 1], b = pts0[j - 1];
+      ro.set(`after $${fmtN(a[0])}$ samples: &nbsp;<b>${a[1].toFixed(2)}</b> vs. <b>${b[1].toFixed(2)}</b>`);
+    };
+    const row = QV.controls(el);
+    QV.button(row, "Run again (new seed)", () => {
+      seed += 1; simulate();
+      if (anim) anim.stop();
+      anim = QV.anim((dt, t) => { const j = Math.max(1, Math.min(pts1.length, Math.round(pts1.length * t / 2.5))); draw(j); return j < pts1.length; });
+      anim.start();
+    }, { primary: true });
+    const ro = QV.readout(row);
+    simulate(); draw(pts1.length);
+    return { hide() { if (anim && anim.running) { anim.stop(); draw(pts1.length); } } };
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; properties of estimators: egg weight</h2>
+  <div class="block problem">
+    <p>A farmer draws $n=4$ eggs randomly and independently from a flock with $\mu=50$ g and $\sigma^2=25$ g$^2$. Four estimators of $\mu$ are proposed:</p>
+    <p>\[ \hat\mu_A=\frac{X_1+X_2+X_3+X_4}{4},\qquad \hat\mu_B=\frac{X_1+X_4}{2}, \]</p>
+    <p>\[ \hat\mu_C=\frac{X_1+2X_2+X_3+X_4}{5},\qquad \hat\mu_D=\frac{X_1+X_2+X_3}{4}. \]</p>
+  </div>
+  <ol class="alpha fs-s">
+    <li>Which estimators are unbiased? Give the expected value and, if any, the bias.</li>
+    <li>Compute the variance of the four estimators.</li>
+    <li>Which estimator should the farmer use? Argue with the criteria.</li>
+    <li>Let $n$ grow ($\hat\mu_A=\bar X_n$, $\hat\mu_B=\tfrac{X_1+X_n}{2}$): which of the two is consistent?</li>
+  </ol>
+  <aside class="notes">Talk track (optional material): the rules for $E$ and $\mathrm{Var}$ from the foundations are all that is needed. The lesson of c): unbiasedness comes first, then efficiency &ndash; a tiny variance does not help an estimator that aims at the wrong value.</aside>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; egg weight: expected values and variances</h2>
+  <p class="fs-s"><b>Rules:</b> $E\bigl(\sum a_iX_i\bigr)=\mu\sum a_i$; &nbsp; for independent $X_i$: $\mathrm{Var}\bigl(\sum a_iX_i\bigr)=\sigma^2\sum a_i^2$ &nbsp; (here $\mu=50$, $\sigma^2=25$).</p>
+  <table class="bt left p3b-mid">
+    <thead><tr><th></th><th>weights $a_i$</th><th>$E(\hat\mu)$</th><th>Bias</th><th>$\mathrm{Var}(\hat\mu)$</th></tr></thead>
+    <tbody>
+      <tr><td>$\hat\mu_A$</td><td>$\tfrac14,\tfrac14,\tfrac14,\tfrac14$</td><td>$50$</td><td>$0$</td><td>$\tfrac{4}{16}\cdot25=\mathbf{6.25}$</td></tr>
+      <tr><td>$\hat\mu_B$</td><td>$\tfrac12,0,0,\tfrac12$</td><td>$50$</td><td>$0$</td><td>$\tfrac{2}{4}\cdot25=\mathbf{12.5}$</td></tr>
+      <tr><td>$\hat\mu_C$</td><td>$\tfrac15,\tfrac25,\tfrac15,\tfrac15$</td><td>$50$</td><td>$0$</td><td>$\tfrac{1+4+1+1}{25}\cdot25=\mathbf{7}$</td></tr>
+      <tr><td>$\hat\mu_D$</td><td>$\tfrac14,\tfrac14,\tfrac14,0$</td><td>$\tfrac34\cdot50=37.5$</td><td>$\mathbf{-12.5}$</td><td>$\tfrac{3}{16}\cdot25=\mathbf{4.6875}$</td></tr>
+    </tbody>
+  </table>
+  <p class="inwords">a) $A$, $B$, $C$ are unbiased (weights sum to $1$); $D$ underestimates the egg weight <em>systematically</em> by $12.5$ g (weights sum to only <span style="white-space:nowrap">$\tfrac34$).</span></p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; egg weight: choice and consistency</h2>
+  <div class="stack fs-s" style="gap:8px">
+    <p><b>c)</b> Among the <em>unbiased</em> estimators, $\hat\mu_A=\bar X_4$ has the smallest variance &ndash; it is <b>efficient</b>. $\hat\mu_D$ scatters even less but aims systematically at the wrong value: <b>use $\bar X_4$.</b></p>
+    <p><b>d)</b> $\bar X_n$: unbiased and $\mathrm{Var}=\sigma^2/n\to0$ $\Rightarrow$ <b>consistent</b>. &nbsp; $\tfrac{X_1+X_n}{2}$: unbiased, but $\mathrm{Var}=\sigma^2/2=12.5$ for <em>every</em> $n$ (ignores $n-2$ eggs) $\Rightarrow$ <b>not consistent</b>.</p>
+    <pre class="py">
+import numpy as np
+rng = np.random.default_rng(1)
+m = rng.normal(50, 5, size=(10_000, 4))       # 10 000 samples of 4 eggs
+A = m.mean(axis=1)
+B = (m[:, 0] + m[:, 3]) / 2
+C = (m[:, 0] + 2 * m[:, 1] + m[:, 2] + m[:, 3]) / 5
+D = (m[:, 0] + m[:, 1] + m[:, 2]) / 4
+print(np.round([A.mean(), B.mean(), C.mean(), D.mean()], 2))
+print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
+    </pre>
+    <div class="cols" style="--cols: 36fr 60fr; --gap: 18px">
+      <div><pre class="out">
+[49.95 49.95 49.95 37.47]
+[ 6.14 12.52  6.87  4.52]
+      </pre></div>
+      <div><p>Simulation and theory agree: means $\approx50$ (except $D$: $37.5$), variances <span style="white-space:nowrap">$\approx6.25$, $12.5$, $7$, $4.69$.</span></p></div>
+    </div>
+  </div>
+  <a class="trynb" data-sec="section A.1"></a>
+</section>
+
+<section class="slide" data-subsection="A.2 Law of large numbers">
+  <h2>The law of large numbers &ndash; intuition</h2>
+  <div class="cols" style="--cols: 34fr 64fr; --gap: 22px">
+    <div class="fs-s">
+      <p><b>Die example:</b> a fair die has $E(X)=3.5$. After a few rolls the running mean $\bar x_n$ still jumps around; after many rolls it settles down at $3.5$.</p>
+      <div class="block key"><p>The sample mean $\bar X_n$ gets ever more <b>reliably close</b> to the expected value as $n$ grows.</p></div>
+    </div>
+    <div><div class="viz" id="p3b-lln" style="height:410px"></div></div>
+  </div>
+  <p class="fs-xs">Twelve sequences of die rolls (grey), one highlighted (blue). The funnel $\mu\pm1.96\,\sigma/\sqrt n$ narrows: $\pm1.06$ at $n=10$, $\pm0.33$ at $n=100$, <span class="p3b-nw">$\pm0.11$ at $n=1000$.</span></p>
+  <script>
+  (() => {
+  QV.mount("#p3b-lln", (el) => {
+    const C = QV.C, P = window.P3B;
+    const N = 1000, K = 12, mu = 3.5, sd = Math.sqrt(35 / 12);
+    let seed = 7, runs = [], shown = N, a = null;
+    const ch = QV.chart(el, { x: { domain: [1, N], type: "log", label: "", tickValues: [1, 10, 100, 1000], format: "d" }, y: { domain: [1.4, 5.6], label: "", ticks: 5 }, margin: { left: 58, right: 14, bottom: 50 } });
+    P.ylab(ch, "running mean $\\bar x_n$");
+    P.xlab(ch, "number of rolls $n$ (log scale)");
+    const ns = d3.range(1, N + 1);
+    QV.area(ch, ns.map((k) => [k, mu + 1.96 * sd / Math.sqrt(k), mu - 1.96 * sd / Math.sqrt(k)]), { color: C.blue, opacity: 0.12 });
+    const greys = d3.range(K - 1).map(() => QV.line(ch, [], { color: C.grey, width: 1.1, opacity: 0.65 }));
+    const blue = QV.line(ch, [], { color: C.blue, width: 2.2 });
+    QV.line(ch, [[1, mu], [N, mu]], { color: C.orange, width: 2.2, dash: "7 5" });
+    P.legendIn(ch, [{ label: "$\\mu \\pm 1.96\\,\\sigma/\\sqrt{n}$", color: "var(--c-blue-tint)" }, { label: "one sequence of running means $\\bar x_n$", color: C.blue, type: "line" }, { label: "expected value $E(X)=3.5$", color: C.orange, type: "dash" }], { right: 6, top: 4 });
+    const simulate = () => { const r = QV.rng(seed); runs = d3.range(K).map(() => { let s = 0; return ns.map((k) => { s += r.int(1, 6); return [k, s / k]; }); }); };
+    const draw = (upto) => {
+      shown = upto;
+      greys.forEach((g, i) => QV.setLine(ch, g, runs[i + 1].slice(0, upto)));
+      QV.setLine(ch, blue, runs[0].slice(0, upto));
+      ro.set(`$n = ${upto}$: &nbsp; blue $\\bar x_n = ${runs[0][upto - 1][1].toFixed(3)}$, &nbsp; funnel $3.5 \\pm ${(1.96 * sd / Math.sqrt(upto)).toFixed(2)}$`);
+    };
+    QV.hover(ch, (xv) => {
+      const k = Math.round(P.clamp(xv, 1, shown));
+      return `<b>n = ${k}</b><br>blue: x̄<sub>n</sub> = ${runs[0][k - 1][1].toFixed(3)}<br>funnel: 3.5 ± ${(1.96 * sd / Math.sqrt(k)).toFixed(2)}`;
+    });
+    const row = QV.controls(el);
+    QV.button(row, "Roll (animate)", () => {
+      if (a) a.stop();
+      a = QV.anim((dt, t) => { const k = Math.min(N, Math.max(1, Math.round(Math.pow(10, 3 * t / 4)))); draw(k); return k < N; });
+      a.start();
+    }, { primary: true });
+    QV.button(row, "New rolls", () => { if (a) a.stop(); seed += 1; simulate(); draw(N); });
+    const ro = QV.readout(row);
+    simulate(); draw(N);
+    return { hide() { if (a && a.running) { a.stop(); draw(N); } } };
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>The law of large numbers &ndash; formal statement</h2>
+  <div class="block"><h4>Weak law of large numbers</h4>
+    <p>For i.i.d. $X_i$ with $E(X_i)=\mu$ and $\mathrm{Var}(X_i)=\sigma^2&lt;\infty$:</p>
+    <p>\[ \lim_{n\to\infty}P\bigl(|\bar X_n-\mu|>c\bigr)=0 \quad\text{for every } c>0, \qquad\text{i.e.}\quad \bar X_n\xrightarrow{\;P\;}\mu . \]</p></div>
+  <p class="inwords">Choose any tolerance $c$, however small: the probability that $\bar X_n$ misses $\mu$ by more than $c$ goes to zero.</p>
+  <p class="fs-s"><b>Why?</b> Chebyshev's inequality: $P(|\bar X_n-\mu|>c)\le\mathrm{Var}(\bar X_n)/c^2=\sigma^2/(n\,c^2)\to0$.</p>
+  <div class="block example"><h4>Special case: relative frequencies (Bernoulli)</h4>
+    <p>$X_i=1$ if an event occurs (probability $p$), else $0$: then $\bar X_n$ is the event's <em>relative frequency</em>, and $\bar X_n\xrightarrow{P}p$ &ndash; the basis of the <b>frequentist</b> view used throughout this part.</p></div>
+  <p class="fs-xs">LLN: $\bar X_n$ approaches $\mu$. &nbsp; CLT: how the remaining fluctuation around $\mu$ is distributed.</p>
+</section>
+
+<!-- ---- A.3 one-sided tests: motivation ---- -->
+<section class="slide" data-subsection="A.3 One-sided tests: motivation">
+  <h2>When only one direction matters</h2>
+  <div class="block"><h4>The idea</h4>
+    <p>In a two-sided test <em>any</em> departure from $\mu_0$ counts against $H_0$. Often, though, a deviation is a <b>problem in only one direction</b> &ndash; the other direction is harmless or even welcome.</p></div>
+  <div class="cols">
+    <div class="block example"><h4>Too little in the bottle</h4>
+      <p>For consumer protection only <em>underfilling</em> ($\mu&lt;1000$) is critical &ndash; overfilling does not harm the customer.</p></div>
+    <div class="block example"><h4>Unemployment insurance</h4>
+      <p>Only if the rate <em>exceeds</em> a threshold do contributions fall short. A lower rate causes no problem.</p></div>
+  </div>
+  <div class="block key"><p>The <em>question</em> &ndash; not the data &ndash; decides the direction. The deviation we truly care about defines $H_1$, and the <em>whole</em> $\alpha$ goes on that one side instead of $\alpha/2$ on each.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Business examples &ndash; one direction only</h2>
+  <table class="bt p3b-mid" style="margin-top:20px">
+    <thead><tr><th class="l">You want evidence that &hellip;</th><th>$H_1$</th><th>Direction</th></tr></thead>
+    <tbody>
+      <tr><td class="l" style="padding:12px 13px">the new ad campaign <em>raises</em> the conversion rate</td><td>$\mu > \mu_0$</td><td>right-sided</td></tr>
+      <tr><td class="l" style="padding:12px 13px">the new process <em>lowers</em> the average unit cost</td><td>$\mu &lt; \mu_0$</td><td>left-sided</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-xs center">In both cases $H_0:\mu=\mu_0$, as before.</p>
+  <div class="block key"><p>As in the two-sided case, the claim goes into $H_1$ &ndash; but now its <em>inequality</em> also fixes the side on which we reject.</p></div>
+</section>
+
+<section class="slide">
+  <h2>How to find the critical value &ndash; 3 steps</h2>
+  <ol>
+    <li><b>Direction</b> (read from $H_1$): one-sided or two-sided?</li>
+    <li><b>Tail probability:</b>
+      <ul class="fs-xs">
+        <li>two-sided $\to$ <em>split</em> $\alpha$: use the $1-\alpha/2$ quantile ($\pm$ value),</li>
+        <li>one-sided $\to$ keep $\alpha$ <em>whole</em>: use the $1-\alpha$ quantile (one value, on the $H_1$ side).</li>
+      </ul></li>
+    <li><b>Which table?</b> $\sigma$ known $\to z$ (normal); $\sigma$ unknown $\to t$ with $\mathrm{df}=n-1$.</li>
+  </ol>
+  <div class="block example"><h4>$\alpha=0.05$ &ndash; the resulting critical values</h4>
+    <p>known $\sigma$: two-sided $z_{0.975}=1.96$, &nbsp; one-sided $z_{0.95}=1.645$ ($\Phi$ table).</p>
+    <p>unknown $\sigma$, $n=12$: two-sided $t_{0.975;\,11}=2.20$, &nbsp; one-sided $t_{0.95;\,11}=1.80$ (<code>stats.t.ppf</code>; the $t$-table follows).</p></div>
+  <aside class="notes">Talk track: walk the 3 steps aloud at $\alpha=0.05$. The ONLY one- vs two-sided difference is whether you split $\alpha$ ($1-\alpha/2$) or not ($1-\alpha$). Then &ldquo;known $\sigma\to z$, unknown $\to t$ with $n-1$&rdquo;. Have them read both $1.96$ and $1.645$ off the table so they SEE the bar move inward. Common error: using $1-\alpha$ for a two-sided test (or vice versa).</aside>
+</section>
+
+<section class="slide">
+  <h2>One-sided critical values &ndash; left and right</h2>
+  <div class="p3b-panels" style="gap:20px">
+    <div><div class="p3b-pt">left-sided: &nbsp;reject if $T_n &lt; -t_{1-\alpha,\,n-1}$</div><div class="viz" id="p3b-cv1" style="height:402px"></div></div>
+    <div><div class="p3b-pt">right-sided: &nbsp;reject if $T_n > t_{1-\alpha,\,n-1}$</div><div class="viz" id="p3b-cv2" style="height:402px"></div></div>
+  </div>
+  <div id="p3b-cv-ctrl"></div>
+  <p class="fs-xs">The whole rejection area $\alpha$ sits in <em>one</em> tail &ndash; left for &ldquo;too small&rdquo;, right for &ldquo;too large&rdquo;. The curve is the <b>symmetric</b> $t$-distribution: only the side changes, the shape never does.</p>
+  <aside class="notes">Talk track: point at the picture. &ldquo;Same bell curve &ndash; the whole $\alpha$ just moves into one tail.&rdquo; Left tail tests &ldquo;too small&rdquo;, right tail &ldquo;too large&rdquo;. Stress the curve is the symmetric $t$ &ndash; it never becomes skewed. Ask the room: &ldquo;if $T_n$ lands in the blue, what do we do?&rdquo; (keep $H_0$). Common habit to break: shading both tails &ndash; one-sided means ONE tail.</aside>
+  <script>
+  (() => {
+  QV.mount("#p3b-cv1", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B;
+    let alpha = 0.05, df = 12;
+    const mk = (node, side) => {
+      const sx = side === "left" ? -1 : 1;
+      const ch = QV.density(node, { pdf: (x) => D.tPdf(x, df), domain: [-4, 4], yMax: 0.42, xLabel: "", yLabel: "Density", ticks: 8, chart: { margin: { bottom: 50, left: 58, right: 16 } } });
+      P.xlab(ch, "$T_n$ under $H_0$ &nbsp;(symmetric $t$)");
+      const cl = QV.segment(ch, 0, 0, 0, 0.42, { color: C.red, width: 2, dash: "6 4", layer: "annot" });
+      const lc = P.lbl(ch, 0, 0.012, "", { baseline: "bottom", bg: true, size: 15, color: C.tRed });
+      P.lbl(ch, 0, 0.13, "<b>KEEP $H_0$</b><br>(area $=1-\\alpha$)", { center: true, size: 15 });
+      const lr = P.lbl(ch, sx * 2.95, 0.31, "", { center: true, size: 15, color: C.tOrange });
+      const ar = QV.segment(ch, 0, 0, 0, 0, { color: C.orange, width: 2, arrow: true });
+      const upd = () => {
+        ch.setPdf((x) => D.tPdf(x, df));
+        const c = D.tInv(1 - alpha, df), xc = sx * c;
+        ch.setRegions(side === "left"
+          ? [{ from: xc, color: C.blue, opacity: 0.16 }, { to: xc, color: C.orange, opacity: 0.85 }]
+          : [{ to: xc, color: C.blue, opacity: 0.16 }, { from: xc, color: C.orange, opacity: 0.85 }]);
+        cl.set(xc, 0, xc, 0.42);
+        lc.set(xc, 0.012, side === "left" ? `$-t_{1-\\alpha,\\,n-1} = ${P.f(-c, 3)}$` : `$t_{1-\\alpha,\\,n-1} = ${P.f(c, 3)}$`);
+        lr.set(sx * 2.95, 0.31, `<b>REJECT $H_0$</b><br>(area $=\\alpha$)`);
+        const xe = Math.min(c + 0.35, 3.8);
+        ar.set(sx * 2.95, 0.265, sx * xe, Math.max(D.tPdf(xe, df) * 0.4, 0.004));
+      };
+      return { upd };
+    };
+    const A = mk(el, "left"), B = mk(document.getElementById("p3b-cv2"), "right");
+    const row = QV.controls(null, document.getElementById("p3b-cv-ctrl"));
+    const both = () => { A.upd(); B.upd(); ro.set(`$t_{1-\\alpha,\\,n-1} = t_{${P.ft(1 - alpha, 3)};\\,${df}} = ${P.f(D.tInv(1 - alpha, df), 3)}$`); };
+    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.005, value: alpha, fmt: (v) => v.toFixed(3), onInput: (v) => { alpha = v; both(); } });
+    QV.slider(row, { label: "df&nbsp;$=n-1$", min: 1, max: 60, step: 1, value: df, onInput: (v) => { df = v; both(); } });
+    const ro = QV.readout(row);
+    both();
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>The golden rule of one-sided tests</h2>
+  <div class="block alert"><h4>If you remember only one sentence</h4>
+    <p>We reject $H_0$ when the sample result is <b>sufficiently extreme in the direction specified by the alternative hypothesis</b> $H_1$.</p></div>
+  <div class="p3b-gr" style="margin:6px 0">
+    <span>$H_1:\mu&lt;\mu_0$ <em>(smaller)</em></span>
+    <svg width="330" height="44" viewBox="0 0 330 44" aria-hidden="true">
+      <defs><marker id="p3b-nl-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" style="fill:var(--c-grey)"/></marker></defs>
+      <line x1="15" y1="14" x2="322" y2="14" style="stroke:var(--c-grey);stroke-width:1.5" marker-end="url(#p3b-nl-arr)"/>
+      <line x1="15" y1="14" x2="64.5" y2="14" style="stroke:var(--c-orange);stroke-width:10"/>
+      <line x1="160.2" y1="7" x2="160.2" y2="21" style="stroke:var(--ink);stroke-width:1.5"/>
+      <text x="160.2" y="40" text-anchor="middle" style="font-style:italic">μ<tspan dy="4" style="font-size:13px;font-style:normal">0</tspan></text>
+    </svg>
+    <span>reject if $z$ very <b>negative</b></span>
+    <span>$H_1:\mu>\mu_0$ <em>(larger)</em></span>
+    <svg width="330" height="44" viewBox="0 0 330 44" aria-hidden="true">
+      <line x1="15" y1="14" x2="322" y2="14" style="stroke:var(--c-grey);stroke-width:1.5" marker-end="url(#p3b-nl-arr)"/>
+      <line x1="256" y1="14" x2="305.4" y2="14" style="stroke:var(--c-orange);stroke-width:10"/>
+      <line x1="160.2" y1="7" x2="160.2" y2="21" style="stroke:var(--ink);stroke-width:1.5"/>
+      <text x="160.2" y="40" text-anchor="middle" style="font-style:italic">μ<tspan dy="4" style="font-size:13px;font-style:normal">0</tspan></text>
+    </svg>
+    <span>reject if $z$ very <b>positive</b></span>
+    <span>$H_1:\mu\neq\mu_0$ <em>(different)</em></span>
+    <svg width="330" height="44" viewBox="0 0 330 44" aria-hidden="true">
+      <line x1="15" y1="14" x2="322" y2="14" style="stroke:var(--c-grey);stroke-width:1.5" marker-end="url(#p3b-nl-arr)"/>
+      <line x1="15" y1="14" x2="54.6" y2="14" style="stroke:var(--c-orange);stroke-width:10"/>
+      <line x1="265.8" y1="14" x2="305.4" y2="14" style="stroke:var(--c-orange);stroke-width:10"/>
+      <line x1="160.2" y1="7" x2="160.2" y2="21" style="stroke:var(--ink);stroke-width:1.5"/>
+      <text x="160.2" y="40" text-anchor="middle" style="font-style:italic">μ<tspan dy="4" style="font-size:13px;font-style:normal">0</tspan></text>
+    </svg>
+    <span>reject if $|z|$ very <b>large</b> (either way)</span>
+  </div>
+  <div class="block key"><p>The inequality in $H_1$ points straight at the rejection region (orange): &ldquo;$&lt;$&rdquo; $\to$ left tail, &ldquo;$>$&rdquo; $\to$ right tail, &ldquo;$\neq$&rdquo; $\to$ both.</p></div>
+  <aside class="notes">Talk track: make them memorise the one sentence in the alert box &ndash; it decides every one-sided question. Drill with quick calls: &ldquo;$H_1:\mu>5$, where do we reject?&rdquo; (right tail) &ndash; &ldquo;$z=-3$ in that test?&rdquo; (keep! wrong direction). The orange bars in the table are the visual anchor.</aside>
+</section>
+
+<section class="slide">
+  <h2>A left-sided test as a lawyer's argument</h2>
+  <p><b>Your claim</b> ($H_1:\mu&lt;10$): &ldquo;the true mean is <em>smaller</em> than $10$.&rdquo; &nbsp; The sample mean $\bar x$ is your evidence:</p>
+  <table class="bt">
+    <thead><tr><th>$\bar x=8$</th><th>$\bar x=9$</th><th>$\bar x=10$</th><th>$\bar x=11$</th><th>$\bar x=12$</th></tr></thead>
+    <tbody><tr><td>strong <em>for</em></td><td>some <em>for</em></td><td>neutral</td><td>against</td><td>against</td></tr></tbody>
+  </table>
+  <ul>
+    <li>Below $10$ $\Rightarrow$ evidence <em>for</em> $H_1$; if extreme enough, <b>reject</b> $H_0$.</li>
+    <li>$\bar x=12$ is far from $10$ but in the <em>wrong</em> direction &ndash; it gives <b>no</b> support for &ldquo;$\mu&lt;10$&rdquo;.</li>
+  </ul>
+  <div class="block key"><p>The test asks whether the evidence <em>in the $H_1$ direction</em> is strong enough to reject $H_0$ &ndash; a big deviation the wrong way counts for nothing.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Critical values of the standard normal $N(0,1)$</h2>
+  <table class="bt" style="margin-top:14px">
+    <thead><tr><th>Confidence $1-\alpha$</th><th>$\alpha$</th><th><b>one-sided</b> $z_{1-\alpha}$</th><th><b>two-sided</b> $z_{1-\alpha/2}$</th></tr></thead>
+    <tbody>
+      <tr><td>$90\,\%$</td><td>$0.10$</td><td>$1.282$</td><td>$1.645$</td></tr>
+      <tr><td>$95\,\%$</td><td>$0.05$</td><td>$1.645$</td><td>$1.960$</td></tr>
+      <tr><td>$98\,\%$</td><td>$0.02$</td><td>$2.054$</td><td>$2.326$</td></tr>
+      <tr><td>$99\,\%$</td><td>$0.01$</td><td>$2.326$</td><td>$2.576$</td></tr>
+      <tr><td>$99.9\,\%$</td><td>$0.001$</td><td>$3.090$</td><td>$3.291$</td></tr>
+    </tbody>
+  </table>
+  <p class="inwords">Pattern: the two-sided value at level $\alpha$ equals the one-sided value at level $\alpha/2$ &ndash; e.g. two&#8209;sided $95\%=1.96=$ one&#8209;sided $97.5\%$.</p>
+</section>
+
+<section class="slide">
+  <h2>Critical values of the $t$-distribution $t_{\mathrm{df}}$</h2>
+  <table class="bt fs-xxs p3b-tight">
+    <thead>
+      <tr><th></th><th colspan="5" class="vsep"><b>upper-tail probability</b></th></tr>
+      <tr><th></th><th colspan="5" class="vsep" style="font-weight:400">(one-sided $\alpha$ &nbsp;$\mid$&nbsp; two-sided $\alpha/2$)</th></tr>
+      <tr><th class="r">df&nbsp;$=n-1$</th><th class="vsep">$0.10$</th><th>$0.05$</th><th>$0.025$</th><th>$0.01$</th><th>$0.005$</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="r">$1$</td><td class="vsep">$3.078$</td><td>$6.314$</td><td>$12.706$</td><td>$31.821$</td><td>$63.657$</td></tr>
+      <tr><td class="r">$2$</td><td class="vsep">$1.886$</td><td>$2.920$</td><td>$4.303$</td><td>$6.965$</td><td>$9.925$</td></tr>
+      <tr><td class="r">$3$</td><td class="vsep">$1.638$</td><td>$2.353$</td><td>$3.182$</td><td>$4.541$</td><td>$5.841$</td></tr>
+      <tr><td class="r">$4$</td><td class="vsep">$1.533$</td><td>$2.132$</td><td>$2.776$</td><td>$3.747$</td><td>$4.604$</td></tr>
+      <tr><td class="r">$5$</td><td class="vsep">$1.476$</td><td>$2.015$</td><td>$2.571$</td><td>$3.365$</td><td>$4.032$</td></tr>
+      <tr><td class="r">$6$</td><td class="vsep">$1.440$</td><td>$1.943$</td><td>$2.447$</td><td>$3.143$</td><td>$3.707$</td></tr>
+      <tr><td class="r">$7$</td><td class="vsep">$1.415$</td><td>$1.895$</td><td>$2.365$</td><td>$2.998$</td><td>$3.499$</td></tr>
+      <tr><td class="r">$8$</td><td class="vsep">$1.397$</td><td>$1.860$</td><td>$2.306$</td><td>$2.896$</td><td>$3.355$</td></tr>
+      <tr><td class="r">$9$</td><td class="vsep">$1.383$</td><td>$1.833$</td><td class="hl">$2.262$</td><td>$2.821$</td><td>$3.250$</td></tr>
+      <tr><td class="r">$10$</td><td class="vsep">$1.372$</td><td>$1.812$</td><td>$2.228$</td><td>$2.764$</td><td>$3.169$</td></tr>
+      <tr><td class="r">$15$</td><td class="vsep">$1.341$</td><td>$1.753$</td><td>$2.131$</td><td>$2.602$</td><td>$2.947$</td></tr>
+      <tr><td class="r">$20$</td><td class="vsep">$1.325$</td><td>$1.725$</td><td>$2.086$</td><td>$2.528$</td><td>$2.845$</td></tr>
+      <tr><td class="r">$30$</td><td class="vsep">$1.310$</td><td>$1.697$</td><td>$2.042$</td><td>$2.457$</td><td>$2.750$</td></tr>
+      <tr><td class="r">$60$</td><td class="vsep">$1.296$</td><td>$1.671$</td><td>$2.000$</td><td>$2.390$</td><td>$2.660$</td></tr>
+      <tr><td class="r">$\infty$</td><td class="vsep">$1.282$</td><td>$1.645$</td><td>$1.960$</td><td>$2.326$</td><td>$2.576$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-xxs center">Highlighted: $t_{0.975;\,9}=2.262$ (two-sided $95\%$, $n=10$); the $\infty$-row is the normal.</p>
+</section>
+
+<section class="slide">
+  <h2>How to read the tables &ndash; worked lookups</h2>
+  <div class="block"><h4>Three questions, every time</h4>
+    <p>(1) one- or two-sided? &nbsp;&nbsp; (2) which $\alpha$? &nbsp;&nbsp; (3) $z$ or $t$ (df&nbsp;$=n-1$)?</p></div>
+  <div class="cols">
+    <div>
+      <p><b>Normal</b> ($\sigma$ known):</p>
+      <ul class="fs-xs">
+        <li>two-sided, $\alpha=0.05$ $\to$ column $1-\tfrac{\alpha}{2}=0.975$ <span class="p3b-nw">$\to z=1.96$.</span></li>
+        <li>one-sided, $\alpha=0.05$ $\to$ $1-\alpha=0.95$ <span class="p3b-nw">$\to z=1.645$.</span></li>
+      </ul>
+    </div>
+    <div>
+      <p>$\boldsymbol{t}$ ($\sigma$ unknown), $n=10\Rightarrow$ df$=9$:</p>
+      <ul class="fs-xs">
+        <li>two-sided, $\alpha=0.05$ $\to$ upper-tail $0.025$ <span class="p3b-nw">$\to t=2.262$.</span></li>
+        <li>one-sided, $\alpha=0.05$ $\to$ upper-tail $0.05$ <span class="p3b-nw">$\to t=1.833$.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="block key"><p>Two-sided <em>halves</em> the tail probability ($\alpha\to\alpha/2$); the $t$-row is $\mathrm{df}=n-1$. As df grows, the $t$-value slides towards $z$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; test direction and critical value</h2>
+  <div class="block problem">
+    <p>For each case, state $H_1$, the test direction and the rejection rule with the critical value from the $N(0,1)$- or $t$-table of the previous slides (always $H_0:\mu=\mu_0$).</p>
+  </div>
+  <ol class="fs-s">
+    <li>A parcel service wants to show that its mean delivery time is <em>below</em> $24$ h. &nbsp; $\sigma$ unknown, $n=16$, $\alpha=0.05$.</li>
+    <li>An energy supplier checks whether the mean annual consumption per household has <em>risen</em> above last year's $3\,500$ kWh. &nbsp; $\sigma$ known, $\alpha=0.01$.</li>
+    <li>A brewery checks whether the mean fill volume <em>deviates</em> from the target of $500$ ml. &nbsp; $\sigma$ unknown, $n=10$, $\alpha=0.01$.</li>
+    <li>An online shop wants to show that a new layout <em>increases</em> the mean time on site from $4$ min so far. &nbsp; $\sigma$ unknown, $n=21$, $\alpha=0.10$.</li>
+  </ol>
+  <aside class="notes">Talk track: five minutes, tables only. Insist on the order of the three questions: direction from the wording, then split $\alpha$ or not, then $z$ or $t$ with df&nbsp;$=n-1$. Case 3 is the trap: two-sided at $\alpha=0.01$ means the upper-tail column $0.005$.</aside>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; test direction and critical value</h2>
+  <p class="fs-s"><b>Rule:</b> (1) direction from the wording $\to H_1$; &nbsp; (2) one-sided: quantile $1-\alpha$, two-sided: $1-\alpha/2$; &nbsp; <span class="p3b-nw">(3) $\sigma$ known $\to z$,</span> otherwise $t$ with df&nbsp;$=n-1$.</p>
+  <table class="bt left">
+    <thead><tr><th class="center" style="text-align:center"></th><th>$H_1$</th><th>Direction</th><th>Table value</th><th style="text-align:center">Reject $H_0$ if &hellip;</th></tr></thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>$\mu&lt;24$</td><td>left-sided</td><td>$t_{0.95;\,15}=1.753$</td><td style="text-align:center">$T_n&lt;\mathbf{-1.753}$</td></tr>
+      <tr><td style="text-align:center">2</td><td>$\mu>3\,500$</td><td>right-sided</td><td>$z_{0.99}=2.326$</td><td style="text-align:center">$Z_n>\mathbf{2.326}$</td></tr>
+      <tr><td style="text-align:center">3</td><td>$\mu\neq500$</td><td>two-sided</td><td>$t_{0.995;\,9}=3.250$</td><td style="text-align:center">$|T_n|>\mathbf{3.250}$</td></tr>
+      <tr><td style="text-align:center">4</td><td>$\mu>4$</td><td>right-sided</td><td>$t_{0.90;\,20}=1.325$</td><td style="text-align:center">$T_n>\mathbf{1.325}$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-xs">Upper-tail probability in the $t$-table: one-sided the whole $\alpha$ (cases 1 and 4: columns $0.05$ and $0.10$), two-sided $\alpha/2=0.005$ (case 3). Case 2: one-sided $99\,\%$ row of the $N(0,1)$ table.</p>
+  <div class="block key"><p>First the direction, then $\alpha$ (split or not), then the table ($z$, or $t$ with df&nbsp;$=n-1$).</p></div>
+</section>
+
+<section class="slide">
+  <h2>Why the $t$-table ends in the normal</h2>
+  <div class="cols" style="--cols: 63fr 35fr; --gap: 22px">
+    <div><div class="viz" id="p3b-tc" style="height:450px"></div></div>
+    <div>
+      <ul class="fs-xs">
+        <li>Small df $\to$ heavier tails $\to$ <em>larger</em> critical value.</li>
+        <li>As df grows, the $t$-value shrinks towards the <span class="p3b-nw">$z$-value.</span></li>
+        <li>By df $\approx 30$ the gap is tiny &ndash; the $\infty$ row <em>is</em> the normal.</li>
+      </ul>
+      <div id="p3b-tc-tiles"></div>
+      <p class="fs-xxs muted">Move the df slider or hover over the points for the exact table values.</p>
+    </div>
+  </div>
+  <script>
+  (() => {
+  QV.mount("#p3b-tc", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B;
+    const ch = QV.chart(el, { x: { domain: [0, 41], label: "degrees of freedom df = n − 1", tickValues: [0, 5, 10, 15, 20, 25, 30, 35, 40] }, y: { domain: [1.5, 4.4], label: "critical value", tickValues: [1.5, 2, 2.5, 3, 3.5, 4] }, margin: { right: 104 } });
+    const dfs = d3.range(1, 41);
+    const A = dfs.map((v) => [v, D.tInv(0.975, v)]), B = dfs.map((v) => [v, D.tInv(0.95, v)]);
+    QV.hline(ch, 1.96, { color: C.blue, dash: "6 4", width: 1.6 });
+    QV.hline(ch, 1.645, { color: C.orange, dash: "6 4", width: 1.6 });
+    P.lbl(ch, 41, 1.96, "$z_{0.975}=1.96$", { anchor: "start", dx: 8, size: 15 });
+    P.lbl(ch, 41, 1.645, "$z_{0.95}=1.645$", { anchor: "start", dx: 8, size: 15 });
+    const hl = QV.segment(ch, 9, 1.5, 9, 4.4, { color: C.axis, width: 1.5, dash: "3 3", layer: "data" });
+    QV.line(ch, A, { color: C.blue, width: 2.2 });
+    QV.line(ch, B, { color: C.orange, width: 2.2 });
+    QV.dots(ch, A.filter((d) => d[1] <= 4.4), { r: 4, color: C.blue, tip: (d) => `df = ${d[0]}<br>t<sub>0.975, df</sub> = <b>${d[1].toFixed(3)}</b><br>gap to z: ${(d[1] - 1.96).toFixed(3)}` });
+    QV.dots(ch, B.filter((d) => d[1] <= 4.4), { r: 4, color: C.orange, tip: (d) => `df = ${d[0]}<br>t<sub>0.95, df</sub> = <b>${d[1].toFixed(3)}</b><br>gap to z: ${(d[1] - 1.645).toFixed(3)}` });
+    const big = QV.dots(ch, [[9, 2.262], [9, 1.833]], { r: 8, color: (d, i) => (i === 0 ? C.blue : C.orange), layer: "front" }).style("pointer-events", "none");
+    P.legendIn(ch, [{ label: "$t_{0.975,\\,df}$ (two-sided 95%)", color: C.blue, type: "line" }, { label: "$t_{0.95,\\,df}$ (one-sided 95%)", color: C.orange, type: "line" }], { right: 8, top: 4 });
+    const tl = QV.tiles(document.getElementById("p3b-tc-tiles"), ["df", "$t_{0.975,\\,df}$", "$t_{0.95,\\,df}$"]);
+    const row = QV.controls(el);
+    const upd = (v) => {
+      const a = D.tInv(0.975, v), b = D.tInv(0.95, v);
+      hl.set(v, 1.5, v, 4.4);
+      big.data([[v, a], [v, b]]).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1])).style("display", (d) => (d[1] > 4.4 ? "none" : null));
+      tl.set(0, v); tl.set(1, a.toFixed(3)); tl.set(2, b.toFixed(3));
+      ro.set(`gap to $z$: &nbsp;$${P.f(a - 1.96, 3)}$ (two-sided), &nbsp;$${P.f(b - 1.645, 3)}$ (one-sided)`);
+    };
+    QV.slider(row, { label: "df", min: 1, max: 40, step: 1, value: 9, onInput: upd });
+    const ro = QV.readout(row);
+    upd(9);
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>The wording reveals the test direction</h2>
+  <table class="bt p3b-mid" style="margin-top:14px">
+    <thead><tr><th class="l">Signal words</th><th>Hypotheses</th><th>Direction</th></tr></thead>
+    <tbody>
+      <tr><td class="l" style="padding:12px 13px">exceed, greater, increased</td><td>$H_0:\mu=\mu_0$, &nbsp;&nbsp;$H_1:\mu>\mu_0$</td><td>right-sided</td></tr>
+      <tr><td class="l" style="padding:12px 13px">fall below, smaller, reduced</td><td>$H_0:\mu=\mu_0$, &nbsp;&nbsp;$H_1:\mu&lt;\mu_0$</td><td>left-sided</td></tr>
+    </tbody>
+  </table>
+  <div class="block alert"><h4>Note</h4>
+    <p>The <em>question</em> decides one- or two-sided &ndash; not the data. The statement you want to find evidence for goes into $H_1$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Why put the whole $\alpha$ on one side?</h2>
+  <div class="cols" style="--cols: 62fr 36fr; --gap: 22px">
+    <div class="p3b-panels">
+      <div><div class="p3b-pt">two-sided: $\alpha/2$ each side</div><div class="viz" id="p3b-os1" style="height:358px"></div></div>
+      <div><div class="p3b-pt">one-sided (left): full $\alpha$</div><div class="viz" id="p3b-os2" style="height:358px"></div></div>
+    </div>
+    <div class="fs-xs">
+      <ul>
+        <li>Two-sided spends $\alpha/2$ guarding <em>each</em> tail &ndash; guarding the harmless side is wasted.</li>
+        <li>One-sided puts the <em>whole</em> $\alpha$ in the relevant tail, so the critical value moves inward ($1.96\to1.645$).</li>
+        <li>A true deviation in that direction now clears the bar <em>more easily</em>.</li>
+      </ul>
+      <div id="p3b-os-ctrl" style="margin-top:4px"></div>
+      <p class="fs-xxs muted">Drag the observed $Z$ (blue): at $Z=-1.80$ only the one&#8209;sided test rejects.</p>
+    </div>
+  </div>
+  <div class="block key"><p>Same $\alpha$, more power &ndash; but <em>only</em> in the chosen direction. A one-sided test at level $\alpha$ uses the critical value of a two&#8209;sided test at level $2\alpha$ on that side.</p></div>
+  <aside class="notes">Key sentence to say out loud: &ldquo;a one-sided test at $\alpha$ uses the same cutoff as a two-sided test at $2\alpha$ on that side&rdquo; &ndash; that is why $1.96$ drops to $1.645$. Frame it as a trade: more power one way, in exchange for zero ability to detect the other way.</aside>
+  <script>
+  (() => {
+  QV.mount("#p3b-os1", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B, f = D.normPdf;
+    let alpha = 0.05, z = -1.8;
+    const panels = [];
+    const mk = (node, two) => {
+      const ch = QV.density(node, { pdf: f, domain: [-4, 4], yMax: 0.43, xLabel: "", yLabel: "Density", ticks: 5, chart: { margin: { left: 56, right: 12, bottom: 48 } } });
+      P.xlab(ch, "$Z$ under $H_0$");
+      const n = two ? 2 : 1;
+      const ln = d3.range(n).map(() => QV.segment(ch, 0, 0, 0, 0.43, { color: C.ink2, width: 1.4, dash: "5 4", layer: "annot" }));
+      const cv = d3.range(n).map(() => P.lbl(ch, 0, 0.012, "", { baseline: "bottom", bg: true, size: 13 }));
+      const ta = d3.range(n).map(() => P.lbl(ch, 0, 0.05, "", { size: 14, color: C.tOrange }));
+      const m = P.marker(ch, z, { yTop: 0.3, min: -3.9, max: 3.9, step: 0.01, onMove: (v) => { z = v; panels.forEach((p) => p.upd()); } });
+      const lv = P.lbl(ch, z, 0.315, "", { baseline: "bottom", size: 13, bg: true });
+      const upd = () => {
+        const c = two ? D.normInv(1 - alpha / 2) : D.normInv(1 - alpha);
+        const tail = two ? alpha / 2 : alpha;
+        ch.setRegions(two
+          ? [{ from: -c, to: c, color: C.blue, opacity: 0.18 }, { to: -c, color: C.orange, opacity: 0.85 }, { from: c, color: C.orange, opacity: 0.85 }]
+          : [{ from: -c, color: C.blue, opacity: 0.18 }, { to: -c, color: C.orange, opacity: 0.85 }]);
+        const xs = two ? [-c, c] : [-c];
+        xs.forEach((x, i) => {
+          ln[i].set(x, 0, x, 0.43);
+          cv[i].set(x, 0.012, `$${P.f(x, two ? 2 : 3)}$`);
+          const xt = x < 0 ? Math.max(x - 0.8, -3.6) : Math.min(x + 0.8, 3.6);
+          ta[i].set(xt, f(Math.abs(x) + 0.4) + 0.035, `$${P.f(tail, 3)}$`);
+        });
+        const rej = two ? Math.abs(z) > c : z < -c;
+        m.set(z);
+        lv.set(z, 0.315, `$Z=${P.f(z, 2)}$: <b>${rej ? "reject" : "keep"}</b>`);
+      };
+      panels.push({ upd });
+    };
+    mk(el, true); mk(document.getElementById("p3b-os2"), false);
+    const row = QV.controls(null, document.getElementById("p3b-os-ctrl"));
+    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.005, value: alpha, fmt: (v) => v.toFixed(3), onInput: (v) => { alpha = v; panels.forEach((p) => p.upd()); } });
+    panels.forEach((p) => p.upd());
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>The price: you must commit in advance</h2>
+  <div class="block alert"><h4>The direction is part of the hypothesis</h4>
+    <p>Choose one- vs. two-sided <b>before</b> looking at the data &ndash; based on the research question alone.</p></div>
+  <ul>
+    <li>Picking the side <em>after</em> seeing which way the data point inflates the true Type I error from $\alpha$ to as much as $2\alpha$.</li>
+    <li>A one-sided test is <b>blind</b> to deviations in the other direction: even a large effect on the &ldquo;wrong&rdquo; side never rejects $H_0$.</li>
+    <li>If both directions genuinely matter, use a two-sided test.</li>
+  </ul>
+  <p class="inwords">One-sided tests buy power with a promise &ndash; that the other direction really does not matter.</p>
+</section>
+
+<!-- ---- A.4 left- and right-sided tests ---- -->
+<section class="slide" data-subsection="A.4 Left- and right-sided tests">
+  <h2>Left-sided test &ndash; consumer protection</h2>
+  <div class="block"><h4>Task</h4>
+    <p>A new filling line fills milk (label $1\,\text{l}$). Are the consumer protection requirements met, i.e. is <em>not too little</em> being filled? Test with $1-\alpha=0.95$.</p></div>
+  <ul>
+    <li>$H_0:\mu = 1000$ &nbsp;&nbsp; vs. &nbsp;&nbsp; $H_1:\mu &lt; 1000$.</li>
+    <li>Only $\mu &lt; 1000$ (too little in the bottle) is critical.</li>
+  </ul>
+  <div class="block"><h4>Procedure</h4>
+    <p>Test statistic $T_n = (\bar X - \mu_0)\big/(s/\sqrt n)$; reject if $T_n &lt; -t_{1-\alpha,\,n-1}$ &nbsp; (known: $Z_n &lt; -z_{1-\alpha}$).</p>
+    <p>$p$-value: $p = F_{t,n-1}(T_n)$.</p></div>
+  <p class="inwords">We reject only if $\bar X$ falls <em>clearly below</em> $\mu_0$ &ndash; a value above $\mu_0$ can never be evidence for &ldquo;too little&rdquo;.</p>
+</section>
+
+<section class="slide">
+  <h2>Right-sided test &ndash; do not exceed a limit</h2>
+  <div class="block"><h4>Task</h4>
+    <p>Advertisement: &ldquo;Our milk contains <b>at most</b> $1\,\text{mg} = 1000\,\mu\text{g}$ of substance K per litre.&rdquo; Is this met? We measure in <span class="p3b-nw">$\mu$g,</span> so <span class="p3b-nw">$\mu_0 = 1000\,\mu$g.</span></p></div>
+  <ul>
+    <li>$H_0:\mu = 1000\,\mu\text{g}$ &nbsp;&nbsp; vs. &nbsp;&nbsp; $H_1:\mu > 1000\,\mu\text{g}$.</li>
+    <li><em>Exceeding</em> the limit is critical.</li>
+  </ul>
+  <div class="block"><h4>Procedure</h4>
+    <p>Reject if $T_n > t_{1-\alpha,\,n-1}$ &nbsp; (known: $Z_n > z_{1-\alpha}$).</p>
+    <p>$p$-value: $p = 1 - F_{t,n-1}(T_n)$.</p></div>
+  <p class="inwords">Mirror image of the left-sided case: we reject only for values <em>clearly above</em> $\mu_0$.</p>
+</section>
+
+<section class="slide">
+  <h2>Right-sided test &ndash; substance K with numbers</h2>
+  <p><b>Data (known variance):</b> <span class="p3b-nw">$\sigma=90\,\mu$g,</span> $n=9$, <span class="p3b-nw">$\bar x = 1060\,\mu$g,</span> $\mu_0=1000$, $\alpha=0.05$, $z_{0.95}=1.645$.</p>
+  \begin{align*} Z_n &= \frac{1060-1000}{90/\sqrt{9}} = \frac{60}{30} = 2.00\\[2pt] Z_n &= 2.00 \;>\; 1.645 = z_{0.95} \end{align*}
+  <div class="block alert"><h4>Decision</h4>
+    <p>$H_0:\mu=1000$ is <b>rejected</b> ($p = 1-\Phi(2.00) = 0.0228$). Evidence that the limit is <em>exceeded</em> &ndash; the advertising claim is not statistically tenable.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Left vs. right-sided &ndash; at a glance</h2>
+  <table class="bt left">
+    <thead><tr><th></th><th style="text-align:center">left-sided</th><th style="text-align:center">right-sided</th></tr></thead>
+    <tbody>
+      <tr><td>Question</td><td style="text-align:center">&ldquo;too <em>small</em>?&rdquo;</td><td style="text-align:center">&ldquo;too <em>large</em>?&rdquo;</td></tr>
+      <tr><td>$H_0$ / $H_1$</td><td style="text-align:center">$\mu=\mu_0$ / $\mu&lt;\mu_0$</td><td style="text-align:center">$\mu=\mu_0$ / $\mu>\mu_0$</td></tr>
+      <tr><td>Reject if</td><td style="text-align:center">$T_n&lt;-t_{1-\alpha,n-1}$</td><td style="text-align:center">$T_n>t_{1-\alpha,n-1}$</td></tr>
+      <tr><td>Rejection region</td><td style="text-align:center">far <em>left</em> tail</td><td style="text-align:center">far <em>right</em> tail</td></tr>
+      <tr><td>$p$-value</td><td style="text-align:center">$F_{t,n-1}(T_n)$</td><td style="text-align:center">$1-F_{t,n-1}(T_n)$</td></tr>
+    </tbody>
+  </table>
+  <p class="fs-xs">Some textbooks write the null as $\mu\ge\mu_0$ (left-sided) or $\mu\le\mu_0$ (right-sided) &ndash; the test is <b>identical</b>, because critical value and $p$-value are computed at the boundary $\mu=\mu_0$ either way.</p>
+  <div class="block key"><p>$H_1$ always points <em>towards</em> the rejection region: the inequality in $H_1$ tells you which tail you reject in.</p></div>
+  <aside class="notes">Use this slide as the cheat-sheet. Say: &ldquo;the inequality in $H_1$ literally points at the rejection tail &ndash; $&lt;$ means the left tail, $>$ means the right tail.&rdquo; Quick exercise: have students cover the table and rebuild the reject rule just from the sign in $H_1$.</aside>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; discount campaign (right-sided $t$-test)</h2>
+  <div class="block problem">
+    <p>An online shop wants to show that a discount campaign <em>raises</em> the mean basket value above its previous level of $\mu_0=48$ EUR. A sample of $n=25$ orders placed during the campaign gives $\bar x=51.20$ EUR and $s=8$ EUR; &nbsp; $\alpha=0.05$.</p>
+  </div>
+  <ol class="alpha">
+    <li>State $H_0$ and $H_1$. Which test direction?</li>
+    <li>Determine the critical value and the rejection rule.</li>
+    <li>Compute $T_n$ and decide.</li>
+    <li>From which sample mean $\bar x$ onwards would the shop have rejected $H_0$?</li>
+  </ol>
+  <p><b>Hint:</b> $t_{0.95;\,24}=1.7109$.</p>
+  <aside class="notes">Talk track: four minutes. Part d) turns the critical value back into euros &ndash; the &ldquo;critical mean&rdquo; $\mu_0+t\cdot\mathrm{SE}$ is the same move as the acceptance region in the types-of-error section later.</aside>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; discount campaign (right-sided $t$-test)</h2>
+  <p><b>Rule:</b> right-sided: reject $H_0$ if $T_n>t_{1-\alpha;\,n-1}$; &nbsp; $T_n=(\bar x-\mu_0)/(s/\sqrt n)$.</p>
+  <ol class="alpha">
+    <li>&ldquo;raises &hellip; above&rdquo; $\Rightarrow$ $H_0:\mu=48$ &nbsp; vs. &nbsp; $H_1:\mu>48$ &nbsp; (<b>right-sided</b>).</li>
+    <li>$\sigma$ unknown $\Rightarrow$ $t$-test, df&nbsp;$=25-1=24$: reject if $T_n>t_{0.95;\,24}=\mathbf{1.7109}$.</li>
+    <li class="p3b-bl" style="white-space:nowrap">$\mathrm{SE}=s/\sqrt n=8/\sqrt{25}=8/5=1.6$; &nbsp; $T_n=\dfrac{51.20-48}{1.6}=\dfrac{3.2}{1.6}=\mathbf{2.00}>1.7109$.</li>
+    <li style="white-space:nowrap">Solve $T_n>1.7109$ for $\bar x$: &nbsp; $\bar x_{\text{crit}}=\mu_0+t_{0.95;\,24}\cdot\mathrm{SE} =48+1.7109\cdot1.6=\mathbf{50.74}$ EUR.</li>
+  </ol>
+  <div class="block alert"><h4>Decision</h4>
+    <p>$H_0$ is <b>rejected</b>: there is evidence that the campaign raises the mean basket value &ndash; any sample mean above $50.74$ EUR would have been enough.</p></div>
+</section>
+
+<!-- ---- A.5 one-sided p-values ---- -->
+<section class="slide" data-subsection="A.5 One-sided $p$-values">
+  <h2>One-sided $p$-value &ndash; formulas</h2>
+  <div class="cols">
+    <div class="block"><h4>Left-sided</h4>
+      <p>\[ p = F_{t,n-1}(T_n) \]</p>
+      <p class="fs-xs">known: $p=\Phi(Z_n)$</p></div>
+    <div class="block"><h4>Right-sided</h4>
+      <p>\[ p = 1 - F_{t,n-1}(T_n) \]</p>
+      <p class="fs-xs">known: $p=1-\Phi(Z_n)$</p></div>
+  </div>
+  <p class="inwords">In a one-sided test we do <em>not</em> double &ndash; only the one relevant tail area counts.</p>
+</section>
+
+<section class="slide">
+  <h2>One-sided $p$-value &ndash; graphically</h2>
+  <div class="p3b-panels" style="gap:20px">
+    <div><div class="p3b-pt">left-sided ($H_1:\mu&lt;\mu_0$): area <b>below</b> $T_n$</div><div class="viz" id="p3b-po1" style="height:396px"></div></div>
+    <div><div class="p3b-pt">right-sided ($H_1:\mu>\mu_0$): area <b>above</b> $T_n$</div><div class="viz" id="p3b-po2" style="height:396px"></div></div>
+  </div>
+  <div id="p3b-po-ctrl"></div>
+  <p class="fs-xs">The $p$-value is the <em>single</em> tail area beyond the observed statistic, <b>in the direction of $H_1$</b>. Left panel: the cream example <span class="p3b-nw">($T_n=-2.11$, df&nbsp;$=15$, $p=0.026$).</span></p>
+  <aside class="notes">Talk track: contrast directly with the two-sided picture (both tails, factor 2). Here only the tail that $H_1$ points to counts. Ask: &ldquo;what would $p$ be in the LEFT panel if $T_n$ were $+2.11$?&rdquo; Answer: $F_{t,15}(2.11) \approx 0.97$ &ndash; huge, never reject. That sets up the sign-trap slide that follows.</aside>
+  <script>
+  (() => {
+  QV.mount("#p3b-po1", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B;
+    let df = 15;
+    const panels = [];
+    const mk = (node, side, t0) => {
+      let t = t0;
+      const L = side === "left";
+      const ch = QV.density(node, { pdf: (x) => D.tPdf(x, df), domain: [-4, 4], yMax: 0.48, xLabel: "", yLabel: "Density", ticks: 8, chart: { margin: { bottom: 50, left: 58, right: 16 } } });
+      P.xlab(ch, "$T_n$ under $H_0$");
+      const m = P.marker(ch, t, { yTop: 0.4, min: -3.9, max: 3.9, step: 0.005, onMove: (v) => { t = v; upd(); } });
+      const lo = P.lbl(ch, t, 0.4, "", { size: 15, anchor: L ? "start" : "end", dx: L ? 14 : -14 });
+      const lp = P.lbl(ch, L ? -3.05 : 3.05, 0.2, "", { center: true, size: 15, color: C.tOrange });
+      const ar = QV.segment(ch, 0, 0, 0, 0, { color: C.orange, width: 2, arrow: true });
+      const upd = () => {
+        ch.setPdf((x) => D.tPdf(x, df));
+        const p = L ? D.tCdf(t, df) : 1 - D.tCdf(t, df);
+        ch.setRegions([L ? { to: t, color: C.orange, opacity: 0.85 } : { from: t, color: C.orange, opacity: 0.85 }]);
+        m.set(t);
+        lo.set(t, 0.4, `observed<br>$T_n=${t >= 0 && !L ? "+" : ""}${P.f(t, 2)}$`);
+        lp.set(L ? -3.05 : 3.05, 0.2, L ? `<b>$p = F_{t,${df}}(T_n)$</b><br>$= ${P.f(p, 3)}$` : `<b>$p = 1-F_{t,${df}}(T_n)$</b><br>$= ${P.f(p, 3)}$`);
+        const xe = L ? P.clamp(t - 0.45, -3.85, 3.85) : P.clamp(t + 0.45, -3.85, 3.85);
+        ar.set(L ? -3.05 : 3.05, 0.165, xe, Math.max(D.tPdf(xe, df) * 0.45, 0.004));
+      };
+      panels.push({ upd });
+    };
+    mk(el, "left", -2.1086); mk(document.getElementById("p3b-po2"), "right", 2.1086);
+    const row = QV.controls(null, document.getElementById("p3b-po-ctrl"));
+    QV.slider(row, { label: "df", min: 1, max: 60, step: 1, value: df, onInput: (v) => { df = v; panels.forEach((p) => p.upd()); } });
+    QV.readout(row, '<span class="muted">Drag $T_n$ to the &ldquo;wrong&rdquo; side: the one-sided $p$ jumps above $0.5$.</span>');
+    panels.forEach((p) => p.upd());
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>One-sided $p$-value &ndash; mind the sign</h2>
+  <div class="block"><h4>Only the $H_1$-tail counts</h4>
+    <p>The one-sided $p$-value is the probability, under $H_0$, of a value <em>at least as far in the $H_1$ direction</em> as the one observed. The opposite tail is irrelevant &ndash; a deviation there supports $H_0$.</p></div>
+  <div class="block alert"><h4>Sign check &ndash; a big $|z|$ in the wrong direction is <em>not</em> significant</h4>
+    <p>Right-sided test with $z=-2.5$: the statistic is on the $H_0$ side, so <span class="p3b-nw">$p = 1-\Phi(-2.5) = 0.994 > 0.5$</span> &ndash; you <b>never</b> reject, even though $|z|$ is large. Check the data point in the $H_1$ direction <em>before</em> computing.</p></div>
+  <p class="inwords">Link to two-sided: if the deviation is in the $H_1$ direction, $p_{\text{one}} = p_{\text{two}}/2$; otherwise <span class="p3b-nw">$p_{\text{one}} = 1-p_{\text{two}}/2$.</span></p>
+  <aside class="notes">The classic trap: a right-sided test with a <em>negative</em> $T_n$. Say: &ldquo;if your statistic is on the $H_0$ side, $p>0.5$ &ndash; stop, you can never reject.&rdquo; Always check the statistic points the $H_1$ way <em>before</em> computing the tail area.</aside>
+</section>
+
+<section class="slide">
+  <h2>One-sided $p$-value &ndash; milk ($T_n=0.7947$, df&nbsp;$=8$)</h2>
+  <div class="cols">
+    <div class="block"><h4>Left-sided</h4>
+      <p>\[ p = F_{t,8}(0.7947) = 0.7751 \]</p>
+      <p>$> 0.05 \Rightarrow H_0:\mu=1000$ kept.</p></div>
+    <div class="block"><h4>Right-sided</h4>
+      <p>\[ p = 1-0.7751 = 0.2249 \]</p>
+      <p>$> 0.05 \Rightarrow H_0:\mu=1000$ kept.</p></div>
+  </div>
+  <div class="block example"><h4>Interpretation (left)</h4>
+    <p>No evidence that the machine fills <em>too little</em> &ndash; from a statistical point of view, consumer protection is met.</p></div>
+</section>
+
+<section class="slide">
+  <h2>One-sided $p$-value &ndash; cream (left, unknown var.)</h2>
+  <p>With $T_n = -2.1086$, $\mathrm{df}=15$:</p>
+  <p>\[ p = F_{t,15}(-2.1086) = 0.0261 \]</p>
+  <div class="block alert"><h4>Decision</h4>
+    <p>$p = 0.0261 &lt; 0.05 \Rightarrow H_0:\mu = 250$ is <b>rejected</b> (in favour of $H_1:\mu&lt;250$).</p></div>
+  <div class="block key"><p>In contrast to the two-sided test ($p=0.0522$), the left-sided test is <b>significant</b> here &ndash; because the whole $\alpha$ lies on the critical side.</p></div>
+</section>
+
+<section class="slide">
+  <h2>One-sided test with Python</h2>
+  <pre class="py">
+stats.ttest_1samp(milk, 1000, alternative="less")      # H1: mu &lt; mu0, p = 0.7751
+stats.ttest_1samp(milk, 1000, alternative="greater")   # H1: mu &gt; mu0, p = 0.2249
+
+cream = np.array([251, 248, 248, 249, 250, 251, 247, 246,
+                  252, 251, 248, 247, 246, 249, 248, 252])
+res = stats.ttest_1samp(cream, 250, alternative="less")   # left-sided
+ci = res.confidence_interval(0.95)                        # one-sided CI
+print(f"t = {res.statistic:.4f}, df = {res.df}, p = {res.pvalue:.4f}")
+print(f"95% CI: [{ci.low}, {ci.high:.2f}]")
+  </pre>
+  <div class="cols" style="--cols: 44fr 52fr">
+    <div class="block"><h4>Cream, left-sided &ndash; output</h4>
+      <pre class="out">
+t = -2.1086, df = 15, p = 0.0261
+95% CI: [-inf, 249.82]
+      </pre></div>
+    <div><p class="fs-xs">The argument <code>alternative</code> controls the direction (<code>"two-sided"</code> (default), <code>"less"</code>, <code>"greater"</code>).</p></div>
+  </div>
+  <a class="trynb" data-sec="section A.5"></a>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; one- vs. two-sided on the same data</h2>
+  <div class="block problem">
+    <p>A coating must <em>exceed</em> a target thickness. A test gives $T_n = 1.80$ with df&nbsp;$=15$. Compare the right-sided and the two-sided decision at $\alpha = 0.05$ &ndash; with the $p$-value and with the critical value.</p>
+  </div>
+  <p><b>Hint:</b> $1-F_{t,15}(1.80) = 0.0460$; &nbsp; $t$-table, row df&nbsp;$=15$.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; one- vs. two-sided</h2>
+  <p><b>Rule:</b> one-sided $p$ $=$ the single tail in the $H_1$ direction; two-sided $p$ $=$ both tails $=2\times$ the one-sided value (here $T_n$ points in the $H_1$ direction).</p>
+  \begin{align*} \text{right-sided:}\ & p = 1-F_{t,15}(1.80) = \mathbf{0.0460} &lt; 0.05 \;\Rightarrow\; \text{reject}\\ \text{two-sided:}\ & p = 2\cdot 0.0460 = \mathbf{0.0920} > 0.05 \;\Rightarrow\; \text{keep} \end{align*}
+  <p class="fs-s"><b>Check with the critical values</b> ($t$-table, row df&nbsp;$=15$): right-sided $T_n=1.80>1.753=t_{0.95;\,15}$ $\Rightarrow$ reject; &nbsp; two-sided $|T_n|=1.80&lt;2.131=t_{0.975;\,15}$ $\Rightarrow$ keep &ndash; the same verdicts.</p>
+  <div class="block key"><p>Identical data, opposite decisions. The one-sided test is more powerful <em>in the chosen direction</em> &ndash; exactly why the direction must be fixed before seeing the data.</p></div>
+</section>
+
+<!-- ---- A.6 one-sided confidence intervals ---- -->
+<section class="slide" data-subsection="A.6 One-sided confidence intervals">
+  <h2>One-sided confidence intervals</h2>
+  <ul>
+    <li>A one-sided test has a one-sided CI &ndash; only <em>one</em> bound, the other is $\pm\infty$.</li>
+    <li><code>scipy</code> reports them with <code>low=-inf</code> or <code>high=inf</code>, i.e. $(-\infty;\,x]$ or $[x;\,+\infty)$.</li>
+  </ul>
+  <div class="block"><h4>Calculation (known variance)</h4>
+    \begin{align*} \text{left-sided test } (H_1:\mu&lt;\mu_0):\quad & \Bigl(-\infty,\ \bar X + z_{1-\alpha}\tfrac{\sigma}{\sqrt n}\Bigr]\\ \text{right-sided test } (H_1:\mu>\mu_0):\quad & \Bigl[\bar X - z_{1-\alpha}\tfrac{\sigma}{\sqrt n},\ +\infty\Bigr) \end{align*}
+    <p>For unknown variance: replace $z_{1-\alpha}$ by $t_{1-\alpha,\,n-1}$.</p></div>
+  <p class="fs-xs">Note the one-sided quantile $z_{1-\alpha}$ (not $z_{1-\alpha/2}$) &ndash; the whole $\alpha$ sits on one side, exactly as in the test.</p>
+</section>
+
+<section class="slide">
+  <h2>One-sided CIs &ndash; milk and cream (known)</h2>
+  <p><b>CI for the <em>left-sided</em> test: upper bound</b> ($z_{0.95}=1.645$):</p>
+  \begin{align*} \text{Milk:}\; & 1001 + 1.645\cdot\tfrac{3}{\sqrt{9}} = 1002.645\\ \text{Cream:}\; & 248.9375 + 1.645\cdot\tfrac{2}{\sqrt{16}} = 249.760 \end{align*}
+  <p><b>CI for the <em>right-sided</em> test: lower bound:</b></p>
+  \begin{align*} \text{Milk:}\; & 1001 - 1.645\cdot\tfrac{3}{\sqrt{9}} = 999.355\\ \text{Cream:}\; & 248.9375 - 1.645\cdot\tfrac{2}{\sqrt{16}} = 248.115 \end{align*}
+  <p class="inwords">If $\mu_0$ lies beyond the single bound, $H_0$ is rejected.</p>
+</section>
+
+<!-- ---- A.7 exercises on one-sided tests ---- -->
+<section class="slide" data-subsection="A.7 Exercises on one-sided tests">
+  <h2>Exercise &ndash; net weight (left-sided, unknown $\sigma$)</h2>
+  <div class="block problem">
+    <p>A package must contain <em>at least</em> $\mu_0 = 500$ g. A sample of $n=12$ gives $\bar x = 496$, $s = 6$. Is there evidence of underfilling? &nbsp; ($\alpha=0.05$.)</p>
+  </div>
+  <p><b>Hint:</b> $t_{0.95;\,11} = 1.7959$.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; net weight</h2>
+  <p>Underfilling is critical $\Rightarrow$ $H_0:\mu= 500$ vs. $H_1:\mu&lt;500$ (left-sided). Reject if $T_n &lt; -t_{0.95;\,11} = -1.7959$.</p>
+  <p>\[ T_n = \frac{496-500}{6/\sqrt{12}} = \frac{-4}{1.7321} = -2.3094 &lt; -1.7959 \]</p>
+  <div class="block alert"><h4>Decision</h4>
+    <p>Reject $H_0$: evidence of underfilling. $p = F_{t,11}(-2.3094) = \mathbf{0.0207} &lt; 0.05$.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; muesli filling (exam-style, one-sided $t$-test)</h2>
+  <div class="block problem">
+    <p>A plant fills muesli into packs with target weight $\mu_0=250$ g. Overfilling costs money, so management asks: does the plant fill <em>more</em> than $250$ g on average? After maintenance, a sample of $n=25$ packs gives $\bar x=252.6$ g and $s=5.0$ g; $\alpha=0.05$.</p>
+    <p class="fs-xs">Table values: $t_{0.95;\,24}=1.7109$, $t_{0.975;\,24}=2.0639$, $t_{0.99;\,24}=2.4922$, $t_{0.995;\,24}=2.7969$; &nbsp; $\Phi(2.60)=0.9953$.</p>
+  </div>
+  <ol class="alpha">
+    <li>State the hypotheses.</li>
+    <li>Compute the standard error, the test statistic and the critical value, and decide.</li>
+    <li>Which Python command performs this test for a data vector <code>x</code>?</li>
+    <li>Bracket the $p$-value with the $t$-table, and approximate it with the normal distribution.</li>
+    <li>Compute the (two-sided) $95\,\%$ CI for $\mu$.</li>
+    <li>Decide <em>without new calculation</em> whether $H_0:\mu=253$ is rejected by a two-sided test <span class="p3b-nw">at $\alpha=0.05$.</span></li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/3) &ndash; muesli: hypotheses and test</h2>
+  <div class="stack" style="gap:8px">
+    <p><b>a)</b> The claim to be established (overfilling) goes into $H_1$ $\Rightarrow$ <b>right-sided</b>:</p>
+    <p>\[ H_0:\mu=250 \qquad\text{vs.}\qquad H_1:\mu>250 \]</p>
+    <p><b>b)</b> $\sigma$ unknown $\Rightarrow$ $t$-test with df&nbsp;$=n-1=24$:</p>
+    <p>\[ \frac{s}{\sqrt n}=\frac{5.0}{\sqrt{25}}=\mathbf{1.0\ g},\qquad T_n=\frac{252.6-250}{1.0}=\mathbf{2.60},\qquad \text{critical value } t_{0.95;\,24}=\mathbf{1.7109} \]</p>
+    <p class="fs-s">One-sided: the <em>whole</em> $\alpha$ sits in the right tail, so the $0.95$-quantile (not $0.975$).</p>
+    <div class="block alert"><h4>Decision</h4>
+      <p>$T_n=2.60>1.7109$ $\Rightarrow$ $H_0$ is <b>rejected</b>: the plant fills significantly more than $250$ g on average &ndash; it should be readjusted.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/3) &ndash; muesli: Python and the $p$-value</h2>
+  <div class="stack" style="gap:6px">
+    <p><b>c)</b> and the exact $p$-value from the summary figures:</p>
+    <pre class="py">
+from scipy import stats
+# raw data x available:  stats.ttest_1samp(x, popmean=250, alternative="greater")
+t = (252.6 - 250) / (5.0 / 25 ** 0.5)                  # from the summary figures
+print(f"{t:.2f} {stats.t.sf(t, df=24):.4f} {stats.norm.sf(t):.4f}")
+    </pre>
+    <pre class="out">
+2.60 0.0079 0.0047
+    </pre>
+    <p><b>d)</b> $T_n$ lies between the $0.99$- and the $0.995$-quantile:</p>
+    <p>\[ t_{0.99;\,24}=2.4922 \;&lt;\; 2.60 \;&lt;\; 2.7969=t_{0.995;\,24} \;\Longrightarrow\; \mathbf{0.005&lt;p&lt;0.01} \]</p>
+    <p class="fs-s">One-sided: the upper-tail areas $0.01$ and $0.005$ <em>are</em> the bounds &ndash; no doubling (exact: $p=0.0079$).</p>
+    <p>Normal approximation: $p\approx1-\Phi(2.60)=1-0.9953=\mathbf{0.0047}$ &ndash; smaller than the exact $0.0079$, because the $t$-distribution has heavier tails. Both are far below $0.05$: same decision.</p>
+  </div>
+  <a class="trynb" data-sec="section A.7"></a>
+</section>
+
+<section class="slide">
+  <h2>Solution (3/3) &ndash; muesli: CI and duality</h2>
+  <p>\[ \textbf{e)}\quad 252.6\pm2.0639\cdot1.0=252.6\pm2.0639 \ \Rightarrow\ \text{CI}_{0.95}=\mathbf{[\,250.54\,;\,254.66\,]}\ \text{g} \]</p>
+  <p><b>f)</b> The two-sided CI contains exactly the values $\mu_0$ that a two-sided test does <em>not</em> reject:</p>
+  <p>\[ 250.54&lt;253&lt;254.66 \ \Rightarrow\ H_0:\mu=253 \text{ is \textbf{not} rejected.} \]</p>
+  <p class="fs-s">Every $\mu_0&lt;250.54$ or $\mu_0>254.66$ would be rejected &ndash; e.g. $\mu_0=250$.</p>
+  <div class="block alert"><h4>Careful with the duality</h4>
+    <p>The <em>two-sided</em> CI belongs to the <em>two-sided</em> test. The partner of the right-sided test in b) is the one-sided CI $[\,252.6-1.7109\cdot1.0\,;\,\infty)=[\,250.89\,;\,\infty)$ &ndash; it excludes $250$, consistent with the rejection.</p></div>
+  <aside class="notes">Talk track: typical exam errors in this task &ndash; $t_{0.975}$ instead of $t_{0.95}$ for a one-sided test; doubling the one-sided $p$-value; swapping the bracket ($t_{0.99}$ belongs to a tail area of $0.01$, not $0.99$); df&nbsp;$=25$ instead of $24$. The normal approximation shows nicely why the $t$-tails are heavier.</aside>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; delivery time revisited (one-sided test vs. two-sided CI)</h2>
+  <div class="block problem">
+    <p>The logistics provider from the delivery-time exercise now advertises a mean delivery time <em>below</em> $\mu_0=48$ hours. A new sample of $n=16$ shipments gives <span class="p3b-nw">$\bar x=46.4$ h</span> and <span class="p3b-nw">$s=3.2$ h;</span> $\alpha=0.05$.</p>
+    <p class="fs-xs">Table values: $t_{0.95;\,15}=1.7531$, $t_{0.975;\,15}=2.1314$.</p>
+  </div>
+  <ol class="alpha">
+    <li>State the hypotheses and carry out the test with the critical value.</li>
+    <li>Compute the two-sided $95\,\%$ CI. Does it contain $48$? Is that a contradiction to a)?</li>
+    <li>Which confidence interval matches the test in a)? Compute it.</li>
+    <li>Check a) and c) with Python.</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Solution (1/2) &ndash; delivery time revisited: left-sided test</h2>
+  <p><b>a)</b> The advertised claim goes into $H_1$ $\Rightarrow$ <b>left-sided</b>:</p>
+  <p>\[ H_0:\mu=48 \qquad\text{vs.}\qquad H_1:\mu&lt;48 \]</p>
+  <p>\[ \frac{s}{\sqrt n}=\frac{3.2}{\sqrt{16}}=0.8,\qquad T_n=\frac{46.4-48}{0.8}=\mathbf{-2.00},\qquad \text{critical value: }{-t_{0.95;\,15}}=\mathbf{-1.7531} \]</p>
+  <div class="block alert"><h4>Decision</h4>
+    <p>$T_n=-2.00&lt;-1.7531$ $\Rightarrow$ $H_0$ is <b>rejected</b> ($p=F_{t,15}(-2.00)=0.0320$): the mean delivery time is significantly below $48$ h &ndash; the advertisement is statistically supported.</p></div>
+  <p class="fs-s">The negative sign belongs to the result: the rejection region lies on the <em>left</em>. Comparing absolute values would lose the direction.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution (2/2) &ndash; delivery time revisited: which CI?</h2>
+  <div class="stack fs-s" style="gap:6px">
+    <p><b>b)</b> $46.4\pm2.1314\cdot0.8=46.4\pm1.7051$ $\Rightarrow$ $\text{CI}_{0.95}=\mathbf{[\,44.69\,;\,48.11\,]}$ &ndash; it <em>contains</em> $48$! <em>No</em> contradiction: the two-sided CI belongs to the <em>two-sided</em> test, which would indeed keep $H_0$ here <span class="p3b-nw">($p=0.064$).</span> The one-sided test puts the whole $\alpha$ on one side and is sharper in that direction.</p>
+    <p><b>c)</b> The partner of the left-sided test is the one-sided CI with an upper bound:</p>
+    <p>\[ \Bigl(-\infty\,;\ 46.4+1.7531\cdot0.8\Bigr]=\mathbf{(-\infty\,;\,47.80]} \quad\Rightarrow\quad 48\ \text{lies outside -- consistent with a).} \]</p>
+    <p><b>d)</b></p>
+    <pre class="py small">
+from scipy import stats
+t = (46.4 - 48) / (3.2 / 16 ** 0.5)
+print(f"{t:.2f} {stats.t.cdf(t, df=15):.4f}")           # T_n, left-sided p-value
+print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sided CI
+    </pre>
+    <div class="cols" style="--cols: 22fr 74fr; --gap: 14px">
+      <div><pre class="out">
+-2.00 0.0320
+47.80
+      </pre></div>
+      <div><p class="fs-xs">With raw data: <code>stats.ttest_1samp(x, 48, alternative="less")</code> and <code>.confidence_interval(0.95)</code>.</p></div>
+    </div>
+  </div>
+  <a class="trynb" data-sec="section A.7"></a>
+  <aside class="notes">Talk track: the punchline of this task is the duality rule &ldquo;like with like&rdquo;: one-sided test $\leftrightarrow$ one-sided CI, two-sided test $\leftrightarrow$ two-sided CI. Ask the room before showing b): &ldquo;the test rejected 48 &ndash; will the 95 % CI exclude 48?&rdquo; Many say yes. It is the compact version of the earlier &ldquo;one- vs. two-sided on the same data&rdquo; exercise.</aside>
+</section>
+
+<section class="slide">
+  <h2>One-sided tests at a glance</h2>
+  <div class="block"><h4>One-sided tests (unknown variance)</h4>
+    <table class="bt left" style="margin:0; align-self:flex-start">
+      <tbody>
+        <tr><td style="border:0"><b>left:</b> &nbsp;&nbsp;$H_1:\mu&lt;\mu_0$</td><td style="border:0">reject if $T_n&lt;-t_{1-\alpha,\,n-1}$</td></tr>
+        <tr><td style="border:0"><b>right:</b> $H_1:\mu>\mu_0$</td><td style="border:0">reject if $T_n> t_{1-\alpha,\,n-1}$</td></tr>
+      </tbody>
+    </table></div>
+  <div class="block key"><p>Fix the direction <em>before</em> looking at the data &ndash; the whole $\alpha$ then sits on one side.</p></div>
+</section>
+
+<!-- ---- A.8 power of a test ---- -->
+<section class="slide" data-subsection="A.8 Power of a test">
+  <h2>Trade-off and power</h2>
+  <div class="cols" style="--cols: 62fr 36fr; --gap: 22px">
+    <div><div class="viz" id="p3b-pw" style="height:340px"></div></div>
+    <div class="fs-xs">
+      <ul>
+        <li>$\alpha\!\downarrow \Rightarrow \beta\!\uparrow$ (trade-off).</li>
+        <li>Larger $n$ raises power at every $\mu\neq\mu_0$ (at $\mu_0$ it stays at $\alpha$) &ndash; more power at the same level.</li>
+        <li>Power rises with the true deviation.</li>
+      </ul>
+      <p class="fs-xxs muted">Drag the grey handle on the deviation axis; at $2$ SE (milk, $n=9$ vs. $36$) the curves give $0.516$ and $0.979$. Lower $\alpha$ and both curves drop.</p>
+    </div>
+  </div>
+  <div class="block"><h4>Practice</h4>
+    <p>Typically $\alpha=0.05$ and desired power $1-\beta\ge 0.80$. A <b>power analysis</b> provides the required $n$.</p></div>
+  <script>
+  (() => {
+  QV.mount("#p3b-pw", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B;
+    let alpha = 0.05, k = 4, dx = 2;
+    const X0 = -0.35, X1 = 4.3;
+    const ch = QV.chart(el, { x: { domain: [X0, X1], label: "", tickValues: [0, 1, 2, 3, 4] }, y: { domain: [0, 1.03], label: "", tickValues: [0, 0.2, 0.4, 0.6, 0.8, 1], format: ".1f" }, margin: { bottom: 48, left: 62, right: 14 } });
+    P.xlab(ch, "true deviation &nbsp;$|\\mu_1-\\mu_0|$ &nbsp;(in standard errors)");
+    P.ylab(ch, "Power $1-\\beta$");
+    const pw = (e) => { const z = D.normInv(1 - alpha / 2); return 1 - (D.normCdf(z - e) - D.normCdf(-z - e)); };
+    QV.hline(ch, 0.8, { color: C.red, dash: "6 4", width: 1.6 });
+    P.lbl(ch, X1, 0.8, "target power 0.80", { anchor: "end", baseline: "top", dy: 5, size: 14, color: C.tRed });
+    const ha = QV.hline(ch, alpha, { color: C.grey, dash: "2 4", width: 1.8 });
+    const la = P.lbl(ch, X1, alpha, "", { anchor: "end", baseline: "bottom", dy: -3, size: 14, cls: "muted" });
+    const lN = QV.line(ch, [], { color: C.blue, width: 3 }), lK = QV.line(ch, [], { color: C.orange, width: 3 });
+    const m = P.marker(ch, dx, { color: C.ink2, width: 1.5, dash: "4 4", y0: 1.0, yTop: 0, min: 0, max: 4.2, step: 0.01, onMove: (v) => { dx = v; upd(); } });
+    const dN = QV.dots(ch, [[dx, 0]], { r: 6.5, color: C.blue, layer: "front" }).style("pointer-events", "none");
+    const dK = QV.dots(ch, [[dx, 0]], { r: 6.5, color: C.orange, layer: "front" }).style("pointer-events", "none");
+    const tN = P.lbl(ch, dx, 0, "", { anchor: "start", dx: 11, size: 15, bg: true }), tK = P.lbl(ch, dx, 0, "", { anchor: "end", dx: -11, size: 15, bg: true });
+    let lg = null;
+    const legend = () => { if (lg) lg.remove(); lg = P.legendIn(ch, [{ label: "sample $n$", color: C.blue, type: "line" }, { label: `sample $${k}\\cdot n$`, color: C.orange, type: "line" }], { right: 8, bottom: 40 }); };
+    const row = QV.controls(el);
+    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.005, value: alpha, width: 110, fmt: (v) => v.toFixed(3), onInput: (v) => { alpha = v; upd(); } });
+    QV.segmented(row, { label: "compare with", options: [["2", "$2n$"], ["4", "$4n$"], ["9", "$9n$"]], value: "4", onChange: (v) => { k = +v; legend(); upd(); } });
+    const ro = QV.readout(row);
+    const upd = () => {
+      const sk = Math.sqrt(k);
+      QV.setLine(ch, lN, QV.sample(pw, X0, X1, 300));
+      QV.setLine(ch, lK, QV.sample((e) => pw(sk * e), X0, X1, 300));
+      ha.set(alpha); la.set(X1, alpha, `level $\\alpha = ${P.f(alpha, 3)}$`);
+      const a = pw(dx), b = pw(sk * dx);
+      dN.attr("cx", ch.x(dx)).attr("cy", ch.y(a)); dK.attr("cx", ch.x(dx)).attr("cy", ch.y(b));
+      tN.set(dx, a, `$${P.f(a, 3)}$`); tK.set(dx, b, `$${P.f(b, 3)}$`);
+      ro.set(`at $${P.f(dx, 2)}$ SE: power <b>${P.f(a, 3)}</b> ($n$) vs. <b>${P.f(b, 3)}</b> ($${k}n$)`);
+    };
+    legend(); upd();
+  });
+  })();
+  </script>
+</section>
+
+<section class="slide">
+  <h2>Computing $\beta$ concretely &ndash; milk</h2>
+  <div class="cols" style="--cols: 55fr 43fr; --gap: 22px">
+    <div class="fs-s" style="gap:8px">
+      <p><b>Setup:</b> $H_0:\mu=1000$ vs. $H_1:\mu\neq1000$, $\sigma=3$, $n=9$ ($\mathrm{SE}=1$), <span class="p3b-nw">$\alpha=0.05$.</span></p>
+      <p><b>Step 1</b> &ndash; turn &ldquo;$|Z_n|\le1.96$&rdquo; into bounds on $\bar X$: <span class="p3b-nw">$\mu_0\pm1.96\cdot\mathrm{SE}=1000\pm1.96=[998.04\,;\,1001.96]$.</span></p>
+      <p><b>Step 2</b> &ndash; the truth is $\mu_1=1002$; find how often $\bar X$ still lands in that region, <em>standardising with $\mu_1$</em>:</p>
+      \begin{align*} \beta &= P\bigl(998.04 \le \bar X \le 1001.96 \;\big|\; \mu=1002\bigr)\\ &= \Phi\!\bigl(\tfrac{1001.96-1002}{1}\bigr) - \Phi\!\bigl(\tfrac{998.04-1002}{1}\bigr) = 0.484 \end{align*}
+    </div>
+    <div style="gap:4px">
+      <div class="viz" id="p3b-beta" style="height:345px"></div>
+    </div>
+  </div>
+  <div class="block example"><h4>Result</h4>
+    <p>Power $=1-\beta = 0.516$: a true deviation of $2$ ml is detected with $n=9$ in only just over half the cases.</p></div>
+  <script>
+  (() => {
+  QV.mount("#p3b-beta", (el) => {
+    const D = QV.dist, C = QV.C, P = window.P3B;
+    let n = 9;
+    const X0 = 996, X1 = 1005;
+    const ch = QV.chart(el, { x: { domain: [X0, X1], label: "", tickValues: [996, 998, 1000, 1002, 1004], format: "d" }, y: { domain: [0, 0.9], label: "Density", ticks: 4 }, margin: { bottom: 48, right: 12, left: 56 } });
+    P.xlab(ch, "sample mean $\\bar X$ (ml)");
+    const acc = QV.rect(ch, 998.04, 1001.96, 0, 0.9, { fill: C.greyT });
+    const aB = QV.area(ch, [], { color: C.blue, opacity: 0.35 });
+    const l0 = QV.line(ch, [], { color: C.ink2, width: 2.4 }), l1 = QV.line(ch, [], { color: C.blue, width: 2.6 });
+    const lb = P.lbl(ch, 1001, 0.1, "", { size: 15, bg: true, color: C.tBlue });
+    const lacc = P.lbl(ch, 1000, 0.86, "acceptance region ($H_0$ world)", { size: 13, cls: "muted" });
+    P.legendIn(ch, [{ label: "$H_0$: $\\mu=1000$", color: C.ink2, type: "line" }, { label: "truth: $\\mu_1=1002$", color: C.blue, type: "line" }], { right: 4, top: 22 });
+    const row = QV.controls(el);
+    QV.slider(row, { label: "$n$", min: 4, max: 64, step: 1, value: n, width: 120, onInput: (v) => { n = v; upd(); } });
+    const ro = QV.readout(row);
+    const upd = () => {
+      const se = 3 / Math.sqrt(n), lo = 1000 - 1.96 * se, hi = 1000 + 1.96 * se;
+      const beta = D.normCdf(hi, 1002, se) - D.normCdf(lo, 1002, se);
+      acc.set(lo, hi, 0, 0.9);
+      QV.setLine(ch, l0, QV.sample((x) => D.normPdf(x, 1000, se), X0, X1, 300));
+      QV.setLine(ch, l1, QV.sample((x) => D.normPdf(x, 1002, se), X0, X1, 300));
+      QV.setArea(ch, aB, QV.sample((x) => D.normPdf(x, 1002, se), lo, hi, 160));
+      lb.set(Math.min(hi, 1002) - 0.45, Math.max(D.normPdf(Math.min(hi, 1002) - 0.45, 1002, se) * 0.4, 0.05), `$\\beta=${P.f(beta, 3)}$`);
+      lacc.set((lo + hi) / 2, 0.86);
+      ro.set(`$[${P.f(lo, 2)}\\,;\\,${P.f(hi, 2)}]$ &nbsp; power $=$ <b>${P.f(1 - beta, 3)}</b>`);
+    };
+    upd();
+  });
+  })();
+  </script>
+  <aside class="notes">Talk track: the key move is the change of world. Step 1 lives in the $H_0$ world (where the acceptance region was built); step 2 asks how often $\bar X$ lands in that same region when the TRUTH is $\mu_1=1002$ &ndash; so we standardise with $1002$, not $1000$. Students often reuse $\mu_0$ in step 2; catch that explicitly. The sobering message: with $n=9$, a real 2 ml error escapes detection almost half the time.</aside>
+</section>
+
+<section class="slide">
+  <h2>Four levers for more power</h2>
+  <p>More sample size helps decisively. Same situation with $n=36$ instead of $9$:</p>
+  <p>\[ \text{SE}=\tfrac{3}{\sqrt{36}}=0.5 \;\Rightarrow\; \beta = 0.021,\quad \text{power}=0.979. \]</p>
+  <div class="block"><h4>Levers of power $1-\beta$</h4>
+    <ol>
+      <li><b>Sample size</b> $n\uparrow$ (strongest lever).</li>
+      <li><b>Effect size</b> $|\mu_1-\mu_0|$ (given).</li>
+      <li><b>Spread</b> $\sigma\downarrow$ (e.g. measure more precisely).</li>
+      <li><b>Level</b> $\alpha\uparrow$ (buys more Type I error).</li>
+    </ol></div>
+  <div class="block key"><p>Quadrupling $n$ from $9$ to $36$ raises the power from $0.52$ to $0.98$.</p></div>
+  <aside class="notes">Talk track: go through the four levers and ask for each &ldquo;who controls this?&rdquo; &ndash; $n$: the researcher (budget); effect size: nature/the question; $\sigma$: partly the lab (better instruments); $\alpha$: the convention, and raising it is usually unacceptable. So in practice power planning $=$ sample size planning. Connect back to the CI length slide: same logic, $1/\sqrt n$.</aside>
+</section>
+
+<section class="slide">
+  <h2>$\beta$ and power with Python</h2>
+  <pre class="py">
+import numpy as np
+from scipy import stats
+from statsmodels.stats.power import NormalIndPower
+for n in (9, 36):                        # milk: mu0 = 1000, true mu1 = 1002, sigma = 3
+    se = 3 / np.sqrt(n)
+    lo, hi = 1000 - 1.96 * se, 1000 + 1.96 * se         # acceptance region (H0 world)
+    beta = stats.norm.cdf(hi, 1002, se) - stats.norm.cdf(lo, 1002, se)  # mu1 world
+    print(f"n = {n}: beta = {beta:.3f}, power = {1 - beta:.3f}")
+pw = NormalIndPower()                    # power of the z-test; ratio=0: one sample
+pw.power(effect_size=2/3, nobs1=9, alpha=0.05, ratio=0)              # 0.516
+pw.solve_power(effect_size=2/3, power=0.80, alpha=0.05, ratio=0)     # 17.66 -&gt; n = 18
+  </pre>
+  <div class="cols" style="--cols: 44fr 52fr">
+    <div class="block"><h4>Output</h4>
+      <pre class="out">
+n = 9: beta = 0.484, power = 0.516
+n = 36: beta = 0.021, power = 0.979
+      </pre></div>
+    <div><p class="fs-xs">Effect size $d=|\mu_1-\mu_0|/\sigma=2/3$. <code>solve_power</code> does the power analysis: $80\,\%$ power needs at least $n=18$ bottles.</p></div>
+  </div>
+  <a class="trynb" data-sec="section A.8"></a>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; compute $\beta$ and power (two-sided)</h2>
+  <div class="block problem">
+    <p>Test $H_0:\mu = 100$ vs. $H_1:\mu\neq 100$, known $\sigma = 10$, $n=25$, $\alpha=0.05$. The true mean is actually $\mu_1 = 105$. Find the Type II error $\beta$ and the power.</p>
+  </div>
+  <p><b>Step 1:</b> the acceptance region for $\bar X$ under $H_0$.</p>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; $\beta$ and power (two-sided)</h2>
+  <p>$\text{SE} = 10/\sqrt{25} = 2$. Acceptance region: $100 \pm 1.96\cdot 2 = [96.08\,;\,103.92]$.</p>
+  \begin{align*} \beta &= P(96.08 \le \bar X \le 103.92 \mid \mu = 105)\\ &= \Phi\!\Big(\tfrac{103.92-105}{2}\Big) - \Phi\!\Big(\tfrac{96.08-105}{2}\Big) = \Phi(-0.54) - \Phi(-4.46)\\ &= 0.2946 - 0.0000 = \mathbf{0.2946} \end{align*}
+  <div class="block example"><h4>Power</h4>
+    <p>$1-\beta = \mathbf{0.7054}$: a true shift of $5$ units is detected in about $71\,\%$ of samples.</p></div>
+</section>
+
+<section class="slide">
+  <h2>Exercise &ndash; power of a one-sided test</h2>
+  <div class="block problem">
+    <p>Now use a <em>right-sided</em> test, $H_1:\mu>100$, with $\sigma=10$, $n=25$, $\alpha=0.05$, true $\mu_1=105$. Find the power and compare with the two-sided value $0.7054$.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Solution &ndash; one-sided power</h2>
+  <p>$\text{SE}=2$. Critical mean: $\bar x_{\text{crit}} = 100 + 1.645\cdot 2 = 103.29$.</p>
+  <p>\[ 1-\beta = P(\bar X > 103.29 \mid \mu=105) = 1-\Phi\!\Big(\tfrac{103.29-105}{2}\Big) = 1-\Phi(-0.855) = \mathbf{0.8037} \]</p>
+  <div class="block example"><h4>Comparison</h4>
+    <p>Power $0.804$ vs. $0.705$ two-sided &ndash; the one-sided test is <em>more powerful</em> for the same $n$ and <span class="p3b-nw">$\alpha$,</span> because the whole $\alpha$ sits on the relevant side.</p></div>
+</section>
+<!-- END SLIDES -->
+</main></div>
+</body>
+</html>

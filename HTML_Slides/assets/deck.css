@@ -1,0 +1,679 @@
+/* ==========================================================================
+   Quantitative Research Methods -- HTML slide decks (shared stylesheet)
+
+   Every slide is a fixed 1280 x 720 canvas that is scaled to the window,
+   so a layout that fits once fits on every screen (and in print).
+   Colours are tokens: light and dark mode swap them in one place.
+   ========================================================================== */
+
+/* ---------- Fonts (vendored, work offline) ---------- */
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 400; font-display: block; src: url(fonts/source-sans-3-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 400; font-display: block; src: url(fonts/source-sans-3-latin-400-italic.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 600; font-display: block; src: url(fonts/source-sans-3-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 600; font-display: block; src: url(fonts/source-sans-3-latin-600-italic.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 700; font-display: block; src: url(fonts/source-sans-3-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 700; font-display: block; src: url(fonts/source-sans-3-latin-700-italic.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: block; src: url(fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: block; src: url(fonts/jetbrains-mono-latin-700-normal.woff2) format("woff2"); }
+
+/* ---------- Tokens: light ---------- */
+:root {
+  color-scheme: light;
+  /* brand (from the Beamer decks) */
+  --brand:        #3333B2;
+  --brand-dark:   #1C1C6E;
+  --brand-ink:    #1C1C6E;      /* titles, emphasis */
+  --on-brand:     #ffffff;
+
+  /* surfaces and ink */
+  --page:         #e9e9ef;      /* behind the slide */
+  --surface:      #fcfcfb;      /* the slide itself, chart surface */
+  --surface-2:    #f3f3f6;      /* code, table stripes */
+  --surface-3:    #e8e8ee;
+  --ink:          #16161d;
+  --ink-2:        #4a4a55;
+  --ink-muted:    #6d6d78;
+  --rule:         #c9c9d3;
+  --grid:         #e4e4ea;
+  --axis:         #8a8a96;
+
+  /* data series (validated: CVD-safe in this order, light surface) */
+  --c-blue:       #4248c8;
+  --c-orange:     #E69F00;
+  --c-green:      #2E8B57;
+  --c-violet:     #8C3CA0;
+  --c-red:        #C0392B;
+  --c-grey:       #9A9A9A;
+  /* tints (area washes, highlighted cells) */
+  --c-blue-tint:  rgba(66, 72, 200, .12);
+  --c-orange-tint:rgba(230, 159, 0, .18);
+  --c-green-tint: rgba(46, 139, 87, .14);
+  --c-violet-tint:rgba(140, 60, 160, .13);
+  --c-red-tint:   rgba(192, 57, 43, .13);
+  --c-grey-tint:  rgba(120, 120, 130, .12);
+  /* text versions of the series hues (AA contrast on the surface) */
+  --t-blue:       #3333B2;
+  --t-orange:     #9a5d00;
+  --t-green:      #1f6e43;
+  --t-violet:     #7a2f8e;
+  --t-red:        #b03224;
+  --t-grey:       #5f5f6a;
+
+  /* blocks (Beamer block / alertblock / exampleblock) */
+  --blk-blue-head:  #3a3fb8;
+  --blk-blue-body:  #eef0fb;
+  --blk-red-head:   #b8382a;
+  --blk-red-body:   #fbefed;
+  --blk-green-head: #2a7f50;
+  --blk-green-body: #ecf6f0;
+  --blk-orange-head:#b87700;
+  --blk-orange-body:#fdf4e2;
+  --blk-grey-head:  #5c5c68;
+  --blk-grey-body:  #f1f1f4;
+
+  /* code */
+  --code-bg:      #f4f4f8;
+  --code-ink:     #1d1d27;
+  --code-kw:      #3333B2;
+  --code-str:     #1f7a5a;
+  --code-com:     #7c7c88;
+  --code-num:     #8C3CA0;
+  --code-fn:      #9a5d00;
+  --out-bg:       #fbfbfd;
+
+  --shadow: 0 10px 40px rgba(20, 20, 60, .18);
+}
+
+/* ---------- Tokens: dark (selected, not flipped) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --brand:        #6a72ef;
+    --brand-dark:   #12123a;
+    --brand-ink:    #b9bdff;
+    --on-brand:     #ffffff;
+    --page:         #0d0d12;
+    --surface:      #17181f;
+    --surface-2:    #20212a;
+    --surface-3:    #2a2b36;
+    --ink:          #ececf1;
+    --ink-2:        #c4c4cf;
+    --ink-muted:    #9a9aa8;
+    --rule:         #3c3d4a;
+    --grid:         #2a2b36;
+    --axis:         #7a7a88;
+    --c-blue:       #6a72ef;
+    --c-orange:     #c47f00;
+    --c-green:      #1a9a6c;
+    --c-violet:     #a866cc;
+    --c-red:        #e25a4e;
+    --c-grey:       #8a8a96;
+    --c-blue-tint:  rgba(106, 114, 239, .20);
+    --c-orange-tint:rgba(196, 127, 0, .24);
+    --c-green-tint: rgba(26, 154, 108, .22);
+    --c-violet-tint:rgba(168, 102, 204, .22);
+    --c-red-tint:   rgba(226, 90, 78, .22);
+    --c-grey-tint:  rgba(160, 160, 175, .16);
+    --t-blue:       #a9aeff;
+    --t-orange:     #f0b445;
+    --t-green:      #5fd09f;
+    --t-violet:     #d3a2ee;
+    --t-red:        #ff8f84;
+    --t-grey:       #b0b0bc;
+    --blk-blue-head:  #3e44a8;
+    --blk-blue-body:  #1d1f33;
+    --blk-red-head:   #9e3428;
+    --blk-red-body:   #2c1d1d;
+    --blk-green-head: #1f7048;
+    --blk-green-body: #182922;
+    --blk-orange-head:#966100;
+    --blk-orange-body:#2b2416;
+    --blk-grey-head:  #4b4b58;
+    --blk-grey-body:  #22232c;
+    --code-bg:      #1f2029;
+    --code-ink:     #e6e6ee;
+    --code-kw:      #a9aeff;
+    --code-str:     #6fd3a8;
+    --code-com:     #8a8a98;
+    --code-num:     #d3a2ee;
+    --code-fn:      #f0b445;
+    --out-bg:       #1a1b23;
+    --shadow: 0 10px 40px rgba(0, 0, 0, .5);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --brand:        #6a72ef;
+  --brand-dark:   #12123a;
+  --brand-ink:    #b9bdff;
+  --on-brand:     #ffffff;
+  --page:         #0d0d12;
+  --surface:      #17181f;
+  --surface-2:    #20212a;
+  --surface-3:    #2a2b36;
+  --ink:          #ececf1;
+  --ink-2:        #c4c4cf;
+  --ink-muted:    #9a9aa8;
+  --rule:         #3c3d4a;
+  --grid:         #2a2b36;
+  --axis:         #7a7a88;
+  --c-blue:       #6a72ef;
+  --c-orange:     #c47f00;
+  --c-green:      #1a9a6c;
+  --c-violet:     #a866cc;
+  --c-red:        #e25a4e;
+  --c-grey:       #8a8a96;
+  --c-blue-tint:  rgba(106, 114, 239, .20);
+  --c-orange-tint:rgba(196, 127, 0, .24);
+  --c-green-tint: rgba(26, 154, 108, .22);
+  --c-violet-tint:rgba(168, 102, 204, .22);
+  --c-red-tint:   rgba(226, 90, 78, .22);
+  --c-grey-tint:  rgba(160, 160, 175, .16);
+  --t-blue:       #a9aeff;
+  --t-orange:     #f0b445;
+  --t-green:      #5fd09f;
+  --t-violet:     #d3a2ee;
+  --t-red:        #ff8f84;
+  --t-grey:       #b0b0bc;
+  --blk-blue-head:  #3e44a8;
+  --blk-blue-body:  #1d1f33;
+  --blk-red-head:   #9e3428;
+  --blk-red-body:   #2c1d1d;
+  --blk-green-head: #1f7048;
+  --blk-green-body: #182922;
+  --blk-orange-head:#966100;
+  --blk-orange-body:#2b2416;
+  --blk-grey-head:  #4b4b58;
+  --blk-grey-body:  #22232c;
+  --code-bg:      #1f2029;
+  --code-ink:     #e6e6ee;
+  --code-kw:      #a9aeff;
+  --code-str:     #6fd3a8;
+  --code-com:     #8a8a98;
+  --code-num:     #d3a2ee;
+  --code-fn:      #f0b445;
+  --out-bg:       #1a1b23;
+  --shadow: 0 10px 40px rgba(0, 0, 0, .5);
+}
+
+/* ---------- Page and stage ---------- */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+#stage {
+  position: fixed; left: 50%; top: 50%;
+  width: 1280px; height: 720px;
+  transform-origin: 0 0;
+}
+#deck { position: relative; width: 1280px; height: 720px; }
+
+/* ---------- Slide canvas ---------- */
+.slide {
+  position: absolute; inset: 0;
+  width: 1280px; height: 720px;
+  display: none;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  font-size: 24px;
+  line-height: 1.32;
+}
+.slide.active { display: flex; }
+body.no-js .slide { display: flex; position: relative; margin: 20px auto; }
+
+/* headline: section navigation (like the Beamer headline) */
+.slide > .hdr {
+  flex: 0 0 30px; height: 30px;
+  display: flex; align-items: center; gap: 2px;
+  padding: 0 18px;
+  background: var(--brand-dark);
+  color: rgba(255, 255, 255, .55);
+  font-size: 14px; letter-spacing: .02em;
+  white-space: nowrap; overflow: hidden;
+}
+.hdr a { color: inherit; text-decoration: none; padding: 3px 9px; border-radius: 5px; }
+.hdr a:hover { color: #fff; background: rgba(255, 255, 255, .1); }
+.hdr a.on { color: #fff; font-weight: 600; background: rgba(255, 255, 255, .14); }
+.hdr .sp { flex: 1; }
+
+/* title bar */
+.slide > .ttl {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 14px;
+  min-height: 70px;
+  padding: 12px 48px 8px 48px;
+  border-bottom: 2px solid var(--grid);
+}
+.ttl h2 {
+  margin: 0; font-size: 33px; line-height: 1.12; font-weight: 700;
+  color: var(--brand-ink); letter-spacing: -.005em;
+}
+.ttl .badge {
+  flex: 0 0 auto;
+  font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px; color: #fff;
+}
+.slide.exercise .ttl .badge { background: var(--blk-orange-head); }
+.slide.solution .ttl .badge { background: var(--blk-green-head); }
+.slide.python   .ttl .badge { background: var(--blk-blue-head); }
+.slide.appendix-slide .ttl .badge { background: var(--blk-grey-head); }
+
+/* body: the content area is 1184 x ~590 px */
+.slide > .bd {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px 48px 12px 48px;
+  position: relative;
+}
+.bd > * { margin-top: 0; margin-bottom: 0; flex-shrink: 0; }   /* never squeeze (and clip) a block */
+.bd > .grow { flex-shrink: 1; }
+
+/* footline */
+.slide > .ftr {
+  flex: 0 0 28px; height: 28px;
+  display: flex; align-items: center; gap: 16px;
+  padding: 0 24px;
+  font-size: 14px; color: rgba(255, 255, 255, .78);
+  background: var(--brand-dark);
+  position: relative;
+}
+.ftr .sp { flex: 1; }
+.ftr .back { color: #fff; cursor: pointer; text-decoration: none; padding: 1px 8px; border-radius: 4px; background: rgba(255,255,255,.14); display: none; }
+.ftr .back.show { display: inline-block; }
+.ftr .prog { position: absolute; left: 0; top: -3px; height: 3px; background: var(--c-orange); }
+
+/* ---------- Typography inside slides ---------- */
+.bd p { margin: 0; }
+.bd ul, .bd ol { margin: 0; padding-left: 1.25em; }
+.bd li { margin: 0 0 .28em 0; }
+.bd li::marker { color: var(--brand); }
+.bd ul > li { list-style: none; position: relative; }
+.bd ul > li::before {
+  content: ""; position: absolute; left: -.95em; top: .52em;
+  width: .36em; height: .36em; border-radius: 2px; background: var(--brand);
+}
+.bd ul ul > li::before { background: var(--c-grey); border-radius: 50%; }
+.bd ol.alpha { list-style: none; counter-reset: alpha; padding-left: 1.7em; }
+.bd ol.alpha > li { counter-increment: alpha; position: relative; }
+.bd ol.alpha > li::before { content: counter(alpha, lower-alpha) ")"; position: absolute; left: -1.6em; font-weight: 600; color: var(--brand-ink); }
+.bd ol.alpha > li::marker { content: none; }
+.bd dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; column-gap: 16px; row-gap: 10px; }
+.bd dt { font-weight: 700; color: var(--brand-ink); }
+.bd dd { margin: 0; }
+.bd dl.stack { display: block; }
+.bd dl.stack dt { margin-top: 10px; }
+b, strong { font-weight: 700; }
+em { font-style: italic; }
+code, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: .86em; }
+.bd code { background: var(--surface-2); padding: .02em .16em; border-radius: 4px; }
+a { color: var(--t-blue); }
+
+/* font-size steps (Beamer \small ... \tiny) */
+.fs-l   { font-size: 27px; }
+.fs-s   { font-size: 21px; }
+.fs-xs  { font-size: 19px; }
+.fs-xxs { font-size: 17px; }
+.fs-tiny{ font-size: 15px; }
+
+/* colours for text (accessible text tokens) */
+.c-blue   { color: var(--t-blue); }
+.c-orange { color: var(--t-orange); }
+.c-green  { color: var(--t-green); }
+.c-violet { color: var(--t-violet); }
+.c-red    { color: var(--t-red); }
+.c-grey, .muted { color: var(--t-grey); }
+.c-ink    { color: var(--brand-ink); }
+.hl  { background: var(--c-orange-tint); border-radius: 4px; padding: 0 .15em; }
+.hlb { background: var(--c-blue-tint); border-radius: 4px; padding: 0 .15em; }
+.hlg { background: var(--c-green-tint); border-radius: 4px; padding: 0 .15em; }
+.hlr { background: var(--c-red-tint); border-radius: 4px; padding: 0 .15em; }
+.center { text-align: center; }
+.right  { text-align: right; }
+.mt-auto { margin-top: auto !important; }
+.grow { flex: 1 1 auto; min-height: 0; }
+
+/* math colour classes (used by the KaTeX macros \blue, \orange, ...) */
+.m-blue   { color: var(--t-blue); }
+.m-orange { color: var(--t-orange); }
+.m-green  { color: var(--t-green); }
+.m-violet { color: var(--t-violet); }
+.m-red    { color: var(--t-red); }
+.m-grey   { color: var(--t-grey); }
+.m-ink    { color: var(--brand-ink); }
+.m-hl     { background: var(--c-orange-tint); border-radius: 3px; padding: 0 2px; }
+.katex { font-size: 1.07em; }
+.katex-display { margin: .3em 0; }
+.katex-display > .katex { font-size: 1.12em; }
+
+/* ---------- Layout helpers ---------- */
+.cols { display: grid; grid-template-columns: var(--cols, 1fr 1fr); gap: var(--gap, 28px); align-items: start; }
+.cols.mid { align-items: center; }
+.cols.stretch { align-items: stretch; }
+.cols > * { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.spacer { flex: 1 1 auto; }
+
+/* ---------- Blocks ---------- */
+/* <div class="block"><h4>Title</h4> ...</div>   (blue, Beamer block)
+   .block.alert (red)  .block.example (green)  .block.orange  .block.grey  .block.plain
+   .block.key / .block.guiding / .block.problem get their title automatically. */
+.block {
+  border-radius: 10px; overflow: hidden;
+  background: var(--blk-blue-body);
+  display: flex; flex-direction: column;
+  padding: 0 16px 11px 16px;
+}
+.block > * + * { margin-top: 6px; }
+.block > h4, .block::before {
+  display: block; margin: 0 -16px 10px -16px; padding: 6px 16px;
+  font-size: 20px; font-weight: 600; line-height: 1.25;
+  color: #fff; background: var(--blk-blue-head);
+}
+.block > h4 + * { margin-top: 0; }
+.block:not(:has(> h4)):not(.key):not(.guiding):not(.problem) { padding-top: 10px; }
+.block.alert   { background: var(--blk-red-body); }
+.block.alert   > h4, .block.alert::before   { background: var(--blk-red-head); }
+.block.example { background: var(--blk-green-body); }
+.block.example > h4, .block.example::before { background: var(--blk-green-head); }
+.block.orange  { background: var(--blk-orange-body); }
+.block.orange  > h4, .block.orange::before  { background: var(--blk-orange-head); }
+.block.grey    { background: var(--blk-grey-body); }
+.block.grey    > h4, .block.grey::before    { background: var(--blk-grey-head); }
+.block.key      { background: var(--blk-red-body); }
+.block.key::before      { content: "Key takeaway"; background: var(--blk-red-head); }
+.block.guiding  { background: var(--blk-green-body); }
+.block.guiding::before  { content: "Guiding question"; background: var(--blk-green-head); }
+.block.problem::before  { content: "Problem statement"; }
+.block.plain { background: var(--surface-2); }
+.block.plain > h4 { background: transparent; color: var(--brand-ink); padding-bottom: 0; }
+.block.tight { padding-bottom: 7px; }
+.block.tight > h4, .block.tight::before { padding-top: 4px; padding-bottom: 4px; margin-bottom: 6px; font-size: 18px; }
+
+/* "In words:" line */
+.inwords { font-size: 21px; color: var(--ink); }
+.inwords::before { content: "In words: "; font-weight: 700; color: var(--brand-ink); }
+
+/* pointers to the notebook / Python course / appendix / source */
+.pointers { margin-top: auto !important; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+a.trynb, a.pycourse, .apxnote, .srcnote {
+  display: block; text-align: right; font-size: 16px; text-decoration: none; margin-top: auto;
+}
+a.trynb    { color: var(--t-orange); }
+a.pycourse { color: var(--t-green); }
+.apxnote   { color: var(--t-blue); font-style: italic; }
+.srcnote   { color: var(--ink-muted); font-style: italic; font-size: 13px; }
+.trynb b, .pycourse b { font-weight: 700; }
+a.trynb:hover, a.pycourse:hover { text-decoration: underline; }
+:is(.trynb, .pycourse, .apxnote, .srcnote) + :is(.trynb, .pycourse, .apxnote, .srcnote) { margin-top: 0 !important; }
+a.btn, button.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 600 16px "Source Sans 3", sans-serif;
+  color: #fff; background: var(--blk-blue-head); border: 0; border-radius: 6px;
+  padding: 4px 12px; text-decoration: none; cursor: pointer;
+}
+
+/* ---------- Concept diagrams (replacements for TikZ flow boxes) ---------- */
+/* <div class="flow"><div class="fbox">Python</div><span class="farr">&rarr;</span><div class="fbox o">SciPy</div></div> */
+.flow { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: nowrap; }
+.flow.v { flex-direction: column; gap: 6px; }
+.fbox {
+  border: 2.5px solid var(--brand-ink); background: var(--blk-blue-body); color: var(--ink);
+  border-radius: 10px; padding: 7px 16px; text-align: center; font-size: 20px; line-height: 1.25;
+}
+.fbox.o  { border-color: var(--c-orange); background: var(--blk-orange-body); }
+.fbox.g  { border-color: var(--c-grey);   background: var(--blk-grey-body); }
+.fbox.gr { border-color: var(--c-green);  background: var(--blk-green-body); }
+.fbox.r  { border-color: var(--c-red);    background: var(--blk-red-body); }
+.fbox.v  { border-color: var(--c-violet); background: var(--c-violet-tint); }
+.fbox small, .fnote { display: block; font-size: 15px; color: var(--ink-muted); }
+.farr { color: var(--brand-ink); font-size: 28px; line-height: 1; font-weight: 700; }
+.diagram { position: relative; }
+.diagram svg { display: block; overflow: visible; }
+.diagram svg text { fill: var(--ink); font-family: "Source Sans 3", sans-serif; }
+
+/* ---------- Tables (booktabs) ---------- */
+table.bt { border-collapse: collapse; font-size: 21px; margin-left: auto; margin-right: auto; }
+table.bt th, table.bt td { padding: 4px 13px; text-align: center; vertical-align: top; }
+table.bt th { font-weight: 700; }
+table.bt.left th, table.bt.left td, table.bt .l { text-align: left; }
+table.bt .r { text-align: right; }
+table.bt thead tr:first-child th, table.bt thead tr:first-child td { border-top: 2px solid var(--ink); }
+table.bt thead tr:last-child th, table.bt thead tr:last-child td { border-bottom: 1px solid var(--ink); }
+table.bt tbody tr:last-child td, table.bt tbody tr:last-child th { border-bottom: 2px solid var(--ink); }
+table.bt:not(:has(thead)) tbody tr:first-child td, table.bt:not(:has(thead)) tbody tr:first-child th { border-top: 2px solid var(--ink); }
+table.bt tr.mid td, table.bt tr.mid th { border-top: 1px solid var(--rule); }
+table.bt tr.total td, table.bt tr.total th { border-top: 1px solid var(--ink); font-weight: 600; }
+table.bt td.hl, table.bt th.hl { background: var(--c-orange-tint); }
+table.bt td.hlb, table.bt th.hlb { background: var(--c-blue-tint); }
+table.bt td.hlg, table.bt th.hlg { background: var(--c-green-tint); }
+table.bt td.hlr, table.bt th.hlr { background: var(--c-red-tint); }
+table.bt .vsep { border-left: 1px solid var(--rule); }
+table.bt.striped tbody tr:nth-child(even) td { background: var(--surface-2); }
+table.bt.full { width: 100%; }
+table.bt caption { caption-side: bottom; font-size: 16px; color: var(--ink-muted); padding-top: 6px; }
+
+/* ---------- Code ---------- */
+pre.py, pre.out {
+  margin: 0;
+  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  font-size: 16px; line-height: 1.42;
+  white-space: pre; overflow: hidden;
+  border-radius: 8px;
+  tab-size: 4;
+}
+pre.py  { background: var(--code-bg); color: var(--code-ink); padding: 10px 14px; border-left: 4px solid var(--brand); }
+pre.out { background: var(--out-bg); color: var(--ink-2); padding: 8px 14px; border: 1px dashed var(--rule); font-size: 15px; }
+pre.out::before { content: "Output"; display: block; font: 600 12px "Source Sans 3", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 2px; }
+pre.small, pre.fs-s { font-size: 14.5px; }
+pre.xs { font-size: 13.5px; }
+pre .kw  { color: var(--code-kw); font-weight: 700; }
+pre .str { color: var(--code-str); }
+pre .com { color: var(--code-com); font-style: italic; }
+pre .num { color: var(--code-num); }
+pre .fn  { color: var(--code-fn); }
+pre .bi  { color: var(--code-kw); }
+
+/* ---------- Figures ---------- */
+figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+figure img { max-width: 100%; max-height: 100%; object-fit: contain; }
+figcaption { font-size: 16px; color: var(--ink-muted); text-align: center; }
+
+/* ---------- Interactive charts ---------- */
+.viz { position: relative; width: 100%; color: var(--ink); }
+.viz svg { display: block; overflow: visible; font-family: "Source Sans 3", sans-serif; }
+.viz svg text { fill: var(--ink-2); font-size: 15px; }
+.viz .axis path, .viz .axis line { stroke: var(--axis); }
+.viz .axis text { fill: var(--ink-muted); font-size: 14px; }
+.viz .axis-label { fill: var(--ink-2); font-size: 15px; font-weight: 600; }
+.viz .grid line { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
+.viz .grid path { display: none; }
+.viz .lbl { fill: var(--ink); font-size: 15px; }
+.viz .lbl-muted { fill: var(--ink-muted); font-size: 14px; }
+.viz .lbl-strong { fill: var(--ink); font-size: 16px; font-weight: 700; }
+.viz .ring { stroke: var(--surface); stroke-width: 2; }
+.viz .drag { cursor: grab; }
+.viz .drag:active { cursor: grabbing; }
+.viz .hit { fill: transparent; }
+.viz foreignObject { overflow: visible; }
+.viz .fo-tex { font-size: 17px; color: var(--ink); white-space: nowrap; line-height: 1; }
+.viz .fo-tex .katex { font-size: 1em; }
+
+.viz-ctrl {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px;
+  font-size: 17px; color: var(--ink-2);
+  padding: 6px 12px; border-radius: 8px; background: var(--surface-2);
+}
+.viz-ctrl label { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.viz-ctrl input[type=range] { width: 150px; accent-color: var(--brand); }
+.viz-ctrl .val { font-family: "JetBrains Mono", monospace; font-size: 15px; min-width: 3.2em; color: var(--ink); }
+.viz-ctrl select { font: 16px "Source Sans 3", sans-serif; padding: 2px 6px; border-radius: 5px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
+.viz-ctrl button {
+  font: 600 15px "Source Sans 3", sans-serif;
+  padding: 4px 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.viz-ctrl button.primary { background: var(--blk-blue-head); color: #fff; border-color: transparent; }
+.viz-ctrl button:hover { filter: brightness(1.05); border-color: var(--brand); }
+.viz-ctrl .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.viz-ctrl .seg button { border: 0; border-radius: 0; border-right: 1px solid var(--rule); }
+.viz-ctrl .seg button:last-child { border-right: 0; }
+.viz-ctrl .seg button.on { background: var(--blk-blue-head); color: #fff; }
+.viz-ctrl .readout { font-size: 17px; color: var(--ink); }
+.viz-ctrl .readout b { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 15px; }
+.viz-ctrl .sp { flex: 1; }
+
+/* stat tiles (live numbers next to a chart) */
+.tiles { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 10px; }
+.tile { background: var(--surface-2); border-radius: 8px; padding: 6px 12px; }
+.tile .k { font-size: 14px; color: var(--ink-muted); }
+.tile .v { font-size: 25px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.viz-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 15px; color: var(--ink-2); }
+.viz-legend .key { display: inline-flex; align-items: center; gap: 6px; }
+.viz-legend .sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.viz-legend .ln { width: 20px; height: 0; border-top: 3px solid; display: inline-block; }
+.viz-legend .ln.dash { border-top-style: dashed; }
+.viz-legend .dt { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+.qv-tip {
+  position: absolute; pointer-events: none; z-index: 20;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+  padding: 5px 9px; font-size: 15px; line-height: 1.3; white-space: nowrap;
+  opacity: 0; transition: opacity .08s;
+}
+.qv-tip.on { opacity: 1; }
+.qv-tip b { font-weight: 700; }
+
+/* ---------- Generated slides ---------- */
+.slide.title-slide { background: var(--surface); }
+.title-slide .bd { justify-content: center; align-items: center; text-align: center; gap: 22px; padding: 0 72px; }
+.title-slide .t-kicker { font-size: 19px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; }
+.title-slide .t-band {
+  position: relative; overflow: hidden; width: 100%;
+  padding: 54px 40px 50px; border-radius: 18px;
+  background: linear-gradient(135deg, #3a3fc0 0%, #1C1C6E 100%);
+  box-shadow: 0 14px 40px rgba(28, 28, 110, .28);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.title-slide .t-title { position: relative; font-size: 64px; font-weight: 700; color: #fff; line-height: 1.04; letter-spacing: -.01em; }
+.title-slide .t-sub { position: relative; font-size: 34px; color: rgba(255, 255, 255, .9); }
+.title-slide .t-author { font-size: 27px; color: var(--ink); margin-top: 10px; }
+.title-slide .t-hint { position: absolute; bottom: 22px; left: 0; right: 0; font-size: 15px; color: var(--ink-muted); }
+.title-slide .t-art { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .55; }
+
+/* section overviews are centred optically by the engine (fitSlide) */
+.toc { display: grid; grid-template-columns: var(--toc-cols, 1fr); gap: 0 40px; align-content: start; }
+.toc .sec { display: flex; flex-direction: column; margin-bottom: 10px; }
+.toc .sec > a { display: flex; gap: 14px; align-items: baseline; color: var(--ink); text-decoration: none; font-size: 24px; font-weight: 600; }
+.toc .sec > a .no { color: var(--brand); min-width: 1.6em; font-variant-numeric: tabular-nums; }
+.toc .sec.dim > a { color: var(--ink-muted); font-weight: 400; }
+.toc .sec.dim > a .no { color: var(--ink-muted); }
+.toc .sec.cur > a { color: var(--brand-ink); }
+.toc .subs { display: flex; flex-direction: column; padding-left: calc(1.6em + 14px); margin-top: 2px; }
+.toc .subs a { color: var(--ink-2); text-decoration: none; font-size: 19px; line-height: 1.35; }
+.toc .subs a .no { color: var(--ink-muted); display: inline-block; min-width: 2.4em; font-variant-numeric: tabular-nums; }
+.toc a:hover { color: var(--t-blue) !important; }
+.toc.compact .sec > a { font-size: 21px; }
+.toc.compact .subs a { font-size: 17px; }
+.toc.compact .sec { margin-bottom: 6px; }
+
+.lect .photo { width: 100%; height: 400px; object-fit: cover; object-position: center top; border-radius: 12px; background: var(--surface-2); }
+.lect .social a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--t-blue); font-size: 19px; }
+.lect .social svg { width: 22px; height: 22px; }
+
+/* ---------- Overlays: outline, help, notes ---------- */
+.panel {
+  position: fixed; z-index: 50; top: 0; bottom: 0; left: 0; width: min(440px, 92vw);
+  background: var(--surface); color: var(--ink);
+  box-shadow: 4px 0 30px rgba(0, 0, 0, .25);
+  transform: translateX(-105%); transition: transform .18s ease;
+  display: flex; flex-direction: column;
+  font-size: 15px;
+}
+.panel.open { transform: none; }
+.panel header { padding: 14px 16px 10px; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 8px; }
+.panel header .ph { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 17px; color: var(--brand-ink); }
+.panel header input { font: 15px "Source Sans 3", sans-serif; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface-2); color: var(--ink); }
+.panel .list { overflow-y: auto; padding: 8px 0 30px; }
+.panel .list .s { padding: 10px 16px 2px; font-weight: 700; color: var(--brand-ink); font-size: 14px; text-transform: uppercase; letter-spacing: .05em; }
+.panel .list .ss { padding: 6px 16px 0 24px; font-weight: 600; color: var(--ink-2); font-size: 13.5px; }
+.panel .list a { display: flex; gap: 10px; padding: 3px 16px 3px 32px; color: var(--ink); text-decoration: none; }
+.panel .list a .n { color: var(--ink-muted); min-width: 2.2em; text-align: right; font-variant-numeric: tabular-nums; }
+.panel .list a:hover { background: var(--surface-2); }
+.panel .list a.cur { background: var(--c-blue-tint); font-weight: 600; }
+.panel .x { cursor: pointer; border: 0; background: none; font-size: 20px; color: var(--ink-muted); }
+
+.help {
+  position: fixed; z-index: 60; inset: 0; display: none; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .45);
+}
+.help.open { display: flex; }
+.help .card { background: var(--surface); color: var(--ink); border-radius: 12px; padding: 22px 28px; min-width: 420px; box-shadow: var(--shadow); font-size: 16px; }
+.help h3 { margin: 0 0 10px; color: var(--brand-ink); }
+.help table td { padding: 3px 12px 3px 0; }
+.help kbd { font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--rule); background: var(--surface-2); }
+
+.notes-pane {
+  position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; max-height: 34vh; overflow-y: auto;
+  background: rgba(20, 20, 32, .94); color: #f2f2f6;
+  font-size: 17px; line-height: 1.45; padding: 14px 28px 18px;
+  display: none;
+}
+.notes-pane.open { display: block; }
+.notes-pane h5 { margin: 0 0 6px; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #b9bdff; }
+aside.notes { display: none !important; }
+
+.toolbar {
+  position: fixed; z-index: 30; right: 12px; bottom: 10px;
+  display: flex; gap: 6px; opacity: 0; transition: opacity .2s;
+}
+body:hover .toolbar { opacity: .9; }
+.toolbar button {
+  font: 600 13px "Source Sans 3", sans-serif;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2);
+  border-radius: 6px; padding: 4px 9px; cursor: pointer;
+}
+.toolbar button:hover { color: var(--ink); border-color: var(--brand); }
+
+/* ---------- Print: one slide per page ---------- */
+@page { size: 1280px 720px; margin: 0; }
+@media print {
+  html, body { height: auto; overflow: visible; background: #fff; }
+  #stage { position: static; transform: none !important; width: 1280px; height: auto; }
+  #deck { height: auto; }
+  .slide { display: flex !important; position: relative; box-shadow: none; break-after: page; page-break-after: always; }
+  .panel, .help, .notes-pane, .toolbar { display: none !important; }
+  .ftr .back { display: none !important; }
+  .viz-ctrl input, .viz-ctrl button, .viz-ctrl select { print-color-adjust: exact; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* inline code inside coloured block titles stays readable */
+.block > h4 code { background: rgba(255, 255, 255, .22); color: inherit; }
+
+/* code shows exactly what is typed (no "->" / "<=" ligatures) */
+pre, code, .mono { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+/* a custom label for an output listing: <pre class="out" data-label="Output (code below)"> */
+pre.out[data-label]::before { content: attr(data-label); }
+pre.out.nolabel::before { content: none; }
+/* text-level elements placed directly in a column keep their normal layout */
+.cols > :is(p, table, pre, ul, ol, dl, span) { display: revert; }
+/* note: booktabs tables keep 21px; set another size with style="font-size:…px" on the table */
+
+/* inline maths glued to touching characters (see glueMath in deck.js) */
+.glue { white-space: nowrap; }
+/* text inside formulas in the sans-serif body font, as in the Beamer decks (\text, \mathrm, operator names) */
+.katex .text, .katex .mathrm, .katex .textrm, .katex .mop .mathrm { font-family: "Source Sans 3", "Segoe UI", sans-serif; }
+/* colour classes also win over element defaults such as .bd dt */
+.bd .c-blue { color: var(--t-blue); } .bd .c-orange { color: var(--t-orange); } .bd .c-green { color: var(--t-green); }
+.bd .c-violet { color: var(--t-violet); } .bd .c-red { color: var(--t-red); } .bd .c-grey { color: var(--t-grey); }
