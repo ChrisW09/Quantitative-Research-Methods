@@ -26,13 +26,20 @@
 .p4a-ftitle { font-size: 16px; color: var(--ink-2); text-align: center; margin: 0 0 -6px 0 !important; }
 .p4a-ftitle.l { text-align: left; }
 .p4a-note { font-size: 19px; color: var(--brand-ink); }
-.p4a-hint { font-size: 16px; color: var(--ink-muted); }
 .p4a-cap { font-size: 16px; color: var(--ink-2); text-align: center; }
 .p4a-panels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
 .p4a-panels > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .p4a-panels .p4a-ftitle { margin: 0 !important; font-size: 18px; }
 .p4a-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .p4a-mini > div { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.p4a-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.p4a-pair > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.p4a-side { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.p4a-side > div { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.p4a-side .tiles { grid-template-columns: 1fr; }
+.p4a-side .viz-ctrl { flex-direction: column; align-items: stretch; gap: 8px; }
+.p4a-verdict { font-size: 18px; line-height: 1.3; }
+.viz-ctrl.p4a-tightrow { gap: 6px 14px; padding: 5px 10px; }
 table.bt.p4a-tight th, table.bt.p4a-tight td { padding: 2px 8px; }
 table.bt.p4a-tight2 th, table.bt.p4a-tight2 td { padding: 1px 5px; }
 table.bt.p4a-left td, table.bt.p4a-left th { text-align: left; }
@@ -133,12 +140,12 @@ table.bt.p4a-mid td { vertical-align: middle; }
   P.resid = (ch, X, Y, o = {}) => {
     const g = ch.layer(o.layer || "data").append("g");
     const api = {
-      g,
+      g, signed: !!o.signed,
       set(b0, b1, active) {
         const d = X.map((x, i) => [x, Y[i], b0 + b1 * x, i]).filter((d) => !active || active(d[3]));
         g.selectAll("line").data(d).join("line")
           .attr("x1", (d) => ch.x(d[0])).attr("x2", (d) => ch.x(d[0])).attr("y1", (d) => ch.y(d[1])).attr("y2", (d) => ch.y(d[2]))
-          .style("stroke", (d) => (o.signed ? (d[1] - d[2] > 1e-9 ? C.green : d[1] - d[2] < -1e-9 ? C.red : C.grey) : o.color || C.red))
+          .style("stroke", (d) => (api.signed ? (d[1] - d[2] > 1e-9 ? C.green : d[1] - d[2] < -1e-9 ? C.red : C.grey) : o.color || C.red))
           .style("stroke-width", o.width || 2.5).style("opacity", o.opacity ?? 1);
         return api;
       },
@@ -156,7 +163,7 @@ table.bt.p4a-mid td { vertical-align: middle; }
         const sel = g.selectAll("rect").data(d).join("rect")
           .attr("x", (d) => ch.x(d.x)).attr("width", (d) => Math.abs(ch.x(d.x + Math.abs(d.u)) - ch.x(d.x)))
           .attr("y", (d) => ch.y(Math.max(d.y, d.yh))).attr("height", (d) => Math.abs(ch.y(d.y) - ch.y(d.yh)))
-          .style("fill", C.red).style("fill-opacity", 0.15).style("stroke", C.red).style("stroke-width", 1.3);
+          .style("fill", C.red).style("fill-opacity", 0.15).style("stroke", C.red).style("stroke-width", 2);
         if (o.tip !== false) QV.attachTip(ch, sel, (d) => `${o.unit || "Obs."} ${d.i + 1}: û = ${P.f(d.u, 2)}<br>area û² = <b>${P.f(d.u * d.u, 2)}</b>`);
         return d.reduce((s, v) => s + v.u * v.u, 0);
       },
@@ -186,23 +193,95 @@ table.bt.p4a-mid td { vertical-align: middle; }
     return c.set(x, y);
   };
   /** Dashed grey guide line through points. */
-  P.guide = (ch, pts, o = {}) => QV.line(ch, pts, { color: o.color || C.grey, width: o.width || 1.6, dash: o.dash || "6 4", layer: o.layer || "data" });
+  P.guide = (ch, pts, o = {}) => QV.line(ch, pts, { color: o.color || C.grey, width: o.width || 2.5, dash: o.dash || "6 4", layer: o.layer || "data" });
   /** Double arrow between (x1, y) and (x2, y). */
   P.span = (ch, x1, x2, y, o = {}) => {
-    const s = QV.segment(ch, x1, y, x2, y, { color: o.color || C.ink2, width: 1.6, arrow: true, layer: "annot" });
+    const s = QV.segment(ch, x1, y, x2, y, { color: o.color || C.ink2, width: 2.5, arrow: true, layer: "annot" });
     s.attr("marker-start", s.attr("marker-end"));
     return s;
   };
   P.sum = (a) => a.reduce((s, v) => s + v, 0);
-  /** Online shop with the two proposed lines (exercises 3 and 4). */
-  P.shopTwoLines = (el) => {
+  /** Rule of thumb of the slide "strength of the relationship" in words. */
+  P.rword = (r) => {
+    const a = Math.abs(r);
+    if (a < 0.005) return "no linear relationship";
+    if (a > 0.995) return "all points exactly on a line";
+    return (a > 0.8 ? "strong " : a >= 0.5 ? "moderate " : "weak ") + (r > 0 ? "positive" : "negative") + " correlation";
+  };
+  /** Signed number for read-outs ("+4", "−3"). */
+  P.sg = (v, d = 2) => (v > 0 ? "+" : "") + P.f(v, d);
+  /** Large invisible targets on top of small data points (easy to hit with a mouse on a projector or a finger). */
+  P.hit = (ch, X, Y, fn, tip) => {
+    const sel = ch.layer("front").append("g").selectAll("circle").data(X.map((x, i) => [x, Y[i], i])).join("circle")
+      .attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1])).attr("r", 14).style("fill", "transparent");
+    if (tip) QV.attachTip(ch, sel, (d) => tip(d[2]));
+    sel.style("cursor", "pointer").on("click", (e, d) => fn(d[2]));
+    return sel;
+  };
+  /** Orange handle that slides along the line b0 + b1 x. o: {b0, b1, x, min, max, step, onMove(x, yhat)} -> {x, set(x, fire)} */
+  P.probe = (ch, o) => {
+    const c = ch.layer("front").append("circle").attr("r", o.r || 9).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2.5);
+    const st = o.step || 0.5;
+    const api = {
+      el: c, x: o.x,
+      set(x, fire = true) {
+        api.x = Math.max(o.min, Math.min(o.max, +(Math.round(x / st) * st).toFixed(6)));
+        c.attr("cx", ch.x(api.x)).attr("cy", ch.y(o.b0 + o.b1 * api.x));
+        if (fire && o.onMove) o.onMove(api.x, o.b0 + o.b1 * api.x);
+        return api;
+      },
+    };
+    QV.drag(ch, c, (xv) => api.set(xv));
+    return api.set(o.x, false);
+  };
+  /** A line placed with two orange handles (dragged vertically at x = xa and x = xb). o: {xa, xb, ya, yb, step, color, onMove(b0, b1)} */
+  P.handleLine = (ch, o) => {
+    const ends = [[o.xa, o.ya], [o.xb, o.yb]], st = o.step || 0.1;
+    const [lo, hi] = ch.y.domain();
+    const ln = P.line(ch, 0, 0, { color: o.color || C.ink2, width: 3 });
+    const hd = QV.dots(ch, ends, { r: 9, color: C.orange, layer: "front" });
+    const api = {
+      ln, hd,
+      coef() { const b1 = (ends[1][1] - ends[0][1]) / (ends[1][0] - ends[0][0]); return [ends[0][1] - b1 * ends[0][0], b1]; },
+      redraw(fire = true) {
+        const [b0, b1] = api.coef();
+        ln.set(b0, b1); hd.attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
+        if (fire && o.onMove) o.onMove(b0, b1);
+        return api;
+      },
+      set(b0, b1, fire = true) { ends[0][1] = b0 + b1 * o.xa; ends[1][1] = b0 + b1 * o.xb; return api.redraw(fire); },
+      show(on) { ln.style("display", on ? null : "none"); hd.style("display", on ? null : "none"); return api; },
+    };
+    QV.drag(ch, hd, (xv, yv, d) => { d[1] = Math.max(lo, Math.min(hi, +(Math.round(yv / st) * st).toFixed(6))); api.redraw(); });
+    return api.redraw(false);
+  };
+  /** Online shop with the two proposed lines (exercises 3 and 4). The residuals of one line can be shown on request;
+      o.values also prints them (exercise 4, where they are given on the slide). */
+  P.shopTwoLines = (el, o = {}) => {
     const X = P.D.shop.x, Y = P.D.shop.y;
     const ch = P.chart(el, P.ax("shop"));
-    P.line(ch, 23, 1, { color: C.orange, width: 3 });
-    P.line(ch, 20, 2, { color: C.violet, width: 3 });
+    const LN = { 1: { b0: 23, b1: 1, eq: "\\hat y = 23 + x" }, 2: { b0: 20, b1: 2, eq: "\\hat y = 20 + 2\\,x" } };
+    const res = P.resid(ch, X, Y, { width: 3 });
+    const l1 = P.line(ch, 23, 1, { color: C.orange, width: 3 }), l2 = P.line(ch, 20, 2, { color: C.violet, width: 3 });
     P.dots(ch, X, Y, { r: 6.5, tip: (i) => `<b>Month ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}` });
-    P.tex(ch, 0.15, 25.0, "\\text{Line 1}", { anchor: "start", baseline: "bottom", bg: true, color: C.tOrange, size: 15 });
-    P.tex(ch, 0.15, 19.6, "\\text{Line 2}", { anchor: "start", baseline: "top", bg: true, color: C.tViolet, size: 15 });
+    const t1 = P.tex(ch, 0.15, 25.0, "\\text{Line 1}", { anchor: "start", baseline: "bottom", bg: true, color: C.tOrange, size: 15 });
+    const t2 = P.tex(ch, 0.15, 19.6, "\\text{Line 2}", { anchor: "start", baseline: "top", bg: true, color: C.tViolet, size: 15 });
+    const labs = X.map(() => P.tex(ch, 0, 0, "", { anchor: "start", dx: 8, bg: true, size: 15, color: C.tRed }));
+    const row = QV.controls(el);
+    const show = (v) => {
+      l1.style("opacity", v === "2" ? 0.18 : 1); l2.style("opacity", v === "1" ? 0.18 : 1);
+      t1.style.opacity = v === "2" ? 0.3 : 1; t2.style.opacity = v === "1" ? 0.3 : 1;
+      if (v === "both") res.set(0, 0, () => false); else res.set(LN[v].b0, LN[v].b1);
+      labs.forEach((t, i) => {
+        if (v === "both" || !o.values) { t.style.display = "none"; return; }
+        const yh = LN[v].b0 + LN[v].b1 * X[i];
+        t.style.display = ""; t.set(X[i], (Y[i] + yh) / 2, P.t(Y[i] - yh));
+      });
+      ro.set(v === "both" ? "" : `<strong>Line ${v}</strong>: &nbsp;$${LN[v].eq}$` + (o.values ? `, &nbsp;$\\hat u_i$: $${X.map((x, i) => P.t(Y[i] - LN[v].b0 - LN[v].b1 * x)).join(",\\ ")}$` : ""));
+    };
+    QV.segmented(row, { label: "Show", options: [["both", "both lines"], ["1", "residuals of Line 1"], ["2", "residuals of Line 2"]], value: "both", onChange: show });
+    const ro = QV.readout(row, "");
+    show("both");
     return ch;
   };
   /** Axis names "x" / "y" next to a frame without tick labels. */
@@ -355,8 +434,8 @@ table.bt.p4a-mid td { vertical-align: middle; }
   <div class="cols" style="--cols: 51fr 47fr">
     <div>
       <p class="p4a-ftitle">Lamp example: price and sales quantity</p>
-      <div class="viz" id="p4a-scatter" style="height:430px"></div>
-      <p class="p4a-hint">Hover over a point: each point is one store.</p>
+      <div class="viz" id="p4a-scatter" style="height:405px"></div>
+      <p class="hint">Click a point: which store is it, and where do its two values sit on the axes?</p>
     </div>
     <div>
       <div class="block"><h4>Idea</h4>
@@ -370,18 +449,31 @@ table.bt.p4a-mid td { vertical-align: middle; }
   </div>
   <script>
   QV.mount("#p4a-scatter", (el) => {
-    const P = P4A, X = P.D.lamp.x, Y = P.D.lamp.y;
+    const P = P4A, C = QV.C, X = P.D.lamp.x, Y = P.D.lamp.y;
     const ch = P.chart(el, P.ax("lamp"));
-    P.dots(ch, X, Y, { r: 6.5, tip: (i) => `<b>Store ${i + 1}</b><br>price x = ${X[i]} EUR<br>quantity y = ${Y[i]}` });
+    const drop = P.guide(ch, [], { color: C.orange });
+    const dots = P.dots(ch, X, Y, { r: 6.5 });
+    const ro = QV.readout(QV.controls(el), "Each point is one store: &nbsp;$(x_i,\\,y_i)$ = (price, quantity)");
+    P.hit(ch, X, Y, (i) => {
+      QV.setLine(ch, drop, [[X[i], 0], [X[i], Y[i]], [75, Y[i]]]);
+      dots.style("fill", (d) => (d[2] === i ? C.orange : C.blue)).attr("r", (d) => (d[2] === i ? 8 : 6.5));
+      ro.set(`<strong>Store ${i + 1}</strong>: &nbsp;price $x_{${i + 1}} = ${X[i]}$ EUR, &nbsp;quantity $y_{${i + 1}} = ${Y[i]}$`);
+    }, (i) => `<b>Store ${i + 1}</b>: (${X[i]}, ${Y[i]})`);
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which store sold the most lamps, and at what price?</li>
+    <li>Click the point top left: store 1, 80 EUR, 20 lamps. The orange lines lead to both axes.</li>
+    <li>Click from left to right: the price rises, the quantity falls &ndash; falling, strong, roughly linear.</li>
+  </ol></aside>
 </section>
 
 <section class="slide" data-subsection="Covariance and correlation">
   <h2>Covariance: how do we measure the direction of a relationship?</h2>
   <div class="cols" style="--cols: 56fr 42fr">
     <div>
-      <div class="viz" id="p4a-quad" style="height:370px"></div>
+      <div class="viz" id="p4a-quad" style="height:350px"></div>
+      <p class="hint">Drag a point: its colour, the means and the covariance follow.</p>
     </div>
     <div>
       <div class="block"><h4>Idea: four quadrants</h4>
@@ -406,12 +498,13 @@ table.bt.p4a-mid td { vertical-align: middle; }
     P.tex(ch, 112.5, 20.5, "(+)\\cdot(+) = +", { color: C.tGreen, bg: true, size: 15 });
     P.tex(ch, 87.5, -1.8, "(-)\\cdot(-) = +", { color: C.tGreen, bg: true, size: 15 });
     P.tex(ch, 112.5, -1.8, "(+)\\cdot(-) = -", { color: C.tRed, bg: true, size: 15 });
-    const dots = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", 7)
+    const dots = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", 8)
       .style("stroke", C.surface).style("stroke-width", 2);
-    let showRect = false, mx = 100, my = 10;
+    let showRect = false, mx = 100, my = 10, cur = null;
+    const par = (v) => (v < 0 ? `(${P.t(v, 2)})` : P.t(v, 2));
     QV.attachTip(ch, dots, (d) => `<b>Store ${d.i + 1}</b> (${P.f(d.x, 1)}, ${P.f(d.y, 1)})<br>(${P.f(d.x - mx, 2)}) · (${P.f(d.y - my, 2)}) = <b>${P.f((d.x - mx) * (d.y - my), 2)}</b>`);
     const row = QV.controls(el);
-    const t = QV.tiles(row.parentNode, ["$S_{xy}$ (sum of products)", "$s_{xy} = S_{xy}/(n-1)$", "$r_{xy}$"], "append");
+    const t = QV.tiles(row, ["negative / positive", "$S_{xy}$ (sum)", "$s_{xy} = S_{xy}/(n-1)$", "$r_{xy}$"], "after");
     const update = () => {
       const X = pts.map((p) => p.x), Y = pts.map((p) => p.y);
       mx = S.mean(X); my = S.mean(Y);
@@ -423,17 +516,25 @@ table.bt.p4a-mid td { vertical-align: middle; }
         .attr("x", (d) => Math.min(ch.x(d.x), ch.x(mx))).attr("width", (d) => Math.abs(ch.x(d.x) - ch.x(mx)))
         .attr("y", (d) => Math.min(ch.y(d.y), ch.y(my))).attr("height", (d) => Math.abs(ch.y(d.y) - ch.y(my)))
         .style("fill", col).style("fill-opacity", 0.12).style("stroke", col).style("stroke-width", 1);
-      const Sxy = P.sum(pts.map((p) => (p.x - mx) * (p.y - my)));
-      t.set(0, P.f(Sxy, 2)); t.set(1, P.f(Sxy / (pts.length - 1), 2)); t.set(2, P.ff(S.corr(X, Y), 4));
+      const prod = pts.map((p) => (p.x - mx) * (p.y - my)), Sxy = P.sum(prod);
+      const neg = prod.filter((v) => v < -1e-9).length, pos = prod.filter((v) => v > 1e-9).length;
+      t.set(0, `<span class="c-red">${neg}</span> / <span class="c-green">${pos}</span>`);
+      t.set(1, P.f(Sxy, 2)); t.set(2, P.f(Sxy / (pts.length - 1), 2)); t.set(3, P.ff(S.corr(X, Y), 4));
+      ro.set(cur ? `<strong>Store ${cur.i + 1}</strong>: &nbsp;$${par(cur.x - mx)} \\cdot ${par(cur.y - my)} = ${P.t(prod[cur.i], 2)}$` : "product $(x_i - \\bar x)(y_i - \\bar y)$ of a store");
     };
-    QV.drag(ch, dots, (xv, yv, d) => { d.x = Math.round(xv * 2) / 2; d.y = Math.round(yv * 2) / 2; update(); });
-    dots.style("cursor", "grab");
+    QV.drag(ch, dots, (xv, yv, d) => { d.x = Math.round(xv * 2) / 2; d.y = Math.round(yv * 2) / 2; cur = d; update(); });
+    dots.style("cursor", "grab").on("pointerenter.sel", (e, d) => { cur = d; update(); });
     const bR = QV.button(row, "Show rectangles", () => { showRect = !showRect; bR.setLabel(showRect ? "Hide rectangles" : "Show rectangles"); update(); });
-    QV.button(row, "Reset", () => { pts.forEach((p) => { p.x = P.D.lamp.x[p.i]; p.y = P.D.lamp.y[p.i]; }); update(); });
-    QV.readout(row, "Drag a point: colours, means and $s_{xy}$ update.");
+    QV.button(row, "Reset", () => { pts.forEach((p) => { p.x = P.D.lamp.x[p.i]; p.y = P.D.lamp.y[p.i]; }); cur = null; update(); });
+    const ro = QV.readout(row, "");
     update();
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: in which quadrants do most points lie &ndash; and what does that mean for the sum of the products?</li>
+    <li>&ldquo;Show rectangles&rdquo;: each area is the size of one product, red means negative.</li>
+    <li>Drag the green point (store 4) far up to the right: its product grows and the covariance becomes less negative.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -505,7 +606,8 @@ table.bt.p4a-mid td { vertical-align: middle; }
     </div>
     <div>
       <p class="p4a-ftitle">Template for your drawing</p>
-      <div class="viz" id="p4a-ex1" style="height:380px"></div>
+      <div class="viz" id="p4a-ex1" style="height:360px"></div>
+      <p class="hint">Click into the grid to place a point (click it again to remove it), then check with the data.</p>
     </div>
   </div>
   <script>
@@ -513,41 +615,55 @@ table.bt.p4a-mid td { vertical-align: middle; }
     const P = P4A, C = QV.C, X = P.D.shop.x, Y = P.D.shop.y;
     const ch = P.chart(el, P.ax("shop"));
     const mine = [];
-    const gMine = ch.layer("annot").append("g");
-    const drawMine = () => gMine.selectAll("circle").data(mine).join("circle")
-      .attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1])).attr("r", 6)
-      .style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2);
+    let checked = false;
+    const gData = ch.layer("annot").append("g"), gMine = ch.layer("front").append("g");
+    const isData = (d) => X.some((x, i) => x === d[0] && Y[i] === d[1]);
+    const row = QV.controls(el);
+    const draw = () => {
+      gData.selectAll("circle").data(checked ? X.map((x, i) => [x, Y[i]]) : []).join("circle")
+        .attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1])).attr("r", 6.5)
+        .style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 2);
+      gMine.selectAll("circle").data(mine).join("circle")
+        .attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1])).attr("r", 8)
+        .style("fill", (d) => (!checked ? C.orange : isData(d) ? C.green : C.red)).style("stroke", C.surface).style("stroke-width", 2);
+      const ok = mine.filter(isData).length;
+      ro.set(!checked ? `your points: <strong>${mine.length}</strong> of 5`
+        : mine.length ? `<span class="c-green">correct: <strong>${ok}</strong></span> of ${mine.length}` : "the five months");
+    };
     ch.svg.style("cursor", "crosshair").on("click", (e) => {
       const [xv, yv] = ch.toData(e);
-      if (xv < 0 || xv > 6 || yv < 16 || yv > 34) return;
-      mine.push([Math.round(xv * 2) / 2, Math.round(yv)]); drawMine();
+      if (xv < -0.2 || xv > 6.2 || yv < 15.5 || yv > 34.5) return;
+      const q = [Math.max(0, Math.min(6, Math.round(xv * 2) / 2)), Math.max(16, Math.min(34, Math.round(yv)))];
+      const k = mine.findIndex((d) => d[0] === q[0] && d[1] === q[1]);
+      if (k >= 0) mine.splice(k, 1); else mine.push(q);
+      draw();
     });
-    let data = null;
-    const row = QV.controls(el);
-    const bS = QV.button(row, "Show the data", () => {
-      if (data) { data.remove(); data = null; bS.setLabel("Show the data"); return; }
-      const sel = P.dots(ch, X, Y, { r: 6, layer: "front", tip: (i) => `Month ${i + 1}: x = ${X[i]}, y = ${Y[i]}` });
-      data = d3.select(sel.node().parentNode);
-      bS.setLabel("Hide the data");
-    });
-    QV.button(row, "Clear my points", () => { mine.length = 0; drawMine(); });
-    QV.readout(row, "Click into the grid to place your points.");
+    const bS = QV.button(row, "Check with the data", () => { checked = !checked; bS.setLabel(checked ? "Hide the data" : "Check with the data"); draw(); });
+    QV.button(row, "Clear my points", () => { mine.length = 0; draw(); });
+    const ro = QV.readout(row, "");
+    draw();
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Work phase: the grid is empty. Let students name the five points of the table and click them in.</li>
+    <li>&ldquo;Check with the data&rdquo;: correct points turn green, wrong ones red.</li>
+    <li>Ask for the pattern: more advertising goes with more revenue.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
   <h2>Solution &ndash; online shop (1): scatter plot and covariance</h2>
   <div class="cols" style="--cols: 44fr 54fr">
     <div>
-      <div class="viz" id="p4a-sol1" style="height:340px"></div>
+      <div class="viz" id="p4a-sol1" style="height:330px"></div>
+      <p class="hint">Click a point: its two deviations span a rectangle &ndash; the product in the table.</p>
       <p><b>(1)</b> More advertising tends to go with more revenue: a <b>positive</b>, roughly linear relationship.</p>
     </div>
     <div>
       <div class="block"><h4>(2) Means</h4>
         <p>$\bar{x} = 15/5 = \mathbf{3}$, &emsp;&emsp; $\bar{y} = 130/5 = \mathbf{26}$</p></div>
       <div class="block"><h4>(3) Rule: $s_{xy} = \sum (x_i-\bar{x})(y_i-\bar{y}) / (n-1)$</h4>
-        <table class="bt p4a-tight">
+        <table class="bt p4a-tight" id="p4a-sol1-tab">
           <thead><tr><th>$i$</th><th>$x_i$</th><th>$y_i$</th><th>$x_i-\bar{x}$</th><th>$y_i-\bar{y}$</th><th>$(x_i-\bar{x})(y_i-\bar{y})$</th></tr></thead>
           <tbody>
             <tr><td>1</td><td>1</td><td>21</td><td>$-2$</td><td>$-5$</td><td>$10$</td></tr>
@@ -563,14 +679,41 @@ table.bt.p4a-mid td { vertical-align: middle; }
   </div>
   <script>
   QV.mount("#p4a-sol1", (el) => {
-    const P = P4A, X = P.D.shop.x, Y = P.D.shop.y;
+    const P = P4A, C = QV.C, X = P.D.shop.x, Y = P.D.shop.y;
     const ch = P.chart(el, P.ax("shop"));
+    const gR = ch.layer("data").append("g");
     P.guide(ch, [[3, 16], [3, 34]]); P.guide(ch, [[0, 26], [6, 26]]);
-    P.tex(ch, 3, 16.2, "\\bar{x}", { anchor: "start", baseline: "bottom", dx: 4, color: QV.C.tGrey });
-    P.tex(ch, 0.1, 26, "\\bar{y}", { anchor: "start", baseline: "bottom", dy: -2, color: QV.C.tGrey });
-    P.dots(ch, X, Y, { r: 6.5, tip: (i) => `<b>Month ${i + 1}</b> (${X[i]}, ${Y[i]})<br>x − x̄ = ${P.f(X[i] - 3)}, y − ȳ = ${P.f(Y[i] - 26)}<br>product = <b>${P.f((X[i] - 3) * (Y[i] - 26))}</b>` });
+    P.tex(ch, 3, 16.2, "\\bar{x}", { anchor: "start", baseline: "bottom", dx: 4, color: C.tGrey });
+    P.tex(ch, 0.1, 26, "\\bar{y}", { anchor: "start", baseline: "bottom", dy: -2, color: C.tGrey });
+    const dots = P.dots(ch, X, Y, { r: 6.5 });
+    const rows = document.querySelectorAll("#p4a-sol1-tab tbody tr:not(.mid)");
+    const prod = (i) => (X[i] - 3) * (Y[i] - 26);
+    const col = (i) => (prod(i) > 0 ? C.green : prod(i) < 0 ? C.red : C.grey);
+    const par = (v) => (v < 0 ? `(${P.t(v)})` : P.t(v));
+    let cur = -1, all = false;
+    const row = QV.controls(el);
+    const draw = () => {
+      gR.selectAll("rect").data(X.map((x, i) => i).filter((i) => all || i === cur)).join("rect")
+        .attr("x", (i) => Math.min(ch.x(X[i]), ch.x(3))).attr("width", (i) => Math.abs(ch.x(X[i]) - ch.x(3)))
+        .attr("y", (i) => Math.min(ch.y(Y[i]), ch.y(26))).attr("height", (i) => Math.abs(ch.y(Y[i]) - ch.y(26)))
+        .style("fill", col).style("fill-opacity", 0.16).style("stroke", col).style("stroke-width", 2.5);
+      dots.style("fill", (d) => (all || d[2] === cur ? col(d[2]) : C.blue)).attr("r", (d) => (d[2] === cur ? 8 : 6.5));
+      rows.forEach((r, i) => r.querySelectorAll("td").forEach((td) => td.classList.toggle("hl", i === cur)));
+      ro.set(cur >= 0 ? `<strong>Month ${cur + 1}</strong>: &nbsp;$${par(X[cur] - 3)} \\cdot ${par(Y[cur] - 26)} = ${P.t(prod(cur))}$`
+        : all ? "$S_{xy} = 10 + 0 + 0 + 4 + 6 = 20$" : "");
+    };
+    P.hit(ch, X, Y, (i) => { cur = cur === i ? -1 : i; draw(); }, (i) => `<b>Month ${i + 1}</b>: (${X[i]}, ${Y[i]})`);
+    const bA = QV.button(row, "Show all products", () => { all = !all; cur = -1; bA.setLabel(all ? "Hide the products" : "Show all products"); draw(); });
+    const ro = QV.readout(row, "");
+    draw();
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which months lie above both means?</li>
+    <li>Click month 4: $1 \cdot 4 = 4$, a green rectangle top right.</li>
+    <li>Click month 1: $(-2)\cdot(-5) = 10$ &ndash; bottom left, positive as well.</li>
+    <li>&ldquo;Show all products&rdquo;: no red rectangle, $S_{xy} = 20 &gt; 0$.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -586,12 +729,14 @@ table.bt.p4a-mid td { vertical-align: middle; }
 <section class="slide">
   <h2>Correlation coefficient &ndash; strength of the relationship</h2>
   <div class="p4a-panels">
-    <div><p class="p4a-ftitle">$r = 0.95$</p><div class="viz" id="p4a-cp1" style="height:150px"></div></div>
-    <div><p class="p4a-ftitle">$r = 0.6$</p><div class="viz" id="p4a-cp2" style="height:150px"></div></div>
-    <div><p class="p4a-ftitle">$r = 0$</p><div class="viz" id="p4a-cp3" style="height:150px"></div></div>
-    <div><p class="p4a-ftitle">$r = -0.8$</p><div class="viz" id="p4a-cp4" style="height:150px"></div></div>
-    <div><p class="p4a-ftitle" id="p4a-cp5-t">Explore</p><div class="viz" id="p4a-cp5" style="height:150px"></div></div>
+    <div><p class="p4a-ftitle">$r = 0.95$</p><div class="viz" id="p4a-cp1" style="height:164px"></div></div>
+    <div><p class="p4a-ftitle">$r = 0.6$</p><div class="viz" id="p4a-cp2" style="height:164px"></div></div>
+    <div><p class="p4a-ftitle">$r = 0$</p><div class="viz" id="p4a-cp3" style="height:164px"></div></div>
+    <div><p class="p4a-ftitle">$r = -0.8$</p><div class="viz" id="p4a-cp4" style="height:164px"></div></div>
+    <div><p class="p4a-ftitle" id="p4a-cp5-t">Explore</p><div class="viz" id="p4a-cp5" style="height:164px"></div></div>
   </div>
+  <div class="viz-ctrl p4a-tightrow" id="p4a-cp-ctrl"></div>
+  <p class="hint">Orange panel: move the slider or pick a value &ndash; or let the class guess $r$ for a new cloud.</p>
   <div class="cols" style="--cols: 44fr 54fr">
     <div class="block"><h4>Rule of thumb</h4>
       <table class="bt p4a-left p4a-tight fs-s">
@@ -619,30 +764,54 @@ table.bt.p4a-mid td { vertical-align: middle; }
     };
     const panel = (el) => P.chart(el, { x: [0, 10], y: [0.8, 9.2], hideX: true, hideY: true, grid: false, frame: true, margin: { top: 4, right: 4, bottom: 4, left: 4 } });
     const tip = (d) => `(${P.ff(d[0], 2)}, ${P.ff(d[1], 2)})`;
-    Object.keys(SETS).forEach((id) => QV.mount("#" + id, (el) => { QV.dots(panel(el), SETS[id], { r: 3.6, tip }); }));
-    // explorer: fixed x, seeded noise made exactly uncorrelated with x -> sample r is exactly the slider value
+    Object.keys(SETS).forEach((id) => QV.mount("#" + id, (el) => { QV.dots(panel(el), SETS[id], { r: 4.5, tip }); }));
+    // explorer: fixed x, seeded noise made exactly uncorrelated with x -> the sample r is exactly the chosen value
     QV.mount("#p4a-cp5", (el) => {
-      const S = QV.stats, X = SETS["p4a-cp1"].map((d) => d[0]), n = X.length;
-      const R = QV.rng(11), Z = X.map(() => R.normal());
+      const S = QV.stats, X = SETS["p4a-cp1"].map((d) => d[0]);
       const mx = S.mean(X), sx = S.sd(X), zx = X.map((x) => (x - mx) / sx);
-      const b = S.sum(Z.map((z, i) => z * zx[i])) / S.sum(zx.map((v) => v * v));
-      const E0 = Z.map((z, i) => z - b * zx[i]), me = S.mean(E0), se = S.sd(E0), E = E0.map((e) => (e - me) / se);
+      const noise = (seed) => {
+        const R = QV.rng(seed), Z = X.map(() => R.normal());
+        const b = S.sum(Z.map((z, i) => z * zx[i])) / S.sum(zx.map((v) => v * v));
+        const E0 = Z.map((z, i) => z - b * zx[i]), me = S.mean(E0), se = S.sd(E0);
+        return E0.map((e) => (e - me) / se);
+      };
+      let E = noise(11), r = 0.3, hidden = false;
       const ch = panel(el);
       const pts = X.map((x) => [x, 5]);
-      const dots = QV.dots(ch, pts, { r: 3.6, color: QV.C.orange, tip });
+      const dots = QV.dots(ch, pts, { r: 4.5, color: QV.C.orange, tip });
       const title = document.getElementById("p4a-cp5-t");
-      const set = (r) => {
-        pts.forEach((p, i) => { p[1] = 5 + 1.45 * (r * zx[i] + Math.sqrt(Math.max(0, 1 - r * r)) * E[i]); });
+      const row = document.getElementById("p4a-cp-ctrl");
+      const GUESS = "Guess $r$: new cloud";
+      const draw = () => {
+        const v = zx.map((z, i) => r * z + Math.sqrt(Math.max(0, 1 - r * r)) * E[i]);
+        const k = Math.min(1.45, 3.9 / Math.max(...v.map(Math.abs)));      // the scale does not change r
+        pts.forEach((p, i) => { p[1] = 5 + k * v[i]; });
         dots.attr("cy", (d) => ch.y(d[1]));
-        title.innerHTML = "Explore: " + Deck.tex(`r = ${P.tt(S.corr(X, pts.map((p) => p[1])), 2)}`);
+        title.innerHTML = hidden ? "Guess: " + Deck.tex("r = \\text{?}") : "Explore: " + Deck.tex(`r = ${P.tt(r, 2)}`);
+        sl.input.parentNode.style.visibility = hidden ? "hidden" : "";
+        bQ.setLabel(hidden ? "Reveal $r$" : GUESS);
+        ro.set(hidden ? "How strong is the relationship &ndash; and which sign?" : `$r = ${P.tt(r, 2)}$: <strong>${P.rword(r)}</strong>`);
       };
-      const row = QV.controls(el);
-      row.style.padding = "4px 8px";
-      QV.slider(row, { label: "$r$", min: -1, max: 1, step: 0.05, value: 0.3, width: 118, fmt: (v) => P.ff(v, 2), onInput: set });
-      set(0.3);
+      const sl = QV.slider(row, { label: "$r$ (orange panel)", min: -1, max: 1, step: 0.05, value: 0.3, width: 150, fmt: (v) => P.ff(v, 2),
+        onInput: (v) => { r = v; hidden = false; seg.set("", false); draw(); } });
+      const seg = QV.segmented(row, { label: "set $r$ to", options: [["-1", "−1"], ["0.5", "0.5"], ["0.8", "0.8"], ["1", "1"]], value: "",
+        onChange: (v) => { r = +v; hidden = false; sl.set(r, false); draw(); } });
+      const Q = QV.rng(23), POOL = [-0.9, -0.7, -0.4, 0.2, 0.5, 0.7, 0.9];
+      const bQ = QV.button(row, GUESS, () => {
+        if (hidden) { hidden = false; sl.set(r, false); }
+        else { r = Q.choice(POOL); E = noise(Q.int(1, 99999)); hidden = true; seg.set("", false); }
+        draw();
+      });
+      const ro = QV.readout(row, "");
+      draw();
     });
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Set $r$ to $0.5$ and $0.8$: how tight must a cloud be to count as &ldquo;strong&rdquo;?</li>
+    <li>Set $1$ and $-1$: all points exactly on a line.</li>
+    <li>&ldquo;Guess $r$&rdquo;: collect guesses for the new cloud, then reveal &ndash; repeat two or three times.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -706,6 +875,7 @@ table.bt.p4a-mid td { vertical-align: middle; }
         <p class="p4a-ftitle" id="p4a-ushape-t" style="font-size:18px">$r = 0$</p>
         <div class="viz" id="p4a-ushape" style="height:270px"></div>
         <p>A clear U-shape &ndash; and yet $r_{xy} = 0$. Always look at the scatter plot first.</p></div>
+      <p class="hint">Use only the left or only the right half of the points: what is $r$ there?</p>
     </div>
   </div>
   <script>
@@ -714,20 +884,27 @@ table.bt.p4a-mid td { vertical-align: middle; }
     const U = [[0.00,8.73],[0.50,6.27],[1.00,5.48],[1.50,3.41],[2.00,3.16],[2.50,2.18],[3.00,1.10],[3.50,0.86],[4.00,-0.01],[4.50,-0.42],[5.00,0.10],[5.50,-0.42],[6.00,-0.01],[6.50,0.86],[7.00,1.10],[7.50,2.18],[8.00,3.16],[8.50,3.41],[9.00,5.48],[9.50,6.27],[10.00,8.73]];
     el.style.width = "440px"; el.style.alignSelf = "center";
     const ch = P.chart(el, { x: [-0.5, 10.5], y: [-1.5, 9.8], hideX: true, hideY: true, grid: false, frame: true, margin: { top: 4, right: 4, bottom: 4, left: 4 } });
-    const dots = QV.dots(ch, U, { r: 4.5, tip: (d) => `(${P.ff(d[0], 2)}, ${P.ff(d[1], 2)})` });
+    const dots = QV.dots(ch, U, { r: 5, tip: (d) => `(${P.ff(d[0], 2)}, ${P.ff(d[1], 2)})` });
     const title = document.getElementById("p4a-ushape-t");
     const upd = (v) => {
       const act = (d) => v === "all" || (v === "left" ? d[0] <= 5 : d[0] >= 5);
       dots.style("fill", (d) => (act(d) ? C.blue : C.grey)).style("opacity", (d) => (act(d) ? 1 : 0.35));
       const A = U.filter(act), r = S.corr(A.map((d) => d[0]), A.map((d) => d[1]));
       title.innerHTML = Deck.tex(`r = ${Math.abs(r) < 0.005 ? "0" : P.tt(r, 2)}`) + (v === "all" ? "" : ` &nbsp;(${v} half only)`);
+      ro.set(v === "all" ? "" : `<strong>${P.rword(r)}</strong>`);
     };
     const row = QV.controls(el);
     row.style.alignSelf = "stretch";
     QV.segmented(row, { label: "Use", options: [["all", "all points"], ["left", "left half"], ["right", "right half"]], value: "all", onChange: upd });
+    const ro = QV.readout(row, "");
     upd("all");
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: the points clearly follow a pattern &ndash; why is $r = 0$?</li>
+    <li>&ldquo;Left half&rdquo;: a strong negative correlation. &ldquo;Right half&rdquo;: equally strong, but positive.</li>
+    <li>Together the two halves cancel: $r$ only measures the <em>linear</em> part.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -782,6 +959,7 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     <div>
       <p class="p4a-ftitle">Regression: <em>how many units per euro?</em></p>
       <div class="viz" id="p4a-c2r-b" style="height:228px"></div>
+      <p class="hint" style="margin-top:-6px">Let the class guess the &ldquo;?&rdquo; first, then reveal it.</p>
     </div>
   </div>
   <table class="bt p4a-left p4a-tight">
@@ -814,15 +992,22 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
       const row = QV.controls(el);
       row.style.padding = "3px 10px";
       let shown = false;
+      const ASK = "price $+10$ EUR: how many units fewer?";
       const b = QV.button(row, "Reveal", () => {
         shown = !shown;
         q.set(110.5, 7.8, shown ? "-4.47\\text{ units}" : "\\textbf{?}\\text{ units}");
         b.setLabel(shown ? "Hide" : "Reveal");
-      });
-      QV.readout(row, "$10 \\cdot \\hat\\beta_1 = 10 \\cdot (-0.4467)$");
+        ro.set(shown ? "$10 \\cdot \\hat\\beta_1 = 10 \\cdot (-0.4467) = -4.47$ units" : ASK);
+      }, { primary: true });
+      const ro = QV.readout(row, ASK);
     });
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Left: $r_{xy} = -0.97$ says &ldquo;very close&rdquo; &ndash; but it has no unit.</li>
+    <li>Right: the price rises by $10$ EUR. Ask for a guess: how many lamps fewer?</li>
+    <li>&ldquo;Reveal&rdquo;: $-4.47$ units, ten times the slope. Only a line can answer this.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -856,7 +1041,8 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
   <h2>Which line describes the data best?</h2>
   <div class="cols" style="--cols: 55fr 44fr">
     <div>
-      <div class="viz" id="p4a-cand" style="height:420px"></div>
+      <div class="viz" id="p4a-cand" style="height:390px"></div>
+      <p class="hint">Show one candidate at a time, or place your own line with the orange handles.</p>
     </div>
     <div>
       <div class="block"><h4>Four candidates</h4>
@@ -881,21 +1067,41 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
       QV.text(ch, 14.2, labs[k], k, { anchor: "start", baseline: "middle", color: QV.textOf(L[k].c), weight: 700, size: 16 });
     });
     P.dots(ch, X, Y, { tip: (i) => `<b>Store ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}` });
+    const row = QV.controls(el);
+    let cur = "all", mine = false;
+    const own = P.handleLine(ch, { xa: 1, xb: 13, ya: 34, yb: 43, step: 0.1, onMove: () => say() }).show(false);
+    const say = () => {
+      const [b0, b1] = own.coef();
+      const a = cur === "all" ? "" : `<strong>Line ${cur}</strong>: ${L[cur].d}`;
+      const b = mine ? `your line: ${P.f(b0, 1)} at $x = 0$, ${b1 < 0 ? "falls" : "rises"} by ${P.f(Math.abs(b1), 2)} per unit of $x$` : "";
+      ro.set(a + (a && b ? " &nbsp;&middot;&nbsp; " : "") + b);
+    };
     const show = (v) => {
+      cur = v;
       Object.keys(lines).forEach((k) => lines[k].style("opacity", v === "all" || v === k ? 1 : 0.18));
       if (v === "all") res.set(0, 0, () => false); else res.set(L[v].b0, L[v].b1);
+      say();
     };
-    QV.segmented(QV.controls(el), { label: "Show", options: [["all", "all lines"], ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], value: "all", onChange: show });
+    QV.segmented(row, { label: "Show", options: [["all", "all lines"], ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], value: "all", onChange: show });
+    const bO = QV.button(row, "Your own line", () => { mine = !mine; own.show(mine); bO.setLabel(mine ? "Hide your line" : "Your own line"); say(); });
+    const ro = QV.readout(row, "");
     show("all");
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Vote: A, B, C or D &ndash; and why?</li>
+    <li>Show A, then B: where do the points lie relative to the line?</li>
+    <li>&ldquo;Your own line&rdquo;: let two students direct the orange handles to &ldquo;their&rdquo; best line. The lines differ.</li>
+    <li>So judging by eye is subjective &ndash; we need a criterion.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
   <h2>How do we describe a straight line mathematically?</h2>
   <div class="cols" style="--cols: 47fr 51fr">
     <div>
-      <div class="viz" id="p4a-eq" style="height:420px"></div>
+      <div class="viz" id="p4a-eq" style="height:400px"></div>
+      <p class="hint">Drag the two orange points (or use the sliders): $\beta_0$ shifts the line, $\beta_1$ tilts it.</p>
     </div>
     <div>
       <div class="block"><h4>Equation of a line</h4>
@@ -913,35 +1119,52 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     const ch = P.chart(el, { x: [0, 4], y: [0, 14], xt: [0, 1, 2, 3, 4], yt: P.rng(0, 14, 2), xf: "d", xLabel: "x", yLabel: "y", margin: { left: 50 } });
     const ln = P.line(ch, 2, 3, { width: 3 });
     const step = QV.line(ch, [], { color: C.green, width: 3, layer: "annot" });
-    const dot = ch.layer("annot").append("circle").attr("r", 7).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2);
-    const lb0 = P.tex(ch, 0.15, 1.2, "", { anchor: "start", color: C.tOrange });
+    const mk = () => ch.layer("front").append("circle").attr("r", 9).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2.5);
+    const dot = mk(), top = mk();
+    const lb0 = P.tex(ch, 0.15, 1.2, "", { anchor: "start", dx: 6, bg: true, color: C.tOrange });
     const l1 = P.tex(ch, 1.5, 5, "+1", { baseline: "top", dy: 4, bg: true, color: C.tGreen });
-    const lb1 = P.tex(ch, 2, 6.5, "", { anchor: "start", dx: 6, color: C.tGreen });
+    const lb1 = P.tex(ch, 2, 6.5, "", { anchor: "start", dx: 14, color: C.tGreen });
     let b0 = 2, b1 = 3;
+    const half = (v) => Math.round(v * 2) / 2;
     const upd = () => {
+      // the step from x = 1 to x = 2 stays inside the plot (y between 0 and 14)
+      b1 = Math.max(Math.ceil(-b0) / 2, Math.min(Math.floor(14 - b0) / 2, b1));
+      s1.set(b1, false);
       ln.set(b0, b1);
       const y1 = b0 + b1, y2 = b0 + 2 * b1;
       QV.setLine(ch, step, [[1, y1], [2, y1], [2, y2]]);
       dot.attr("cx", ch.x(0)).attr("cy", ch.y(b0));
-      lb0.set(0.15, b0 - 0.8, `\\beta_0 = ${P.t(b0, 1)}`);
+      top.attr("cx", ch.x(2)).attr("cy", ch.y(y2));
+      lb0.set(0.15, b0 < 1.5 ? b0 + 0.9 : b0 - 0.9, `\\beta_0 = ${P.t(b0, 1)}`);
       l1.set(1.5, y1, "+1");
       l1.style.transform = b1 >= 0 ? "translate(-50%, 0%)" : "translate(-50%, -100%)";
       l1.style.marginTop = b1 >= 0 ? "4px" : "-4px";
       lb1.set(2, (y1 + y2) / 2, `${b1 >= 0 ? "+" : ""}${P.t(b1, 1)} = \\beta_1`);
+      lb1.style.marginTop = b1 === 0 ? "-20px" : "0";
+      ro.set(`$y = ${P.t(b0, 1)} ${b1 < 0 ? "-" : "+"} ${P.t(Math.abs(b1), 1)}\\,x$`);
     };
     const row = QV.controls(el);
-    QV.slider(row, { label: "$\\beta_0$", min: 0, max: 6, step: 0.5, value: 2, fmt: (v) => P.ff(v, 1), onInput: (v) => { b0 = v; upd(); } });
-    QV.slider(row, { label: "$\\beta_1$", min: -2, max: 4, step: 0.5, value: 3, fmt: (v) => P.ff(v, 1), onInput: (v) => { b1 = v; upd(); } });
+    const s0 = QV.slider(row, { label: "intercept $\\beta_0$", min: 0, max: 6, step: 0.5, value: 2, width: 100, fmt: (v) => P.ff(v, 1), onInput: (v) => { b0 = v; upd(); } });
+    const s1 = QV.slider(row, { label: "slope $\\beta_1$", min: -2, max: 4, step: 0.5, value: 3, width: 100, fmt: (v) => P.ff(v, 1), onInput: (v) => { b1 = v; upd(); } });
+    const ro = QV.readout(row, "");
+    QV.drag(ch, dot, (xv, yv) => { b0 = Math.max(0, Math.min(6, half(yv))); s0.set(b0, false); upd(); });
+    QV.drag(ch, top, (xv, yv) => { b1 = Math.max(-2, Math.min(4, half((yv - b0) / 2))); upd(); });
     upd();
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what happens to the line when $\beta_0$ grows? Drag the orange point on the $y$-axis.</li>
+    <li>Drag the upper orange point: $\beta_1$ is the rise per unit of $x$. Make it $0$, then negative.</li>
+    <li>Reset (key r): intercept $2$, slope $+3$, the line of the slide.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
   <h2>Observed value, fitted value and residual</h2>
   <div class="cols" style="--cols: 53fr 45fr">
     <div>
-      <div class="viz" id="p4a-ofr" style="height:420px"></div>
+      <div class="viz" id="p4a-ofr" style="height:400px"></div>
+      <p class="hint">Click a store: its fitted value on the line and its residual.</p>
     </div>
     <div>
       <div class="block"><h4>Store 9 ($x_9 = 10$), line D</h4>
@@ -964,8 +1187,7 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     QV.text(ch, 14.2, 46.8, "D", { anchor: "start", baseline: "middle", color: C.tBlue, weight: 700, size: 16 });
     const seg = QV.segment(ch, 0, 0, 0, 0, { color: C.red, width: 3, layer: "data" });
     const ring = P.ring(ch, 0, 0, { color: "var(--brand-ink)" });
-    const dots = P.dots(ch, X, Y, { tip: (i) => `<b>Store ${i + 1}</b>: click to select` });
-    dots.style("cursor", "pointer");
+    const dots = P.dots(ch, X, Y, {});
     const ly = P.tex(ch, 0, 0, "", { anchor: "end", dx: -8, bg: true, size: 15, color: C.tOrange });
     const lh = P.tex(ch, 0, 0, "", { anchor: "start", bg: true, size: 15, color: "var(--brand-ink)" });
     const lu = P.tex(ch, 0, 0, "", { anchor: "start", dx: 11, bg: true, size: 15, color: C.tRed });
@@ -979,12 +1201,17 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
       lh.set(x, yh, `\\hat{y}_{${k}} = ${P.t(yh, 1)}`); lh.style.marginTop = (17 * s) + "px";
       lh.style.transform = s > 0 ? "translate(-100%, -50%)" : "translate(0%, -50%)"; lh.style.marginLeft = (s > 0 ? -9 : 9) + "px";
       lu.set(x, y, `\\hat{u}_{${k}} = ${P.t(u, 1)}`); lu.style.marginTop = (-12 * s) + "px";
-      ro.set(`<strong>Store ${k}</strong>: &nbsp;$\\hat y_{${k}} = 30 + 1.2 \\cdot ${x} = ${P.t(yh, 1)}$, &nbsp;$\\hat u_{${k}} = ${y} - ${P.t(yh, 1)} = ${P.t(u, 1)}$ &nbsp;<span class="p4a-hint">(click another store)</span>`);
+      ro.set(`<strong>Store ${k}</strong>: &nbsp;$\\hat y_{${k}} = 30 + 1.2 \\cdot ${x} = ${P.t(yh, 1)}$, &nbsp;$\\hat u_{${k}} = ${y} - ${P.t(yh, 1)} = ${P.t(u, 1)}$: <strong>${u > 0 ? "above" : "below"}</strong> the line`);
     };
-    dots.on("click", (e, d) => sel(d[2]));
+    P.hit(ch, X, Y, sel, (i) => `<b>Store ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}`);
     sel(8);
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Store 9: observed $45$, fitted $42$, residual $3$ &ndash; the point lies above the line.</li>
+    <li>Ask: which store has the most negative residual? Click store 2 ($x = 3$): $-3.6$, far below the line.</li>
+    <li>Ask: what would a residual of $0$ look like?</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1001,7 +1228,8 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
         </ol></div>
     </div>
     <div>
-      <div class="viz" id="p4a-ex3" style="height:340px"></div>
+      <div class="viz" id="p4a-ex3" style="height:300px"></div>
+      <p class="hint">When the residuals are computed: show them for one line at a time.</p>
       <table class="bt p4a-r p4a-tight">
         <thead><tr><th class="l">Month $i$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
         <tbody>
@@ -1014,6 +1242,11 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
   <script>
   QV.mount("#p4a-ex3", (el) => { P4A.shopTwoLines(el); });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Work phase: both lines, no residuals shown.</li>
+    <li>&ldquo;Residuals of Line 1&rdquo;: read the five vertical distances off the grid and compare with the students&rsquo; $\hat{u}_i$.</li>
+    <li>The same for Line 2. Ask: which line fits better by eye?</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1035,9 +1268,10 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     </div>
     <div>
       <div class="p4a-mini">
-        <div><p class="p4a-ftitle c-orange">Line 1</p><div class="viz" id="p4a-s3a" style="height:250px"></div></div>
-        <div><p class="p4a-ftitle c-violet">Line 2</p><div class="viz" id="p4a-s3b" style="height:250px"></div></div>
+        <div><p class="p4a-ftitle c-orange">Line 1</p><div class="viz" id="p4a-s3a" style="height:250px"></div><p class="p4a-cap">$-3+1-2+3+1 = \mathbf{0}$</p></div>
+        <div><p class="p4a-ftitle c-violet">Line 2</p><div class="viz" id="p4a-s3b" style="height:250px"></div><p class="p4a-cap">$-1+2-2+2-1 = \mathbf{0}$</p></div>
       </div>
+      <p class="hint">Hover over a point for its residual.</p>
       <div class="block alert"><h4>(3) Line 2 fits visibly better</h4>
         <p>Yet both sums are $0$: the sum of the residuals does <b>not</b> detect the difference.</p></div>
     </div>
@@ -1055,6 +1289,11 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     QV.mount("#p4a-s3b", (el) => mk(el, 20, 2, C.violet));
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which line fits better by eye?</li>
+    <li>Compare the green and the red lengths in each panel: they balance exactly, both sums are $0$.</li>
+    <li>So the sum of the residuals cannot tell the two lines apart.</li>
+  </ol></aside>
 </section>
 
 <section class="slide" data-subsection="Least squares">
@@ -1074,7 +1313,8 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
   <h2>The sum of residuals cannot tell good from bad lines</h2>
   <div class="cols" style="--cols: 46fr 52fr">
     <div>
-      <div class="viz" id="p4a-sumres" style="height:380px"></div>
+      <div class="viz" id="p4a-sumres" style="height:345px"></div>
+      <p class="hint">Switch between the lines; colour the residuals by sign to see what cancels.</p>
       <p class="fs-s center" id="p4a-sumres-txt">Line A: residuals $7$, $0$, $5$, $-1$, $2$, $1$, $-1$, $1$, $1$, $-6$, $-6$, $-3$&nbsp;&ndash; sum $0$</p>
     </div>
     <div>
@@ -1104,8 +1344,10 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     P.dots(ch, X, Y, { tip: (i) => `<b>Store ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}` });
     const txt = document.getElementById("p4a-sumres-txt");
     const rows = document.querySelectorAll("#p4a-sumres-tab tr[data-l]");
+    let cur = "A";
     const show = (k) => {
       const l = L[k];
+      cur = k;
       res.set(l.b0, l.b1);
       ln.set(l.b0, l.b1).style("stroke", l.c);
       lab.set(14.2, Math.min(52.5, l.b0 + 14 * l.b1), k).style("fill", QV.textOf(l.c));
@@ -1115,11 +1357,22 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
       const lastRes = parts.pop();                 // the last residual, the dash and the sum stay on one line
       txt.innerHTML = `Line ${k}: residuals ` + parts.join(", ") + ', <span class="p4a-nw">' + lastRes + "&nbsp;&ndash; sum " + Deck.tex(P.t(Math.abs(s) < 1e-9 ? 0 : s, 1)) + "</span>";
       rows.forEach((r) => r.querySelectorAll("td").forEach((td) => td.classList.toggle("hl", r.dataset.l === k)));
+      const pos = P.sum(u.filter((v) => v > 0)), neg = P.sum(u.filter((v) => v < 0));
+      ro.set(res.signed ? `<span class="c-green">$+${P.t(pos, 1)}$</span> and <span class="c-red">$${P.t(neg, 1)}$</span>: sum $${P.t(Math.abs(s) < 1e-9 ? 0 : s, 1)}$` : `$\\sum \\hat u_i = ${P.t(Math.abs(s) < 1e-9 ? 0 : s, 1)}$`);
     };
-    QV.segmented(QV.controls(el), { label: "Line", options: [["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], value: "A", onChange: show });
+    const row = QV.controls(el);
+    QV.segmented(row, { label: "Line", options: [["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], value: "A", onChange: show });
+    const bS = QV.button(row, "Colour by sign", () => { res.signed = !res.signed; bS.setLabel(res.signed ? "All red" : "Colour by sign"); show(cur); });
+    const ro = QV.readout(row, "");
     show("A");
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Line A is clearly too steep &ndash; yet its residuals add up to $0$. Ask: how can that be?</li>
+    <li>&ldquo;Colour by sign&rdquo;: positive residuals on the left, negative ones on the right cancel.</li>
+    <li>Line C: every residual is negative, sum $-60$ &ndash; a &ldquo;smallest sum&rdquo; would reward a line that lies too high.</li>
+    <li>Line D gives $0$ as well.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1142,12 +1395,18 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
         </ol></div>
     </div>
     <div>
-      <div class="viz" id="p4a-ex4" style="height:430px"></div>
+      <div class="viz" id="p4a-ex4" style="height:390px"></div>
+      <p class="hint">Show the residuals of one line: these are the five numbers to square.</p>
     </div>
   </div>
   <script>
-  QV.mount("#p4a-ex4", (el) => { P4A.shopTwoLines(el); });
+  QV.mount("#p4a-ex4", (el) => { P4A.shopTwoLines(el, { values: true }); });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>&ldquo;Residuals of Line 1&rdquo;: $-3,\ 1,\ -2,\ 3,\ 1$ &ndash; the row of the table, now as red distances.</li>
+    <li>Ask: which of them will count most after squaring?</li>
+    <li>The same for Line 2; let the class add up the squares before you move on.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1169,10 +1428,11 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     </div>
     <div>
       <div class="p4a-mini">
-        <div><p class="p4a-ftitle c-orange">Line 1</p><div class="viz" id="p4a-s4a" style="height:430px"></div></div>
-        <div><p class="p4a-ftitle c-violet">Line 2</p><div class="viz" id="p4a-s4b" style="height:430px"></div></div>
+        <div><p class="p4a-ftitle c-orange">Line 1</p><div class="viz" id="p4a-s4a" style="height:400px"></div><p class="p4a-cap">$9+1+4+9+1 = \mathbf{24}$</p></div>
+        <div><p class="p4a-ftitle c-violet">Line 2</p><div class="viz" id="p4a-s4b" style="height:400px"></div><p class="p4a-cap">$1+4+4+4+1 = \mathbf{14}$</p></div>
       </div>
-      <p class="p4a-cap">Area of a square $= \hat{u}_i^{\,2}$ &nbsp;<span class="p4a-hint">(hover over a square)</span></p>
+      <p class="p4a-cap">Area of a square $= \hat{u}_i^{\,2}$</p>
+      <p class="hint">Hover over a square: its residual and its area.</p>
     </div>
   </div>
   <script>
@@ -1183,12 +1443,17 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
       P.squares(ch, X, Y, { unit: "Month" }).set(b0, b1);
       P.resid(ch, X, Y, { width: 2.5, b0, b1 });
       P.line(ch, b0, b1, { color: col, width: 2.5 });
-      QV.dots(ch, X.map((x, i) => [x, Y[i]]), { r: 4.5 });
+      QV.dots(ch, X.map((x, i) => [x, Y[i]]), { r: 5 });
     };
     QV.mount("#p4a-s4a", (el) => mk(el, 23, 1, C.orange));
     QV.mount("#p4a-s4b", (el) => mk(el, 20, 2, C.violet));
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which panel contains less red area in total?</li>
+    <li>Line 1: $9+1+4+9+1 = 24$. Line 2: $1+4+4+4+1 = 14$.</li>
+    <li>Point at the two large squares of line 1 (area $9$ each): large residuals dominate the sum.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1241,9 +1506,17 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
 
 <section class="slide">
   <h2>Squared residuals as areas</h2>
-  <div class="cols" style="--cols: 38fr 60fr">
+  <div class="cols" style="--cols: 52fr 46fr">
     <div>
-      <div class="viz" id="p4a-areas" style="height:530px"></div>
+      <div class="p4a-side">
+        <div class="viz" id="p4a-areas" style="height:500px; width:384px"></div>
+        <div>
+          <div id="p4a-areas-tiles"></div>
+          <p class="p4a-verdict" id="p4a-areas-verdict"></p>
+          <div class="viz-ctrl" id="p4a-areas-ctrl"></div>
+        </div>
+      </div>
+      <p class="hint">Drag the two orange handles: can you make the total red area smaller than for line D?</p>
     </div>
     <div>
       <div class="block"><h4>Construction</h4>
@@ -1253,8 +1526,6 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
         </ul></div>
       <div class="block key"><p>The best line is the one for which the <b>sum of these square areas</b> is as small as possible.</p></div>
       <p class="fs-s">Scaling: both axes are in $1000$ EUR and one unit has the same length on both axes. Only then are the squares really squares and their areas comparable.</p>
-      <div id="p4a-areas-tiles"></div>
-      <div class="viz-ctrl" id="p4a-areas-ctrl"></div>
     </div>
   </div>
   <script>
@@ -1263,37 +1534,46 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     const ch = P.chart(el, P.ax("store", { x: [0, 15], y: [28, 50], xt: [0, 5, 10, 15], yt: P.rng(30, 50, 5), equal: true }));
     const sq = P.squares(ch, X, Y, { unit: "Store" });
     const res = P.resid(ch, X, Y, { width: 2.5 });
-    const ln = P.line(ch, 30, 1.2, { width: 3 });
     P.dots(ch, X, Y, { r: 5, tip: (i) => `<b>Store ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}` });
-    const ends = [[0.5, 30.6], [14.5, 47.4]];
-    const hd = QV.dots(ch, ends, { r: 9, color: C.orange, layer: "front" });
-    const t = QV.tiles(document.getElementById("p4a-areas-tiles"), ["$\\sum \\hat u_i^{\\,2}$ of your line", "line D (OLS)"]);
+    const t = QV.tiles(document.getElementById("p4a-areas-tiles"), ["$\\sum \\hat u_i^{\\,2}$ of your line", "$\\sum \\hat u_i^{\\,2}$ of line D"]);
     t.set(1, "64.8");
-    const redraw = () => {
-      const b1 = (ends[1][1] - ends[0][1]) / (ends[1][0] - ends[0][0]), b0 = ends[0][1] - b1 * ends[0][0];
-      ln.set(b0, b1); res.set(b0, b1);
-      t.set(0, P.ff(sq.set(b0, b1), 1));
-      hd.attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
+    const verdict = document.getElementById("p4a-areas-verdict");
+    const own = P.handleLine(ch, { xa: 0.5, xb: 14.5, ya: 30.6, yb: 47.4, step: 0.1, color: C.blue, onMove: (b0, b1) => upd(b0, b1) });
+    const upd = (b0, b1) => {
+      res.set(b0, b1);
+      const s = sq.set(b0, b1), more = s - 64.8;
+      t.set(0, P.ff(s, 1));
+      const isD = Math.abs(b0 - 30) < 1e-6 && Math.abs(b1 - 1.2) < 1e-6;
+      verdict.innerHTML = isD ? `<span class="c-green"><b>your line is line D</b></span>` : `<span class="c-red"><b>${QV.fmt(more, more < 1 ? 2 : 1)} more</b></span> than line D`;
     };
-    QV.drag(ch, hd, (xv, yv, d) => { d[1] = Math.round(yv * 10) / 10; redraw(); });
-    const row = document.getElementById("p4a-areas-ctrl");
-    QV.button(row, "Show line D (OLS)", () => { ends[0][1] = 30 + 1.2 * 0.5; ends[1][1] = 30 + 1.2 * 14.5; redraw(); }, { primary: true });
-    QV.readout(row, "Drag the two orange handles.");
-    redraw();
+    QV.button(document.getElementById("p4a-areas-ctrl"), "Back to line D", () => own.set(30, 1.2), { primary: true });
+    upd(30, 1.2);
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: can any line have a smaller total area than line D ($64.8$)?</li>
+    <li>Drag one handle up: the squares on that side grow quickly &ndash; watch the sum.</li>
+    <li>Let students direct you (tilt, shift): the sum never falls below $64.8$.</li>
+    <li>&ldquo;Back to line D&rdquo;. Why this is so follows on the next slides.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
   <h2>Comparison: a poorly fitting line and the best line</h2>
-  <div class="cols" style="--cols: 31fr 31fr 34fr; --gap: 20px">
+  <div class="cols" style="--cols: 64fr 34fr; --gap: 20px">
     <div>
-      <div class="viz" id="p4a-cmpA" style="height:400px"></div>
-      <p class="p4a-cap" id="p4a-cmpA-cap">A: $\sum \hat{u}_i^{\,2} = \mathbf{164.0}$</p>
-    </div>
-    <div>
-      <div class="viz" id="p4a-cmpD" style="height:400px"></div>
-      <p class="p4a-cap">D: $\sum \hat{u}_i^{\,2} = \mathbf{64.8}$</p>
+      <div class="p4a-pair">
+        <div>
+          <div class="viz" id="p4a-cmpA" style="height:400px"></div>
+          <p class="p4a-cap" id="p4a-cmpA-cap">A: $\sum \hat{u}_i^{\,2} = \mathbf{164.0}$</p>
+        </div>
+        <div>
+          <div class="viz" id="p4a-cmpD" style="height:400px"></div>
+          <p class="p4a-cap">D: $\sum \hat{u}_i^{\,2} = \mathbf{64.8}$</p>
+        </div>
+      </div>
+      <div class="viz-ctrl" id="p4a-cmp-ctrl"></div>
+      <p class="hint">Switch the left panel to A, B or C and compare its red area with line D.</p>
     </div>
     <div>
       <table class="bt p4a-tight" id="p4a-cmp-tab" style="font-size:23px">
@@ -1306,7 +1586,6 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
         </tbody>
       </table>
       <div class="block key"><p>The sum of squares separates good from bad lines. Is there an even better line than D?</p></div>
-      <div class="viz-ctrl" id="p4a-cmp-ctrl"></div>
     </div>
   </div>
   <script>
@@ -1315,9 +1594,9 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
     const mk = (el, k) => {
       const ch = P.chart(el, { x: [0, 19], y: [25, 51], xt: [0, 5, 10, 15], yt: P.rng(25, 50, 5), xLabel: "x (1000 EUR)", yLabel: "y (1000 EUR)", equal: true, margin: { left: 56, bottom: 46 } });
       const sq = P.squares(ch, X, Y, { unit: "Store" });
-      const res = P.resid(ch, X, Y, { width: 2.2 });
+      const res = P.resid(ch, X, Y, { width: 2.5 });
       const ln = P.line(ch, 0, 0, { width: 2.5, from: 0, to: 14 });
-      QV.dots(ch, X.map((x, i) => [x, Y[i]]), { r: 4.5 });
+      QV.dots(ch, X.map((x, i) => [x, Y[i]]), { r: 5 });
       const set = (k) => { const l = L[k]; ln.set(l.b0, l.b1).style("stroke", l.c); res.set(l.b0, l.b1); return sq.set(l.b0, l.b1); };
       set(k);
       return set;
@@ -1331,12 +1610,21 @@ df["price"].corr(df["quantity"])    # -0.9732 (Pearson is the default)
         const s = set(k);
         cap.innerHTML = Deck.tex(`\\text{${k}: } \\sum \\hat{u}_i^{\\,2} = \\mathbf{${P.tt(s, 1)}}`);
         rows.forEach((r) => r.querySelectorAll("td").forEach((td) => td.classList.toggle("hl", r.dataset.l === k)));
+        ro.set(`<strong>Line ${k}</strong> (${L[k].d}): &nbsp;$${P.tt(s, 1)}$ against $64.8$ &ndash; <span class="c-red">$${P.tt(s - 64.8, 1)}$ more</span> than line D`);
       };
-      QV.segmented(document.getElementById("p4a-cmp-ctrl"), { label: "Left panel", options: [["A", "A"], ["B", "B"], ["C", "C"]], value: "A", onChange: show });
+      const row = document.getElementById("p4a-cmp-ctrl");
+      QV.segmented(row, { label: "Left panel", options: [["A", "A"], ["B", "B"], ["C", "C"]], value: "A", onChange: show });
+      const ro = QV.readout(row, "");
       show("A");
     });
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which of A, B and C has the largest total area?</li>
+    <li>Left panel C: $364.8$ &ndash; every square is large, because the line lies too high.</li>
+    <li>B: $120.6$, A: $164.0$. Line D wins with $64.8$.</li>
+    <li>Ask: could an even better line than D exist?</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1473,7 +1761,7 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
   <div class="cols" style="--cols: 44fr 54fr">
     <div>
       <div class="viz" id="p4a-icpt" style="height:330px"></div>
-      <p class="p4a-hint">Hover over the plot: fitted value $\hat y$ for any $x$.</p>
+      <p class="hint">Drag the orange point along the line: the fitted value $\hat y$ for any $x$ (try $x = 7$).</p>
     </div>
     <div>
       <div class="block"><h4>From the first normal equation</h4>
@@ -1491,16 +1779,32 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
     const ch = P.chart(el, P.ax("store", { margin: { bottom: 46 } }));
     P.line(ch, 30, 1.2, { width: 3 });
     P.guide(ch, [[7.5, 24], [7.5, 39], [0, 39]]);
-    P.dots(ch, X, Y, { r: 5 });
+    const drop = P.guide(ch, [], { color: C.orange });
+    P.dots(ch, X, Y, { r: 5, tip: (i) => `<b>Store ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}` });
     P.square(ch, 7.5, 39, { size: 12 });
-    ch.layer("annot").append("circle").attr("cx", ch.x(0)).attr("cy", ch.y(30)).attr("r", 6.5).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2);
+    P.ring(ch, 0, 30, { r: 5, color: C.orange });
     P.tex(ch, 7.7, 38.6, "(\\bar{x},\\bar{y})", { anchor: "start", baseline: "top", dx: 3, dy: 3, bg: true, size: 15, color: C.tOrange });
     P.tex(ch, 0.3, 27.6, "\\hat{\\beta}_0 = 30", { anchor: "start", dx: 3, bg: true, size: 15, color: C.tOrange });
     P.tex(ch, 7.7, 24.2, "\\bar{x}", { anchor: "start", baseline: "bottom", dx: 3, dy: -2, size: 15, color: C.tGrey });
     P.tex(ch, 0.3, 40.2, "\\bar{y}", { anchor: "start", dx: 3, size: 15, color: C.tGrey });
-    QV.hover(ch, (xv) => (xv < 0 || xv > 14 ? null : `x = ${P.ff(xv, 1)}: &nbsp;ŷ = 30 + 1.2 · ${P.ff(xv, 1)} = <b>${P.ff(30 + 1.2 * +xv.toFixed(1), 2)}</b>`));
+    // the orange point starts at the intercept (as in the PDF) and can be moved along the line
+    const lab = P.tex(ch, 0, 0, "", { anchor: "start", baseline: "bottom", dx: -4, dy: -14, bg: true, size: 16, color: C.tOrange });
+    lab.style.border = "1px solid var(--rule)";
+    P.probe(ch, { b0: 30, b1: 1.2, x: 0, min: 0, max: 14, step: 0.5, onMove: (x, yh) => {
+      QV.setLine(ch, drop, x > 0 ? [[x, 24], [x, yh], [0, yh]] : []);
+      lab.style.display = x > 0 ? "" : "none";
+      lab.set(x, yh, `\\hat y = 30 + 1.2 \\cdot ${P.t(x, 1)} = \\mathbf{${P.t(yh, 1)}}` + (x === 7.5 ? " = \\bar y" : ""));
+      lab.anchor(x > 6 ? "end" : "start", "bottom");
+      lab.style.marginLeft = x > 6 ? "8px" : "0";
+    } });
+    lab.style.display = "none";
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>The orange point starts at the intercept: $x = 0$, $\hat{y} = 30$.</li>
+    <li>Ask the starting question again: which revenue at $7000$ EUR? Drag to $x = 7$: $\hat{y} = 38.4$.</li>
+    <li>Drag on to $x = 7.5$: $\hat{y} = 39 = \bar{y}$ &ndash; the line passes through the centroid.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1567,7 +1871,8 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
           <tr><td class="l">Revenue $y_i$</td><td>12</td><td>20</td><td>19</td><td>23</td><td>31</td></tr>
         </tbody>
       </table>
-      <div class="viz" id="p4a-ex6" style="height:330px"></div>
+      <div class="viz" id="p4a-ex6" style="height:320px"></div>
+      <p class="hint">Task 5: &ldquo;Draw my line&rdquo;, then drag the two orange handles onto your computed line.</p>
     </div>
   </div>
   <script>
@@ -1575,8 +1880,23 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
     const P = P4A, X = P.D.shopB.x, Y = P.D.shopB.y;
     const ch = P.chart(el, P.ax("shopB"));
     P.dots(ch, X, Y, { r: 6.5, tip: (i) => `<b>Month ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}` });
+    const row = QV.controls(el);
+    let on = false;
+    const say = () => {
+      const [b0, b1] = own.coef();
+      ro.set(on ? `your line: &nbsp;$\\hat y = ${P.t(b0, 2)} ${b1 < 0 ? "-" : "+"} ${P.t(Math.abs(b1), 2)}\\,x$` : "");
+    };
+    // a flat starting line well below the points: it gives nothing away
+    const own = P.handleLine(ch, { xa: 1, xb: 8, ya: 8, yb: 8, step: 0.5, onMove: say }).show(false);
+    const b = QV.button(row, "Draw my line", () => { on = !on; own.show(on); b.setLabel(on ? "Remove my line" : "Draw my line"); say(); }, { primary: true });
+    const ro = QV.readout(row, "");
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Work phase: the plot shows only the five months.</li>
+    <li>&ldquo;Draw my line&rdquo;: ask a student for two points of the computed line and drag the handles (at $x = 1$ and $x = 8$) there.</li>
+    <li>Read the equation of the drawn line under the plot and compare it with the computed one.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1606,12 +1926,13 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
   <h2>Solution (2/2) &ndash; online shop (6): residuals and graph</h2>
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
-      <div class="viz" id="p4a-s6" style="height:420px"></div>
+      <div class="viz" id="p4a-s6" style="height:385px"></div>
       <p class="p4a-cap">(5) The line passes through the centroid $(5,\,21)$.</p>
+      <p class="hint">Click a month: its fitted value and residual, as in the row of the table.</p>
     </div>
     <div>
       <div class="block"><h4>(4) Rule: $\hat{y}_i = 6 + 3\,x_i$, &nbsp;$\hat{u}_i = y_i - \hat{y}_i$</h4>
-        <table class="bt p4a-tight">
+        <table class="bt p4a-tight" id="p4a-s6-tab">
           <thead><tr><th>$i$</th><th>$x_i$</th><th>$y_i$</th><th>$\hat{y}_i$</th><th class="r">$\hat{u}_i$</th></tr></thead>
           <tbody>
             <tr><td>1</td><td>2</td><td>12</td><td>$6 + 3 \cdot 2 = 12$</td><td class="r">$0$</td></tr>
@@ -1632,19 +1953,41 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
     const ch = P.chart(el, P.ax("shopB"));
     P.resid(ch, X, Y, { width: 3, b0: 6, b1: 3 });
     P.line(ch, 6, 3, { width: 3 });
-    P.dots(ch, X, Y, { r: 6.5, tip: (i) => `<b>Month ${i + 1}</b> (${X[i]}, ${Y[i]})<br>ŷ = 6 + 3 · ${X[i]} = ${6 + 3 * X[i]}, &nbsp;û = <b>${P.f(Y[i] - 6 - 3 * X[i])}</b>` });
+    const ring = P.ring(ch, 0, 0, { color: "var(--brand-ink)" }).style("display", "none");
+    const dots = P.dots(ch, X, Y, { r: 6.5 });
     P.square(ch, 5, 21, { size: 12 });
     P.tex(ch, 4.8, 21.6, "(\\bar{x},\\bar{y})", { anchor: "end", baseline: "bottom", bg: true, size: 15, color: C.tOrange });
     P.tex(ch, 6.5, 20.5, "\\hat{y} = 6 + 3x", { anchor: "start", baseline: "top", bg: true, size: 15, color: C.tBlue });
+    const rows = document.querySelectorAll("#p4a-s6-tab tbody tr:not(.mid)");
+    const ro = QV.readout(QV.controls(el), "");
+    let cur = -1;
+    const sel = (i) => {
+      cur = cur === i ? -1 : i;
+      dots.style("fill", (d) => (d[2] === cur ? C.orange : C.blue)).attr("r", (d) => (d[2] === cur ? 8 : 6.5));
+      rows.forEach((r, k) => r.querySelectorAll("td").forEach((td) => td.classList.toggle("hl", k === cur)));
+      ring.style("display", cur < 0 ? "none" : null);
+      if (cur < 0) { ro.set("$\\sum \\hat u_i = 0 + 2 - 2 - 1 + 1 = 0$"); return; }
+      const x = X[cur], y = Y[cur], yh = 6 + 3 * x, u = y - yh;
+      ring.set(x, yh);
+      ro.set(`<strong>Month ${cur + 1}</strong>: &nbsp;$\\hat y = 6 + 3 \\cdot ${x} = ${yh}$, &nbsp;$\\hat u = ${y} - ${yh} = ${P.t(u)}$: <strong>${u > 0 ? "above" : u < 0 ? "below" : "on"}</strong> the line`);
+    };
+    P.hit(ch, X, Y, sel, (i) => `<b>Month ${i + 1}</b>: (${X[i]}, ${Y[i]})`);
+    sel(-1);
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Click month 2: $\hat{y} = 18$, $\hat{u} = 2$ &ndash; the point lies above the line.</li>
+    <li>Month 1 lies exactly on the line: $\hat{u} = 0$.</li>
+    <li>Ask: do the residuals cancel? $0 + 2 - 2 - 1 + 1 = 0$.</li>
+  </ol></aside>
 </section>
 
 <section class="slide" data-subsection="Interpretation">
   <h2>How do we interpret the slope?</h2>
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
-      <div class="viz" id="p4a-slope" style="height:420px"></div>
+      <div class="viz" id="p4a-slope" style="height:385px"></div>
+      <p class="hint">Change the start or the step $\Delta x$: the rise $\Delta\hat y = 1.2 \cdot \Delta x$ is the same everywhere.</p>
     </div>
     <div>
       <div class="block"><h4>Slope $\hat{\beta}_1 = 1.2$</h4>
@@ -1672,22 +2015,28 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
       QV.setLine(ch, step, [[x0, y0], [x1, y0], [x1, y1]]);
       r0.set(x0, y0); r1.set(x1, y1);
       ldx.set((x0 + x1) / 2, y0, `+${P.t(dx, 1)}`); ldy.set(x1 + 0.1, (y0 + y1) / 2, `+${P.t(1.2 * dx, 2)}`);
-      ro.set(`$\\Delta\\hat y = 1.2 \\cdot ${P.t(dx, 1)} = ${P.t(1.2 * dx, 2)}$ (from ${P.f(y0, 2)} to ${P.f(y1, 2)})`);
+      ro.set(`$\\Delta\\hat y = 1.2 \\cdot ${P.t(dx, 1)} = ${P.t(1.2 * dx, 2)}$ &nbsp;($\\hat y$ from ${P.f(y0, 2)} to ${P.f(y1, 2)})`);
     };
-    QV.slider(row, { label: "start $x$", min: 0, max: 7, step: 0.5, value: 5, width: 110, fmt: (v) => P.ff(v, 1), onInput: (v) => { x0 = v; upd(); } });
-    QV.slider(row, { label: "$\\Delta x$", min: 0.5, max: 7, step: 0.5, value: 5, width: 110, fmt: (v) => P.ff(v, 1), onInput: (v) => { dx = v; upd(); } });
+    QV.slider(row, { label: "start $x$", min: 0, max: 7, step: 0.5, value: 5, width: 100, fmt: (v) => P.ff(v, 1), onInput: (v) => { x0 = v; upd(); } });
+    const sD = QV.slider(row, { label: "step $\\Delta x$", min: 0.5, max: 7, step: 0.5, value: 5, width: 100, fmt: (v) => P.ff(v, 1), onInput: (v) => { dx = v; seg.set("", false); upd(); } });
+    const seg = QV.segmented(row, { label: "set $\\Delta x$ to", options: [["1", "1"], ["5", "5"]], value: "5", onChange: (v) => { dx = +v; sD.set(dx, false); upd(); } });
     const ro = QV.readout(row, "");
     upd();
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Set $\Delta x$ to $1$: one more unit of $x$ raises $\hat{y}$ by $1.2$ &ndash; the slope itself.</li>
+    <li>Set $\Delta x$ to $5$ (the example of the slide): $\hat{y}$ from $36$ to $42$, i.e. $+6$.</li>
+    <li>Move &ldquo;start $x$&rdquo;: the triangle slides along the line, $\Delta\hat{y}$ stays $6$.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
   <h2>How do we interpret the intercept?</h2>
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
-      <div class="viz" id="p4a-icpt2" style="height:330px"></div>
-      <p class="p4a-hint">Hover over the plot: fitted value inside or outside the observed range.</p>
+      <div class="viz" id="p4a-icpt2" style="height:300px"></div>
+      <p class="hint">Drag the orange point along the line: inside or outside the observed range?</p>
     </div>
     <div>
       <div class="block"><h4>Intercept $\hat{\beta}_0 = 30$</h4>
@@ -1703,25 +2052,38 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
     const ch = P.chart(el, P.ax("store"));
     P.guide(ch, [[1, 24], [1, 52]]); P.guide(ch, [[13, 24], [13, 52]]);
     P.line(ch, 30, 1.2, { width: 3 });
-    P.dots(ch, X, Y, { r: 5 });
-    ch.layer("annot").append("circle").attr("cx", ch.x(0)).attr("cy", ch.y(30)).attr("r", 7).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2);
+    const drop = P.guide(ch, [], { color: C.red });
+    P.dots(ch, X, Y, { r: 5, tip: (i) => `<b>Store ${i + 1}</b>: x = ${X[i]}, y = ${Y[i]}` });
+    P.ring(ch, 0, 30, { r: 5, color: C.orange });
     P.tex(ch, 0.2, 27.6, "\\hat{\\beta}_0 = 30", { anchor: "start", bg: true, size: 15, color: C.tOrange });
     P.span(ch, 1, 13, 50);
     P.tex(ch, 7, 49.6, "\\text{observed range}", { baseline: "top", bg: true, size: 15, color: C.tGrey });
-    QV.hover(ch, (xv) => {
-      if (xv < 0 || xv > 14) return null;
-      const xr = +xv.toFixed(1), inside = xr >= 1 && xr <= 13;
-      return `x = ${P.ff(xr, 1)}: ŷ = <b>${P.ff(30 + 1.2 * xr, 2)}</b><br>${inside ? "inside the observed range" : "<b>outside</b> the observed range"}`;
-    });
+    // the orange point starts at the intercept (as in the PDF) and can be moved along the line
+    const ro = QV.readout(QV.controls(el), "");
+    const say = (x, yh) => {
+      const inside = x >= 1 && x <= 13;
+      QV.setLine(ch, drop, x > 0 ? [[x, 24], [x, yh]] : []);
+      drop.style("stroke", inside ? C.green : C.red);
+      ro.set(`$x = ${P.t(x, 1)}$: &nbsp;$\\hat y = 30 + 1.2 \\cdot ${P.t(x, 1)} = ${P.t(yh, 1)}$ &ndash; `
+        + (inside ? `<strong class="c-green">inside</strong> the observed range` : `<strong class="c-red">outside</strong> the observed range: extrapolated`));
+    };
+    P.probe(ch, { b0: 30, b1: 1.2, x: 0, min: 0, max: 14, step: 0.5, onMove: say });
+    say(0, 30);
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Start: $x = 0$ gives $\hat{y} = 30$ &ndash; but no store had $x = 0$: the point lies outside the observed range.</li>
+    <li>Drag to the right: from $x = 1$ to $13$ the line is backed by data.</li>
+    <li>Ask: how far beyond $13$ would you still trust the line?</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
   <h2>Interpretation at a glance &ndash; and predictions</h2>
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
-      <div class="viz" id="p4a-pred" style="height:420px"></div>
+      <div class="viz" id="p4a-pred" style="height:400px"></div>
+      <p class="hint">Move $x$: where does the prediction turn from interpolation into extrapolation?</p>
     </div>
     <div>
       <div class="block"><h4>$\hat{y} = \textcolor{#ffc95c}{30} + \textcolor{#8ee6b4}{1.2}\,x$ &nbsp;(twelve stores)</h4>
@@ -1759,13 +2121,18 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
       lab.set(x - 0.4, yh + 0.4, `\\hat{y} = ${P.t(yh, 2)}${inside ? "" : "\\text{?}"}`);
       lab.style.transform = x > 13 ? "translate(-100%, -100%)" : "translate(0%, -100%)";
       lab.style.marginLeft = x > 13 ? "0px" : "16px";
-      ro.set(`$\\hat y = 30 + 1.2 \\cdot ${P.t(x, 1)} = ${P.t(yh, 2)}$: <strong>${inside ? "interpolation" : "extrapolation"}</strong>`);
+      ro.set(`$\\hat y = 30 + 1.2 \\cdot ${P.t(x, 1)} = ${P.t(yh, 2)}$: <strong class="${inside ? "c-green" : "c-red"}">${inside ? "interpolation" : "extrapolation"}</strong>`);
     };
-    QV.slider(row, { label: "$x$", min: 0, max: 26, step: 0.5, value: 25, width: 160, fmt: (v) => P.ff(v, 1), onInput: set });
+    QV.slider(row, { label: "advertising $x$", min: 0, max: 26, step: 0.5, value: 25, width: 150, fmt: (v) => P.ff(v, 1), onInput: set });
     const ro = QV.readout(row, "");
     set(25);
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Start: $x = 25$ gives $\hat{y} = 60$ &ndash; far to the right of the shaded observed range.</li>
+    <li>Move $x$ down slowly: from $13$ on the read-out turns to &ldquo;interpolation&rdquo;.</li>
+    <li>Go on to $x = 0$: below $1$ it is an extrapolation again &ndash; the intercept $30$, too.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1790,8 +2157,8 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
   <h2>The lamp: interpreting the coefficients</h2>
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
-      <div class="viz" id="p4a-lampfit" style="height:430px"></div>
-      <p class="p4a-hint">Hover over a point: fitted value and residual.</p>
+      <div class="viz" id="p4a-lampfit" style="height:385px"></div>
+      <p class="hint">Click a store for its fitted value and residual; change the view to see how far away price $0$ is.</p>
     </div>
     <div>
       <div class="block"><h4>Slope $\hat{\beta}_1 = -0.4467$</h4>
@@ -1803,13 +2170,49 @@ x = pd.Series([1, 2, 3, 4, 5]); y = pd.Series([21, 26, 24, 30, 29])
   <script>
   QV.mount("#p4a-lampfit", (el) => {
     const P = P4A, C = QV.C, X = P.D.lamp.x, Y = P.D.lamp.y, b0 = 54.6667, b1 = -0.44667;
-    const ch = P.chart(el, P.ax("lamp"));
-    P.resid(ch, X, Y, { width: 2.5, b0, b1 });
-    P.line(ch, b0, b1, { width: 3 });
-    P.dots(ch, X, Y, { r: 6, tip: (i) => `<b>Store ${i + 1}</b> (${X[i]} EUR, ${Y[i]})<br>ŷ = 54.67 − 0.4467 · ${X[i]} = ${P.ff(b0 + b1 * X[i], 2)}<br>û = <b>${P.ff(Y[i] - b0 - b1 * X[i], 2)}</b>` });
-    P.tex(ch, 96, 16.5, "\\hat y = 54.67 - 0.4467\\,x", { anchor: "start", bg: true, size: 16, color: C.tBlue });
+    const row = QV.controls(el);
+    let wide = false, cur = -1;
+    const say = () => {
+      if (cur < 0) { ro.set(wide ? "price $0$: $\\hat y = \\hat\\beta_0 = 54.67$ &ndash; but the observed prices run from $80$ to $120$ EUR" : "$\\hat y = 54.67 - 0.4467\\,x$"); return; }
+      const x = X[cur], y = Y[cur], yh = b0 + b1 * x;
+      ro.set(`<strong>Store ${cur + 1}</strong>: &nbsp;$\\hat y = 54.67 - 0.4467 \\cdot ${x} = ${P.tt(yh, 2)}$, &nbsp;$\\hat u = ${y} - ${P.tt(yh, 2)} = ${P.tt(y - yh, 2)}$`);
+    };
+    // the figure is drawn for the data range (as in the PDF) or from price 0 (axes of the Python plot on the next slide)
+    const build = () => {
+      el.replaceChildren();
+      const ch = P.chart(el, wide ? { x: [0, 125], y: [0, 60], xt: P.rng(0, 120, 20), yt: P.rng(0, 60, 10), xLabel: "Price x (EUR)", yLabel: "Sales quantity y" } : P.ax("lamp"));
+      P.resid(ch, X, Y, { width: 2.5, b0, b1 });
+      if (wide) {
+        QV.rect(ch, 80, 120, 0, 60, { fill: C.blueT, layer: "back" });
+        P.tex(ch, 100, 55, "\\text{observed range}", { size: 15, color: "var(--brand-ink)" });
+        P.line(ch, b0, b1, { width: 3, from: 0, to: 80, dash: "7 5" });
+        P.line(ch, b0, b1, { width: 3, from: 80, to: 125 });
+        ch.layer("annot").append("circle").attr("cx", ch.x(0)).attr("cy", ch.y(b0)).attr("r", 8).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2);
+        P.tex(ch, 3, 51, "\\hat{\\beta}_0 = 54.67", { anchor: "start", baseline: "top", bg: true, size: 15, color: C.tOrange });
+      } else {
+        P.line(ch, b0, b1, { width: 3 });
+        P.tex(ch, 96, 16.5, "\\hat y = 54.67 - 0.4467\\,x", { anchor: "start", bg: true, size: 16, color: C.tBlue });
+      }
+      const ring = P.ring(ch, 0, 0, { color: "var(--brand-ink)" });
+      const dots = P.dots(ch, X, Y, { r: wide ? 5 : 6 });
+      const mark = () => {
+        dots.style("fill", (d) => (d[2] === cur ? C.orange : C.blue)).attr("r", (d) => (d[2] === cur ? 8 : wide ? 5 : 6));
+        ring.style("display", cur < 0 ? "none" : null);
+        if (cur >= 0) ring.set(X[cur], b0 + b1 * X[cur]);
+      };
+      P.hit(ch, X, Y, (i) => { cur = cur === i ? -1 : i; mark(); say(); }, (i) => `<b>Store ${i + 1}</b>: ${X[i]} EUR, ${Y[i]} units`);
+      mark();
+    };
+    QV.segmented(row, { label: "View", options: [["data", "data range"], ["zero", "from price 0"]], value: "data", onChange: (v) => { wide = v === "zero"; build(); say(); } });
+    const ro = QV.readout(row, "");
+    build(); say();
   });
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Click store 4 ($95$ EUR): fitted $12.23$, sold $9$ &ndash; the residual $-3.23$ is the largest.</li>
+    <li>Ask: what does the intercept $54.67$ mean?</li>
+    <li>View &ldquo;from price 0&rdquo;: the line has to be extended far to the left of the data ($80$ to $120$ EUR) to reach it.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1898,7 +2301,7 @@ plt.axline((0, reg.params["Intercept"]), slope=reg.params["price"])
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
       <div class="viz" id="p4a-furn" style="height:430px"></div>
-      <p class="p4a-hint">Hover over the plot: expected revenue for any $x$.</p>
+      <p class="hint">Hover over the plot: expected revenue for any $x$.</p>
     </div>
     <div>
       <div class="block"><h4>(2) Rule: insert $x$ into the line</h4>
@@ -1909,6 +2312,11 @@ plt.axline((0, reg.params["Intercept"]), slope=reg.params["price"])
         <p>Far outside the data: whether the relationship is still linear there (saturation?) was never observed. <b>Not reliable.</b></p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which revenue does the line give for $x = 5$? The orange square: $52.5$.</li>
+    <li>Hover along the line between $2$ and $12$: interpolation, plausible as an expected value.</li>
+    <li>Hover beyond $12$: the tooltip switches to &ldquo;extrapolation&rdquo;. $x = 30$ lies far off the chart &ndash; the line says $115$, but nothing was observed there.</li>
+  </ol></aside>
   <script>
   QV.mount("#p4a-furn", (el) => {
     const P = P4A, C = QV.C, X = P.D.furn.x, Y = P.D.furn.y;
@@ -2007,12 +2415,18 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
     </div>
   </div>
   <div class="viz-ctrl" id="p4a-rss-ctrl"></div>
+  <p class="hint">Change the slope of the right line: the red residuals and the split of the bar below follow.</p>
   <div style="display:grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center">
     <span class="fs-xs p4a-nw">$\text{TSS} = 288$</span>
     <div class="viz" id="p4a-ssbar" style="height:34px"></div>
   </div>
   <p class="fs-s"><b>Guiding question:</b> without $x$, $\bar{y}$ is the best guess for every store. How much better is the line?</p>
   <div class="block key"><p>The sum of squares falls from $288$ to $64.8$: the line &ldquo;explains&rdquo; $223.2/288 = \mathbf{77.5\,\%}$ of the variation.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask the guiding question, then compare the green deviations from $\bar{y}$ (left) with the red residuals (right).</li>
+    <li>Click <b>slope 0</b>: the right panel equals the left one, the residual part is the whole $288$.</li>
+    <li>Raise the slope slowly: the red part shrinks until $1.20$ ($64.8$), then grows again &ndash; click <b>least squares</b>.</li>
+  </ol></aside>
   <script>
   (() => {
     const P = P4A, C = QV.C, X = P.D.store.x, Y = P.D.store.y;
@@ -2050,7 +2464,9 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
         title.innerHTML = Deck.tex("\\text{With } x\\text{: }") + (ols ? "predict " + Deck.tex("\\hat{y}_i") + ", &nbsp;" : "") + Deck.tex(`\\sum \\hat{u}_i^{\\,2} = \\mathbf{${P.tt(rss, 1)}}`) + (ols ? "" : " &nbsp;(not OLS)");
         ro.set(`explained share $(288 - ${P.tt(rss, 1)})/288 = ${P.tt(100 * ex / 288, 1)}\\,\\%$`);
       };
-      QV.slider(row, { label: "slope of the right line (through $(\\bar x, \\bar y)$)", min: 0, max: 2.4, step: 0.05, value: 1.2, width: 170, fmt: (v) => P.ff(v, 2), onInput: set });
+      const sl = QV.slider(row, { label: "slope of the right line (through $(\\bar x, \\bar y)$)", min: 0, max: 2.4, step: 0.05, value: 1.2, width: 150, fmt: (v) => P.ff(v, 2), onInput: set });
+      QV.button(row, "slope 0", () => sl.set(0));
+      QV.button(row, "least squares", () => sl.set(1.2));
       const ro = QV.readout(row, "");
       set(1.2);
     });
@@ -2063,6 +2479,7 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
       <div class="viz" id="p4a-split" style="height:420px"></div>
+      <p class="hint">Click another store: its deviation from $\bar{y}$ is split in the same way.</p>
     </div>
     <div>
       <div class="block"><h4>Store 12: $x_{12} = 13$, $y_{12} = 47$</h4>
@@ -2076,6 +2493,11 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
       <p class="inwords">Deviation from the average $=$ part explained by advertising $+$ rest.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Start with store 12: $8 = 6.6 + 1.4$ &ndash; green $=$ orange $+$ red.</li>
+    <li>Ask: can the two parts have opposite signs? Click store 10 ($x = 11$, $y = 40$): $1 = 4.2 - 3.2$.</li>
+    <li>Click store 2 ($x = 3$, $y = 30$): $-9 = -5.4 - 3.6$, below the average and below the line.</li>
+  </ol></aside>
   <script>
   QV.mount("#p4a-split", (el) => {
     const P = P4A, C = QV.C, X = P.D.store.x, Y = P.D.store.y;
@@ -2100,7 +2522,7 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
       lG.set(x + 1.9, (39 + y) / 2, P.t(y - 39, 1));
       lO.set(x, (39 + yh) / 2, P.t(yh - 39, 1));
       lR.set(xr, (yh + y) / 2, P.t(y - yh, 1));
-      ro.set(`<strong>Store ${k}</strong>: &nbsp;$\\green{${P.t(y - 39, 1)}} = \\orange{${P.t(yh - 39, 1)}} + \\red{${P.t(y - yh, 1)}}$ &nbsp;<span class="p4a-hint">(click another store)</span>`);
+      ro.set(`<strong>Store ${k}</strong>: &nbsp;$\\green{${P.t(y - 39, 1)}} = \\orange{${P.t(yh - 39, 1)}} + \\red{${P.t(y - yh, 1)}}$`);
     };
     dots.on("click", (e, d) => sel(d[2]));
     sel(11);
@@ -2219,7 +2641,12 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
         <p>$\hat{\beta}_1 = 0$: the line runs horizontally at the level $\bar{y}$, $\text{ESS} = 0$. Knowing $x$ does not improve the prediction.</p></div>
     </div>
   </div>
-  <p class="p4a-hint">Move the sliders to leave the extreme cases: noise lowers $R^2$ from $1$, a trend raises it from $0$.</p>
+  <p class="hint">Move the sliders to leave the extreme cases: noise lowers $R^2$ from $1$, a trend raises it from $0$.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Left: all points on the line, $R^2 = 1$. Ask what noise will do, then raise $\sigma$ to $1.50$: $R^2 = 0.857$, the line itself stays.</li>
+    <li>Right: $R^2 = 0$. Raise the trend to $0.50$ and $1.00$: $R^2 = 0.512$ and $0.808$.</li>
+    <li>Set the trend to $-1.00$: again $0.808$ &ndash; $R^2$ has no direction.</li>
+  </ol></aside>
   <script>
   (() => {
     const P = P4A, C = QV.C, S = QV.stats;
@@ -2295,11 +2722,17 @@ reg.predict(pd.DataFrame({"price": [15]}))     # 45.0
     </div>
     <div>
       <div class="block alert"><h4>High $R^{2}$, yet the wrong model</h4>
-        <div class="viz" id="p4a-satur" style="height:262px"></div>
+        <div class="viz" id="p4a-satur" style="height:250px"></div>
+        <p class="hint" style="margin:2px 0 0 !important">Show the residuals of the line, then the curve on $\ln x$.</p>
         <p class="fs-s">Ten regions, advertising and revenue: $R^{2} = 0.81$ &ndash; yet the points clearly bend (residual analysis: Appendix A.3).</p></div>
       <div class="block key"><p>$R^{2}$ does not replace the residual plot.</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $R^2 = 0.81$ &ndash; is the line a good model for these ten regions?</li>
+    <li>Click <b>+ residuals</b>: negative at both ends, positive in between &ndash; a systematic bend.</li>
+    <li>Click <b>curve on log x</b>: $R^2 = 0.97$ with the same data; the form of the model was wrong, not the data.</li>
+  </ol></aside>
   <script>
   QV.mount("#p4a-satur", (el) => {
     const P = P4A, C = QV.C, X = P.D.satur.x, Y = P.D.satur.y;
@@ -2711,6 +3144,7 @@ hours          2.5000      0.264      9.487      0.000       1.913       3.087
   <div class="cols" style="--cols: 50fr 48fr">
     <div>
       <div class="viz" id="p4a-hgt1" style="height:430px"></div>
+      <p class="hint">Hover over a point for the person's height and shoe size; the orange square is $(\bar{k}, \bar{s})$.</p>
     </div>
     <div>
       <div class="block example"><h4>Description</h4>
@@ -2723,6 +3157,11 @@ hours          2.5000      0.264      9.487      0.000       1.913       3.087
            $S_{ss} = 24\,272 - 602^2/15 = \mathbf{111.73}$</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what kind of relationship do you see? Positive and almost linear.</li>
+    <li>Hover over the tallest person: $198$&thinsp;cm, shoe size $46$.</li>
+    <li>Point at the orange square, the means $(170.2,\ 40.13)$ &ndash; the regression line of Task 2 passes through it.</li>
+  </ol></aside>
   <script>
   QV.mount("#p4a-hgt1", (el) => {
     const P = P4A, C = QV.C, X = P.D.height.x, Y = P.D.height.y;
@@ -2763,6 +3202,11 @@ hours          2.5000      0.264      9.487      0.000       1.913       3.087
         </ul></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: by how much does the shoe size rise per cm of body height? $0.22$ &ndash; about one size per $4.5$&thinsp;cm.</li>
+    <li>Click <b>Show residuals</b> and hover over the point farthest above the line: person 13 ($168$&thinsp;cm, size $41$), $\hat u = 1.36$.</li>
+    <li>Ask what the line gives for $0$&thinsp;cm: $2.3147$ &ndash; not interpretable.</li>
+  </ol></aside>
   <script>
   QV.mount("#p4a-hgt2", (el) => {
     const P = P4A, C = QV.C, X = P.D.height.x, Y = P.D.height.y, b0 = 2.3147, b1 = 0.2222;
@@ -2774,7 +3218,7 @@ hours          2.5000      0.264      9.487      0.000       1.913       3.087
     let on = false;
     const row = QV.controls(el);
     const b = QV.button(row, "Show residuals", () => { on = !on; if (on) res.set(b0, b1); else res.set(0, 0, () => false); b.setLabel(on ? "Hide residuals" : "Show residuals"); });
-    QV.readout(row, "<span class=\"p4a-hint\">Hover over a point: fitted size and residual.</span>");
+    QV.readout(row, "<span class='hint'>Hover over a point: fitted size and residual.</span>");
   });
   </script>
 </section>
@@ -2809,7 +3253,16 @@ hours          2.5000      0.264      9.487      0.000       1.913       3.087
 .p4b-road { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: 10px 12px; align-items: center; }
 .p4b-road .fbox { min-height: 92px; display: flex; flex-direction: column; justify-content: center; font-size: 19px; }
 .p4b-road .farr { text-align: center; }
-.p4b-hint { font-size: 15px; color: var(--ink-muted); }
+.p4b-ok { color: var(--t-green); font-weight: 700; }
+.p4b-bad { color: var(--t-red); font-weight: 700; }
+.p4b-hl { color: var(--t-orange); font-weight: 700; }
+.viz-ctrl button:disabled { opacity: .45; cursor: default; }
+.viz .p4b-inleg { position: absolute; flex-direction: column; flex-wrap: nowrap; gap: 1px; font-size: 15px; padding: 3px 8px; border-radius: 6px; background: var(--surface); pointer-events: none; }
+.p4b-quiz .p4b-cap, .p4b-quiz .p4b-ans { visibility: hidden; }
+.p4b-quiz .p4b-shown .p4b-cap, .p4b-quiz .p4b-shown .p4b-ans { visibility: visible; }
+.p4b-pick { display: flex; justify-content: center; gap: 6px; background: none; padding: 0; }
+.p4b-pick button.p4b-right { background: var(--c-green); color: #fff; border-color: transparent; }
+.p4b-pick button.p4b-wrong { background: var(--c-red); color: #fff; border-color: transparent; }
 .p4b-tight li { margin-bottom: .12em; }
 .p4b-snug .block > * + * { margin-top: 3px; }
 table.bt.p4b-tt td, table.bt.p4b-tt th { padding: 2px 9px; }
@@ -2932,6 +3385,29 @@ table.bt.p4b-nw2 td:nth-child(-n+2) { white-space: nowrap; }
     const dots = QV.dots(ch, pts, { r: o.r || 6, color: C.blue, tip: P.tip(o.tip || ((d) => `$\\hat y$ = ${QV.fmt(d[0], 2)}, &nbsp;$\\hat u$ = ${QV.fmt(d[1], 2)}`)) });
     return { stems, dots };
   };
+  /** Legend inside the plot area. o: {top, right | left} in px from the corner of the plot area. */
+  P.inLegend = (ch, items, o = {}) => {
+    const lg = QV.legend(ch.el, items);
+    lg.classList.add("p4b-inleg");
+    if (o.bottom !== undefined) lg.style.bottom = (ch.m.bottom + o.bottom) + "px"; else lg.style.top = (ch.m.top + (o.top ?? 2)) + "px";
+    if (o.left !== undefined) lg.style.left = (ch.m.left + o.left) + "px"; else lg.style.right = (ch.m.right + (o.right ?? 4)) + "px";
+    return lg;
+  };
+  /** Verdicts in the decision colours: green = keep / correct, red = reject / flagged. */
+  P.ok = (html) => `<span class="p4b-ok">${html}</span>`;
+  P.bad = (html) => `<span class="p4b-bad">${html}</span>`;
+  /** Step-through controls (Start over, Back, Next) with a read-out. o: {steps, start, next, onStep(k), label(k)} */
+  P.stepper = (row, o) => {
+    let k = o.start ?? o.steps;
+    const ro = { set() {} };
+    const upd = () => { nb.disabled = k >= o.steps; bb.disabled = k <= 0; o.onStep(k); ro.set(o.label(k)); };
+    QV.button(row, "Start over", () => { k = 0; upd(); });
+    const bb = QV.button(row, "&#9664; Back", () => { k = Math.max(0, k - 1); upd(); });
+    const nb = QV.button(row, (o.next || "Next") + " &#9654;", () => { k = Math.min(o.steps, k + 1); upd(); }, { primary: true });
+    Object.assign(ro, QV.readout(row, ""));
+    upd();
+    return { step: () => k, set(v) { k = v; upd(); } };
+  };
   /** Tooltip text helper: renders TeX inside a tooltip string. */
   P.tip = (fn) => (d, i) => P.th(fn(d, i));
   /** Small schematic panel (residual / QQ patterns): no ticks, axis labels in TeX. */
@@ -2995,30 +3471,36 @@ table.bt.p4b-nw2 td:nth-child(-n+2) { white-space: nowrap; }
 <section class="slide">
   <h2>Population line vs. sample lines</h2>
   <div class="cols" style="--cols: 1fr 1fr; --gap: 26px">
-    <div><div class="viz" id="p4b-samp-a" style="height:352px"></div></div>
-    <div><div class="viz" id="p4b-samp-b" style="height:352px"></div></div>
+    <div><div class="viz" id="p4b-samp-a" style="height:392px"></div><div class="viz-ctrl" id="p4b-samp-ctrl-a"></div></div>
+    <div><div class="viz" id="p4b-samp-b" style="height:392px"></div><div class="viz-ctrl" id="p4b-samp-ctrl-b"></div></div>
   </div>
-  <div class="viz-ctrl" id="p4b-samp-ctrl"></div>
   <p class="fs-xs">Simulation with the lamp prices: (a) every sample gives its own OLS line around the fixed population line; (b) over $5000$ samples the slopes $\hat\beta_1$ are normally distributed around $\beta_1$ – their standard deviation is the <b>standard error</b>.</p>
+  <p class="hint">Draw one new sample at a time, then run $5000$ samples; raise the error SD $\sigma$ and watch the lines fan out.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: would nine other stores give the same line?</li>
+    <li><b>New sample</b>, several times: every orange line differs; its slope is marked in (b).</li>
+    <li><b>Run 5000 samples</b>: the slopes pile up around the true $\beta_1$; their SD matches SE $=0.040$.</li>
+    <li>Raise $\sigma$: the lines fan out, the histogram widens.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-samp-a", (elA) => {
     const P = window.P4B, C = QV.C, D = QV.dist, S = QV.stats;
-    const X = P.LAMP.x, n = X.length, xbar = 100, Sxx = 1500;
+    const X = P.LAMP.x, xbar = 100, Sxx = 1500, NT = 5000;
     const fit = S.ols(X, P.LAMP.y), B0 = fit.b0, B1 = fit.b1;
     const elB = document.getElementById("p4b-samp-b");
-    let sigma = fit.s, rng, slopes = [], lines = [], latest = null, sampleY = null, N = 0;
-    // ---- panel (a)
+    let sigma = fit.s, rng, slopes = [], lines = [], latest = null, sampleY = null, N = 0, filling = false;
+    // ---- panel (a): one sample, its line, the lines of the last 25 samples
     const a = QV.chart(elA, { x: { domain: [76, 124], label: "Price (EUR)", tickValues: [80, 90, 100, 110, 120] },
       y: { domain: [-3, 23.5], label: "Sales quantity", tickValues: [0, 5, 10, 15, 20] }, margin: { top: 30 } });
     P.title(a, "(a) Every sample gives its own line");
     const gLines = a.layer("data").append("g");
-    const popLine = QV.line(a, [[76, B0 + B1 * 76], [124, B0 + B1 * 124]], { color: C.red, width: 3.5 });
-    const latestLine = QV.line(a, [], { color: C.orange, width: 3 });
+    QV.line(a, [[76, B0 + B1 * 76], [124, B0 + B1 * 124]], { color: C.red, width: 3.5 });
+    const latestLine = QV.line(a, [], { color: C.orange, width: 3.5 });
     const gPts = a.layer("annot").append("g");
-    QV.legend(elA.parentNode, [{ label: "one simulated sample", color: C.blue, type: "dot" }, { label: "population line (fixed)", color: C.red, type: "line" },
-      { label: "OLS lines of 25 samples", color: C.grey, type: "line" }, { label: "newest sample", color: C.orange, type: "line" }]);
-    // ---- panel (b)
+    const lgNew = P.inLegend(a, [{ label: "one simulated sample", color: C.blue, type: "dot" }, { label: "population line (fixed)", color: C.red, type: "line" },
+      { label: "OLS lines of 25 samples", color: C.grey, type: "line" }, { label: "newest sample", color: C.orange, type: "line" }]).lastElementChild;
+    // ---- panel (b): the slopes of all samples
     const b = QV.chart(elB, { x: { domain: [-0.66, -0.23], label: "", tickValues: [-0.6, -0.55, -0.5, -0.45, -0.4, -0.35, -0.3], format: ".2f" },
       y: { domain: [0, 11], label: "Density" }, margin: { top: 30, bottom: 50 } });
     P.title(b, "(b) Sampling distribution of $\\hat\\beta_1$");
@@ -3026,74 +3508,85 @@ table.bt.p4b-nw2 td:nth-child(-n+2) { white-space: nowrap; }
     const gBars = b.layer("data").append("g");
     const curve = QV.line(b, [], { color: C.blue, width: 3 });
     const trueL = b.layer("annot").append("line").style("stroke", C.red).style("stroke-width", 2.5);
-    const seArrow = QV.segment(b, 0, 0, 0, 0, { color: C.ink2, width: 1.8, arrow: true });
-    const seArrow2 = QV.segment(b, 0, 0, 0, 0, { color: C.ink2, width: 1.8, arrow: true });
+    const seArrow = QV.segment(b, 0, 0, 0, 0, { color: C.ink2, width: 2.5, arrow: true });
+    const seArrow2 = QV.segment(b, 0, 0, 0, 0, { color: C.ink2, width: 2.5, arrow: true });
     const seLab = P.lab(b, 0, 0, "", { bg: true, baseline: "bottom" });
     const trueLab = P.lab(b, 0, 0, "true $\\beta_1$", { anchor: "start", dx: 8, bg: true });
-    const mark = b.layer("front").append("path").attr("d", d3.symbol(d3.symbolTriangle, 110)()).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 1.5).style("display", "none");
-    QV.legend(elB.parentNode, [{ label: "histogram of the simulated slopes", color: "var(--c-blue-tint)", type: "swatch" },
-      { label: "$N\\bigl(\\beta_1,\\ \\mathrm{SE}(\\hat\\beta_1)^2\\bigr)$", color: C.blue, type: "line" }]);
-    const row = document.getElementById("p4b-samp-ctrl");
+    const curveLab = P.lab(b, 0, 0, "$N\\bigl(\\beta_1,\\ \\mathrm{SE}(\\hat\\beta_1)^2\\bigr)$", { anchor: "start", dx: 6 });
+    curveLab.style.color = "var(--t-blue)";
+    const stat = P.lab(b, -0.655, 0, "", { anchor: "start", baseline: "top", dy: 2 });
+    stat.style.lineHeight = "1.3";
+    const mark = b.layer("front").append("path").attr("d", d3.symbol(d3.symbolTriangle, 130)()).style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 1.5).style("display", "none");
     const one = () => {
       const y = X.map((x) => B0 + B1 * x + rng.normal(0, sigma));
       const my = S.mean(y), c1 = S.sum(X.map((x, i) => (x - xbar) * (y[i] - my))) / Sxx;
       return { y, c0: my - c1 * xbar, c1 };
     };
     const SE = () => sigma / Math.sqrt(Sxx);
+    const num = (v) => (Number.isFinite(v) ? `$${QV.fmt(v, 4)}$` : "–");
     const drawA = () => {
       gLines.selectAll("line").data(lines.slice(-25)).join("line")
         .attr("x1", a.x(76)).attr("x2", a.x(124)).attr("y1", (d) => a.y(d.c0 + d.c1 * 76)).attr("y2", (d) => a.y(d.c0 + d.c1 * 124))
-        .style("stroke", C.grey).style("stroke-width", 1.4).style("opacity", 0.8);
+        .style("stroke", C.grey).style("stroke-width", 2).style("opacity", 0.6);
       if (latest) QV.setLine(a, latestLine, [[76, latest.c0 + latest.c1 * 76], [124, latest.c0 + latest.c1 * 124]]);
       else QV.setLine(a, latestLine, []);
       gPts.selectAll("circle").data(sampleY ? X.map((x, i) => [x, sampleY[i]]) : []).join("circle")
         .attr("cx", (d) => a.x(d[0])).attr("cy", (d) => a.y(d[1])).attr("r", 6).style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 2);
+      lgNew.style.display = latest ? "" : "none";
+      roA.set(latest ? `newest sample: slope <span class="p4b-hl">$\\hat\\beta_1=${QV.fmt(latest.c1, 4)}$</span>` : "one sample &rarr; one line &rarr; one slope $\\hat\\beta_1$");
     };
+    let yTop = 0;
     const drawB = () => {
       const se = SE(), bw = se / 5.5, x0 = -0.66, nb = Math.ceil(0.43 / bw);
       const cnt = new Array(nb).fill(0);
       slopes.forEach((s) => { const k = Math.floor((s - x0) / bw); if (k >= 0 && k < nb) cnt[k]++; });
-      const dens = cnt.map((c) => (N ? c / (N * bw) : 0));
-      const peak = 1 / (se * Math.sqrt(2 * Math.PI));
-      const ymax = Math.max(peak, d3.max(dens)) * 1.12;
-      b.y.domain([0, ymax]); b.opts.y.tickValues = null; b.axes();
-      gBars.selectAll("rect").data(dens).join("rect")
+      // while a run fills up, the bars are scaled to the final 5000 samples: they grow into the curve
+      const scale = (filling ? NT : Math.max(N, 1)) * bw;
+      const peak = 1 / (se * Math.sqrt(2 * Math.PI)), ymax = peak * 1.16;
+      if (ymax !== yTop) { yTop = ymax; b.y.domain([0, ymax]); b.axes(); }
+      gBars.selectAll("rect").data(cnt).join("rect")
         .attr("x", (d, k) => b.x(x0 + k * bw) + 0.5).attr("width", Math.max(0.5, b.x(bw) - b.x(0) - 1))
-        .attr("y", (d) => b.y(d)).attr("height", (d) => b.y(0) - b.y(d)).style("fill", C.blue).style("opacity", 0.3);
+        .attr("y", (d) => b.y(d / scale)).attr("height", (d) => b.y(0) - b.y(d / scale)).style("fill", C.blue).style("opacity", 0.3);
       QV.setLine(b, curve, QV.sample((x) => D.normPdf(x, B1, se), -0.66, -0.23, 300));
       trueL.attr("x1", b.x(B1)).attr("x2", b.x(B1)).attr("y1", b.y(0)).attr("y2", b.y(ymax));
       const ya = peak * 0.52;
       seArrow.set(B1 - 0.004, ya, B1 - se, ya); seArrow2.set(B1 - se + 0.004, ya, B1, ya);
       seLab.setHTML(`SE $=${QV.fmt(se, 3)}$`); seLab.set(B1 - se / 2, ya + ymax * 0.03);
-      trueLab.set(B1, ymax * 0.9);
-      if (latest) { mark.style("display", null).attr("transform", `translate(${b.x(latest.c1)},${b.y(0) - 8})`); } else mark.style("display", "none");
+      trueLab.set(B1, ymax * 0.93);
+      curveLab.set(Math.min(B1 + 1.25 * se, -0.37), peak * 0.6);
+      if (latest) { mark.style("display", null).attr("transform", `translate(${b.x(latest.c1)},${b.y(0) - 9})`); } else mark.style("display", "none");
       const m = N ? S.mean(slopes) : NaN, sd = N > 1 ? S.sd(slopes) : NaN;
-      ro.set(`samples: <b>${N}</b> &nbsp; mean of $\\hat\\beta_1$: <b>${QV.fmt(m, 4)}</b> &nbsp; SD: <b>${QV.fmt(sd, 4)}</b> &nbsp; (theory: SE $=${QV.fmt(se, 4)}$)`);
+      stat.setHTML(`samples: <b>${N}</b><br>mean ${num(m)}<br>SD ${num(sd)}`); stat.set(-0.655, ymax);
     };
     const reset = (N0) => {
-      rng = QV.rng(2026); slopes = []; lines = []; latest = null; N = 0; sampleY = null;
+      rng = QV.rng(2026); slopes = []; lines = []; latest = null; N = 0; sampleY = null; filling = false;
       for (let r = 0; r < N0; r++) { const s = one(); slopes.push(s.c1); if (r < 25) lines.push(s); if (r === 0) sampleY = s.y; }
       N = N0;
     };
+    // a run starts slowly (one sample per frame) and then speeds up: about 2.5 s for 5000 samples
     const run = QV.anim(() => {
-      for (let k = 0; k < 40 && N < 5000; k++) { const s = one(); slopes.push(s.c1); N++; lines.push(s); if (lines.length > 25) lines.shift(); sampleY = s.y; }
+      const k = N < 20 ? 1 : N < 200 ? 5 : 60;
+      for (let j = 0; j < k && N < NT; j++) { const s = one(); slopes.push(s.c1); N++; lines.push(s); if (lines.length > 25) lines.shift(); sampleY = s.y; }
+      if (N >= NT) filling = false;
       drawA(); drawB();
-      return N < 5000;
+      return N < NT;
     });
-    QV.slider(row, { label: "error SD $\\sigma$", min: 0.5, max: 2.5, step: 0.01, value: fit.s, fmt: (v) => QV.fmt(v, 2),
-      onInput: (v) => { run.stop(); sigma = v; reset(5000); drawA(); drawB(); } });
-    QV.button(row, "New sample", () => {
-      run.stop();
+    const stop = () => { run.stop(); filling = false; };
+    const rowA = document.getElementById("p4b-samp-ctrl-a"), rowB = document.getElementById("p4b-samp-ctrl-b");
+    QV.button(rowA, "New sample", () => {
+      stop();
       if (latest) { lines.push(latest); if (lines.length > 25) lines.shift(); }
       latest = one(); slopes.push(latest.c1); N++; sampleY = latest.y; drawA(); drawB();
     }, { primary: true });
-    QV.button(row, "Run 5000 samples", () => { run.stop(); reset(0); latest = null; run.start(); });
-    QV.button(row, "Reset", () => { run.stop(); reset(5000); drawA(); drawB(); });
-    const ro = QV.readout(row, "");
-    reset(5000); drawA(); drawB();
-    return { hide() { run.stop(); } };
+    const roA = QV.readout(rowA, "");
+    QV.button(rowB, "Run 5000 samples", () => { stop(); reset(0); filling = true; run.start(); }, { primary: true });
+    QV.button(rowB, "Reset", () => { stop(); reset(NT); drawA(); drawB(); });
+    QV.slider(rowB, { label: "error SD $\\sigma$", min: 0.5, max: 2.5, step: 0.01, value: fit.s, width: 120, fmt: (v) => QV.fmt(v, 2),
+      onInput: (v) => { stop(); sigma = v; reset(NT); drawA(); drawB(); } });
+    reset(NT); drawA(); drawB();
+    return { hide() { if (run.running) { stop(); reset(NT); drawA(); drawB(); } } };
   });
-  
+
   })();
   </script>
 </section>
@@ -3252,11 +3745,17 @@ table.bt.p4b-nw2 td:nth-child(-n+2) { white-space: nowrap; }
 <section class="slide">
   <h2>Two $t$-tests in one picture</h2>
   <div class="cols" style="--cols: 1fr 1fr; --gap: 26px">
-    <div class="viz" id="p4b-tt-a" style="height:396px"></div>
-    <div class="viz" id="p4b-tt-b" style="height:396px"></div>
+    <div><div class="viz" id="p4b-tt-a" style="height:386px"></div><div class="viz-ctrl" id="p4b-tt-ctrl-a"></div></div>
+    <div><div class="viz" id="p4b-tt-b" style="height:386px"></div><div class="viz-ctrl" id="p4b-tt-ctrl-b"></div></div>
   </div>
-  <div class="viz-ctrl" id="p4b-tt-ctrl"></div>
-  <p class="fs-xs">Both tests use the same $t_7$-distribution and the same bars $\pm2.365$. (a) $T=-11.19$ lies far in the rejection region (orange); (b) $T=1.34$ lies inside the acceptance region. The decision is nothing more than: <b>where does the statistic fall?</b> <span class="p4b-hint">Move $\beta_{1,0}$ for panel (b), change $\alpha$, or shade the $p$-value.</span></p>
+  <p class="fs-xs">Both tests use the same $t_7$-distribution and the same bars $\pm2.365$. (a) $T=-11.19$ lies far in the rejection region (orange); (b) $T=1.34$ lies inside the acceptance region. The decision is nothing more than: <b>where does the statistic fall?</b></p>
+  <p class="hint">Move the hypothesised slope $\beta_{1,0}$ of panel (b); $\alpha$ and the shaded $p$-value apply to both tests.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: for which hypothesised slopes $\beta_{1,0}$ would we keep $H_0$?</li>
+    <li>Move $\beta_{1,0}$: $T$ walks through the $t_7$-density; $H_0$ is kept roughly between $-0.54$ and $-0.35$.</li>
+    <li>Show the $p$-value: the area beyond $\pm|T|$, at $-0.5$ it is $0.223$.</li>
+    <li>$\alpha=0.01$: the bars move out to $\pm3.499$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-tt-a", (elA) => {
@@ -3276,57 +3775,65 @@ table.bt.p4b-nw2 td:nth-child(-n+2) { white-space: nowrap; }
       ch.pL = QV.area(ch, [], { color: `url(#${pat})`, opacity: 1 });
       ch.pR = QV.area(ch, [], { color: `url(#${pat})`, opacity: 1 });
       QV.line(ch, QV.sample((x) => D.tPdf(x, df), xl[0], xl[1], 500), { color: C.blue, width: 2.5 });
-      ch.cl = QV.vline(ch, 0, { color: C.red, dash: "6 4", width: 1.8, layer: "front" });
-      ch.cr = QV.vline(ch, 0, { color: C.red, dash: "6 4", width: 1.8, layer: "front" });
+      ch.cl = QV.vline(ch, 0, { color: C.red, dash: "6 4", width: 2.5, layer: "front" });
+      ch.cr = QV.vline(ch, 0, { color: C.red, dash: "6 4", width: 2.5, layer: "front" });
       ch.crit = P.lab(ch, 0, 0.33, "", { anchor: "start", dx: 6, bg: true });
       ch.tl = QV.vline(ch, 0, { color: C.green, width: 3.5, layer: "front" });
       ch.tlab = P.lab(ch, 0, 0.25, "", { anchor: "start", dx: 7, bg: true, size: 16 });
-      ch.dec = P.lab(ch, decX, 0.385, "", { anchor: "start", size: 16 });
+      ch.dec = P.lab(ch, decX, 0.4, "", { anchor: "start", baseline: "top", size: 17, bg: true });
+      ch.dec.style.lineHeight = "1.35"; ch.decX = decX;
       return ch;
     };
     const a = mk(elA, [-12.5, 4.5], "(a) $H_0:\\beta_1=0$", "Density", -8.6);
     const b = mk(document.getElementById("p4b-tt-b"), [-4.5, 4.5], "(b) $H_0:\\beta_1=\\beta_{1,0}$", "", -4.3);
+    const pTxt = (p) => (p < 0.000005 ? "p<0.00001" : `p=${QV.fmt(p, p < 0.001 ? 5 : 3)}`);
     const draw = (ch, T) => {
       const [x0, x1] = ch.x.domain(), tc = D.tInv(1 - alpha / 2, df), f = (x) => D.tPdf(x, df);
       QV.setArea(ch, ch.gAcc, QV.sample(f, -tc, tc, 200));
       QV.setArea(ch, ch.gL, QV.sample(f, x0, -tc, 120)); QV.setArea(ch, ch.gR, QV.sample(f, tc, x1, 120));
-      const at = Math.abs(T);
+      const at = Math.abs(T), p = 2 * (1 - D.tCdf(at, df));
       QV.setArea(ch, ch.pL, showP && -at > x0 ? QV.sample(f, x0, -at, 120) : []);
       QV.setArea(ch, ch.pR, showP && at < x1 ? QV.sample(f, at, x1, 120) : []);
       ch.cl.set(-tc); ch.cr.set(tc);
       ch.crit.setHTML(`$t_{${QV.fmt(1 - alpha / 2, 3, true)};7}=${QV.fmt(tc, 3)}$`);
-      // right of the right bar if there is room, otherwise left of the left bar (panel a)
+      // right of the right bar if there is room, otherwise left of the left bar (panel a), otherwise between the bars
       const cw = (ch.crit.offsetWidth + 12) / (ch.x(1) - ch.x(0));
-      if (tc + cw < x1) { ch.crit.style.transform = "translate(0,-50%)"; ch.crit.set(tc, 0.33); }
-      else { ch.crit.style.transform = "translate(-100%,-50%)"; ch.crit.set(-tc, 0.33); ch.crit.style.left = (parseFloat(ch.crit.style.left) - 12) + "px"; }
+      const place = (x, right) => { ch.crit.style.transform = right ? "translate(0,-50%)" : "translate(-100%,-50%)"; ch.crit.set(x, 0.3); if (!right) ch.crit.style.left = (parseFloat(ch.crit.style.left) - 12) + "px"; };
+      if (tc + cw < x1) place(tc, true); else if (-tc - cw > x0 + 2.5) place(-tc, false); else place(tc, false);
       ch.tl.set(T);
       ch.tlab.setHTML(`$T=${QV.fmt(T, 2)}$`);
       // place the T label beside its line, on the side where it crosses neither critical bar
       const w = ch.tlab.offsetWidth / (ch.x(1) - ch.x(0)), g = 0.15;
       const ok = (l, r) => l > x0 && r < x1 && !(l < tc && r > tc) && !(l < -tc && r > -tc);
-      const right = ok(T + g, T + g + w) || !ok(T - g - w, T - g);
+      const right = ok(T + g, T + g + w) || (!ok(T - g - w, T - g) && T < 0);   // if neither side is free: towards the centre
       const lo = right ? T + g : T - g - w;
       const yl = lo < 1.2 && lo + w > -1.2 ? 0.1 : 0.25;
       ch.tlab.style.transform = right ? "translate(0,-50%)" : "translate(-100%,-50%)";
       ch.tlab.set(T + (right ? g : -g), yl);
-      ch.dec.setHTML(at > tc ? "<b>reject $H_0$</b>" : "<b>keep $H_0$</b>");
-      return 2 * (1 - D.tCdf(at, df));
+      const verdict = at > tc ? P.bad("reject $H_0$") : P.ok("keep $H_0$");
+      ch.dec.setHTML(verdict + (showP ? `<br>$${pTxt(p)}$` : ""));
+      // the decision sits top left; if the statistic comes too close (panel b), it moves to the top right
+      const flip = ch.decX > -5 && T < -2.4;
+      ch.dec.anchor(flip ? "end" : "start", "top"); ch.dec.style.textAlign = flip ? "right" : "left";
+      ch.dec.set(flip ? x1 - 0.15 : ch.decX, 0.4);
+      return { p, verdict };
     };
-    const row = document.getElementById("p4b-tt-ctrl");
     const ro = { set() {} };
     const upd = () => {
       draw(a, B1 / SE);
-      const T = (B1 - b10) / SE, p = draw(b, T);
+      const T = (B1 - b10) / SE, r = draw(b, T);
       b.ttl.setHTML(`(b) $H_0:\\beta_1=${+b10.toFixed(3)}$`);
-      ro.set(`(b): $T=${QV.fmt(T, 3)}$, &nbsp;$p=${QV.fmt(p, 3)}$`);
+      ro.set(`panel (b): &nbsp;$T=${QV.fmt(T, 3)}$, &nbsp;$${pTxt(r.p)}${r.p < alpha ? "<" : "\\ge"}\\alpha$ &nbsp;&rarr;&nbsp; ${r.verdict}`);
     };
-    QV.slider(row, { label: "$\\beta_{1,0}$ in (b)", min: -0.6, max: -0.3, step: 0.005, value: -0.5, fmt: (v) => QV.fmt(v, 3), onInput: (v) => { b10 = v; upd(); } });
-    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.01, value: 0.05, width: 120, fmt: (v) => QV.fmt(v, 2), onInput: (v) => { alpha = v; upd(); } });
-    QV.segmented(row, { label: "$p$-value area", options: [["0", "off"], ["1", "on"]], value: "0", onChange: (v) => { showP = v === "1"; upd(); } });
-    Object.assign(ro, QV.readout(row, ""));
+    const rowA = document.getElementById("p4b-tt-ctrl-a"), rowB = document.getElementById("p4b-tt-ctrl-b");
+    QV.segmented(rowA, { label: "level $\\alpha$", options: [["0.1", "0.10"], ["0.05", "0.05"], ["0.01", "0.01"]], value: "0.05", onChange: (v) => { alpha = +v; upd(); } });
+    QV.segmented(rowA, { label: "$p$-value area", options: [["0", "hide"], ["1", "show"]], value: "0", onChange: (v) => { showP = v === "1"; upd(); } });
+    QV.slider(rowB, { label: "$\\beta_{1,0}$", min: -0.6, max: -0.3, step: 0.005, value: -0.5, width: 140, fmt: (v) => QV.fmt(v, 3), onInput: (v) => { b10 = v; upd(); } });
+    Object.assign(ro, QV.readout(rowB, ""));
+    ro.el.style.flexBasis = "100%";      // the verdict always has its own line: nothing jumps while the slider moves
     upd();
   });
-  
+
   })();
   </script>
 </section>
@@ -3389,53 +3896,73 @@ table.bt.p4b-nw2 td:nth-child(-n+2) { white-space: nowrap; }
         <p>The CI for $\beta_0$ is $[45.15;\,64.18]$. It is computed in the same way – but $\beta_0$ (sales at price $0$) has no substantive meaning here.</p></div>
     </div>
     <div>
-      <div class="viz" id="p4b-cov" style="height:420px"></div>
+      <div class="viz" id="p4b-cov" style="height:400px"></div>
+      <p class="hint">Draw $40$ new samples, or run $1000$; then switch the level.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how many of $40$ intervals should miss $\beta_1$ at $95\,\%$? (About two.)</li>
+    <li><b>40 new samples</b>, a few times: every batch gives other intervals; the red ones miss.</li>
+    <li><b>Run 1000</b>: the share that covers settles near $95\,\%$.</li>
+    <li>Switch to $90\,\%$ or $99\,\%$: same samples, narrower or wider intervals.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-cov", (el) => {
     const P = window.P4B, C = QV.C, D = QV.dist, S = QV.stats;
     const X = P.LAMP.x, fit = S.ols(X, P.LAMP.y), B0 = fit.b0, B1 = fit.b1, sig = fit.s;
-    const K = 40;
-    let rng = QV.rng(11), level = 0.95, total = 0, hits = 0, cur = [];
+    const K = 40, rng = QV.rng(11), all = [];
+    let level = 0.95;
     const ch = QV.chart(el, { x: { domain: [-0.66, -0.23], label: "", tickValues: [-0.6, -0.5, -0.4, -0.3], format: ".1f" },
       y: { domain: [K + 0.8, -1.6], label: "", hide: true }, margin: { top: 30, left: 14, right: 14 } });
     P.title(ch, "40 simulated samples, one CI each");
     P.axes(ch, "slope $\\beta_1$ (lamps per euro)");
-    QV.vline(ch, B1, { color: C.ink2, width: 2, dash: "6 4", layer: "front", y0: K + 0.8, y1: -0.3 });
+    QV.vline(ch, B1, { color: C.ink2, width: 2.5, dash: "6 4", layer: "front", y0: K + 0.8, y1: -0.3 });
     P.lab(ch, B1, -0.75, "true $\\beta_1$", { anchor: "start", dx: 6, bg: true });
     const g = ch.layer("data").append("g");
     const tip = QV.tooltip(ch);
+    const covers = (s, q) => s.b - q * s.se <= B1 && B1 <= s.b + q * s.se;
+    const row = QV.controls(el);
+    const lg = document.createElement("div");
+    lg.className = "viz-legend";
+    row.parentNode.insertBefore(lg, row.nextSibling);
     const draw = () => {
       const q = D.tInv(1 - (1 - level) / 2, 7);
-      const ints = cur.map((s) => ({ lo: s.b - q * s.se, hi: s.b + q * s.se, b: s.b }));
-      ints.forEach((d) => { d.ok = d.lo <= B1 && B1 <= d.hi; });
-      const sel = g.selectAll("g.ci").data(ints).join((en) => { const gg = en.append("g").attr("class", "ci"); gg.append("line"); gg.append("circle"); return gg; });
-      sel.select("line").attr("x1", (d) => ch.x(d.lo)).attr("x2", (d) => ch.x(d.hi)).attr("y1", (d, i) => ch.y(i + 1)).attr("y2", (d, i) => ch.y(i + 1))
+      const ints = all.slice(-K).map((s) => ({ lo: s.b - q * s.se, hi: s.b + q * s.se, b: s.b, ok: covers(s, q) }));
+      const sel = g.selectAll("g.ci").data(ints).join((en) => { const gg = en.append("g").attr("class", "ci"); gg.append("line").attr("class", "w"); gg.append("line").attr("class", "m"); return gg; });
+      sel.select("line.w").attr("x1", (d) => ch.x(d.lo)).attr("x2", (d) => ch.x(d.hi)).attr("y1", (d, i) => ch.y(i + 1)).attr("y2", (d, i) => ch.y(i + 1))
         .style("stroke", (d) => (d.ok ? C.blue : C.red)).style("stroke-width", 3).style("stroke-linecap", "round");
-      sel.select("circle").attr("cx", (d) => ch.x(d.b)).attr("cy", (d, i) => ch.y(i + 1)).attr("r", 3.2).style("fill", C.ink2);
-      sel.on("pointermove", (e, d) => tip.show(`$[${QV.fmt(d.lo, 3)};\\,${QV.fmt(d.hi, 3)}]$ ${d.ok ? "covers" : "<b>misses</b>"} $\\beta_1$`.replace(/\$([^$]+)\$/g, (m, t) => Deck.tex(t)), e))
+      // the estimate: a short tick in the middle of its interval
+      sel.select("line.m").attr("x1", (d) => ch.x(d.b)).attr("x2", (d) => ch.x(d.b)).attr("y1", (d, i) => ch.y(i + 1) - 4).attr("y2", (d, i) => ch.y(i + 1) + 4)
+        .style("stroke", C.ink).style("stroke-width", 2.5);
+      sel.on("pointermove", (e, d) => tip.show(P.th(`$\\hat\\beta_1=${QV.fmt(d.b, 3)}$, CI $[${QV.fmt(d.lo, 3)};\\,${QV.fmt(d.hi, 3)}]$ ${d.ok ? "covers" : "<b>misses</b>"} $\\beta_1$`), e))
         .on("pointerleave", () => tip.hide());
-      const k = ints.filter((d) => d.ok).length;
-      ro.set(`covered: <b>${k} of ${K}</b>` + (total > K ? ` &nbsp; all draws: <b>${QV.fmt(100 * hits / total, 1)} %</b> of ${total}` : ""));
-      return k;
+      const k = ints.filter((d) => d.ok).length, hits = all.filter((s) => covers(s, q)).length;
+      lg.innerHTML = P.th(`<span class="key"><span class="ln" style="border-color:${C.blue}"></span><span>covers $\\beta_1$: <b>${k}</b></span></span>`
+        + `<span class="key"><span class="ln" style="border-color:${C.red}"></span><span>misses $\\beta_1$: <b>${K - k}</b></span></span>`
+        + `<span class="key"><span>all ${all.length} samples so far: <b>${QV.fmt(100 * hits / all.length, 1)} %</b> cover</span></span>`);
     };
     const draw40 = () => {
-      cur = [];
       for (let r = 0; r < K; r++) {
         const y = X.map((x) => B0 + B1 * x + rng.normal(0, sig)), f = S.ols(X, y);
-        cur.push({ b: f.b1, se: f.seB1 });
+        all.push({ b: f.b1, se: f.seB1 });
       }
     };
-    const row = QV.controls(el);
-    QV.button(row, "40 new samples", () => { draw40(); total += K; hits += draw(); }, { primary: true });
-    QV.segmented(row, { options: [["0.9", "90 %"], ["0.95", "95 %"], ["0.99", "99 %"]], value: "0.95", onChange: (v) => { level = +v; total = 0; hits = 0; draw(); } });
-    const ro = QV.readout(row, "");
-    QV.legend(el.parentNode, [{ label: "CI covers $\\beta_1$", color: C.blue, type: "line" }, { label: "CI misses $\\beta_1$", color: C.red, type: "line" }]);
-    draw40(); total = K; hits = draw();
+    // "Run 1000": 25 batches of 40 samples, ten batches per second
+    let left = 0, acc = 0;
+    const run = QV.anim((dt) => {
+      acc += dt;
+      while (acc >= 0.1 && left > 0) { acc -= 0.1; draw40(); left--; }
+      draw();
+      return left > 0;
+    });
+    QV.button(row, "40 new samples", () => { run.stop(); draw40(); draw(); }, { primary: true });
+    QV.button(row, "Run 1000", () => { run.stop(); left = 25; acc = 0.1; run.start(); });
+    QV.segmented(row, { label: "level", options: [["0.9", "90 %"], ["0.95", "95 %"], ["0.99", "99 %"]], value: "0.95", onChange: (v) => { level = +v; draw(); } });
+    draw40(); draw();
+    return { hide() { run.stop(); } };
   });
-  
+
   })();
   </script>
 </section>
@@ -3553,19 +4080,25 @@ price         -0.4467      0.040    -11.189      0.000      -0.541      -0.352
   <h2>Confidence band vs. prediction band</h2>
   <div class="cols mid" style="--cols: 64fr 34fr; --gap: 24px">
     <div>
-      <div class="viz" id="p4b-band" style="height:430px"></div>
+      <div class="viz" id="p4b-band" style="height:392px"></div>
+      <div id="p4b-band-tiles" class="p4b-smtiles"></div>
+      <p class="hint">Drag the orange handle along the line, or jump to a price $x_0$; change the level.</p>
     </div>
-    <div class="fs-xs">
+    <div class="fs-s">
       <ul>
         <li>Both bands are narrowest at $\bar x=100$ and widen towards the edges.</li>
         <li>The prediction band contains most of the points; the confidence band does not need to.</li>
       </ul>
       <div class="block alert"><h4>Extrapolation</h4>
         <p>At $x_0=125$ euros the line predicts $\hat y_0=-1.17$ lamps – impossible. Outside the data range the linear model breaks down.</p></div>
-      <div id="p4b-band-tiles" class="p4b-smtiles"></div>
-      <p class="p4b-hint">Drag the red handle along the line, or change the level.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where is the prediction most precise? Jump to $\bar x=100$: both intervals are narrowest.</li>
+    <li>$x_0=110$: CI $[3.99;\,7.07]$ for the mean, PI $[1.57;\,9.50]$ for one store – always wider.</li>
+    <li>$x_0=125$: $\hat y_0=-1.17$, extrapolation.</li>
+    <li>Level $99\,\%$: both bands widen.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-band", (el) => {
@@ -3577,16 +4110,19 @@ price         -0.4467      0.040    -11.189      0.000      -0.541      -0.352
     QV.hline(ch, 0, { color: C.axis, width: 1, layer: "back" });
     const pi = QV.area(ch, [], { color: C.orange, opacity: 0.25 });
     const ci = QV.area(ch, [], { color: C.blue, opacity: 0.3 });
-    QV.vline(ch, 100, { color: C.grey, dash: "2 4", width: 1.5, layer: "data" });
-    P.lab(ch, 100, 26, "$\\bar x = 100$", { anchor: "start", dx: 6, size: 14 });
+    QV.vline(ch, 100, { color: C.grey, dash: "2 4", width: 2, layer: "data" });
+    P.lab(ch, 100, 26, "$\\bar x = 100$", { anchor: "start", dx: 6 });
     QV.line(ch, [[75, f.predict(75)], [125, f.predict(125)]], { color: C.red, width: 3 });
-    QV.dots(ch, X.map((x, i) => [x, Y[i]]), { r: 6.5, color: C.ink2, tip: (d) => `price ${d[0]} EUR, ${d[1]} lamps` });
+    QV.dots(ch, X.map((x, i) => [x, Y[i]]), { r: 6.5, color: C.blue, tip: (d) => `price ${d[0]} EUR, ${d[1]} lamps` });
     const piSeg = QV.segment(ch, 0, 0, 0, 0, { color: C.orange, width: 6, layer: "front" });
     const ciSeg = QV.segment(ch, 0, 0, 0, 0, { color: C.blue, width: 6, layer: "front" });
     piSeg.style("stroke-linecap", "round"); ciSeg.style("stroke-linecap", "round");
-    const h = QV.dots(ch, [[x0, 0]], { r: 9, color: C.red, layer: "front" });
-    const x0lab = P.lab(ch, 0, 0, "", { anchor: "start", dx: 14, bg: true, size: 14 });
-    const tl = QV.tiles(document.getElementById("p4b-band-tiles"), ["$\\hat y_0$", "CI", "PI"]);
+    const h = QV.dots(ch, [[x0, 0]], { r: 10, color: C.orange, layer: "front" }).style("stroke-width", 2.5);
+    const x0lab = P.lab(ch, 0, 0, "", { anchor: "start", dx: 14, bg: true });
+    P.inLegend(ch, [{ label: "prediction interval (single store)", color: "var(--c-orange-tint)" }, { label: "confidence interval (mean sales)", color: "var(--c-blue-tint)" },
+      { label: "$\\hat y = 54.67 - 0.4467\\,x$", color: C.red, type: "line" }, { label: "observations", color: C.blue, type: "dot" }], { left: 6, bottom: 6 });
+    const tl = QV.tiles(document.getElementById("p4b-band-tiles"), ["", "", ""]);
+    const keys = tl.el.querySelectorAll(".k");
     const half = (x, one) => f.s * Math.sqrt(one + 1 / 9 + (x - 100) ** 2 / 1500);
     const upd = () => {
       const q = D.tInv(1 - (1 - level) / 2, 7);
@@ -3598,19 +4134,23 @@ price         -0.4467      0.040    -11.189      0.000      -0.541      -0.352
       h.data([[x0, yh]]).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
       x0lab.setHTML(`$x_0=${QV.fmt(x0, 1, true)}$`); x0lab.set(x0, yh + e2 + 1.2);
       if (x0 > 112) { x0lab.style.transform = "translate(-100%,-50%)"; x0lab.set(x0, yh + e2 + 1.2); x0lab.style.left = (parseFloat(x0lab.style.left) - 28) + "px"; } else x0lab.style.transform = "translate(0,-50%)";
-      tl.set(0, QV.fmt(yh, 2));
-      tl.set(1, `[${QV.fmt(yh - e1, 2)}; ${QV.fmt(yh + e1, 2)}]`);
-      tl.set(2, `[${QV.fmt(yh - e2, 2)}; ${QV.fmt(yh + e2, 2)}]`);
+      const pc = QV.fmt(100 * level, 0), out = x0 < 80 || x0 > 120;
+      keys[0].innerHTML = P.th(`prediction $\\hat y_0$ at $x_0=${QV.fmt(x0, 1, true)}$`);
+      keys[1].innerHTML = P.th(`$${pc}\\,\\%$ CI: mean sales`);
+      keys[2].innerHTML = P.th(`$${pc}\\,\\%$ PI: one new store`);
+      tl.set(0, QV.fmt(yh, 2) + (out ? ` ${P.bad("extrapolation")}` : ""));
+      tl.set(1, `±${QV.fmt(e1, 2)}: [${QV.fmt(yh - e1, 2)}; ${QV.fmt(yh + e1, 2)}]`);
+      tl.set(2, `±${QV.fmt(e2, 2)}: [${QV.fmt(yh - e2, 2)}; ${QV.fmt(yh + e2, 2)}]`);
     };
     const row = QV.controls(el);
-    QV.slider(row, { label: "level $1-\\alpha$", min: 0.8, max: 0.99, step: 0.01, value: 0.95, width: 130, fmt: (v) => QV.fmt(v, 2), onInput: (v) => { level = v; upd(); } });
-    const xs = QV.slider(row, { label: "$x_0$", min: 75, max: 125, step: 0.5, value: 110, width: 130, fmt: (v) => QV.fmt(v, 1), onInput: (v) => { x0 = v; upd(); } });
-    QV.drag(ch, h, (xv) => { x0 = Math.round(Math.max(75, Math.min(125, xv)) * 2) / 2; xs.set(x0, false); upd(); });
-    QV.legend(el.parentNode, [{ label: "prediction interval (single store)", color: "var(--c-orange-tint)" }, { label: "confidence interval (mean sales)", color: "var(--c-blue-tint)" },
-      { label: "$\\hat y = 54.67 - 0.4467\\,x$", color: C.red, type: "line" }, { label: "observations", color: C.ink2, type: "dot" }]);
+    QV.segmented(row, { label: "level", options: [["0.9", "90 %"], ["0.95", "95 %"], ["0.99", "99 %"]], value: "0.95", onChange: (v) => { level = +v; upd(); } });
+    const go = (v, from) => { x0 = v; if (from !== "seg") seg.set(String(v), false); if (from !== "slider") xs.set(v, false); upd(); };
+    const seg = QV.segmented(row, { label: "price $x_0$", options: [["100", "$\\bar x=100$"], ["110", "$110$"], ["125", "$125$"]], value: "110", onChange: (v) => go(+v, "seg") });
+    const xs = QV.slider(row, { label: "", min: 75, max: 125, step: 0.5, value: 110, width: 120, fmt: (v) => QV.fmt(v, 1), onInput: (v) => go(v, "slider") });
+    QV.drag(ch, h, (xv) => go(Math.round(Math.max(75, Math.min(125, xv)) * 2) / 2, "drag"));
     upd();
   });
-  
+
   })();
   </script>
 </section>
@@ -3774,14 +4314,20 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
     <div class="viz" id="p4b-ad3-1" style="height:310px"></div>
     <div class="viz" id="p4b-ad3-2" style="height:310px"></div>
   </div>
-  <p class="p4b-hint p4b-mt0" style="margin-top:-6px !important">Hover over a market: the same market lights up in all three panels.</p>
+  <p class="hint p4b-mt0" style="margin-top:-6px !important">Point at a market, or click it to keep it: the same market is marked in all three panels, with its budgets.</p>
   <div class="srcnote">Advertising data from James, Witten, Hastie, Tibshirani: <em>An Introduction to Statistical Learning</em>, www.statlearning.com</div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which medium is most closely related to sales? Compare the clouds: $r=0.78$, $0.58$, $0.23$.</li>
+    <li>Click a market with high sales: its TV and radio budgets are high, its newspaper budget can be anything.</li>
+    <li>Ask: where should the budget go? One model for all three media follows.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-ad3-0", () => {
     const P = window.P4B, C = QV.C, S = QV.stats;
     const vars = ["TV", "radio", "newspaper"], cols = [C.blue, C.orange, C.grey];
     const xmax = { TV: 310, radio: 52, newspaper: 120 };
+    let pinned = null;
     const charts = vars.map((v, k) => {
       const el = document.getElementById("p4b-ad3-" + k);
       const xs = P.AD.map((d) => d[v]), ys = P.AD.map((d) => d.sales), f = S.ols(xs, ys);
@@ -3789,22 +4335,38 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
         y: { domain: [0, 28.5], label: k === 0 ? "sales (1000 units)" : "", tickValues: [0, 5, 10, 15, 20, 25] },
         margin: { top: 30, left: k === 0 ? 56 : 34, right: 10 } });
       P.title(ch, `slope $\\hat\\beta_1=${QV.fmt(f.b1, 4)}$, &nbsp;$r=${QV.fmt(S.corr(xs, ys), 2)}$`);
-      const dots = QV.dots(ch, P.AD.map((d) => [d[v], d.sales, d.i]), { r: 3.6, color: cols[k], opacity: 0.75, ring: false });
+      const dots = QV.dots(ch, P.AD.map((d) => [d[v], d.sales, d.i]), { r: 5, color: cols[k], opacity: 0.6, ring: false });
       QV.line(ch, [[d3.min(xs), f.predict(d3.min(xs))], [d3.max(xs), f.predict(d3.max(xs))]], { color: C.red, width: 3, layer: "annot" });
-      const hl = ch.layer("front").append("circle").attr("r", 7.5).style("fill", C.ink).style("stroke", C.surface).style("stroke-width", 2.5).style("display", "none");
-      return { ch, dots, hl, v };
+      const hl = ch.layer("front").append("circle").attr("r", 8).style("fill", C.ink).style("stroke", C.surface).style("stroke-width", 2.5).style("display", "none").style("pointer-events", "none");
+      const lab = P.lab(ch, 0, 0, "", { bg: true });
+      lab.style.display = "none"; lab.style.fontWeight = "600";
+      return { ch, dots, hl, lab, v };
     });
-    const show = (i, ev, src) => {
-      const d = P.AD[i - 1];
-      charts.forEach((c) => c.hl.style("display", null).attr("cx", c.ch.x(d[c.v])).attr("cy", c.ch.y(d.sales)));
-      QV.tooltip(src.ch).show(`<b>market ${i}</b><br>TV ${d.TV} · radio ${d.radio} · newspaper ${d.newspaper}<br>sales ${d.sales}`, ev);
-    };
+    // mark market i in all three panels and write its values next to the mark (null: nothing marked)
+    const mark = (i) => charts.forEach((c) => {
+      c.hl.style("display", i === null ? "none" : null); c.lab.style.display = i === null ? "none" : "";
+      if (i === null) return;
+      const d = P.AD[i - 1], low = d.sales < 5;
+      c.hl.attr("cx", c.ch.x(d[c.v])).attr("cy", c.ch.y(d.sales));
+      c.lab.setHTML(`${c.v} ${d[c.v]} &middot; sales ${d.sales}`);
+      c.lab.anchor(d[c.v] > 0.5 * xmax[c.v] ? "end" : "start", low ? "bottom" : "top");
+      c.lab.set(d[c.v], d.sales);
+      c.lab.style.top = (parseFloat(c.lab.style.top) + (low ? -12 : 12)) + "px";
+    });
     charts.forEach((c) => {
-      c.dots.style("cursor", "default").on("pointerenter pointermove", (ev, d) => show(d[2], ev, c))
-        .on("pointerleave", () => { charts.forEach((o) => o.hl.style("display", "none")); QV.tooltip(c.ch).hide(); });
+      const tip = QV.tooltip(c.ch);
+      c.dots.style("cursor", "pointer")
+        .on("pointerenter pointermove", (ev, d) => {
+          const m = P.AD[d[2] - 1];
+          mark(d[2]);
+          tip.show(`<b>market ${m.i}</b><br>TV ${m.TV} · radio ${m.radio} · newspaper ${m.newspaper}<br>sales ${m.sales}`, ev);
+        })
+        .on("pointerleave", () => { mark(pinned); tip.hide(); })
+        .on("click", (ev, d) => { pinned = pinned === d[2] ? null : d[2]; mark(pinned); ev.stopPropagation(); });
+      c.ch.svg.on("click", () => { pinned = null; mark(null); });
     });
   });
-  
+
   })();
   </script>
 </section>
@@ -3824,7 +4386,8 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
   <h2>Geometry: from a line to a plane</h2>
   <div class="cols mid" style="--cols: 56fr 42fr; --gap: 26px">
     <div>
-      <div class="viz" id="p4b-plane" style="height:440px"></div>
+      <div class="viz" id="p4b-plane" style="height:418px"></div>
+      <p class="hint">Drag the figure to rotate it, or pick a side view; click a market to see its residual.</p>
     </div>
     <div>
       <ul>
@@ -3832,10 +4395,14 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
         <li style="margin-bottom:.5em">The residuals are again the <em>vertical</em> distances of the points from the plane.</li>
         <li>With $p$ variables: a “hyperplane” – no longer drawable, but the same idea.</li>
       </ul>
-      <p class="p4b-hint">Drag the figure to rotate it; hover over a market for its values.</p>
     </div>
   </div>
   <div class="srcnote">ISLR, Figure 3.5 (sales on TV and radio).</div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what do we see when we look along the radio axis? Switch to <b>sales vs TV</b>: the familiar scatter plot; the plane becomes a band.</li>
+    <li>Back to <b>3-D</b>, then <b>Rotate 360°</b>: points lie above and below the plane.</li>
+    <li>Click a market: its residual is the vertical distance to the plane.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-plane", (el) => {
@@ -3849,8 +4416,8 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
       .attr("orient", "auto").append("path").attr("d", "M0,0L10,5L0,10z").style("fill", C.ink2);
     const gItems = svg.append("g"), gAx = svg.append("g"), gLab = svg.append("g");
     const U = (tv) => (tv - 150) / 150, V = (r) => (r - 25) / 25, Z = (s) => (s - 14) / 13;
-    const A0 = -0.8, E0 = 0.42;
-    let az = A0, elv = E0, showRes = true;
+    const VIEWS = { "3d": [-0.8, 0.42], tv: [0, 0], radio: [-Math.PI / 2, 0] };   // azimuth, elevation
+    let az = VIEWS["3d"][0], elv = VIEWS["3d"][1], showRes = true, pick = null;
     const sc = Math.min(W * 0.32, H * 0.34);
     const proj = (u, v, w) => {
       const ca = Math.cos(az), sa = Math.sin(az), ce = Math.cos(elv), se = Math.sin(elv);
@@ -3869,14 +4436,22 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
     const axes = [
       { to: [335, 0, 1.6], lab: "TV" }, { to: [0, 58, 1.6], lab: "Radio" }, { to: [0, 0, 30], lab: "Sales" },
     ];
+    const eq = `plane: $\\hat y = ${QV.fmt(f.b[0], 3)} + ${QV.fmt(f.b[1], 4)}\\,x_1 + ${QV.fmt(f.b[2], 4)}\\,x_2$ &nbsp;($x_1$ TV, $x_2$ radio)`;
+    const say = () => {
+      if (pick === null) { ro.set(eq); return; }
+      const p = pts[pick - 1];
+      ro.set(`market ${pick}: sales $${p.d.sales}$ $-$ fitted $${QV.fmt(p.fit, 2)}$ $=$ residual <span class="p4b-bad">$${QV.fmt(p.res, 2)}$</span> &nbsp;(${p.res > 0 ? "above" : "below"} the plane)`);
+    };
     const render = () => {
       const o = proj(U(0), V(0), Z(1.6));
+      const tipOf = (a) => proj(U(a.to[0]), V(a.to[1]), Z(a.to[2]));
+      const len = (a) => Math.hypot(tipOf(a)[0] - o[0], tipOf(a)[1] - o[1]);
       gAx.selectAll("line").data(axes).join("line").attr("x1", o[0]).attr("y1", o[1])
-        .attr("x2", (a) => proj(U(a.to[0]), V(a.to[1]), Z(a.to[2]))[0]).attr("y2", (a) => proj(U(a.to[0]), V(a.to[1]), Z(a.to[2]))[1])
-        .style("stroke", C.ink2).style("stroke-width", 1.8).attr("marker-end", "url(#p4b-plane-arr)");
+        .attr("x2", (a) => tipOf(a)[0]).attr("y2", (a) => tipOf(a)[1])
+        .style("stroke", C.ink2).style("stroke-width", 2).attr("marker-end", "url(#p4b-plane-arr)").style("display", (a) => (len(a) < 24 ? "none" : null));
       gLab.selectAll("text").data(axes).join("text").attr("class", "lbl")
-        .attr("x", (a) => proj(U(a.to[0]), V(a.to[1]), Z(a.to[2]))[0] + 8).attr("y", (a) => proj(U(a.to[0]), V(a.to[1]), Z(a.to[2]))[1] + 5)
-        .style("fill", C.ink).style("font-size", "16px").text((a) => a.lab);
+        .attr("x", (a) => tipOf(a)[0] + 8).attr("y", (a) => tipOf(a)[1] + 5)
+        .style("fill", C.ink).style("font-size", "16px").style("display", (a) => (len(a) < 24 ? "none" : null)).text((a) => a.lab);
       const items = [];
       quads.forEach((q) => {
         const pp = q.c.map(([t, r]) => proj(U(t), V(r), Z(plane(t, r))));
@@ -3884,35 +4459,57 @@ pred[["obs_ci_lower", "obs_ci_upper"]]      # one store:  [1.57, 9.50]
         items.push(q);
       });
       pts.forEach((p) => { const q = proj(U(p.d.TV), V(p.d.radio), Z(p.d.sales)); p.x = q[0]; p.y = q[1]; p.z = q[2] - 0.004; items.push(p); });
-      if (showRes) segs.forEach((s) => {
+      segs.forEach((s) => {
+        if (!showRes && s.d.i !== pick) return;
         const a = proj(U(s.d.TV), V(s.d.radio), Z(s.d.sales)), b = proj(U(s.d.TV), V(s.d.radio), Z(s.fit));
         s.path = `M${a[0]},${a[1]}L${b[0]},${b[1]}`; s.z = (a[2] + b[2]) / 2; items.push(s);
       });
       items.sort((p, q) => q.z - p.z);
-      gItems.selectAll("path").data(items, (d) => d.key).join((en) => en.append("path").each(function (d) {
+      const sel = gItems.selectAll("path").data(items, (d) => d.key).join((en) => en.append("path").each(function (d) {
         const s = d3.select(this);
-        if (d.type === "q") s.style("fill", C.blue).style("fill-opacity", 0.32).style("stroke", C.blue).style("stroke-opacity", 0.55).style("stroke-width", 0.8);
-        else if (d.type === "s") s.style("stroke", C.ink2).style("stroke-width", 1.1).style("opacity", 0.7).style("fill", "none");
-        else s.style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 1.2)
+        if (d.type === "q") s.style("fill", C.blue).style("fill-opacity", 0.32).style("stroke", C.blue).style("stroke-opacity", 0.55).style("stroke-width", 0.8).style("pointer-events", "none");
+        else if (d.type === "s") s.style("fill", "none").style("pointer-events", "none");
+        else s.style("fill", C.orange).style("cursor", "pointer")
           .on("pointerenter pointermove", (ev) => tip.show(`<b>market ${d.d.i}</b><br>TV ${d.d.TV} · radio ${d.d.radio}<br>sales ${d.d.sales} · fitted ${QV.fmt(d.fit, 2)}<br>residual ${QV.fmt(d.res, 2)}`, ev))
-          .on("pointerleave", () => tip.hide());
+          .on("pointerleave", () => tip.hide())
+          .on("click", () => { pick = pick === d.d.i ? null : d.d.i; say(); render(); });
       }))
-        .attr("d", (d) => (d.type === "p" ? `M${d.x - 4.6},${d.y}a4.6,4.6 0 1,0 9.2,0a4.6,4.6 0 1,0 -9.2,0` : d.path))
+        .attr("d", (d) => (d.type === "p" ? `M${d.x - 5},${d.y}a5,5 0 1,0 10,0a5,5 0 1,0 -10,0` : d.path))
         .order();
+      // the chosen market: red residual, dark ring
+      sel.filter((d) => d.type === "s").style("stroke", (d) => (d.d.i === pick ? C.red : C.ink2)).style("stroke-width", (d) => (d.d.i === pick ? 4 : 1.6)).style("opacity", (d) => (d.d.i === pick ? 1 : 0.7));
+      sel.filter((d) => d.type === "p").style("stroke", (d) => (d.d.i === pick ? C.ink : C.surface)).style("stroke-width", (d) => (d.d.i === pick ? 3 : 1.2));
     };
-    svg.call(d3.drag().on("start", () => svg.style("cursor", "grabbing")).on("drag", (ev) => {
+    let moved = false;
+    svg.call(d3.drag().on("start", () => { moved = false; svg.style("cursor", "grabbing"); }).on("drag", (ev) => {
+      moved = true; turn.stop(); spin.stop(); view.set("", false);
       az -= ev.dx * 0.008; elv = Math.max(-0.05, Math.min(1.45, elv + ev.dy * 0.008)); render();
     }).on("end", () => svg.style("cursor", "grab")));
     const row = QV.controls(el);
+    // turning to a preset view: 0.8 s, along the shorter way round
+    let from = null, to = null;
+    const turn = QV.anim((dt, t) => {
+      const k = Math.min(1, t / 0.8), e = k * k * (3 - 2 * k);
+      az = from[0] + (to[0] - from[0]) * e; elv = from[1] + (to[1] - from[1]) * e; render();
+      return k < 1;
+    });
+    const view = QV.segmented(row, { label: "view", options: [["3d", "3-D"], ["tv", "sales vs TV"], ["radio", "sales vs radio"]], value: "3d", onChange: (v) => {
+      spin.stop(); turn.stop();
+      const TAU = 2 * Math.PI, a0 = ((az % TAU) + TAU) % TAU;
+      let a1 = ((VIEWS[v][0] % TAU) + TAU) % TAU;
+      if (a1 - a0 > Math.PI) a1 -= TAU; else if (a0 - a1 > Math.PI) a1 += TAU;
+      from = [a0, elv]; to = [a1, VIEWS[v][1]]; turn.start();
+    } });
     QV.segmented(row, { label: "residuals", options: [["1", "show"], ["0", "hide"]], value: "1", onChange: (v) => { showRes = v === "1"; render(); } });
-    const spin = QV.anim((dt, t) => { az += dt * 1.6; render(); return t < 3.9; });
-    QV.button(row, "Rotate 360°", () => { spin.stop(); spin.start(); }, { primary: true });
-    QV.button(row, "Reset view", () => { spin.stop(); az = A0; elv = E0; render(); });
-    QV.readout(row, `$\\hat y = ${QV.fmt(f.b[0], 3)} + ${QV.fmt(f.b[1], 4)}\\,x_1 + ${QV.fmt(f.b[2], 4)}\\,x_2$`);
-    render();
-    return { hide() { spin.stop(); } };
+    let az0 = 0;
+    const spin = QV.anim((dt, t) => { const k = Math.min(1, t / 4); az = az0 + 2 * Math.PI * k; render(); if (k >= 1) az = az0; return k < 1; });
+    QV.button(row, "Rotate 360°", () => { turn.stop(); spin.stop(); az0 = az; spin.start(); }, { primary: true });
+    const ro = QV.readout(row, "");
+    ro.el.style.flexBasis = "100%";
+    say(); render();
+    return { hide() { spin.stop(); turn.stop(); } };
   });
-  
+
   })();
   </script>
 </section>
@@ -3986,74 +4583,82 @@ newspaper     -0.0010      0.006     -0.177      0.860      -0.013       0.011
 <section class="slide">
   <h2>Confounding: why the newspaper slope collapses</h2>
   <div class="cols" style="--cols: 1fr 1fr; --gap: 26px">
-    <div class="viz" id="p4b-conf-a" style="height:300px"></div>
-    <div class="viz" id="p4b-conf-b" style="height:300px"></div>
+    <div><div class="viz" id="p4b-conf-a" style="height:270px"></div><div class="viz-ctrl" id="p4b-conf-ctrl-a"></div></div>
+    <div><div class="viz" id="p4b-conf-b" style="height:270px"></div><div class="viz-ctrl" id="p4b-conf-ctrl-b"></div></div>
   </div>
-  <div class="viz-ctrl" id="p4b-conf-ctrl"></div>
   <ul class="fs-xs p4b-tight">
     <li>Markets with a large radio budget also spend more on newspapers ($r=0.35$) – and radio really drives sales.</li>
     <li>In the simple regression, newspaper acts as a <b>proxy</b> for radio and “borrows” its effect.</li>
   </ul>
   <div class="block key fs-xs"><p><b>Confounding:</b> a simple association can be produced by a third variable – include all relevant variables.</p></div>
+  <p class="hint p4b-mt0">Highlight the markets with a large radio budget in (a); show the step in between in (b).</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: why can newspaper look useful on its own?</li>
+    <li>Highlight radio $>25$: these markets also spend more on newspapers ($38.2$ vs. $23.8$) and sell more ($16.7$ vs. $11.7$).</li>
+    <li>In (b) show the step in between: with radio in the model the newspaper slope drops from $0.0547$ to $0.0066$, its CI covers $0$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-conf-a", (elA) => {
     const P = window.P4B, C = QV.C, S = QV.stats;
     const AD = P.AD, R = AD.map((d) => d.radio), N = AD.map((d) => d.newspaper), Y = AD.map((d) => d.sales), T = AD.map((d) => d.TV);
     const fa = S.ols(R, N);
-    let thr = null;
     const a = QV.chart(elA, { x: { domain: [0, 52], label: "radio budget (1000 $)", ticks: 6 }, y: { domain: [0, 120], label: "newspaper budget (1000 $)", tickValues: [0, 25, 50, 75, 100] }, margin: { top: 30 } });
     P.title(a, `(a) Budgets move together: $r(\\text{radio},\\text{newspaper})=${QV.fmt(S.corr(R, N), 2)}$`);
     const band = QV.rect(a, 0, 0, 0, 120, { fill: C.orangeT, layer: "back" }).style("display", "none");
-    const dots = QV.dots(a, AD.map((d) => [d.radio, d.newspaper, d]), { r: 4, color: C.blue, opacity: 0.7, ring: false,
+    const dots = QV.dots(a, AD.map((d) => [d.radio, d.newspaper, d]), { r: 5, color: C.blue, opacity: 0.65, ring: false,
       tip: (d) => `market ${d[2].i}: radio ${d[2].radio}, newspaper ${d[2].newspaper}, sales ${d[2].sales}` });
     QV.line(a, [[0, fa.b0], [50, fa.b0 + fa.b1 * 50]], { color: C.red, width: 3, layer: "annot" });
     // panel (b): newspaper slope with 95% CI in different models
     const m1 = P.mols([N], Y), m2 = P.mols([R, N], Y), m3 = P.mols([T, R, N], Y);
+    const code = (s) => `<code style="font-size:14px">${s}</code>`;
     const all = [
-      { key: "s", lab: "simple regression<br><code>sales ~ newspaper</code>", short: "simple<br><code>~ newspaper</code>", m: m1, j: 1, col: C.orange },
-      { key: "r", lab: "adding radio<br><code>sales ~ radio + newspaper</code>", short: "adding radio<br><code>~ radio</code><br><code>+ newspaper</code>", m: m2, j: 2, col: C.green },
-      { key: "m", lab: "multiple regression<br><code>sales ~ TV + radio + newspaper</code>", short: "multiple<br><code>~ TV + radio</code><br><code>+ newspaper</code>", m: m3, j: 3, col: C.blue },
+      { key: "s", lab: `simple regression<br>${code("sales ~ newspaper")}`, m: m1, j: 1, col: C.orange },
+      { key: "r", lab: `adding radio<br>${code("sales ~ radio")}<br>${code("+ newspaper")}`, m: m2, j: 2, col: C.green },
+      { key: "m", lab: `multiple regression<br>${code("sales ~ TV + radio")}<br>${code("+ newspaper")}`, m: m3, j: 3, col: C.blue },
     ];
     const elB = document.getElementById("p4b-conf-b");
+    const pTxt = (p) => (p < 0.0005 ? "p<0.001" : `p=${QV.fmt(p, p < 0.01 ? 3 : 2)}`);
     let mid = false, b = null;
     const drawB = () => {
       elB.innerHTML = "";
       const items = mid ? all : [all[0], all[2]];
       b = QV.chart(elB, { x: { domain: items.map((d) => d.key), type: "point", padding: 0.5, hide: true }, y: { domain: [-0.03, 0.1], label: "newspaper slope with 95% CI", tickValues: [-0.025, 0, 0.025, 0.05, 0.075, 0.1], format: ".3f" },
-        margin: { top: 30, bottom: 52, left: 80 } });
+        margin: { top: 30, bottom: 68, left: 80 } });
       P.title(b, "(b) The newspaper effect disappears");
       // zero line across the whole panel (QV.hline on a point scale only spans the first to the last model)
       b.layer("data").append("line").attr("x1", 0).attr("x2", b.w).attr("y1", b.y(0)).attr("y2", b.y(0))
-        .style("stroke", C.red).style("stroke-width", 1.8).style("stroke-dasharray", "6 4");
+        .style("stroke", C.red).style("stroke-width", 2.5).style("stroke-dasharray", "6 4");
       items.forEach((it) => {
         const e = it.m.b[it.j], ci = it.m.ci(it.j), X = b.x(it.key);
         const g = b.layer("annot").append("g");
-        g.append("line").attr("x1", X).attr("x2", X).attr("y1", b.y(ci[0])).attr("y2", b.y(ci[1])).style("stroke", it.col).style("stroke-width", 3);
-        [ci[0], ci[1]].forEach((v) => g.append("line").attr("x1", X - 12).attr("x2", X + 12).attr("y1", b.y(v)).attr("y2", b.y(v)).style("stroke", it.col).style("stroke-width", 3));
-        const c = g.append("circle").attr("cx", X).attr("cy", b.y(e)).attr("r", 8).style("fill", it.col).style("stroke", C.surface).style("stroke-width", 2);
-        QV.attachTip(b, g, () => `${it.lab.replace(/<br>/, ": ")}<br>slope ${QV.fmt(e, 4)}, 95% CI [${QV.fmt(ci[0], 4)}; ${QV.fmt(ci[1], 4)}], p = ${QV.fmt(it.m.p[it.j], 3)}`);
-        const L = P.lab(b, null, e, `$${QV.fmt(e, 4)}$`, { anchor: "start", dx: 16, bg: true });
-        L.style.left = (b.m.left + X + 16) + "px";
-        const T2 = P.lab(b, null, -0.03, mid ? it.short : it.lab, { baseline: "top", dy: 6, size: 13 });
-        T2.style.left = (b.m.left + X) + "px"; T2.style.textAlign = "center"; T2.style.whiteSpace = "nowrap";
+        g.append("line").attr("x1", X).attr("x2", X).attr("y1", b.y(ci[0])).attr("y2", b.y(ci[1])).style("stroke", it.col).style("stroke-width", 3.5);
+        [ci[0], ci[1]].forEach((v) => g.append("line").attr("x1", X - 12).attr("x2", X + 12).attr("y1", b.y(v)).attr("y2", b.y(v)).style("stroke", it.col).style("stroke-width", 3.5));
+        g.append("circle").attr("cx", X).attr("cy", b.y(e)).attr("r", 8).style("fill", it.col).style("stroke", C.surface).style("stroke-width", 2);
+        QV.attachTip(b, g, () => `${it.lab.replace(/<br>/, ": ").replace(/<br>/, " ")}<br>slope ${QV.fmt(e, 4)}, 95% CI [${QV.fmt(ci[0], 4)}; ${QV.fmt(ci[1], 4)}], p = ${QV.fmt(it.m.p[it.j], 3)}`);
+        const L = P.lab(b, null, e, `$${QV.fmt(e, 4)}$<br>$${pTxt(it.m.p[it.j])}$`, { anchor: "start", dx: 16, bg: true });
+        L.style.left = (b.m.left + X + 16) + "px"; L.style.lineHeight = "1.25";
+        const T2 = P.lab(b, null, -0.03, it.lab, { baseline: "top", dy: 5, size: 15 });
+        T2.style.left = (b.m.left + X) + "px"; T2.style.textAlign = "center"; T2.style.whiteSpace = "nowrap"; T2.style.lineHeight = "1.3";
       });
     };
-    const row = document.getElementById("p4b-conf-ctrl");
-    const ro = { set() {} };
-    QV.slider(row, { label: "highlight radio &gt;", min: 0, max: 50, step: 1, value: 0, width: 140, fmt: (v) => (v ? String(v) : "off"), onInput: (v) => {
-      thr = v || null;
+    const rowA = document.getElementById("p4b-conf-ctrl-a"), rowB = document.getElementById("p4b-conf-ctrl-b");
+    const mean = (rows, k) => QV.fmt(S.mean(rows.map((d) => d[k])), 1);
+    const hi = (thr) => {
       band.style("display", thr ? null : "none"); if (thr) band.set(thr, 52, 0, 120);
       dots.style("fill", (d) => (thr && d[0] > thr ? C.orange : C.blue));
-      if (!thr) { ro.set(""); return; }
-      const hi = AD.filter((d) => d.radio > thr), lo = AD.filter((d) => d.radio <= thr);
-      ro.set(`radio &gt; ${thr}: mean newspaper <b>${QV.fmt(S.mean(hi.map((d) => d.newspaper)), 1)}</b>, mean sales <b>${QV.fmt(S.mean(hi.map((d) => d.sales)), 1)}</b> &nbsp;|&nbsp; others: <b>${QV.fmt(S.mean(lo.map((d) => d.newspaper)), 1)}</b>, <b>${QV.fmt(S.mean(lo.map((d) => d.sales)), 1)}</b>`);
-    } });
-    QV.segmented(row, { label: "(b)", options: [["0", "2 models"], ["1", "+ radio only"]], value: "0", onChange: (v) => { mid = v === "1"; drawB(); } });
-    Object.assign(ro, QV.readout(row, ""));
-    drawB();
+      if (!thr) { roA.set("Do markets with a large radio budget differ from the others?"); return; }
+      const up = AD.filter((d) => d.radio > thr), lo = AD.filter((d) => d.radio <= thr);
+      roA.set(`radio $>${thr}$: newspaper <b>${mean(up, "newspaper")}</b>, sales <b>${mean(up, "sales")}</b> &nbsp;|&nbsp; others: <b>${mean(lo, "newspaper")}</b>, <b>${mean(lo, "sales")}</b> (means)`);
+    };
+    QV.segmented(rowA, { label: "highlight markets with", options: [["0", "off"], ["25", "radio > 25"], ["35", "radio > 35"]], value: "0", onChange: (v) => hi(+v) });
+    const roA = QV.readout(rowA, "");
+    roA.el.style.flexBasis = "100%";
+    QV.segmented(rowB, { label: "step in between", options: [["0", "hide"], ["1", "show"]], value: "0", onChange: (v) => { mid = v === "1"; drawB(); } });
+    QV.readout(rowB, "CI covers $0$ &rarr; not significant");
+    hi(0); drawB();
   });
-  
+
   })();
   </script>
 </section>
@@ -4125,10 +4730,18 @@ newspaper     -0.0010      0.006     -0.177      0.860      -0.013       0.011
   <h2>$F$-test – advertising example</h2>
   <p><b>Given:</b> $\text{TSS}=5417.15$, $\text{RSS}=556.83$, $n=200$, $p=3$.</p>
   <p>\[ F=\frac{(5417.15-556.83)/3}{556.83/196}=\frac{1620.11}{2.8410}=\mathbf{570.3} \;\gg\;2.65=F_{0.95;\,3,\,196} \]</p>
-  <div style="width:820px; margin:0 auto">
-    <div class="viz" id="p4b-fdist" style="height:330px"></div>
+  <div class="cols" style="--cols: 860px; justify-content: center">
+    <div>
+      <div class="viz" id="p4b-fdist" style="height:282px"></div>
+      <p class="hint p4b-mt0" style="margin-top:-6px !important">Switch the $x$-axis to $0$–$620$ to see where the observed $F$ lies; change $\alpha$.</p>
+    </div>
   </div>
   <p class="inwords">$H_0$ is rejected: at least one advertising medium is related to sales (<code>Prob (F-statistic)</code> $=1.58\cdot10^{-96}$, practically $0$).</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: if no medium mattered, where would $F$ land? Around $1$, as the density shows.</li>
+    <li>The rejection region starts at $2.65$ for $\alpha=0.05$ (at $3.88$ for $0.01$).</li>
+    <li>Switch the $x$-axis to $0$–$620$: the observed $570.3$ lies far beyond – reject $H_0$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-fdist", (el) => {
@@ -4146,11 +4759,13 @@ newspaper     -0.0010      0.006     -0.177      0.860      -0.013       0.011
       QV.area(ch, QV.sample(pdf, 0.0005, fc, 300), { color: C.blue, opacity: 0.22 });
       QV.area(ch, QV.sample(pdf, fc, xmax, 300), { color: C.orange, opacity: 0.85 });
       QV.line(ch, QV.sample(pdf, 0.0005, xmax, wide ? 2000 : 400), { color: C.blue, width: 2.5 });
-      QV.vline(ch, fc, { color: C.red, dash: "6 4", width: 1.8 });
+      QV.vline(ch, fc, { color: C.red, dash: "6 4", width: 2.5 });
       P.lab(ch, fc, 0.55, `$F_{${QV.fmt(1 - alpha, 2, true)};\\,3,\\,196}=${QV.fmt(fc, 2)}$`, { anchor: "start", dx: 8, bg: true });
       if (!wide) {
-        P.lab(ch, 3.05, 0.12, `rejection region ($\\alpha=${QV.fmt(alpha, 2, true)}$)`, { anchor: "start" });
-        QV.segment(ch, 4.1, 0.33, 4.93, 0.03, { color: C.green, width: 2.4, arrow: true });
+        // right of the critical value; for a small alpha there is no room there, so it goes to its left
+        if (fc < 3.3) P.lab(ch, 3.05, 0.12, `rejection region ($\\alpha=${QV.fmt(alpha, 2, true)}$)`, { anchor: "start" });
+        else P.lab(ch, fc - 0.1, 0.12, `rejection region ($\\alpha=${QV.fmt(alpha, 2, true)}$) &rarr;`, { anchor: "end" });
+        QV.segment(ch, 4.1, 0.33, 4.93, 0.03, { color: C.green, width: 2.5, arrow: true });
         P.lab(ch, 3.75, 0.40, "observed $F=570$<br>(far off the chart)", { anchor: "middle" });
       } else {
         QV.vline(ch, Fobs, { color: C.green, width: 3.5 });
@@ -4158,12 +4773,14 @@ newspaper     -0.0010      0.006     -0.177      0.860      -0.013       0.011
         P.lab(ch, 300, 0.25, "the whole $F_{3,196}$-density is squeezed against $0$", { anchor: "middle" });
       }
       QV.hover(ch, (x) => (x <= 0 ? null : P.th(`$P(F\\ge ${QV.fmt(x, 2)}) = ${x > 60 ? "\\approx 0" : QV.fmt(1 - D.fCdf(x, d1, d2), 4)}$`)));
+      ro.set(`observed $F=570.3 \\;>\\; ${QV.fmt(fc, 2)}$ &nbsp;&rarr;&nbsp; ${P.bad("reject $H_0$")}`);
     };
-    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.01, value: 0.05, width: 140, fmt: (v) => QV.fmt(v, 2), onInput: (v) => { alpha = v; build(); } });
-    QV.segmented(row, { label: "x-axis", options: [["0", "0 to 5"], ["1", "0 to 620"]], value: "0", onChange: (v) => { wide = v === "1"; build(); } });
+    QV.segmented(row, { label: "level $\\alpha$", options: [["0.1", "0.10"], ["0.05", "0.05"], ["0.01", "0.01"]], value: "0.05", onChange: (v) => { alpha = +v; build(); } });
+    QV.segmented(row, { label: "$x$-axis", options: [["0", "0 to 5"], ["1", "0 to 620"]], value: "0", onChange: (v) => { wide = v === "1"; build(); } });
+    const ro = QV.readout(row, "");
     build();
   });
-  
+
   })();
   </script>
 </section>
@@ -4274,7 +4891,8 @@ stats.f.sf(F, p, n - p - 1)                     # p-value 1.58e-96
   <h2>A dummy shifts the intercept</h2>
   <div class="cols mid" style="--cols: 61fr 37fr; --gap: 24px">
     <div>
-      <div class="viz" id="p4b-dummy" style="height:440px"></div>
+      <div class="viz" id="p4b-dummy" style="height:420px"></div>
+      <p class="hint">Drag the orange handle along the income axis and read the gap between the lines; then switch the model.</p>
     </div>
     <div class="fs-xs">
       <p>\[ \widehat{\texttt{Balance}}=211.1+5.98\,\texttt{Income}+382.7\,D \]</p>
@@ -4282,51 +4900,67 @@ stats.f.sf(F, p, n - p - 1)                     # p-value 1.58e-96
         <li style="margin-bottom:.4em">Two <b>parallel</b> lines: same slope for income, intercept shifted by $\hat\beta_2=382.7$.</li>
         <li>Reading: at the <em>same</em> income, students carry on average $382.7\,\$$ more balance.</li>
       </ul>
-      <p class="p4b-hint">Switch to “separate slopes” to see what an interaction would add (Appendix A.6).</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Start with <b>one line</b>. Ask: how can the model let students differ?</li>
+    <li><b>Student dummy</b>: two parallel lines. Drag the handle: the gap is $382.7$ at every income.</li>
+    <li><b>Separate slopes</b>: now the gap changes with income – an interaction (Appendix A.6).</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-dummy", (el) => {
     const P = window.P4B, C = QV.C;
     const CR = P.CR, inc = CR.map((d) => d.Income), st = CR.map((d) => d.St), bal = CR.map((d) => d.Balance);
-    const fp = P.mols([inc, st], bal), fi = P.mols([inc, st, inc.map((v, i) => v * st[i])], bal);
+    const f1 = P.mols([inc], bal), fp = P.mols([inc, st], bal), fi = P.mols([inc, st, inc.map((v, i) => v * st[i])], bal);
     const ch = QV.chart(el, { x: { domain: [0, 200], label: "Income (1000 $)", ticks: 8 }, y: { domain: [0, 2100], label: "Balance ($)", tickValues: [0, 500, 1000, 1500, 2000], format: "d" }, margin: { top: 30, left: 66 } });
     const ttl = P.title(ch, "Credit data: a dummy variable shifts the intercept");
-    const tri = d3.symbol(d3.symbolTriangle, 46)(), circ = d3.symbol(d3.symbolCircle, 30)();
+    const tri = d3.symbol(d3.symbolTriangle, 82)(), circ = d3.symbol(d3.symbolCircle, 72)();
     const g = ch.layer("data").append("g");
     const pts = g.selectAll("path").data(CR).join("path").attr("d", (d) => (d.St ? tri : circ))
       .attr("transform", (d) => `translate(${ch.x(d.Income)},${ch.y(d.Balance)})`)
-      .style("fill", (d) => (d.St ? C.orange : C.blue)).style("opacity", (d) => (d.St ? 0.85 : 0.5));
+      .style("fill", (d) => (d.St ? C.orange : C.blue)).style("opacity", (d) => (d.St ? 0.85 : 0.45));
     QV.attachTip(ch, pts, (d) => `${d.St ? "student" : "non-student"}<br>income ${d.Income}, balance ${d.Balance}`);
     const l0 = QV.line(ch, [], { color: C.blue, width: 3.5, layer: "annot" }), l1 = QV.line(ch, [], { color: C.orange, width: 3.5, layer: "annot" });
-    const arr = QV.segment(ch, 0, 0, 0, 0, { color: C.red, width: 2, arrow: true, layer: "front" });
-    const arr2 = QV.segment(ch, 0, 0, 0, 0, { color: C.red, width: 2, arrow: true, layer: "front" });
-    const plain = QV.segment(ch, 0, 0, 0, 0, { color: C.red, width: 3, layer: "front" });
+    const guide = QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, width: 1.5, dash: "4 4", layer: "annot" });
+    const arr = QV.segment(ch, 0, 0, 0, 0, { color: C.red, width: 2.5, arrow: true, layer: "front" });
+    const arr2 = QV.segment(ch, 0, 0, 0, 0, { color: C.red, width: 2.5, arrow: true, layer: "front" });
     const alab = P.lab(ch, 0, 0, "", { anchor: "start", dx: 8, bg: true });
-    const lg = QV.legend(el.parentNode, []);
-    let inter = false;
+    const lg = P.inLegend(ch, [], { left: 6, top: 2 });
+    lg.style.background = "color-mix(in srgb, var(--surface) 72%, transparent)";   // the points behind it stay visible
+    const h = QV.dots(ch, [[170, 0]], { r: 9, color: C.orange, layer: "front" }).style("stroke-width", 2.5);
+    let mode = "dummy", X = 170;
     const upd = () => {
-      const f = inter ? fi : fp, b = f.b;
-      const s0 = b[1], s1 = inter ? b[1] + b[3] : b[1], a0 = b[0], a1 = b[0] + b[2];
-      QV.setLine(ch, l0, [[0, a0], [190, a0 + s0 * 190]]); QV.setLine(ch, l1, [[0, a1], [190, a1 + s1 * 190]]);
-      const X = 170, y0 = a0 + s0 * X, y1 = a1 + s1 * X, m = (y0 + y1) / 2;
-      arr.set(X, m, X, y1 - 12); arr2.set(X, m, X, y0 + 12);
-      arr.style("display", inter ? "none" : null); arr2.style("display", inter ? "none" : null);
-      plain.set(X, y0, X, y1).style("display", inter ? null : "none");
-      alab.setHTML(inter ? `gap at $170$: $${QV.fmt(y1 - y0, 1)}$` : `$\\hat\\beta_2=${QV.fmt(b[2], 1)}$`); alab.set(X, m);
-      ttl.setHTML(inter ? "With an interaction: different slopes" : "Credit data: a dummy variable shifts the intercept");
-      lg.innerHTML = [
-        `<span class="key"><span class="dt" style="background:${C.blue}"></span>Student = No</span>`,
-        `<span class="key"><span class="dt" style="background:${C.orange}"></span>Student = Yes</span>`,
-        `<span class="key"><span class="ln" style="border-color:${C.blue}"></span>${P.th(`non-students: $${QV.fmt(a0, 1)} + ${QV.fmt(s0, 2)}\\,x$`)}</span>`,
-        `<span class="key"><span class="ln" style="border-color:${C.orange}"></span>${P.th(inter ? `students: $${QV.fmt(a1, 1)} + ${QV.fmt(s1, 2)}\\,x$` : `students: $(${QV.fmt(a0, 1)} + ${QV.fmt(b[2], 1)}) + ${QV.fmt(s0, 2)}\\,x$`)}</span>`].join("");
+      const one = mode === "one", inter = mode === "inter", f = one ? f1 : inter ? fi : fp, b = f.b;
+      const s0 = b[1], s1 = inter ? b[1] + b[3] : b[1], a0 = b[0], a1 = one ? b[0] : b[0] + b[2];
+      QV.setLine(ch, l0, [[0, a0], [190, a0 + s0 * 190]]); QV.setLine(ch, l1, one ? [] : [[0, a1], [190, a1 + s1 * 190]]);
+      l0.style("stroke", one ? C.ink2 : C.blue);
+      const y0 = a0 + s0 * X, y1 = a1 + s1 * X, m = (y0 + y1) / 2, up = y1 >= y0 ? 1 : -1, big = Math.abs(y1 - y0) > 70;
+      h.attr("cx", ch.x(X));
+      guide.set(X, 0, X, Math.max(y0, y1));
+      arr.set(X, m, X, y1 - up * 12); arr2.set(X, m, X, y0 + up * 12);
+      arr.style("display", one || !big ? "none" : null); arr2.style("display", one || !big ? "none" : null);
+      alab.style.display = one ? "none" : "";
+      alab.setHTML(inter ? `gap: $${QV.fmt(y1 - y0, 1)}$` : `$\\hat\\beta_2=${QV.fmt(b[2], 1)}$`); alab.set(X, m);
+      if (X > 165) { alab.anchor("end", "middle"); alab.style.left = (parseFloat(alab.style.left) - 16) + "px"; } else alab.anchor("start", "middle");
+      ttl.setHTML(one ? "Credit data: one line for all customers" : inter ? "With an interaction: different slopes" : "Credit data: a dummy variable shifts the intercept");
+      const key = (cls, col, html) => `<span class="key"><span class="${cls}" style="${cls === "ln" ? "border-color" : "background"}:${col}"></span><span>${P.th(html)}</span></span>`;
+      lg.innerHTML = key("dt", C.blue, "Student = No") + key("dt", C.orange, "Student = Yes")
+        + (one ? key("ln", C.ink2, `all customers: $${QV.fmt(a0, 1)} + ${QV.fmt(s0, 2)}\\,x$`)
+          : key("ln", C.blue, `non-students: $${QV.fmt(a0, 1)} + ${QV.fmt(s0, 2)}\\,x$`)
+            + key("ln", C.orange, inter ? `students: $${QV.fmt(a1, 1)} + ${QV.fmt(s1, 2)}\\,x$` : `students: $(${QV.fmt(a0, 1)} + ${QV.fmt(b[2], 1)}) + ${QV.fmt(s0, 2)}\\,x$`));
+      const at = `at Income $=${X}$: `;
+      ro.set(one ? `${at}$\\widehat{\\text{Balance}}=${QV.fmt(y0, 1)}$ for students and non-students alike`
+        : `${at}non-students $${QV.fmt(y0, 1)}$, students $${QV.fmt(y1, 1)}$ &rarr; gap <b>${QV.fmt(y1 - y0, 1)}</b> ${inter ? "(changes with income)" : "(the same at every income)"}`);
     };
     const row = QV.controls(el);
-    QV.segmented(row, { label: "model", options: [["0", "Income + Student (parallel)"], ["1", "separate slopes"]], value: "0", onChange: (v) => { inter = v === "1"; upd(); } });
+    QV.segmented(row, { label: "model", options: [["one", "one line"], ["dummy", "Student dummy (parallel)"], ["inter", "separate slopes"]], value: "dummy", onChange: (v) => { mode = v; upd(); } });
+    const ro = QV.readout(row, "");
+    ro.el.style.flexBasis = "100%";
+    QV.drag(ch, h, (xv) => { X = Math.round(Math.max(10, Math.min(185, xv))); upd(); });
     upd();
   });
-  
+
   })();
   </script>
 </section>
@@ -4577,10 +5211,15 @@ sm.stats.anova_lm(small, large) # F-test
       </table></div>
     <div>
       <div class="viz" id="p4b-parab" style="height:250px"></div>
-      <p class="p4b-hint p4b-mt0" style="margin-top:-8px !important">Drag the red point: the slope is $0$ only at the minimum.</p>
+      <p class="hint p4b-mt0" style="margin-top:-8px !important">Drag the orange point: the slope is $0$ only at the minimum.</p>
     </div>
   </div>
   <div class="pointers"><a class="btn" href="#solutionpath">&#8617; back</a></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how do we find the lowest point of $S$ without trying every $\beta$?</li>
+    <li>Drag the point to the left and to the right: the red tangent is tilted, its slope negative on the left and positive on the right.</li>
+    <li>At the minimum the tangent is horizontal, slope $0$ &ndash; hence &ldquo;set the derivative to zero&rdquo;.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-parab", (el) => {
@@ -4593,7 +5232,7 @@ sm.stats.anova_lm(small, large) # F-test
     let b = 2;
     const tan = QV.segment(ch, 0, 0, 0, 0, { color: C.red, width: 2.8 });
     const lab = P.lab(ch, 2, 0.9, "", { baseline: "top", size: 14 });
-    const pt = QV.dots(ch, [[2, 1.2]], { r: 7.5, color: C.red, layer: "front" });
+    const pt = QV.dots(ch, [[2, 1.2]], { r: 9, color: C.orange, layer: "front" });
     const upd = () => {
       const y = S(b), m = dS(b), dx = 1 / Math.sqrt(1 + (m / 4) ** 2);
       tan.set(b - dx, y - m * dx, b + dx, y + m * dx);
@@ -4795,7 +5434,8 @@ np.linalg.solve(A, [130, 410])
   <h2>A line can always be computed – but does it fit?</h2>
   <div class="cols mid" style="--cols: 52fr 46fr">
     <div>
-      <div class="viz" id="p4b-satur" style="height:420px"></div>
+      <div class="viz" id="p4b-satur" style="height:402px"></div>
+      <p class="hint p4b-mt0">Colour the residuals by sign; hover over a point for its fitted value and residual.</p>
       <p class="fs-xs center p4b-mt0">Ten regions, OLS line computed as usual. $R^2=0.81$.<br>Does it describe the data well?</p>
     </div>
     <div class="fs-s">
@@ -4806,6 +5446,11 @@ np.linalg.solve(A, [130, 410])
       <div class="block guiding"><p>How do we detect such patterns <em>systematically</em> – even when they are less obvious?</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $R^2 = 0.81$ &ndash; does the line describe the ten regions well?</li>
+    <li>Click <b>colour by sign</b>: red (below the line) at both edges, green in the middle.</li>
+    <li>Hover over regions 1 and 10: residuals $-6$ and $-5$. The line errs systematically, not at random.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-satur", (el) => {
@@ -4853,7 +5498,12 @@ np.linalg.solve(A, [130, 410])
     <div class="viz" id="p4b-sr-b" style="height:390px"></div>
   </div>
   <p class="fs-s">Each point moves to $(\hat{y}_i,\,\hat{u}_i)$, store 9 to $(42,\,3)$. <b>The line becomes the zero line</b>; the deviations are magnified. Here: no arc, no funnel, no outlier (largest $|\hat u_2|=3.6$) – the line is adequate.</p>
-  <p class="p4b-hint p4b-mt0">Click any store in either panel to follow it into the other one.</p>
+  <p class="hint p4b-mt0">Click any store in either panel to follow it into the other one.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Start with store 9: $3$ above the line on the left, at $(42,\,3)$ on the right.</li>
+    <li>Ask where the store with the largest negative residual lands, then click store 2 ($x = 3$, $y = 30$): $(33.6,\,-3.6)$.</li>
+    <li>Click the two stores at $x = 8$: same fitted value $39.6$, so they lie above each other, at $1.4$ and $-0.6$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-sr-a", (elA) => {
@@ -4936,9 +5586,14 @@ np.linalg.solve(A, [130, 410])
     </div>
     <div>
       <div class="viz" id="p4b-tmpl" style="height:400px"></div>
-      <p class="fs-xs center p4b-mt0">Template for your drawing <span class="p4b-hint">– click to place a point (snaps to the grid)</span></p>
+      <p class="hint p4b-mt0">Template for your drawing: click to place a point (it snaps to the grid).</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Give the students time for tasks 1 and 2, then let them call out the points $(\hat{y}_i,\,\hat{u}_i)$ and click them into the template.</li>
+    <li>The read-out shows the sum of the residuals entered so far.</li>
+    <li>Click <b>Compare with the solution</b>: green rings mark the five correct positions.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-tmpl", (el) => {
@@ -4994,8 +5649,14 @@ np.linalg.solve(A, [130, 410])
     </div>
     <div>
       <div class="viz" id="p4b-shopres" style="height:430px"></div>
+      <p class="hint p4b-mt0">Hover over a point: month, fitted value and residual.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Compare with the students' drawing: $(22,-1)$, $(24,2)$, $(26,-2)$, $(28,2)$, $(30,-1)$.</li>
+    <li>Check task 2 in the table: the residuals sum to $0$.</li>
+    <li>Ask: is there a pattern? The signs alternate, but with five values nothing reliable can be said.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-shopres", (el) => {
@@ -5020,6 +5681,11 @@ np.linalg.solve(A, [130, 410])
   </div>
   <div class="viz-ctrl" id="p4b-pat-ctrl" style="align-self:center"></div>
   <p class="fs-s">For time series, the residuals are also plotted in time order: only then do waves become visible.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Click <b>hide</b>: are the arc, the funnel and the waves still visible in the points alone?</li>
+    <li>Show the lines again: a curve through the middle (b), a widening band (c), long runs of one sign (d).</li>
+    <li>Contrast with (a): no such line can be drawn &ndash; an even band.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-pat-0", () => {
@@ -5041,6 +5707,7 @@ np.linalg.solve(A, [130, 410])
       QV.dots(ch, xs.map((x, i) => [x, ys[i]]), { r: 4, color: C.blue, ring: false, tip: (d) => `${QV.fmt(d[0], 2)}, ${QV.fmt(d[1], 2)}` });
     });
     QV.segmented(document.getElementById("p4b-pat-ctrl"), { label: "orange guide lines", options: [["1", "show"], ["0", "hide"]], value: "1", onChange: (v) => gs.forEach((g) => g.style("display", v === "1" ? null : "none")) });
+    QV.readout(document.getElementById("p4b-pat-ctrl"), "<span class='hint'>Hide the lines: is the pattern still visible in the points alone?</span>");
   });
   
   })();
@@ -5071,6 +5738,7 @@ np.linalg.solve(A, [130, 410])
   <div class="cols mid" style="--cols: 52fr 46fr">
     <div>
       <div class="viz" id="p4b-satres" style="height:450px"></div>
+      <p class="hint p4b-mt0">Hide the orange arc: do you still see it in the ten residuals? Hover for the values.</p>
     </div>
     <div class="fs-s">
       <div class="block"><h4>Finding</h4>
@@ -5080,6 +5748,11 @@ np.linalg.solve(A, [130, 410])
       <div class="block key"><p>The residual plot shows what the line alone – and a high $R^2=0.81$ – do not reveal.</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Click <b>hide</b>: only the ten residuals. Ask the students to describe the pattern.</li>
+    <li>Negative at both ends, positive in the middle &ndash; click <b>show</b>: the arc.</li>
+    <li>Recall $R^2 = 0.81$: the scatter plot looked fine, the residual plot shows the wrong functional form.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-satres", (el) => {
@@ -5102,6 +5775,7 @@ np.linalg.solve(A, [130, 410])
   <div class="cols mid" style="--cols: 52fr 46fr">
     <div>
       <div class="viz" id="p4b-lampres" style="height:450px"></div>
+      <p class="hint p4b-mt0">Hover over a point: price, fitted quantity and residual. Orange: the conspicuous store.</p>
       <p class="fs-xs center p4b-mt0">$\hat{y} = 54.67 - 0.4467\,x$; high prices $\Rightarrow$ small $\hat{y}_i$ (left)</p>
     </div>
     <div class="fs-s">
@@ -5114,6 +5788,11 @@ np.linalg.solve(A, [130, 410])
         <p>No clear systematic pattern. Check the conspicuous store substantively (supply shortage? recording error?). With $n = 9$ every verdict is uncertain.</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: arc, funnel or outlier? Let the students judge before the checklist is read.</li>
+    <li>Hover over the orange point: price $95$ EUR, $\hat{y} = 12.23$, $\hat{u} = -3.23$ &ndash; $9$ lamps instead of the expected $12.2$.</li>
+    <li>Ask what to do with this store: check it (supply shortage? recording error?), do not delete it automatically.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-lampres", (el) => {
@@ -5160,12 +5839,18 @@ reg.resid.sum()      # practically 0 (rounding): first-order condition
     <div class="viz" id="p4b-dg-1" style="height:265px"></div>
     <div class="viz" id="p4b-dg-2" style="height:265px"></div>
   </div>
+  <p class="hint p4b-mt0" style="text-align:center">Three residual plots to diagnose; hover over a point for its values.</p>
   <div class="block example fs-s"><h4>Tasks</h4>
     <ol>
       <li>Which pattern does each residual plot show?</li>
       <li>Which assumption on $u_i$ is violated – if any? Give a reason.</li>
       <li>What does this mean for the OLS line, and what should be done?</li>
     </ol></div>
+  <aside class="notes" data-demo><ol>
+    <li>Give the students three minutes for task 1: one pattern per plot, in their own words.</li>
+    <li>Collect the answers: (A) the spread grows with $\hat{y}$, a funnel; (B) an arc; (C) an even band.</li>
+    <li>Tasks 2 and 3 are answered on the solution slide.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-dg-0", () => {
@@ -5234,9 +5919,14 @@ reg.resid.sum()      # practically 0 (rounding): first-order condition
     <div>
       <div class="viz" id="p4b-lev" style="height:352px"></div>
       <div id="p4b-lev-tiles" class="p4b-smtiles"></div>
-      <p class="p4b-hint p4b-mt0">Lamp data plus one extra store (orange): drag it and watch the line.</p>
+      <p class="hint p4b-mt0">Lamp data plus one extra store (orange): drag it and watch the line.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Start: the extra store at a price of $150$ EUR has $h = 0.640 &gt; 6/n$ and pulls the slope from $-0.4467$ to $-0.1787$.</li>
+    <li>Ask what happens if it had sold what the lamp line predicts. Drag it down onto the dashed line: both lines agree.</li>
+    <li>Drag it to a price of about $100$ EUR and move it up and down: $h$ is small, the slope hardly reacts.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-lev", (el) => {
@@ -5400,6 +6090,7 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
   <div class="cols mid" style="--cols: 52fr 46fr">
     <div>
       <div class="viz" id="p4b-qqpq" style="height:450px"></div>
+      <p class="hint p4b-mt0">Switch between the sorted values and the original pairs; hover over a point.</p>
     </div>
     <div class="fs-s">
       <div class="block"><h4>Reference line</h4>
@@ -5409,6 +6100,11 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
         <p>The points lie close to the line: prices and quantities are <b>similarly distributed</b> – both spread fairly evenly over their range. Location and spread differ (euros vs. units), which only changes the position of the line.</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what does a QQ-plot pair up? The smallest price with the smallest quantity, the second smallest with the second smallest, and so on.</li>
+    <li>Click <b>original pairs (scatter)</b>: the same nine stores as observed, a falling cloud.</li>
+    <li>Back to the QQ-plot: the points follow the line through the quartiles $(90,\,4)$ and $(110,\,15)$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-qqpq", (el) => {
@@ -5448,7 +6144,8 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
   <h2>Residuals against the normal distribution: theoretical quantiles</h2>
   <div class="cols mid" style="--cols: 48fr 50fr">
     <div>
-      <div class="viz" id="p4b-zq" style="height:370px"></div>
+      <div class="viz" id="p4b-zq" style="height:334px"></div>
+      <p class="hint p4b-mt0">Change $n$: more strips, and the outer $z_i$ move outwards. Hover over a red point.</p>
       <p class="fs-xs center" id="p4b-zq-cap">$n = 5$: five strips with probability $\frac{1}{5}$ each; red: $z_i$ in the middle of each strip</p>
     </div>
     <div class="fs-s">
@@ -5462,6 +6159,11 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
       <p class="inwords">$z_i$ is where the $i$-th smallest of $n$ values “should” lie under a normal distribution. Example $n = 5$: <span class="p4b-nw">$z_i = -1.28,\ -0.52,\ 0,\ 0.52,\ 1.28$.</span></p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>$n = 5$: five strips with probability $\frac15$ each; the red points mark $z_i = -1.28,\ -0.52,\ 0,\ 0.52,\ 1.28$.</li>
+    <li>Ask where the outer points go when $n$ grows. Set $n = 9$ (the lamp example): $\pm 1.59$.</li>
+    <li>$n = 15$: $\pm 1.83$ &ndash; more data reach further into the tails.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-zq", (el) => {
@@ -5527,7 +6229,8 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
   <h2>Lamp example: QQ-plot of the residuals</h2>
   <div class="cols mid" style="--cols: 52fr 46fr">
     <div>
-      <div class="viz" id="p4b-qqlamp" style="height:410px"></div>
+      <div class="viz" id="p4b-qqlamp" style="height:384px"></div>
+      <p class="hint p4b-mt0">Rebuild the plot: <b>Start over</b>, then <b>Next step</b>. Hover over a point for its values.</p>
       <p class="fs-xs center p4b-mt0">Reference line through the quartiles: $0.5833 + 0.5189\,z$</p>
     </div>
     <div class="fs-s">
@@ -5540,6 +6243,11 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
         <p>A hint at a deviation from normality (long lower tail, left-skewed). But $n = 9$ is very few data – <b>the verdict is uncertain</b>; tests and confidence intervals for this example should be read with caution.</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Click <b>Start over</b>, then <b>Next step</b> four times: sorted residuals, $p_i$ and $z_i$, the points, the reference line.</li>
+    <li>Ask which points do not follow the line: the two smallest residuals (prices $95$ and $110$ EUR) lie clearly below it.</li>
+    <li>With $n = 9$ this is a hint, not a verdict.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-qqlamp", (el) => {
@@ -5627,11 +6335,17 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
     </div>
     <div>
       <div class="viz" id="p4b-qqhand" style="height:330px"></div>
+      <p class="hint p4b-mt0">Hover over a point: its quantile $z_i$ and residual.</p>
       <p class="fs-s"><b>(3)</b> The points lie roughly on the line; with $n=5$ no deviation from normality can be detected – and none can be ruled out.</p>
     </div>
   </div>
   <p class="fs-xs">Note: the residual plot ($2,0,-2,-4,4$ over $\hat y$) shows an <b>arc</b> – costs rise faster for old machines. A QQ-plot does not check linearity.</p>
   <a class="trynb" data-sec="section A.5"></a>
+  <aside class="notes" data-demo><ol>
+    <li>Ask the students for the five pairs $(z_i,\,\hat{u}_{(i)})$ from table (2), then compare with the plot.</li>
+    <li>Hover over the lowest point: $z = -1.2816$, $\hat{u} = -4$.</li>
+    <li>Ask whether five points can prove normality: no &ndash; and the note below shows that a QQ-plot does not check linearity.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-qqhand", (el) => {
@@ -5653,7 +6367,13 @@ smf.ols("quantity ~ price", data=df[df["price"] != 95]).fit().params["price"]
     <div><div class="viz" id="p4b-qqd-1" style="height:290px"></div><div class="p4b-cap" style="font-size:20px"><b>S-shape</b>: left end below, right end above the line – more extreme values (outliers)</div></div>
     <div><div class="viz" id="p4b-qqd-2" style="height:290px"></div><div class="p4b-cap" style="font-size:20px"><b>Arc</b>: both ends above the line – long upper tail</div></div>
   </div>
+  <p class="hint p4b-mt0" style="text-align:center">Hover over a point: theoretical quantile and observed value.</p>
   <div class="block key"><p>Small deviations, especially at the ends, are normal for small $n$. Take <em>systematic</em> shapes such as an S or an arc seriously.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how do (b) and (c) differ from (a) at the two ends of the line?</li>
+    <li>(b): the ends leave the line in opposite directions, an S &ndash; more extreme values than a normal distribution has.</li>
+    <li>(c): both ends lie above the line, an arc &ndash; a long upper tail.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-qqd-0", () => {
@@ -5721,6 +6441,7 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
   <div class="cols mid" style="--cols: 52fr 46fr">
     <div>
       <div class="viz" id="p4b-hres" style="height:450px"></div>
+      <p class="hint p4b-mt0">Hover over a point: person, body height, fitted size and residual.</p>
     </div>
     <div class="fs-s">
       <div class="block"><h4>Residuals $\hat{u}_i = s_i - \hat{s}_i$</h4>
@@ -5730,6 +6451,11 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
       <p class="fs-xs">Equal body heights $\Rightarrow$ equal $\hat{s}_i$: these points lie vertically above each other.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: arc, funnel or outlier? None &ndash; the residuals scatter between $-1.20$ and $1.36$.</li>
+    <li>Hover over the highest point: person 13 ($168$&thinsp;cm), $\hat{s} = 39.64$, $\hat{u} = 1.36$.</li>
+    <li>Ask why some points lie exactly above each other: equal body heights give equal fitted values.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-hres", (el) => {
@@ -5784,6 +6510,7 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
   <div class="cols mid" style="--cols: 52fr 46fr">
     <div>
       <div class="viz" id="p4b-hqq" style="height:420px"></div>
+      <p class="hint p4b-mt0">Hover over a point: rank, quantile $z$ and residual.</p>
       <p class="fs-xs center p4b-mt0">Reference line through the quartiles: $-0.0056 + 0.7002\,z$<br>(quartiles $-0.478$, $0.467$ interpolated, as in <code>sm.qqplot</code>)</p>
     </div>
     <div class="fs-s">
@@ -5793,6 +6520,11 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
         <p><b>No indication against normally distributed errors</b> – not a proof, since $n = 15$ only reveals clear deviations. This model is a good candidate for inference (next section).</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: S-shape or arc? Neither &ndash; all $15$ points follow the line.</li>
+    <li>Point at the small steps: shoe sizes are whole numbers.</li>
+    <li>Conclusion: no indication against normally distributed errors, but with $n = 15$ no proof either.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-hqq", (el) => {
@@ -5861,6 +6593,11 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
     <li>Effect of $1000\,\$$ more TV budget: $0.0191+0.00109\cdot\texttt{radio}$, i.e. $0.030$ at radio $=10$, but $0.063$ at radio $=40$.</li>
     <li>Parallel lines $=$ no interaction; lines that fan out $=$ synergy.</li>
   </ul>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: does $1000\,\$$ more TV budget pay off equally at every radio budget? In (a) yes: both lines have the slope $0.0458$.</li>
+    <li>In (b) the lines fan out: $0.030$ at radio $= 10$, $0.063$ at radio $= 40$.</li>
+    <li>Move the slider to radio $= 0$: in (b) the slope is $0.0191$, TV alone; at $50$ it is $0.0736$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-int-a", (elA) => {
@@ -5887,7 +6624,7 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
     const ro = { set() {} };
     const upd = () => {
       lg3.style.display = r3 === null ? "none" : "";
-      if (r3 === null) { [a, b].forEach((ch) => QV.setLine(ch, ch.l3, [])); ro.set("move the slider to add a third radio budget"); return; }
+      if (r3 === null) { [a, b].forEach((ch) => QV.setLine(ch, ch.l3, [])); ro.set("<span class='hint'>Move the slider to add a third radio budget.</span>"); return; }
       [a, b].forEach((ch) => { QV.setLine(ch, ch.l3, [[0, ch.pred(0, r3)], [300, ch.pred(300, r3)]]); });
       ro.set(`TV effect at radio $=${r3}$: (a) <b>${QV.fmt(fa.b[1], 4)}</b> &nbsp; (b) $0.0191+0.00109\\cdot${r3}=$ <b>${QV.fmt(0.0191 + 0.00109 * r3, 4)}</b>`);
     };
@@ -5951,6 +6688,11 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
     <li>(a) The additive model leaves a <b>U-shaped</b> pattern: it over-predicts when one medium dominates and under-predicts when the budget is split.</li>
     <li>(b) With the interaction term the pattern largely disappears – the residuals <em>told</em> us that a term was missing.</li>
   </ul>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: (a) has $R^2 = 0.897$ &ndash; is the additive model adequate? Follow the orange moving average: a U-shape.</li>
+    <li>Widen the window to $75$ points: the U remains, it is not noise.</li>
+    <li>Compare (b): with the interaction term the average stays near $0$ and $R^2$ rises to $0.968$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-adres-a", (elA) => {
@@ -5979,6 +6721,7 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
     const row = document.getElementById("p4b-adres-ctrl");
     QV.slider(row, { label: "moving average over", min: 5, max: 75, step: 2, value: 25, width: 160, fmt: (v) => v + " points", onInput: (v) => { k = v; upd(); } });
     QV.legend(row, [{ label: "moving average", color: C.orange, type: "line" }]);
+    QV.readout(row, "<span class='hint'>Change the window of the moving average; hover over a point for its market.</span>");
     upd();
   });
   
@@ -6007,6 +6750,11 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
   </div>
   <div class="viz-ctrl" id="p4b-col-ctrl"></div>
   <p class="inwords">When two variables move in lockstep (right), the data cannot separate their individual effects – holding one fixed while the other changes almost never happens.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: can we compare customers with the same Limit but different Rating? Switch <b>hold Limit (almost) fixed</b> on.</li>
+    <li>Inside the band (Limit $4700$&ndash;$5300$) Age still varies, SD $15.4$ of $17.2$; Rating hardly does, SD $15.9$ of $154.7$.</li>
+    <li>Move the band: the picture stays. The data cannot separate Limit and Rating.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p4b-col-a", (elA) => {
@@ -6036,7 +6784,7 @@ z = stats.norm.ppf(p)                   # -1.5932, -0.9674, ..., 1.5932
         const inside = CR.filter((d) => d.Limit >= lo && d.Limit <= hi).map((d) => d[ch.yv]);
         msg.push(`SD(${ch.yv}) <b>${inside.length > 1 ? QV.fmt(S.sd(inside), 1) : "–"}</b> (all: ${QV.fmt(ch.sdAll, 1)})`);
       });
-      ro.set(on ? `Limit within ${c - W}–${c + W}: ` + msg.join(" &nbsp;·&nbsp; ") : "");
+      ro.set(on ? `Limit within ${c - W}–${c + W}: ` + msg.join(" &nbsp;·&nbsp; ") : "<span class='hint'>Switch on a narrow band of Limit, then move it.</span>");
     };
     const seg = QV.segmented(row, { label: "hold Limit (almost) fixed", options: [["0", "off"], ["1", "on"]], value: "0", onChange: (v) => { on = v === "1"; upd(); } });
     QV.slider(row, { label: "Limit", min: 1500, max: 12000, step: 100, value: 5000, width: 140, fmt: (v) => String(v), onInput: (v) => { c = v; if (!on) { on = true; seg.set("1", false); } upd(); } });

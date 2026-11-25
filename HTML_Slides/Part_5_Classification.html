@@ -74,6 +74,9 @@ table.bt td.p5-l, table.bt th.p5-l { text-align: left; }
 .p5-tiles2 .tile .v { font-size: 22px; }
 .p5-tiles2 .tile { padding: 4px 10px; }
 .p5-nw, .p5-nw .katex { white-space: nowrap; }
+/* two panels of one figure inside a single column (so that "z" enlarges both together with their controls) */
+.p5-pair { display: grid; grid-template-columns: var(--cols, 1fr 1fr); gap: var(--gap, 8px); }
+.p5-pair > * { min-width: 0; }
 </style>
 
 <script>
@@ -104,6 +107,11 @@ table.bt td.p5-l, table.bt th.p5-l { text-align: left; }
   /** small panel title inside a chart (needs margin.top >= 26) */
   X.title = (ch, txt, o = {}) => ch.g.append("text").attr("class", "lbl-strong").attr("x", o.x ?? 0).attr("y", -10)
     .attr("text-anchor", o.anchor || "start").style("font-size", (o.size || 15) + "px").text(txt);
+  /** orange drag handle (larger than any data marker) at data coordinates; X.at moves a marker */
+  X.handle = (ch, x, y) => QV.dots(ch, [[x, y]], { r: 9, color: QV.C.orange, layer: "front" });
+  X.at = (sel, ch, x, y) => sel.attr("cx", ch.x(x)).attr("cy", ch.y(y));
+  /** surface-coloured halo behind an SVG label that sits on data or on a curve */
+  X.halo = (t, w = 5) => t.style("paint-order", "stroke").style("stroke", QV.C.surface).style("stroke-width", w).style("stroke-linejoin", "round");
 
   /**
    * Probability tree with HTML nodes (KaTeX inside) and SVG arrows.
@@ -324,56 +332,79 @@ table.bt td.p5-l, table.bt th.p5-l { text-align: left; }
 <section class="slide">
   <h2>Our story: the Default data</h2>
   <div class="cols" style="--cols: 57fr 21.5fr 21.5fr; --gap: 12px">
-    <div class="viz" id="p5-dd-sc" style="height:396px"></div>
-    <div class="viz" id="p5-dd-bal" style="height:396px"></div>
-    <div class="viz" id="p5-dd-inc" style="height:396px"></div>
+    <div class="viz" id="p5-dd-sc" style="height:370px"></div>
+    <div class="viz" id="p5-dd-bal" style="height:370px"></div>
+    <div class="viz" id="p5-dd-inc" style="height:370px"></div>
   </div>
   <div class="viz-ctrl" id="p5-dd-ctrl"></div>
+  <p class="hint" style="margin-top:-6px">Drag the orange handle along the balance axis or pick a cut-off: how many customers lie to its right, and how many of them defaulted?</p>
   <ul class="fs-s">
     <li>$n=10\,000$ customers, of which only $333$ ($3.33\,\%$) defaulted.</li>
     <li>Defaulters have clearly <b>higher balances</b>; income hardly differs between the groups.</li>
   </ul>
   <div class="srcnote">Default data from James, Witten, Hastie, Tibshirani: <em>An Introduction to Statistical Learning</em>, www.statlearning.com</div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $3.33\,\%$ of all customers defaulted. What is the rate among customers with a balance of at least $1500\,\$$?</li>
+    <li>Click 1&#8239;500, then 2&#8239;000: the default rate to the right of the cut-off rises to $28.3\,\%$ and $76.4\,\%$.</li>
+    <li>Panel (c): the two income boxes hardly differ, so income will not separate the groups.</li>
+  </ol></aside>
   <script>
   (() => {
     const X = window.P5X, C = QV.C, D = X.D;
-    const share = {};          // shared state between the three panels
+    const share = {};          // shared state between the panels
     QV.mount("#p5-dd-sc", (el) => {
       const ch = QV.chart(el, { margin: { top: 28, right: 14, left: 56 },
         x: { domain: [-100, 2800], label: "balance ($)", tickValues: [0, 500, 1000, 1500, 2000, 2500], format: "d" },
         y: { domain: [0, 75], label: "income (1000 $)", ticks: 7 } });
       X.title(ch, "(a) Balance and income (all 333 defaulters, 1500 others)");
+      const zone = QV.rect(ch, 0, 2800, 0, 75, { fill: C.orangeT, opacity: 0.55, layer: "back" });
       const tip = (lab) => (d) => `<b>default = ${lab}</b><br>balance ${X.int(d[0])} $<br>income ${QV.fmt(d[1], 1)} thousand $`;
       QV.dots(ch, D.scNo, { r: 2.8, color: C.blue, ring: false, opacity: 0.45, layer: "data", tip: tip("No") });
       X.plus(ch, D.scYes, { r: 3.6, width: 1.8, color: C.orange, tip: tip("Yes") });
-      const vl = QV.vline(ch, 0, { color: C.ink2, dash: "6 4", width: 1.8, layer: "annot" });
+      const vl = QV.vline(ch, 0, { color: C.ink2, dash: "6 4", width: 2, layer: "annot" });
+      const lab = X.halo(QV.text(ch, 0, 4.4, "", { anchor: "start", cls: "lbl-strong", layer: "front" }));
       const lg = QV.legend(el, [{ label: "default = No (1500 of 9667 shown)", color: C.blue, type: "dot" }, { label: "default = Yes (all 333)", color: C.orange, type: "dot" }]);
       lg.style.position = "absolute"; lg.style.right = "16px"; lg.style.top = "30px"; lg.style.flexDirection = "column";
       lg.style.background = "var(--surface)"; lg.style.padding = "4px 8px"; lg.style.borderRadius = "6px"; lg.style.border = "1px solid var(--rule)";
-      share.vl = (c) => vl.set(c).style("display", c > 0 ? null : "none");   // no cut-off line at c = 0
-      share.vl(0);
-      // control row: balance cut-off, linked to panel (b)
+      const hd = X.handle(ch, 0, 0);
+      // control row (below the three panels): balance cut-off, linked to panel (b)
       const row = document.getElementById("p5-dd-ctrl");
-      const ro = { set: () => {} };
-      QV.slider(row, { label: "balance cut-off $c$", min: 0, max: 2650, step: 50, value: 0, width: 230, fmt: (v) => X.int(v),
-        onInput: (c) => { share.vl(c); if (share.hl) share.hl(c); upd(c); } });
+      let c = 0;
+      const sl = QV.slider(row, { label: "balance cut-off $c$", min: 0, max: 2650, step: 50, value: 0, width: 150, fmt: (v) => X.int(v) + " $", onInput: (v) => set(v) });
+      sl.input.nextSibling.style.minWidth = "4.4em";
+      const pre = QV.segmented(row, { options: [[0, "0"], [1000, "1&#8239;000"], [1500, "1&#8239;500"], [2000, "2&#8239;000 $"]], value: 0, onChange: (v) => set(+v) });
       const out = QV.readout(row, "");
-      const upd = (c) => {
-        const i = Math.round(c / 50), N = D.cumN[i], Dd = D.cumD[i];
-        out.set(`customers with balance $\\ge c$: <b>${X.int(N)}</b>, of which <b>${Dd}</b> defaulted &rarr; default rate <b>${N ? QV.pct(Dd / N, 2) : "–"}</b>`);
+      const set = (v) => {
+        c = Math.max(0, Math.min(2650, Math.round(v / 50) * 50));
+        const i = c / 50, N = D.cumN[i], Dd = D.cumD[i], on = c > 0;
+        sl.set(c, false); pre.set(c, false);
+        vl.set(c).style("display", on ? null : "none");            // as in the PDF: no cut-off line at c = 0
+        zone.set(c, 2800, 0, 75); zone.style("display", on ? null : "none");
+        X.at(hd, ch, c, 0);
+        const right = c <= 1500;
+        lab.attr("text-anchor", right ? "start" : "end").style("display", on ? null : "none");
+        lab.set(c, 4.4, `${Dd} of ${X.int(N)} defaulted = ${QV.pct(Dd / N, 1)}`).attr("x", ch.x(c) + (right ? 14 : -14));
+        if (share.hl) share.hl(c);
+        out.set(`balance $\\ge c$: <b>${X.int(N)}</b> customer${N === 1 ? "" : "s"}, <b>${Dd}</b> defaulted &rarr; default rate <b>${QV.pct(Dd / N, 2)}</b>`);
       };
-      upd(0);
+      QV.drag(ch, hd, (xv) => set(xv));
+      share.ready = () => set(c);
+      set(0);
     });
-    const boxPanel = (sel, key, title, dom, lab, unit, link) => QV.mount(sel, (el) => {
+    const boxPanel = (sel, key, title, dom, unit, link) => QV.mount(sel, (el) => {
       const ch = QV.chart(el, { margin: { top: 28, right: 8, left: 50 },
         x: { type: "band", domain: ["No", "Yes"], label: "default", padding: 0.3 }, y: { domain: dom, ticks: 6, format: "d" } });
       X.title(ch, title, { x: ch.w / 2, anchor: "middle", size: 14 });
       X.vbox(ch, "No", D[key][0], C.blue, "default = No", unit);
       X.vbox(ch, "Yes", D[key][1], C.orange, "default = Yes", unit);
-      if (link) { const hl = QV.hline(ch, 0, { color: C.ink2, dash: "6 4", width: 1.8 }); share.hl = (c) => hl.set(c).style("display", c > 0 ? null : "none"); share.hl(0); }
+      if (link) {
+        const hl = ch.layer("annot").append("line").attr("x1", 0).attr("x2", ch.w).style("stroke", C.ink2).style("stroke-width", 2).style("stroke-dasharray", "6 4");
+        share.hl = (c) => hl.attr("y1", ch.y(c)).attr("y2", ch.y(c)).style("display", c > 0 ? null : "none");
+        share.hl(0); if (share.ready) share.ready();
+      }
     });
-    boxPanel("#p5-dd-bal", "boxBal", "(b) balance ($)", [0, 2800], "balance", " $", true);
-    boxPanel("#p5-dd-inc", "boxInc", "(c) income (1000 $)", [0, 78], "income", "", false);
+    boxPanel("#p5-dd-bal", "boxBal", "(b) balance ($)", [0, 2800], " $", true);
+    boxPanel("#p5-dd-inc", "boxInc", "(c) income (1000 $)", [0, 78], "", false);
   })();
   </script>
 </section>
@@ -434,74 +465,84 @@ table.bt td.p5-l, table.bt th.p5-l { text-align: left; }
         <li>Students default <b>more often</b>: $4.31\,\%$ vs. $2.92\,\%$ (overall $3.33\,\%$).</li>
         <li>The other direction is a <em>different</em> question: $\frac{127}{333}=0.381$ &ndash; $38\,\%$ of the <em>defaulters</em> are students (divide by the column total).</li>
       </ul>
-      <p class="fs-xs muted">Hover over a tile of the mosaic for its joint and conditional shares.</p>
     </div>
-    <div>
-      <div class="viz" id="p5-mosaic" style="height:262px"></div>
+    <div style="gap:8px">
+      <div class="viz" id="p5-mosaic" style="height:246px"></div>
+      <p class="hint">Choose the total to divide by; hover over a tile for its counts.</p>
     </div>
   </div>
   <p class="inwords">Conditioning = restricting attention to one row (or column) and dividing by its total.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $127$ customers are students <em>and</em> defaulted. Is that a lot?</li>
+    <li>Click &ldquo;grand total&rdquo;, &ldquo;row totals&rdquo;, &ldquo;column totals&rdquo;: $127/10\,000=0.0127$, $127/2944=0.0431$, $127/333=0.381$.</li>
+    <li>Same count, three answers: always say which total you divide by.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-mosaic", (el) => {
     const X = window.P5X, C = QV.C;
-    // counts: [student][default]
-    const n = { N: { N: 6850, Y: 206 }, S: { N: 2817, Y: 127 } };
+    // the two-way table drawn to scale: rows = student status, columns = default (as in the table on the left)
+    const n = { N: { N: 6850, Y: 206 }, S: { N: 2817, Y: 127 } };       // counts [student][default]
     const rowT = { N: 7056, S: 2944 }, colT = { N: 9667, Y: 333 };
     const lab = { N: "non-student", S: "student" }, labD = { N: "no default", Y: "default" };
-    const ch = QV.chart(el, { margin: { top: 22, right: 128, bottom: 26, left: 8 }, x: { domain: [0, 1], hide: true }, y: { domain: [0, 1], hide: true, grid: false } });
-    const g = ch.layer("data").append("g"), gl = ch.layer("front").append("g");
+    const ch = QV.chart(el, { height: el.clientHeight - 28, margin: { top: 24, right: 76, bottom: 4, left: 2 }, x: { domain: [0, 1], hide: true }, y: { domain: [0, 1], hide: true, grid: false } });
+    const W = ch.w, H = ch.h, g = ch.layer("data").append("g"), gl = ch.layer("front").append("g");
+    const cap = document.createElement("div"); cap.className = "viz-legend";
+    Object.assign(cap.style, { position: "absolute", left: "0", right: "0", bottom: "0", justifyContent: "center", gap: "0 6px", color: "var(--ink)" });
+    el.appendChild(cap);
     const tip = QV.tooltip(ch);
-    const gap = 0.012;
-    const tipHtml = (s, d) => `<b>${lab[s]} &cap; ${labD[d]}</b>: n = ${X.int(n[s][d])}<br>joint: ${n[s][d]}/10 000 = ${QV.fmt(n[s][d] / 10000, 4)}<br>given ${lab[s]} (row): ${n[s][d]}/${rowT[s]} = <b>${QV.fmt(n[s][d] / rowT[s], 4)}</b><br>given ${labD[d]} (column): ${n[s][d]}/${colT[d]} = <b>${QV.fmt(n[s][d] / colT[d], 3)}</b>`;
+    const cells = ["NN", "NY", "SN", "SY"];
+    const tipHtml = (s, d) => `<b>${lab[s]} &cap; ${labD[d]}</b>: n = ${X.int(n[s][d])}<br>of all: ${X.int(n[s][d])}/10 000 = ${QV.fmt(n[s][d] / 10000, 4)}<br>of the ${lab[s]}s (row): ${X.int(n[s][d])}/${X.int(rowT[s])} = <b>${QV.fmt(n[s][d] / rowT[s], 4)}</b><br>of &ldquo;${labD[d]}&rdquo; (column): ${X.int(n[s][d])}/${X.int(colT[d])} = <b>${QV.fmt(n[s][d] / colT[d], 3)}</b>`;
+    const tiles = g.selectAll("rect").data(cells).join("rect").attr("rx", 3)
+      .style("fill", (k) => (k[1] === "Y" ? C.orange : C.blue)).style("fill-opacity", (k) => (k === "SY" ? 1 : k[0] === "S" ? 0.8 : 0.36))
+      .on("pointermove", function (e, k) { tip.show(tipHtml(k[0], k[1]), e); d3.select(this).style("filter", "brightness(1.12)"); })
+      .on("pointerleave", function () { tip.hide(); d3.select(this).style("filter", null); });
+    const focus = ch.layer("annot").append("rect").attr("rx", 4).style("fill", "none").style("stroke", C.ink).style("stroke-width", 2.5).style("pointer-events", "none");
+    /** tile rectangles [x0, x1, y0, y1] as fractions of the mosaic (y from the top) */
+    const geo = (mode) => {
+      const o = {};
+      if (mode === "cols") {
+        const wN = colT.N / 10000;
+        [["N", 0, wN], ["Y", wN, 1]].forEach(([d, a, b]) => { const hN = n.N[d] / colT[d]; o["N" + d] = [a, b, 0, hN]; o["S" + d] = [a, b, hN, 1]; });
+      } else {
+        const hN = rowT.N / 10000;
+        [["N", 0, hN], ["S", hN, 1]].forEach(([s, a, b]) => { const wN = n[s].N / rowT[s]; o[s + "N"] = [0, wN, a, b]; o[s + "Y"] = [wN, 1, a, b]; });
+      }
+      return o;
+    };
+    const px = (r) => { const p = 1.5, x0 = r[0] * W + (r[0] > 0 ? p : 0), x1 = r[1] * W - (r[1] < 1 ? p : 0), y0 = r[2] * H + (r[2] > 0 ? p : 0), y1 = r[3] * H - (r[3] < 1 ? p : 0); return [x0, Math.max(3, x1 - x0), y0, Math.max(3, y1 - y0)]; };
     const txt = (x, y, s, o = {}) => {
-      const t = gl.append("text").attr("class", o.cls || "lbl").attr("x", ch.x(x) + (o.dx || 0)).attr("y", ch.y(y) + (o.dy || 0))
-        .attr("text-anchor", o.anchor || "middle").attr("dominant-baseline", "middle").style("font-size", (o.size || 15) + "px").text(s);
-      if (o.bg) { const b = t.node().getBBox(); gl.insert("rect", () => t.node()).attr("x", b.x - 5).attr("y", b.y - 1).attr("width", b.width + 10).attr("height", b.height + 2).attr("rx", 4).style("fill", C.surface).style("opacity", 0.92); }
+      const t = gl.append("text").attr("class", o.cls || "lbl").attr("x", x).attr("y", y).attr("text-anchor", o.anchor || "middle")
+        .attr("dominant-baseline", "middle").style("font-size", (o.size || 16) + "px").style("pointer-events", "none").text(s);
+      if (o.bg) { const b = t.node().getBBox(); gl.insert("rect", () => t.node()).attr("x", b.x - 5).attr("y", b.y - 1).attr("width", b.width + 10).attr("height", b.height + 2).attr("rx", 4).style("fill", C.surface).style("opacity", 0.9).style("pointer-events", "none"); }
       return t;
     };
-    const tile = (x0, x1, y0, y1, s, d, trim = 0) => {
-      const r = g.append("rect").attr("x", ch.x(x0)).attr("width", Math.max(1, ch.x(x1) - ch.x(x0))).attr("y", ch.y(y1) + trim).attr("height", Math.max(1, ch.y(y0) - ch.y(y1) - trim))
-        .attr("rx", 3).style("fill", d === "Y" ? C.orange : C.blue).style("fill-opacity", s === "S" ? 0.85 : 0.38);
-      r.on("pointermove", (e) => { tip.show(tipHtml(s, d), e); r.style("filter", "brightness(1.12)"); }).on("pointerleave", () => { tip.hide(); r.style("filter", null); });
-    };
+    let first = true;
     const draw = (mode) => {
-      g.selectAll("*").remove(); gl.selectAll("*").remove();
-      if (mode === "rows") {           // columns = student status, split = default
-        let x = 0;
-        ["N", "S"].forEach((s) => {
-          const w = rowT[s] / 10000, x1 = x + w - (s === "N" ? gap : 0), pd = n[s].Y / rowT[s];
-          tile(x, x1, 0, 1 - pd, s, "N", 2); tile(x, x1, 1 - pd, 1, s, "Y");
-          txt((x + x1) / 2, (1 - pd) / 2, `no default ${QV.pct(1 - pd, 2)}`, { size: 15, bg: true });
-          txt((x + x1) / 2, 1, `default ${QV.pct(pd, 2)}`, { dy: -10, size: 14, cls: "lbl-strong" });
-          txt((x + x1) / 2, 0, `${lab[s]} (${QV.pct(w, 2)})`, { dy: 14, size: 14, cls: "lbl-muted" });
-          x += w;
-        });
-        txt(1, 0.5, "rows: divide by", { anchor: "start", dx: 12, dy: -10, size: 14, cls: "lbl-muted" });
-        txt(1, 0.5, "the row total", { anchor: "start", dx: 12, dy: 8, size: 14, cls: "lbl-muted" });
-      } else {                         // columns = default status, split = student
-        let x = 0;
-        ["N", "Y"].forEach((d) => {
-          const w = colT[d] / 10000, x1 = x + w - (d === "N" ? gap : 0), ps = n.S[d] / colT[d];
-          tile(x, x1, 0, 1 - ps, "N", d, 2); tile(x, x1, 1 - ps, 1, "S", d);
-          if (d === "N") {
-            txt((x + x1) / 2, (1 - ps) / 2, `non-student ${QV.pct(1 - ps, 1)}`, { size: 15, bg: true });
-            txt((x + x1) / 2, 1 - ps / 2, `student ${QV.pct(ps, 1)}`, { size: 15, bg: true });
-            txt((x + x1) / 2, 0, `no default (${QV.pct(w, 2)})`, { dy: 14, size: 14, cls: "lbl-muted" });
-          } else {
-            txt(x1, 1 - ps / 2, `student ${QV.pct(ps, 1)}`, { anchor: "start", dx: 8, size: 14, cls: "lbl-strong" });
-            txt(x1, (1 - ps) / 2, `non-student ${QV.pct(1 - ps, 1)}`, { anchor: "start", dx: 8, size: 14 });
-            txt(x1, 0, `default (${QV.pct(w, 2)})`, { anchor: "start", dx: 8, dy: 14, size: 14, cls: "lbl-muted" });
-          }
-          x += w;
-        });
-      }
+      const G = geo(mode), den = (k) => (mode === "all" ? 10000 : mode === "rows" ? rowT[k[0]] : colT[k[1]]), dg = mode === "cols" ? 3 : 4;
+      (first ? tiles : tiles.transition().duration(350)).attr("x", (k) => px(G[k])[0]).attr("width", (k) => px(G[k])[1]).attr("y", (k) => px(G[k])[2]).attr("height", (k) => px(G[k])[3]);
+      first = false;
+      gl.selectAll("*").remove();
+      cells.forEach((k) => {
+        const [x, w, y, h] = px(G[k]), v = QV.fmt(n[k[0]][k[1]] / den(k), dg);
+        if (k[1] === "N") {                                   // large tiles: row name on the left, share in the middle
+          txt(x + 10, y + h / 2, lab[k[0]] + (mode === "rows" ? ` (${X.int(rowT[k[0]])})` : ""), { anchor: "start", size: 15, bg: true });
+          txt(x + w * 0.66, y + h / 2, v, { cls: "lbl-strong", bg: true });
+        } else txt(W + 9, y + h / 2, v, { anchor: "start", cls: k === "SY" ? "lbl-strong" : "lbl", size: k === "SY" ? 17 : 16 });   // thin tiles: label outside
+      });
+      const wN = mode === "cols" ? colT.N / 10000 : 0.96;
+      txt(wN * W / 2, -12, labD.N + (mode === "cols" ? ` (${X.int(colT.N)})` : ""), { cls: "lbl-muted", size: 15 });
+      txt(W + 74, -12, labD.Y + (mode === "cols" ? ` (${colT.Y})` : ""), { cls: "lbl-muted", size: 15, anchor: "end" });
+      const f = mode === "rows" ? [0, 1, rowT.N / 10000, 1] : [colT.N / 10000, 1, 0, 1];
+      focus.style("display", mode === "all" ? "none" : null).attr("x", f[0] * W - 1).attr("width", (f[1] - f[0]) * W + 2).attr("y", f[2] * H - 1).attr("height", (f[3] - f[2]) * H + 2);
+      cap.innerHTML = mode === "all" ? `<span><b>127 / 10&#8239;000 = 0.0127</b> of all customers are students and defaulted</span>`
+        : mode === "rows" ? `<span>row &ldquo;student&rdquo;: <b>127 / 2&#8239;944 = 0.0431</b> defaulted</span><span>&middot; &ldquo;non-student&rdquo;: 206 / 7&#8239;056 = 0.0292</span>`
+        : `<span>column &ldquo;default&rdquo;: <b>127 / 333 = 0.381</b> are students</span><span>&middot; &ldquo;no default&rdquo;: 2&#8239;817 / 9&#8239;667 = 0.291</span>`;
     };
     const row = QV.controls(el);
-    QV.segmented(row, { label: "Condition on", options: [["rows", "student status (rows)"], ["cols", "default (columns)"]], value: "rows", onChange: draw });
+    QV.segmented(row, { label: "Divide by the", options: [["all", "grand total"], ["rows", "row totals"], ["cols", "column totals"]], value: "rows", onChange: draw });
     draw("rows");
   });
-  
   })();
   </script>
 </section>
@@ -695,10 +736,16 @@ print(pd.crosstab(bal_class, df.default, normalize="index").round(3))
   <div class="block"><h4>Tempting idea</h4>
     <p>Code $Y=1$ for default and $Y=0$ otherwise and run the regression of Part&nbsp;4: $\hat y=\hat\beta_0+\hat\beta_1\,\text{balance}$.</p></div>
   <div id="p5-lvl" class="cols" style="--cols: 1fr 1fr; --gap: 16px">
-    <div class="viz" id="p5-lvl-a" style="height:332px"></div>
-    <div class="viz" id="p5-lvl-b" style="height:332px"></div>
+    <div class="viz" id="p5-lvl-a" style="height:308px"></div>
+    <div class="viz" id="p5-lvl-b" style="height:308px"></div>
   </div>
+  <p class="hint" style="margin-top:-6px">Drag an orange handle (or pick a balance): what do the two models predict for the same customer?</p>
   <p class="inwords">The straight line predicts <em>negative</em> default &ldquo;probabilities&rdquo; for $3123$ customers (all balances below $579\,\$$); the S-curve stays between $0$ and $1$.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which &ldquo;probability&rdquo; does the straight line give a customer with a balance of $300\,\$$? Read panel (a): $\hat y=-0.036$.</li>
+    <li>Click 2&#8239;000 $: the line says $0.185$, the S-curve $0.586$.</li>
+    <li>&ldquo;Show observed rates&rdquo;: the default rates per $100\,\$$ class follow the S-curve, not the line.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-lvl", (wrap) => {
@@ -707,7 +754,7 @@ print(pd.crosstab(bal_class, df.default, normalize="index").round(3))
     const R = QV.rng(2);
     const pts = D.stripNo.map((b) => [b, (R.uniform() - 0.5) * 0.034]).concat(D.stripYes.map((b) => [b, 1 + (R.uniform() - 0.5) * 0.034]));
     const rates = D.bins.filter((b) => b[1] > 0).map((b) => ({ x: b[0] + 50, y: b[2] / b[1], b }));
-    const mk = (el, title, f, left) => {
+    const mk = (el, title, f, left, sym) => {
       const ch = QV.chart(el, { margin: { top: 26, right: 12, left: left ? 58 : 40, bottom: 44 },
         x: { domain: [0, 2700], label: "balance ($)", tickValues: [0, 500, 1000, 1500, 2000, 2500], format: "d" },
         y: { domain: [-0.2, 1.08], label: left ? "P(default = Yes)" : "", tickValues: [-0.2, 0, 0.2, 0.4, 0.6, 0.8, 1], format: ".1f" } });
@@ -715,40 +762,48 @@ print(pd.crosstab(bal_class, df.default, normalize="index").round(3))
       QV.dots(ch, pts, { r: 2.1, color: C.orange, ring: false, opacity: 0.35, layer: "data" });
       [0, 1].forEach((v) => QV.hline(ch, v, { color: C.grey, dash: "2 4", width: 1.3, layer: "back" }));
       QV.fnLine(ch, f, { color: C.blue, width: 3, n: 300 });
-      const rs = QV.dots(ch, rates.map((r) => [r.x, r.y, r.b]), { r: 4.5, color: C.surface, ring: false, layer: "annot",
+      const rs = QV.dots(ch, rates.map((r) => [r.x, r.y, r.b]), { r: 5, color: C.surface, ring: false, layer: "annot",
         tip: (d) => `<b>class [${d[2][0]}, ${d[2][0] + 100})</b><br>${d[2][2]} of ${X.int(d[2][1])} defaulted<br>rate ${QV.fmt(d[1], 3)}` })
-        .style("stroke", C.green).style("stroke-width", 2.2).style("display", "none");
-      const vl = ch.layer("front").append("line").attr("y1", 0).attr("y2", ch.h).style("stroke", C.axis).style("stroke-width", 1).style("display", "none");
-      const dot = ch.layer("front").append("circle").attr("r", 6).style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 2).style("display", "none");
-      return { ch, f, rs, vl, dot };
+        .style("stroke", C.ink).style("stroke-width", 2.2).style("display", "none");
+      const vl = ch.layer("annot").append("line").attr("y1", 0).attr("y2", ch.h).style("stroke", C.ink2).style("stroke-width", 1.4).style("stroke-dasharray", "4 4");
+      const lab = QV.tex(ch, 0, 0, "", { bg: true, size: 17 });
+      const hd = X.handle(ch, 0, 0);
+      return { ch, f, rs, vl, lab, hd, sym };
     };
-    const A = mk(document.getElementById("p5-lvl-a"), "(a) Linear regression", lin, true);
-    const B = mk(document.getElementById("p5-lvl-b"), "(b) Logistic regression", logi, false);
+    const A = mk(document.getElementById("p5-lvl-a"), "(a) Linear regression", lin, true, "\\hat y");
+    const B = mk(document.getElementById("p5-lvl-b"), "(b) Logistic regression", logi, false, "\\hat p");
     // negative "probabilities" band of panel (a)
     QV.rect(A.ch, 0, 578.8, -0.2, 0, { fill: C.red, opacity: 0.13, layer: "back" });
     QV.text(A.ch, 40, -0.165, "negative “probabilities”", { anchor: "start", color: C.tRed, layer: "annot" });
     const row = QV.controls(wrap);
-    let showRates = false;
-    QV.segmented(row, { label: "default rate per 100 $ class", options: [["off", "hide"], ["on", "show"]], value: "off",
-      onChange: (v) => { showRates = v === "on"; [A, B].forEach((P) => P.rs.style("display", showRates ? null : "none")); } });
-    const out = QV.readout(row, "Hover over a panel: both fits at the same balance.");
-    const upd = (xv) => {
-      xv = Math.max(0, Math.min(2700, xv));
+    let x = 300, showRates = false;
+    const pre = QV.segmented(row, { label: "balance", options: [[300, "300 $"], [1000, "1&#8239;000 $"], [2000, "2&#8239;000 $"]], value: x, onChange: (v) => set(+v) });
+    const btn = QV.button(row, "Show observed rates", () => {
+      showRates = !showRates; btn.setLabel(showRates ? "Hide observed rates" : "Show observed rates");
+      [A, B].forEach((P) => P.rs.style("display", showRates ? null : "none")); set(x);
+    });
+    const out = QV.readout(row, "");
+    const set = (xv) => {
+      x = Math.max(0, Math.min(2700, Math.round(xv / 10) * 10));
       [A, B].forEach((P) => {
-        P.vl.style("display", null).attr("x1", P.ch.x(xv)).attr("x2", P.ch.x(xv));
-        P.dot.style("display", null).attr("cx", P.ch.x(xv)).attr("cy", P.ch.y(P.f(xv)));
+        const y = P.f(x), right = x <= 1800;
+        P.vl.attr("x1", P.ch.x(x)).attr("x2", P.ch.x(x)); X.at(P.hd, P.ch, x, y);
+        P.lab.set(x, y, `${P.sym}=${y.toFixed(3)}`);
+        P.lab.style.transform = `translate(${right ? "13px" : "calc(-100% - 13px)"}, calc(-100% - 9px))`;
+        P.lab.style.color = y < 0 ? C.tRed : "";
       });
-      const b = D.bins[Math.min(D.bins.length - 1, Math.floor(xv / 100))];
-      out.set(`balance <b>${X.int(xv)}</b>: linear $\\hat y$ = <b>${QV.fmt(lin(xv), 3)}</b> · logistic $\\hat p$ = <b>${QV.fmt(logi(xv), 3)}</b> · observed rate in [${b[0]}, ${b[0] + 100}): <b>${b[1] ? QV.fmt(b[2] / b[1], 3) : "–"}</b>`);
+      pre.set(x, false);
+      const b = D.bins[Math.min(D.bins.length - 1, Math.floor(x / 100))], neg = lin(x) < 0;
+      out.set(`at <b>${X.int(x)}</b> &#36;: linear $\\hat y$ = <b>${QV.fmt(lin(x), 3)}</b>${neg ? " &lt; 0 (impossible)" : ""} &middot; logistic $\\hat p$ = <b>${QV.fmt(logi(x), 3)}</b>`
+        + (showRates ? ` &middot; observed in [${b[0]}, ${b[0] + 100}): <b>${b[1] ? QV.fmt(b[2] / b[1], 3) : "–"}</b>` : ""));
     };
     [A, B].forEach((P) => {
-      P.ch.layer("back").append("rect").attr("class", "hit").attr("width", P.ch.w).attr("height", P.ch.h)
-        .on("pointermove", (e) => upd(P.ch.toData(e)[0]));
+      QV.drag(P.ch, P.hd, (xv) => set(xv));
+      P.ch.layer("back").append("rect").attr("class", "hit").attr("width", P.ch.w).attr("height", P.ch.h).on("pointerdown", (e) => set(P.ch.toData(e)[0]));
       P.ch.layer("data").style("pointer-events", "none");
-      P.ch.layer("front").style("pointer-events", "none");
     });
+    set(x);
   });
-  
   })();
   </script>
 </section>
@@ -837,13 +892,19 @@ dtype: float64
 <section class="slide">
   <h2>Why log-odds?</h2>
   <div id="p5-sig" class="cols" style="--cols: 1fr 1fr; --gap: 22px">
-    <div style="gap:2px"><p class="fs-xxs center"><b>(a) logistic function</b> $p=e^{\eta}/(1+e^{\eta})$</p><div class="viz" id="p5-sig-a" style="height:368px"></div></div>
-    <div style="gap:2px"><p class="fs-xxs center"><b>(b) logit:</b> maps $(0,1)$ onto $(-\infty,\infty)$</p><div class="viz" id="p5-sig-b" style="height:368px"></div></div>
+    <div style="gap:2px"><p class="fs-xxs center"><b>(a) logistic function</b> $p=e^{\eta}/(1+e^{\eta})$</p><div class="viz" id="p5-sig-a" style="height:362px"></div></div>
+    <div style="gap:2px"><p class="fs-xxs center"><b>(b) logit:</b> maps $(0,1)$ onto $(-\infty,\infty)$</p><div class="viz" id="p5-sig-b" style="height:362px"></div></div>
   </div>
+  <p class="hint" style="margin-top:-6px">Drag an orange point or pick a probability: both panels show the same pair ($p$, log-odds), read in opposite directions.</p>
   <ul>
     <li>The log-odds can take <b>any real value</b> &ndash; just like the right-hand side $\beta_0+\beta_1x$ of a regression.</li>
     <li>The logistic function (a) is the inverse of the logit (b): it maps every log-odds value back into $(0,1)$.</li>
   </ul>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $p=0.8$ means odds of $4$. What are the log-odds? Both panels show the pair $(0.8,\ 1.386)$.</li>
+    <li>Click $0.2$: odds $0.25$, log-odds $-1.386$ &ndash; the mirror image.</li>
+    <li>Drag towards $p=0.99$ and $p=0.01$: $p$ stays inside $(0,1)$, the log-odds keep growing in size.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-sig", (wrap) => {
@@ -860,26 +921,31 @@ dtype: float64
     QV.fnLine(A, X.sig, { color: C.blue, width: 3 });
     QV.line(B, QV.sample(X.logit, 0.0015, 0.9985, 400), { color: C.orange, width: 3 });
     QV.tex(A, -0.3, 0.62, "\\eta=0 \\Leftrightarrow p=0.5", { anchor: "end", bg: true, size: 15 });
-    const gd = (ch) => [QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, dash: "4 4", width: 1.4 }), QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, dash: "4 4", width: 1.4 })];
+    const gd = (ch) => [QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, dash: "4 4", width: 1.6 }), QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, dash: "4 4", width: 1.6 })];
     const gA = gd(A), gB = gd(B);
-    const mA = QV.dots(A, [[0, 0.5]], { r: 8, color: C.blue, layer: "front" }), mB = QV.dots(B, [[0.5, 0]], { r: 8, color: C.orange, layer: "front" });
+    // read-out inside each panel (stays visible when one panel is enlarged with "z")
+    const rA = QV.tex(A, 5.8, 0.1, "", { anchor: "end", bg: true, size: 18 }), rB = QV.tex(B, 0.03, 5.4, "", { anchor: "start", bg: true, size: 18 });
+    const mA = X.handle(A, 0, 0.5), mB = X.handle(B, 0.5, 0);
     const row = QV.controls(wrap);
     let p = 0.8;
-    const sl = QV.slider(row, { label: "probability $p$", min: 0.01, max: 0.99, step: 0.01, value: p, width: 200, fmt: (v) => QV.fmt(v, 2), onInput: (v) => { p = v; upd(); } });
+    const sl = QV.slider(row, { label: "probability $p$", min: 0.01, max: 0.99, step: 0.01, value: p, width: 170, fmt: (v) => QV.fmt(v, 2), onInput: (v) => { p = v; upd(); } });
+    const pre = QV.segmented(row, { options: [0.1, 0.2, 0.5, 0.8, 0.9].map((v) => [v, String(v)]), value: p, onChange: (v) => { p = +v; upd(); } });
     const out = QV.readout(row, "");
-    const clamp = (v) => Math.max(0.01, Math.min(0.99, v));
+    const clamp = (v) => Math.max(0.01, Math.min(0.99, Math.round(v * 100) / 100));
     const upd = () => {
       const eta = X.logit(p), odds = p / (1 - p);
-      mA.attr("cx", A.x(eta)).attr("cy", A.y(p)); mB.attr("cx", B.x(p)).attr("cy", B.y(eta));
+      sl.set(p, false); pre.set(p, false);
+      X.at(mA, A, eta, p); X.at(mB, B, p, eta);
       gA[0].set(eta, 0, eta, p); gA[1].set(-6, p, eta, p);
       gB[0].set(p, -6.5, p, eta); gB[1].set(0, eta, p, eta);
-      out.set(`$p$ = <b>${QV.fmt(p, 2)}</b> &rarr; odds $\\frac{p}{1-p}$ = <b>${QV.fmt(odds, 3)}</b> &rarr; log-odds = <b>${QV.fmt(eta, 3)}</b> &nbsp;<span class="p5-mini">(drag a point)</span>`);
+      rA.set(5.8, 0.1, `\\eta=${eta.toFixed(3)}\\enspace \\mapsto\\enspace p=${p.toFixed(2)}`);
+      rB.set(0.03, 5.4, `p=${p.toFixed(2)}\\enspace \\mapsto\\enspace \\log\\tfrac{p}{1-p}=${eta.toFixed(3)}`);
+      out.set(`$p$ = <b>${QV.fmt(p, 2)}</b> &rarr; odds $\\frac{p}{1-p}$ = <b>${QV.fmt(odds, 3)}</b> &rarr; log-odds = <b>${QV.fmt(eta, 3)}</b>`);
     };
-    QV.drag(A, mA, (xv) => { p = clamp(X.sig(xv)); sl.set(p, false); upd(); });
-    QV.drag(B, mB, (xv) => { p = clamp(xv); sl.set(p, false); upd(); });
+    QV.drag(A, mA, (xv) => { p = clamp(X.sig(xv)); upd(); });
+    QV.drag(B, mB, (xv) => { p = clamp(xv); upd(); });
     upd();
   });
-  
   })();
   </script>
 </section>
@@ -951,44 +1017,60 @@ plt.plot(eta, np.exp(eta) / (1 + np.exp(eta)))   # logistic function, panel (a)
       <li>We write $\eta=\beta_0+\beta_1x$ for the <b>linear predictor</b> (the log-odds).</li>
       <li>Several explanatory variables: <span class="p5-nw">$\eta=\beta_0+\beta_1x_1+\dots+\beta_px_p$</span> (Section&nbsp;3).</li>
     </ul>
-    <div style="gap:0">
-      <div id="p5-mod" class="cols" style="--cols: 1fr 1fr; --gap: 8px">
-        <div class="viz" id="p5-mod-a" style="height:226px"></div>
-        <div class="viz" id="p5-mod-b" style="height:226px"></div>
+    <div style="gap:6px">
+      <div id="p5-mod" class="p5-pair">
+        <div class="viz" id="p5-mod-a" style="height:206px"></div>
+        <div class="viz" id="p5-mod-b" style="height:206px"></div>
       </div>
+      <p class="hint">Move the sliders; the grey curves show the starting model for comparison.</p>
     </div>
   </div>
   <div class="block key"><p>Logistic regression = the regression model of Part&nbsp;4, applied to the <b>log-odds</b> instead of $Y$ itself.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what happens to the S-curve when $\beta_0$ rises from $0$ to $2$? Move the slider: it shifts to the left, $p=0.5$ is now reached at $x=-2$.</li>
+    <li>Raise $\beta_1$ to $2$: steeper S-curve, the log-odds stay a straight line.</li>
+    <li>Set $\beta_1=-1$: $p$ falls with $x$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-mod", (wrap) => {
     const X = window.P5X, C = QV.C;
     let b0 = 0, b1 = 1;
     const mk = (el, title, y) => {
-      const ch = QV.chart(el, { margin: { top: 24, right: 10, left: 44, bottom: 34 }, x: { domain: [-6, 6], label: "", tickValues: [-6, -3, 0, 3, 6] }, y });
+      const ch = QV.chart(el, { margin: { top: 24, right: 10, left: 44, bottom: 30 }, x: { domain: [-6, 6], label: "", tickValues: [-6, -3, 0, 3, 6] }, y });
       X.subs(X.title(ch, title, { size: 14 }));
       return ch;
     };
     const A = mk(document.getElementById("p5-mod-a"), "log-odds η = β₀ + β₁x", { domain: [-8, 8], tickValues: [-8, -4, 0, 4, 8] });
     const B = mk(document.getElementById("p5-mod-b"), "probability p(x)", { domain: [0, 1.02], tickValues: [0, 0.5, 1], format: ".1f" });
     QV.hline(A, 0, { color: C.grey, dash: true, width: 1.2, layer: "back" }); QV.hline(B, 0.5, { color: C.grey, dash: true, width: 1.2, layer: "back" });
+    // grey reference: the starting model (beta0 = 0, beta1 = 1)
+    QV.line(A, [[-6, -6], [6, 6]], { color: C.grey, width: 2, dash: "3 4" }); QV.fnLine(B, X.sig, { color: C.grey, width: 2, dash: "3 4" });
     const lA = QV.line(A, [], { color: C.blue, width: 3 }), lB = QV.line(B, [], { color: C.blue, width: 3 });
     const vA = QV.vline(A, 0, { color: C.orange, dash: "5 4", width: 2 }), vB = QV.vline(B, 0, { color: C.orange, dash: "5 4", width: 2 });
+    const dA = QV.dots(A, [[0, 0]], { r: 5.5, color: C.orange }), dB = QV.dots(B, [[0, 0.5]], { r: 5.5, color: C.orange });
+    const tA = X.halo(QV.text(A, 0, 0, "η = 0", { anchor: "start", dx: 9, dy: 18 }), 4), tB = X.halo(QV.text(B, 0, 0.5, "p = 0.5", { anchor: "start", dx: 9, dy: 18 }), 4);
     const row = QV.controls(wrap);
     const fmt1 = (v) => QV.fmt(v, 1);
-    QV.slider(row, { label: "$\\beta_0$", min: -4, max: 4, step: 0.1, value: 0, width: 110, fmt: fmt1, onInput: (v) => { b0 = v; upd(); } });
-    QV.slider(row, { label: "$\\beta_1$", min: -2, max: 2, step: 0.1, value: 1, width: 110, fmt: fmt1, onInput: (v) => { b1 = v; upd(); } });
+    QV.slider(row, { label: "intercept $\\beta_0$", min: -4, max: 4, step: 0.1, value: 0, width: 110, fmt: fmt1, onInput: (v) => { b0 = v; upd(); } });
+    QV.slider(row, { label: "slope $\\beta_1$", min: -2, max: 2, step: 0.1, value: 1, width: 110, fmt: fmt1, onInput: (v) => { b1 = v; upd(); } });
     const out = QV.readout(row, "");
     const upd = () => {
       QV.setLine(A, lA, QV.sample((x) => b0 + b1 * x, -6, 6, 2));
       QV.setLine(B, lB, QV.sample((x) => X.sig(b0 + b1 * x), -6, 6, 240));
-      const ok = Math.abs(b1) > 1e-9, x50 = ok ? -b0 / b1 : NaN, vis = ok && x50 >= -6 && x50 <= 6;
-      [vA, vB].forEach((v) => { v.style("display", vis ? null : "none"); if (vis) v.set(x50); });
-      out.set(ok ? `$p=0.5$ at $x=-\\beta_0/\\beta_1$ = <b>${QV.fmt(x50, 2)}</b>` : "$\\beta_1=0$: $p$ does not depend on $x$");
+      const ok = Math.abs(b1) > 1e-9, x50 = ok ? -b0 / b1 : NaN, vis = ok && x50 >= -6 && x50 <= 6, d = vis ? null : "none";
+      [vA, vB, dA, dB, tA, tB].forEach((s) => s.style("display", d));
+      if (vis) {
+        vA.set(x50); vB.set(x50); X.at(dA, A, x50, 0); X.at(dB, B, x50, 0.5);
+        const right = x50 < 2.6;
+        tA.attr("text-anchor", right ? "start" : "end").set(x50, 0).attr("x", A.x(x50) + (right ? 9 : -9));
+        tB.attr("text-anchor", right ? "start" : "end").set(x50, 0.5).attr("x", B.x(x50) + (right ? 9 : -9));
+      }
+      out.set(ok ? `$p=0.5$ at $x=-\\beta_0/\\beta_1$ = <b>${QV.fmt(x50, 2)}</b> &middot; $\\beta_1${b1 > 0 ? ">" : "<"}0$: $p$ ${b1 > 0 ? "rises" : "falls"} with $x$`
+        : `$\\beta_1=0$: $p$ = <b>${QV.fmt(X.sig(b0), 3)}</b> for every $x$`);
     };
     upd();
   });
-  
   })();
   </script>
 </section>
@@ -1126,46 +1208,60 @@ balance     0.005499  0.000220  24.952404  2.010855e-137   0.005067  0.005931
       </table>
     </div>
     <div style="gap:6px">
-      <div class="viz" id="p5-we" style="height:300px"></div>
+      <div class="viz" id="p5-we" style="height:274px"></div>
+      <p class="hint" id="p5-we-hint">Drag the orange starting point or pick a start balance: the step is always $+1000\,\$$.</p>
     </div>
   </div>
   <div class="block alert"><h4>Common mistake</h4>
     <p>&ldquo;The odds multiply by $245$&rdquo; does <em>not</em> mean the probability is $245$ times as large &ndash; probabilities can never exceed $1$.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $1000\,\$$ more balance multiplies the odds by $245$. Does the probability also become $245$ times as large?</li>
+    <li>Start at 1&#8239;000: $\hat p$ rises from $0.006$ to $0.587$. Click 2&#8239;000: from $0.587$ to $0.997$, only $+0.410$.</li>
+    <li>Tiles: log-odds always $+5.5$, odds always $\times245$; only the probability step depends on the start.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-we", (el) => {
     const X = window.P5X, C = QV.C;
     const b0 = -10.65, b1 = 0.0055, eta = (x) => b0 + b1 * x, p = (x) => X.sig(eta(x));
-    const ch = QV.chart(el, { margin: { top: 10, right: 16, left: 62, bottom: 44 },
+    const ch = QV.chart(el, { margin: { top: 10, right: 16, left: 66, bottom: 44 },
       x: { domain: [0, 3200], label: "balance ($)", tickValues: [0, 500, 1000, 1500, 2000, 2500, 3000], format: "d" },
       y: { domain: [0, 1.04], label: "p̂(x)", tickValues: [0, 0.25, 0.5, 0.75, 1], format: ".2f" } });
     QV.fnLine(ch, p, { color: C.blue, width: 3 });
     const seg = QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, width: 2, arrow: true });
     const segV = QV.segment(ch, 0, 0, 0, 0, { color: C.orange, width: 3, arrow: true });
     const g1 = QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, dash: "4 4", width: 1.3 }), g2 = QV.segment(ch, 0, 0, 0, 0, { color: C.ink2, dash: "4 4", width: 1.3 });
-    const pts = QV.dots(ch, [[0, 0], [0, 0]], { r: 7, color: C.blue, layer: "front" });
-    const lab = QV.text(ch, 0, 0.06, "+1000 $", { cls: "lbl-muted", dy: -8, anchor: "start" })
-      .style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 5).style("stroke-linejoin", "round");   // halo over the curve
+    const end = QV.dots(ch, [[0, 0]], { r: 7, color: C.blue, layer: "front" });
+    const lab = X.halo(QV.text(ch, 0, 0.06, "+1000 $", { cls: "lbl-muted", dy: -8, anchor: "start" }));        // halo over the curve
+    const gain = X.halo(QV.text(ch, 0, 0, "", { cls: "lbl-strong", color: C.tOrange, layer: "front" }));
+    const hd = X.handle(ch, 0, 0);
     const row = QV.controls(el);
     let x0 = 1000;
-    QV.slider(row, { label: "start balance $x$", min: 0, max: 2200, step: 50, value: x0, width: 170, fmt: (v) => X.int(v), onInput: (v) => { x0 = v; upd(); } });
-    const t = QV.tiles(row.parentNode, ["log-odds: +5.5 (always)", "odds: ×245 (always)", "probability: depends on $x$"]);
+    const sl = QV.slider(row, { label: "start balance $x$", min: 500, max: 2200, step: 50, value: x0, width: 104, fmt: (v) => X.int(v) + " $", onInput: (v) => set(v) });
+    sl.input.nextSibling.style.minWidth = "4.2em";
+    const pre = QV.segmented(row, { options: [[500, "500"], [1000, "1&#8239;000"], [1500, "1&#8239;500"], [2000, "2&#8239;000"]], value: x0, onChange: (v) => set(+v) });
+    const t = QV.tiles(document.getElementById("p5-we-hint"), ["log-odds: +5.5 (always)", "odds: ×245 (always)", "probability: depends on $x$"], "before");
     t.el.classList.add("p5-tiles2");
-    const upd = () => {
-      const x1 = x0 + 1000, p0 = p(x0), p1 = p(x1);
-      pts.data([[x0, p0], [x1, p1]]).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
+    const set = (v) => {
+      x0 = Math.max(500, Math.min(2200, Math.round(v / 50) * 50));
+      const x1 = x0 + 1000, p0 = p(x0), p1 = p(x1), big = p1 - p0 > 0.03;
+      sl.set(x0, false); pre.set(x0, false);
+      X.at(hd, ch, x0, p0); X.at(end, ch, x1, p1);
       seg.set(x0, 0.06, x1 - 20, 0.06); lab.set(x0 + 40, 0.06);
       g1.set(x1, 0.06, x1, p1); g2.set(x0, p0, x1 + 40, p0);
       segV.set(x1 + 40, p0, x1 + 40, Math.max(p0 + 0.001, p1 - 0.015));
-      segV.style("display", p1 - p0 > 0.03 ? null : "none");
-      const f = (v) => QV.fmt(v, v < 0.01 ? 4 : 3);
+      segV.style("display", big ? null : "none");
+      const left = x1 > 2550;
+      gain.attr("text-anchor", left ? "end" : "start").set(x1 + 40, (p0 + p1) / 2, `+${QV.fmt(p1 - p0, 3)}`).attr("x", ch.x(x1 + 40) + (left ? -10 : 10)).attr("dy", 5)
+        .style("display", big ? null : "none");
+      const f = (v) => QV.fmt(v, v < 0.01 ? 4 : v < 100 ? 3 : 1);
       t.set(0, `${QV.fmt(eta(x0), 2)} → ${QV.fmt(eta(x1), 2)}`);
       t.set(1, `${f(Math.exp(eta(x0)))} → ${f(Math.exp(eta(x1)))}`);
-      t.set(2, `${f(p0)} → ${f(p1)}`);
+      t.set(2, `${QV.fmt(p0, 3)} → ${QV.fmt(p1, 3)}`);
     };
-    upd();
+    QV.drag(ch, hd, (xv) => set(xv));
+    set(x0);
   });
-  
   })();
   </script>
 </section>
@@ -1338,20 +1434,34 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
 <section class="slide">
   <h2>The student paradox visualised</h2>
   <div class="cols" style="--cols: 62fr 38fr; --gap: 16px">
-    <div class="viz" id="p5-sp-a" style="height:420px"></div>
-    <div class="viz" id="p5-sp-b" style="height:420px"></div>
+    <div style="gap:8px">
+      <div class="viz" id="p5-sp-a" style="height:386px"></div>
+      <div class="viz-ctrl" id="p5-sp-ctrl"></div>
+    </div>
+    <div style="gap:8px">
+      <div class="viz" id="p5-sp-b" style="height:386px"></div>
+      <div class="viz-ctrl" id="p5-sp-ctrl-b"></div>
+    </div>
   </div>
-  <div class="viz-ctrl" id="p5-sp-ctrl"></div>
+  <p class="hint" style="margin-top:-4px">Drag the orange handle along the balance axis: both groups at the same balance in (a), and in (b) the share of each group that reaches this balance.</p>
   <ul class="fs-s">
     <li>(a) For every balance, the student curve lies <em>below</em> the non-student curve; the overall rates (dashed) point the other way.</li>
     <li>(b) Students are concentrated at higher balances.</li>
   </ul>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: overall, students default more often ($4.31\,\%$ vs. $2.92\,\%$). Who is riskier at the same balance of $1500\,\$$?</li>
+    <li>Read (a): non-students $0.103$, students $0.057$. Click 1&#8239;000 and 2&#8239;000: the student curve is always lower.</li>
+    <li>Explain with (b): $14.4\,\%$ of the students, but only $6.9\,\%$ of the non-students have at least $1500\,\$$.</li>
+  </ol></aside>
   <script>
   (() => {
     const X = window.P5X, C = QV.C, D = X.D;
-    const B0 = -10.8690452, BS = -0.646775808, BB = 0.00573650527, BI = 3.03345012e-6;
-    const S = { inc: 33516.98, hl: null };
-    const f = (stu) => (b) => X.sig(B0 + BS * stu + BB * b + BI * S.inc);
+    const B0 = -10.8690452, BS = -0.646775808, BB = 0.00573650527, BI = 3.03345012e-6, INC = 33516.98;   // model g3; income at its mean
+    const f = (stu) => (b) => X.sig(B0 + BS * stu + BB * b + BI * INC);
+    // customers with balance >= c for c = 0, 50, ..., 2700 (students: n = 2944, non-students: n = 7056)
+    const cumS = [2944,2857,2844,2810,2780,2749,2708,2655,2604,2549,2471,2392,2305,2216,2136,2012,1895,1781,1662,1544,1425,1295,1175,1072,966,848,744,651,579,494,424,359,310,274,236,199,161,124,97,75,63,48,42,28,22,17,13,9,5,4,3,2,1,1,0];
+    const cumN = [7056,6517,6398,6278,6146,5990,5795,5591,5369,5131,4916,4669,4414,4118,3828,3580,3286,3008,2749,2466,2207,1972,1735,1524,1328,1151,995,836,689,590,487,410,324,258,209,156,127,91,73,58,43,30,17,11,9,5,4,3,2,1,0,0,0,0,0];
+    const S = { hl: null, b: 1500 };
     QV.mount("#p5-sp-a", (el) => {
       const ch = QV.chart(el, { margin: { top: 28, right: 14, left: 56 },
         x: { domain: [400, 2750], label: "balance ($)", tickValues: [500, 1000, 1500, 2000, 2500], format: "d" },
@@ -1359,9 +1469,8 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
       X.title(ch, "(a) At the same balance, students default less");
       QV.hline(ch, 0.02920, { color: C.blue, dash: "8 5", width: 2.2, layer: "data" });
       QV.hline(ch, 0.04314, { color: C.orange, dash: "8 5", width: 2.2, layer: "data" });
-      const cN = QV.line(ch, [], { color: C.blue, width: 3 }), cS = QV.line(ch, [], { color: C.orange, width: 3 });
-      const draw = () => { QV.setLine(ch, cN, QV.sample(f(0), 500, 2650, 300)); QV.setLine(ch, cS, QV.sample(f(1), 500, 2650, 300)); };
-      draw();
+      QV.line(ch, QV.sample(f(0), 500, 2650, 300), { color: C.blue, width: 3 });
+      QV.line(ch, QV.sample(f(1), 500, 2650, 300), { color: C.orange, width: 3 });
       const box = QV.tex(ch, 520, 0.36, "", { anchor: "start", bg: true, size: 15 });
       box.innerHTML = X.tx("<span>overall default rates:</span><br>students $4.31\\,\\%$ &gt; non-students $2.92\\,\\%$");
       box.style.lineHeight = "1.3"; box.style.whiteSpace = "nowrap";
@@ -1371,25 +1480,29 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
         { label: "students: P(default | balance)", color: C.orange, type: "line" },
         { label: "students: overall rate 4.31 %", color: C.orange, type: "dash" }]);
       Object.assign(lg.style, { position: "absolute", left: "70px", top: "34px", flexDirection: "column", gap: "2px", background: "var(--surface)", padding: "4px 8px", borderRadius: "6px", border: "1px solid var(--rule)" });
-      // hover: both curves at the same balance
-      const vl = ch.layer("front").append("line").attr("y1", 0).attr("y2", ch.h).style("stroke", C.axis).style("stroke-width", 1).style("display", "none");
-      const m = QV.dots(ch, [[0, 0], [0, 0]], { r: 6, color: (d, i) => (i ? C.orange : C.blue), layer: "front" }).style("display", "none");
-      ch.layer("front").style("pointer-events", "none");
+      // both groups at the same balance: guide, two markers with their values, orange handle on the axis
+      const vl = ch.layer("annot").append("line").attr("y1", 0).attr("y2", ch.h).style("stroke", C.ink2).style("stroke-width", 1.6).style("stroke-dasharray", "4 4");
+      const m = QV.dots(ch, [[0, 0], [0, 0]], { r: 6.5, color: (d, i) => (i ? C.orange : C.blue), layer: "front" });
+      const lN = X.halo(QV.text(ch, 0, 0, "", { anchor: "end", dx: -11, dy: -5, cls: "lbl-strong", color: C.tBlue }));
+      const lS = X.halo(QV.text(ch, 0, 0, "", { anchor: "start", dx: 11, dy: 17, cls: "lbl-strong", color: C.tOrange }));
+      const hd = X.handle(ch, S.b, 0);
       const row = document.getElementById("p5-sp-ctrl");
-      QV.slider(row, { label: "income (both groups)", min: 10000, max: 70000, step: 500, value: 33500, width: 160, fmt: (v) => X.int(v),
-        onInput: (v) => { S.inc = v; draw(); if (S.last) upd(S.last); } });
-      const out = QV.readout(row, "Hover over panel (a): both groups at the same balance.");
-      const upd = (b) => {
-        S.last = b;
-        const pn = f(0)(b), ps = f(1)(b);
-        vl.style("display", null).attr("x1", ch.x(b)).attr("x2", ch.x(b));
-        m.style("display", null).data([[b, pn], [b, ps]]).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
+      const pre = QV.segmented(row, { label: "balance", options: [[1000, "1&#8239;000 $"], [1500, "1&#8239;500 $"], [2000, "2&#8239;000 $"]], value: S.b, onChange: (v) => set(+v) });
+      const out = QV.readout(row, "");
+      const set = (v) => {
+        const b = S.b = Math.max(500, Math.min(2650, Math.round(v / 50) * 50)), pn = f(0)(b), ps = f(1)(b);
+        pre.set(b, false);
+        vl.attr("x1", ch.x(b)).attr("x2", ch.x(b)); X.at(hd, ch, b, 0);
+        m.data([[b, pn], [b, ps]]).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
+        lN.set(b, pn, QV.fmt(pn, 3)); lS.set(b, ps, QV.fmt(ps, 3));
         if (S.hl) S.hl(b);
-        out.set(`balance <b>${X.int(b)}</b>: non-student $\\hat p$ = <b>${QV.fmt(pn, 3)}</b>, student $\\hat p$ = <b>${QV.fmt(ps, 3)}</b> &middot; odds ratio $e^{-0.6468}$ = <b>0.524</b> at every balance`);
+        out.set(`at <b>${X.int(b)}</b> &#36;: non-students $\\hat p$ = <b>${QV.fmt(pn, 3)}</b> &gt; students $\\hat p$ = <b>${QV.fmt(ps, 3)}</b>`);
       };
-      ch.layer("back").append("rect").attr("class", "hit").attr("width", ch.w).attr("height", ch.h)
-        .on("pointermove", (e) => upd(Math.max(500, Math.min(2650, ch.toData(e)[0]))));
+      S.set = set;
+      QV.drag(ch, hd, (xv) => set(xv));
+      ch.layer("back").append("rect").attr("class", "hit").attr("width", ch.w).attr("height", ch.h).on("pointerdown", (e) => set(ch.toData(e)[0]));
       ch.layer("data").style("pointer-events", "none");
+      set(S.b);
     });
     QV.mount("#p5-sp-b", (el) => {
       const ch = QV.chart(el, { margin: { top: 28, right: 10, left: 72 },
@@ -1398,9 +1511,14 @@ income          3.033e-06    8.2e-06      0.370      0.712    -1.3e-05    1.91e-
       X.title(ch, "(b) … but carry larger balances", { x: ch.w / 2, anchor: "middle" });
       X.vbox(ch, "non-students", D.boxStu[0], C.blue, "non-students", " $");
       X.vbox(ch, "students", D.boxStu[1], C.orange, "students", " $");
-      const hl = QV.hline(ch, 0, { color: C.ink2, dash: "6 4", width: 1.6 });
-      hl.style("display", "none");
-      S.hl = (b) => { hl.style("display", null); hl.set(b); };
+      const hl = ch.layer("annot").append("line").attr("x1", 0).attr("x2", ch.w).style("stroke", C.ink2).style("stroke-width", 1.6).style("stroke-dasharray", "4 4");
+      const out = QV.readout(document.getElementById("p5-sp-ctrl-b"), "");
+      S.hl = (b) => {
+        hl.attr("y1", ch.y(b)).attr("y2", ch.y(b));
+        const i = b / 50;
+        out.set(`balance $\\ge$ <b>${X.int(b)}</b> &#36;: <b>${QV.pct(cumN[i] / 7056, 1)}</b> of non-students, <b>${QV.pct(cumS[i] / 2944, 1)}</b> of students`);
+      };
+      S.hl(S.b);
     });
   })();
   </script>
@@ -1535,12 +1653,17 @@ plt.legend()
   </table>
   <div class="cols mid" style="--cols: 36fr 62fr; --gap: 22px">
     <div><p class="inwords">Lowering the threshold moves the boundary to the left: more defaulters are caught &ndash; but more good customers are rejected as well.</p>
-      <p class="fs-xs muted">Move the slider or drag the orange point.</p></div>
+      <p class="hint">Pick one of the two thresholds, move the slider or drag the orange point.</p></div>
     <div style="gap:0">
       <div class="viz" id="p5-db" style="height:226px"></div>
     </div>
   </div>
   <div class="block key"><p>The threshold is not a statistical but a <b>business decision</b>: it depends on the cost of a missed defaulter compared with the cost of a rejected good customer.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: the bank lowers the threshold from $0.5$ to $0.2$ &ndash; which way does the balance cut-off move?</li>
+    <li>Click <b>0.2</b>: the boundary jumps from $1936\,\$$ to $1684\,\$$, the orange region (predicted default) grows.</li>
+    <li>Drag the point up to $t = 0.8$: only balances above about $2188\,\$$ are flagged.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-db", (el) => {
@@ -1558,10 +1681,12 @@ plt.legend()
     const pt = QV.dots(ch, [[1936, 0.5]], { r: 7, color: C.orange, layer: "front" });
     const row = QV.controls(el);
     let t = 0.5;
-    const sl = QV.slider(row, { label: "threshold $t$", min: 0.05, max: 0.95, step: 0.01, value: t, width: 150, fmt: (v) => QV.fmt(v, 2), onInput: (v) => { t = v; upd(); } });
+    const sl = QV.slider(row, { label: "threshold $t$", min: 0.05, max: 0.95, step: 0.01, value: t, width: 110, fmt: (v) => QV.fmt(v, 2), onInput: (v) => { t = v; upd(); } });
+    const pre = QV.segmented(row, { options: [["0.5", "0.5"], ["0.2", "0.2"]], value: "0.5", onChange: (v) => { t = +v; sl.set(t, false); upd(); } });   // the two rows of the table
     const out = QV.readout(row, "");
     const upd = () => {
       const c = X.logit(t), b = (c - b0) / b1;
+      pre.set(t === 0.5 ? "0.5" : t === 0.2 ? "0.2" : "", false);
       ht.set(t); vb.set(b, ""); zone.set(b, 3000, 0, 1.02);
       pt.data([[b, t]]).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
       out.set(`cut-off $\\log\\frac{t}{1-t}$ = <b>${QV.fmt(c, 3)}</b> &rarr; balance <b>${X.int(b)}</b>`);
@@ -1761,12 +1886,18 @@ Yes      0.0231  0.7241
   <div class="cols mid" style="--cols: 64fr 34fr; --gap: 22px">
     <div style="gap:4px">
       <div id="p5-brt" class="no-zoom" style="height:296px"></div>
+      <p class="hint">Move the base rate: the rule stays the same, the tree and the precision change.</p>
     </div>
     <div class="block example"><h4>Precision</h4>
       \[ \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}}=\frac{61}{61+284}=\textbf{0.177} \]
       <p class="fs-s">Only about one alarm in six &ndash; compared with $0.423$ at the actual base rate of $3.33\,\%$.</p></div>
   </div>
   <p class="inwords">The rule has not changed (same sensitivity and specificity) &ndash; the mix has: with rare defaulters, the few false alarms from the huge majority outnumber the correct alarms.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Read the guiding question, then the tree: at a base rate of $1\,\%$ there are $61$ correct alarms against $284$ false ones, precision $0.177$.</li>
+    <li>Move $\pi$ to $3.3\,\%$, the base rate of the Default data: about $0.42$.</li>
+    <li>Move $\pi$ to $10\,\%$ and $30\,\%$: $0.703$ and $0.901$ &ndash; the same rule, far more reliable alarms.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-brt", (el) => {
@@ -1814,10 +1945,16 @@ Yes      0.0231  0.7241
       <p class="fs-s">Check ($\pi=0.0333$): <span class="p5-nw">$0.610\cdot0.0333=0.0203$,</span> <span class="p5-nw">$0.0287\cdot0.9667=0.0277$</span> <span class="p5-nw">$\Rightarrow$ $0.0203/0.0480=0.423$ $\checkmark$</span></p>
     </div>
     <div style="gap:4px">
-      <div class="viz" id="p5-prec" style="height:388px"></div>
+      <div class="viz" id="p5-prec" style="height:362px"></div>
+      <p class="hint">Hover over the chart for the counts per $10\,000$ customers; the sliders change the rule.</p>
     </div>
   </div>
   <div class="block key"><p>Sensitivity and specificity describe the <em>rule</em>; precision also depends on the <b>base rate</b> (Appendix&nbsp;A.1).</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: the rule catches $61\,\%$ of the defaulters &ndash; are $61\,\%$ of its alarms correct? Point at $3.33\,\%$: precision $0.423$.</li>
+    <li>Hover at a base rate of $1\,\%$: of $10\,000$ customers $61$ TP against $284$ FP, precision $0.177$.</li>
+    <li>Raise spec. to $0.9900$: at $3.33\,\%$ the precision rises to $0.677$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-prec", (el) => {
@@ -1921,8 +2058,14 @@ for pi in [0.01, 0.0333, 0.10]:
     </div>
     <div style="gap:4px">
       <div class="viz p5-icons" id="p5-icons" style="height:318px"></div>
+      <p class="hint">Each square is one of the $1000$ people. Move prevalence, sens. and spec.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: a positive test &ndash; how likely is the illness? Count the dark squares: $9$ orange against $99$ blue, $P(\text{ill}\mid +) = 0.083$.</li>
+    <li>Raise the prevalence to $10\,\%$: $90$ against $90$, the probability is $0.5$.</li>
+    <li>Back to $1\,\%$, raise spec. to $0.99$: only $10$ false alarms, $0.474$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-icons", (el) => {
@@ -1983,6 +2126,11 @@ for pi in [0.01, 0.0333, 0.10]:
     <li>Lower $t$ $\Rightarrow$ sensitivity $\uparrow$, specificity $\downarrow$ &ndash; and vice versa.</li>
     <li>The error rate is minimal around $t=0.5$, but that is not necessarily the <em>cheapest</em> threshold.</li>
   </ul>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: the bank wants to catch more defaulters &ndash; which way must $t$ move, and what does it cost?</li>
+    <li>Drag the handle from $0.5$ to $0.2$: sensitivity rises from $0.315$ to $0.610$, specificity falls from $0.996$ to $0.971$; FP grows from $40$ to $277$.</li>
+    <li>Ask where the error rate is smallest (around $0.5$) and why the bank may still prefer $0.2$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-tt", (el) => {
@@ -2002,7 +2150,7 @@ for pi in [0.01, 0.0333, 0.10]:
     Object.assign(lg.style, { position: "absolute", right: "22px", top: "58px", flexDirection: "column", gap: "2px", background: "var(--surface)", padding: "4px 8px", borderRadius: "6px", border: "1px solid var(--rule)" });
     const vt = QV.vline(ch, 0.5, { color: C.ink, width: 2, layer: "front" });
     const mk = QV.dots(ch, ser.map(() => [0, 0]), { r: 6, color: (d, i) => ser[i].color, layer: "front" });
-    const handle = QV.dots(ch, [[0.5, 1.0]], { r: 8, color: C.ink, layer: "front" });
+    const handle = QV.dots(ch, [[0.5, 1.0]], { r: 9, color: C.orange, layer: "front" });
     // live confusion matrix and measures
     const cmBox = document.getElementById("p5-tt-cm");
     cmBox.innerHTML = `<table class="p5-cmx live">
@@ -2017,7 +2165,7 @@ for pi in [0.01, 0.0333, 0.10]:
     const row = QV.controls(el);
     let t = 0.5;
     const sl = QV.slider(row, { label: "threshold $t$", min: 0.01, max: 0.9, step: 0.005, value: t, width: 260, fmt: (v) => QV.fmt(v, 3, true), onInput: (v) => { t = v; upd(); } });
-    QV.readout(row, "<span class='p5-mini'>or drag the black handle</span>");
+    QV.readout(row, "<span class='hint'>or drag the orange handle</span>");
     const upd = () => {
       const m = X.cm(t);
       vt.set(t); handle.attr("cx", ch.x(t));
@@ -2038,7 +2186,8 @@ for pi in [0.01, 0.0333, 0.10]:
 <section class="slide">
   <h2>The ROC curve</h2>
   <div class="cols" style="--cols: 50fr 48fr; --gap: 22px">
-    <div style="gap:0"><div class="viz" id="p5-roc" style="height:440px"></div></div>
+    <div style="gap:0"><div class="viz" id="p5-roc" style="height:436px"></div>
+      <p class="hint" style="margin-top:6px">Move the threshold: the ring travels along the curve. Zoom the x-axis, shade the AUC.</p></div>
     <div>
       <div class="block"><h4>Construction</h4>
         <p>For <em>every</em> threshold $t$, plot the pair</p>
@@ -2051,6 +2200,11 @@ for pi in [0.01, 0.0333, 0.10]:
       <p class="p5-live" id="p5-roc-ro"></p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where on the curve does a very high threshold sit, where a very low one? (Bottom left; top right.)</li>
+    <li>Move $t$ from $0.5$ to $0.2$ and $0.1$: the ring passes the square and the triangle &ndash; more defaulters caught, more false alarms.</li>
+    <li>Switch the x-axis to 0&ndash;0.2 to separate the three rules, then shade the AUC: $0.950$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-roc", (el) => {
@@ -2118,6 +2272,11 @@ for pi in [0.01, 0.0333, 0.10]:
     <div style="gap:0"><div class="viz" id="p5-auc" style="height:226px"></div></div>
   </div>
   <div class="block key"><p>The ROC curve and AUC evaluate the <em>model</em>; the confusion matrix evaluates one <em>decision rule</em> (one threshold).</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: pick one defaulter and one non-defaulter at random &ndash; how often does the defaulter get the higher $\hat p$?</li>
+    <li>Click <b>Draw 1 pair</b> a few times: green = defaulter higher, red = non-defaulter higher.</li>
+    <li>Click <b>Draw 100 pairs</b> several times: the share settles near $0.950$, the AUC.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-auc", (el) => {
@@ -2149,7 +2308,7 @@ for pi in [0.01, 0.0333, 0.10]:
         pg.append("line").attr("x1", ch.x(a)).attr("y1", ch.y(1)).attr("x2", ch.x(b)).attr("y2", ch.y(0)).style("stroke", col).style("stroke-width", 2).style("opacity", op);
         [[a, 1], [b, 0]].forEach(([x, y]) => pg.append("circle").attr("cx", ch.x(x)).attr("cy", ch.y(y)).attr("r", 4.5).style("fill", col).style("opacity", op).style("stroke", C.surface).style("stroke-width", 1.5));
       });
-      out.set(n ? `pairs: <b>${n}</b> &middot; defaulter higher: <b>${k}</b> &middot; share <b>${QV.fmt(k / n, 3)}</b> &nbsp;(AUC $=0.950$)` : "Draw random pairs (defaulter, non-defaulter): which one gets the higher $\\hat p$?");
+      out.set(n ? `pairs: <b>${n}</b> &middot; defaulter higher: <b>${k}</b> &middot; share <b>${QV.fmt(k / n, 3)}</b> &nbsp;(AUC $=0.950$)` : "<span class='hint'>Draw random pairs (defaulter, non-defaulter): which one gets the higher $\\hat p$?</span>");
     };
     QV.button(row, "Draw 1 pair", () => { draw1(); render(); }, { primary: true });
     QV.button(row, "Draw 100 pairs", () => { for (let i = 0; i < 100; i++) draw1(); render(); });
@@ -2489,8 +2648,14 @@ test = df.drop(train.index)
     </div>
     <div style="gap:4px">
       <div id="p5-taxi" class="no-zoom lg" style="height:300px"></div>
+      <p class="hint">Change the number of blue taxis or the witness accuracy: the tree is recounted.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask for a gut answer first: the witness is right in $80\,\%$ of the cases &ndash; so $80\,\%$? The tree: $4$ of the $9$ &ldquo;blue&rdquo; statements are true, $0.444$.</li>
+    <li>Set the blue taxis to $15$: $12/(12+3) = 0.800$ &ndash; only with equal priors does the answer equal the accuracy.</li>
+    <li>Back to $5$; lower the accuracy to $0.50$: $0.167$, the prior. A witness who guesses adds nothing.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-taxi", (el) => {
@@ -2769,8 +2934,14 @@ print(bayes(np.array([0.01, 0.99]), np.array([0.9, 0.1])))   # P(ill | +) 0.0833
       <div class="block alert"><h4>Common mistake</h4>
         <p>Ignoring the prior: $0.42/(0.42+0.02)=0.955$ overstates the spam probability. With rare positives the prior can even flip the decision.</p></div>
     </div>
-    <div style="gap:0"><div class="viz" id="p5-nb" style="height:172px"></div></div>
+    <div style="gap:0"><div class="viz" id="p5-nb" style="height:172px"></div>
+      <p class="hint" style="margin-top:6px">Switch the features, move the prior; &ldquo;ignore&rdquo; is the common mistake.</p></div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Start: posterior $0.933$. Ask what happens if the prior is ignored, then click <b>ignore</b>: $0.955$.</li>
+    <li>Back to <b>use</b>; lower $P(\text{Spam})$ to $0.05$: the posterior falls to $0.525$ &ndash; still Spam, but only just.</li>
+    <li>Now set <i>free</i> to <b>no</b>: $0.076$, the decision flips to Ham.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-nb", (el) => {
@@ -2829,12 +3000,17 @@ print(bayes(np.array([0.01, 0.99]), np.array([0.9, 0.1])))   # P(ill | +) 0.0833
     <li>LDA compares the <b>prior-weighted densities</b> $\pi_kf_k(x)$; the boundary lies where they cross.</li>
     <li>The grey overlap is the error that <em>no</em> classifier can avoid.</li>
   </ul>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where would you put the boundary in (a)? At the crossing, $x^\star = 1$; error $0.159$.</li>
+    <li>Drag the handle in (a) away from $1$: the grey area grows, the error rises above its minimum.</li>
+    <li>In (b) raise $\pi_1$ from $0.2$ to $0.5$: the boundary moves from $1.693$ back to $1$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p5-lda", (wrap) => {
     const X = window.P5X, C = QV.C, N = QV.dist;
     const E = {}; let ro = null;
-    const showE = () => { if (ro && E.a && E.b) ro.set(`error (a) <b>${E.a[0]}</b> (min ${E.a[1]}) &middot; (b) <b>${E.b[0]}</b> (min ${E.b[1]}) &nbsp;<span class="p5-mini">drag the red handles</span>`); };
+    const showE = () => { if (ro && E.a && E.b) ro.set(`error (a) <b>${E.a[0]}</b> (min ${E.a[1]}) &middot; (b) <b>${E.b[0]}</b> (min ${E.b[1]}) &nbsp; <span class="hint">Drag the orange handles.</span>`); };
     const mk = (el, pi1, title, key) => {
       const S = { pi1, c: null };
       const xs = (pi) => 1 - Math.log(pi / (1 - pi)) / 2;          // x* for mu0 = 0, mu1 = 2, sigma = 1
@@ -2845,7 +3021,7 @@ print(bayes(np.array([0.01, 0.99]), np.array([0.9, 0.1])))   # P(ill | +) 0.0833
       const l0 = QV.line(ch, [], { color: C.blue, width: 3 }), l1 = QV.line(ch, [], { color: C.orange, width: 3 });
       const opt = QV.vline(ch, 0, { color: C.grey, dash: "3 4", width: 1.5 });
       const bnd = QV.vline(ch, 0, { color: C.red, dash: "7 4", width: 2.4 });
-      const hd = QV.dots(ch, [[0, 0.37]], { r: 8, color: C.red, layer: "front" });
+      const hd = QV.dots(ch, [[0, 0.37]], { r: 9, color: C.orange, layer: "front" });
       const lab = QV.tex(ch, 0, 0.33, "", { anchor: "start", dx: 8, bg: true, size: 15, color: C.tRed });
       const lg = QV.legend(el, [{ label: "$\\pi_0 f_0(x)$, $\\mu_0=0$", color: C.blue, type: "line" }, { label: "$\\pi_1 f_1(x)$, $\\mu_1=2$", color: C.orange, type: "line" }]);
       Object.assign(lg.style, { position: "absolute", left: "66px", top: "34px", flexDirection: "column", gap: "1px", background: "var(--surface)", padding: "3px 8px", borderRadius: "6px", border: "1px solid var(--rule)" });

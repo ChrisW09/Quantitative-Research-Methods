@@ -23,7 +23,6 @@
 /* ---- Part 3a (foundations, confidence intervals, tests): deck-specific styles ---- */
 .p3a-ttl { text-align: center; font-size: 16px; font-weight: 600; color: var(--brand-ink); line-height: 1.25; }
 .p3a-ttl .katex { font-size: 1em; }
-.p3a-hint { font-size: 15px; color: var(--t-grey); }
 .p3a-nw { white-space: nowrap; }
 table.bt.p3a-roomy th, table.bt.p3a-roomy td { padding-top: 7px; padding-bottom: 7px; }   /* \arraystretch 1.3 */
 .p3a-noshrink > * { flex-shrink: 0; }
@@ -62,7 +61,7 @@ table.bt.p3a-phi .rc { background: var(--c-blue-tint); }
 .p3a-rej { color: var(--t-red); font-weight: 700; }
 .p3a-nl { display: flex; flex-direction: column; gap: 2px; }
 .p3a-nl .hd { font-size: 19px; text-align: center; }
-.p3a-nl .ro { font-size: 15px; color: var(--ink-muted); text-align: center; }
+.p3a-nl .ro { font-size: 16px; color: var(--ink-2); text-align: center; }
 </style>
 <script>
 /* Shared helpers for the Part 3a figures (namespaced; no top-level names). */
@@ -87,15 +86,15 @@ table.bt.p3a-phi .rc { background: var(--c-blue-tint); }
     if (o.title) lg.insertAdjacentHTML("afterbegin", `<span style="font-weight:600;color:var(--ink-2)">${o.title}</span>`);
     return lg;
   };
-  /** Draggable vertical marker. o: {color, width, dash, min, max, step, y0, y1, knobY, r, onMove(v)} */
+  /** Draggable vertical marker; the knob is always the orange "drag me" dot. o: {color (line), width, dash, min, max, step, y0, y1, knobY, r, onMove(v)} */
   P.vhandle = (ch, x, o = {}) => {
     const dom = ch.y.domain();
     const y0 = o.y0 ?? dom[0], y1 = o.y1 ?? dom[1], ky = o.knobY ?? y1;
-    const g = ch.layer(o.layer || "front").append("g").style("cursor", "ew-resize");
+    const g = ch.layer(o.layer || "front").append("g");
     const ln = g.append("line").style("stroke", o.color || QV.C.orange).style("stroke-width", o.width || 3)
       .style("stroke-dasharray", o.dash || null);
     const hit = g.append("line").style("stroke", "transparent").style("stroke-width", 20);
-    const knob = g.append("circle").attr("r", o.r ?? 7.5).style("fill", o.color || QV.C.orange)
+    const knob = g.append("circle").attr("r", Math.max(8.5, o.r ?? 9)).style("fill", QV.C.orange)
       .style("stroke", QV.C.surface).style("stroke-width", 2);
     const api = {
       g, x,
@@ -105,7 +104,7 @@ table.bt.p3a-phi .rc { background: var(--c-blue-tint); }
         knob.attr("cx", px).attr("cy", ch.y(ky));
         return api;
       },
-      color(c) { ln.style("stroke", c); knob.style("fill", c); return api; },
+      color(c) { ln.style("stroke", c); return api; },
     };
     QV.drag(ch, g, (xv) => {
       let v = Math.max(o.min ?? ch.x.domain()[0], Math.min(o.max ?? ch.x.domain()[1], xv));
@@ -182,13 +181,13 @@ table.bt.p3a-phi .rc { background: var(--c-blue-tint); }
     };
     if (o.marker) {
       mk = P.vhandle(ch, zs, { color: QV.C.green, width: 3, min: -3.9, max: 3.9, step: 0.005, y1: 0.4, knobY: 0.4, onMove: (v) => setZ(v) });
-      mkLab = QV.tex(ch, zs, 0.425, "", { bg: true, size: 16 });
+      mkLab = QV.tex(ch, zs, 0.425, "", { bg: true, size: 16, dy: -8 });
     }
     setAlpha(alpha);
     return { ch, setAlpha, setZ, alpha: () => alpha, z: () => zs, crit: () => crit };
   };
-  /** Phi table linked to a small N(0,1) curve. */
-  P.phiLookup = (el, table, z0) => {
+  /** Phi table linked to a small N(0,1) curve, with the reading rule in words. o: {find: [p, ...]} adds "backwards" buttons. */
+  P.phiLookup = (el, table, z0, o = {}) => {
     const D = QV.dist;
     const ch = QV.density(el, { pdf: D.normPdf, domain: [-3.5, 3.5], yMax: 0.5, tickValues: [-3, -2, -1, 0, 1, 2, 3], xLabel: "z" });
     const zl = QV.vline(ch, z0, { color: QV.C.orange, width: 2.5, y1: 0.43 });
@@ -196,23 +195,47 @@ table.bt.p3a-phi .rc { background: var(--c-blue-tint); }
     const zt = QV.tex(ch, z0, 0.43, "", { size: 15, baseline: "bottom", dy: -2 });
     const cells = Array.from(table.querySelectorAll("td.c"));
     const head = Array.from(table.querySelectorAll("thead th"));
-    let sel = cells.find((c) => +c.dataset.z === z0) || cells[0];
-    const show = (cell) => {
-      const z = +cell.dataset.z;
+    const val = (c) => c.textContent.trim(), rowOf = (c) => (+c.dataset.z).toFixed(2).slice(0, 3), colOf = (c) => ".0" + (+c.dataset.z).toFixed(2)[3];
+    const row = QV.controls(el);
+    row.style.gap = "4px 12px";
+    (o.find || []).forEach((p) => QV.button(row, `Find $${p}$`, () => find(p)));
+    const rd = QV.readout(row, "");
+    const draw = (z, digits, phi, hl) => {
       ch.setRegions([{ from: -3.5, to: z, color: QV.C.blue, opacity: 0.32 }]);
-      zl.set(z); zt.set(z, 0.43, `z = ${z.toFixed(2)}`);
-      lab.set(-3.4, 0.465, `\\Phi(${z.toFixed(2)}) = ${cell.textContent.trim()}`);
+      zl.set(z); zt.set(z, 0.43, `z = ${z.toFixed(digits)}`);
+      lab.set(-3.4, 0.465, `\\Phi(${z.toFixed(digits)}) = ${phi}`);
       table.querySelectorAll(".rc").forEach((e) => e.classList.remove("rc"));
-      const tr = cell.parentNode, ci = Array.from(tr.children).indexOf(cell);
-      tr.children[0].classList.add("rc"); if (head[ci]) head[ci].classList.add("rc");
+      hl.forEach((c) => { const tr = c.parentNode, ci = Array.from(tr.children).indexOf(c); tr.children[0].classList.add("rc"); if (head[ci]) head[ci].classList.add("rc"); });
+    };
+    // forwards: a cell (row + column -> z -> Phi); backwards: a probability (inside -> margins -> z)
+    const cell = (c) => () => {
+      draw(+c.dataset.z, 2, val(c), [c]);
+      rd.set(`row $${rowOf(c)}$, column $${colOf(c)}$ $\\Rightarrow$ $\\Phi(${(+c.dataset.z).toFixed(2)})=$ <b>${val(c)}</b>; &nbsp;right of $z$: <b>${(1 - +val(c)).toFixed(4)}</b>`);
+    };
+    let cur = null, sel = [];
+    const keep = (cs, fn) => { sel.forEach((c) => c.classList.remove("sel")); sel = cs; cs.forEach((c) => c.classList.add("sel")); cur = fn; cur(); };
+    const find = (p) => {
+      const hit = cells.find((c) => Math.abs(+val(c) - p) < 5e-5);
+      if (hit) return keep([hit], () => {
+        draw(+hit.dataset.z, 2, val(hit), [hit]);
+        rd.set(`backwards: $${val(hit)}$ stands in row $${rowOf(hit)}$, column $${colOf(hit)}$ $\\Rightarrow$ $z_{${p}}=$ <b>${(+hit.dataset.z).toFixed(2)}</b>`);
+      });
+      const lo = cells.filter((c) => +val(c) < p).pop(), hi = cells.find((c) => +val(c) > p);
+      if (!lo || !hi) return;
+      const z = (+lo.dataset.z + +hi.dataset.z) / 2;
+      keep([lo, hi], () => {
+        draw(z, 3, String(p), [lo, hi]);
+        rd.set(`backwards: $${p}$ lies between $${val(lo)}$ ($z=${(+lo.dataset.z).toFixed(2)}$) and $${val(hi)}$ ($z=${(+hi.dataset.z).toFixed(2)}$) $\\Rightarrow$ $z_{${p}}\\approx$ <b>${z.toFixed(3)}</b>`);
+      });
     };
     cells.forEach((c) => {
-      c.addEventListener("pointerenter", () => show(c));
-      c.addEventListener("click", () => { sel.classList.remove("sel"); sel = c; c.classList.add("sel"); show(c); });
+      c.addEventListener("pointerenter", () => cell(c)());
+      c.addEventListener("click", () => keep([c], cell(c)));
     });
-    table.addEventListener("pointerleave", () => show(sel));
-    sel.classList.add("sel"); show(sel);
-    return { ch, select: (z) => { const c = cells.find((x) => Math.abs(+x.dataset.z - z) < 1e-9); if (c) c.click(); } };
+    table.addEventListener("pointerleave", () => cur());
+    const c0 = cells.find((c) => +c.dataset.z === z0) || cells[0];
+    keep([c0], cell(c0));
+    return { ch, find, select: (z) => { const c = cells.find((x) => Math.abs(+x.dataset.z - z) < 1e-9); if (c) c.click(); } };
   };
 })();
 </script>
@@ -477,13 +500,14 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -&gt; 2.
   <div class="cols" style="--cols: 1fr 1fr; --gap: 26px">
     <div style="gap:4px">
       <div class="p3a-ttl">many bottles $\rightarrow$ bell curve</div>
-      <div class="viz" id="p3a-bell-hist" style="height:300px"></div>
+      <div class="viz" id="p3a-bell-hist" style="height:282px"></div>
     </div>
     <div style="gap:4px">
       <div class="p3a-ttl">$\mu$ = location, $\sigma$ = spread</div>
-      <div class="viz" id="p3a-bell-mu" style="height:300px"></div>
+      <div class="viz" id="p3a-bell-mu" style="height:282px"></div>
     </div>
   </div>
+  <p class="hint">Left: choose how many bottles are measured. Right: move the dashed curve with the $\mu$ and $\sigma$ sliders or the two buttons.</p>
   <div class="cols" style="--cols: 46fr 50fr">
     <div class="block"><h4>Density of $X\sim N(\mu,\sigma^2)$</h4>
       <p>\[ f(x)=\frac{1}{\sqrt{2\pi}\,\sigma}\;e^{-\frac{(x-\mu)^2}{2\sigma^2}}, \quad x\in\mathbb{R} \]</p></div>
@@ -497,6 +521,10 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -&gt; 2.
     distribution is the idealised model of such data. Right panel: $\mu$ moves the bell, $\sigma$ widens it (and lowers it, because
     the area stays $1$). Repeat the convention: in this course the second argument is the variance; scipy's <code>scale</code> is
     $\sigma$.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how will the histogram look with only $50$ bottles? Click $50$, then $200$, $1000$, $5000$: it settles on the curve; $\bar x$ and $s$ approach $1000$ and $3$.</li>
+    <li>Right: ask what a larger $\sigma$ does to the bell. Click &ldquo;wider&rdquo;: the dashed curve lands on the grey one &ndash; wider <em>and</em> lower, the area stays $1$.</li>
+  </ol></aside>
   <script>
   (() => {
     const D = QV.dist;
@@ -506,21 +534,31 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -&gt; 2.
         y: { domain: [0, 0.235], label: "Density", tickValues: [0, 0.05, 0.1, 0.15, 0.2], format: ".2f" },
       });
       const mids = d3.range(989, 1012, 1);                      // classes (988.5, 989.5], ..., (1010.5, 1011.5]
-      let N = 1000, seed = 2026, lg = null;
+      // starting state: the 1000 bottles of the PDF figure (make_figures.py, numpy seed 2026)
+      const PDF = { h: [1, 0, 4, 1, 11, 24, 24, 52, 87, 104, 111, 131, 129, 108, 84, 61, 28, 22, 8, 4, 5, 1, 0], m: 1000.063, sd: 3.093 };
+      const seed0 = 2026;
+      let N = 1000, seed = seed0, lg = null;
       const bars = QV.bars(ch, mids.map((m) => ({ x: m, y: 0, h: 0 })), {
         width: 0.92, color: QV.C.blue, opacity: 0.45, radius: 2,
         tip: (d) => `<b>(${QV.fmt(d.x - 0.5, 1)}, ${QV.fmt(d.x + 0.5, 1)}] ml</b><br>${d.h} bottles · density ${QV.fmt(d.y, 3)}`,
       });
       QV.fnLine(ch, (x) => D.normPdf(x, 1000, 3), { color: QV.C.orange, width: 2.6 });
       const update = () => {
-        const r = QV.rng(seed), h = mids.map(() => 0);
-        for (let i = 0; i < N; i++) { const k = Math.floor(r.normal(1000, 3) - 988.5); if (k >= 0 && k < h.length) h[k]++; }
-        bars.update(mids.map((m, k) => ({ x: m, y: h[k] / N, h: h[k] })));
+        let h, m, sd;
+        if (seed === seed0 && N === 1000) ({ h, m, sd } = PDF);
+        else {
+          const r = QV.rng(seed), v = Array.from({ length: N }, () => r.normal(1000, 3));
+          h = mids.map(() => 0);
+          v.forEach((x) => { const k = Math.floor(x - 988.5); if (k >= 0 && k < h.length) h[k]++; });
+          m = QV.stats.mean(v); sd = QV.stats.sd(v);
+        }
+        bars.update(mids.map((mid, k) => ({ x: mid, y: h[k] / N, h: h[k] })));
         if (lg) lg.remove();
         lg = P3A.legendIn(el, [
           { label: `${N} bottles (histogram)`, color: QV.C.blue },
           { label: "density of $N(1000,\\,3^2)$", color: QV.C.orange, type: "line" },
         ], { size: 14 });
+        lg.insertAdjacentHTML("beforeend", `<span style="color:var(--ink)">${Deck.tex("\\bar x=")} <b>${QV.fmt(m, 2)}</b> ml, ${Deck.tex("s=")} <b>${QV.fmt(sd, 2)}</b> ml</span>`);
       };
       const row = QV.controls(el);
       QV.segmented(row, { label: "Bottles", options: [[50, "50"], [200, "200"], [1000, "1000"], [5000, "5000"]], value: 1000,
@@ -550,10 +588,14 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -&gt; 2.
           { label: `$\\mu=${P3A.t(mu, 1)},\\ \\sigma=${P3A.t(sd, 1)}$${tags.length ? ` (${tags.join(", ")})` : ""}`, color: QV.C.orange, type: "dash" },
           { label: "$\\mu=1000,\\ \\sigma=6$ (wider)", color: QV.C.grey, type: "line" },
         ], { size: 14 });
+        pre.set(mu === 1006 && sd === 3 ? "shift" : mu === 1000 && sd === 6 ? "wide" : "", false);
       };
       const row = QV.controls(el);
-      QV.slider(row, { label: "dashed: $\\mu$", min: 990, max: 1012, step: 0.5, value: 1006, width: 120, fmt: (v) => QV.fmt(v, 1, true), onInput: (v) => { mu = v; update(); } });
-      QV.slider(row, { label: "$\\sigma$", min: 2, max: 8, step: 0.5, value: 3, width: 110, fmt: (v) => QV.fmt(v, 1, true), onInput: (v) => { sd = v; update(); } });
+      row.style.gap = "6px 14px";
+      const slM = QV.slider(row, { label: "dashed: $\\mu$", min: 990, max: 1012, step: 0.5, value: 1006, width: 84, fmt: (v) => QV.fmt(v, 1, true) + " ml", onInput: (v) => { mu = v; update(); } });
+      const slS = QV.slider(row, { label: "$\\sigma$", min: 2, max: 8, step: 0.5, value: 3, width: 66, fmt: (v) => QV.fmt(v, 1, true) + " ml", onInput: (v) => { sd = v; update(); } });
+      const pre = QV.segmented(row, { options: [["shift", "shifted"], ["wide", "wider"]], value: "shift",
+        onChange: (v) => { mu = v === "shift" ? 1006 : 1000; sd = v === "shift" ? 3 : 6; slM.set(mu, false); slS.set(sd, false); update(); } });
       update();
     });
   })();
@@ -584,49 +626,70 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -&gt; 2.
 <section class="slide">
   <h2>Probabilities as areas &ndash; the four basic cases</h2>
   <div class="cols" style="--cols: 1fr 1fr; --gap: 10px 40px">
-    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar1-t">&nbsp;</div><div class="viz" id="p3a-ar1" style="height:204px"></div></div>
-    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar2-t">&nbsp;</div><div class="viz" id="p3a-ar2" style="height:204px"></div></div>
-    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar3-t">&nbsp;</div><div class="viz" id="p3a-ar3" style="height:204px"></div></div>
-    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar4-t">&nbsp;</div><div class="viz" id="p3a-ar4" style="height:204px"></div></div>
+    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar1-t">&nbsp;</div><div class="viz" id="p3a-ar1" style="height:188px"></div></div>
+    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar2-t">&nbsp;</div><div class="viz" id="p3a-ar2" style="height:188px"></div></div>
+    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar3-t">&nbsp;</div><div class="viz" id="p3a-ar3" style="height:188px"></div></div>
+    <div style="gap:0"><div class="p3a-ttl" id="p3a-ar4-t">&nbsp;</div><div class="viz" id="p3a-ar4" style="height:188px"></div></div>
   </div>
+  <div class="viz-ctrl" id="p3a-ar-ctrl"><p class="hint">Drag an orange line (the first three panels share one $z$) or pick</p></div>
   <p class="fs-s">The table gives only $\Phi(z)=P(Z\le z)$. Everything else follows from <b>total area $=1$</b> and <b>symmetry</b>:
     &nbsp;$P(Z>z)=1-\Phi(z)$, &nbsp;$\Phi(-z)=1-\Phi(z)$, &nbsp;$P(a\le Z\le b)=\Phi(b)-\Phi(a)$.</p>
-  <p class="p3a-hint">Drag the orange lines: the shaded area and the formula above each panel follow.</p>
   <aside class="notes">Talk track: &ldquo;draw before you calculate&rdquo; &ndash; sketch the bell, shade the area, then decide which
     rule applies. Ask: why is $P(Z&gt;0.75)$ equal to $P(Z\le-0.75)$? (symmetry). For continuous variables $P(Z=z)=0$, so $&lt;$ and
     $\le$ give the same probability.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which two of the four areas are always equal? Drag $z$ in the first panel: &ldquo;complement&rdquo; and &ldquo;symmetry&rdquo; show the same number.</li>
+    <li>Click $z=1.96$: ask for the right tail before pointing at it ($0.025$).</li>
+    <li>Fourth panel: drag both lines; the area is $\Phi(b)-\Phi(a)$.</li>
+  </ol></aside>
   <script>
   (() => {
     const D = QV.dist, T = (v) => P3A.t(v, 2), F4 = (p) => p.toFixed(4);
+    // panels 1-3 share one z >= 0 (the table value, its complement and its mirror image); panel 4 has its own a and b
+    let zc = 0.75, pre = null, rd = null;
+    const ab = [-0.5, 1];
     const cases = [
-      { id: "p3a-ar1", rule: "table value", z: [0.75], lim: [-3.5, 3.5], reg: (z) => [-4, z[0]],
+      { id: "p3a-ar1", rule: "table value", z: () => [zc], lim: [0, 3.5], reg: (z) => [-4, z[0]],
         title: (z) => `P(Z \\le ${T(z[0])}) = \\Phi(${T(z[0])}) = ${F4(D.normCdf(z[0]))}` },
-      { id: "p3a-ar2", rule: "complement", z: [0.75], lim: [-3.5, 3.5], reg: (z) => [z[0], 4],
+      { id: "p3a-ar2", rule: "complement", z: () => [zc], lim: [0, 3.5], reg: (z) => [z[0], 4],
         title: (z) => `P(Z > ${T(z[0])}) = 1-\\Phi(${T(z[0])}) = ${F4(1 - D.normCdf(z[0]))}` },
-      { id: "p3a-ar3", rule: "symmetry", z: [-0.75], lim: [-3.5, 0], reg: (z) => [-4, z[0]],
+      { id: "p3a-ar3", rule: "symmetry", z: () => [-zc], lim: [-3.5, 0], reg: (z) => [-4, z[0]],
         title: (z) => `P(Z \\le {${T(z[0])}}) = 1-\\Phi(${T(-z[0])}) = ${F4(1 - D.normCdf(-z[0]))}` },
-      { id: "p3a-ar4", rule: "difference", z: [-0.5, 1], lim: [-3.5, 3.5], reg: (z) => [z[0], z[1]],
+      { id: "p3a-ar4", rule: "difference", z: () => ab, lim: [-3.5, 3.5], reg: (z) => [z[0], z[1]],
         title: (z) => `P(${T(z[0])} \\le Z \\le ${T(z[1])}) = \\Phi(${T(z[1])})-\\Phi(${T(z[0])}) = ${F4(D.normCdf(z[1]) - D.normCdf(z[0]))}` },
     ];
-    cases.forEach((c) => QV.mount("#" + c.id, (el) => {
+    const views = [];
+    const sync = () => {
+      views.forEach((v) => v());
+      if (pre) pre.set([0.75, 1, 1.96].includes(zc) ? zc : "", false);
+      if (rd) rd.set(`total area: $\\Phi(${T(zc)})+P(Z>${T(zc)})=${F4(D.normCdf(zc))}+${F4(1 - D.normCdf(zc))}=1$`);
+    };
+    cases.forEach((c, ci) => QV.mount("#" + c.id, (el) => {
       const ch = QV.density(el, { pdf: D.normPdf, domain: [-4, 4], yMax: 0.45, tickValues: [-3, -2, -1, 0, 1, 2, 3], xLabel: "" });
       QV.text(ch, 3.95, 0.37, c.rule, { anchor: "end", cls: "lbl-muted" });
-      const z = c.z.slice(), ttl = document.getElementById(c.id + "-t");
-      let hs = [];
-      const upd = () => {
-        const [a, b] = c.reg(z);
+      const ttl = document.getElementById(c.id + "-t");
+      const hs = c.z().map((v, i) => P3A.vhandle(ch, v, {
+        color: QV.C.orange, width: 2.5, step: 0.01, min: c.lim[0], max: c.lim[1], y1: 0.45, knobY: 0.42,
+        onMove: (nv) => {
+          if (ci === 3) ab[i] = i === 0 ? Math.min(nv, ab[1] - 0.01) : Math.max(nv, ab[0] + 0.01);
+          else zc = Math.abs(nv);
+          sync();
+        },
+      }));
+      views.push(() => {
+        const z = c.z(), [a, b] = c.reg(z);
         ch.setRegions([{ from: a, to: b, color: QV.C.blue, opacity: 0.4 }]);
         hs.forEach((h, i) => h.set(z[i]));
         ttl.innerHTML = Deck.tex(c.title(z));
-      };
-      hs = z.map((v, i) => P3A.vhandle(ch, v, {
-        color: QV.C.orange, width: 2.5, r: 6.5, step: 0.01, min: c.lim[0], max: c.lim[1], y1: 0.45, knobY: 0.42,
-        onMove: (nv) => {
-          if (z.length === 2) nv = i === 0 ? Math.min(nv, z[1] - 0.01) : Math.max(nv, z[0] + 0.01);
-          z[i] = nv; upd();
-        },
-      }));
-      upd();
+      });
+      if (ci === 0) {
+        const row = document.getElementById("p3a-ar-ctrl");
+        pre = QV.segmented(row, { options: [[0.75, "$z=0.75$"], [1, "$z=1$"], [1.96, "$z=1.96$"]], value: 0.75,
+          onChange: (v) => { zc = +v; sync(); } });
+        QV.spacer(row);
+        rd = QV.readout(row, "");
+      }
+      sync();
     }));
   })();
   </script>
@@ -656,12 +719,17 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -&gt; 2.
       </tbody>
     </table></div>
     <div>
-      <div class="viz" id="p3a-phi1-viz" style="height:330px; width:455px"></div>
-      <p class="p3a-hint">Hover over a cell: the curve shows its area $\Phi(z)$; row and column headers light up. Click to keep a cell.</p>
+      <div class="viz" id="p3a-phi1-viz" style="height:300px; width:455px"></div>
+      <p class="hint">Hover over a cell: the curve shows its area $\Phi(z)$; row and column headers light up. Click to keep a cell.</p>
     </div>
   </div>
   <p class="fs-xs"><b>Reading:</b> row $=$ $z$ to one decimal, column $=$ second decimal. Highlighted: $z=0.75$ $\to$ row $0.7$,
     column $.05$ $\to$ $\Phi(0.75)=0.7734$.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask where $\Phi(0.75)$ stands before pointing: row $0.7$, column $.05$.</li>
+    <li>Move along one row, then down one column: the shaded area grows with $z$.</li>
+    <li>Click a cell to keep it; the line under the curve repeats the reading rule and gives the area right of $z$.</li>
+  </ol></aside>
   <script>
   (() => { QV.mount("#p3a-phi1-viz", (el) => P3A.phiLookup(el, document.getElementById("p3a-phi1"), 0.75)); })();
   </script>
@@ -691,14 +759,19 @@ print(round(np.sqrt(9 * VarX), 2), round(np.sqrt(VarX / 9), 2))   # c)  -&gt; 2.
       </tbody>
     </table></div>
     <div>
-      <div class="viz" id="p3a-phi2-viz" style="height:330px; width:455px"></div>
-      <p class="p3a-hint">Backwards: find $0.95$ or $0.975$ <em>inside</em> the table and read off $z$ in the margins.</p>
+      <div class="viz" id="p3a-phi2-viz" style="height:300px; width:455px"></div>
+      <p class="hint">Backwards: find $0.95$ or $0.975$ <em>inside</em> the table and read off $z$ in the margins &ndash; the two buttons show the answer.</p>
     </div>
   </div>
   <p class="fs-xs">Negative $z$ via symmetry: $\Phi(-z)=1-\Phi(z)$. For $z\ge 3$: $\Phi(z)\approx 1$. Highlighted: the quantiles
     $1.645$ and $1.96$ (next slide).</p>
+  <aside class="notes" data-demo><ol>
+    <li>Let the students search $0.975$ inside the table, then click &ldquo;Find $0.975$&rdquo;: row $1.9$, column $.06$, so $z=1.96$.</li>
+    <li>&ldquo;Find $0.95$&rdquo;: it lies between $0.9495$ and $0.9505$, so $z\approx1.645$.</li>
+    <li>Hover over the last rows: the area hardly changes any more.</li>
+  </ol></aside>
   <script>
-  (() => { QV.mount("#p3a-phi2-viz", (el) => P3A.phiLookup(el, document.getElementById("p3a-phi2"), 1.96)); })();
+  (() => { QV.mount("#p3a-phi2-viz", (el) => P3A.phiLookup(el, document.getElementById("p3a-phi2"), 1.96, { find: [0.95, 0.975] })); })();
   </script>
 </section>
 
@@ -856,14 +929,19 @@ d) 1008.26
   <p class="fs-xs">Processing times of customer orders are right-skewed (here: gamma distribution with $\mu=12$, $\sigma=6$ minutes). For
     each $n$, $20\,000$ samples were drawn and their means $\bar x$ plotted. For $n=1$ the normal curve fits badly; at $n=36$ the
     histogram of $\bar x$ is practically normal &ndash; and it narrows like $6/\sqrt n$.</p>
-  <p class="p3a-hint">&ldquo;Build up&rdquo; draws the samples step by step. The other populations also have $\mu=12$, $\sigma=6$; the slider sets $n$ in the right panel.</p>
+  <p class="hint">&ldquo;1 sample&rdquo;: each panel draws $n$ times (blue dots) and adds their mean (orange) as one block. All populations have $\mu=12$, $\sigma=6$.</p>
   <aside class="notes">Talk track: read the panels from left to right. Left: single values, clearly skewed &ndash; the orange normal curve
     is wrong. Each step to the right: the histogram becomes more symmetric AND narrower. Two messages in one picture: the shape becomes
     normal (CLT) and the spread shrinks like $1/\sqrt n$ (standard error). Seed and code are in <code>make_figures.py</code>.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Click &ldquo;1 sample&rdquo; a few times: $n$ times &rarr; their mean &rarr; one block. Then &ldquo;+100&rdquo; and &ldquo;All 20 000&rdquo;.</li>
+    <li>Ask: will a &ldquo;very skewed&rdquo; or &ldquo;bimodal&rdquo; population still give a bell at $n=36$? Switch and look.</li>
+    <li>$x$-axis &ldquo;same&rdquo;: all panels on $0$&ndash;$40$ minutes &ndash; the histograms narrow like $6/\sqrt n$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p3a-clt", (el) => {
-      const MU = 12, SIG = 6, REPS = 20000, NB = 45, TH = 42;
+      const MU = 12, SIG = 6, REPS = 20000, TH = 42, NBMAX = 80, D = QV.dist;
       const S32 = Math.sqrt(32), W12 = 6 * Math.sqrt(12);
       const POP = {   // every population has mu = 12 and sigma = 6
         gamma: (r) => -3 * Math.log((1 - r.uniform()) * (1 - r.uniform()) * (1 - r.uniform()) * (1 - r.uniform())),
@@ -872,8 +950,11 @@ d) 1008.26
         bimodal: (r) => MU + (r.uniform() < 0.5 ? -S32 : S32) + 2 * r.normal(),
       };
       const KEYS = Object.keys(POP);
-      let pop = "gamma", run = null;
+      const fmtN = (v) => v.toLocaleString("en").replace(/,/g, " ");
+      // same = all panels on 0..40 minutes; stepping = samples are added one by one (the newest one is shown)
+      let pop = "gamma", same = false, stepping = false, run = null;
       const W = el.clientWidth, H = el.clientHeight, GAP = 16, PW = (W - 3 * GAP) / 4;
+      const se = (P) => SIG / Math.sqrt(P.n);
       const panels = [1, 4, 9, 36].map((n, i) => {
         const box = document.createElement("div");
         box.style.cssText = `position:absolute;left:${i * (PW + GAP)}px;top:0;width:${PW}px;height:${H}px`;
@@ -883,87 +964,118 @@ d) 1008.26
         cd.appendChild(xl); box.append(ttl, cd); el.appendChild(box);
         const ch = QV.chart(cd, { width: PW, height: H - TH, x: { domain: [0, 1], label: "", ticks: 5 }, y: { domain: [0, 1], hide: true },
           margin: { left: 10, right: 12, top: 4, bottom: 50 } });
-        const P = { n, i, ttl, xl, ch, counts: new Float64Array(NB), drawn: 0, lo: 0, hi: 1, bw: 1 };
-        P.barsG = ch.layer("data").append("g");
-        P.curve = QV.line(ch, [], { color: QV.C.orange, width: 2.4 });
+        const P = { n, i, ttl, xl, ch, counts: new Float64Array(NBMAX), nb: 45, drawn: 0, lo: 0, hi: 1, bw: 1, last: null };
+        P.bars = ch.layer("data").append("g").selectAll("path").data(d3.range(NBMAX)).join("path").style("fill", QV.C.blue).style("opacity", 0.5);
+        QV.attachTip(ch, P.bars, (b) => `<b>(${QV.fmt(P.lo + b * P.bw, 2)}, ${QV.fmt(P.lo + (b + 1) * P.bw, 2)}]</b><br>${fmtN(P.counts[b])} of ${fmtN(P.drawn)} means<br>normal curve: ${QV.fmt(P.drawn * P.bw * D.normPdf(P.lo + (b + 0.5) * P.bw, MU, se(P)), 1)} expected`);
+        P.curve = QV.line(ch, [], { color: QV.C.orange, width: 2.6 });
         P.muLine = QV.segment(ch, MU, 0, MU, 1, { color: QV.C.ink2, width: 1.3, dash: "2 3", layer: "data" });
+        P.newG = ch.layer("data").append("g").style("pointer-events", "none");     // the newest sample: its values, its mean, its block
+        P.lab = ch.layer("annot").append("text").attr("class", "lbl").style("font-weight", 600)
+          .style("paint-order", "stroke").style("stroke", QV.C.surface).style("stroke-width", "5px").style("stroke-linejoin", "round");
         return P;
       });
-      const se = (P) => SIG / Math.sqrt(P.n);
       const setup = (P) => {
-        [P.lo, P.hi] = P.n === 1 ? [0, 40] : [MU - 4.2 * se(P), MU + 4.2 * se(P)];
-        P.bw = (P.hi - P.lo) / NB;
+        [P.lo, P.hi] = same || P.n === 1 ? [0, 40] : [MU - 4.2 * se(P), MU + 4.2 * se(P)];
+        P.nb = same ? NBMAX : 45;
+        P.bw = (P.hi - P.lo) / P.nb;
         P.ch.x.domain([P.lo, P.hi]); P.ch.axes();
         P.ttl.innerHTML = (P.n === 1 ? `${Deck.tex("n=1")} (single values)` : Deck.tex(`n=${P.n}`)) + "<br>" +
           Deck.tex(`\\mathrm{SE}=6/\\sqrt{${P.n}}=${P3A.t(se(P), 3)}`);
         P.xl.innerHTML = Deck.tex(P.n === 1 ? "x" : "\\bar x") + " (minutes)";
       };
-      const reset = (P) => { P.counts.fill(0); P.drawn = 0; P.rng = QV.rng(42 + 7919 * P.i + 104729 * KEYS.indexOf(pop) + 31 * P.n); };
+      const start = (P) => { P.counts.fill(0); P.drawn = 0; P.last = null; P.rng = QV.rng(42 + 7919 * P.i + 104729 * KEYS.indexOf(pop) + 31 * P.n); };
       const add = (P, k) => {
         const f = POP[pop], r = P.rng, n = P.n;
+        let vals = null, m = 0;
         for (let j = 0; j < k; j++) {
+          const keep = j === k - 1;
+          if (keep) vals = new Array(n);
           let s = 0;
-          for (let t = 0; t < n; t++) s += f(r);
-          const b = Math.floor((s / n - P.lo) / P.bw);
-          if (b >= 0 && b < NB) P.counts[b]++;
+          for (let t = 0; t < n; t++) { const v = f(r); s += v; if (keep) vals[t] = v; }
+          m = s / n;
+          const b = Math.floor((m - P.lo) / P.bw);
+          if (b >= 0 && b < P.nb) P.counts[b]++;
         }
         P.drawn += k;
+        if (k > 0) P.last = { vals, m };
       };
-      const fitY = (P) => {
-        const hmax = Math.max(...P.counts) / (P.drawn * P.bw);
-        const peak = 1 / (se(P) * Math.sqrt(2 * Math.PI));
-        const top = Math.max(hmax, peak) * 1.1;
-        P.ch.y.domain([0, top]);
-        QV.setLine(P.ch, P.curve, QV.sample((v) => QV.dist.normPdf(v, MU, se(P)), P.lo, P.hi, 200));
+      // bars are counts; the normal curve is scaled to expected counts, so the full picture equals the density histogram
+      const draw = (P) => {
+        const ch = P.ch, x = ch.x, y = ch.y;
+        const peak = P.drawn * P.bw / (se(P) * Math.sqrt(2 * Math.PI));
+        let mx = 0; for (let b = 0; b < P.nb; b++) if (P.counts[b] > mx) mx = P.counts[b];
+        const top = stepping ? Math.max(5, mx, peak) * 1.5 : Math.max(mx, peak, 1) * 1.1;   // one-step view: room for the newest sample above the bars
+        y.domain([0, top]);
+        P.bars.attr("d", (b) => {
+          if (b >= P.nb || !P.counts[b]) return "";
+          const x0 = x(P.lo + b * P.bw) + 0.6, x1 = x(P.lo + (b + 1) * P.bw) - 0.6;
+          return QV.barPath(x0, y(P.counts[b]), Math.max(0.5, x1 - x0), y(0) - y(P.counts[b]), true, 1.5);
+        });
+        QV.setLine(ch, P.curve, P.drawn ? QV.sample((v) => P.drawn * P.bw * D.normPdf(v, MU, se(P)), P.lo, P.hi, 200) : []);
         P.muLine.set(MU, 0, MU, top);
-      };
-      const render = (P) => {
-        const x = P.ch.x, y = P.ch.y, den = P.drawn * P.bw || 1;
-        const sel = P.barsG.selectAll("path").data(Array.from(P.counts, (c, b) => ({ b, c, P }))).join("path")
-          .attr("d", (d) => {
-            const x0 = x(P.lo + d.b * P.bw) + 0.6, x1 = x(P.lo + (d.b + 1) * P.bw) - 0.6, hv = d.c / den;
-            return QV.barPath(x0, y(hv), Math.max(0.5, x1 - x0), y(0) - y(hv), true, 1.5);
-          })
-          .style("fill", QV.C.blue).style("opacity", 0.5);
-        if (!P.tipped) {
-          P.tipped = true;
-          QV.attachTip(P.ch, sel, (d) => `<b>(${QV.fmt(P.lo + d.b * P.bw, 2)}, ${QV.fmt(P.lo + (d.b + 1) * P.bw, 2)}]</b><br>${d.c} of ${d.P.drawn} means<br>height ${QV.fmt(d.c / (d.P.drawn * P.bw || 1), 3)} · normal ${QV.fmt(QV.dist.normPdf(P.lo + (d.b + 0.5) * P.bw, MU, se(P)), 3)}`);
+        P.newG.selectAll("*").remove();
+        const showNew = stepping && P.last && P.drawn > 0;
+        P.lab.style("display", showNew ? null : "none");
+        if (!showNew) return;
+        const { vals, m } = P.last, yA = 13, yB = 36, b = Math.floor((m - P.lo) / P.bw), inside = b >= 0 && b < P.nb;
+        const xm = Math.max(0, Math.min(ch.w, x(m)));
+        if (inside) {
+          const x0 = x(P.lo + b * P.bw) + 0.6, x1 = x(P.lo + (b + 1) * P.bw) - 0.6, c = P.counts[b];
+          P.newG.append("rect").attr("x", x0).attr("width", Math.max(0.5, x1 - x0)).attr("y", y(c)).attr("height", Math.max(1.5, y(c - 1) - y(c))).style("fill", QV.C.orange);
         }
+        P.newG.append("line").attr("x1", xm).attr("x2", xm).attr("y1", yB).attr("y2", y(inside ? P.counts[b] : 0)).style("stroke", QV.C.orange).style("stroke-width", 2);
+        P.newG.selectAll("circle.v").data(vals).join("circle").attr("class", "v").attr("cx", (v) => x(v)).attr("cy", yA).attr("r", 5)
+          .style("fill", QV.C.blue).style("opacity", 0.5);
+        P.newG.append("circle").attr("cx", xm).attr("cy", yB).attr("r", 6.5).style("fill", QV.C.orange).style("stroke", QV.C.surface).style("stroke-width", 2);
+        const right = xm < ch.w * 0.58;
+        P.lab.attr("x", xm + (right ? 12 : -12)).attr("y", yB + 5).attr("text-anchor", right ? "start" : "end").text(`${P.n === 1 ? "x" : "x̄"} = ${QV.fmt(m, 2)}`);
       };
-      const full = (P) => { reset(P); add(P, REPS); fitY(P); render(P); };
       const row = QV.controls(el);
       QV.legend(el, [
         { label: "histogram of $20\\,000$ sample means $\\bar x$", color: QV.C.blue },
         { label: "normal curve $N(\\mu,\\ \\sigma^2/n)$", color: QV.C.orange, type: "line" },
         { label: "$\\mu=12$", color: QV.C.ink2, type: "dash" },
       ], "after").style.justifyContent = "center";
-      const ro = { set: () => {} };
+      let rd = null;
+      const status = () => {
+        const k = panels[0].drawn;
+        rd.set(stepping ? `<b>${fmtN(k)}</b> of $20\\,000$ samples` : `<b>${fmtN(k)}</b> samples per panel`);
+      };
+      const drawAll = () => { panels.forEach(draw); status(); };
       const stop = () => { if (run) { run.stop(); run = null; } };
-      const allFull = () => { stop(); panels.forEach(full); ro.set(); };
-      QV.segmented(row, { label: "Population", value: "gamma",
-        options: [["gamma", "right-skewed"], ["exp", "very skewed"], ["unif", "flat"], ["bimodal", "bimodal"]],
-        onChange: (v) => { pop = v; allFull(); } });
-      QV.slider(row, { label: "$n$ (right panel)", min: 2, max: 100, step: 1, value: 36, width: 120,
-        onInput: (v) => { stop(); const P = panels[3]; P.n = v; setup(P); full(P); ro.set(); } });
-      QV.button(row, "Build up", () => {
+      const fill = () => { stop(); stepping = false; panels.forEach((P) => { start(P); add(P, REPS); }); drawAll(); };
+      const step = (k) => {
         stop();
-        panels.forEach((P) => { full(P); reset(P); render(P); });
-        run = QV.anim(() => {
-          let done = true;
-          panels.forEach((P) => {
-            const k = Math.min(REPS - P.drawn, Math.max(6, Math.round(P.drawn * 0.055)));
-            if (k > 0) { add(P, k); render(P); done = false; }
-          });
-          ro.set();
-          if (done) { run = null; return false; }
+        if (!stepping || panels[0].drawn + k > REPS) { stepping = true; panels.forEach(start); }
+        panels.forEach((P) => add(P, k)); drawAll();
+      };
+      const all = () => {                       // from the samples drawn so far (or from zero) up to 20 000, in about 3 s
+        stop();
+        if (!stepping || panels[0].drawn >= REPS) panels.forEach(start);
+        stepping = false;
+        const k0 = Math.max(1, panels[0].drawn);
+        run = QV.anim((dt, t) => {
+          const target = Math.min(REPS, Math.round(k0 * Math.pow(REPS / k0, Math.min(1, t / 3))));
+          if (target > panels[0].drawn) { const k = target - panels[0].drawn; panels.forEach((P) => add(P, k)); drawAll(); }
+          if (target >= REPS) { run = null; return false; }
         });
         run.start();
-      }, { primary: true });
-      const rd = QV.readout(row, "");
-      ro.set = () => { rd.set(`<b>${panels[0].drawn.toLocaleString("en").replace(/,/g, " ")}</b> means per panel`); };
-      panels.forEach((P) => { setup(P); full(P); });
-      ro.set();
-      return { hide: () => { if (run) allFull(); } };
+      };
+      QV.segmented(row, { label: "Population", value: "gamma",
+        options: [["gamma", "right-skewed"], ["exp", "very skewed"], ["unif", "flat"], ["bimodal", "bimodal"]],
+        onChange: (v) => { pop = v; fill(); } });
+      QV.segmented(row, { label: "$x$-axis", value: "own", options: [["own", "zoomed"], ["same", "same"]],
+        onChange: (v) => {
+          const k = run ? REPS : panels[0].drawn; stop(); same = v === "same";
+          panels.forEach((P) => { setup(P); start(P); add(P, k); }); drawAll();
+        } });
+      QV.button(row, "1 sample", () => step(1));
+      QV.button(row, "+100", () => step(100));
+      QV.button(row, "All 20 000", all, { primary: true });
+      rd = QV.readout(row, "");
+      panels.forEach((P) => { setup(P); start(P); add(P, REPS); });
+      drawAll();
+      return { hide: () => { if (run) fill(); } };
     });
   })();
   </script>
@@ -1139,12 +1251,17 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
     <div style="gap:0"><div class="p3a-ttl" id="p3a-se1-t">&nbsp;</div><div class="viz" id="p3a-se1" style="height:110px"></div></div>
     <div style="gap:0"><div class="p3a-ttl" id="p3a-se2-t">&nbsp;</div><div class="viz" id="p3a-se2" style="height:110px"></div></div>
   </div>
-  <p class="p3a-hint" style="margin-top:-6px">Drag the orange line ($\bar x$): both panels move together and the readings update.</p>
+  <p class="hint" style="margin-top:-6px">Drag the orange line ($\bar x$): both panels move together. Darker band: the central $95\,\%$, $\mu_0\pm1.96\,\mathrm{SE}$.</p>
   <div class="block key"><p>Same raw deviation, opposite readings. Dividing by the SE turns it into a <em>universal</em> ruler &ndash;
     &ldquo;how many standard errors&rdquo; &ndash; comparable across samples and units.</p></div>
   <aside class="notes">Talk track: walk the table row by row &ndash; same gap of $2$ units, but in row 1 the mean typically wobbles by
     $2$ anyway (nothing special), while in row 2 it wobbles by $0.4$, so a gap of $2$ is five wobbles away (very unusual). This is THE
     reason every test statistic in this course has the same shape: (estimate $-$ hypothesised) / SE.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $\bar x=8$ is $2$ units below $\mu_0=10$ in both panels &ndash; where is that unusual? Left $z=-1.0$, right $z=-5.0$.</li>
+    <li>Drag $\bar x$ towards $10$: the right panel turns &ldquo;ordinary&rdquo; only inside its narrow band.</li>
+    <li>Same gap, different ruler: that is why we divide by the SE.</li>
+  </ol></aside>
   <script>
   (() => {
     const D = QV.dist, sc = [{ id: "p3a-se1", se: 2, lab: "large spread, small $n$" }, { id: "p3a-se2", se: 0.4, lab: "small spread, large $n$" }];
@@ -1154,8 +1271,9 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
     sc.forEach((s) => QV.mount("#" + s.id, (el) => {
       const ch = QV.chart(el, { x: { domain: [3, 17], label: "", tickValues: [4, 6, 8, 10, 12, 14, 16], format: (v) => (v === 10 ? "μ₀ = 10" : String(v)) },
         y: { domain: [0, 1.15 * D.normPdf(10, 10, s.se)], hide: true }, margin: { top: 6, bottom: 28, left: 14, right: 14 } });
-      QV.fnArea(ch, (x) => D.normPdf(x, 10, s.se), { color: QV.C.blue, opacity: 0.16, n: 400 });
-      QV.fnLine(ch, (x) => D.normPdf(x, 10, s.se), { color: QV.C.blue, width: 2.4, n: 400 });
+      QV.fnArea(ch, (x) => D.normPdf(x, 10, s.se), { color: QV.C.blue, opacity: 0.14, n: 400 });
+      QV.fnArea(ch, (x) => D.normPdf(x, 10, s.se), { color: QV.C.blue, opacity: 0.22, n: 200, from: 10 - 1.96 * s.se, to: 10 + 1.96 * s.se });   // "ordinary": the central 95 %
+      QV.fnLine(ch, (x) => D.normPdf(x, 10, s.se), { color: QV.C.blue, width: 2.6, n: 400 });
       QV.segment(ch, 10, 0, 10, D.normPdf(10, 10, s.se), { color: QV.C.ink2, width: 1.2, dash: "3 3" });
       const ttl = document.getElementById(s.id + "-t");
       const h = P3A.vhandle(ch, xbar, { color: QV.C.orange, width: 2.6, r: 6.5, step: 0.05, min: 3.5, max: 16.5,
@@ -1254,22 +1372,35 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
   <div class="block"><h4>Recall from Foundations</h4>
     <p class="fs-s">Over repeated samples, $\bar x$ scatters around $\mu$ with standard error $\sigma/\sqrt n$ (milk: <span class="p3a-nw">$3/\sqrt9=1$&nbsp;ml</span>),
       normally &ndash; exactly for normal data, approximately by the CLT. Standardised: $Z_n\sim N(0,1)$.</p></div>
-  <div class="viz" id="p3a-meandist" style="height:318px; width:860px; margin: 0 auto"></div>
+  <div class="viz" id="p3a-meandist" style="height:300px; width:860px; margin: 0 auto"></div>
   <p class="fs-xs">The central (blue) region holds $95\,\%$ of the probability &ndash; in $95\,\%$ of samples $Z_n$ lands here; $2.5\,\%$ in
     each tail.</p>
+  <p class="hint">Pick a confidence level: the two bars move to $\pm z_{1-\alpha/2}$ and the tails shrink or grow.</p>
   <aside class="notes">Talk track: no new theory here &ndash; one sentence recalls the Foundations (standard error, CLT), then the picture.
     Point at the blue area: &ldquo;95&nbsp;% of all samples land here.&rdquo; The next slide turns exactly this picture into a
     probability statement, and the derivation turns that statement into the confidence interval.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where must the bars stand so that $95\,\%$ of all samples land between them? ($\pm1.96$)</li>
+    <li>Ask for $99\,\%$ before clicking it: the bars move out to $\pm2.576$, each tail holds $0.005$.</li>
+    <li>Click $90\,\%$: $\pm1.645$. More confidence needs a wider region.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p3a-meandist", (el) => {
       const tc = P3A.testCurve(el, { ciLabels: true, legend: true, symTicks: true,
         xTex: "\\text{standardised deviation }\\ Z_n=(\\bar X-\\mu)/(\\sigma/\\sqrt n)" });
       const row = QV.controls(el);
-      row.style.width = "860px"; row.style.margin = "0 auto";
-      QV.slider(row, { label: "Confidence level $1-\\alpha$", min: 0.8, max: 0.99, step: 0.01, value: 0.95, width: 200,
-        fmt: (v) => QV.fmt(v, 2), onInput: (v) => { tc.setAlpha(1 - v); rd.set(`$z_{1-\\alpha/2}=$ <b>${QV.fmt(tc.crit(), 3)}</b>`); } });
-      const rd = QV.readout(row, `$z_{1-\\alpha/2}=$ <b>1.960</b>`);
+      const set = (v) => {
+        tc.setAlpha(1 - v);
+        pre.set([0.9, 0.95, 0.99].includes(v) ? v : "", false);
+        rd.set(`$z_{1-\\alpha/2}=$ <b>${QV.fmt(tc.crit(), 3)}</b> &rarr; $${P3A.t(100 * v, 0)}\\,\\%$ of samples lie within $\\pm$<b>${QV.fmt(tc.crit(), 3)}</b> standard errors of $\\mu$`);
+      };
+      const sl = QV.slider(row, { label: "Confidence level $1-\\alpha$", min: 0.8, max: 0.99, step: 0.01, value: 0.95, width: 150,
+        fmt: (v) => QV.fmt(v, 2), onInput: set });
+      const pre = QV.segmented(row, { options: [[0.9, "$90\\,\\%$"], [0.95, "$95\\,\\%$"], [0.99, "$99\\,\\%$"]], value: 0.95,
+        onChange: (v) => { sl.set(+v, false); set(+v); } });
+      const rd = QV.readout(row, "");
+      set(0.95);
       QV.hover(tc.ch, (x) => (Math.abs(x) > 4 ? null : `z = ${QV.fmt(x, 2)}<br>φ(z) = ${QV.fmt(QV.dist.normPdf(x), 4)} · Φ(z) = ${QV.fmt(QV.dist.normCdf(x), 4)}`));
     });
   })();
@@ -1394,19 +1525,22 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
   <div class="viz" id="p3a-ci20" style="height:357px"></div>
   <p class="fs-xs">Of $20$ computed $95\,\%$ intervals, on average $\approx 19$ cover the true value $\mu$ (red line). The confidence
     <em>level</em> refers to the <b>procedure</b> across many samples.</p>
-  <p class="p3a-hint">Each row: one sample of $n=9$ bottles and its CI. Draw new samples or run 50 rounds &ndash; the long-run share settles near the confidence level.</p>
+  <p class="hint">Each row: one sample of $n=9$ bottles and its CI. &ldquo;1 sample&rdquo; shows the nine bottles (grey), their mean and the interval; &ldquo;Run 50 rounds&rdquo; adds $1000$ intervals.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how many of the $20$ intervals contain $\mu=1000$? ($19$; sample $13$ misses.) Is that luck?</li>
+    <li>&ldquo;1 sample&rdquo; a few times: nine bottles &rarr; mean &rarr; interval &rarr; covers or misses.</li>
+    <li>&ldquo;Run 50 rounds&rdquo;: the share settles near $95\,\%$. Then lower the confidence level: shorter intervals, more misses.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p3a-ci20", (el) => {
-      const MU = 1000, SE = 1;                                 // sigma / sqrt(n) = 3 / 3
-      const draw = (s, k) => { const r = QV.rng(s); return Array.from({ length: k }, () => MU + SE * r.normal()); };
-      // default: the 20 sample means of the PDF figure (make_figures.py, numpy seed 0: one miss, sample 13, below mu)
+      const MU = 1000, SIG = 3, N = 9, SE = SIG / Math.sqrt(N), K = 20;      // SE = 1 ml
+      // starting state: the 20 sample means of the PDF figure (make_figures.py, numpy seed 0: one miss, sample 13, below mu)
       const PDF20 = [1000.126, 999.868, 1000.640, 1000.105, 999.464, 1000.362, 1001.304, 1000.947, 999.296, 998.735,
         999.377, 1000.041, 997.675, 999.781, 998.754, 999.268, 999.456, 999.684, 1000.412, 1001.043];
-      const seed0 = 1;
-      let seed = seed0;
-      const sample = (k) => (seed === seed0 && k === 20 ? PDF20.slice() : draw(seed, k));
-      let K = 20, conf = 0.95, means = sample(K), tally = { hit: 0, all: 0 }, run = null, round = 0;
+      const fmtN = (v) => v.toLocaleString("en").replace(/,/g, " ");
+      let conf = 0.95, run = null, rng = QV.rng(1001);
+      let rows = PDF20.map((m) => ({ m, vals: null })), tally = { hit: 0, all: 0 }, stepping = false;
       const ttl = document.getElementById("p3a-ci20-t");
       QV.legend(document.getElementById("p3a-ci20-lg"), [
         { label: "true value $\\mu=1000$", color: QV.C.red, type: "line" },
@@ -1415,54 +1549,66 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
       ]);
       const ch = QV.chart(el, { x: { domain: [995, 1005], label: "Fill quantity (ml)", ticks: 10, format: "d" },
         y: { domain: [0.3, 20.7], label: "Sample no.", tickValues: [5, 10, 15, 20] }, margin: { top: 8, left: 58 } });
-      const gI = ch.layer("data").append("g"), gD = ch.layer("data").append("g");
-      const red = ch.layer("annot").append("line").style("stroke", QV.C.red).style("stroke-width", 2.4)
+      const half = () => QV.dist.normInv(1 - (1 - conf) / 2) * SE;
+      const info = (i) => { const r = rows[i], h = half(); return r ? { i: i + 1, m: r.m, lo: r.m - h, hi: r.m + h, miss: Math.abs(r.m - MU) > h, vals: r.vals } : null; };
+      const gV = ch.layer("data").append("g");                                 // the nine bottles of the newest sample
+      const idx = d3.range(K);
+      const ln = ch.layer("data").append("g").selectAll("line").data(idx).join("line").style("stroke-linecap", "round");
+      const dt = ch.layer("data").append("g").selectAll("circle").data(idx).join("circle").attr("r", 5).style("stroke", QV.C.surface).style("stroke-width", 1.5);
+      ch.layer("annot").append("line").style("stroke", QV.C.red).style("stroke-width", 2.4)
         .attr("x1", ch.x(MU)).attr("x2", ch.x(MU)).attr("y1", 0).attr("y2", ch.h);
+      const note = ch.layer("front").append("text").attr("class", "lbl").style("font-weight", 600)
+        .style("paint-order", "stroke").style("stroke", QV.C.surface).style("stroke-width", "5px").style("stroke-linejoin", "round");
       const box = QV.tex(ch, 995.15, 20.5, "", { anchor: "start", baseline: "top", bg: true, size: 17 });
       box.style.border = "1px solid var(--rule)"; box.style.padding = "3px 7px";
-      const tip = (d) => `<b>sample ${d.i}</b>: x̄ = ${QV.fmt(d.m, 2)}<br>CI [${QV.fmt(d.lo, 2)}, ${QV.fmt(d.hi, 2)}]<br>${d.miss ? "misses μ" : "covers μ = 1000"}`;
-      let tipped = false;
+      const tip = (i) => { const d = info(i); return d ? `<b>sample ${d.i}</b>: x̄ = ${QV.fmt(d.m, 2)}<br>CI [${QV.fmt(d.lo, 2)}, ${QV.fmt(d.hi, 2)}]<br>${d.miss ? "misses μ" : "covers μ = 1000"}` : ""; };
+      QV.attachTip(ch, ln, tip); QV.attachTip(ch, dt, tip);
       const render = () => {
-        const h = QV.dist.normInv(1 - (1 - conf) / 2) * SE;
-        const data = means.map((m, i) => ({ i: i + 1, m, lo: m - h, hi: m + h, miss: m - h > MU || m + h < MU }));
-        const big = K > 20;
-        const ln = gI.selectAll("line").data(data).join("line")
-          .attr("x1", (d) => ch.x(d.lo)).attr("x2", (d) => ch.x(d.hi)).attr("y1", (d) => ch.y(d.i)).attr("y2", (d) => ch.y(d.i))
-          .style("stroke", (d) => (d.miss ? QV.C.orange : QV.C.blue)).style("stroke-width", big ? 2.2 : 3.4).style("stroke-linecap", "round");
-        const dt = gD.selectAll("circle").data(data).join("circle")
-          .attr("cx", (d) => ch.x(d.m)).attr("cy", (d) => ch.y(d.i)).attr("r", big ? 2.4 : 4.6)
-          .style("fill", (d) => (d.miss ? QV.C.orange : QV.C.blue)).style("stroke", QV.C.surface).style("stroke-width", big ? 0.5 : 1.5);
-        if (!tipped) { tipped = true; QV.attachTip(ch, ln, tip); QV.attachTip(ch, dt, tip); }
-        const cover = data.filter((d) => !d.miss).length;
-        box.set(995.15, K + 0.5, `\\text{${cover} of ${K} contain }\\mu`);
-        ttl.innerHTML = `${K} samples &rarr; ${K} confidence intervals (${Math.round(conf * 100)}&thinsp;%)`;
-        return cover;
+        const col = (i) => { const d = info(i); return d && d.miss ? QV.C.orange : QV.C.blue; };
+        const newest = stepping ? rows.length - 1 : -1;
+        ln.style("display", (i) => (rows[i] ? null : "none")).filter((i) => rows[i])
+          .attr("x1", (i) => ch.x(info(i).lo)).attr("x2", (i) => ch.x(info(i).hi)).attr("y1", (i) => ch.y(i + 1)).attr("y2", (i) => ch.y(i + 1))
+          .style("stroke", col).style("stroke-width", (i) => (i === newest ? 5.5 : 3.4));
+        dt.style("display", (i) => (rows[i] ? null : "none")).filter((i) => rows[i])
+          .attr("cx", (i) => ch.x(rows[i].m)).attr("cy", (i) => ch.y(i + 1)).style("fill", col).attr("r", (i) => (i === newest ? 6.5 : 5));
+        const d = newest >= 0 ? info(newest) : null;
+        // a bottle outside the axis range becomes a small arrow at the edge
+        const inAx = (v) => v >= 995 && v <= 1005;
+        gV.selectAll("path").data(d && d.vals ? d.vals : []).join("path")
+          .attr("d", (v) => d3.symbol(inAx(v) ? d3.symbolCircle : d3.symbolTriangle, inAx(v) ? 64 : 52)())
+          .attr("transform", (v) => `translate(${ch.x(Math.max(995, Math.min(1005, v)))},${ch.y(d ? d.i : 1) - 12}) rotate(${inAx(v) ? 0 : v < 995 ? -90 : 90})`)
+          .style("fill", QV.C.grey).style("opacity", 0.75);
+        note.style("display", d ? null : "none");
+        if (d) {
+          const right = ch.x(d.hi) < ch.w - 250;
+          note.attr("x", right ? ch.x(d.hi) + 12 : ch.x(d.lo) - 12).attr("y", ch.y(d.i) + 6).attr("text-anchor", right ? "start" : "end")
+            .text(`x̄ = ${QV.fmt(d.m, 2)} ml: ${d.miss ? "misses μ" : "covers μ"}`);
+        }
+        const cover = rows.filter((r, i) => !info(i).miss).length, k = rows.length;
+        box.set(995.15, 20.5, `\\text{${cover} of ${k} contain }\\mu`);
+        ttl.innerHTML = `${k} sample${k === 1 ? "" : "s"} &rarr; ${k} confidence interval${k === 1 ? "" : "s"} (${Math.round(conf * 100)}&thinsp;%)`;
+        rd.set(`so far: <b>${fmtN(tally.hit)}</b> of ${fmtN(tally.all)} intervals cover $\\mu$ (<b>${QV.fmt(100 * tally.hit / tally.all, 1)}&thinsp;%</b>)`);
       };
-      const show = (fresh) => {
-        const c = render();
-        if (fresh) { tally.hit += c; tally.all += K; } else { tally = { hit: c, all: K }; }
-        rd.set(`all rounds: <b>${tally.hit.toLocaleString("en").replace(/,/g, " ")}</b> of ${tally.all.toLocaleString("en").replace(/,/g, " ")} cover $\\mu$ (<b>${QV.fmt(100 * tally.hit / tally.all, 1)}&thinsp;%</b>)`);
-      };
-      const next = () => { round += 1; seed = seed0 + 1000 + round; means = draw(seed, K); show(true); };
+      const one = () => { const vals = Array.from({ length: N }, () => rng.normal(MU, SIG)); return { m: QV.stats.mean(vals), vals }; };
+      const count = (rs) => { const h = half(); rs.forEach((r) => { tally.all += 1; if (Math.abs(r.m - MU) <= h) tally.hit += 1; }); };
       const stop = () => { if (run) { run.stop(); run = null; } };
-      const setK = (k) => {
-        K = k; means = sample(K);
-        ch.y.domain([0.3, K + 0.7]); ch.opts.y.tickValues = K > 20 ? [20, 40, 60, 80, 100] : [5, 10, 15, 20]; ch.axes();
-        show(false);
-      };
+      const step = () => { stop(); if (!stepping || rows.length >= K) rows = []; stepping = true; const r = one(); rows.push(r); count([r]); render(); };
+      const round = () => { stepping = false; rows = Array.from({ length: K }, one); count(rows); render(); };
+      const reset = () => { stop(); rng = QV.rng(1001); conf = 0.95; sl.set(0.95, false); stepping = false; rows = PDF20.map((m) => ({ m, vals: null })); tally = { hit: 0, all: 0 }; count(rows); render(); };
       const row = QV.controls(el);
-      const sl = QV.slider(row, { label: "Confidence level", min: 0.5, max: 0.99, step: 0.01, value: 0.95, width: 150,
-        fmt: (v) => Math.round(v * 100) + "&thinsp;%", onInput: (v) => { stop(); conf = v; show(false); } });
-      const sg = QV.segmented(row, { label: "Intervals", options: [[20, "20"], [100, "100"]], value: 20, onChange: (v) => { stop(); setK(+v); } });
-      QV.button(row, "New samples", () => { stop(); next(); });
+      row.style.gap = "8px 16px";
+      const sl = QV.slider(row, { label: "Confidence level", min: 0.5, max: 0.99, step: 0.01, value: 0.95, width: 130,
+        fmt: (v) => Math.round(v * 100) + "&thinsp;%", onInput: (v) => { stop(); conf = v; tally = { hit: 0, all: 0 }; count(rows); render(); } });
+      QV.button(row, "1 sample", step);
+      QV.button(row, "20 samples", () => { stop(); round(); });
       QV.button(row, "Run 50 rounds", () => {
         stop(); let acc = 0, left = 50;
-        run = QV.anim((dt) => { acc += dt; if (acc >= 0.12) { acc = 0; next(); left -= 1; } if (left <= 0) { run = null; return false; } });
+        run = QV.anim((dt) => { acc += dt; if (acc >= 0.11) { acc = 0; round(); left -= 1; } if (left <= 0) { run = null; return false; } });
         run.start();
       }, { primary: true });
-      QV.button(row, "Reset", () => { stop(); seed = seed0; round = 0; conf = 0.95; sl.set(0.95, false); sg.set(20, false); setK(20); });
+      QV.button(row, "Reset", reset);
       const rd = QV.readout(row, "");
-      show(false);
+      count(rows); render();
       return { hide: stop };
     });
   })();
@@ -1552,16 +1698,21 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
         <li>Larger $n$ $\Rightarrow$ <em>shorter</em> (with $1/\sqrt{n}$).</li>
         <li>Larger spread $\sigma$ $\Rightarrow$ <em>longer</em>.</li>
       </ul>
-      <p class="p3a-hint">Drag the dotted $n$ line or use the sliders; the readout gives $L$ for the three levels.</p>
+      <p class="hint">Drag the dotted $n$ line or click $n=9$, $18$, $36$; the legend gives $L$ for the three levels.</p>
     </div>
     <div><div class="viz" id="p3a-cilen" style="height:318px"></div></div>
   </div>
   <p class="inwords">More confidence <em>or</em> more precision &ndash; both require a larger sample.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Milk, $n=9$: the $95\,\%$ interval is $L=3.92$ ml long. Ask: we double the sample to $18$ &ndash; does the length halve?</li>
+    <li>Click $18$: only $2.77$. Click $36$: $1.96$ &ndash; half the length costs four times the sample.</li>
+    <li>Move $\sigma$: every curve scales in proportion.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p3a-cilen", (el) => {
       const LV = [{ z: 1.645, lab: "90&thinsp;%", c: QV.C.green }, { z: 1.96, lab: "95&thinsp;%", c: QV.C.blue }, { z: 2.576, lab: "99&thinsp;%", c: QV.C.orange }];
-      let sigma = 3, n = 9;
+      let sigma = 3, n = 9, lg = null;
       const ch = QV.chart(el, { x: { domain: [0, 62], label: "Sample size n", tickValues: [0, 10, 20, 30, 40, 50, 60] },
         y: { domain: [0, 12], label: "Length of CI  L = 2zσ/√n", tickValues: [0, 2, 4, 6, 8, 10, 12] } });
       const L = (z, m) => 2 * z * sigma / Math.sqrt(m);
@@ -1570,22 +1721,25 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
         return `<b>n = ${m}</b><br>` + LV.map((l) => `${l.lab}: L = ${QV.fmt(L(l.z, m), 2)}`).join("<br>");
       });
       const lines = LV.map((l) => QV.line(ch, [], { color: l.c, width: 3 }));
-      const lab = QV.text(ch, n, 11.3, "", { anchor: "start", dx: 8 });
-      const hd = P3A.vhandle(ch, n, { color: QV.C.ink2, width: 2, dash: "3 4", r: 6.5, min: 2, max: 60, step: 1, knobY: 11.6,
-        onMove: (v) => { slN.set(v, true); } });
-      const dots = QV.dots(ch, LV.map(() => [n, 0]), { r: 5.5, color: (d, i) => LV[i].c, layer: "front",
-        tip: (d, i) => `${LV[i].lab}, n = ${n}: L = ${QV.fmt(L(LV[i].z, n), 2)} ml` });
-      P3A.legendIn(el, LV.map((l) => ({ label: `${l.lab} &nbsp;($z = ${l.z}$)`, color: l.c, type: "line" })), { title: "Confidence level", right: 14, top: 4 });
+      const lab = QV.text(ch, n, 11.3, "", { anchor: "start", dx: 12 });
+      const dots = QV.dots(ch, LV.map(() => [n, 0]), { r: 5.5, color: (d, i) => LV[i].c, layer: "front" }).style("pointer-events", "none");
+      const hd = P3A.vhandle(ch, n, { color: QV.C.ink2, width: 2, dash: "3 4", min: 2, max: 60, step: 1, knobY: 0,
+        onMove: (v) => { n = v; update(); } });
       const update = () => {
         lines.forEach((p, k) => QV.setLine(ch, p, QV.sample((m) => L(LV[k].z, m), 2, 60, 240)));
         hd.set(n);
         dots.data(LV.map((l) => [n, L(l.z, n)])).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]));
-        lab.set(n, 11.3, n === 9 && sigma === 3 ? "n = 9 (milk)" : `n = ${n}`);
-        rd.set(`$L$: ${LV.map((l) => `<b>${QV.fmt(L(l.z, n), 2)}</b>`).join(" · ")}`);
+        lab.set(n, 11.3, n === 9 && sigma === 3 ? "n = 9 (milk)" : `n = ${n}`).style("display", n > 31 ? "none" : null);   // further right the legend names n
+        if (lg) lg.remove();
+        lg = P3A.legendIn(el, LV.map((l) => ({ label: `${l.lab} &nbsp;($z = ${l.z}$): &nbsp;$L=$ <b>${QV.fmt(L(l.z, n), 2)}</b>`, color: l.c, type: "line" })),
+          { title: `Confidence level &nbsp;&rarr;&nbsp; length at ${Deck.tex(`n=${n}`)}`, right: 14, top: 4 });
+        pre.set([9, 18, 36].includes(n) ? n : "", false);
+        rd.set(`$95\\,\\%$: $L=2\\cdot1.96\\cdot${P3A.t(sigma, 1)}/\\sqrt{${n}}=$ <b>${QV.fmt(L(1.96, n), 2)}</b> ml`);
       };
       const row = QV.controls(el);
-      QV.slider(row, { label: "$\\sigma$", min: 1, max: 6, step: 0.5, value: 3, width: 100, fmt: (v) => QV.fmt(v, 1, true), onInput: (v) => { sigma = v; update(); } });
-      const slN = QV.slider(row, { label: "$n$", min: 2, max: 60, step: 1, value: 9, width: 100, onInput: (v) => { n = v; update(); } });
+      row.style.gap = "6px 16px";
+      QV.slider(row, { label: "$\\sigma$", min: 1, max: 6, step: 0.5, value: 3, width: 90, fmt: (v) => QV.fmt(v, 1, true) + " ml", onInput: (v) => { sigma = v; update(); } });
+      const pre = QV.segmented(row, { label: "$n$", options: [[9, "9"], [18, "18"], [36, "36"]], value: 9, onChange: (v) => { n = +v; update(); } });
       const rd = QV.readout(row, "");
       update();
     });
@@ -1595,16 +1749,68 @@ print(f"d) {(6 / 0.5) ** 2:.0f}")
 
 <section class="slide">
   <h2>Different confidence levels &ndash; milk</h2>
-  <table class="bt p3a-roomy">
-    <thead><tr><th class="l">Confidence level</th><th>Quantile $z_{1-\alpha/2}$</th><th>CI for milk example</th></tr></thead>
-    <tbody>
-      <tr><td class="l">$90\,\%$</td><td>$z_{0.95} = 1.645$</td><td>$[999.36\,;\,1002.64]$</td></tr>
-      <tr><td class="l">$95\,\%$</td><td>$z_{0.975} = 1.96$</td><td>$[999.04\,;\,1002.96]$</td></tr>
-      <tr><td class="l">$99\,\%$</td><td>$z_{0.995} = 2.576$</td><td>$[998.42\,;\,1003.58]$</td></tr>
-    </tbody>
-  </table>
+  <div class="cols mid" style="--cols: 43fr 55fr; --gap: 28px">
+    <div>
+      <table class="bt p3a-roomy" style="font-size:19px">
+        <thead><tr><th class="l">Confidence level</th><th>Quantile $z_{1-\alpha/2}$</th><th>CI for milk example</th></tr></thead>
+        <tbody>
+          <tr><td class="l">$90\,\%$</td><td>$z_{0.95} = 1.645$</td><td>$[999.36\,;\,1002.64]$</td></tr>
+          <tr><td class="l">$95\,\%$</td><td>$z_{0.975} = 1.96$</td><td>$[999.04\,;\,1002.96]$</td></tr>
+          <tr><td class="l">$99\,\%$</td><td>$z_{0.995} = 2.576$</td><td>$[998.42\,;\,1003.58]$</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="viz" id="p3a-lv" style="height:296px"></div>
+      <p class="hint">Move the slider or click a level: the orange interval is the CI at that confidence level.</p>
+    </div>
+  </div>
   <div class="block key" style="margin-top:14px"><p>Higher confidence level $\Rightarrow$ wider interval $\Rightarrow$ less precise statement.
     Confidence and precision are a trade-off.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: we want $99\,\%$ instead of $95\,\%$ confidence &ndash; what happens to the interval? Click $99\,\%$: $[999.04;\,1002.96]$ widens to $[998.42;\,1003.58]$.</li>
+    <li>Pull the slider down to $50\,\%$: a short, precise-looking interval &ndash; from a procedure that misses in half of all samples.</li>
+    <li>Every interval is centred at $\bar x=1001$.</li>
+  </ol></aside>
+  <script>
+  (() => {
+    QV.mount("#p3a-lv", (el) => {
+      const XB = 1001, SE = 1, D = QV.dist;                  // milk: x-bar = 1001, sigma / sqrt(n) = 3 / 3
+      const FIX = [{ lab: "90 %", lo: 999.36, hi: 1002.64, y: 4 }, { lab: "95 %", lo: 999.04, hi: 1002.96, y: 3 }, { lab: "99 %", lo: 998.42, hi: 1003.58, y: 2 }];
+      const ch = QV.chart(el, { x: { domain: [997.4, 1004.6], label: "Fill quantity (ml)", tickValues: [998, 999, 1000, 1001, 1002, 1003, 1004], format: "d" },
+        y: { domain: [0, 4.75], hide: true, grid: false }, margin: { top: 26, left: 66, right: 14 } });
+      QV.segment(ch, XB, 0, XB, 4.75, { color: QV.C.ink2, width: 1.5, dash: "4 4", layer: "data" });
+      QV.tex(ch, XB, 4.75, "\\bar x=1001", { baseline: "bottom", size: 16, dy: -4 });
+      const end = (x, y, s, side, cls) => QV.text(ch, x, y, s, { anchor: side < 0 ? "end" : "start", dx: 9 * side, baseline: "central", cls });
+      const side = (y, s, o = {}) => QV.text(ch, 997.4, y, s, Object.assign({ anchor: "end", dx: -10, baseline: "central", layer: "axes" }, o));
+      FIX.forEach((f) => {
+        QV.segment(ch, f.lo, f.y, f.hi, f.y, { color: QV.C.blue, width: 12, layer: "data" }).style("opacity", 0.5);
+        end(f.lo, f.y, QV.fmt(f.lo, 2), -1, "lbl-muted"); end(f.hi, f.y, QV.fmt(f.hi, 2), 1, "lbl-muted");
+        side(f.y, f.lab);
+      });
+      QV.dots(ch, FIX.map((f) => [XB, f.y]), { r: 5.5, color: QV.C.ink, layer: "annot" });
+      QV.segment(ch, 997.4, 1.38, 1004.6, 1.38, { color: QV.C.grid, width: 1, layer: "data" });
+      const bar = QV.segment(ch, XB, 0.65, XB, 0.65, { color: QV.C.orange, width: 14, layer: "data" });
+      QV.dots(ch, [[XB, 0.65]], { r: 5.5, color: QV.C.ink, layer: "annot" });
+      const lo = end(XB, 0.65, "", -1, "lbl-strong"), hi = end(XB, 0.65, "", 1, "lbl-strong");
+      const lv = side(0.65, "", { color: QV.C.tOrange, weight: 700 });
+      const set = (c) => {
+        const z = D.normInv(1 - (1 - c / 100) / 2), a = XB - z * SE, b = XB + z * SE;
+        bar.set(a, 0.65, b, 0.65);
+        lo.set(a, 0.65, QV.fmt(a, 2)); hi.set(b, 0.65, QV.fmt(b, 2));
+        lv.set(997.4, 0.65, `${QV.fmt(c, 1, true)} %`);
+        pre.set([90, 95, 99].includes(c) ? c : "", false);
+        rd.set(`$z_{1-\\alpha/2}=$ <b>${QV.fmt(z, 3)}</b> &rarr; CI $[\\,$<b>${QV.fmt(a, 2)}</b>$\\,;\\,$<b>${QV.fmt(b, 2)}</b>$\\,]$ ml, length <b>${QV.fmt(b - a, 2)}</b> ml`);
+      };
+      const row = QV.controls(el);
+      row.style.gap = "6px 16px";
+      const sl = QV.slider(row, { label: "Confidence level", min: 50, max: 99.5, step: 0.5, value: 95, width: 130, fmt: (v) => QV.fmt(v, 1, true) + "&thinsp;%", onInput: set });
+      const pre = QV.segmented(row, { options: [[90, "$90\\,\\%$"], [95, "$95\\,\\%$"], [99, "$99\\,\\%$"]], value: 95, onChange: (v) => { sl.set(+v, false); set(+v); } });
+      const rd = QV.readout(row, "");
+      set(95);
+    });
+  })();
+  </script>
 </section>
 
 <section class="slide">
@@ -1697,9 +1903,15 @@ print(n_required(0.95, 3, 1), n_required(0.99, 3, 1), n_required(0.95, 3, 0.5))
         <li>For large $n$, $s$ barely varies, so <span class="p3a-nw">$t_{n-1}\to N(0,1)$.</span></li>
       </ul>
     </div>
-    <div><div class="viz" id="p3a-tvsn" style="height:345px"></div></div>
+    <div><div class="viz" id="p3a-tvsn" style="height:322px"></div>
+      <p class="hint">Change the degrees of freedom: the orange $t$-curve and its $0.975$-quantile follow.</p></div>
   </div>
   <div class="block key"><p>Unknown $\sigma$ $\Rightarrow$ use $t_{n-1}$: larger quantiles, so the CI is wider on average.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Milk, $n=9$: the $t_8$ quantile is $2.306$ instead of $1.96$. Ask: what happens with only $n=3$ bottles?</li>
+    <li>Click df $=2$: the orange curve lands on the dashed one, quantile $4.303$.</li>
+    <li>Click df $=30$: orange almost covers the normal curve, quantile $2.042$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p3a-tvsn", (el) => {
@@ -1731,10 +1943,14 @@ print(n_required(0.95, 3, 1), n_required(0.99, 3, 1), n_required(0.95, 3, 0.5))
           { label: `$t_{${df}}\\ (n=${df + 1})$`, color: QV.C.orange, type: "line" },
           { label: "$t_2\\ (n=3)$", color: QV.C.green, type: "dash" },
         ], { left: 70, top: 4 });
-        rd.set(`$t_{0.975;\\,${df}}=$ <b>${QV.fmt(D.tInv(0.975, df), 3)}</b> vs $z_{0.975}=$ <b>1.960</b>`);
+        const t = D.tInv(0.975, df);
+        rd.set(`$t_{0.975;\\,${df}}=$ <b>${QV.fmt(t, 3)}</b> vs. $z_{0.975}=$ <b>1.960</b> &rarr; CI <b>${QV.fmt(t / 1.96, 2)}</b> times as wide`);
+        pre.set([2, 8, 30].includes(df) ? df : "", false);
       };
       const row = QV.controls(el);
-      QV.slider(row, { label: "df $=n-1$", min: 1, max: 60, step: 1, value: 8, width: 130, onInput: (v) => { df = v; update(); } });
+      row.style.gap = "6px 14px";
+      const sl = QV.slider(row, { label: "df $=n-1$", min: 1, max: 60, step: 1, value: 8, width: 110, onInput: (v) => { df = v; update(); } });
+      const pre = QV.segmented(row, { options: [[2, "2"], [8, "8"], [30, "30"]], value: 8, onChange: (v) => { df = +v; sl.set(df, false); update(); } });
       const rd = QV.readout(row, "");
       update();
     });
@@ -1908,10 +2124,15 @@ t, 95%: [998.10, 1003.90]
     <div class="ro" id="p3a-nl2-r">&nbsp;</div>
   </div>
   <div class="block key"><p>$\mu_0$ inside the CI $\Leftrightarrow$ keep $H_0$;&nbsp;&nbsp; outside $\Leftrightarrow$ reject. (Both at known $\sigma$, $\alpha=0.05$.)</p></div>
-  <p class="p3a-hint">Drag the red $\mu_0$ marks: the verdict and $|Z_n|$ change together.</p>
+  <p class="hint">Drag the orange dots: they move the red $\mu_0$ marks; the verdict and $|Z_n|$ change together.</p>
   <aside class="notes">Talk track: &ldquo;the CI is the set of all null values that survive the test.&rdquo; Walk both lines: milk &ndash;
     target inside, nothing to complain about; cream &ndash; target outside, the data are incompatible with 250&nbsp;g. Point out the CI
     is centred at $\bar x$, never at $\mu_0$.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which values $\mu_0$ would the milk data <em>not</em> reject? (All inside $999.04$&ndash;$1002.96$.)</li>
+    <li>Drag the milk $\mu_0$ across $1002.96$: the verdict flips exactly where $|Z_n|$ passes $1.96$.</li>
+    <li>Cream: drag $\mu_0$ from $250$ into the interval &ndash; &ldquo;keep $H_0$&rdquo;.</li>
+  </ol></aside>
   <script>
   (() => {
     const cfg = [
@@ -1966,9 +2187,14 @@ t, 95%: [998.10, 1003.90]
       </ul>
       <p>&ldquo;Acceptance region&rdquo; is conventional for the <em>non-rejection</em> region: landing there means we <em>fail to reject</em>
         $H_0$, not that we accept it as true.</p>
-      <p class="p3a-hint">Drag the statistic $Z_n$; the slider sets $\alpha$.</p>
+      <p class="hint">Drag the orange dot (the statistic $Z_n$); the slider sets $\alpha$.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $Z_n=1.00$ &ndash; blue or orange region? (Blue: keep $H_0$.)</li>
+    <li>Drag $Z_n$ past $1.96$: the line turns red, the read-out says &ldquo;reject&rdquo;.</li>
+    <li>Leave it just past $1.96$ and set $\alpha=0.01$: the bars move out to $\pm2.58$ &ndash; the same statistic is kept again.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p3a-tworead", (el) => {
@@ -2173,9 +2399,15 @@ t = 0.7947, df = 8, p = 0.4497
   <div class="viz-ctrl" id="p3a-mc-ctrl"></div>
   <p class="fs-xs">Two-sided test, known $\sigma$, $\alpha=0.05$: the milk statistic ($Z_n=1.00$) stays <em>inside</em> the bars $\pm1.96$, the
     cream statistic ($Z_n=-2.125$) lands <em>beyond</em> them. The decision is nothing more than: <b>where does my statistic fall?</b></p>
+  <p class="hint">Drag the orange dots: a statistic turns red beyond the bars. The $\alpha$ slider moves the bars $\pm z_{1-\alpha/2}$ in both panels.</p>
   <aside class="notes">Talk track: this is the recap picture for the whole section &ndash; one curve (the $H_0$ world), two bars (the critical
     values), and the only question: inside or outside? Milk inside, cream outside. If students can redraw this from memory, they have
     understood the classical test.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where does the cream statistic $-2.125$ fall? Beyond the bar: reject. Milk ($1.00$) inside: keep.</li>
+    <li>Drag the milk statistic beyond $1.96$: its verdict flips.</li>
+    <li>&ldquo;Reset statistics&rdquo;, then $\alpha=0.01$: the bars move to $\pm2.576$ &ndash; now cream is kept as well.</li>
+  </ol></aside>
   <script>
   (() => {
     const cfg = [{ id: "p3a-mc1", name: "milk", z: 1.0, d: 2 }, { id: "p3a-mc2", name: "cream", z: -2.125, d: 3 }];
@@ -2196,8 +2428,6 @@ t = 0.7947, df = 8, p = 0.4497
           onInput: (v) => { alpha = v; tcs.forEach((t) => t.setAlpha(v)); rd.set(`bars at $\\pm z_{1-\\alpha/2}=\\pm$<b>${QV.fmt(tcs[0].crit(), 3)}</b>`); } });
         QV.button(row, "Reset statistics", () => { tcs.forEach((t, i) => t.setZ(cfg[i].z)); });
         const rd = QV.readout(row, `bars at $\\pm z_{1-\\alpha/2}=\\pm$<b>1.960</b>`);
-        QV.spacer(row);
-        QV.readout(row, '<span class="p3a-hint">drag the green/red statistic lines</span>');
       }
     }));
   })();
@@ -2416,7 +2646,7 @@ table.bt.p3b-mid td { vertical-align: middle; }
     if (pos.bottom !== undefined) lg.style.bottom = (ch.m.bottom + pos.bottom) + "px"; else lg.style.top = (ch.m.top + (pos.top ?? 4)) + "px";
     return lg;
   };
-  /** Vertical marker line with a draggable handle at the top. o: {color, dash, width, yTop, y0, min, max, step, onMove, drag} */
+  /** Vertical marker line with a draggable handle (always the orange "drag me" dot). o: {color (line), dash, width, yTop, y0, min, max, step, onMove, drag} */
   P.marker = (ch, x0, o = {}) => {
     const [a, b] = ch.x.domain();
     const y0 = o.y0 ?? 0, yTop = o.yTop ?? ch.y.domain()[1] * 0.9;
@@ -2425,9 +2655,9 @@ table.bt.p3b-mid td { vertical-align: middle; }
     const api = { x: x0 };
     let h = null;
     api.set = (x) => { api.x = x; ln.set(x, y0, x, yTop); if (h) h.attr("cx", ch.x(x)); return api; };
-    api.color = (c) => { if (c !== col) { col = c; ln.style("stroke", c); if (h) h.style("fill", c); } return api; };
+    api.color = (c) => { if (c !== col) { col = c; ln.style("stroke", c); } return api; };
     if (o.drag !== false) {
-      h = QV.dots(ch, [[x0, yTop]], { r: 9, color: col, layer: "front" });
+      h = QV.dots(ch, [[x0, yTop]], { r: 9, color: QV.C.orange, layer: "front" });
       QV.drag(ch, h, (xv) => {
         let v = P.clamp(xv, o.min ?? a, o.max ?? b);
         if (o.step) v = Math.round(v / o.step) * o.step;
@@ -2478,8 +2708,13 @@ table.bt.p3b-mid td { vertical-align: middle; }
 <section class="slide">
   <h2>The $p$-value &ndash; graphically</h2>
   <div class="viz" id="p3b-pv2" style="height:400px"></div>
-  <p class="fs-xs">The (two-sided) $p$-value is the <b>total area</b> in both tails that is <em>at least as extreme</em> as the observed value.
-    <span class="muted">Drag the blue handle; switch $H_1$ to see the one&#8209;sided tail.</span></p>
+  <p class="fs-xs">The (two-sided) $p$-value is the <b>total area</b> in both tails that is <em>at least as extreme</em> as the observed value.</p>
+  <p class="hint">Drag the orange dot (the observed $Z_n$) or click an example; switch $H_1$ to see the one&#8209;sided tail.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: milk has $Z_n=1.00$ &ndash; is $p$ larger or smaller than for cream? Click &ldquo;milk&rdquo;: $p=0.3173$, keep $H_0$.</li>
+    <li>Click &ldquo;cream&rdquo;: $Z_n=-2.125$, $p=0.0336$, reject. Drag towards $0$: the orange area and $p$ grow.</li>
+    <li>Switch $H_1$ to &ldquo;left&rdquo;: one tail only, $p$ halves.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-pv2", (el) => {
@@ -2495,6 +2730,7 @@ table.bt.p3b-mid td { vertical-align: middle; }
     const lc2 = P.lbl(ch, 0, 0.12, "", { size: 18, bg: true });
     const row = QV.controls(el);
     QV.segmented(row, { label: "$H_1$:", options: [["two", "$\\mu\\neq\\mu_0$ (two-sided)"], ["left", "$\\mu<\\mu_0$ (left)"], ["right", "$\\mu>\\mu_0$ (right)"]], value: "two", onChange: (v) => { side = v; upd(); } });
+    const ex = QV.segmented(row, { label: "Example:", options: [["1", "milk $Z_n=1.00$"], ["-2.125", "cream $Z_n=-2.125$"]], value: "", onChange: (v) => { z = +v; m.set(z); upd(); } });
     QV.spacer(row);
     const ro = QV.readout(row);
     const right = (t) => [P.clamp(t + 0.6, -3.55, 3.55), f(t + 0.3) + 0.035];
@@ -2513,7 +2749,8 @@ table.bt.p3b-mid td { vertical-align: middle; }
       lo.set(P.clamp(z, -3.15, 3.15), 0.37, `observed: $Z_n = ${P.f(z, 3)}$`);   // keep the label inside the figure
       lc1.set(0, 0.2, `$p$-value = ${what}`);
       lc2.set(0, 0.13, `$${form} = ${P.f(p, 4)}$`);
-      ro.set(`at $\\alpha = 0.05$: <b>${p < 0.05 ? "reject" : "keep"}</b> $H_0$`);
+      ro.set(`$p=$ <b>${P.f(p, 4)}</b> $${p < 0.05 ? "<" : "\\ge"}\\ \\alpha=0.05$ &rarr; <b>${p < 0.05 ? "reject" : "keep"}</b> $H_0$`);
+      ex.set(z === 1 ? "1" : z === -2.125 ? "-2.125" : "", false);
     };
     upd();
   });
@@ -2538,9 +2775,12 @@ table.bt.p3b-mid td { vertical-align: middle; }
   <div class="block alert"><h4>One rule for all tests</h4>
     <p>\[ p &lt; \alpha \;\Longrightarrow\; \text{reject } H_0 \qquad\qquad p \ge \alpha \;\Longrightarrow\; \text{keep } H_0 \]</p></div>
   <div class="cols" style="--cols: 64fr 34fr; --gap: 22px">
-    <div class="p3b-panels">
-      <div><div class="p3b-pt" id="p3b-dr1-t"></div><div class="viz" id="p3b-dr1" style="height:390px"></div></div>
-      <div><div class="p3b-pt" id="p3b-dr2-t"></div><div class="viz" id="p3b-dr2" style="height:390px"></div></div>
+    <div>
+      <div class="p3b-panels">
+        <div><div class="p3b-pt" id="p3b-dr1-t"></div><div class="viz" id="p3b-dr1" style="height:346px"></div></div>
+        <div><div class="p3b-pt" id="p3b-dr2-t"></div><div class="viz" id="p3b-dr2" style="height:346px"></div></div>
+      </div>
+      <div id="p3b-dr-ctrl"></div>
     </div>
     <div class="fs-xs">
       <ul>
@@ -2548,10 +2788,14 @@ table.bt.p3b-mid td { vertical-align: middle; }
         <li>Right: $p$ small, value in the rejection region.</li>
         <li>$\alpha$ is the &ldquo;benchmark&rdquo;.</li>
       </ul>
-      <div id="p3b-dr-ctrl" style="margin-top:10px"></div>
-      <p class="fs-xxs muted">Drag either handle across the grey critical value; move $\alpha$ to shift the benchmark.</p>
+      <p class="hint">Drag an orange dot across the grey critical value; move $\alpha$ to shift the benchmark.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: left panel, $Z=1.0$ &ndash; is $p$ above or below $\alpha$? ($p=0.317>0.05$: keep.)</li>
+    <li>Drag that dot outwards: exactly at the grey line $p$ equals $\alpha$, beyond it the area turns orange and the verdict flips.</li>
+    <li>Raise $\alpha$ to $0.10$: the benchmark moves in to $1.645$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-dr1", (el) => {
@@ -2563,9 +2807,9 @@ table.bt.p3b-mid td { vertical-align: middle; }
       P.xlab(ch, "$Z$");
       const cl = QV.segment(ch, -2, 0, -2, 0.43, { color: C.grey, width: 1.6, dash: "5 4", layer: "annot" });
       const cr = QV.segment(ch, 2, 0, 2, 0.43, { color: C.grey, width: 1.6, dash: "5 4", layer: "annot" });
-      const lc = P.lbl(ch, 2, 0.41, "crit. value", { size: 13, cls: "muted", bg: true });
+      const lc = P.lbl(ch, 2, 0.41, "crit. value", { size: 14, cls: "muted", bg: true });
       const m = P.marker(ch, z, { yTop: 0.3, min: -3.9, max: 3.9, step: 0.01, onMove: (v) => { z = v; upd(); } });
-      const lo = P.lbl(ch, z, 0.3, "", { size: 13, bg: true, center: true });
+      const lo = P.lbl(ch, z, 0.3, "", { size: 14, bg: true, center: true });
       const upd = () => {
         const c = D.normInv(1 - alpha / 2), a = Math.abs(z), p = 2 * D.normCdf(-a), rej = p < alpha;
         const col = rej ? C.orange : C.blue;
@@ -2575,7 +2819,7 @@ table.bt.p3b-mid td { vertical-align: middle; }
         lc.set(z >= 0 ? -c : c, 0.41);
         m.color(col).set(z);
         // label next to the handle: outside, above or inside -- whichever keeps clear of the curve
-        lo.set(z, 0.3, rej ? "$p$ small<br>(value extreme)" : "$p$ large<br>(value not extreme)");
+        lo.set(z, 0.3, rej ? "$p$ small<br>(value<br>extreme)" : "$p$ large<br>(value not<br>extreme)");
         const o = z >= 0 ? 1 : -1;
         P.avoid(ch, lo, D.normPdf, [
           { x: z, y: 0.3, anchor: o > 0 ? "start" : "end", dx: 11 * o },
@@ -2589,8 +2833,8 @@ table.bt.p3b-mid td { vertical-align: middle; }
     const A = mk(el, document.getElementById("p3b-dr1-t"), 1.0);
     const B = mk(document.getElementById("p3b-dr2"), document.getElementById("p3b-dr2-t"), 2.5);
     const row = QV.controls(null, document.getElementById("p3b-dr-ctrl"));
-    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.01, value: 0.05, fmt: (v) => v.toFixed(2), onInput: (v) => { alpha = v; A.upd(); B.upd(); ro.set(`critical value $z_{1-\\alpha/2} = ${P.f(D.normInv(1 - v / 2), 3)}$`); } });
-    const ro = QV.readout(row, `critical value $z_{1-\\alpha/2} = 1.960$`);
+    QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.01, value: 0.05, fmt: (v) => v.toFixed(2), onInput: (v) => { alpha = v; A.upd(); B.upd(); ro.set(`critical value $z_{1-\\alpha/2} =$ <b>${P.f(D.normInv(1 - v / 2), 3)}</b> &nbsp;(grey lines at $\\pm$ this value)`); } });
+    const ro = QV.readout(row, `critical value $z_{1-\\alpha/2} =$ <b>1.960</b> &nbsp;(grey lines at $\\pm$ this value)`);
     A.upd(); B.upd();
   });
   })();
@@ -2600,9 +2844,12 @@ table.bt.p3b-mid td { vertical-align: middle; }
 <section class="slide">
   <h2>Two rules, one decision: critical value $\leftrightarrow$ $p$-value</h2>
   <div class="cols" style="--cols: 62fr 36fr; --gap: 22px">
-    <div class="p3b-panels">
-      <div><div class="p3b-pt" id="p3b-cp1-t"></div><div class="viz" id="p3b-cp1" style="height:330px"></div></div>
-      <div><div class="p3b-pt" id="p3b-cp2-t"></div><div class="viz" id="p3b-cp2" style="height:330px"></div></div>
+    <div>
+      <div class="p3b-panels">
+        <div><div class="p3b-pt" id="p3b-cp1-t"></div><div class="viz" id="p3b-cp1" style="height:300px"></div></div>
+        <div><div class="p3b-pt" id="p3b-cp2-t"></div><div class="viz" id="p3b-cp2" style="height:300px"></div></div>
+      </div>
+      <div id="p3b-cp-ctrl"></div>
     </div>
     <div class="fs-xs">
       <ul>
@@ -2611,10 +2858,15 @@ table.bt.p3b-mid td { vertical-align: middle; }
         <li>Statistic past the bar $\Leftrightarrow$ its tail is smaller $\Leftrightarrow p&lt;\alpha$.</li>
         <li>Picture: <em>right-sided</em> test ($z_{0.95}=1.645$); two-sided: both tails, $z_{0.975}=1.96$.</li>
       </ul>
-      <div id="p3b-cp-ctrl" style="margin-top:6px"></div>
+      <p class="hint">Drag the orange dots (the observed statistic); the slider sets $\alpha$.</p>
     </div>
   </div>
   <div class="block key"><p>The two decision rules are <b>identical</b>: &ldquo;test statistic beyond the critical value&rdquo; and &ldquo;$p&lt;\alpha$&rdquo; always agree &ndash; the critical value is simply the statistic whose tail area equals $\alpha$.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: left panel &ndash; which tail is smaller, $\alpha$ or $p$? (The statistic is past the bar, so its tail $p=0.007$ is the dark one.)</li>
+    <li>Drag the observed value back across the red line: at the bar the two tails coincide, behind it $p>\alpha$ and the title says &ldquo;keep&rdquo;.</li>
+    <li>A smaller $\alpha$ moves the bar to the right.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-cp1", (el) => {
@@ -2625,8 +2877,8 @@ table.bt.p3b-mid td { vertical-align: middle; }
       const ch = QV.density(node, { pdf: f, domain: [-1, 4.2], yMax: 0.48, xLabel: "test statistic", yLabel: "Density", ticks: 5, chart: { margin: { left: 56, right: 12 } } });
       const cl = QV.segment(ch, 1.645, 0, 1.645, 0.48, { color: C.red, width: 2, dash: "6 4", layer: "annot" });
       const m = P.marker(ch, z, { yTop: 0.43, min: -0.9, max: 4.1, step: 0.01, color: C.blue, onMove: (v) => { z = v; upd(); } });
-      const lcv = P.lbl(ch, 0, 0.47, "critical value", { size: 13, color: C.tRed, baseline: "top" });
-      const lob = P.lbl(ch, 0, 0.47, "observed", { size: 13, color: C.tBlue, baseline: "top" });
+      const lcv = P.lbl(ch, 0, 0.47, "critical value", { size: 14, color: C.tRed, baseline: "top" });
+      const lob = P.lbl(ch, 0, 0.47, "observed", { size: 14, color: C.tBlue, baseline: "top" });
       const la = P.lbl(ch, 0, 0, "", { size: 16, bg: true }), lp = P.lbl(ch, 0, 0, "", { size: 16, bg: true });
       const upd = () => {
         const c = D.normInv(1 - alpha), p = 1 - D.normCdf(z), rej = z > c;
@@ -2657,8 +2909,6 @@ table.bt.p3b-mid td { vertical-align: middle; }
     const ro = { set: () => {} };
     QV.slider(row, { label: "$\\alpha$", min: 0.01, max: 0.2, step: 0.005, value: 0.05, fmt: (v) => v.toFixed(3), onInput: (v) => { alpha = v; A.upd(); B.upd(); rd.set(`critical value $z_{1-\\alpha} = ${P.f(D.normInv(1 - v), 3)}$`); } });
     const rd = QV.readout(row, "critical value $z_{1-\\alpha} = 1.645$");
-    QV.spacer(row);
-    QV.readout(row, '<span class="muted">drag the blue handles</span>');
     A.upd(); B.upd();
   });
   })();
@@ -2788,22 +3038,33 @@ z = -2.1250, p = 0.0336 | t = -2.1086, p = 0.0522
       </tbody>
     </table>
     <div class="p3b-sig" id="p3b-sig"></div>
+    <p class="hint" style="margin-top:6px">Move $n$ or jump to the two rows of the table: the deviation stays $0.2$ ml, only the verdict changes.</p>
   </div>
   <div class="block key"><p>The same irrelevant $0.2$ ml deviation &ndash; invisible at $n=9$, &ldquo;highly significant&rdquo; at $n=10\,000$. So report the <b>effect size and the CI</b>, not just $p$.</p></div>
   <aside class="notes">Talk track: significance answers &ldquo;is there evidence of ANY deviation?&rdquo;, not &ldquo;is the deviation large enough to matter?&rdquo;. With $n=10\,000$ the SE is $0.03$ ml &ndash; the test becomes a microscope. Flip side (links to power): with small $n$, even an important deviation often stays invisible. Practical rule for the students: $p$-value for evidence, CI for magnitude &ndash; always read both.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: the machine is off by $0.2$ ml on average &ndash; a problem? At $n = 9$: $Z_n = 0.20$, $p = 0.84$.</li>
+    <li>Move $n$ up slowly: the verdict flips near $n = 870$, where $Z_n$ passes $1.96$.</li>
+    <li>Click $n = 10\,000$: $Z_n = 6.67$, $p &lt; 0.0001$ &ndash; for the same $0.2$ ml.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-sig", (el) => {
     const D = QV.dist, P = window.P3B;
     const row = QV.controls(null, el);
     const ro = QV.readout(row);
+    // the slider runs from 0 to 1 on a log scale, so both rows of the table (n = 9 and n = 10 000) are reached exactly
+    const nOf = (v) => Math.round(9 * Math.pow(10000 / 9, v));
+    const grp = (n, sep) => (n >= 10000 ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep) : String(n));
     const upd = (v) => {
-      const n = Math.round(Math.pow(10, v)), se = 3 / Math.sqrt(n), z = 0.2 / se, p = 2 * D.normCdf(-z);
-      ro.set(`$n = ${n}$: &nbsp; $\\mathrm{SE} = ${P.f(se, 3)}$, &nbsp; $Z_n = ${P.f(z, 2)}$, &nbsp; $p = ${p < 0.0001 ? "< 0.0001" : P.f(p, 4)}$ &nbsp;&rarr; <b>${p < 0.05 ? "significant" : "not significant"}</b>`);
+      const n = nOf(v), se = 3 / Math.sqrt(n), z = 0.2 / se, p = 2 * D.normCdf(-z);
+      ro.set(`$n = ${grp(n, "\\,")}$: &nbsp; $\\mathrm{SE} = ${P.f(se, 3)}$, &nbsp; $Z_n = ${P.f(z, 2)}$, &nbsp; $p ${p < 0.0001 ? "< 0.0001" : "= " + P.f(p, 4)}$ &nbsp;&rarr; <b>${p < 0.05 ? "significant" : "not significant"}</b>`);
     };
-    QV.slider(row, { label: "try $n$ (log scale)", min: Math.log10(9), max: 4, step: 0.01, value: Math.log10(9), width: 220, fmt: (v) => String(Math.round(Math.pow(10, v))), onInput: upd });
+    const sl = QV.slider(row, { label: "try $n$ (log scale)", min: 0, max: 1, step: 0.005, value: 0, width: 180, fmt: (v) => grp(nOf(v), " "), onInput: upd });
+    QV.button(row, "$n = 9$", () => sl.set(0));
+    QV.button(row, "$n = 10\\,000$", () => sl.set(1));
     row.appendChild(ro.el);
-    upd(Math.log10(9));
+    upd(0);
   });
   })();
   </script>
@@ -2958,9 +3219,14 @@ print(z, round(2 * stats.norm.sf(abs(z)), 4))           # z and two-sided p-valu
         <li><span class="c-blue">$\beta$</span>: $H_1$ true, but on this side.</li>
         <li>The distributions overlap &ndash; both errors cannot be $0$ at once.</li>
       </ul>
-      <p class="fs-xxs muted">Sliders: a smaller $\alpha$ moves the red line right ($\beta$ grows); a larger effect or a larger $n$ pulls the $H_1$ curve away ($\beta$ shrinks).</p>
+      <p class="hint">Sliders: a smaller $\alpha$ moves the red line right ($\beta$ grows); a larger effect or a larger $n$ pulls the $H_1$ curve away ($\beta$ shrinks).</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what happens to $\beta$ if we demand a smaller $\alpha$? Move $\alpha$ to $0.010$: the red line moves to $2.326$ and $\beta$ grows from $0.170$ to $0.392$.</li>
+    <li>Back to $0.050$. Ask how to shrink both errors, then raise $n$ from $4$ to $9$: $\beta$ drops to $0.012$.</li>
+    <li>Set the effect to $0$: the curves coincide and the power equals $\alpha$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-ab", (el) => {
@@ -3192,8 +3458,13 @@ math.ceil((1.96 * sigma / e)**2)  # n
 <section class="slide" data-subsection="A.1 Properties of estimators">
   <h2>What makes a good estimator? &ndash; the target picture</h2>
   <div class="viz" id="p3b-tgt" style="height:410px; width:640px; margin:0 auto"></div>
-  <p class="fs-xs">Each dot $=$ the estimate from <em>one</em> sample; red cross $=$ the true value $\theta$. Unbiased $=$ centred on the cross; efficient $=$ tightly clustered.
-    <span class="muted">Draw more samples: the orange ring (average of all estimates) stays on the cross only for the unbiased estimators. Hover over a target for its bias and spread.</span></p>
+  <p class="fs-xs">Each dot $=$ the estimate from <em>one</em> sample; red cross $=$ the true value $\theta$. Unbiased $=$ centred on the cross; efficient $=$ tightly clustered.</p>
+  <p class="hint">Draw more samples: the orange ring (average of all estimates) stays on the cross only for the unbiased estimators. Hover over a target for its bias and spread.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which of the four estimators would you choose, and which is second best?</li>
+    <li>Click <b>Draw 10 more samples</b> a few times: the orange ring settles on the cross for the two unbiased estimators only.</li>
+    <li>Point at bottom left: unbiased, yet single estimates land far off &ndash; efficiency matters as well.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-tgt", (el) => {
@@ -3281,9 +3552,15 @@ math.ceil((1.96 * sigma / e)**2)  # n
       </ul>
     </div>
     <div style="gap:4px">
-      <div class="viz" id="p3b-s2" style="height:340px"></div>
+      <div class="viz" id="p3b-s2" style="height:314px"></div>
+      <p class="hint">Run it again: every new seed ends at $25$ and $18.75$.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: both lines average the same squared deviations &ndash; why does the orange one end lower?</li>
+    <li>Click <b>Run again</b>: new samples, but the lines settle at $25$ (divide by $n-1$) and $18.75$ (divide by $n$) again.</li>
+    <li>$18.75 = \tfrac34 \cdot 25$: with $n = 4$ a quarter of the variance is lost.</li>
+  </ol></aside>
   <div class="block example"><h4>Simulation: $100\,000$ samples of size $n=4$ from $N(50,\,5^2)$, i.e. $\sigma^2=25$</h4>
     <p>Average of $s^2$ with $n-1$: $\mathbf{24.97}$ &nbsp;&nbsp; vs. &nbsp;&nbsp; with $n$: $\mathbf{18.73}$ &nbsp; ($\approx\tfrac34\cdot25=18.75$).</p></div>
   <script>
@@ -3398,9 +3675,15 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
       <p><b>Die example:</b> a fair die has $E(X)=3.5$. After a few rolls the running mean $\bar x_n$ still jumps around; after many rolls it settles down at $3.5$.</p>
       <div class="block key"><p>The sample mean $\bar X_n$ gets ever more <b>reliably close</b> to the expected value as $n$ grows.</p></div>
     </div>
-    <div><div class="viz" id="p3b-lln" style="height:410px"></div></div>
+    <div><div class="viz" id="p3b-lln" style="height:404px"></div>
+      <p class="hint">Click <b>Roll</b> to watch the twelve running means settle; <b>New rolls</b> draws other sequences.</p></div>
   </div>
   <p class="fs-xs">Twelve sequences of die rolls (grey), one highlighted (blue). The funnel $\mu\pm1.96\,\sigma/\sqrt n$ narrows: $\pm1.06$ at $n=10$, $\pm0.33$ at $n=100$, <span class="p3b-nw">$\pm0.11$ at $n=1000$.</span></p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: after $10$ rolls, how far can the running mean still be from $3.5$? (Funnel: $\pm1.06$.)</li>
+    <li>Click <b>Roll (animate)</b>: the twelve lines start wide apart and all end inside the narrow funnel ($\pm0.11$ at $n = 1000$).</li>
+    <li>Click <b>New rolls</b> twice: different paths, same ending.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-lln", (el) => {
@@ -3501,11 +3784,17 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
 <section class="slide">
   <h2>One-sided critical values &ndash; left and right</h2>
   <div class="p3b-panels" style="gap:20px">
-    <div><div class="p3b-pt">left-sided: &nbsp;reject if $T_n &lt; -t_{1-\alpha,\,n-1}$</div><div class="viz" id="p3b-cv1" style="height:402px"></div></div>
-    <div><div class="p3b-pt">right-sided: &nbsp;reject if $T_n > t_{1-\alpha,\,n-1}$</div><div class="viz" id="p3b-cv2" style="height:402px"></div></div>
+    <div><div class="p3b-pt">left-sided: &nbsp;reject if $T_n &lt; -t_{1-\alpha,\,n-1}$</div><div class="viz" id="p3b-cv1" style="height:390px"></div></div>
+    <div><div class="p3b-pt">right-sided: &nbsp;reject if $T_n > t_{1-\alpha,\,n-1}$</div><div class="viz" id="p3b-cv2" style="height:390px"></div></div>
   </div>
   <div id="p3b-cv-ctrl"></div>
+  <p class="hint">Move $\alpha$ or df: the cut-off moves, the orange area stays $\alpha$.</p>
   <p class="fs-xs">The whole rejection area $\alpha$ sits in <em>one</em> tail &ndash; left for &ldquo;too small&rdquo;, right for &ldquo;too large&rdquo;. The curve is the <b>symmetric</b> $t$-distribution: only the side changes, the shape never does.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: with $\alpha = 0.05$ and df $= 12$, where does the rejection region start on the left, where on the right? ($-1.782$ and $1.782$.)</li>
+    <li>Lower $\alpha$ to $0.010$: both cut-offs move outwards, to $\mp 2.681$.</li>
+    <li>Back at $0.050$, raise df to $60$: $1.671$, close to $z_{0.95} = 1.645$.</li>
+  </ol></aside>
   <aside class="notes">Talk track: point at the picture. &ldquo;Same bell curve &ndash; the whole $\alpha$ just moves into one tail.&rdquo; Left tail tests &ldquo;too small&rdquo;, right tail &ldquo;too large&rdquo;. Stress the curve is the symmetric $t$ &ndash; it never becomes skewed. Ask the room: &ldquo;if $T_n$ lands in the blue, what do we do?&rdquo; (keep $H_0$). Common habit to break: shading both tails &ndash; one-sided means ONE tail.</aside>
   <script>
   (() => {
@@ -3710,9 +3999,14 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
         <li>By df $\approx 30$ the gap is tiny &ndash; the $\infty$ row <em>is</em> the normal.</li>
       </ul>
       <div id="p3b-tc-tiles"></div>
-      <p class="fs-xxs muted">Move the df slider or hover over the points for the exact table values.</p>
+      <p class="hint">Move the df slider or hover over the points for the exact table values.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: for a sample of ten (df $= 9$), how much larger than $1.96$ is the two-sided critical value? $2.262$, a gap of $0.302$.</li>
+    <li>Move the slider to df $= 2$: $4.303$ and $2.920$.</li>
+    <li>Move it to df $= 30$: $2.042$ and $1.697$ &ndash; the gaps are only $0.082$ and $0.052$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-tc", (el) => {
@@ -3775,11 +4069,16 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
         <li>A true deviation in that direction now clears the bar <em>more easily</em>.</li>
       </ul>
       <div id="p3b-os-ctrl" style="margin-top:4px"></div>
-      <p class="fs-xxs muted">Drag the observed $Z$ (blue): at $Z=-1.80$ only the one&#8209;sided test rejects.</p>
+      <p class="hint">Drag the observed $Z$ (orange dot): at $Z=-1.80$ only the one&#8209;sided test rejects.</p>
     </div>
   </div>
   <div class="block key"><p>Same $\alpha$, more power &ndash; but <em>only</em> in the chosen direction. A one-sided test at level $\alpha$ uses the critical value of a two&#8209;sided test at level $2\alpha$ on that side.</p></div>
   <aside class="notes">Key sentence to say out loud: &ldquo;a one-sided test at $\alpha$ uses the same cutoff as a two-sided test at $2\alpha$ on that side&rdquo; &ndash; that is why $1.96$ drops to $1.645$. Frame it as a trade: more power one way, in exchange for zero ability to detect the other way.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $Z = -1.80$ at $\alpha = 0.05$ &ndash; reject or keep? Two-sided: keep ($|Z| &lt; 1.96$); one-sided: reject ($Z &lt; -1.645$).</li>
+    <li>Drag $Z$ to $+1.80$ and beyond: the left-sided test never rejects there.</li>
+    <li>Set $\alpha = 0.100$: the two-sided bounds become $\pm 1.645$, the one-sided cut-off at $0.05$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-os1", (el) => {
@@ -3791,10 +4090,10 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
       P.xlab(ch, "$Z$ under $H_0$");
       const n = two ? 2 : 1;
       const ln = d3.range(n).map(() => QV.segment(ch, 0, 0, 0, 0.43, { color: C.ink2, width: 1.4, dash: "5 4", layer: "annot" }));
-      const cv = d3.range(n).map(() => P.lbl(ch, 0, 0.012, "", { baseline: "bottom", bg: true, size: 13 }));
+      const cv = d3.range(n).map(() => P.lbl(ch, 0, 0.012, "", { baseline: "bottom", bg: true, size: 14 }));
       const ta = d3.range(n).map(() => P.lbl(ch, 0, 0.05, "", { size: 14, color: C.tOrange }));
       const m = P.marker(ch, z, { yTop: 0.3, min: -3.9, max: 3.9, step: 0.01, onMove: (v) => { z = v; panels.forEach((p) => p.upd()); } });
-      const lv = P.lbl(ch, z, 0.315, "", { baseline: "bottom", size: 13, bg: true });
+      const lv = P.lbl(ch, z, 0.315, "", { baseline: "bottom", size: 14, bg: true });
       const upd = () => {
         const c = two ? D.normInv(1 - alpha / 2) : D.normInv(1 - alpha);
         const tail = two ? alpha / 2 : alpha;
@@ -3804,7 +4103,7 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
         const xs = two ? [-c, c] : [-c];
         xs.forEach((x, i) => {
           ln[i].set(x, 0, x, 0.43);
-          cv[i].set(x, 0.012, `$${P.f(x, two ? 2 : 3)}$`);
+          cv[i].set(x, 0.012, `$${P.f(x, 3).replace(/0$/, "")}$`);          // 1.96, 1.645, 2.576: as in the tables
           const xt = x < 0 ? Math.max(x - 0.8, -3.6) : Math.min(x + 0.8, 3.6);
           ta[i].set(xt, f(Math.abs(x) + 0.4) + 0.035, `$${P.f(tail, 3)}$`);
         });
@@ -3940,6 +4239,11 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
   <div id="p3b-po-ctrl"></div>
   <p class="fs-xs">The $p$-value is the <em>single</em> tail area beyond the observed statistic, <b>in the direction of $H_1$</b>. Left panel: the cream example <span class="p3b-nw">($T_n=-2.11$, df&nbsp;$=15$, $p=0.026$).</span></p>
   <aside class="notes">Talk track: contrast directly with the two-sided picture (both tails, factor 2). Here only the tail that $H_1$ points to counts. Ask: &ldquo;what would $p$ be in the LEFT panel if $T_n$ were $+2.11$?&rdquo; Answer: $F_{t,15}(2.11) \approx 0.97$ &ndash; huge, never reject. That sets up the sign-trap slide that follows.</aside>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: in the left panel, what would $p$ be if $T_n$ were $+2.11$? Drag it there: $p = 0.974$, never reject.</li>
+    <li>Press <b>r</b>, then lower df to $5$: heavier tails, $p$ rises from $0.026$ to $0.044$.</li>
+    <li>The right panel mirrors the left: $p = 1 - F$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-po1", (el) => {
@@ -3970,7 +4274,7 @@ print(np.round([A.var(ddof=1), B.var(ddof=1), C.var(ddof=1), D.var(ddof=1)], 2))
     mk(el, "left", -2.1086); mk(document.getElementById("p3b-po2"), "right", 2.1086);
     const row = QV.controls(null, document.getElementById("p3b-po-ctrl"));
     QV.slider(row, { label: "df", min: 1, max: 60, step: 1, value: df, onInput: (v) => { df = v; panels.forEach((p) => p.upd()); } });
-    QV.readout(row, '<span class="muted">Drag $T_n$ to the &ldquo;wrong&rdquo; side: the one-sided $p$ jumps above $0.5$.</span>');
+    QV.readout(row, '<span class="hint">Drag $T_n$ to the &ldquo;wrong&rdquo; side: the one-sided $p$ jumps above $0.5$.</span>');
     panels.forEach((p) => p.upd());
   });
   })();
@@ -4222,11 +4526,16 @@ print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sid
         <li>Larger $n$ raises power at every $\mu\neq\mu_0$ (at $\mu_0$ it stays at $\alpha$) &ndash; more power at the same level.</li>
         <li>Power rises with the true deviation.</li>
       </ul>
-      <p class="fs-xxs muted">Drag the grey handle on the deviation axis; at $2$ SE (milk, $n=9$ vs. $36$) the curves give $0.516$ and $0.979$. Lower $\alpha$ and both curves drop.</p>
+      <p class="hint">Drag the orange handle on the deviation axis; at $2$ SE (milk, $n=9$ vs. $36$) the curves give $0.516$ and $0.979$. Lower $\alpha$ and both curves drop.</p>
     </div>
   </div>
   <div class="block"><h4>Practice</h4>
     <p>Typically $\alpha=0.05$ and desired power $1-\beta\ge 0.80$. A <b>power analysis</b> provides the required $n$.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how large must the true deviation be for the blue curve to reach the target $0.80$? Drag the handle: about $2.8$ SE.</li>
+    <li>Switch to $2n$: at $2$ SE the power is $0.807$ &ndash; twice the sample is enough here.</li>
+    <li>Lower $\alpha$ to $0.010$ at $4n$: at $2$ SE the powers drop to $0.282$ and $0.923$.</li>
+  </ol></aside>
   <script>
   (() => {
   QV.mount("#p3b-pw", (el) => {
@@ -4278,7 +4587,8 @@ print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sid
       \begin{align*} \beta &= P\bigl(998.04 \le \bar X \le 1001.96 \;\big|\; \mu=1002\bigr)\\ &= \Phi\!\bigl(\tfrac{1001.96-1002}{1}\bigr) - \Phi\!\bigl(\tfrac{998.04-1002}{1}\bigr) = 0.484 \end{align*}
     </div>
     <div style="gap:4px">
-      <div class="viz" id="p3b-beta" style="height:345px"></div>
+      <div class="viz" id="p3b-beta" style="height:320px"></div>
+      <p class="hint">Move $n$: the acceptance region narrows and the blue area $\beta$ shrinks.</p>
     </div>
   </div>
   <div class="block example"><h4>Result</h4>
@@ -4295,7 +4605,7 @@ print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sid
     const aB = QV.area(ch, [], { color: C.blue, opacity: 0.35 });
     const l0 = QV.line(ch, [], { color: C.ink2, width: 2.4 }), l1 = QV.line(ch, [], { color: C.blue, width: 2.6 });
     const lb = P.lbl(ch, 1001, 0.1, "", { size: 15, bg: true, color: C.tBlue });
-    const lacc = P.lbl(ch, 1000, 0.86, "acceptance region ($H_0$ world)", { size: 13, cls: "muted" });
+    const lacc = P.lbl(ch, 1000, 0.86, "acceptance region ($H_0$ world)", { size: 14, cls: "muted" });
     P.legendIn(ch, [{ label: "$H_0$: $\\mu=1000$", color: C.ink2, type: "line" }, { label: "truth: $\\mu_1=1002$", color: C.blue, type: "line" }], { right: 4, top: 22 });
     const row = QV.controls(el);
     QV.slider(row, { label: "$n$", min: 4, max: 64, step: 1, value: n, width: 120, onInput: (v) => { n = v; upd(); } });
@@ -4315,6 +4625,11 @@ print(f"{46.4 + stats.t.ppf(0.95, df=15) * 0.8:.2f}")   # upper bound of one-sid
   });
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how can we catch a deviation of $2$ ml more often without raising $\alpha$?</li>
+    <li>Move $n$ from $9$ to $18$: the region narrows to $[998.61\,;\,1001.39]$, the power rises from $0.516$ to $0.807$.</li>
+    <li>At $n = 36$ the power is $0.979$ &ndash; the value of the $4n$ curve on the previous slide.</li>
+  </ol></aside>
   <aside class="notes">Talk track: the key move is the change of world. Step 1 lives in the $H_0$ world (where the acceptance region was built); step 2 asks how often $\bar X$ lands in that same region when the TRUTH is $\mu_1=1002$ &ndash; so we standardise with $1002$, not $1000$. Students often reuse $\mu_0$ in step 2; catch that explicitly. The sobering message: with $n=9$, a real 2 ml error escapes detection almost half the time.</aside>
 </section>
 

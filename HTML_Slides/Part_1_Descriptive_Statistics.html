@@ -41,6 +41,10 @@
   .p1-vflow .farr { text-align: center; font-size: 24px; }
   .p1-vflow .fnote { font-size: 16px; }
   .p1-side { display: flex; flex-direction: column; gap: 8px; }
+  /* a figure with its read-outs beside it, as one full-width unit (so nothing is lost when the figure is enlarged) */
+  .p1-row { display: flex; align-items: center; gap: 28px; }
+  .p1-row > .viz { flex: 58 1 0; width: auto; min-width: 0; }
+  .p1-row > .p1-side { flex: 38 1 0; min-width: 0; }
   .p1-sw { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
   .p1-sw.dash { border-top-style: dashed; }
   .p1-twin { display: flex; gap: 24px; }
@@ -349,7 +353,12 @@ print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.6
   <p><b>The variable:</b> The shoe sizes of a soccer team with the following observations:</p>
   <p class="p1-values">40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39</p>
   <div class="viz" id="p1-sort" style="height:362px"></div>
-  <p class="fs-xs muted" style="margin-top:-4px">One token per player. Sort the observations, then stack equal values: the stacks are the absolute frequencies of the next slide.</p>
+  <p class="hint" style="margin-top:-4px">One token per player: click <b>Sorted</b>, then <b>Stacked by value</b> &ndash; the stacks are the absolute frequencies of the next slide.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which shoe size is the most frequent, and how many players wear it?</li>
+    <li>Click <b>Sorted</b>, then <b>Stacked by value</b>.</li>
+    <li>Students notice: the stack heights 1, 2, 4, 2, 1, 1 add up to $n = 11$; size 46 stands apart.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-sort", (el) => {
@@ -375,8 +384,8 @@ print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.6
       const axl = ch.layer("axes").append("text").attr("class", "axis-label").attr("x", W / 2).attr("y", H + 42).attr("text-anchor", "middle").text("Shoe size").style("opacity", 0);
       const fr = QV.stats.freq(X);
       const cl = ch.layer("front").append("g").style("opacity", 0);
-      fr.forEach((r) => cl.append("text").attr("class", "lbl-muted").attr("text-anchor", "middle")
-        .attr("x", ch.x(r.x)).attr("y", base - (r.h - 1) * (2 * R + 3) - R - 8).text(`h = ${r.h}`));
+      fr.forEach((r) => cl.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").style("font-size", "18px")
+        .attr("x", ch.x(r.x)).attr("y", base - (r.h - 1) * (2 * R + 3) - R - 9).text(`h = ${r.h}`));
       const g = ch.layer("annot").selectAll("g.tok").data(items).join("g").attr("class", "tok")
         .attr("transform", (d) => `translate(${P.raw(d)})`);
       const circ = g.append("circle").attr("r", R).style("fill", QV.C.blue).style("stroke", QV.C.surface).style("stroke-width", 2);
@@ -393,7 +402,7 @@ print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.6
       const msg = {
         raw: "Observation order: $x_1 = 40,\\ x_2 = 39,\\ \\ldots,\\ x_{11} = 39$",
         sorted: "Sorted: $x_{(1)} = 37 \\le x_{(2)} = 38 \\le \\cdots \\le x_{(11)} = 46$",
-        stack: "Stacked: the height of each stack is the absolute frequency $h_j$ (size 39: $h = 4$)",
+        stack: "Stacked: stack height = absolute frequency $h_j$; check: $1 + 2 + 4 + 2 + 1 + 1 = 11 = n$",
       };
       const setMode = (m) => {
         g.transition().duration(750).attr("transform", (d) => `translate(${P[m](d)})`);
@@ -413,7 +422,7 @@ print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.6
 
 <section class="slide">
   <h2>Frequency Table</h2>
-  <table class="bt p1-t24 p1-colhl p1-padl" style="margin-top:20px">
+  <table class="bt p1-t24 p1-colhl p1-padl" id="p1-ft" style="margin-top:20px">
     <thead><tr><th class="l">Shoe size</th><th>37</th><th>38</th><th>39</th><th>40</th><th>41</th><th>46</th><th>Total</th></tr></thead>
     <tbody>
       <tr><td class="l">Absolute frequency</td><td>1</td><td>2</td><td>4</td><td>2</td><td>1</td><td>1</td><td>11</td></tr>
@@ -425,21 +434,43 @@ print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.6
       <tr><td class="l">Cumulative rel. freq. (fraction)</td><td>$\tfrac{1}{11}$</td><td>$\tfrac{3}{11}$</td><td>$\tfrac{7}{11}$</td><td>$\tfrac{9}{11}$</td><td>$\tfrac{10}{11}$</td><td>1</td><td></td></tr>
     </tbody>
   </table>
-  <p class="fs-xs muted center">Hover over a column to follow one shoe size through all rows.</p>
+  <p class="center" id="p1-ft-out">&nbsp;</p>
+  <p class="hint center">Hover over a column, or click it to keep it selected: one shoe size through all rows, read out in words.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how many players wear size 40 or smaller? Let the students find the row.</li>
+    <li>Click column 40: 2 players wear exactly 40 (18.2&thinsp;%), 9 of 11 wear 40 or smaller (81.8&thinsp;%).</li>
+    <li>Click <b>Total</b>: the absolute frequencies add up to 11, the relative ones to 1.</li>
+  </ol></aside>
   <script>
   (() => {
+    // column highlight for every table.p1-colhl: hover previews a column, a click keeps it selected
     const init = () => document.querySelectorAll("table.p1-colhl").forEach((t) => {
-      if (t.dataset.p1hl) return;
-      t.dataset.p1hl = "1";
-      const clear = () => t.querySelectorAll(".p1-on").forEach((c) => c.classList.remove("p1-on"));
-      t.addEventListener("pointerover", (e) => {
-        const c = e.target.closest("td, th");
-        clear();
-        if (!c || c.cellIndex === 0) return;
-        t.querySelectorAll("tr").forEach((r) => { const k = r.cells[c.cellIndex]; if (k) k.classList.add("p1-on"); });
-      });
-      t.addEventListener("pointerleave", clear);
+      if (t._p1hl) return;
+      t._p1hl = true;
+      let pin = +t.dataset.pin || 0;
+      const mark = (j) => {
+        t.querySelectorAll(".p1-on").forEach((c) => c.classList.remove("p1-on"));
+        if (j > 0) t.querySelectorAll("tr").forEach((r) => { const k = r.cells[j]; if (k) k.classList.add("p1-on"); });
+        if (t._p1read) t._p1read(j);
+      };
+      const col = (e) => { const c = e.target.closest("td, th"); return c ? c.cellIndex : 0; };
+      t.addEventListener("pointerover", (e) => mark(col(e) || pin));
+      t.addEventListener("pointerleave", () => mark(pin));
+      t.addEventListener("click", (e) => { const j = col(e); if (j > 0) { pin = j === pin ? 0 : j; mark(pin); } });
+      mark(pin);
     });
+    // frequency table of the soccer team: the selected column in words
+    const ft = document.getElementById("p1-ft"), out = document.getElementById("p1-ft-out");
+    if (ft && out) {
+      ft.dataset.pin = 3;
+      ft._p1read = (j) => {
+        const cell = (r) => ft.rows[r].cells[j].textContent.trim();
+        if (j < 1) { out.innerHTML = "&nbsp;"; return; }
+        if (j > 6) { out.innerHTML = "<b>Total:</b> the absolute frequencies add up to 11 players, the relative frequencies to 1 (100&thinsp;%)."; return; }
+        const x = cell(0), h = +cell(1), H = +cell(5), pc = (k) => (100 * k / 11).toFixed(1).replace(/\.0$/, "");
+        out.innerHTML = `<b>Shoe size ${x}:</b> ${h} of 11 players ${h === 1 ? "wears" : "wear"} exactly ${x} (${pc(h)}&thinsp;%); ${H} of 11 wear ${x} or smaller (${pc(H)}&thinsp;%).`;
+      };
+    }
     // later tables (e.g. the exam-style solution) are parsed after this script: attach once the page is complete
     init();
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
@@ -479,10 +510,15 @@ print(round(price.max() - price.min(), 2), round(price.mean(), 2))   # 10.0 23.6
       };
       QV.slider(row, { label: "Share last year", min: 5, max: 95, step: 1, value: a, fmt: (v) => v + " %", onInput: (v) => { a = v; upd(); } });
       QV.slider(row, { label: "Share this year", min: 5, max: 95, step: 1, value: b, fmt: (v) => v + " %", onInput: (v) => { b = v; upd(); } });
-      QV.readout(row, "<span class='muted'>Move the sliders: both blocks update.</span>");
+      QV.readout(row, "<span class='hint'>Move the sliders: both blocks update.</span>");
     });
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: from $40\,\%$ to $50\,\%$ &ndash; did the share rise by 10 or by 25?</li>
+    <li>Set last year to $10\,\%$ and this year to $20\,\%$: again 10 percentage points, but now $100\,\%$.</li>
+    <li>Let students predict $80\,\% \to 90\,\%$ (10 points, $12.5\,\%$), then show it.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -640,14 +676,22 @@ print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
 
 <section class="slide">
   <h2>Column Chart</h2>
-  <div class="viz" id="p1-col" style="height:460px"></div>
-  <p class="fs-xs muted">Hover over a column for $h_j$ and $f_j$. Switch the x-axis to categories: the gap between 41 and 46 disappears &ndash; and with it the visible outlier.</p>
+  <div class="viz" id="p1-col" style="height:436px"></div>
+  <p class="hint">Switch the x-axis and the height; hover over a column for $h_j$ and $f_j$.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where is the outlier? Point to 46 and the empty sizes 42 to 45.</li>
+    <li>Switch the x-axis to <b>categories</b>: the gap disappears. Ask what was lost.</li>
+    <li>Switch the height to <b>relative</b> $f_j$: the shape stays, only the scale changes (sum 1 instead of 11).</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-col", (el) => {
       const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
       const tab = QV.stats.freq(X);
-      let axis = "num", rel = false;
+      let axis = "num", rel = false, out = null;
+      const say = () => out && out.set(
+        (axis === "num" ? "<strong>Numeric axis:</strong> true distances &ndash; the gap between 41 and 46 shows the outlier." : "<strong>Categories:</strong> equal spacing &ndash; the gap between 41 and 46, and with it the visible outlier, is gone.") +
+        (rel ? " &ensp; <strong>Heights</strong> $f_j = h_j / 11$ (sum $= 1$): same shape." : " &ensp; <strong>Heights</strong> $h_j$ (sum $= 11$)."));
       const draw = () => {
         el.querySelectorAll(":scope > *").forEach((c) => c.remove());
         const yo = rel
@@ -662,10 +706,14 @@ print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
           tip: (d) => `<b>Shoe size ${d.r.x}</b><br>h = ${d.r.h} &nbsp; f = ${d.r.h}/11 = ${QV.fmt(d.r.f, 4)} (${QV.fmt(100 * d.r.f, 1)} %)`,
           labels: (d) => (rel ? QV.fmt(d.y, 4) : d.y),
         });
+        ch.layer("annot").selectAll("text.lbl").style("font-size", "18px").style("font-weight", 600);
+        say();
       };
       const row = QV.controls(el);
       QV.segmented(row, { label: "x-axis", options: [["num", "numeric (true distances)"], ["cat", "categories"]], value: "num", onChange: (v) => { axis = v; draw(); } });
       QV.segmented(row, { label: "Height", options: [["abs", "absolute $h_j$"], ["rel", "relative $f_j$"]], value: "abs", onChange: (v) => { rel = v === "rel"; draw(); } });
+      out = QV.readout(row, "");
+      out.el.style.flexBasis = "100%";
       draw();
     });
   })();
@@ -675,13 +723,18 @@ print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
 <section class="slide">
   <h2>Bar Chart</h2>
   <div class="viz" id="p1-barh" style="height:460px"></div>
-  <p class="fs-xs muted">Horizontal bars: the length is the absolute frequency. Sorted by frequency, the axis becomes categorical and the most frequent size comes first.</p>
+  <p class="hint">Switch the order of the bars; hover over a bar for $h_j$ and $f_j$.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: same data as in the column chart &ndash; what is different? (Horizontal bars, length = absolute frequency.)</li>
+    <li>Click <b>by frequency</b>: size 39 with 4 players moves to the top.</li>
+    <li>Students notice: the ranking is easy to read, but the gap between 41 and 46 is gone.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-barh", (el) => {
       const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
       const tab = QV.stats.freq(X);
-      let order = "size";
+      let order = "size", out = null;
       const hbar = (x0, yc, len, th, r = 4) => {
         r = Math.max(0, Math.min(r, th / 2, len));
         const y0 = yc - th / 2;
@@ -700,10 +753,15 @@ print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
           .style("fill", QV.C.blue);
         QV.attachTip(ch, sel, (r) => `<b>Shoe size ${r.x}</b><br>h = ${r.h} &nbsp; f = ${r.h}/11 = ${QV.fmt(r.f, 4)}`);
         ch.layer("annot").selectAll("text").data(tab).join("text").attr("class", "lbl").attr("dominant-baseline", "middle")
+          .style("font-size", "18px").style("font-weight", 600)
           .attr("x", (r) => ch.x(r.h) + 8).attr("y", (r) => yc(r)).text((r) => r.h);
+        if (out) out.set(order === "size"
+          ? "<strong>By shoe size:</strong> numeric axis &ndash; the gap between 41 and 46 stays visible."
+          : "<strong>By frequency:</strong> a ranking with size 39 (4 players) on top &ndash; the distances between the sizes are lost.");
       };
       const row = QV.controls(el);
       QV.segmented(row, { label: "Order", options: [["size", "by shoe size (numeric axis)"], ["freq", "by frequency"]], value: "size", onChange: (v) => { order = v; draw(); } });
+      out = QV.readout(row, "");
       draw();
     });
   })();
@@ -712,18 +770,23 @@ print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
 
 <section class="slide">
   <h2>Pie Chart</h2>
-  <div class="cols mid" style="--cols: 58fr 38fr">
+  <div class="p1-row">
     <div class="viz" id="p1-pie" style="height:540px"></div>
     <div class="p1-side">
       <div id="p1-pie-tiles"></div>
       <p class="fs-s">Each slice stands for one shoe size; its angle is proportional to the share: &ensp;$\text{angle}_j = f_j \cdot 360^\circ$.</p>
-      <p class="fs-xs muted">Hover over a slice, or click it to keep it selected.</p>
+      <p class="hint">Click a slice to select it; hovering previews its numbers.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which slice is the largest, and how large is its angle?</li>
+    <li>Slice 39 is selected: share $4/11 = 0.3636$, angle $0.3636 \cdot 360^\circ = 130.9^\circ$.</li>
+    <li>Click 38, then 40: both $18.2\,\%$ ($65.5^\circ$). Students notice that equal slices are hard to compare by eye.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-pie", (el) => {
-      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
+      const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], C = QV.C;
       const tab = QV.stats.freq(X);
       const W = el.clientWidth, H = el.clientHeight;
       const svg = d3.select(el).append("svg").attr("width", W).attr("height", H).attr("viewBox", `0 0 ${W} ${H}`);
@@ -732,31 +795,45 @@ print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
       const arcs = d3.pie().value((d) => d.h).sort(null).startAngle(0).endAngle(-2 * Math.PI)(tab);
       const arc = d3.arc().innerRadius(0).outerRadius(R);
       const op = [0.42, 0.54, 0.66, 0.78, 0.89, 1];
-      const t = QV.tiles(document.getElementById("p1-pie-tiles"), ["Shoe size $x_j$", "Absolute $h_j$", "Share $f_j$", "Angle $f_j \\cdot 360^\\circ$"]);
+      const t = QV.tiles(document.getElementById("p1-pie-tiles"), ["Shoe size $x_j$", "Absolute frequency $h_j$", "Share $f_j = h_j / n$", "Angle $= f_j \\cdot 360^\\circ$"]);
       t.el.style.setProperty("--n", 2); t.el.classList.add("p1-tiles2");
-      let pinned = null;
+      t.el.children[2].style.gridColumn = "span 2"; t.el.children[3].style.gridColumn = "span 2";
+      let sel = arcs[2];                       // selected slice (orange); starts with the most frequent size
       const show = (d) => {
         const r = d.data;
-        t.set(0, r.x); t.set(1, r.h); t.set(2, `${r.h}/11 = ${QV.fmt(r.f, 4)}`); t.set(3, `${QV.fmt(360 * r.f, 1)}°`);
+        t.set(0, r.x); t.set(1, r.h);
+        t.set(2, `${r.h}/11 = ${QV.fmt(r.f, 4)} = ${QV.fmt(100 * r.f, 1)} %`);
+        t.set(3, `${QV.fmt(r.f, 4)} · 360° = ${QV.fmt(360 * r.f, 1)}°`);
       };
       const off = (d) => { const a = (d.startAngle + d.endAngle) / 2; return [Math.sin(a) * 12, -Math.cos(a) * 12]; };
       const sl = g.selectAll("path").data(arcs).join("path").attr("d", arc)
-        .style("fill", QV.C.blue).style("fill-opacity", (d, i) => op[i])
-        .style("stroke", QV.C.surface).style("stroke-width", 3).style("cursor", "pointer");
-      const place = () => sl.attr("transform", (d) => (d === pinned ? `translate(${off(d)})` : null));
-      const tip = QV.tooltip({ el });
-      sl.on("pointerenter pointermove", function (e, d) { show(d); d3.select(this).style("filter", "brightness(1.1)"); tip.show(`<b>Shoe size ${d.data.x}</b><br>h = ${d.data.h} &nbsp; f = ${QV.fmt(100 * d.data.f, 1)} %<br>angle = ${QV.fmt(360 * d.data.f, 1)}°`, e); })
-        .on("pointerleave", function () { d3.select(this).style("filter", null); tip.hide(); if (pinned) show(pinned); })
-        .on("click", (e, d) => { pinned = pinned === d ? null : d; place(); if (pinned) show(pinned); });
+        .style("stroke", C.surface).style("stroke-width", 3).style("cursor", "pointer");
+      // the angle of the slice whose numbers are shown, marked at the centre
+      const ang = g.append("path").style("fill", "none").style("stroke", C.ink).style("stroke-width", 3).style("pointer-events", "none");
+      const angArc = d3.arc().innerRadius(56).outerRadius(56);
+      const angTxt = g.append("text").attr("text-anchor", "middle").attr("dominant-baseline", "middle").style("font-size", "18px").style("font-weight", 700).style("fill", C.ink)
+        .style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 4).style("stroke-linejoin", "round").style("pointer-events", "none");
+      const paint = (hov) => {
+        const cur = hov || sel;
+        sl.style("fill", (d) => (d === sel ? C.orange : C.blue)).style("fill-opacity", (d, i) => (d === sel ? 1 : op[i]))
+          .attr("transform", (d) => (d === sel ? `translate(${off(d)})` : null))
+          .style("filter", (d) => (d === hov && d !== sel ? "brightness(1.18)" : null));
+        ang.attr("d", angArc(cur)).attr("transform", cur === sel ? `translate(${off(cur)})` : null);
+        const a = (cur.startAngle + cur.endAngle) / 2, o = cur === sel ? off(cur) : [0, 0];
+        angTxt.attr("x", Math.sin(a) * 92 + o[0]).attr("y", -Math.cos(a) * 92 + o[1]).text(`${QV.fmt(360 * cur.data.f, 1)}°`);
+        show(cur);
+      };
+      sl.on("pointerenter", (e, d) => paint(d)).on("pointerleave", () => paint(null))
+        .on("click", (e, d) => { sel = d; paint(null); });
       // outside labels: size (bold) and share
-      const lab = d3.arc().innerRadius(R + 30).outerRadius(R + 30);
-      const lg = g.append("g");
+      const lab = d3.arc().innerRadius(R + 32).outerRadius(R + 32);
+      const lg = g.append("g").style("pointer-events", "none");
       arcs.forEach((d) => {
         const [x, y] = lab.centroid(d);
-        const tx = lg.append("text").attr("x", x).attr("y", y - 2).attr("text-anchor", "middle").style("font-size", "17px").style("font-weight", 700).style("fill", "var(--ink)").text(d.data.x);
+        lg.append("text").attr("x", x).attr("y", y - 2).attr("text-anchor", "middle").style("font-size", "18px").style("font-weight", 700).style("fill", "var(--ink)").text(d.data.x);
         lg.append("text").attr("x", x).attr("y", y + 16).attr("text-anchor", "middle").style("font-size", "15px").style("fill", "var(--ink-muted)").text(`${QV.fmt(100 * d.data.f, 1)} %`);
       });
-      show(arcs[2]);
+      paint(null);
     });
   })();
   </script>
@@ -765,43 +842,48 @@ print(50 - 40, round((50 - 40) / 40, 4))     # 10 0.25
 <section class="slide">
   <h2>Empirical Distribution Function (Empirical CDF, ECDF)</h2>
   <div class="viz" id="p1-ecdf" style="height:455px"></div>
-  <p class="fs-xs muted">Choose a shoe size $x$: &ldquo;at most $x$&rdquo; is read off as the height $F(x)$, &ldquo;at least $x$&rdquo; as the rest above the step just before $x$.</p>
+  <p class="hint">Drag the orange handle on the x-axis (or use the slider) and switch between &ldquo;at most&rdquo; and &ldquo;at least&rdquo;.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which share of the players has a shoe size of at most 39? Follow the arrows: up to the step, left to $F(39) = 7/11$.</li>
+    <li>Ask for &ldquo;at least 40&rdquo;, then drag $x$ to 40 and switch: $1 - F(39) = 4/11$.</li>
+    <li>Students notice: between 41 and 46 the function stays flat &ndash; nobody has these sizes.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-ecdf", (el) => {
       const X = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], n = X.length;
-      const ch = QV.ecdf(el, { data: X, xLabel: "Shoe size", domain: [35.5, 48], chart: { y: { domain: [0, 1.08], label: "F(x)", tickValues: [0, 0.2, 0.4, 0.6, 0.8, 1], format: ".1f" } } });
+      const ch = QV.ecdf(el, { data: X, xLabel: "Shoe size", domain: [35.5, 48], hover: false, chart: { y: { domain: [0, 1.08], label: "F(x)", tickValues: [0, 0.2, 0.4, 0.6, 0.8, 1], format: ".1f" } } });
       const C = QV.C;
-      let x = 39, mode = "most";
+      let x = 39, mode = "most", sl = null, out = null;
+      // reading path: from x on the axis up to the step, then left to the share on the y-axis
       const band = QV.rect(ch, 35.5, 35.85, 0, 1, { fill: C.orange, opacity: 0.55, layer: "annot" });
-      const hl = QV.segment(ch, 35.5, 0, 39, 0, { color: C.orange, width: 2, dash: "6 4" });
-      const vl = QV.segment(ch, 39, 0, 39, 0, { color: C.orange, width: 2, dash: "6 4" });
-      const pt = QV.dots(ch, [[39, 0]], { r: 7, color: C.orange, layer: "front" });
-      const lab = QV.tex(ch, 36, 0.5, "", { anchor: "start", bg: true, size: 17 });
+      const vl = QV.segment(ch, 39, 0, 39, 0, { color: C.orange, width: 2.5, dash: "6 4", arrow: true });
+      const hl = QV.segment(ch, 39, 0, 35.9, 0, { color: C.orange, width: 2.5, dash: "6 4", arrow: true });
+      const lab = QV.tex(ch, 36, 0.5, "", { anchor: "start", bg: true, size: 20 });
+      const hd = QV.dots(ch, [[39, 0]], { r: 10, color: C.orange, layer: "front" });
       const row = QV.controls(el);
-      let out = null;
       const cnt = (f) => X.filter(f).length;
       const upd = () => {
         const le = cnt((v) => v <= x), lt = cnt((v) => v < x);
+        hd.attr("cx", ch.x(x));
         if (mode === "most") {
           const F = le / n;
           band.set(35.5, 35.85, 0, F);
-          hl.set(35.5, F, x, F); vl.set(x, 0, x, F);
-          pt.attr("cx", ch.x(x)).attr("cy", ch.y(F));
-          lab.set(35.95, F / 2, `F(${x}) = \\tfrac{${le}}{11}`);
-          out.set(`Share with shoe size at most ${x}: $F(${x}) = \\tfrac{${le}}{11} = ${QV.fmt(F, 4)}$`);
+          vl.set(x, 0, x, F); hl.set(x, F, 35.9, F);
+          lab.set(35.98, F / 2, `F(${x}) = \\tfrac{${le}}{11}`);
+          out.set(`<strong>At most ${x}:</strong> $F(${x}) = \\tfrac{${le}}{11} = ${QV.fmt(F, 4)}$ &ndash; ${le} of the 11 players`);
         } else {
           const F0 = lt / n;
           band.set(35.5, 35.85, F0, 1);
-          hl.set(35.5, F0, x, F0); vl.set(x, 0, x, F0);
-          pt.attr("cx", ch.x(x)).attr("cy", ch.y(F0));
-          lab.set(35.95, (F0 + 1) / 2, `1 - F(${x - 1}) = \\tfrac{${n - lt}}{11}`);
-          out.set(`Share with shoe size at least ${x}: $1 - F(${x - 1}) = 1 - \\tfrac{${lt}}{11} = ${QV.fmt(1 - F0, 4)}$`);
+          vl.set(x, 0, x, F0); hl.set(x, F0, 35.9, F0);
+          lab.set(35.98, (F0 + 1) / 2, `1 - F(${x - 1}) = \\tfrac{${n - lt}}{11}`);
+          out.set(`<strong>At least ${x}:</strong> $1 - F(${x - 1}) = 1 - \\tfrac{${lt}}{11} = \\tfrac{${n - lt}}{11} = ${QV.fmt(1 - F0, 4)}$ &ndash; ${n - lt} of the 11 players`);
         }
       };
-      QV.slider(row, { label: "$x$", min: 36, max: 47, step: 1, value: x, onInput: (v) => { x = v; upd(); } });
+      sl = QV.slider(row, { label: "Shoe size $x$", min: 36, max: 47, step: 1, value: x, onInput: (v) => { x = v; upd(); } });
       QV.segmented(row, { label: "", options: [["most", "at most $x$"], ["least", "at least $x$"]], value: "most", onChange: (v) => { mode = v; upd(); } });
       out = QV.readout(row, "");
+      QV.drag(ch, hd, (xv) => { const v = Math.max(36, Math.min(47, Math.round(xv))); if (v !== x) { x = v; sl.set(v, false); upd(); } });
       upd();
     });
   })();
@@ -901,8 +983,15 @@ print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
     </ul>
     <div>
       <div class="viz" id="p1-ctq" style="height:340px"></div>
+      <p class="hint">Ask a question, then click its button to show the measure that answers it.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Read the four questions; let the students guess each value from the dot plot.</li>
+    <li>Click <b>Middle</b> (median $x_{(6)} = 39$), then <b>Centre of gravity</b> (mean $39.64$).</li>
+    <li>Students notice: the single 46 pulls the balance point to the right of the median.</li>
+    <li>Click the quarters: $Q_1 = x_{(3)} = 38$, $Q_3 = x_{(9)} = 40$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-ctq", (el) => {
@@ -916,12 +1005,12 @@ print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
       // balance beam with the fulcrum at the mean
       const ful = ch.layer("annot").append("g").style("display", "none");
       ful.append("line").attr("x1", ch.x(36.6)).attr("x2", ch.x(46.4)).attr("y1", H - 16).attr("y2", H - 16).style("stroke", C.ink2).style("stroke-width", 3);
-      ful.append("path").attr("d", `M${ch.x(mean)},${H - 15}L${ch.x(mean) - 12},${H}L${ch.x(mean) + 12},${H}Z`).style("fill", C.orange);
+      ful.append("path").attr("d", `M${ch.x(mean)},${H - 15}L${ch.x(mean) - 12},${H}L${ch.x(mean) + 12},${H}Z`).style("fill", C.red);
       const marks = [
-        { key: "med", label: "Middle", v: S.median(X), color: C.green, y: 16, anchor: "middle", k: 6, tex: "\\tilde{x} = 39 \\ \\text{(median)}" },
-        { key: "mean", label: "Centre of gravity", v: mean, color: C.orange, y: 50, anchor: "start", tex: "\\bar{x} = 39.64 \\ \\text{(mean, balance point)}" },
-        { key: "q1", label: "One quarter", v: S.quantile(X, 0.25), color: C.violet, y: 84, anchor: "end", k: 3, tex: "Q_1 = 38" },
-        { key: "q3", label: "Three quarters", v: S.quantile(X, 0.75), color: C.violet, y: 84, anchor: "start", k: 9, tex: "Q_3 = 40" },
+        { key: "med", label: "Middle", v: S.median(X), color: C.green, y: 16, anchor: "middle", k: 6, tex: "\\tilde{x} = x_{(6)} = 39 \\ \\text{(median: 6th of 11)}" },
+        { key: "mean", label: "Centre of gravity", v: mean, color: C.red, y: 50, anchor: "start", tex: "\\bar{x} = \\tfrac{436}{11} = 39.64 \\ \\text{(mean, balance point)}" },
+        { key: "q1", label: "One quarter", v: S.quantile(X, 0.25), color: C.violet, y: 84, anchor: "end", k: 3, tex: "Q_1 = x_{(3)} = 38" },
+        { key: "q3", label: "Three quarters", v: S.quantile(X, 0.75), color: C.violet, y: 84, anchor: "start", k: 9, tex: "Q_3 = x_{(9)} = 40" },
       ];
       const ringG = ch.layer("annot").append("g");
       const lineG = ch.layer("data").append("g");
@@ -937,7 +1026,7 @@ print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
           const d = pts[m.k - 1];
           m.ring = ringG.append("circle").attr("cx", ch.x(d.v)).attr("cy", cy(d)).attr("r", r + 4).style("fill", "none").style("stroke", m.color).style("stroke-width", 3).style("display", "none");
         }
-        m.lab = QV.tex(ch, m.v, ch.y.invert(m.y), m.tex, { anchor: m.anchor, dx: m.anchor === "start" ? 6 : m.anchor === "end" ? -6 : 0, bg: true, size: 16 });
+        m.lab = QV.tex(ch, m.v, ch.y.invert(m.y), m.tex, { anchor: m.anchor, dx: m.anchor === "start" ? 6 : m.anchor === "end" ? -6 : 0, bg: true, size: 17 });
         m.lab.style.display = "none";
       });
       const row = QV.controls(el);
@@ -953,7 +1042,6 @@ print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
     });
   })();
   </script>
-  <p class="fs-xs muted" style="margin-top:-4px">Click a question in the control row to show the measure that answers it.</p>
 </section>
 
 <section class="slide">
@@ -1000,49 +1088,62 @@ print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
       </ul>
     </div>
     <div style="gap:6px">
-      <div class="viz" id="p1-geo" style="height:228px"></div>
+      <div class="viz" id="p1-geo" style="height:204px"></div>
+      <p class="hint">Pick an example or move the growth rates $r_1$ and $r_2$.</p>
     </div>
   </div>
   <div class="block key fs-s"><p>Average growth rate $= \bar{x}_{\text{geo}}$ of the growth factors $1 + r_i$, minus $1$. $\bar{x}_{\text{geo}}$ is the <em>constant</em> factor that produces the same total growth.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: $+20\,\%$, then $-10\,\%$ &ndash; is that $+5\,\%$ per year? The red line ($5\,\%$ per year) ends at $110.25$, not at $108$.</li>
+    <li>Click <b>+100&thinsp;%, &minus;50&thinsp;%</b>: revenue is back at 100, yet the arithmetic mean says $+25\,\%$ per year.</li>
+    <li>Click <b>+10&thinsp;%, +10&thinsp;%</b>: with equal rates both means agree.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-geo", (el) => {
       const C = QV.C;
       let r1 = 0.2, r2 = -0.1;
-      const ch = QV.chart(el, { x: { domain: [0, 2], label: "Year", tickValues: [0, 1, 2], format: "d" }, y: { domain: [95, 125], label: "Revenue (year 0 = 100)", ticks: 5 }, margin: { top: 10, right: 64, left: 58, bottom: 44 } });
-      const lM = QV.line(ch, [], { color: C.green, width: 2.5, dash: true });
-      const lG = QV.line(ch, [], { color: C.orange, width: 2.5 });
+      const ch = QV.chart(el, { x: { domain: [0, 2], label: "", tickValues: [0, 1, 2], format: (v) => `Year ${v}` }, y: { domain: [95, 125], label: "Revenue (year 0 = 100)", ticks: 5 }, margin: { top: 12, right: 150, left: 58, bottom: 30 } });
+      // green = the correct average (geometric mean), red = the wrong one (arithmetic mean of the rates)
+      const lM = QV.line(ch, [], { color: C.red, width: 2.5, dash: true });
+      const lG = QV.line(ch, [], { color: C.green, width: 3 });
       const lA = QV.line(ch, [], { color: C.blue, width: 3 });
       const dG = ch.layer("annot").append("g");
-      const tA = QV.text(ch, 2, 100, "", { anchor: "start", dx: 9, baseline: "middle" });
-      const tM = QV.text(ch, 2, 100, "", { anchor: "start", dx: 9, baseline: "middle" });
-      const leg = QV.legend(el, [
-        { label: "actual", color: C.blue, type: "line" },
-        { label: "constant geometric mean", color: C.orange, type: "line" },
-        { label: "constant arithmetic mean", color: C.green, type: "dash" },
-      ], "after");
-      const row = QV.controls(leg);
+      const halo = (t) => t.style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 4).style("stroke-linejoin", "round");
+      const tG = halo(QV.text(ch, 2, 100, "", { anchor: "start", dx: 9, baseline: "middle", color: C.tGreen, weight: 600 }));
+      const tM = halo(QV.text(ch, 2, 100, "", { anchor: "start", dx: 9, baseline: "middle", color: C.tRed, weight: 600 }));
+      const tA = halo(QV.text(ch, 1, 100, "actual", { color: C.tBlue, weight: 600 }));
+      const row = QV.controls(el);
       const out = document.createElement("p"); out.className = "fs-xs"; row.parentNode.insertBefore(out, row.nextSibling);
       const pc = (v) => (v >= 0 ? "+" : "") + QV.fmt(100 * v, 2) + " %";
       const upd = () => {
         const f1 = 1 + r1, f2 = 1 + r2, tot = f1 * f2, g = Math.sqrt(tot), m = 1 + (r1 + r2) / 2;
         const A = [[0, 100], [1, 100 * f1], [2, 100 * tot]], G = [[0, 100], [1, 100 * g], [2, 100 * tot]], M = [[0, 100], [1, 100 * m], [2, 100 * m * m]];
         const all = A.concat(G, M).map((p) => p[1]);
-        const lo = Math.min(...all), hi = Math.max(...all), pad = (hi - lo) * 0.1 + 2;
+        const lo = Math.min(...all), hi = Math.max(...all), pad = (hi - lo) * 0.16 + 2;
         ch.y.domain([lo - pad, hi + pad]).nice(); ch.axes();
         QV.setLine(ch, lA, A); QV.setLine(ch, lG, G); QV.setLine(ch, lM, M);
-        dG.selectAll("circle").data(A).join("circle").attr("r", 5).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]))
+        dG.selectAll("circle").data(A).join("circle").attr("r", 5.5).attr("cx", (d) => ch.x(d[0])).attr("cy", (d) => ch.y(d[1]))
           .style("fill", C.blue).style("stroke", C.surface).style("stroke-width", 2);
-        const yA = ch.y(100 * tot), yM = ch.y(100 * m * m);
-        let dA = 0, dM = 0;
-        if (Math.abs(yA - yM) < 18) { const s = (18 - Math.abs(yA - yM)) / 2; if (yA >= yM) { dA = s; dM = -s; } else { dA = -s; dM = s; } }
-        tA.set(2, 100 * tot, QV.fmt(100 * tot, 2)).attr("y", yA + dA);
-        tM.set(2, 100 * m * m, QV.fmt(100 * m * m, 2)).attr("y", yM + dM);
+        // direct labels: the two constant paths at their ends, the actual path at its bend
+        const yG = ch.y(100 * tot), yM = ch.y(100 * m * m);
+        let dg = 0, dm = 0;
+        if (Math.abs(yG - yM) < 20) { const s = (20 - Math.abs(yG - yM)) / 2; if (yG >= yM) { dg = s; dm = -s; } else { dg = -s; dm = s; } }
+        tG.set(2, 100 * tot, `geometric ${QV.fmt(100 * tot, 2)}`).attr("y", yG + dg);
+        tM.set(2, 100 * m * m, `arithmetic ${QV.fmt(100 * m * m, 2)}`).attr("y", yM + dm);
+        tA.set(1, 100 * f1).attr("dy", f1 >= g - 1e-12 ? -12 : 23);
         out.innerHTML = Deck.tex(`\\bar{x}_{\\text{geo}} = \\sqrt{${QV.fmt(f1, 2)} \\cdot ${QV.fmt(f2, 2)}} = ${QV.fmt(g, 4)}`) +
-          ` &rarr; <b>${pc(g - 1)}</b> per year; arithmetic mean of the rates: ${pc(m - 1)}` + (m - g > 1e-12 ? " (too high)" : " (equal rates: both agree)");
+          ` &rarr; <b>${pc(g - 1)}</b> per year; arithmetic mean of the rates: <b>${pc(m - 1)}</b>` + (m - g > 1e-12 ? " (too high)" : " (equal rates: both agree)");
       };
-      QV.slider(row, { label: "$r_1$", min: -40, max: 60, step: 1, value: 20, width: 120, fmt: (v) => (v > 0 ? "+" : "") + v + " %", onInput: (v) => { r1 = v / 100; upd(); } });
-      QV.slider(row, { label: "$r_2$", min: -40, max: 60, step: 1, value: -10, width: 120, fmt: (v) => (v > 0 ? "+" : "") + v + " %", onInput: (v) => { r2 = v / 100; upd(); } });
+      // examples: the slide's own case, "doubled and halved", equal rates
+      const P = { a: [20, -10], b: [100, -50], c: [10, 10] };
+      const key = () => Object.keys(P).find((k) => P[k][0] === Math.round(100 * r1) && P[k][1] === Math.round(100 * r2)) || "";
+      const pf = (v) => (v > 0 ? "+" : "") + v + " %";
+      let seg = null;
+      const s1 = QV.slider(row, { label: "$r_1$", min: -50, max: 100, step: 5, value: 20, width: 110, fmt: pf, onInput: (v) => { r1 = v / 100; seg.set(key(), false); upd(); } });
+      const s2 = QV.slider(row, { label: "$r_2$", min: -50, max: 100, step: 5, value: -10, width: 110, fmt: pf, onInput: (v) => { r2 = v / 100; seg.set(key(), false); upd(); } });
+      seg = QV.segmented(row, { label: "Example", options: [["a", "+20 %, −10 %"], ["b", "+100 %, −50 %"], ["c", "+10 %, +10 %"]], value: "a",
+        onChange: (k) => { r1 = P[k][0] / 100; r2 = P[k][1] / 100; s1.set(P[k][0], false); s2.set(P[k][1], false); upd(); } });
       upd();
     });
   })();
@@ -1113,7 +1214,7 @@ print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
       </tbody>
     </table></div>
     <div style="gap:6px">
-      <div class="viz" id="p1-cte" style="height:320px"></div>
+      <div class="viz" id="p1-cte" style="height:360px"></div>
     </div>
   </div>
   <script>
@@ -1122,56 +1223,75 @@ print((stars &lt;= 3).mean(), (stars &gt;= 4).sum())        # 0.25 9
       const S = QV.stats, C = QV.C, X0 = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], n = 11;
       const pts = X0.map((v, i) => ({ i, v }));
       let alpha = 0.1;
-      const ch = QV.chart(el, { x: { domain: [35, 60], label: "Shoe size", tickValues: d3.range(35, 61, 5), format: "d", grid: true }, y: { domain: [0, 1], hide: true }, margin: { top: 8, right: 16, bottom: 46, left: 16 } });
+      const ch = QV.chart(el, { x: { domain: [35, 53], label: "Shoe size", tickValues: d3.range(36, 53, 2), format: "d", grid: true }, y: { domain: [0, 1], hide: true }, margin: { top: 8, right: 16, bottom: 46, left: 16 } });
       const H = ch.h, r = 11, gap = 25;
-      const specs = [{ k: "mean", color: C.orange }, { k: "geo", color: C.orange, dash: "3 4" }, { k: "trim", color: C.violet }, { k: "med", color: C.green }];
-      const L = {};
-      specs.forEach((s) => { L[s.k] = ch.layer("data").append("line").attr("y1", 0).attr("y2", H).style("stroke", s.color).style("stroke-width", 2.5).style("stroke-dasharray", s.dash || null); });
-      const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", (d) => (d.i === 4 ? 13 : r)).style("stroke-width", (d) => (d.i === 4 ? 3 : 2));
-      QV.attachTip(ch, sel, (d) => `Player ${d.i + 1}: ${d.v}${d.trim ? " (trimmed)" : ""}`);
-      const tag = QV.text(ch, 46, 0.5, "player 5: drag", { cls: "lbl-muted" });
+      // every measure is a vertical line with its name and value written next to it
+      const specs = [
+        { k: "mean", name: "mean", color: C.red, dash: "7 5" },
+        { k: "geo", name: "geometric", color: C.grey, dash: "2 4" },
+        { k: "trim", name: "trimmed", color: C.violet },
+        { k: "med", name: "median", color: C.green },
+      ];
+      specs.forEach((s) => {
+        s.ln = ch.layer("data").append("line").style("stroke", s.color).style("stroke-width", 2.5).style("stroke-dasharray", s.dash || null);
+        s.tx = ch.layer("front").append("text").attr("class", "lbl").style("fill", QV.textOf(s.color)).style("font-size", "16px").style("font-weight", 600)
+          .style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 5).style("stroke-linejoin", "round").style("pointer-events", "none");
+      });
+      const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", (d) => (d.i === 4 ? 13 : r));
+      QV.attachTip(ch, sel, (d) => `Player ${d.i + 1}: ${d.v}${d.trim ? " (cut off by trimming)" : ""}`);
+      const tag = QV.text(ch, 46, 0.5, "player 5", { cls: "lbl-muted" });
       const $ = (id) => document.getElementById(id);
       const f4 = (v) => QV.fmt(v, 4);
+      // table cells that differ from their starting value are marked orange: "this measure reacted"
+      const start = {};
+      const put = (id, txt) => { txt = String(txt); if (!(id in start)) start[id] = txt; const c = $(id); c.textContent = txt; c.classList.toggle("hl", txt !== start[id]); };
       const upd = () => {
         const X = pts.map((d) => d.v);
         const srt = pts.slice().sort((a, b) => a.v - b.v || a.i - b.i), k = Math.floor(alpha * n + 1e-9);
         const c = {};
         srt.forEach((d, j) => { d.trim = j < k || j >= n - k; c[d.v] = (c[d.v] || 0) + 1; d.lev = c[d.v]; });
         const cy = (d) => H - 16 - (d.lev - 1) * gap;
+        // player 5 is the handle (orange); hollow = cut off by trimming
         sel.attr("cx", (d) => ch.x(d.v)).attr("cy", cy)
-          .style("fill", (d) => (d.trim ? C.surface : C.blue))
-          .style("stroke", (d) => (d.i === 4 ? C.ink : d.trim ? C.grey : C.surface));
+          .style("fill", (d) => (d.trim ? C.surface : d.i === 4 ? C.orange : C.blue))
+          .style("stroke", (d) => (d.i === 4 ? (d.trim ? C.orange : C.surface) : d.trim ? C.grey : C.surface))
+          .style("stroke-width", (d) => (d.i === 4 && d.trim ? 4 : 2));
         const h = pts[4];
-        tag.set(h.v, ch.y.invert(cy(h) - 24));
+        tag.set(h.v, ch.y.invert(cy(h) - 22));
         const m = { mean: S.mean(X), geo: S.geomean(X), trim: S.trimmedMean(X, alpha), med: S.median(X) };
-        Object.keys(L).forEach((key) => L[key].attr("x1", ch.x(m[key])).attr("x2", ch.x(m[key])));
+        // labels in two rows: the outer two measures on top, the inner two below; the left pair is written to the left
+        specs.slice().sort((a, b) => m[a.k] - m[b.k]).forEach((s, j) => {
+          const left = j < 2, y = j === 0 || j === 3 ? 16 : 40, px = ch.x(m[s.k]);
+          s.ln.attr("x1", px).attr("x2", px).attr("y1", y - 13).attr("y2", H);
+          s.tx.attr("x", px + (left ? -7 : 7)).attr("y", y).attr("text-anchor", left ? "end" : "start").text(`${s.name} ${QV.fmt(m[s.k], 2, true)}`);
+        });
         const cnt = {}; X.forEach((v) => { cnt[v] = (cnt[v] || 0) + 1; });
         const mx = Math.max(...Object.values(cnt));
         const modes = Object.keys(cnt).filter((v) => cnt[v] === mx).map(Number).sort((a, b) => a - b);
-        $("p1-cte-p5").textContent = h.v;
-        $("p1-cte-sum").textContent = S.sum(X);
-        $("p1-cte-mean").textContent = f4(m.mean);
-        $("p1-cte-geo").textContent = f4(m.geo);
-        $("p1-cte-trim").textContent = f4(m.trim);
+        put("p1-cte-p5", h.v);
+        put("p1-cte-sum", S.sum(X));
+        put("p1-cte-mean", f4(m.mean));
+        put("p1-cte-geo", f4(m.geo));
+        put("p1-cte-trim", f4(m.trim));
         $("p1-cte-tl").innerHTML = `Trimmed mean (${Math.round(alpha * 100)}&thinsp;% per end)`;
-        $("p1-cte-med").textContent = m.med;
-        $("p1-cte-mode").textContent = modes.join(", ");
+        put("p1-cte-med", m.med);
+        put("p1-cte-mode", modes.join(", "));
       };
-      QV.drag(ch, sel.filter((d) => d.i === 4), (xv, yv, d) => { const v = Math.max(36, Math.min(60, Math.round(xv))); if (v !== d.v) { d.v = v; upd(); } });
-      const leg = QV.legend(el, [
-        { label: "mean $\\bar{x}$", color: C.orange, type: "line" },
-        { label: "geometric mean", color: C.orange, type: "dash" },
-        { label: "trimmed mean", color: C.violet, type: "line" },
-        { label: "median", color: C.green, type: "line" },
-      ], "after");
-      const row = QV.controls(leg);
+      QV.drag(ch, sel.filter((d) => d.i === 4), (xv, yv, d) => { const v = Math.max(36, Math.min(52, Math.round(xv))); if (v !== d.v) { d.v = v; upd(); } });
+      const row = QV.controls(el);
       const sl = QV.slider(row, { label: "Trim $\\alpha$", min: 0, max: 0.4, step: 0.05, value: 0.1, width: 130, fmt: (v) => `${Math.round(v * 100)} % (${Math.floor(v * n + 1e-9)} per end)`, onInput: (v) => { alpha = v; upd(); } });
       QV.button(row, "Reset", () => { pts[4].v = 46; sl.set(0.1); upd(); });
+      QV.readout(row, "<span class='muted'>Orange cells: changed.</span>");
       upd();
     });
   })();
   </script>
-  <p class="fs-xs muted">Drag player 5 (ringed dot) and move $\alpha$: the mean follows the outlier, median and trimmed mean hardly move. Hollow dots are cut off by trimming.</p>
+  <p class="hint">Drag the orange dot (player 5) and move the trim share $\alpha$; hollow dots are cut off by trimming.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: player 5 gets even bigger shoes &ndash; which measures change?</li>
+    <li>Drag the orange dot to the right: sum and mean follow (orange cells); median and mode stay at 39.</li>
+    <li>Set $\alpha$ to 0&thinsp;%: the trimmed mean equals the mean; at 10&thinsp;% it ignores the 37 and the outlier.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1313,7 +1433,12 @@ print(np.average([37, 38, 39, 40, 41, 46], weights=[1, 2, 4, 2, 1, 1]))  # 39.63
       <div class="viz" id="p1-q" style="height:380px"></div>
     </div>
   </div>
-  <p class="fs-xs muted">Click a row or move $p$: position $k$ covers the interval $(k-1,\,k]$ of the $n \cdot p$ line, so $n \cdot p$ is rounded <b>up</b>; an integer $n \cdot p$ stays.</p>
+  <p class="hint">Click a row of the table or move $p$: position $k$ covers the interval $(k-1,\,k]$ of the $n \cdot p$ line, so $n \cdot p$ is rounded <b>up</b>.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: at which position is the 80&thinsp;%-quantile of 11 values? $n \cdot p = 8.8$ is rounded up to 9: $x_{(9)} = 40$.</li>
+    <li>Click the row <b>1st quartile</b>: $2.75$ becomes position 3.</li>
+    <li>Move $p$ slowly from $0.80$ to $0.82$: the position jumps to 10 as soon as $n \cdot p$ passes 9.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-q", (el) => {
@@ -1338,8 +1463,8 @@ print(np.average([37, 38, 39, 40, 41, 46], weights=[1, 2, 4, 2, 1, 1]))  # 39.63
       const mk = ch.layer("front").append("path").style("fill", C.orange);
       const mkLab = ch.layer("front").append("text").attr("class", "lbl-strong").attr("text-anchor", "middle");
       const arr = QV.segment(ch, 0, 0, 0, 0, { color: C.orange, width: 2.5, arrow: true, layer: "front" });
-      const res = QV.tex(ch, 5.5, Y(H - 54), "", { size: 21, bg: true });
-      const cov = QV.tex(ch, 5.5, Y(H - 16), "", { size: 16 });
+      const res = QV.tex(ch, 5.5, Y(H - 58), "", { size: 25, bg: true });
+      const cov = QV.tex(ch, 5.5, Y(H - 16), "", { size: 19 });
       let p = 0.8;
       const rows = Array.from(document.querySelectorAll("#p1-q-tab tr.p1-qrow"));
       const upd = () => {
@@ -1351,12 +1476,16 @@ print(np.average([37, 38, 39, 40, 41, 46], weights=[1, 2, 4, 2, 1, 1]))  # 39.63
         mkLab.attr("x", Math.max(X(0) + 40, Math.min(X(11) - 40, px))).attr("y", yLine - 24).text(`n·p = ${QV.fmt(np, 2)}`);
         arr.set(np, Y(yLine + 4), k - 0.5, Y(yTok - 4));
         const ps = QV.fmt(p, 2);
-        res.set(5.5, Y(H - 54), `x_{${ps}} = x_{(\\lceil ${QV.fmt(np, 2)} \\rceil)} = x_{(${k})} = \\mathbf{${v}}`);
-        cov.set(5.5, Y(H - 16), `\\text{at or below } ${v}\\text{: } ${k} \\text{ of } 11 = ${QV.fmt(100 * k / n, 1)}\\,\\% \\ \\ge \\ ${QV.fmt(100 * p, 0)}\\,\\%`);
+        res.set(5.5, Y(H - 58), `x_{${ps}} = x_{(\\lceil ${QV.fmt(np, 2)} \\rceil)} = x_{(${k})} = \\mathbf{${v}}`);
+        const c = SX.filter((u) => u <= v).length;          // all values at or below x_p (ties beyond position k count too)
+        cov.set(5.5, Y(H - 16), `\\text{at or below } ${v}\\text{: } ${c} \\text{ of } 11 = ${QV.fmt(100 * c / n, 1)}\\,\\% \\ \\ge \\ ${QV.fmt(100 * p, 0)}\\,\\%`);
         rows.forEach((r) => r.classList.toggle("p1-sel", Math.abs(+r.dataset.p - p) < 1e-9));
+        if (seg) seg.set([0.25, 0.5, 0.75].find((q) => Math.abs(q - p) < 1e-9) || "", false);
       };
       const row = QV.controls(el);
-      const sl = QV.slider(row, { label: "$p$", min: 0.01, max: 1, step: 0.01, value: p, width: 230, fmt: (v) => v.toFixed(2), onInput: (v) => { p = v; upd(); } });
+      let seg = null;
+      const sl = QV.slider(row, { label: "$p$", min: 0.01, max: 1, step: 0.01, value: p, width: 200, fmt: (v) => v.toFixed(2), onInput: (v) => { p = v; upd(); } });
+      seg = QV.segmented(row, { label: "", options: [[0.25, "$Q_1$"], [0.5, "median"], [0.75, "$Q_3$"]], value: "", onChange: (v) => sl.set(+v) });
       rows.forEach((r) => r.addEventListener("click", () => sl.set(+r.dataset.p)));
       upd();
     });
@@ -1494,18 +1623,25 @@ print(np.quantile(data, 0.80, method="inverted_cdf"))  # 40
   <h2>Solution (3/4) &ndash; Measures of Central Tendency and Quantiles</h2>
   <p><b>d)</b> The salary of the head of department ($120$) is an outlier and pulls the mean up to $45.9$ &ndash; a salary hardly anyone in the department earns. The <b>median ($36$)</b> and the trimmed mean ($38.9$) are robust to the outlier and describe the typical salary better.</p>
   <div class="viz" id="p1-sal" style="height:270px"></div>
-  <p class="fs-xs muted" style="margin-top:-6px">Drag the head of department (ringed dot): the mean follows, median and trimmed mean stay put.</p>
+  <p class="hint" style="margin-top:-6px">Drag the orange dot (the head of department) and watch the three measures.</p>
   <div class="block key"><p>For skewed data with outliers (salaries, wealth, sales) always report the median <b>and</b> the mean &ndash; the gap between them reveals the skewness.</p></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: the head of department gets a rise to 160 &ndash; what happens to mean, median and trimmed mean?</li>
+    <li>Drag the orange dot to 160: the mean rises to 49.9; the median (36) and the trimmed mean (38.875) do not move.</li>
+    <li>Drag it down to 40: the mean (37.9) now lies close to the median.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-sal", (el) => {
       const S = QV.stats, C = QV.C;
       const pts = [34, 42, 28, 120, 36, 31, 45, 34, 50, 39].map((v, i) => ({ v, i, head: i === 3 }));
       const ch = QV.chart(el, { x: { domain: [25, 160], label: "thousand euros", tickValues: d3.range(30, 161, 10), format: "d" }, y: { domain: [0, 1.6], hide: true }, margin: { top: 4, right: 20, bottom: 46, left: 20 } });
-      const mk = (color, top, anchor, dx) => ({ ln: QV.segment(ch, 0, 0, 0, top, { color, width: 3, layer: "data" }), tx: QV.text(ch, 0, top, "", { anchor, dx, dy: -6, cls: "lbl" }), top });
-      const M = { med: mk(C.green, 0.9, "end", -4), trim: mk(C.violet, 1.35, "start", 4), mean: mk(C.orange, 0.9, "start", 4) };
+      const mk = (color, top, anchor, dx, dash) => ({ ln: QV.segment(ch, 0, 0, 0, top, { color, width: 3, dash, layer: "data" }), top,
+        tx: QV.text(ch, 0, top, "", { anchor, dx, dy: -6, cls: "lbl", color: QV.textOf(color), size: 17, weight: 600 }) });
+      const M = { med: mk(C.green, 0.9, "end", -4), trim: mk(C.violet, 1.35, "start", 4), mean: mk(C.red, 0.9, "start", 4, "7 5") };
+      // the head of department is the handle: orange and larger than the other employees
       const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle")
-        .attr("r", (d) => (d.head ? 11 : 9)).style("fill", C.blue).style("stroke", (d) => (d.head ? C.ink : C.surface)).style("stroke-width", (d) => (d.head ? 3 : 2));
+        .attr("r", (d) => (d.head ? 13 : 9)).style("fill", (d) => (d.head ? C.orange : C.blue)).style("stroke", C.surface).style("stroke-width", 2);
       QV.attachTip(ch, sel, (d) => `${d.head ? "head of department" : "employee"}: ${d.v} thousand euros`);
       const tag = QV.text(ch, 120, 0.2, "head of department", { cls: "lbl", dy: -20 });
       const ft = (v) => QV.fmt(v, 3, true);
@@ -1615,7 +1751,8 @@ print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
 
 <section class="slide">
   <h2>Measures of Dispersion &ndash; Visualisation</h2>
-  <div class="viz" id="p1-disp" style="height:352px"></div>
+  <div class="viz" id="p1-disp" style="height:318px"></div>
+  <p class="hint" style="margin-top:-4px">Step through <b>data</b>, <b>deviations from the mean</b> and <b>squared deviations</b>; hover over a dot for its values.</p>
   <ul style="margin-top:-4px">
     <li>Mean and median are identical &ndash; but the <b>dispersion</b> differs considerably</li>
     <li>Four A: Data farther from the mean $\to$ greater dispersion</li>
@@ -1628,7 +1765,7 @@ print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
       const groups = [{ name: "Four A", x: [34, 37, 40, 41] }, { name: "Four B", x: [36, 37, 39, 40] }];
       el.classList.add("p1-twin");
       const legend = QV.legend(el, [
-        { label: "mean $\\bar{x} = 38$", color: C.orange, type: "dash" },
+        { label: "mean $\\bar{x} = 38$", color: C.red, type: "dash" },
         { label: "median $\\tilde{x} = 37$", color: C.green, type: "line" },
         { label: "deviation $x_i - \\bar{x}$ / squared deviation", color: C.red, type: "swatch" },
       ], "before");
@@ -1640,20 +1777,20 @@ print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
         const ux = ch.x(1) - ch.x(0), base = ch.h - 18, Y = (px) => ch.y.invert(px);
         const xs = p.g.x, m = S.mean(xs), med = S.median(xs), dev = xs.map((v) => v - m), n = xs.length;
         ch.svg.append("text").attr("class", "lbl-strong").attr("x", ch.m.left + ch.w / 2).attr("y", 18).attr("text-anchor", "middle").text(p.g.name);
-        QV.vline(ch, m, { color: C.orange, dash: "7 5", width: 2.5, layer: "data" });
+        QV.vline(ch, m, { color: C.red, dash: "7 5", width: 2.5, layer: "data" });
         QV.vline(ch, med, { color: C.green, dash: "10 4 2 4", width: 2.5, layer: "data" });
         const sq = ch.layer("data").append("g").style("display", "none");
         xs.forEach((v, i) => {
           const side = Math.abs(dev[i]) * ux;
           sq.append("rect").attr("x", ch.x(Math.min(v, m))).attr("width", side).attr("y", base - side).attr("height", side)
             .style("fill", C.red).style("fill-opacity", 0.1).style("stroke", C.red).style("stroke-width", 1.5);
-          if (side > 26) sq.append("text").attr("class", "lbl-muted").attr("text-anchor", "middle").attr("x", ch.x((v + m) / 2)).attr("y", base - side + 17).style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 4).text(`${dev[i] * dev[i]}`);
+          if (side > 26) sq.append("text").attr("class", "lbl-strong").style("font-size", "17px").attr("text-anchor", "middle").attr("x", ch.x((v + m) / 2)).attr("y", base - side + 17).style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 4).text(`${dev[i] * dev[i]}`);
         });
         const dv = ch.layer("annot").append("g").style("display", "none");
         xs.forEach((v, i) => {
           const yy = base - 40 - i * 30;
           QV.segment(ch, m, Y(yy), v, Y(yy), { color: C.red, width: 2.5, arrow: true }).remove().each(function () { dv.node().appendChild(this); });
-          dv.append("text").attr("class", "lbl").attr("text-anchor", "middle").attr("x", ch.x((v + m) / 2)).attr("y", yy - 7).text((dev[i] > 0 ? "+" : "−") + Math.abs(dev[i]));
+          dv.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("x", ch.x((v + m) / 2)).attr("y", yy - 7).style("font-size", "17px").style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 4).text((dev[i] > 0 ? "+" : "−") + Math.abs(dev[i]));
           dv.append("line").attr("x1", ch.x(v)).attr("x2", ch.x(v)).attr("y1", yy).attr("y2", base).style("stroke", C.red).style("stroke-width", 1).style("stroke-dasharray", "2 3");
         });
         const mid = Math.round(ch.h * 0.5);
@@ -1663,7 +1800,7 @@ print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
           .call((s) => QV.attachTip(ch, s, (v) => `x = ${v}<br>x − x̄ = ${v - m > 0 ? "+" : ""}${QV.fmt(v - m, 0)}<br>(x − x̄)² = ${(v - m) ** 2}`));
         const vl = dots.append("g");
         xs.forEach((v) => vl.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("x", ch.x(v)).attr("y", base - 16).style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 5).style("stroke-linejoin", "round").text(v));
-        const lab = QV.tex(ch, 37.5, Y(-14), "", { size: 15 });
+        const lab = QV.tex(ch, 37.5, Y(-14), "", { size: 17 });
         const ss = dev.reduce((a, d) => a + d * d, 0);
         p.set = (mode, instant) => {
           const y = mode === "pts" ? mid : base;
@@ -1678,12 +1815,23 @@ print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
         };
       });
       const row = QV.controls(el);
-      QV.segmented(row, { label: "Show", options: [["pts", "data"], ["dev", "deviations from the mean"], ["sq", "squared deviations"]], value: "pts", onChange: (v) => P.forEach((p) => p.set(v)) });
-      QV.readout(row, "<span class='muted'>Squares have side $|x_i - \\bar{x}|$; their total area is $\\sum (x_i - \\bar{x})^2$.</span>");
+      const say = {
+        pts: "Same mean, same median &ndash; so what is different?",
+        dev: "The deviations add up to $0$ in <strong>both</strong> fours: their sum cannot measure dispersion.",
+        sq: "Squares have side $|x_i - \\bar{x}|$: total area $30$ vs. $10$ &rarr; $s^2 = 10$ vs. $3.33$.",
+      };
+      let out = null;
+      QV.segmented(row, { label: "Show", options: [["pts", "data"], ["dev", "deviations from the mean"], ["sq", "squared deviations"]], value: "pts", onChange: (v) => { P.forEach((p) => p.set(v)); out.set(say[v]); } });
+      out = QV.readout(row, say.pts);
       P.forEach((p) => p.set("pts", true));
     });
   })();
   </script>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: mean 38 and median 37 in both fours &ndash; are the two data sets equivalent?</li>
+    <li>Click <b>deviations from the mean</b>: they add up to 0 in both fours.</li>
+    <li>Click <b>squared deviations</b>: total area 30 vs. 10, so $s^2 = 10$ vs. $3.33$ &ndash; Four A is more dispersed.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -1830,23 +1978,56 @@ print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
   <p class="center">$s^2 = 56.5455 / 10 = \mathbf{5.6545}, \qquad s = \sqrt{5.6545} = \mathbf{2.3779}$</p>
   <div class="viz" id="p1-ss" style="height:50px"></div>
   <p><span class="c-red"><b>Observation:</b></span> the single value 46 contributes $40.50$ of $56.55$ ($72\,\%$) to the sum of squares $\to$ $s^2$ and $s$ react strongly <span class="p1-nw">to outliers.</span></p>
+  <div id="p1-ss-ctrl"></div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which value contributes most to the sum of squares? The red segment: $40.50$ of $56.55$ ($72\,\%$).</li>
+    <li>Ask: what would $s$ be without the player with size 46?</li>
+    <li>Click <b>without the 46</b>: $s^2 = 1.3333$ and $s = 1.1547$ instead of $5.6545$ and $2.3779$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p1-ss", (el) => {
-      const C = QV.C, xs = [37, 38, 39, 40, 41, 46], hs = [1, 2, 4, 2, 1, 1], m = 436 / 11;
-      const parts = xs.map((x, j) => ({ x, h: hs[j], c: hs[j] * (x - m) ** 2 }));
-      let acc = 0; parts.forEach((p) => { p.a = acc; acc += p.c; p.b = acc; });
-      const tot = acc;
-      const ch = QV.chart(el, { x: { domain: [0, tot], hide: true }, y: { domain: [0, 1], hide: true, grid: false }, margin: { top: 2, right: 1, bottom: 2, left: 1 } });
-      const sel = ch.layer("data").selectAll("rect").data(parts).join("rect")
-        .attr("x", (p) => ch.x(p.a) + 1).attr("width", (p) => Math.max(1.5, ch.x(p.b) - ch.x(p.a) - 2)).attr("y", 0).attr("height", ch.h).attr("rx", 4)
-        .style("fill", (p) => (p.x === 46 ? C.red : C.blue)).style("fill-opacity", (p) => (p.x === 46 ? 0.9 : 0.3));
-      QV.attachTip(ch, sel, (p) => `<b>x<sub>j</sub> = ${p.x}</b> (h<sub>j</sub> = ${p.h})<br>h<sub>j</sub>·(x<sub>j</sub> − x̄)² = ${QV.fmt(p.c, 4)}<br>share of the sum of squares: ${QV.fmt(100 * p.c / tot, 1)} %`);
-      ch.layer("front").selectAll("text").data(parts.filter((p) => ch.x(p.b) - ch.x(p.a) > 90)).join("text")
-        .attr("x", (p) => (ch.x(p.a) + ch.x(p.b)) / 2).attr("y", ch.h / 2 + 5).attr("text-anchor", "middle")
-        .style("font-size", "15px").style("font-weight", 600).style("pointer-events", "none")
-        .style("fill", (p) => (p.x === 46 ? "#fff" : "var(--ink)"))
-        .text((p) => (p.x === 46 ? `x = 46: ${QV.fmt(p.c, 2)} of ${QV.fmt(tot, 2)} (${QV.fmt(100 * p.c / tot, 0)} %)` : `${p.x}: ${QV.fmt(p.c, 2)}`));
+      const C = QV.C, XS = [37, 38, 39, 40, 41, 46], HS = [1, 2, 4, 2, 1, 1];
+      // contributions h_j (x_j - mean)^2, with or without the outlier (the mean is recomputed)
+      const calc = (all) => {
+        const xs = XS.filter((x) => all || x !== 46), hs = xs.map((x) => HS[XS.indexOf(x)]);
+        const n = d3.sum(hs), m = d3.sum(xs.map((x, j) => hs[j] * x)) / n;
+        let acc = 0;
+        const parts = xs.map((x, j) => { const q = { x, h: hs[j], c: hs[j] * (x - m) ** 2, a: acc }; acc += q.c; q.b = acc; return q; });
+        return { n, m, parts, tot: acc };
+      };
+      const full = calc(true);
+      let cur = full;
+      const ch = QV.chart(el, { x: { domain: [0, full.tot], hide: true }, y: { domain: [0, 1], hide: true, grid: false }, margin: { top: 2, right: 1, bottom: 2, left: 1 } });
+      const ghost = ch.layer("back").append("rect").attr("y", 1).attr("height", ch.h - 2).attr("rx", 4)
+        .style("fill", "none").style("stroke", C.grey).style("stroke-width", 1.5).style("stroke-dasharray", "5 4");
+      const ghostTx = ch.layer("back").append("text").attr("class", "lbl-muted").attr("text-anchor", "middle").attr("y", ch.h / 2 + 5).style("font-size", "16px");
+      const gB = ch.layer("data").append("g"), gT = ch.layer("front").append("g");
+      let out = null;
+      const draw = (all) => {
+        cur = calc(all);
+        const w = (q) => ch.x(q.b) - ch.x(q.a);
+        const sel = gB.selectAll("rect").data(cur.parts, (q) => q.x).join("rect")
+          .attr("x", (q) => ch.x(q.a) + 1).attr("width", (q) => Math.max(1.5, w(q) - 2)).attr("y", 0).attr("height", ch.h).attr("rx", 4)
+          .style("fill", (q) => (q.x === 46 ? C.red : C.blue)).style("fill-opacity", (q) => (q.x === 46 ? 0.9 : 0.3));
+        QV.attachTip(ch, sel, (q) => `<b>x<sub>j</sub> = ${q.x}</b> (h<sub>j</sub> = ${q.h})<br>h<sub>j</sub>·(x<sub>j</sub> − x̄)² = ${QV.fmt(q.c, 4)}<br>share of the sum of squares: ${QV.fmt(100 * q.c / cur.tot, 1)} %`);
+        gT.selectAll("text").data(cur.parts.filter((q) => w(q) > 62), (q) => q.x).join("text")
+          .attr("x", (q) => (ch.x(q.a) + ch.x(q.b)) / 2).attr("y", ch.h / 2 + 5).attr("text-anchor", "middle")
+          .style("font-size", "15px").style("font-weight", 600).style("pointer-events", "none")
+          .style("fill", (q) => (q.x === 46 ? "#fff" : "var(--ink)"))
+          .text((q) => (q.x === 46 ? `x = 46: ${QV.fmt(q.c, 2)} of ${QV.fmt(cur.tot, 2)} (${QV.fmt(100 * q.c / cur.tot, 0)} %)` : `${q.x}: ${QV.fmt(q.c, 2)}`));
+        // what is missing without the outlier
+        ghost.style("display", all ? "none" : null).attr("x", ch.x(cur.tot) + 4).attr("width", Math.max(0, ch.x(full.tot) - ch.x(cur.tot) - 5));
+        ghostTx.style("display", all ? "none" : null).attr("x", (ch.x(cur.tot) + ch.x(full.tot)) / 2)
+          .text(`without the 46: sum of squares ${QV.fmt(cur.tot, 2, true)} instead of ${QV.fmt(full.tot, 2)}`);
+        if (out) out.set(all
+          ? `<span class="hint">The bar is the sum of squares, one segment per shoe size (hover for its share). Switch to &ldquo;without the 46&rdquo;.</span>`
+          : `<strong>Without the 46</strong> ($n = ${cur.n}$, $\\bar{x} = ${QV.fmt(cur.m, 2, true)}$): sum of squares $${QV.fmt(cur.tot, 2, true)}$ &rarr; $s^2 = \\tfrac{${QV.fmt(cur.tot, 2, true)}}{${cur.n - 1}} = ${QV.fmt(cur.tot / (cur.n - 1), 4)}$, $s = ${QV.fmt(Math.sqrt(cur.tot / (cur.n - 1)), 4)}$`);
+      };
+      const row = QV.controls(el, document.getElementById("p1-ss-ctrl"));
+      QV.segmented(row, { label: "Data", options: [["all", "all 11 players"], ["no46", "without the 46"]], value: "all", onChange: (v) => draw(v === "all") });
+      out = QV.readout(row, "");
+      draw(true);
     });
   })();
   </script>
@@ -1936,42 +2117,77 @@ print(stats.gmean(factors) - 1)     # 0.0784  (geometric: correct)
       const S = QV.stats, C = QV.C;
       const G = [{ key: "a", name: "Four A", x0: [34, 37, 40, 41] }, { key: "b", name: "Four B", x0: [36, 37, 39, 40] }];
       const pts = [];
-      G.forEach((g, gi) => g.x0.forEach((v, i) => pts.push({ gi, i, v })));
+      // the rower with the largest shoe size of each four is the handle
+      G.forEach((g, gi) => g.x0.forEach((v, i) => pts.push({ gi, i, v, handle: i === g.x0.length - 1 })));
       const ch = QV.chart(el, { x: { domain: [30, 46], label: "Shoe size", tickValues: d3.range(30, 47, 2), format: "d", grid: true }, y: { domain: G.map((g) => g.name).reverse(), type: "band", padding: 0.3 }, margin: { left: 74, top: 8, right: 16, bottom: 46 } });
-      ch.layers.axes.selectAll(".axis.y .tick text").style("font-size", "16px").style("fill", C.ink2);
+      ch.layers.axes.selectAll(".axis.y .tick text").style("font-size", "17px").style("fill", C.ink2);
       const bw = ch.y.bandwidth();
-      const cy0 = (gi) => ch.y(G[gi].name) + bw / 2;
-      const lines = G.map((g, gi) => ({
-        mean: ch.layer("data").append("line").attr("y1", ch.y(g.name)).attr("y2", ch.y(g.name) + bw).style("stroke", C.orange).style("stroke-width", 2.5).style("stroke-dasharray", "7 5"),
-        med: ch.layer("data").append("line").attr("y1", ch.y(g.name)).attr("y2", ch.y(g.name) + bw).style("stroke", C.green).style("stroke-width", 2.5),
-      }));
-      const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", 10)
-        .style("fill", (d) => QV.series[d.gi === 0 ? 0 : 0]).style("stroke", C.surface).style("stroke-width", 2);
+      // per four: IQR box (Q1 to Q3), range bracket (min to max), mean and median lines, and R / IQR in numbers
+      const marks = G.map((g) => {
+        const c = ch.y(g.name) + bw / 2, L = ch.layer("data");
+        return {
+          c,
+          box: L.append("rect").attr("y", c - 16).attr("height", 32).attr("rx", 5).style("fill", C.blueT).style("stroke", C.blue).style("stroke-width", 1.5).style("stroke-opacity", 0.55),
+          mean: L.append("line").attr("y1", c - 38).attr("y2", c + 20).style("stroke", C.red).style("stroke-width", 2.5).style("stroke-dasharray", "7 5"),
+          med: L.append("line").attr("y1", c - 38).attr("y2", c + 20).style("stroke", C.green).style("stroke-width", 3),
+          rng: L.append("path").style("fill", "none").style("stroke", C.ink2).style("stroke-width", 2),
+          txt: ch.layer("front").append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("y", c + 51).style("font-size", "17px")
+            .style("paint-order", "stroke").style("stroke", C.surface).style("stroke-width", 5).style("stroke-linejoin", "round"),
+        };
+      });
+      const sel = ch.layer("annot").append("g").selectAll("circle").data(pts).join("circle").attr("r", (d) => (d.handle ? 12 : 9))
+        .style("fill", (d) => (d.handle ? C.orange : C.blue)).style("stroke", C.surface).style("stroke-width", 2);
       QV.attachTip(ch, sel, (d) => `${G[d.gi].name}, rower ${d.i + 1}: ${d.v}`);
       const f = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : v.toFixed(4));
+      const names = { mean: "mean", med: "median", R: "range", iqr: "IQR", var: "variance", sd: "standard deviation", v: "$v$", vs: "$v^*$" };
+      const start = {};
+      let out = null, last = null;
       const upd = () => {
+        const changed = [[], []];
         G.forEach((g, gi) => {
           const P = pts.filter((d) => d.gi === gi), X = P.map((d) => d.v);
           const c = {};
           P.slice().sort((a, b) => a.v - b.v || a.i - b.i).forEach((d) => { c[d.v] = (c[d.v] || 0) + 1; d.lev = c[d.v]; });
-          const mean = S.mean(X), med = S.median(X), sd = S.sd(X), v = sd / mean;
-          lines[gi].mean.attr("x1", ch.x(mean)).attr("x2", ch.x(mean));
-          lines[gi].med.attr("x1", ch.x(med)).attr("x2", ch.x(med));
+          const mean = S.mean(X), med = S.median(X), sd = S.sd(X), v = sd / mean, q1 = S.quantile(X, 0.25), q3 = S.quantile(X, 0.75), lo = Math.min(...X), hi = Math.max(...X);
+          const k = marks[gi];
+          k.mean.attr("x1", ch.x(mean)).attr("x2", ch.x(mean));
+          k.med.attr("x1", ch.x(med)).attr("x2", ch.x(med));
+          k.box.attr("x", ch.x(q1) - 13).attr("width", ch.x(q3) - ch.x(q1) + 26);
+          k.rng.attr("d", `M${ch.x(lo)},${k.c + 24}v8H${ch.x(hi)}v-8`);
+          k.txt.attr("x", Math.max(ch.x(30) + 70, Math.min(ch.x(46) - 70, (ch.x(lo) + ch.x(hi)) / 2))).text(`R = ${hi - lo} · IQR = ${q3 - q1}`);
           const val = { mean, med, R: S.range(X), iqr: S.iqr(X), var: S.variance(X), sd, v, vs: v / Math.sqrt(X.length) };
-          Object.keys(val).forEach((k) => { document.getElementById(`p1-ovw-${g.key}-${k}`).textContent = f(val[k]); });
+          // table cells that differ from their starting value are marked orange
+          Object.keys(val).forEach((key) => {
+            const id = `p1-ovw-${g.key}-${key}`, txt = f(val[key]), cell = document.getElementById(id);
+            if (!(id in start)) start[id] = txt;
+            cell.textContent = txt; cell.classList.toggle("hl", txt !== start[id]);
+            if (txt !== start[id]) changed[gi].push(key);
+          });
         });
-        sel.attr("cx", (d) => ch.x(d.v)).attr("cy", (d) => cy0(d.gi) + 8 - (d.lev - 1) * 18);
+        sel.attr("cx", (d) => ch.x(d.v)).attr("cy", (d) => marks[d.gi].c - (d.lev - 1) * 20);
+        if (!out) return;
+        if (last === null || !changed[last].length) { out.set("<span class='muted'>Orange cells in the table: changed.</span>"); return; }
+        const same = Object.keys(names).filter((key) => !changed[last].includes(key));
+        out.set(`<strong>${G[last].name}</strong> &ndash; changed: ${changed[last].map((key) => names[key]).join(", ")}; unchanged: ${same.length ? same.map((key) => names[key]).join(", ") : "none"}`);
       };
-      QV.drag(ch, sel, (xv, yv, d) => { const v = Math.max(30, Math.min(46, Math.round(xv))); if (v !== d.v) { d.v = v; upd(); } });
-      const leg = QV.legend(el, [{ label: "mean", color: C.orange, type: "dash" }, { label: "median", color: C.green, type: "line" }], "after");
+      QV.drag(ch, sel.filter((d) => d.handle), (xv, yv, d) => { const v = Math.max(30, Math.min(46, Math.round(xv))); if (v !== d.v) { d.v = v; last = d.gi; upd(); } });
+      const leg = QV.legend(el, [
+        { label: "mean", color: C.red, type: "dash" }, { label: "median", color: C.green, type: "line" },
+        { label: "IQR: $Q_1$ to $Q_3$", color: C.blueT, type: "swatch" }, { label: "range $R$", color: C.ink2, type: "line" },
+      ], "after");
       const row = QV.controls(leg);
-      QV.button(row, "Reset", () => { pts.forEach((d) => { d.v = G[d.gi].x0[d.i]; }); upd(); });
-      QV.readout(row, "<span class='muted'>Drag a dot: the table updates.</span>");
+      QV.button(row, "Reset", () => { pts.forEach((d) => { d.v = G[d.gi].x0[d.i]; }); last = null; upd(); });
+      out = QV.readout(row, "");
       upd();
     });
   })();
   </script>
-  <p class="fs-xs muted">Drag one rower to an extreme size: range, variance and standard deviation jump, the median and the IQR react less.</p>
+  <p class="hint">Drag an orange dot &ndash; the rower with the largest shoe size of each four &ndash; to an extreme size.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: the largest rower of Four A is replaced by one with size 46 &ndash; which measures change?</li>
+    <li>Drag the orange dot of Four A to 46: range 12 and variance 26.25, but median 37 and IQR 6 stay.</li>
+    <li>Students notice: range, $s^2$ and $s$ depend on the extremes; the IQR ignores them.</li>
+  </ol></aside>
 </section>
 
 <section class="slide">
@@ -2215,7 +2431,7 @@ for x in (city, rural):
   </table>
   <p><b>b)</b> At most 2 books: $F(2) = \frac{3 + 5}{25} = \mathbf{0.32}$ &ensp; (32&thinsp;% of the orders).<br>
   At least 4 books: $1 - F(3) = 1 - 0.68 = \mathbf{0.32}$ &ensp; ($= \frac{5 + 3}{25}$, also 32&thinsp;%).</p>
-  <p class="fs-xs muted">Hover over a column to follow one value through all rows.</p>
+  <p class="hint">Hover over a column to follow one value through all rows.</p>
 </section>
 
 <section class="slide">

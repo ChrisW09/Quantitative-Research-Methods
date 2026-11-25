@@ -8,7 +8,7 @@ points and lines, move sliders, run simulations and hover for exact values.
 |------|------|-------:|-------:|
 | 1 | [`Part_1_Descriptive_Statistics.html`](Part_1_Descriptive_Statistics.html) (revision) | 114 | 13 |
 | 2 | [`Part_2_Graphical_Representations.html`](Part_2_Graphical_Representations.html) (revision) | 110 | 22 |
-| 3 | [`Part_3_Statistical_Inference.html`](Part_3_Statistical_Inference.html) | 198 | 26 |
+| 3 | [`Part_3_Statistical_Inference.html`](Part_3_Statistical_Inference.html) | 198 | 27 |
 | 4 | [`Part_4_Regression.html`](Part_4_Regression.html) | 250 | 60 |
 | 5 | [`Part_5_Classification.html`](Part_5_Classification.html) | 127 | 15 |
 
@@ -124,7 +124,12 @@ The engine fits every slide when it is shown:
   `<aside class="notes" data-demo>…</aside>` holds the demo script for the
   slide's interactive figure; it appears under "Figure demo" in the speaker view.
 - **Interaction hints:** `<p class="hint">Drag the orange handle …</p>`, one line
-  next to an interactive figure.
+  next to an interactive figure (inside a control row: `<span class='hint'>…</span>`
+  in a `QV.readout`). Every figure slide has one hint and one demo script.
+- **Conventions for figures:** orange marks what can be dragged or is selected,
+  blue is data, red is an error or a rejection, green is correct. A state that
+  matters for the lecture gets a one-click preset next to the slider. Exercise
+  slides do not show the solution in their starting state.
 - **Interactive figures:** `<div class="viz" id="…" style="height:…px"></div>`
   plus `QV.mount("#id", el => { … })`. Keep a figure's controls and read-outs in
   the same column as the figure: `z` enlarges that column. Use `QV.drag` and

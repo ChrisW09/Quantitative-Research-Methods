@@ -41,7 +41,9 @@ table.bt tr.p2-on td { background: var(--c-orange-tint); }
 .bd .p2-data { margin: 12px 0 14px; }
 .bd ol.p2-roomy > li, .bd ul.p2-roomy > li { margin-bottom: .55em; }
 table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
-.p2-mini { font-size: 17px; color: var(--ink-muted); }
+.viz-ctrl .p2-wide { flex-basis: 100%; }                 /* a read-out that takes a line of its own */
+.viz-ctrl.p2-ro2 .readout { line-height: 1.38; }
+.slide.fig-zoom .block { overflow: visible; }            /* an enlarged figure (z) inside a block must not be clipped by it */
 .bd .block > h4 code.p2-hc { background: rgba(255, 255, 255, .2); color: #fff; }
 </style>
 <script>
@@ -76,10 +78,10 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
     if (o.color) t.style("fill", o.color);
     if (o.size) t.style("font-size", o.size + "px");
     if (o.weight) t.style("font-weight", o.weight);
-    const SUB = { "₁": "1", "₂": "2", "₃": "3" };
+    const SUB = { "₁": "1", "₂": "2", "₃": "3", "₄": "4" };
     lines.forEach((l, i) => {
       const ts = t.append("tspan").attr("x", x).attr("dy", i ? "1.15em" : 0);
-      const parts = String(l).split(/([₁₂₃])/);
+      const parts = String(l).split(/([₁₂₃₄])/);
       if (parts.length === 1) ts.text(l);
       else {
         let down = false;   // subscript: shift down by 0.25em (baseline-shift "sub" drops it too far)
@@ -92,6 +94,23 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
     return t;
   }
   P2.mtext = mtext;
+
+  /** Orange handle on the x-axis. A click or drag in the plot, or a drag of the handle, calls set(x) (snapped, clamped). */
+  function xHandle(ch, o, set) {
+    const [a, b] = ch.x.domain(), snap = o.snap || 1;
+    const lo = Math.max(o.min ?? -Infinity, Math.ceil(a / snap - 1e-9) * snap), hi = Math.min(o.max ?? Infinity, Math.floor(b / snap + 1e-9) * snap);
+    const sn = (xv) => +Math.max(lo, Math.min(hi, Math.round(xv / snap) * snap)).toFixed(6);
+    const handle = ch.layer("front").append("circle").attr("r", 10).attr("cy", ch.h).attr("cx", ch.x(lo))
+      .style("fill", C.orange).style("stroke", C.surface).style("stroke-width", 2.5);
+    const go = (xv) => { const v = sn(xv); handle.attr("cx", ch.x(v)); set(v); return v; };
+    QV.drag(ch, handle, (xv) => go(xv));
+    let down = false;
+    ch.layer("front").insert("rect", ":first-child").attr("class", "hit").attr("width", ch.w).attr("height", ch.h).style("cursor", "pointer")
+      .on("pointerdown", function (e) { down = true; try { this.setPointerCapture(e.pointerId); } catch (err) { /* synthetic event */ } go(ch.toData(e)[0]); })
+      .on("pointermove", (e) => { if (down) go(ch.toData(e)[0]); })
+      .on("pointerup pointercancel", () => { down = false; });
+    return { go, lo, hi, handle };
+  }
 
   /* ------------------------------------------------------------------ dot lane */
   const tieMax = (vals) => { const m = new Map(); vals.forEach((v) => m.set(v, (m.get(v) || 0) + 1)); return Math.max(...m.values()); };
@@ -109,9 +128,11 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
   }
 
   /* ------------------------------------------------------------------ ECDF
-     o: data, domain, xLabel, tickValues, refs:[p] (dashed red level lines),
-        markers:[{p, color, side, drag, label(p,xp), ly(p)}], strip (dot lane),
-        onHover(x|null), onP(i, info), one (dashed line at 1), xDigits          */
+     o: data, domain, xLabel, tickValues, refs:[p] (dashed red level lines), strip (dot lane),
+        markers:[{p, color, side, drag, level, label(p,xp), ly(p)}]  quantile read-offs; level: starts as a plain
+          level line, the read-off (arrow, x_p) appears with the first click or drag,
+        probe {snap, min, max}  orange handle on the x-axis: F(x) is read off there (replaces the hover read-out),
+        onProbe(info), onHover(x|null), onP(i, info, active), one (dashed line at 1), xDigits          */
   P2.ecdf = function (el, o) {
     const data = S.sortNum(o.data), n = data.length, F = S.ecdf(data), fr = S.freq(data);
     const dom = o.domain, r = 6;
@@ -125,16 +146,16 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
     const col = o.color || C.blue;
     if (o.one !== false) QV.hline(ch, 1, { color: C.grey, width: 1, dash: "4 4", layer: "data" });
     (o.refs || []).forEach((p) => {
-      QV.hline(ch, p, { color: C.red, width: 1.6, dash: "7 5", layer: "data" });
-      QV.text(ch, dom[0], p, String(p), { anchor: "start", dx: 6, dy: -7, color: C.tRed, size: 14 });
+      QV.hline(ch, p, { color: C.red, width: 2, dash: "7 5", layer: "data" });
+      QV.text(ch, dom[0], p, String(p), { anchor: "start", dx: 6, dy: -7, color: C.tRed, size: 15 });
     });
     const steps = [[dom[0], 0]].concat(fr.map((d) => [d.x, d.F]));
     steps.forEach((st, i) => {
       const x1 = i + 1 < steps.length ? steps[i + 1][0] : dom[1];
       QV.segment(ch, st[0], st[1], x1, st[1], { color: col, width: 3, layer: "data" });
     });
-    fr.forEach((d, i) => QV.segment(ch, d.x, i ? fr[i - 1].F : 0, d.x, d.F, { color: col, width: 1.5, dash: "3 4", layer: "data" }));
-    QV.dots(ch, fr.map((d, i) => [d.x, i ? fr[i - 1].F : 0]), { r: 4, color: C.surface, ring: false }).style("stroke", col).style("stroke-width", 2);
+    fr.forEach((d, i) => QV.segment(ch, d.x, i ? fr[i - 1].F : 0, d.x, d.F, { color: col, width: 2, dash: "3 4", layer: "data" }));
+    QV.dots(ch, fr.map((d, i) => [d.x, i ? fr[i - 1].F : 0]), { r: 5, color: C.surface, ring: false }).style("stroke", col).style("stroke-width", 2);
     QV.dots(ch, fr.map((d) => [d.x, d.F]), { r: 5.5, color: col });
     const laneSel = o.strip ? lane(ch, o.data, { r, color: col }) : null;
 
@@ -163,9 +184,38 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       hv.style("display", "none"); tip.hide();
       if (laneSel) laneSel.style("fill", col).style("opacity", 1);
     };
-    ch.layer("front").append("rect").attr("class", "hit").attr("width", ch.w).attr("height", ch.h)
+    if (!o.probe) ch.layer("front").append("rect").attr("class", "hit").attr("width", ch.w).attr("height", ch.h)
       .on("pointermove", (e) => { const xv = snapX(ch.toData(e)[0]); showX(xv, e); if (o.onHover) o.onHover(xv); })
       .on("pointerleave", () => { hideX(); if (o.onHover) o.onHover(null); });
+
+    // x-probe: F(x) is read off at an orange handle on the x-axis (hidden until it is used for the first time)
+    let probe = null;
+    if (o.probe) {
+      const g = ch.layer("front").append("g").style("pointer-events", "none").style("display", "none");
+      const dash = () => g.append("line").style("stroke", C.orange).style("stroke-width", 2.5).style("stroke-dasharray", "7 5");
+      const pv = dash(), ph = dash();
+      const pj = g.append("line").style("stroke", C.orange).style("stroke-width", 7).style("stroke-linecap", "round");   // the jump f(x) at an observed value
+      const pd = g.append("circle").attr("r", 8).style("fill", C.surface).style("stroke", C.orange).style("stroke-width", 3.5);
+      const pl = halo(g.append("text").attr("class", "lbl-strong").attr("text-anchor", "start").attr("x", (o.refs || []).length ? 44 : 8).style("fill", C.tOrange));
+      const pinfo = (v) => {
+        const Fx = F(v), j = fr.findIndex((d) => Math.abs(d.x - v) < 1e-9);
+        let last = null; fr.forEach((d) => { if (d.x <= v + 1e-9) last = d.x; });
+        return { x: v, Fx, H: Math.round(Fx * n), n, obs: j >= 0, h: j >= 0 ? fr[j].h : 0, Fprev: j > 0 ? fr[j - 1].F : 0, last };
+      };
+      const xh = xHandle(ch, o.probe, (v) => {
+        const I = pinfo(v), px = ch.x(v), py = ch.y(I.Fx);
+        g.style("display", null);
+        pv.attr("x1", px).attr("x2", px).attr("y1", ch.h).attr("y2", py);
+        ph.attr("x1", 0).attr("x2", px).attr("y1", py).attr("y2", py);
+        pj.style("display", I.obs ? null : "none").attr("x1", px).attr("x2", px).attr("y1", ch.y(I.Fprev)).attr("y2", py);
+        pd.attr("cx", px).attr("cy", py);
+        pl.attr("y", py - 9).text(tr(I.Fx, 4));
+        if (laneSel) laneSel.style("fill", (d) => (Math.abs(d.v - v) < 1e-9 ? C.orange : d.v <= v ? col : C.grey)).style("opacity", (d) => (d.v <= v + 1e-9 ? 1 : 0.4));
+        probe.x = v;
+        if (o.onProbe) o.onProbe(I);
+      });
+      probe = { x: null, set: xh.go, info: pinfo };
+    }
 
     // quantile markers x_p = min{x | F(x) >= p}
     const info = (p) => {
@@ -173,45 +223,57 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       const j = fr.findIndex((d) => d.x === xp);
       return { p, np, pos, xp, Fxp: fr[j].F, Fprev: j > 0 ? fr[j - 1].F : 0, prevX: j > 0 ? fr[j - 1].x : null, H: fr[j].H, Hprev: j > 0 ? fr[j - 1].H : 0, n };
     };
+    // dragging snaps to 0.01, and "magnetically" to the multiples of 0.05 (0.25, 0.5, 0.75, 0.8 are easy to hit)
+    const snapP = (yv) => { const m5 = Math.round(yv * 20) / 20; return Math.max(0.01, Math.min(1, +(Math.abs(yv - m5) <= 0.013 ? m5 : Math.round(yv * 100) / 100).toFixed(2))); };
     const markers = (o.markers || []).map((m, mi) => {
       const c = m.color || C.orange;
-      const hl = QV.segment(ch, dom[0], m.p, dom[0], m.p, { color: c, width: 2.2, dash: "7 5", layer: "front" }).style("pointer-events", "none");
-      const vl = QV.segment(ch, dom[0], m.p, dom[0], 0, { color: c, width: 2.2, dash: "7 5", arrow: true, layer: "front" }).style("pointer-events", "none");
-      const lv = QV.text(ch, dom[0], m.p, "", { anchor: "start", dx: 14, dy: -8, color: QV.textOf(c), size: 15 }).style("pointer-events", "none");
+      const hl = QV.segment(ch, dom[0], m.p, dom[0], m.p, { color: c, width: 2.5, dash: "7 5", layer: "front" }).style("pointer-events", "none");
+      const vl = QV.segment(ch, dom[0], m.p, dom[0], 0, { color: c, width: 2.5, dash: "7 5", arrow: true, layer: "front" }).style("pointer-events", "none");
+      const lv = QV.text(ch, dom[0], m.p, "", { anchor: "start", dx: 16, dy: -8, color: QV.textOf(c), size: 15 }).style("pointer-events", "none");
       const lx = QV.tex(ch, dom[0], 0.5, "", { anchor: m.side === "left" ? "end" : "start", dx: m.side === "left" ? -10 : 10, bg: true, color: QV.textOf(c), size: 17 });
       lx.style.pointerEvents = "none";
       let handle = null;
-      const obj = { m, p: m.p };
-      if (m.drag) {
-        handle = ch.layer("front").append("circle").datum(obj).attr("r", 9).style("fill", c).style("stroke", C.surface).style("stroke-width", 2.5);
-        QV.drag(ch, handle, (xv, yv) => set(Math.max(0.01, Math.min(1, Math.round(yv * 100) / 100))));
-        QV.attachTip(ch, handle, () => "drag up / down to change $p$".replace(/\$([^$]+)\$/g, (mm, t) => Deck.tex(t)));
-      }
-      const set = (p) => {
+      const obj = { m, p: m.p, active: !m.level };
+      const set = (p, act) => {
+        if (act !== undefined) obj.active = act;
         obj.p = p;
         const I = info(p);
-        hl.set(dom[0], p, I.xp, p);
-        vl.set(I.xp, p, I.xp, 0.0);
+        if (obj.active) {
+          hl.set(dom[0], p, I.xp, p);
+          vl.style("display", null); vl.set(I.xp, p, I.xp, 0.0);
+          lx.style.display = "";
+          lx.set(I.xp, m.ly ? m.ly(p) : Math.max(0.07, p - 0.12), m.label ? m.label(p, I.xp) : `x_{${tr(p, 2)}} = ${tr(I.xp, 2)}`);
+        } else { hl.set(dom[0], p, dom[1], p); vl.style("display", "none"); lx.style.display = "none"; }
         lv.set(dom[0], p, tr(p, 2));
-        const lab = m.label ? m.label(p, I.xp) : `x_{${tr(p, 2)}} = ${tr(I.xp, 2)}`;
-        lx.set(I.xp, m.ly ? m.ly(p) : Math.max(0.07, p - 0.12), lab);
         if (handle) handle.attr("cx", ch.x(dom[0])).attr("cy", ch.y(p));
-        if (o.onP) o.onP(mi, I);
+        if (o.onP) o.onP(mi, I, obj.active);
         return I;
       };
+      if (m.drag) {
+        // every draggable handle is orange; its ring carries the colour of the marker
+        handle = ch.layer("front").append("circle").datum(obj).attr("r", 10).style("fill", C.orange)
+          .style("stroke", c === C.orange ? C.surface : c).style("stroke-width", c === C.orange ? 2.5 : 3.5);
+        let moved = false;
+        QV.drag(ch, handle, (xv, yv) => { moved = true; set(snapP(yv), true); }, { end: () => { if (!moved && m.level) set(obj.p, !obj.active); moved = false; } });
+      }
       obj.set = set;
       set(m.p);
       return obj;
     });
-    return { ch, F, fr, data, n, info, showX: (x) => showX(x), hideX, markers, setP: (i, p) => markers[i].set(p) };
+    return { ch, F, fr, data, n, info, showX: (x) => showX(x), hideX, markers, probe, setP: (i, p, act) => markers[i].set(p, act) };
   };
 
   /* ------------------------------------------------------------------ histogram
      o: data | counts+n, breaks, mode ("density"|"rel"|"abs"), xDomain, xLabel, lane (dot strip),
-        labels (bool), labelFmt(c, mode), areas (bool), yMax {density, rel, abs}, rows (construction
-        table under the axis), stage (1..5), dragBreaks, snap, tip(c, mode), onUpdate(classes, mode)  */
+        labels (bool), labelFmt(c, mode), areas (bool | fn(c)), areaFmt(c, mode), yMax {density, rel, abs},
+        rows (construction table under the axis), stage (1..5), dragBreaks, snap, tip(c, mode),
+        select (a click picks a class: orange bar, passed to onUpdate), onUpdate(classes, mode, breaks, selected)
+     returns setHighlight([class indices] | null): orange bars, the others dimmed                       */
   P2.hist = function (el, o) {
-    let breaks = o.breaks.slice(), mode = o.mode || "density", stage = o.stage || 5, showAreas = !!o.areas;
+    let breaks = o.breaks.slice(), mode = o.mode || "density", stage = o.stage || 5, showAreas = o.areas || false;
+    let sel = null, hl = null;
+    const areaOn = (c) => (typeof showAreas === "function" ? !!showAreas(c) : !!showAreas);
+    const isOn = (i) => (hl ? hl.includes(i) : sel === i);
     const data = o.data ? o.data.slice() : null;
     const n = data ? data.length : o.n;
     const yLab = { density: "Density $f_j/\\Delta x_j$", rel: "Relative frequency $f_j$", abs: "Absolute frequency $h_j$" };
@@ -249,12 +311,17 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
         .attr("x", -12).attr("y", ch.h + 42 + k * rowH).attr("text-anchor", "end").text(t));
       if (o.xLabel) gRows.append("text").attr("class", "axis-label").attr("x", ch.w).attr("y", ch.h + 42 + 4 * rowH - 2).attr("text-anchor", "end").text(o.xLabel);
     }
+    // colours: orange = selected / highlighted class (and its dots); hovering brightens a bar and shows its dots
     const highlight = (c) => {
-      gBars.selectAll("rect").style("filter", (d) => (c && d.i === c.i ? "brightness(1.15)" : null)).style("opacity", (d) => (c && d.i !== c.i ? 0.55 : 1));
-      if (laneSel) laneSel.style("fill", (d) => (c && member(d.v, c.i, breaks) ? C.orange : C.blue)).style("opacity", (d) => (c && !member(d.v, c.i, breaks) ? 0.35 : 1));
+      const act = c ? c.i : sel;
+      gBars.selectAll("rect").style("fill", (d) => (isOn(d.i) ? C.orange : o.color || C.blue))
+        .style("filter", (d) => (c && d.i === c.i ? "brightness(1.15)" : null))
+        .style("opacity", (d) => (hl ? (hl.includes(d.i) ? 1 : 0.4) : c && d.i !== c.i ? 0.55 : 1));
+      if (laneSel) laneSel.style("fill", (d) => (act !== null && member(d.v, act, breaks) ? C.orange : C.blue)).style("opacity", (d) => (act !== null && !member(d.v, act, breaks) ? 0.35 : 1));
     };
     function update(anim) {
       cls = classes();
+      if (sel !== null && sel >= cls.length) sel = null;
       const ym = yMaxFor(mode);
       ch.y.domain([0, ym]);
       if (o.autoDomain) ch.x.domain([breaks[0] - o.autoDomain, breaks[breaks.length - 1] + o.autoDomain]);
@@ -267,7 +334,7 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       const t = anim ? d3.transition().duration(450) : null;
       const bx = (c) => ch.x(c.a) + 1, bw = (c) => Math.max(0, ch.x(c.b) - ch.x(c.a) - 2);
       const bars = gBars.selectAll("rect").data(cls, (c) => c.i).join(
-        (en) => en.append("rect").attr("y", ch.y(0)).attr("height", 0).style("fill", o.color || C.blue).attr("rx", 2));
+        (en) => en.append("rect").attr("y", ch.y(0)).attr("height", 0).style("fill", o.color || C.blue).attr("rx", 2).style("pointer-events", "none"));
       bars.attr("x", bx).attr("width", bw);
       (t ? bars.transition(t) : bars).attr("y", (c) => (showBars ? ch.y(val(c)) : ch.y(0))).attr("height", (c) => (showBars ? ch.y(0) - ch.y(val(c)) : 0));
       // value labels above the bars
@@ -278,11 +345,11 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
           const tx = gLab.append("text").attr("class", "lbl").attr("text-anchor", "middle").attr("x", ch.x((c.a + c.b) / 2)).attr("y", ch.y(val(c)) - 7).text(s);
           if (o.labelSize) tx.style("font-size", o.labelSize + "px");
           if (s === "?") tx.style("fill", C.tRed).style("font-weight", 700).style("font-size", "24px");
-          if (showAreas && mode === "density" && c.h > 0) {
+          if (areaOn(c) && mode !== "abs" && c.h > 0) {
             const hpx = ch.y(0) - ch.y(val(c)), wpx = bw(c);
-            const txt = (o.areaFmt || ((cc) => `area ${tr(cc.f, 4)}`))(c);
+            const txt = (o.areaFmt || ((cc, mm) => `area ${tr(val(cc, mm) * cc.w, 4)}`))(c, mode);
             const cx = ch.x((c.a + c.b) / 2), cy = ch.y(val(c) / 2);
-            const at = gLab.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("x", cx).attr("y", cy + 5).style("fill", "#fff").text(txt);
+            const at = gLab.append("text").attr("class", "lbl-strong").attr("text-anchor", "middle").attr("x", cx).attr("y", cy + 5).style("fill", isOn(c.i) ? "#1b1b2b" : hl ? C.ink : "#fff").text(txt);
             const tw = at.node().getComputedTextLength();
             if (wpx >= tw + 10 && hpx > 26) { /* horizontal, inside the bar */ }
             else if (hpx >= tw + 12 && wpx > 20) at.attr("x", 0).attr("y", 0).attr("transform", `translate(${cx + 5},${cy}) rotate(-90)`);
@@ -306,8 +373,11 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       }
       // hover columns
       gHit.selectAll("rect").data(cls, (c) => c.i).join("rect").attr("class", "hit").attr("x", (c) => ch.x(c.a)).attr("width", (c) => Math.max(0, ch.x(c.b) - ch.x(c.a))).attr("y", 0).attr("height", ch.h)
+        .style("cursor", o.select ? "pointer" : null)
         .on("pointermove", (e, c) => { tip.show((o.tip || defTip)(c, mode), e); highlight(c); })
-        .on("pointerleave", () => { tip.hide(); highlight(null); });
+        .on("pointerleave", () => { tip.hide(); highlight(null); })
+        .on("click", (e, c) => { if (!o.select) return; sel = sel === c.i ? null : c.i; update(false); highlight(c); });
+      highlight(null);
       if (laneSel) { laneSel.place(); laneSel.style("stroke", (d) => (breaks.includes(d.v) ? C.orange : C.surface)).style("stroke-width", (d) => (breaks.includes(d.v) ? 3 : 1.5)); }
       // draggable inner boundaries
       if (o.dragBreaks) {
@@ -326,27 +396,47 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
           });
         hs.attr("transform", (d) => `translate(${ch.x(breaks[d.j])},0)`);
       }
-      if (o.onUpdate) o.onUpdate(cls, mode, breaks);
+      if (o.onUpdate) o.onUpdate(cls, mode, breaks, sel === null ? null : cls[sel]);
     }
     update(false);
     return {
       ch, classes: () => cls, breaks: () => breaks.slice(),
       setMode(m) { mode = m; update(true); },
-      setBreaks(b) { breaks = b.slice(); gHandles.selectAll("*").remove(); update(true); },
+      setBreaks(b) { breaks = b.slice(); sel = null; gHandles.selectAll("*").remove(); update(true); },
       setStage(s) { stage = s; update(true); },
       setAreas(b) { showAreas = b; update(false); },
+      setHighlight(a) { hl = a && a.length ? a.slice() : null; update(false); },
+      select(i) { sel = i; update(false); },
       update,
     };
   };
 
+  /** Read-out of a histogram: the selected class (height · width = area) and the total area.  o: {unit, total} */
+  P2.histText = function (cls, mode, c, o = {}) {
+    const val = (k) => (mode === "density" ? k.dens : mode === "rel" ? k.f : k.h);
+    const A = d3.sum(cls, (k) => val(k) * k.w), n = d3.sum(cls, (k) => k.h);
+    const tot = `${o.short ? "total" : "total area"} <b>${tr(A, 4)}</b> ` + (Math.abs(A - 1) < 1e-9 ? "&check;" : `<span class="c-red">&ne; 1</span>`);
+    if (!c) return o.short ? `total area <b>${tr(A, 4)}</b> ` + (Math.abs(A - 1) < 1e-9 ? "&check;" : `<span class="c-red">&ne; 1</span>`) : tot;
+    const name = `${c.i === 0 ? "[" : "("}${tr(c.a, 2)}, ${tr(c.b, 2)}]`, who = `${c.h} of ${n} ${o.unit || "values"}`;
+    const calc = o.short ? `${tr(val(c), 4)} &middot; ${tr(c.w, 2)} = area <b>${tr(val(c) * c.w, 4)}</b>`
+      : `height ${tr(val(c), 4)} &middot; width ${tr(c.w, 2)} = area <b>${tr(val(c) * c.w, 4)}</b>`;
+    return `${name}: ${who} &nbsp;&middot;&nbsp; ${calc}` + (o.total === false ? "" : ` &nbsp;&middot;&nbsp; ${tot}`);
+  };
+  /** Solution note in a free corner of a plot (multi-line SVG text). */
+  P2.note = function (ch, g, xv, yv, lines) {
+    g.selectAll("*").remove();
+    if (lines && lines.length) mtext(g, ch.x(xv), ch.y(yv), lines, { size: 17, anchor: "start", halo: true });
+  };
+
   /* ------------------------------------------------------------------ boxplot
      o: groups [{name, data | stats, color}], domain, xLabel, tickValues, k (1.5),
-        centers [fractions], boxH, annot {above:[keys], below:[keys], arrows, capsLow, text:{key: fn}},
-        show {fences, points, lengths}, fenceNames, drag [{g, i}], snap, minor (unit grid),
-        tip (false to disable), crosshair (fn(x) -> html), onChange(stats, k)            */
+        centers [fractions], boxH, annot {above:[keys], below:[keys], arrows, capsLow, pad, text:{key: fn}},
+        show {fences, points, lengths, labels}, fenceNames, drag [{g, i}], snap, minor (unit grid),
+        tip (false to disable), ruler {snap, text(x)} (orange handle on the axis with a reading line),
+        onChange(stats, k, groups), onDrag()            */
   P2.box = function (el, o) {
     let k = o.k ?? 1.5;
-    const show = Object.assign({ fences: false, points: false, lengths: false }, o.show || {});
+    const show = Object.assign({ fences: false, points: false, lengths: false, labels: true }, o.show || {});
     const groups = o.groups.map((g, gi) => Object.assign({ color: QV.series[gi % 5] }, g, { data: g.data ? g.data.slice() : null, data0: g.data ? g.data.slice() : null }));
     const G = groups.length, named = groups.some((g) => g.name);
     const ch = QV.chart(el, {
@@ -394,7 +484,8 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
         const tmp = mtext(gAnn, -999, -999, it.lines, { cls: it.cls || "lbl", size: o.annot.size || 17 });
         const w = tmp.node().getBBox().width; tmp.remove();
         const box = (yy) => (dir === "above" ? [it.x - w / 2, yy - H, it.x + w / 2, yy] : [it.x - w / 2, yy, it.x + w / 2, yy + H]);
-        const hit = (b) => placed.some((p) => b[0] < p[2] + 8 && b[2] > p[0] - 8 && b[1] < p[3] + 2 && b[3] > p[1] - 2);
+        const pad = o.annot.pad ?? 8;
+        const hit = (b) => placed.some((p) => b[0] < p[2] + pad && b[2] > p[0] - pad && b[1] < p[3] + 2 && b[3] > p[1] - 2);
         let guard = 0;
         while (hit(box(y)) && guard++ < 8) y += dir === "above" ? -(lh + 4) : lh + 4;
         placed.push(box(y));
@@ -433,7 +524,7 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       if (show.fences) {
         [s.fenceLo, s.fenceHi].forEach((v, j) => {
           if (v < o.domain[0] || v > o.domain[1]) return;
-          ln(X(v), yb0, X(v), yb1, C.red, 2).style("stroke-dasharray", "2 4").style("stroke-linecap", "round");
+          ln(X(v), yb0, X(v), yb1, C.red, 2.5).style("stroke-dasharray", "2 5").style("stroke-linecap", "round");
           const names = o.fenceNames || ["Lower fence", "Upper fence"];
           const t = gAnn.append("text").attr("class", "lbl").attr("x", X(v) + 6).attr("y", yb1 - 8).attr("text-anchor", "start").style("fill", C.tRed).style("font-size", "15px").text(`${names[j]} ${v2(v)}`);
           halo(t);
@@ -441,9 +532,9 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
           if (X(v) + 6 + w > ch.w + 20) t.attr("x", X(v) - 6).attr("text-anchor", "end");
         });
       }
-      ln(X(s.whiskerLo), cy, X(s.q1), cy, C.ink2, 2); ln(X(s.q3), cy, X(s.whiskerHi), cy, C.ink2, 2);
-      ln(X(s.whiskerLo), cy - bh * 0.25, X(s.whiskerLo), cy + bh * 0.25, C.ink2, 2);
-      ln(X(s.whiskerHi), cy - bh * 0.25, X(s.whiskerHi), cy + bh * 0.25, C.ink2, 2);
+      ln(X(s.whiskerLo), cy, X(s.q1), cy, C.ink2, 2.5); ln(X(s.q3), cy, X(s.whiskerHi), cy, C.ink2, 2.5);
+      ln(X(s.whiskerLo), cy - bh * 0.25, X(s.whiskerLo), cy + bh * 0.25, C.ink2, 2.5);
+      ln(X(s.whiskerHi), cy - bh * 0.25, X(s.whiskerHi), cy + bh * 0.25, C.ink2, 2.5);
       gMain.append("rect").attr("x", X(s.q1)).attr("width", Math.max(1, X(s.q3) - X(s.q1))).attr("y", cy - bh / 2).attr("height", bh).attr("rx", 4)
         .style("fill", col).style("fill-opacity", 0.32).style("stroke", col).style("stroke-width", 2.5);
       ln(X(s.median), cy - bh / 2, X(s.median), cy + bh / 2, C.ink, 3.5);
@@ -461,12 +552,12 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
         g.data.forEach((v) => {
           const kk = cnt.get(v) || 0; cnt.set(v, kk + 1);
           const out = v < s.fenceLo || v > s.fenceHi;
-          gMain.append("circle").attr("cx", X(v)).attr("cy", cy + bh / 2 + 13 + kk * 10).attr("r", 4.2)
-            .style("fill", out ? C.red : col).style("opacity", 0.85).style("stroke", C.surface).style("stroke-width", 1);
+          gMain.append("circle").attr("cx", X(v)).attr("cy", cy + bh / 2 + 15 + kk * 12).attr("r", 5)
+            .style("fill", out ? C.red : col).style("opacity", 0.9).style("stroke", C.surface).style("stroke-width", 1);
         });
       }
       // labels
-      if (o.annot) {
+      if (o.annot && show.labels) {
         const A = o.annot, T = Object.assign({}, defText, A.text || {});
         const capTop = cy - bh * 0.25, boxTop = cy - bh / 2, boxBot = cy + bh / 2;
         const keyX = { wlo: s.whiskerLo, whi: s.whiskerHi, q1: s.q1, q3: s.q3, med: s.median };
@@ -501,10 +592,10 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
     function draw() {
       gMain.selectAll("*").remove(); gAnn.selectAll("*").remove();
       groups.forEach((g, gi) => { g.st = statsOf(g); drawGroup(g, gi); });
-      gHandles.selectAll("circle").data(drag).join("circle").attr("r", 9)
+      const isOut = (d) => { const v = groups[d.g].data[d.i], s = groups[d.g].st; return v < s.fenceLo || v > s.fenceHi; };
+      gHandles.selectAll("circle").data(drag).join("circle").attr("r", 10)     // orange = draggable, red ring = outlier
         .attr("cx", (d) => X(groups[d.g].data[d.i])).attr("cy", (d) => cyOf(d.g))
-        .style("fill", (d) => { const v = groups[d.g].data[d.i], s = groups[d.g].st; return v < s.fenceLo || v > s.fenceHi ? C.red : C.orange; })
-        .style("stroke", C.surface).style("stroke-width", 2.5);
+        .style("fill", C.orange).style("stroke", (d) => (isOut(d) ? C.red : C.surface)).style("stroke-width", (d) => (isOut(d) ? 4 : 2.5));
       if (o.onChange) o.onChange(groups.map((g) => g.st), k, groups);
     }
     draw();
@@ -513,15 +604,22 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       QV.drag(ch, hs, (xv, yv, d) => {
         const sn = o.snap || 1;
         const v = Math.max(o.domain[0], Math.min(o.domain[1], Math.round(xv / sn) * sn));
-        if (v !== groups[d.g].data[d.i]) { groups[d.g].data[d.i] = v; draw(); }
+        if (v !== groups[d.g].data[d.i]) { groups[d.g].data[d.i] = v; if (o.onDrag) o.onDrag(); draw(); }
       });
       QV.attachTip(ch, hs, (d) => (o.handleTip ? o.handleTip(d, groups[d.g].data[d.i]) : `value ${v2(groups[d.g].data[d.i])} · drag along the axis`));
     }
-    if (o.crosshair) {
-      const vl = ch.layer("front").insert("line", ":first-child").style("stroke", C.ink2).style("stroke-width", 1.2).style("display", "none").attr("y1", 0).attr("y2", ch.h).style("pointer-events", "none");
-      ch.layer("front").insert("rect", ":first-child").attr("class", "hit").attr("width", ch.w).attr("height", ch.h)
-        .on("pointermove", (e) => { const xv = Math.round(ch.toData(e)[0]); vl.style("display", null).attr("x1", X(xv)).attr("x2", X(xv)); tip.show(o.crosshair(xv), e); })
-        .on("pointerleave", () => { vl.style("display", "none"); tip.hide(); });
+    if (o.ruler) {
+      // reading ruler: an orange handle on the axis, a vertical line and a flag with the value (hidden until it is used)
+      const g = ch.layer("front").append("g").style("pointer-events", "none").style("display", "none");
+      const vl = g.append("line").attr("y1", 0).attr("y2", ch.h).style("stroke", C.orange).style("stroke-width", 2.5);
+      const flag = halo(g.append("text").attr("class", "lbl-strong").attr("y", 18).style("fill", C.tOrange).style("font-size", "18px"));
+      xHandle(ch, o.ruler, (v) => {
+        g.style("display", null);
+        vl.attr("x1", X(v)).attr("x2", X(v));
+        const right = X(v) < ch.w - 230;
+        flag.attr("x", X(v) + (right ? 9 : -9)).attr("text-anchor", right ? "start" : "end").text(o.ruler.text ? o.ruler.text(v) : `x = ${v2(v)}`);
+        if (o.ruler.onSet) o.ruler.onSet(v);
+      });
     }
     return {
       ch, groups, draw,
@@ -635,14 +733,29 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
 
 <section class="slide">
   <h2>Empirical CDF</h2>
-  <div class="viz" id="p2-ecdf-shoe" style="height:520px"></div>
-  <p class="fs-xs muted center">Empirical CDF &ndash; shoe sizes. Each dot at the top is one player. Hover over the chart: the
-    players with a size $\le x$ light up, and $F(x)$ is their share.</p>
+  <div class="viz" id="p2-ecdf-shoe" style="height:462px"></div>
+  <p class="hint">Drag the orange handle along the axis or click a size. Each dot at the top is one player.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what share of the players wear size 39 or smaller?</li>
+    <li>Click 39: seven of the eleven dots stay coloured, $F(39) = 7/11 = 0.6364$; the thick orange jump is $4/11$, the four players with size 39.</li>
+    <li>Drag on to 43: no player there, so $F$ stays at $10/11$ until 46.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-ecdf-shoe", (el) => {
-      P2.ecdf(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], domain: [35, 48], tickValues: [36, 38, 40, 42, 44, 46, 48],
-        xLabel: "Shoe size", strip: true });
+      let seg = null, ro = null;
+      const T = (v) => P2.tr(v, 1);
+      const e = P2.ecdf(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], domain: [35, 48], tickValues: [36, 38, 40, 42, 44, 46, 48],
+        xLabel: "Shoe size", strip: true, probe: { snap: 0.5 },
+        onProbe: (I) => {
+          const who = I.H === 0 ? "no player wears" : I.H === I.n ? `all ${I.n} players wear` : `${I.H} of ${I.n} players wear${I.H === 1 ? "s" : ""}`;
+          ro.set(`$F(${T(I.x)}) = ${I.H}/${I.n} =$ <b>${P2.tr(I.Fx, 4)}</b> &nbsp;&rarr;&nbsp; ${who} size ${T(I.x)} or smaller` +
+            (I.obs ? ` &nbsp;&middot;&nbsp; jump at ${T(I.x)}: $${I.h}/${I.n}$` : I.last === null ? "" : ` &nbsp;&middot;&nbsp; no jump: $F$ stays at $F(${T(I.last)})$`));
+          seg.set(I.x, false);
+        } });
+      const row = QV.controls(el);
+      seg = QV.segmented(row, { label: "Shoe size $x$", options: [37, 38, 39, 40, 41, 46].map((v) => [v, String(v)]), value: "none", onChange: (v) => e.probe.set(+v) });
+      ro = QV.readout(row, "$F(x)$ = share of the players with a size $\\le x$");
     });
   })();
   </script>
@@ -685,8 +798,8 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
 
 <section class="slide">
   <h2>Empirical CDF &ndash; Reading Off Quantiles Graphically</h2>
-  <div class="viz" id="p2-ecdf-q" style="height:340px"></div>
-  <div class="fs-xs" id="p2-ecdf-q-read" style="line-height:1.45"></div>
+  <div class="viz" id="p2-ecdf-q" style="height:348px"></div>
+  <p class="hint">Drag the two orange handles on the $F(x)$ axis: go right from the height $p$ to the step function, then down to $x_p$.</p>
   <div class="fs-xs">
     <p>$80\,\%$ quantile: $F(39) = 0.6364 &lt; 0.8 \le F(40) = 0.8182$
       $\Rightarrow x_{0.8} = 40$.<br>
@@ -694,29 +807,35 @@ table.bt.p2-tt th, table.bt.p2-tt td { padding: 1px 13px; }
       $\lceil 11 \cdot 0.5 \rceil = 6 \rightarrow 39$ and
       $\lceil 11 \cdot 0.8 \rceil = 9 \rightarrow 40$.</p>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where is the $25\,\%$ quantile? Drag the lower handle to $0.25$: $F(37) = 0.0909 &lt; 0.25 \le F(38)$, so $x_{0.25} = 38$.</li>
+    <li>Move it slowly from $0.28$ to $0.63$: the quantile stays $39$, because $F$ jumps over all these heights at $39$.</li>
+    <li>Drag the upper handle from $0.8$ to $0.82$: the quantile jumps from $40$ to $41$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-ecdf-q", (el) => {
-      const out = document.getElementById("p2-ecdf-q-read");
+      let ro = null;
       const lines = ["", ""];
       const T = (p) => P2.tr(p, 2);
       const write = (i, I) => {
         const left = I.prevX === null ? `0 < ${T(I.p)}` : `F(${I.prevX}) = ${P2.tr(I.Fprev, 4)} < ${T(I.p)}`;
         lines[i] = `<span class="${i ? "c-orange" : "c-red"}">&#9679;</span> $p = ${T(I.p)}$: $${left} \\le F(${I.xp}) = ${P2.tr(I.Fxp, 4)} \\Rightarrow x_{${T(I.p)}} = ${I.xp}$` +
           ` &nbsp;&middot;&nbsp; position $\\lceil 11 \\cdot ${T(I.p)} \\rceil = \\lceil ${P2.tr(I.np, 2)} \\rceil = ${I.pos}$`;
-        out.innerHTML = P2.texHTML(lines.join("<br>"));
+        if (ro) ro.set(lines.join("<br>"));
       };
       const e = P2.ecdf(el, {
         data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], domain: [35, 48], tickValues: [36, 38, 40, 42, 44, 46, 48], xLabel: "Shoe size", one: false,
         markers: [
-          { p: 0.5, color: QV.C.red, side: "left", drag: true, ly: (p) => Math.max(0.07, p - 0.12),
+          { p: 0.5, color: QV.C.red, side: "left", drag: true, ly: (p) => Math.max(0.06, p - 0.075),
             label: (p, xp) => (p === 0.5 ? `\\tilde{x} = x_{0.5} = ${xp}` : `x_{${P2.tr(p, 2)}} = ${xp}`) },
-          { p: 0.8, color: QV.C.orange, side: "right", drag: true, ly: (p) => Math.max(0.07, p - 0.09) },
+          { p: 0.8, color: QV.C.orange, side: "right", drag: true, ly: (p) => Math.max(0.06, p - 0.075) },
         ],
         onP: write,
       });
       const row = QV.controls(el);
-      QV.readout(row, "Drag the two handles on the $F(x)$ axis: the rule $\\min\\{x \\mid F(x) \\ge p\\}$ is applied live.");
+      row.classList.add("p2-ro2");
+      ro = QV.readout(row, lines.join("<br>"));
       QV.spacer(row);
       QV.button(row, "Reset", () => { e.setP(0, 0.5); e.setP(1, 0.8); });
     });
@@ -783,18 +902,33 @@ plt.ecdf(shoe)    # step function incl. vertical jumps (matplotlib &gt;= 3.8)
         observed value $F$ jumps up by $f_j$.</p>
     </div>
     <div>
-      <div class="viz" id="p2-ecdf-compl" style="height:480px"></div>
-      <p class="fs-xs muted">Empirical CDF &ndash; complaints per day. Hover over the chart: the matching table row lights up.</p>
+      <div class="viz" id="p2-ecdf-compl" style="height:412px"></div>
+      <p class="hint">Drag the orange handle or click a value: $F(x)$ is read off, and its table row lights up.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: on what share of the days were there at most 2 complaints? Click 2: $F(2) = 0.6$, the row $x = 2$ lights up.</li>
+    <li>Ask: and at most 4, a value that never occurred? Click 4: no jump, $F(4) = F(3) = 0.8$.</li>
+    <li>Click 3, then 1: the share in $(1, 3]$ is $0.8 - 0.3 = 0.5$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-ecdf-compl", (el) => {
       const rows = Array.from(document.querySelectorAll("#p2-compl-tab tbody tr")).slice(0, 6);
       const xs = [0, 1, 2, 3, 5, 6];
-      P2.ecdf(el, { data: [2, 0, 3, 1, 2, 5, 1, 3, 2, 6], domain: [-1, 7.5], tickValues: [-1, 0, 1, 2, 3, 4, 5, 6, 7],
-        xLabel: "Complaints per day", refs: [0.5, 0.8], one: false,
-        onHover: (x) => { let j = -1; xs.forEach((v, i) => { if (x !== null && v <= x + 1e-9) j = i; }); rows.forEach((r, i) => r.classList.toggle("p2-on", i === j)); } });
+      let seg = null, ro = null;
+      const e = P2.ecdf(el, { data: [2, 0, 3, 1, 2, 5, 1, 3, 2, 6], domain: [-1, 7.5], tickValues: [-1, 0, 1, 2, 3, 4, 5, 6, 7],
+        xLabel: "Complaints per day", refs: [0.5, 0.8], one: false, probe: { snap: 1, min: 0, max: 7 },
+        onProbe: (I) => {
+          rows.forEach((r, i) => r.classList.toggle("p2-on", xs[i] === I.last));
+          const same = !I.obs && I.last !== null ? `F(${I.last}) = ` : "";
+          ro.set(`$F(${I.x}) = ${same}${I.H}/${I.n} =$ <b>${P2.tr(I.Fx, 4)}</b> &nbsp;&rarr;&nbsp; at most ${I.x} complaint${I.x === 1 ? "" : "s"} on ${I.H} of ${I.n} days`);
+          seg.set(I.x, false);
+        } });
+      const row = QV.controls(el);
+      seg = QV.segmented(row, { label: "Complaints $x$", options: [1, 2, 3, 4].map((v) => [v, String(v)]), value: "none", onChange: (v) => e.probe.set(+v) });
+      ro = QV.readout(row, "$F(x)$ = share of the days with at most $x$ complaints");
+      ro.el.classList.add("p2-wide");
     });
   })();
   </script>
@@ -877,21 +1011,25 @@ plt.ecdf(compl)                                               # step function
 
 <section class="slide">
   <h2>Histogram &ndash; Example</h2>
-  <div class="viz" id="p2-hist-ex" style="height:440px"></div>
-  <p class="fs-xs muted">Histogram &ndash; shoe sizes (class width 2). Each dot at the top is one player; dots with an orange ring lie
-    exactly on a class boundary. Hover over a bar: its players light up.</p>
+  <div class="viz" id="p2-hist-ex" style="height:412px"></div>
+  <p class="hint">Click a bar: its players (dots at the top) light up; an orange ring marks a value on a class boundary. Then switch the bar height.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which class holds the most players? Click the first bar: 7 of 11, area $0.3182 \cdot 2 = 0.6364$.</li>
+    <li>Point at the four ringed dots at 39: they are counted in $[37,39]$, the class on their left.</li>
+    <li>Switch to relative and absolute frequency: the shape stays, but the total area becomes $2$ and $22$ instead of $1$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-hist-ex", (el) => {
       let ro = null;
       const h = P2.hist(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], breaks: [37, 39, 41, 43, 45, 47], xDomain: [36, 48],
-        xLabel: "Shoe size", lane: true, yMax: { density: 0.34, rel: 0.7, abs: 7.6 },
-        onUpdate: (cls, mode) => { if (ro) ro.set(`Total area $= \\sum$ height $\\cdot$ width $=$ <b>${P2.tr(d3.sum(cls, (c) => (mode === "density" ? c.dens : mode === "rel" ? c.f : c.h) * c.w), 4)}</b>`); } });
+        xLabel: "Shoe size", lane: true, select: true, yMax: { density: 0.34, rel: 0.7, abs: 7.6 },
+        onUpdate: (cls, mode, br, c) => { if (ro) ro.set(P2.histText(cls, mode, c, { unit: "players" })); } });
       const row = QV.controls(el);
-      QV.segmented(row, { label: "Bar height", options: [["density", "density $f_j/\\Delta x_j$"], ["rel", "rel. frequency $f_j$"], ["abs", "abs. frequency $h_j$"]],
+      QV.segmented(row, { label: "Bar height", options: [["density", "density $f_j/\\Delta x_j$"], ["rel", "rel. frequency"], ["abs", "abs. frequency"]],
         value: "density", onChange: (m) => h.setMode(m) });
-      QV.spacer(row);
       ro = QV.readout(row, "");
+      ro.el.classList.add("p2-wide");
       h.update(false);
     });
   })();
@@ -939,15 +1077,27 @@ plt.ecdf(compl)                                               # step function
 <section class="slide">
   <h2>Histogram &ndash; Example</h2>
   <div class="viz" id="p2-hist-build" style="height:448px"></div>
-  <p class="fs-xs muted">The five construction steps on the shoe sizes: step through them. The table under the axis fills up row by row.</p>
+  <p class="hint">Click the steps 1 to 5: the table under the axis fills up row by row, then the bars are drawn.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Click step 1: only the dots and the class boundaries. Ask: into which class does 39 go? (The ringed dots belong to the class on their left.)</li>
+    <li>Steps 2 to 4: count $7, 3, 0, 0, 1$; divide by $11$; divide by the class width $2$.</li>
+    <li>Step 5: ask why the first bar is $0.3182$ high and not $0.6364$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-hist-build", (el) => {
+      const STEP = ["", "Define the classes: every value belongs to exactly one class ($39 \\to [37,39]$)",
+        "Count the observations in each class: absolute frequencies $h_j$",
+        "Compute the relative frequencies $f_j = h_j / 11$",
+        "Divide by the class width: density $= f_j / 2$",
+        "Draw the bars: height $=$ density, so area $= f_j$"];
       const h = P2.hist(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39], breaks: [37, 39, 41, 43, 45, 47], xDomain: [36, 48],
         xLabel: "Shoe size", lane: true, rows: true, stage: 5, yMax: { density: 0.34 } });
       const row = QV.controls(el);
+      let ro = null;
       QV.segmented(row, { label: "Step", options: [[1, "1 classes"], [2, "2 count"], [3, "3 rel. frequency"], [4, "4 density"], [5, "5 bars"]],
-        value: 5, onChange: (s) => h.setStage(+s) });
+        value: 5, onChange: (s) => { h.setStage(+s); ro.set(STEP[+s]); } });
+      ro = QV.readout(row, STEP[5]);
     });
   })();
   </script>
@@ -993,40 +1143,36 @@ plt.ecdf(compl)                                               # step function
   <div class="cols" style="--cols: 1fr 1fr; --gap: 24px">
     <div class="p2-small-gap">
       <p class="center fs-xs"><b>Class width 3</b></p>
-      <div class="viz" id="p2-hist-alt3" style="height:430px"></div>
-      <p class="center fs-xs" id="p2-hist-alt3-a"></p>
+      <div class="viz" id="p2-hist-alt3" style="height:372px"></div>
     </div>
     <div class="p2-small-gap">
       <p class="center fs-xs"><b>Unequal class widths</b></p>
-      <div class="viz" id="p2-hist-altu" style="height:430px"></div>
-      <p class="center fs-xs" id="p2-hist-altu-a"></p>
+      <div class="viz" id="p2-hist-altu" style="height:372px"></div>
     </div>
   </div>
-  <div class="viz-ctrl" id="p2-hist-alt-ctrl"></div>
+  <p class="hint">Click a bar to read its area; drag the orange triangles (right chart) to move the class boundaries. The bar-height switch acts on both charts.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: in the right chart, which class holds more players, $(40,41]$ or $(41,46]$? Click both bars: area $0.0909$ each, one player each.</li>
+    <li>Switch the bar height to rel. frequency: the wide class now looks five times as big; the total area is $2$ (left: $3$).</li>
+    <li>Back to density, drag a triangle: the bars change, the total area stays $1$.</li>
+  </ol></aside>
   <script>
   (() => {
     const SHOE = [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39];
-    const H = {};
-    const areaTxt = (id) => (cls, mode) => {
-      const v = (c) => (mode === "density" ? c.dens : mode === "rel" ? c.f : c.h);
-      const A = d3.sum(cls, (c) => v(c) * c.w);
-      const e = document.getElementById(id);
-      if (e) e.innerHTML = P2.texHTML(`total area $= \\sum$ height $\\cdot\\,\\Delta x_j =$ <b>${P2.tr(A, 4)}</b>` + (Math.abs(A - 1) < 1e-9 ? " &check;" : " &ndash; <span class='c-red'>not the shares!</span>"));
+    const H = {}, RO = {}, SEG = {};
+    const setMode = (m) => ["a", "u"].forEach((k) => { if (H[k]) H[k].setMode(m); if (SEG[k]) SEG[k].set(m, false); });
+    const build = (k, el, opts, reset) => {
+      H[k] = P2.hist(el, Object.assign({ data: SHOE, xDomain: [36, 47], xLabel: "Shoe size", yMax: { density: 0.38, rel: 0.95 }, select: true,
+        onUpdate: (cls, mode, br, c) => { if (RO[k]) RO[k].set(P2.histText(cls, mode, c, { unit: "players", short: true })); } }, opts));
+      const row = QV.controls(el);
+      SEG[k] = QV.segmented(row, { label: "Bar height", options: [["density", "density $f_j/\\Delta x_j$"], ["rel", "rel. frequency $f_j$"]], value: "density", onChange: setMode });
+      if (reset) { QV.spacer(row); QV.button(row, "Reset", reset); }
+      RO[k] = QV.readout(row, "");
+      RO[k].el.classList.add("p2-wide");
+      H[k].update(false);
     };
-    QV.mount("#p2-hist-alt3", (el) => {
-      H.a = P2.hist(el, { data: SHOE, breaks: [37, 40, 43, 46], xDomain: [36, 47], xLabel: "Shoe size", yMax: { density: 0.38, rel: 0.95 },
-        onUpdate: areaTxt("p2-hist-alt3-a") });
-    });
-    QV.mount("#p2-hist-altu", (el) => {
-      H.u = P2.hist(el, { data: SHOE, breaks: [37, 39, 40, 41, 46], xDomain: [36, 47], xLabel: "Shoe size", yMax: { density: 0.38, rel: 0.95 },
-        dragBreaks: true, snap: 1, onUpdate: areaTxt("p2-hist-altu-a") });
-      const row = document.getElementById("p2-hist-alt-ctrl");
-      QV.segmented(row, { label: "Bar height (both charts)", options: [["density", "density $f_j/\\Delta x_j$"], ["rel", "rel. frequency $f_j$"]],
-        value: "density", onChange: (m) => { H.a.setMode(m); H.u.setMode(m); } });
-      QV.readout(row, "Drag the orange triangles (right chart) to move the inner class boundaries.");
-      QV.spacer(row);
-      QV.button(row, "Reset", () => H.u.setBreaks([37, 39, 40, 41, 46]));
-    });
+    QV.mount("#p2-hist-alt3", (el) => build("a", el, { breaks: [37, 40, 43, 46] }));
+    QV.mount("#p2-hist-altu", (el) => build("u", el, { breaks: [37, 39, 40, 41, 46], dragBreaks: true, snap: 1 }, () => H.u.setBreaks([37, 39, 40, 41, 46])));
   })();
   </script>
 </section>
@@ -1038,7 +1184,8 @@ plt.ecdf(compl)                                               # step function
       car park. The bar labels are the densities; the last label is missing.</p>
     <div class="cols" style="--cols: 47fr 51fr; --gap: 22px">
       <div class="p2-small-gap">
-        <div class="viz" id="p2-hist-park" style="height:350px"></div>
+        <div class="viz" id="p2-hist-park" style="height:330px"></div>
+        <p class="hint">Reveal the solution task by task with the buttons 1 to 4.</p>
       </div>
       <div>
         <ol class="p2-roomy">
@@ -1054,18 +1201,32 @@ plt.ecdf(compl)                                               # step function
       </div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Give the class time for task 1, then click 1: the areas $0.25$, $0.3$ and $0.3$ appear in the bars.</li>
+    <li>Click 2: the missing area is $1 - 0.85 = 0.15$, so the height is $0.15/6 = 0.025$.</li>
+    <li>Before 3, ask whether the higher bar holds more tickets: the two orange bars have the same area.</li>
+    <li>Click 4: the two bars up to 2 hours add up to $0.55$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-hist-park", (el) => {
-      let solved = false;
+      let st = 0;
+      const shown = (c) => st >= 2 || (st === 1 && c.i < 3);
+      const NOTE = [null,
+        ["1. area = height · width = f", "tickets: h = f · 200", "= 50, 60 and 60"],
+        ["2. f₄ = 1 − 0.85 = 0.15", "h₄ = 0.15 · 200 = 30", "height = 0.15 / 6 = 0.025"],
+        ["3. No: both areas are 0.3,", "that is 60 tickets each.", "(2, 4] is twice as wide."],
+        ["4. Up to 2 hours:", "0.25 + 0.3 = 0.55,", "that is 110 of 200 tickets."]];
       const h = P2.hist(el, { counts: [50, 60, 60, 30], n: 200, breaks: [0, 1, 2, 4, 10], xDomain: [-0.3, 10.3], xLabel: "Parking duration (hours)",
-        labels: true, yMax: { density: 0.35 }, labelSize: 16,
-        labelFmt: (c) => (c.i === 3 && !solved ? "?" : P2.tr(c.dens, 4)),
+        labels: true, yMax: { density: 0.35 }, labelSize: 16, areas: shown,
+        labelFmt: (c) => (c.i === 3 && st < 2 ? "?" : P2.tr(c.dens, 4)),
         areaFmt: (c) => `f = ${P2.tr(c.f, 2)}`,
-        tip: (c) => `<b>${c.i ? "(" : "["}${c.a}, ${c.b}]</b> &nbsp;width ${c.w} h` + (c.i === 3 && !solved ? "<br>height: ?" : `<br>height ${P2.tr(c.dens, 4)}`) +
-          (solved ? `<br>area = ${P2.tr(c.dens, 4)} · ${c.w} = <b>${P2.tr(c.f, 2)}</b> → ${c.h} tickets` : "") });
+        tip: (c) => `<b>${c.i ? "(" : "["}${c.a}, ${c.b}]</b> &nbsp;width ${c.w} h` + (c.i === 3 && st < 2 ? "<br>height: ?" : `<br>height ${P2.tr(c.dens, 4)}`) +
+          (shown(c) ? `<br>area = ${P2.tr(c.dens, 4)} · ${c.w} = <b>${P2.tr(c.f, 2)}</b> → ${c.h} tickets` : "") });
+      const g = h.ch.layer("front").append("g").style("pointer-events", "none");
       const row = QV.controls(el);
-      const b = QV.button(row, "Show the areas (solution)", () => { solved = !solved; h.setAreas(solved); b.setLabel(solved ? "Hide the solution" : "Show the areas (solution)"); });
+      QV.segmented(row, { label: "Solution", options: [[0, "hidden"], [1, "1"], [2, "2"], [3, "3"], [4, "4"]], value: 0,
+        onChange: (v) => { st = +v; h.setHighlight(st === 3 ? [1, 2] : st === 4 ? [0, 1] : null); P2.note(h.ch, g, 4.5, 0.315, NOTE[st]); } });
     });
   })();
   </script>
@@ -1248,7 +1409,8 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
   <h2>Solution (2/2) &ndash; Histogram (Handball Team): Bars and Comparison</h2>
   <div class="cols" style="--cols: 48fr 50fr; --gap: 24px">
     <div class="p2-small-gap">
-      <div class="viz" id="p2-hist-hand" style="height:470px"></div>
+      <div class="viz" id="p2-hist-hand" style="height:412px"></div>
+      <p class="hint">Switch between the two class partitions: the dots stay, the bars change.</p>
     </div>
     <div>
       <p><b>3.</b> Same data, two impressions:</p>
@@ -1267,15 +1429,26 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
         partition.</p></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what will the histogram look like if every boundary moves one size to the right? Then click the second partition.</li>
+    <li>Follow the four dots at 39: they leave the three 40s and join 37 and 38, so the first bar becomes the highest.</li>
+    <li>Switch back and forth: peak at $(38,40]$ or falling bars, from the same 13 values.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-hist-hand", (el) => {
       const B1 = [36, 38, 40, 42, 44, 46], B2 = [37, 39, 41, 43, 45, 47];
+      const SHAPE = { a: "the bars rise to a peak at $(38,40]$ and then fall", b: "the bars fall from the first class on" };
+      let ro = null, cur = "a";
       const h = P2.hist(el, { data: [40, 39, 38, 41, 46, 39, 39, 38, 37, 40, 39, 40, 42], breaks: B1, xDomain: [35.5, 47.5], xLabel: "Shoe size",
-        lane: true, labels: true, yMax: { density: 0.3 }, labelFmt: (c) => (c.dens > 0 ? P2.tr(c.dens, 4) : "0") });
+        lane: true, labels: true, yMax: { density: 0.3 }, labelFmt: (c) => (c.dens > 0 ? P2.tr(c.dens, 4) : "0"),
+        onUpdate: (cls) => { if (ro) ro.set(`Counts $${cls.map((c) => c.h).join(", ")}$: ${SHAPE[cur]}`); } });
       const row = QV.controls(el);
       QV.segmented(row, { label: "Classes", options: [["a", "$[36,38], (38,40], \\ldots$"], ["b", "$[37,39], (39,41], \\ldots$"]], value: "a",
-        onChange: (v) => h.setBreaks(v === "a" ? B1 : B2) });
+        onChange: (v) => { cur = v; h.setBreaks(v === "a" ? B1 : B2); } });
+      ro = QV.readout(row, "");
+      ro.el.classList.add("p2-wide");
+      h.update(false);
     });
   })();
   </script>
@@ -1337,18 +1510,25 @@ pd.Series(cls).value_counts(normalize=True, sort=False)   # 0.6364 0.2727 0 0 0.
         e.g.&nbsp;$0.015 \cdot 20 = 0.3$; all areas add up to $1$.</p>
     </div>
     <div class="p2-small-gap">
-      <div class="viz" id="p2-hist-phone" style="height:460px"></div>
+      <div class="viz" id="p2-hist-phone" style="height:428px"></div>
+      <p class="hint">Show the areas, then switch the bar height to $f_j$ (wrong) and compare them.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which class is the most densely populated? The dots lie closest in $(10,20]$; its bar is the highest ($0.04$).</li>
+    <li>Show the areas: $0.2$, $0.4$, $0.3$, $0.1$, the shares $f_j$.</li>
+    <li>Switch the height to $f_j$: $(20,40]$ now has the area $6$, more than $(10,20]$ with $4$, although it holds fewer students.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-hist-phone", (el) => {
-      let ro = null;
+      let ro = null, on = false;
       const h = P2.hist(el, { data: [12, 25, 6, 38, 15, 60, 9, 19, 32, 18], breaks: [0, 10, 20, 40, 80], xDomain: [-2, 82], xLabel: "Monthly costs (EUR)",
-        labels: true, yMax: { density: 0.046, rel: 0.48 },
-        onUpdate: (cls, mode) => { if (ro) ro.set(`total area <b>${P2.tr(d3.sum(cls, (c) => (mode === "density" ? c.dens : c.f) * c.w), 4)}</b>`); } });
+        labels: true, lane: true, yMax: { density: 0.046, rel: 0.48 }, areas: () => on,
+        onUpdate: (cls, mode) => { if (ro) ro.set(P2.histText(cls, mode, null)); } });
       const row = QV.controls(el);
       QV.segmented(row, { label: "Height", options: [["density", "density"], ["rel", "$f_j$ (wrong)"]], value: "density", onChange: (m) => h.setMode(m) });
+      const b = QV.button(row, "Show areas", () => { on = !on; b.setLabel(on ? "Hide areas" : "Show areas"); h.update(false); });
       QV.spacer(row);
       ro = QV.readout(row, "");
       h.update(false);
@@ -1409,7 +1589,12 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
 <section class="slide">
   <h2>Boxplot</h2>
   <div class="viz" id="p2-box-clean" style="height:420px"></div>
-  <p class="fs-xs muted">Boxplot of the shoe sizes. Hover over the box for the exact values; switch on the raw data or the bounds.</p>
+  <p class="hint">Boxplot of the shoe sizes: hover over the box for the exact values; switch on the raw data or the bounds.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: what do the box, the line in it and the single point stand for?</li>
+    <li>Switch on the raw data: 11 players, the box holds the middle ones from $38$ to $40$.</li>
+    <li>Switch on the bounds $35$ and $43$: $46$ lies outside and is drawn as a point.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-clean", (el) => {
@@ -1426,8 +1611,13 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
 <section class="slide">
   <h2>Boxplot &ndash; with Labels</h2>
   <div class="viz" id="p2-box-lab" style="height:410px"></div>
-  <p class="fs-xs muted">Drag the outlier (red point) along the axis &ndash; below the upper bound $43$ it becomes the new upper whisker.
+  <p class="hint">Drag the outlier (orange point) along the axis &ndash; below the upper bound $43$ it becomes the new upper whisker.
     The slider changes the whisker factor $k$.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: why is $46$ an outlier, but $41$ is not? Switch on the bounds: $35$ and $43$.</li>
+    <li>Drag the $46$ to $43$: it becomes the upper whisker; at $44$ it is an outlier again.</li>
+    <li>Reset, then set $k = 3$: the upper bound is $40 + 3 \cdot 2 = 46$, so there is no outlier.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-lab", (el) => {
@@ -1469,6 +1659,11 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
       <div class="viz" id="p2-bx-build" style="height:300px"></div>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Before each click, ask for the next value, e.g. at which position the median of 11 sorted values lies (position 6: $39$).</li>
+    <li>Steps 5 and 6: ask why the whiskers end at $37$ and $41$, not at the bounds $35$ and $43$.</li>
+    <li>Step 7: $46 &gt; 43$, an outlier.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-bx-build", (el) => {
@@ -1543,6 +1738,7 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
       QV.button(row, "&#9664; Back", () => { step = Math.max(0, step - 1); render(); });
       QV.button(row, "Next step &#9654;", () => { step = Math.min(8, step + 1); render(); }, { primary: true });
       QV.button(row, "Reset", () => { step = 0; render(); });
+      QV.readout(row, "<span class='hint'>Build the boxplot step by step.</span>");
       QV.spacer(row);
       const readout = QV.readout(row, "");
       render();
@@ -1730,6 +1926,11 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
         <b>bottom</b>: the lower whisker stops at $12$, not at the minimum $4$.</p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how large would the revenue of day 10 have to be so that it is no outlier? (At least $5.5$.)</li>
+    <li>Drag the point to $6$: it becomes the lower whisker.</li>
+    <li>Drag it back to $4$: with $6$ complaints on that day, check the cause before deleting anything.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-rev", (el) => {
@@ -1745,7 +1946,7 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
         handleTip: (d, v) => `day 10: revenue ${T(v)}, complaints 6<br>drag along the axis`,
         margin: { top: 10, bottom: 46 } });
       const row = QV.controls(el);
-      QV.readout(row, "Drag day&nbsp;10 (red point).");
+      QV.readout(row, "<span class='hint'>Drag day&nbsp;10 (orange point) along the axis.</span>");
       QV.spacer(row);
       QV.button(row, "Reset", () => b.reset());
     });
@@ -1811,7 +2012,12 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
 <section class="slide">
   <h2>Boxplot &ndash; with Labels</h2>
   <div class="viz" id="p2-box-lab2" style="height:430px"></div>
-  <p class="fs-xs muted">Switch on the lengths: both box halves and both whiskers are $1$ long &ndash; only the outlier breaks the symmetry.</p>
+  <p class="hint">Switch on the lengths and compare the two box halves and the two whiskers; then show the bounds.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: is this distribution symmetric? Which lengths would you compare?</li>
+    <li>Switch on the lengths: both box halves and both whiskers are $1$ long.</li>
+    <li>Only the outlier breaks the symmetry; switch on the bounds: $46 &gt; 43$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-lab2", (el) => {
@@ -1919,11 +2125,17 @@ density_hist(costs, breaks)              # bars (function from "with Our Classes
       </tbody>
     </table></div>
     <div class="p2-small-gap">
-      <div class="viz" id="p2-box-teams" style="height:410px"></div>
+      <div class="viz" id="p2-box-teams" style="height:390px"></div>
+      <p class="hint">Drag the outlier of Team&nbsp;A (orange point); switch on the raw data or the bounds.</p>
     </div>
   </div>
   <p class="fs-s">Common axis: box from $x_{0.25}$ to $x_{0.75}$, line at the median,
     whiskers to the lower and upper whisker, outliers as single points.</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which team is faster, which works more evenly? Team A: median $7$ against $11$, IQR $3$ against $6$.</li>
+    <li>Switch on the bounds: the upper bound of Team A is $13.5$, so $18$ is an outlier (the other bounds lie outside the axis).</li>
+    <li>Drag the $18$ to $13$: it becomes the upper whisker.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-teams", (el) => {
@@ -2169,6 +2381,11 @@ ax.set_yticks([1, 2], ["Team A", "Team B"])
       <p class="p2-mini" id="p2-ecdf-bh-read"></p>
     </div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how do you read the median off the step function? Go right from $0.5$ to the step, then down: $168$.</li>
+    <li>Click $0.25$ and $0.75$: $162$ and $175$; the line below the block shows the position rule.</li>
+    <li>Drag the handle slowly from $0.5$ to $0.66$: the quantile stays $168$, because $F$ jumps over these heights there.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-ecdf-bh", (el) => {
@@ -2179,7 +2396,7 @@ ax.set_yticks([1, 2], ["Team A", "Team B"])
         onP: (i, I) => { out.innerHTML = P2.texHTML(`Marker: $p = ${P2.tr(I.p, 2)}$, $\\lceil 15 \\cdot ${P2.tr(I.p, 2)} \\rceil = ${I.pos}$, $F(${I.xp}) = ${I.H}/15 \\ge ${P2.tr(I.p, 2)}$ $\\Rightarrow x_{${P2.tr(I.p, 2)}} = ${I.xp}$`); } });
       const row = QV.controls(el);
       QV.segmented(row, { label: "$p$", options: [[0.17, "0.17"], [0.25, "0.25"], [0.5, "0.5"], [0.75, "0.75"]], value: 0.5, onChange: (p) => e.setP(0, +p) });
-      QV.readout(row, "or drag the red handle");
+      QV.readout(row, "<span class='hint'>Pick $p$ or drag the orange handle.</span>");
     });
   })();
   </script>
@@ -2207,21 +2424,26 @@ ax.set_yticks([1, 2], ["Team A", "Team B"])
 
 <section class="slide">
   <h2>Exercise: Body Heights &ndash; Histogram (Class Width 10&thinsp;cm)</h2>
-  <div class="viz" id="p2-hist-bh" style="height:452px"></div>
-  <p class="fs-xs muted">Each dot at the top is one person (orange ring: on a class boundary). Change the class width and compare the shapes.</p>
+  <div class="viz" id="p2-hist-bh" style="height:424px"></div>
+  <p class="hint">Change the class width and compare the shapes; click a bar to see its persons (orange ring = exactly on a class boundary).</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: how does the picture change with classes of 5 or 20 cm instead of 10 cm? Click 5, then 20.</li>
+    <li>Width 5: many low and empty bars; width 20: only three bars, the gap at $(180,190]$ disappears.</li>
+    <li>Back to 10: click the bar over $(160,170]$: 7 of 15 persons, area $0.4667$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-hist-bh", (el) => {
       const H = [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168];
       const br = (w) => { const out = [150]; while (out[out.length - 1] < 198) out.push(out[out.length - 1] + w); return out; };
       let ro = null;
-      const h = P2.hist(el, { data: H, breaks: br(10), xDomain: [147, 203], autoDomain: 3, xLabel: "Body height (cm)", lane: true, yMax: { density: 0.052 },
-        onUpdate: (cls) => { if (ro) ro.set(`${cls.length} classes · counts ${cls.map((c) => c.h).join(", ")}`); } });
+      const h = P2.hist(el, { data: H, breaks: br(10), xDomain: [147, 203], autoDomain: 3, xLabel: "Body height (cm)", lane: true, select: true, yMax: { density: 0.052 },
+        onUpdate: (cls, mode, b, c) => { if (ro) ro.set(`${cls.length} classes &nbsp;&middot;&nbsp; counts ${cls.map((k) => k.h).join(", ")}` + (c ? ` &nbsp;&middot;&nbsp; ${P2.histText(cls, mode, c, { unit: "persons", total: false })}` : "")); } });
       const row = QV.controls(el);
       QV.segmented(row, { label: "Class width (cm)", options: [[5, "5"], [10, "10"], [15, "15"], [20, "20"], [25, "25"]], value: 10, onChange: (w) => h.setBreaks(br(+w)) });
       QV.segmented(row, { label: "Height", options: [["density", "density"], ["abs", "abs. frequency"]], value: "density", onChange: (m) => h.setMode(m) });
-      QV.spacer(row);
       ro = QV.readout(row, "");
+      ro.el.classList.add("p2-wide");
       h.update(false);
     });
   })();
@@ -2231,7 +2453,12 @@ ax.set_yticks([1, 2], ["Team A", "Team B"])
 <section class="slide">
   <h2>Exercise: Body Heights &ndash; Boxplot</h2>
   <div class="viz" id="p2-box-bh" style="height:440px"></div>
-  <p class="fs-xs muted">Hover over the box for the values; switch on the raw data and the bounds $142.5$ and $194.5$; drag the outlier $198$.</p>
+  <p class="hint">Hover over the box for the values; switch on the raw data and the bounds $142.5$ and $194.5$; drag the outlier $198$ (orange point).</p>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: which five values does the box with its whiskers show? Hover over it: $151$, $162$, $168$, $175$, $192$.</li>
+    <li>Switch on the bounds $142.5$ and $194.5$: only $198$ lies outside.</li>
+    <li>Drag the $198$ to $194$: it becomes the upper whisker.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-bh", (el) => {
@@ -2288,16 +2515,22 @@ ax.set_yticks([1, 2], ["Team A", "Team B"])
       <p>Classifying the data simplifies the picture but
         <b>loses information</b> within the classes.</p></div>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Ask: where does each step function reach the dashed line at $0.5$? Raw data: at $168$; classified: at $165$.</li>
+    <li>Move the pointer to $x = 166$: raw $F = 0.4667$, classified $F = 0.6667$.</li>
+    <li>Count the steps: $10$ against $4$ &ndash; the information within the classes is lost.</li>
+  </ol></aside>
   <script>
   (() => {
     const RAW = [164, 162, 168, 198, 166, 166, 192, 160, 151, 175, 180, 160, 168, 175, 168];
     const CLS = [155, 155, 155, 165, 165, 165, 165, 165, 165, 165, 175, 175, 175, 195, 195];
     const E = {};
     let ro = null;
+    const HINT = "<span class='hint'>Hover over either chart: the crosshair is linked.</span>";
     const link = (src) => (x) => {
       const other = src === "raw" ? E.cls : E.raw;
       if (!other) return;
-      if (x === null) { other.hideX(); if (ro) ro.set("Hover over either chart: the crosshair is linked."); return; }
+      if (x === null) { other.hideX(); if (ro) ro.set(HINT); return; }
       other.showX(x);
       if (ro) ro.set(`$x = ${P2.tr(x, 1)}$: &nbsp; raw $F(x) = ${P2.tr(E.raw.F(x), 4)}$ &nbsp;&middot;&nbsp; classified $F(x) = ${P2.tr(E.cls.F(x), 4)}$`);
     };
@@ -2305,7 +2538,7 @@ ax.set_yticks([1, 2], ["Team A", "Team B"])
     QV.mount("#p2-ecdf-raw", (el) => { E.raw = P2.ecdf(el, Object.assign({ data: RAW, onHover: link("raw") }, opts)); });
     QV.mount("#p2-ecdf-cls", (el) => {
       E.cls = P2.ecdf(el, Object.assign({ data: CLS, onHover: link("cls") }, opts));
-      ro = QV.readout(document.getElementById("p2-ecdf-cmp-ctrl"), "Hover over either chart: the crosshair is linked.");
+      ro = QV.readout(document.getElementById("p2-ecdf-cmp-ctrl"), HINT);
     });
   })();
   </script>
@@ -2336,6 +2569,7 @@ np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 16
   <h2>Exercise &ndash; Caf&eacute; Chain (Exam Style): Reading a Boxplot</h2>
   <div class="block"><h4>Problem statement (Part A): boxplot of the $n = 60$ daily revenues of a caf&eacute;</h4>
     <div class="viz" id="p2-box-cafe" style="height:290px"></div>
+    <p class="hint">Move the pointer over the chart: a reading line shows the value on the axis.</p>
     <ol>
       <li>Read off the median, $Q_1$, $Q_3$ and the whisker ends; compute the IQR.</li>
       <li>On at least how many days was the revenue at most 2800 EUR?</li>
@@ -2344,6 +2578,11 @@ np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 16
       <li>Assess the skewness. Is the mean above or below the median?</li>
     </ol>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Let the students read off the five values on their own first (one thin grid line = 100 EUR).</li>
+    <li>To check a reading, move the pointer onto a box edge or a whisker end: the reading line shows the axis value.</li>
+    <li>The figure gives no values away; the solution follows on the next slides.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-cafe", (el) => {
@@ -2361,7 +2600,10 @@ np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 16
     <p><b>B:</b> Histogram of the values (in EUR) of $n = 50$ orders; the bar
       labels are the densities.</p>
     <div class="cols" style="--cols: 46fr 51fr; --gap: 22px">
-      <div class="viz" id="p2-hist-cafe" style="height:290px"></div>
+      <div class="p2-small-gap">
+        <div class="viz" id="p2-hist-cafe" style="height:248px"></div>
+        <p class="hint">Reveal the solution task by task with the buttons 5 to 7.</p>
+      </div>
       <ol start="5">
         <li>Determine the relative frequency and the number of orders of
           every class.</li>
@@ -2378,12 +2620,29 @@ np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 16
         $1.5 \cdot \text{IQR}$ rule? Which measure would you report?</li>
     </ol>
   </div>
+  <aside class="notes" data-demo><ol>
+    <li>Let the class work on tasks 5 to 7 first; the starting state shows only the densities.</li>
+    <li>Click 5: the areas $0.2$, $0.3$, $0.4$, $0.1$ appear in the bars.</li>
+    <li>Click 6: the orange bar $(10,20]$ holds the most orders, although the bar over $(5,10]$ is higher.</li>
+    <li>Click 7: the two orange bars give $0.4 + 0.1 = 0.5$.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-hist-cafe", (el) => {
-      P2.hist(el, { counts: [10, 15, 20, 5], n: 50, breaks: [0, 5, 10, 20, 40], xDomain: [-1.5, 41], xLabel: "Order value (EUR)",
+      let st = 0;
+      const NOTE = { 0: null,
+        5: ["5. f = height · width:", "0.2, 0.3, 0.4, 0.1", "h = f · 50 = 10, 15, 20, 5"],
+        6: ["6. Most orders: (10, 20]", "with 20 orders (40 %).", "Highest bar: (5, 10]."],
+        7: ["7. More than 10 EUR:", "0.4 + 0.1 = 0.5,", "that is 25 of 50 orders."] };
+      const h = P2.hist(el, { counts: [10, 15, 20, 5], n: 50, breaks: [0, 5, 10, 20, 40], xDomain: [-1.5, 41], xLabel: "Order value (EUR)",
         labels: true, labelSize: 16, yMax: { density: 0.072 }, yLabels: { density: "Density" }, yTicks: 4, margin: { bottom: 44 },
-        tip: (c) => `<b>${c.i ? "(" : "["}${c.a}, ${c.b}]</b> &nbsp;width ${c.w}<br>height ${P2.tr(c.dens, 4)}` });
+        areas: () => st >= 5, areaFmt: (c) => `f = ${P2.tr(c.f, 2)}`,
+        tip: (c) => `<b>${c.i ? "(" : "["}${c.a}, ${c.b}]</b> &nbsp;width ${c.w}<br>height ${P2.tr(c.dens, 4)}` +
+          (st >= 5 ? `<br>area = ${P2.tr(c.dens, 4)} · ${c.w} = <b>${P2.tr(c.f, 2)}</b> → ${c.h} orders` : "") });
+      const g = h.ch.layer("front").append("g").style("pointer-events", "none");
+      const row = QV.controls(el);
+      QV.segmented(row, { label: "Solution", options: [[0, "hidden"], [5, "5"], [6, "6"], [7, "7"]], value: 0,
+        onChange: (v) => { st = +v; h.setHighlight(st === 6 ? [2] : st === 7 ? [2, 3] : null); P2.note(h.ch, g, 21, 0.064, NOTE[st]); } });
     });
   })();
   </script>
@@ -2400,6 +2659,11 @@ np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 16
       $\text{IQR} = 36 - 24 = \mathbf{12}$: the middle $50\,\%$ of the days
       lie within a range of 1200 EUR.</li>
   </ol>
+  <aside class="notes" data-demo><ol>
+    <li>Collect the students' readings first, then hover over the box: $15$, $24$, $28$, $36$, $50$.</li>
+    <li>Point at the fences $6$ and $54$: $62 &gt; 54$, so it is drawn as a point.</li>
+    <li>Switch the fences off and on: the whisker ends at $50$, the largest value inside the fence, not at the fence.</li>
+  </ol></aside>
   <script>
   (() => {
     QV.mount("#p2-box-cafe2", (el) => {
@@ -2411,7 +2675,7 @@ np.quantile(classified, 0.5, method="inverted_cdf")      # 165 (exact median: 16
           text: { med: (s) => [`Median ${T(s.median)}`], out: (s, v) => [`Outlier ${T(v)}`] } } });
       const row = QV.controls(el);
       QV.segmented(row, { label: "Fences $Q_1 - 1.5\\,\\text{IQR}$ and $Q_3 + 1.5\\,\\text{IQR}$", options: [[0, "off"], [1, "on"]], value: 1, onChange: (v) => b.set("fences", +v === 1) });
-      QV.readout(row, "Hover over the box for all values.");
+      QV.readout(row, "<span class='hint'>Hover over the box for all values.</span>");
     });
   })();
   </script>
